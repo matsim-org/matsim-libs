@@ -22,9 +22,9 @@ package playground.johannes.gsv.synPop.mid;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainEpisode;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.PlainSegment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -114,8 +114,8 @@ public class TXTReader {
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
 			PlainPerson person = persons.get(id);
-			
-			PlainElement leg = new PlainElement();
+
+			PlainSegment leg = new PlainSegment();
 			for(LegAttributeHandler handler : legAttHandlers)
 				handler.handle(leg, attributes);
 			
@@ -153,8 +153,8 @@ public class TXTReader {
 			}
 			
 			person.addEpisode(plan);
-			
-			PlainElement leg = new PlainElement();
+
+			PlainSegment leg = new PlainSegment();
 			plan.addLeg(leg);
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, ActivityType.HOME);
 			for(LegAttributeHandler handler : journeyAttHandlers) {

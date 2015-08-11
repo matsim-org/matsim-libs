@@ -72,11 +72,11 @@ public class XMLWriter extends MatsimXmlWriter {
 		writeEndTag(Constants.PLAN_TAG);
 	}
 
-	private void writeActivity(Element activity) {
+	private void writeActivity(Attributable activity) {
 		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(((PlainElement)activity).getAttributes()), true);
 	}
 
-	private void writeLeg(Element leg) {
+	private void writeLeg(Attributable leg) {
 		writeStartTag(Constants.LEG_TAG, getAttributes(((PlainElement)leg).getAttributes()), true);
 	}
 

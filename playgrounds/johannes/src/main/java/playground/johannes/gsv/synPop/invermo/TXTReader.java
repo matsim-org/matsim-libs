@@ -118,7 +118,7 @@ public class TXTReader {
 			String id = attributes.get(ColumnKeys.HOUSEHOLD_ID);
 			PlainElement household = households.get(id);
 			if(household == null) {
-				household = new PlainElement();
+				household = new Household();
 				households.put(id, household);
 			}
 			
@@ -128,6 +128,10 @@ public class TXTReader {
 			
 		}
 		
+	}
+
+	private class Household extends PlainElement {
+
 	}
 	private class PersonRowHandler extends RowHandler {
 		

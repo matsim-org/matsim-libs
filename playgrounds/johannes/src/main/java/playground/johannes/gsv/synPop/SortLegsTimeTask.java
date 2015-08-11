@@ -1,8 +1,8 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -14,11 +14,11 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 	
 	@Override
 	public void apply(Episode plan) {
-		SortedMap<Double, Element> map = new TreeMap<Double, Element>();
+		SortedMap<Double, Segment> map = new TreeMap<Double, Segment>();
 		/*
 		 * Insert leg according to start time or end time, respectively.
 		 */
-		for(Element leg : plan.getLegs()) {
+		for(Segment leg : plan.getLegs()) {
 			String val = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			Double time = null;
 			if(val == null) {
@@ -38,7 +38,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 		 * Check for overlapping legs.
 		 */
 		double prevEnd = 0;
-		for(Entry<Double, Element> entry : map.entrySet()) {
+		for(Entry<Double, Segment> entry : map.entrySet()) {
 			String startStr = entry.getValue().getAttribute(CommonKeys.LEG_START_TIME);
 			if(startStr != null) {
 				double start = Double.parseDouble(startStr);
@@ -58,7 +58,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 		 * Clear old legs an insert sorted legs.
 		 */
 		plan.getLegs().clear();
-		for(Entry<Double, Element> entry : map.entrySet()) {
+		for(Entry<Double, Segment> entry : map.entrySet()) {
 			plan.getLegs().add(entry.getValue());
 		}
 

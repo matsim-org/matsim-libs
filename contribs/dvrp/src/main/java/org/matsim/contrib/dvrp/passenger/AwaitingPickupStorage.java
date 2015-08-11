@@ -25,19 +25,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Request;
 
 
-class AwaitingPickupStorage
+public class AwaitingPickupStorage
 {
     //passenger's request id -> driver's stay task
     private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
 
 
-    void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
+    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
     {
         awaitingPickups.put(request.getId(), pickupActivity);
     }
 
 
-    PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
+    public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
     {
         return awaitingPickups.remove(request.getId());
     }

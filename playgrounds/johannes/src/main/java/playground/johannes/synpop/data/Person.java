@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public interface Person extends Element {
+public interface Person extends Attributable {
 
     public List<Episode> getEpisodes();
 

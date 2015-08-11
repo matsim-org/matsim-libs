@@ -20,7 +20,7 @@
 package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.sna.util.Composite;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -30,10 +30,10 @@ import playground.johannes.synpop.data.PlainPerson;
 public class PredicateORComposite extends Composite<Predicate> implements Predicate {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.matrices.Predicate#test(playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement)
+	 * @see playground.johannes.gsv.matrices.LegPredicate#test(playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement)
 	 */
 	@Override
-	public boolean test(PlainPerson person, Element leg, Element prev, Element next) {
+	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
 		for(Predicate p : components) {
 			if(p.test(person, leg, prev, next)) {
 				return true;

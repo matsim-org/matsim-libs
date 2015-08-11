@@ -29,7 +29,7 @@ public interface ActivityType {
 
 	public static final String WORK = "work";
 	
-	public static final String BUISINESS = "buisiness";
+	public static final String BUSINESS = "buisiness";
 	
 	public static final String LEISURE = "leisure";
 	
@@ -38,5 +38,9 @@ public interface ActivityType {
 	public static final String SHOP = "shop";
 	
 	public static final String MISC = "misc";
+
+	String VACATIONS_SHORT = "vacations_short";
+
+	String VACATIONS_LONG = "vacations_long";
 	
 }

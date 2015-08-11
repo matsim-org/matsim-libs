@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -33,7 +33,7 @@ public class SetMissingActTypes implements ProxyPlanTask {
 
 	@Override
 	public void apply(Episode plan) {
-		for(Element act : plan.getActivities()) {
+		for(Attributable act : plan.getActivities()) {
 			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE) == null) {
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.LEISURE);
 			}

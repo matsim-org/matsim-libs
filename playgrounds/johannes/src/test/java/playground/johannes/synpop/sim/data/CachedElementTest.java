@@ -21,8 +21,8 @@ package playground.johannes.synpop.sim.data;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.PlainSegment;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.synpop.data.PlainElement;
 public class CachedElementTest extends TestCase {
 
     public void testSynchronization() {
-        Element e = new PlainElement();
+        Attributable e = new PlainSegment();
 
         String plainKey = "key";
         String plainValue = "1.2";

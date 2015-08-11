@@ -26,7 +26,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -64,7 +64,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 			double sumDur = 0;
 			for(PlainPerson person : persons) {
 				Episode plan = person.getPlan();
-				for(Element leg : plan.getLegs()) {
+				for(Attributable leg : plan.getLegs()) {
 					if(mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					String distVal = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);

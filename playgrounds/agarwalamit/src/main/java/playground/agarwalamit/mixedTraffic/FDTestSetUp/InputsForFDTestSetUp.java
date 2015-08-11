@@ -18,13 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -33,25 +30,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -149,10 +135,11 @@ public class InputsForFDTestSetUp {
 		}
 		//additional startNode and endNode for home and work activities
 		Coord coord = scenario.createCoord(-50.0, 0.0);
-		Node startNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId(-1), coord);
+		Node startNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId("home"), coord);
 		network.addNode(startNode);
+		
 		coord = scenario.createCoord(LINK_LENGTH+50.0, 0.0);
-		Id<Node> endNodeId = Id.createNodeId(3*SUBDIVISION_FACTOR);
+		Id<Node> endNodeId = Id.createNodeId("work");
 		Node endNode = scenario.getNetwork().getFactory().createNode(endNodeId, coord);
 		network.addNode(endNode);
 
@@ -181,14 +168,15 @@ public class InputsForFDTestSetUp {
 			network.addLink(link);
 		}
 		//additional startLink and endLink for home and work activities
-		Id<Link> startLinkId = Id.createLinkId(-1);
+		Id<Link> startLinkId = Id.createLinkId("home");
 		Link startLink = scenario.getNetwork().getFactory().createLink(startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
 		startLink.setCapacity(capMax);
 		startLink.setFreespeed(FREESPEED);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
 		network.addLink(startLink);
-		Id<Link> endLinkId = Id.createLinkId(3*SUBDIVISION_FACTOR);
+		
+		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
 		endLink.setCapacity(capMax);
 		endLink.setFreespeed(FREESPEED);
@@ -206,88 +194,18 @@ public class InputsForFDTestSetUp {
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
 			vehicleType.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(GenerateFundamentalDiagramData.TRAVELMODES[i]));
 			vehicleType.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(GenerateFundamentalDiagramData.TRAVELMODES[i]));
-			VehicleCapacity cap = new VehicleCapacityImpl();
-			cap.setSeats(3);//this is default for now, could be improved with mode-dependent vehicle capacity
-			vehicleType.setCapacity(cap);
 			TravelModesFlowDynamicsUpdator modeData = new TravelModesFlowDynamicsUpdator(vehicleType);
 			vehicle2TravelModesData.put(modeId, modeData);
 		}
 	}
 
-	/**
-	 * @param agentDistribution
-	 * number of vehicles for each vehicle type
-	 * @param gapInSecond
-	 */
-	void createWantedPopulation(List<Integer> agentDistribution, int gapInSecond){
-		GenerateFundamentalDiagramData.log.info("==========Creating population=========");
-		Population population = scenario.getPopulation();
-
-		population.getPersons().clear();
-
-		for (int i=0; i<agentDistribution.size(); i++){
-			createAndAddPersonToPopulation(agentDistribution.get(i), GenerateFundamentalDiagramData.TRAVELMODES[i]);
-		}
-		if(GenerateFundamentalDiagramData.writeInputFiles) new PopulationWriter(population,scenario.getNetwork()).write(outputFolder+"/plans.xml.gz");
-	}
-
-	/**
-	 * @param numberOfAgentOfVehicleType
-	 * @param travelMode
-	 * <p>
-	 * Each agent will leave home randomly in first 15 minutes of simulation.
-	 */
-	private void createAndAddPersonToPopulation(int numberOfAgentOfVehicleType, String travelMode){
-		Population population = scenario.getPopulation();
-		for (long i = 0; i<numberOfAgentOfVehicleType; i++){
-			int numberOfExistingPersonInPopulation = population.getPersons().size();
-			Person person = population.getFactory().createPerson(Id.createPersonId(numberOfExistingPersonInPopulation+1));
-			//			Map<String, Object> customMap = person.getCustomAttributes();
-
-			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHome());
-
-			//			customMap.put("transportMode", travelMode);
-			Leg leg = population.getFactory().createLeg(travelMode);
-
-			final Id<Link> startLinkId = Id.createLinkId(-1);
-			final Id<Link> endLinkId = Id.createLinkId(3*SUBDIVISION_FACTOR);
-			List<Id<Link>> routeDescription = new ArrayList<Id<Link>>();
-			for (long k=0; k<3*SUBDIVISION_FACTOR;k++){
-				routeDescription.add(Id.createLinkId(k));
-			}
-			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
-			route.setLinkIds(startLinkId, routeDescription, endLinkId);
-			leg.setRoute(route);
-
-			plan.addLeg(leg);
-			plan.addActivity(createWork());
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-	}
+	
 	Scenario getScenario(){
 		return scenario;
 	}
 	
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
-	}
-	
-	private Activity createHome(){
-		Id<Link> homeLinkId = Id.createLinkId(-1);
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
-		Random r = new Random();
-		double endTime = r.nextDouble() * 900; 
-		activity.setEndTime(endTime);
-		return activity;
-	}
-
-	private Activity createWork(){
-		Id<Link> workLinkId = Id.createLinkId(3*SUBDIVISION_FACTOR);
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
-		return activity;
 	}
 
 	private double calculateLength(Node from, Node to){

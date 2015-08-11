@@ -73,8 +73,9 @@ public class EquilNetworkControler {
 	private static final String equilRoadTypeMapping = "./equil/input/roadTypeMapping.txt";
 	
 	private final String [] mainModes = {"car","truck"};
-	private final double fractionOfTrucks = 0.2;
-	private static final String outputDir = "./equil/output/carTruck/";
+	private final double fractionOfTrucks = 0.00; //0.2
+	private static final double maxLinkSpeed_kph = 30.; // default is 100 kph
+	private static final String outputDir = "./equil/output/allCar_"+(int)maxLinkSpeed_kph+"/";
 
 	public static void main(String[] args) {
 
@@ -124,6 +125,7 @@ public class EquilNetworkControler {
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(equilNetwork_raw);
 		Network net = sc.getNetwork();
 		for(Link l :sc.getNetwork().getLinks().values()){
+			l.setFreespeed(maxLinkSpeed_kph/3.6);
 			((LinkImpl) l).setType("5");
 			net.addLink(l);
 		}
@@ -132,7 +134,7 @@ public class EquilNetworkControler {
 		BufferedWriter writer = IOUtils.getBufferedWriter(equilRoadTypeMapping);
 		try {
 			writer.write("VISUM_RT_NR" + ";" + "VISUM_RT_NAME" + ";"+ "HBEFA_RT_NAME" + "\n");
-			writer.write("5;;URB/Trunk-Nat./80");
+			writer.write("5;;URB/Trunk-Nat./80"); //need to have here more road types for vehicle variation
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in file. Reason: "
@@ -206,7 +208,7 @@ public class EquilNetworkControler {
 
 		for(int i = 1; i <= noOfCar+noOfTrucks; i++){
 			String mode ;
-			if(i<3200) mode = mainModes[0];
+			if(i<=noOfCar) mode = mainModes[0];
 			else mode = mainModes[1];
 			
 			Person p = popFactory.createPerson(Id.createPersonId(mode+"_"+i));
@@ -244,7 +246,7 @@ public class EquilNetworkControler {
 
 		//create config parameters
 		sc.getConfig().qsim().setStartTime(00*3600); //  start time 0 --> start with earliest activity
-		sc.getConfig().qsim().setEndTime(00*3600); //  end time 0 --> run as long as a vehicle is active
+		sc.getConfig().qsim().setEndTime(24*3600); //  end time 0 --> run as long as a vehicle is active but throws exception during time bin calculation.
 		sc.getConfig().qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
 		sc.getConfig().controler().setFirstIteration(0);

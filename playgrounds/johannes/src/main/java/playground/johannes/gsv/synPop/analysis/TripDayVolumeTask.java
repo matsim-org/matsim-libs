@@ -23,7 +23,7 @@ import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -51,7 +51,7 @@ public class TripDayVolumeTask extends AnalyzerTask {
 			for(Episode plan : person.getEpisodes()) {
 				
 				int cnt = 0;
-				for(Element leg : plan.getLegs()) {
+				for(Attributable leg : plan.getLegs()) {
 					if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 						cnt++;
 					}

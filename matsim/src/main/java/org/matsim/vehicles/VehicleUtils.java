@@ -31,6 +31,12 @@ public class VehicleUtils {
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 
+	static {
+		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
+		capacity.setSeats(4);
+		DEFAULT_VEHICLE_TYPE.setCapacity(capacity);
+	}
+
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
 	}

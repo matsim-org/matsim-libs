@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainSegment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class LegHandlerAdaptor implements AttributeHandler<Episode> {
 					int idx = Character.getNumericValue(key.charAt(1));
 					idx = idx - 1;
 					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainElement());
+						plan.addLeg(new PlainSegment());
 					}
 
 					for (LegAttributeHandler legHandler : delegates)

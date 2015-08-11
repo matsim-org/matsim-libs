@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
@@ -28,7 +28,7 @@ import playground.johannes.synpop.data.Element;
 public class LegStartTimeHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(Element leg, int idx, String key, String value) {
+	public void handle(Attributable leg, int idx, String key, String value) {
 		if(key.endsWith("abstd")) {
 			leg.setAttribute("startTimeHour", value);
 		} else if(key.endsWith("abmin")) {

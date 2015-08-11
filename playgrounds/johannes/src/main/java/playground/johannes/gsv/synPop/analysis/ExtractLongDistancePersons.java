@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -54,7 +54,7 @@ public class ExtractLongDistancePersons {
 		logger.info("Extracting persons...");
 		for(PlainPerson person : parser.getPersons()) {
 			for(Episode plan : person.getEpisodes()) {
-				for(Element leg : plan.getLegs()) {
+				for(Attributable leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						double d = Double.parseDouble(val);

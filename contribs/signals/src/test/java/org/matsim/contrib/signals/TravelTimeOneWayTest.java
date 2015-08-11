@@ -19,46 +19,55 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
-import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalPlan;
-import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author aneumann
  * @author dgrether
+ * @author tthunig
  */
 public class TravelTimeOneWayTest {
 
 	private static final Logger log = Logger.getLogger(TravelTimeOneWayTest.class);
 
-	final static int timeToWaitBeforeMeasure = 498; // Make sure measurement starts with second 0 in signalsystemplan
-
+	private static final boolean WRITE_EVENTS = false;
+	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
@@ -66,7 +75,7 @@ public class TravelTimeOneWayTest {
 		Config conf = new Config();
 		conf.addCoreModules();
 		conf.controler().setMobsim("qsim");
-		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
+		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml");
 		conf.plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
 		String signalSystemsFile = null;
 		if (useLanes){
@@ -98,7 +107,7 @@ public class TravelTimeOneWayTest {
 		return data;
 	}
 
-	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
+	private static SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
@@ -107,20 +116,44 @@ public class TravelTimeOneWayTest {
 
 	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(ScenarioImpl scenario){
 		EventsManager events = EventsUtils.createEventsManager();
+		
+		final List<Event> eventslist = new ArrayList<Event>();
+		if (WRITE_EVENTS){
+			events.addHandler(new BasicEventHandler() {
+
+				@Override
+				public void reset(int iteration) {
+					eventslist.clear();
+				}
+
+				@Override
+				public void handleEvent(Event event) {
+					eventslist.add(event);
+				}
+			});
+		}
+		
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-//		events.addHandler(new LogOutputEventHandler());
-		int circulationTime = 60;
-
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
-		for (int dropping = 10; dropping <= circulationTime; dropping++) {
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().
+				getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class));
+		SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, SignalPlan.class));
+		SignalGroupSettingsData signalSetting = signalPlan.getSignalGroupSettingsDataByGroupId().
+				get(Id.create(100, SignalGroup.class));
+		
+		int circulationTime = signalPlan.getCycleTime();
+		double linkCapacity = scenario.getNetwork().getLinks().get(Id.createLinkId(1)).getCapacity();
+		
+//		signalPlan.setOffset( 3 );
+//		signalSetting.setOnset( 0 );
+		
+//		for (int dropping = 10; dropping <= circulationTime; dropping++) {
+		for (int dropping = 50; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 
-			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class));
-			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, SignalPlan.class));
-			signalPlan.setCycleTime(circulationTime);
-			signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(100, SignalGroup.class)).setDropping(dropping);
+			signalSetting.setDropping(dropping);
 			signalPlan.setStartTime(0.0);
 			signalPlan.setEndTime(0.0);
 
@@ -135,7 +168,17 @@ public class TravelTimeOneWayTest {
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-			Assert.assertEquals((dropping * 2000.0 / circulationTime),
+//			if (WRITE_EVENTS) {
+//				EventWriterXML eventWriter = new EventWriterXML(
+//						testUtils.getOutputDirectory() + "events_" + dropping
+//								+ "_before.xml");
+//				for (Event e : eventslist) {
+//					eventWriter.handleEvent(e);
+//				}
+//				eventWriter.closeFile();
+//			}
+			
+			Assert.assertEquals((dropping * linkCapacity / circulationTime),
 					eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
 			Assert.assertEquals(5000.0, eventHandler.beginningOfLink2.numberOfVehPassed,
 					MatsimTestUtils.EPSILON);
@@ -143,6 +186,7 @@ public class TravelTimeOneWayTest {
 	}
 	
 	/**
+	 * This tests if a QSim with signals creates the correct outflow for all green splits between 1/6 and 1. 
 	 * 
 	 * @author aneumann
 	 * @author dgrether
@@ -154,17 +198,16 @@ public class TravelTimeOneWayTest {
 		
 		scenario = (ScenarioImpl) this.loadScenario(true);
 		this.runTrafficLightIntersection2arms_w_TrafficLight_0_60(scenario);
-		
 	}
 
 	
-	private void runTrafficLightIntersection2arms_w_TrafficLight(Scenario scenario){
+	private static void runTrafficLightIntersection2arms_w_TrafficLight(Scenario scenario){
 		//test with signal systems
 		EventsManager events = EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
-		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
+		SignalEngine signalEngine = initSignalEngine(scenario, events);
 
 		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
@@ -208,10 +251,10 @@ public class TravelTimeOneWayTest {
 	@Test
 	public void testTrafficLightIntersection2arms_w_TrafficLight() {
 		Scenario scenario = this.loadScenario(false);
-		this.runTrafficLightIntersection2arms_w_TrafficLight(scenario);
+		runTrafficLightIntersection2arms_w_TrafficLight(scenario);
 		
 		scenario = this.loadScenario(true);
-		this.runTrafficLightIntersection2arms_w_TrafficLight(scenario);
+		runTrafficLightIntersection2arms_w_TrafficLight(scenario);
 	}
 
 	/* package */ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
@@ -223,8 +266,9 @@ public class TravelTimeOneWayTest {
 			// log.info("link enter event id :" + event.linkId);
 			if (event.getLinkId().toString().equalsIgnoreCase("2")) {
 				if (this.beginningOfLink2 == null) {
-					this.beginningOfLink2 = new MeasurementPoint(event.getTime()
-							+ TravelTimeOneWayTest.timeToWaitBeforeMeasure);
+					// Make sure measurement starts with second 0 in signalsystemplan
+					double nextSignalCycleStart = event.getTime() + (60 - (event.getTime() % 60));
+					this.beginningOfLink2 = new MeasurementPoint(nextSignalCycleStart);
 				}
 
 				this.beginningOfLink2.numberOfVehPassed++;
@@ -252,7 +296,7 @@ public class TravelTimeOneWayTest {
 
 	private static class MeasurementPoint {
 
-		static final int timeToMeasure_s = 3600;
+		static final int timeToMeasure_s = 3600; // 1 hour
 
 		double timeToStartMeasurement;
 

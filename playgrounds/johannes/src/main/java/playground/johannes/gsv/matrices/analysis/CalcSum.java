@@ -31,7 +31,7 @@ public class CalcSum {
     public static void main(String args[]) {
         KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
         reader.setValidating(false);
-        reader.parse("/home/johannes/gsv/fpd/telefonica/matrix/15.xml");
+        reader.parse("/home/johannes/sge/prj/matsim/run/912/output/matrices-averaged/miv.sun.sym.xml");
         KeyMatrix m = reader.getMatrix();
 
         System.out.println(String.format("Trip sum: %s.", MatrixOperations.sum(m)));

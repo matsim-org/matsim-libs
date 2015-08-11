@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -33,7 +33,7 @@ public class DeleteMissingTimesTask implements ProxyPersonTask {
 	 */
 	@Override
 	public void apply(PlainPerson person) {
-		for(Element leg : person.getPlan().getLegs()) {
+		for(Attributable leg : person.getPlan().getLegs()) {
 			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
 			

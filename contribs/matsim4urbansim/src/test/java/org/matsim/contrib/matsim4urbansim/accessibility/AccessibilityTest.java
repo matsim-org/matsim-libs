@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -255,7 +256,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void setZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
+	public void setZoneAccessibilities(ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities1) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new CoordImpl(100,0))){

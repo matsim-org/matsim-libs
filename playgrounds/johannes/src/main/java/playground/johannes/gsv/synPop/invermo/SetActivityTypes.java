@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -35,15 +35,15 @@ public class SetActivityTypes implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(Episode plan) {
-		for(Element act : plan.getActivities()) {
+		for(Attributable act : plan.getActivities()) {
 			if(InvermoKeys.HOME.equals(act.getAttribute(InvermoKeys.LOCATION))) {
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, InvermoKeys.HOME);
 			}
 		}
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Element leg = plan.getLegs().get(i);
-			Element act = plan.getActivities().get(i + 1);
+			Attributable leg = plan.getLegs().get(i);
+			Attributable act = plan.getActivities().get(i + 1);
 			
 			if(!InvermoKeys.HOME.equals(act.getAttribute(InvermoKeys.LOCATION))) {
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, leg.getAttribute(CommonKeys.LEG_PURPOSE));

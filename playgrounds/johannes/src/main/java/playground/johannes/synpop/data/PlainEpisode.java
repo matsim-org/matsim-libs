@@ -28,41 +28,57 @@ import java.util.Map.Entry;
  */
 public class PlainEpisode extends PlainElement implements playground.johannes.synpop.data.Episode {
 
-    private List<Element> activities = new ArrayList<Element>();
+    private List<Segment> activities = new ArrayList<Segment>();
 
-    private List<Element> legs = new ArrayList<Element>();
+    private List<Segment> legs = new ArrayList<Segment>();
 
-    public void addLeg(Element leg) {
+    private Person person;
+
+    public void addLeg(Segment leg) {
+        if(legs.contains(leg)) throw new IllegalArgumentException("You cannot add the same segment twice.");
         legs.add(leg);
+        ((PlainSegment)leg).setEpisode(this, true);
     }
 
-    public List<Element> getLegs() {
+    @Override
+    public Person getPerson() {
+        return person;
+    }
+
+    public List<Segment> getLegs() {
         return legs;
     }
 
-    public void addActivity(Element activity) {
+    public void addActivity(Segment activity) {
+        if(activities.contains(activity)) throw new IllegalArgumentException("You cannot add the same segment twice.");
         activities.add(activity);
+        ((PlainSegment)activity).setEpisode(this, false);
     }
 
-    public List<Element> getActivities() {
+    public List<Segment> getActivities() {
         return activities;
     }
 
     public PlainEpisode clone() {
         PlainEpisode clone = new PlainEpisode();
+//        clone.setPerson(person); not clear if should do this here.
 
         for (Entry<String, String> entry : getAttributes().entrySet()) {
             clone.setAttribute(entry.getKey(), entry.getValue());
         }
 
-        for (Element act : activities) {
-            clone.addActivity(((PlainElement) act).clone());
+        for (Attributable act : activities) {
+            clone.addActivity(((PlainSegment) act).clone());
         }
 
-        for (Element leg : legs) {
-            clone.addLeg(((PlainElement) leg).clone());
+        for (Attributable leg : legs) {
+            clone.addLeg(((PlainSegment) leg).clone());
         }
 
         return clone;
+    }
+
+    void setPerson(Person person) {
+        this.person = person;
     }
 }

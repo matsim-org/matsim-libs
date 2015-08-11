@@ -24,7 +24,7 @@ import org.joda.time.Seconds;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 import java.util.Locale;
@@ -39,7 +39,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 	public void apply(Episode plan) {
 		LocalDateTime reference = null;
 		
-		for(Element leg : plan.getLegs()) {
+		for(Attributable leg : plan.getLegs()) {
 			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			if(start != null) {
 				if(reference == null) {

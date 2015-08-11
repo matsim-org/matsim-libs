@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -60,9 +60,9 @@ public class PkmTask extends AnalyzerTask {
 				Episode plan = person.getEpisodes().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
-					Element leg = plan.getLegs().get(i);
+					Attributable leg = plan.getLegs().get(i);
 					if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-						Element act = plan.getActivities().get(i + 1);
+						Attributable act = plan.getActivities().get(i + 1);
 						if (purpose == null || purpose.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 							if (value != null) {

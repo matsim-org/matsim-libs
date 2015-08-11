@@ -31,7 +31,7 @@ import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -73,8 +73,8 @@ public class RemoveLongTrips {
 		for(PlainPerson person : persons) {
 			for(Episode plan : person.getEpisodes()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
-					Element origin = plan.getActivities().get(i);
-					Element destination = plan.getActivities().get(i + 1);
+					Attributable origin = plan.getActivities().get(i);
+					Attributable destination = plan.getActivities().get(i + 1);
 					
 					Id<ActivityFacility> id1 = Id.create(origin.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					Id<ActivityFacility> id2 = Id.create(destination.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);

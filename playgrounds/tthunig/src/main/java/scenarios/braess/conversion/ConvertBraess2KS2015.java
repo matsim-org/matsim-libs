@@ -3,6 +3,8 @@
  */
 package scenarios.braess.conversion;
 
+import java.util.Calendar;
+
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 
@@ -17,26 +19,34 @@ public class ConvertBraess2KS2015 {
 	public static void main(String[] args) throws Exception {
 		// input files
 		String signalSystemsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalSystems_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalSystems.xml";
 		String signalGroupsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalGroups_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalGroups.xml";
 		String signalControlFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_BC.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_green.xml";
 		String networkFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network_8640_5s_firstLast5s.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network.xml";
 		String lanesFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/laneDefinitions_8640_firstLast5s.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/trivialLanes.xml.gz";
 		String populationFilename = DgPaths.REPOS
-				+ "runs-svn/cottbus/braess/2015-04-13_tbs1_net8640-5s_basecase/output_plans.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/plans3600_woInitRoutes.xml";
 
 		// output files
 		String outputDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/braess2ks/";
-		String dateFormat = "2015-04-13";
-
+		
+		// get the current date in format "yyyy-mm-dd"
+		Calendar cal = Calendar.getInstance();
+		// this class counts months from 0, but days from 1
+		int month = cal.get(Calendar.MONTH) + 1;
+		String monthStr = month + "";
+		if (month < 10)
+			monthStr = "0" + month;
+		String date = cal.get(Calendar.YEAR) + "-"	+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);		
+				
 		/* parameters for the time interval */
 		double startTime = 8 * 3600.0;
-		double endTime = 8 * 3600.0 + 1 * 60;
+		double endTime = 9 * 3600.0;
 		/* parameters for the network area */
 		double signalsBoundingBoxOffset = 500;
 		double cuttingBoundingBoxOffset = 100;
@@ -51,17 +61,15 @@ public class ConvertBraess2KS2015 {
 		int cellsX = 5; // = default value
 		int cellsY = 5; // = default value
 		/* other parameters */
-		String scenarioDescription = "run braess output plans between 08:00 and 08:01";
+		String scenarioDescription = "run braess with 3600 agents";
 
-		TtMatsim2KS2015 converter = new TtMatsim2KS2015(signalSystemsFilename,
+		TtMatsim2KS2015.convertMatsim2KS(signalSystemsFilename,
 				signalGroupsFilename, signalControlFilename, networkFilename,
 				lanesFilename, populationFilename, startTime, endTime,
 				signalsBoundingBoxOffset, cuttingBoundingBoxOffset,
 				freeSpeedFilter, useFreeSpeedTravelTime, maximalLinkLength,
 				matsimPopSampleSize, ksModelCommoditySampleSize,
 				minCommodityFlow, cellsX, cellsY, scenarioDescription,
-				dateFormat, outputDirectory);
-
-		converter.convertMatsim2KS();
+				date, outputDirectory);
 	}
 }

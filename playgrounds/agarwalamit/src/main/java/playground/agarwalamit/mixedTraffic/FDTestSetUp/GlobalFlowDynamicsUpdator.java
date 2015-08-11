@@ -45,7 +45,7 @@ import org.matsim.vehicles.VehicleType;
 
 class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
-	private Scenario scenario;
+//	private Scenario scenario;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private TravelModesFlowDynamicsUpdator globalFlowData;
 
@@ -59,14 +59,14 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 	 * @param travelModeFlowDataContainer
 	 * container to store static properties of vehicles and dynamic flow properties during simulation 
 	 */
-	public GlobalFlowDynamicsUpdator(Scenario sc, Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
-		this.scenario =  sc;
+	public GlobalFlowDynamicsUpdator(/*Scenario sc,*/ Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
+//		this.scenario =  sc;
 		this.travelModesFlowData = travelModeFlowDataContainer;
 		for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 			this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).initDynamicVariables();
 		}
 		this.globalFlowData = new TravelModesFlowDynamicsUpdator();
-		this.globalFlowData.setnumberOfAgents(sc.getPopulation().getPersons().size());
+		this.globalFlowData.setnumberOfAgents(GenerateFundamentalDiagramData.person2Mode.size());
 		this.globalFlowData.initDynamicVariables();
 		this.permanentRegime = false;
 	}
@@ -86,15 +86,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
 			double pcu_person = 0.;
 
-			//Disaggregated data updating methods
-			String travelMode = "NA";
-			List<PlanElement> pes = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
-			for(PlanElement pe :pes){
-				if(pe instanceof Leg){
-					travelMode =((Leg)pe).getMode().toString();
-					break;
-				}
-			}
+			String travelMode = GenerateFundamentalDiagramData.person2Mode.get(personId);
+			
 			Id<VehicleType> transportMode = Id.create(travelMode,VehicleType.class);
 			this.travelModesFlowData.get(transportMode).handle(event);
 			pcu_person = this.travelModesFlowData.get(transportMode).getVehicleType().getPcuEquivalents();

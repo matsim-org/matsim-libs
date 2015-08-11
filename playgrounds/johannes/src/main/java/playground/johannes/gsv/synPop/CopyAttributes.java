@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -76,8 +76,8 @@ public class CopyAttributes {
 				Episode plan = person.getEpisodes().get(0);
 				Episode templatePlan = template.getEpisodes().get(0);
 				for (int i = 0; i < plan.getActivities().size(); i++) {
-					Element act = plan.getActivities().get(i);
-					Element templAct = templatePlan.getActivities().get(i);
+					Attributable act = plan.getActivities().get(i);
+					Attributable templAct = templatePlan.getActivities().get(i);
 
 					act.setAttribute(CommonKeys.ACTIVITY_TYPE, templAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 				}

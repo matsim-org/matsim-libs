@@ -45,7 +45,7 @@ public class Run {
 		String outputRoutes = "../matsim/output/siouxfalls-2014/TestFullSumo_.rou.xml";
 		String outputAdditional = "../matsim/output/siouxfalls-2014/input_additional.add.xml"; //additional data like busstops
 */
-		String configFileName = "../../matsim/examples/siouxfalls-2014/config_renamed.xml";
+		String configFileName = "E:/MA/workspaceMars/matsim/examples/siouxfalls-2014/config_renamed.xml";
 		String populationInput = "../../matsim/output/siouxfalls-2014/output_plans.xml.gz";
 		String vehiclesInput = "../../matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
 		String transitScheduleInput = "../../matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule_renamed.xml";

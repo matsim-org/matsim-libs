@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 import java.text.ParseException;
@@ -44,14 +44,14 @@ public class ComposeTimeTask implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(Episode plan) {
-		for (Element leg : plan.getLegs()) {
+		for (Attributable leg : plan.getLegs()) {
 			setStartTime(leg);
 			setEndTime(leg);
 		}
 
 	}
 
-	private void setEndTime(Element leg) {
+	private void setEndTime(Attributable leg) {
 		StringBuilder builder = new StringBuilder(100);
 
 		boolean valid = true;
@@ -115,7 +115,7 @@ public class ComposeTimeTask implements ProxyPlanTask {
 		}
 	}
 	
-	private void setStartTime(Element leg) {
+	private void setStartTime(Attributable leg) {
 		StringBuilder builder = new StringBuilder(100);
 
 		boolean valid = true;

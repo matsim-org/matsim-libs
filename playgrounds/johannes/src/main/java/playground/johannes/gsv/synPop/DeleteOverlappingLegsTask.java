@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -38,7 +38,7 @@ public class DeleteOverlappingLegsTask implements ProxyPersonTask {
 		 * Check for overlapping legs.
 		 */
 		double prevEnd = 0;
-		for(Element leg : person.getPlan().getLegs()) {
+		for(Attributable leg : person.getPlan().getLegs()) {
 			String startStr = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			if(startStr != null) {
 				double start = Double.parseDouble(startStr);

@@ -24,7 +24,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 			for(PlainPerson person : population) {
 				err[i] = h.evaluate(person);
 				double sum = 0;
-				for(Element leg : person.getEpisodes().get(0).getLegs()) {
+				for(Attributable leg : person.getEpisodes().get(0).getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						sum += Double.parseDouble(val);

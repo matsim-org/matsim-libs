@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.sim3;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainPerson;
@@ -50,7 +50,7 @@ public class CopyFacilityUserData implements SamplerListener {
 
 			for (PlainPerson person : population) {
 				for (Episode plan : person.getEpisodes()) {
-					for (Element act : plan.getActivities()) {
+					for (Attributable act : plan.getActivities()) {
 						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator
 								.USER_DATA_KEY);
 						if (f != null) {

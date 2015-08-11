@@ -32,7 +32,7 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -57,9 +57,9 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	@Override
 	public void apply(Episode plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Element prev = plan.getActivities().get(i);
-			Element leg = plan.getLegs().get(i);
-			Element next = plan.getActivities().get(i + 1);
+			Attributable prev = plan.getActivities().get(i);
+			Attributable leg = plan.getLegs().get(i);
+			Attributable next = plan.getActivities().get(i + 1);
 			
 			String sourceStr = prev.getAttribute(InvermoKeys.COORD);
 			String destStr = next.getAttribute(InvermoKeys.COORD);

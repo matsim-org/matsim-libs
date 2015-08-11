@@ -22,7 +22,7 @@ import playground.dgrether.analysis.RunResultsLoader;
  * Class to analyze the event files of a MATSim simulation of Braess' example.
  * 
  * @author tthunig
- * @deprecated use the controller listener TtBraessControlerListener instead which analyzes whereas simulating
+ * @deprecated use the controller listener TtBraessControlerListener instead which analyzes whereas simulating.
  */
 @Deprecated
 public class TtRunBraessAnalysisAfterSimulation {
@@ -42,7 +42,6 @@ public class TtRunBraessAnalysisAfterSimulation {
 	private Map<Double, double[]> routeStartsPerSecond;
 	private Map<Double, double[]> onRoutePerSecond;
 	private Map<Double, double[]> avgRouteTTsPerDeparture;
-	private Map<Double, double[]> avgRouteTTsPerArrival;
 
 	public TtRunBraessAnalysisAfterSimulation(String runDirectory, int lastIteration,
 			String outputDir) {
@@ -65,7 +64,6 @@ public class TtRunBraessAnalysisAfterSimulation {
 		writeOnRoutes();
 		writeRouteStarts();
 		writeAvgRouteTTsPerDeparture();
-		writeAvgRouteTTsPerArrvial();
 	}
 
 	private void calculateLastItResults() {
@@ -73,7 +71,7 @@ public class TtRunBraessAnalysisAfterSimulation {
 		String eventsFilename = runDir.getEventsFilename(lastIteration);
 
 		EventsManager eventsManager = new EventsManagerImpl();
-		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
+		TtAnalyzeBraess handler = new TtAnalyzeBraess();
 		eventsManager.addHandler(handler);
 
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
@@ -83,10 +81,9 @@ public class TtRunBraessAnalysisAfterSimulation {
 		this.totalRouteTTs = handler.getTotalRouteTTs();
 		this.avgRouteTTs = handler.calculateAvgRouteTTs();
 		this.routeUsers = handler.getRouteUsers();
-		this.routeStartsPerSecond = handler.getRouteStartsPerSecond();
+		this.routeStartsPerSecond = handler.getRouteDeparturesPerSecond();
 		this.onRoutePerSecond = handler.getOnRoutePerSecond();
-		this.avgRouteTTsPerArrival = handler.calculateAvgRouteTTsPerArrivalTime();
-		this.avgRouteTTsPerDeparture = handler.calculateAvgRouteTTsPerWait2LinkTime();
+		this.avgRouteTTsPerDeparture = handler.calculateAvgRouteTTsByDepartureTime();
 		
 		log.info("The total travel time is " + totalTT);
 		log.info(routeUsers[0] + " are using the upper route, " + routeUsers[1] 
@@ -210,33 +207,6 @@ public class TtRunBraessAnalysisAfterSimulation {
 		log.info("output written to " + outputDir + "avgRouteTTsPerDeparture.txt");
 	}
 
-	private void writeAvgRouteTTsPerArrvial() {
-		PrintStream stream;
-		try {
-			stream = new PrintStream(new File(outputDir + "avgRouteTTsPerArrival.txt"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		String header = "arrivalTime\tavg tt up\tavg tt mid\tavg tt low";
-		stream.println(header);
-		for (Double arrivalTime : this.avgRouteTTsPerArrival.keySet()) {
-			StringBuffer line = new StringBuffer();
-			double[] avgRouteTTs = this.avgRouteTTsPerArrival.get(arrivalTime);
-			
-			line.append(arrivalTime);
-			for (int i = 0; i < 3; i++) {
-				line.append("\t" + avgRouteTTs[i]);
-			}
-			stream.println(line.toString());
-		}
-
-		stream.close();
-		
-		log.info("output written to " + outputDir + "avgRouteTTsPerArrival.txt");
-	}
-
 	/**
 	 * analyzes all iterations in terms of route choice and travel time
 	 */
@@ -264,7 +234,7 @@ public class TtRunBraessAnalysisAfterSimulation {
 			String eventsFilename = runDir.getEventsFilename(i);
 
 			EventsManager eventsManager = new EventsManagerImpl();
-			TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
+			TtAnalyzeBraess handler = new TtAnalyzeBraess();
 			eventsManager.addHandler(handler);
 
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);

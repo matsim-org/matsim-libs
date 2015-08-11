@@ -28,7 +28,7 @@ import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
 
@@ -57,7 +57,7 @@ public class InitHomeBasedActLocations implements ProxyPlanTask {
 		/*
 		 * Assign facilities for act with already set facility id.
 		 */
-		for (Element act : plan.getActivities()) {
+		for (Attributable act : plan.getActivities()) {
 			String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 			if (id != null) {
 				Id<ActivityFacility> idObj = Id.create(id, ActivityFacility.class);

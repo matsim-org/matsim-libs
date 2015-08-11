@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -78,7 +78,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 			Episode plan = person.getPlan();
 			
 			if(plan.getActivities().size() > 1) {
-			for(Element act : plan.getActivities()) {
+			for(Attributable act : plan.getActivities()) {
 				
 				if(type == null || ((String)act.getAttribute(CommonKeys.ACTIVITY_TYPE)).equalsIgnoreCase(type)) {
 					int start = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));

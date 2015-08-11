@@ -27,9 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -332,28 +330,24 @@ public class QNetsimEngine implements MobsimEngine {
 			engine.setTime(time);
 		}
 
-		//            this.startBarrier.await();
-		//
-		//            this.endBarrier.await();
-		//        } catch (InterruptedException e) {
-		//            throw new RuntimeException(e);
-		//        } catch (BrokenBarrierException e) {
-		//            throw new RuntimeException(e);
-		//        }
-
-		if ( this.usingThreadpool ) {
+		if (this.usingThreadpool) {
 			try {
-				for ( QNetsimEngineRunner engine : this.engines ) {
+				for (QNetsimEngineRunner engine : this.engines) {
 					engine.setMovingNodes(true);
 				}
-				pool.invokeAll( this.engines ) ;
-				for ( QNetsimEngineRunner engine : this.engines ) {
+				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+					future.get();
+				}
+				for (QNetsimEngineRunner engine : this.engines) {
 					engine.setMovingNodes(false);
 				}
-				pool.invokeAll( this.engines ) ;
+				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+					future.get();
+				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-				throw new RuntimeException("something went wrong during thread pool execution") ;
+				throw new RuntimeException(e) ;
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e.getCause());
 			}
 		} else {
 			this.startBarrier.arriveAndAwaitAdvance();
@@ -467,7 +461,9 @@ public class QNetsimEngine implements MobsimEngine {
 
 		numOfRunners = this.numOfThreads;
 		if ( usingThreadpool ) {
-			numOfRunners *= 10 ;
+			// The number of runners should be larger than the number of threads, yes,
+			// but see MATSIM-404 - Simulation result still depends on the number of runners.
+//			numOfRunners *= 10 ;
 			this.pool = Executors.newFixedThreadPool( this.numOfThreads ) ;
 		}
 

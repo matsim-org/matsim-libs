@@ -25,12 +25,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class NetworkLinkRename {
 
 	public static void main(String[] args) {
-		String networkFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_network_PT.xml";
-		String transitScheduleFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
-		String configFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/config_default.xml";
+		String networkFileName = "../../matsim/examples/siouxfalls-2014/Siouxfalls_network_PT.xml";
+		String transitScheduleFileName = "../../matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
+		String configFileName = "../../matsim/examples/siouxfalls-2014/config_default.xml";
 		String replacement = "-";
-		String newNetworkFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_network_PT_renamed.xml";
-		String newTransitScheduleFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule_renamed.xml";
+		String newNetworkFileName = "../../matsim/examples/siouxfalls-2014/Siouxfalls_network_PT_renamed.xml";
+		String newTransitScheduleFileName = "../../matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule_renamed.xml";
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFileName));
 		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

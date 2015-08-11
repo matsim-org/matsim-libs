@@ -21,7 +21,7 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -38,7 +38,7 @@ public class WeCommuterPredicate implements Predicate {
 	}
 	
 	@Override
-	public boolean test(PlainPerson person, Element leg, Element prev, Element next) {
+	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
 		boolean result = false;
 
 		String day = person.getAttribute(CommonKeys.DAY);
@@ -47,13 +47,13 @@ public class WeCommuterPredicate implements Predicate {
 					|| day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
 				
 				Episode plan = person.getEpisodes().get(0);
-				Element weLeg = null;
+				Attributable weLeg = null;
 				
 				int cnt = 0;
 				for (int i = 0; i < plan.getLegs().size(); i++) {
-					Element leg2 = plan.getLegs().get(i);
-					Element prev2 = plan.getActivities().get(i);
-					Element next2 = plan.getActivities().get(i + 1);
+					Attributable leg2 = plan.getLegs().get(i);
+					Attributable prev2 = plan.getActivities().get(i);
+					Attributable next2 = plan.getActivities().get(i + 1);
 
 					String val = leg2.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if (val != null) {

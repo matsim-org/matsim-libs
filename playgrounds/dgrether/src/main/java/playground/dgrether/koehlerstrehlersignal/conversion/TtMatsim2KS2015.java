@@ -29,52 +29,13 @@ public class TtMatsim2KS2015 {
 
 	private static final Logger log = Logger.getLogger(Cottbus2KS2010.class);
 
-	// input files
-	private String signalSystemsFilename;
-	private String signalGroupsFilename;
-	private String signalControlFilename;
-	
-	private String networkFilename;
-	private String lanesFilename;
-	private String populationFilename;
-
-	// conversion properties
-	
-	/* parameters for the time interval*/
-	private double startTime = 0.0 * 3600.0;
-	private double endTime = 23.99 * 3600.0;
-	/* parameters for the network area */
-	private double signalsBoundingBoxOffset = Double.MAX_VALUE; // outside this envelope all crossings stay unexpanded
-	private double cuttingBoundingBoxOffset = Double.MAX_VALUE;
-	/* parameters for the interior link filter */
-	private double freeSpeedFilter = 1.0; // the minimal free speed value for the interior link filter in m/s
-	private boolean useFreeSpeedTravelTime = true; // a flag for dijkstras cost function: if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
-	private double maximalLinkLength = Double.MAX_VALUE; // restricts the NetworkSimplifier. Double.MAX_VALUE is no restriction.
-	/* parameters for the demand filter */
-	private double matsimPopSampleSize = 1.0; // 100% sample
-	private double ksModelCommoditySampleSize = 1.0; // 1 vehicle is equivalent to 1 unit of flow
-	private double minCommodityFlow = 1.0; // only commodities with at least this demand will be optimized in the BTU model
-	private int cellsX = 5; // number of cells in x direction
-	private int cellsY = 5;	// number of cells in y direction
-	/* other parameters */
-	private String scenarioDescription;
-	private String spCost;
-	
-	// output
-	private String dateFormat; // e.g. 2015-02-24
-	private String outputDirectory;
-	private String ksModelOutputFilename;
-	
-	private static String shapeFileDirectoryName = "shapes/";
+	private static final String shapeFileDirectoryName = "shapes/";
 	
 	private static final CoordinateReferenceSystem CRS = MGC
-			.getCRS(TransformationFactory.WGS84_UTM33N);
-	
-	
-	/* --------------------- constructors -----------------------------*/
+			.getCRS(TransformationFactory.WGS84_UTM33N);	
 	
 	/**
-	 * constructor using some fields
+	 * Runs the conversion process and writes the BTU output file.
 	 * 
 	 * @param signalSystemsFilename
 	 * @param signalGroupsFilename
@@ -82,107 +43,24 @@ public class TtMatsim2KS2015 {
 	 * @param networkFilename
 	 * @param lanesFilename
 	 * @param populationFilename
-	 * @param startTime the start time of the simulation
-	 * @param endTime the end time of the simulation
-	 * @param scenarioDescription the description for the ks model
-	 * @param outputDirectory
-	 * @param dateFormat the date in format 2015-02-24
-	 */
-	public TtMatsim2KS2015(String signalSystemsFilename,
-			String signalGroupsFilename, String signalControlFilename,
-			String networkFilename, String lanesFilename,
-			String populationFilename, double startTime, double endTime,
-			String scenarioDescription, String outputDirectory, String dateFormat) {
-		
-		super();
-		this.signalSystemsFilename = signalSystemsFilename;
-		this.signalGroupsFilename = signalGroupsFilename;
-		this.signalControlFilename = signalControlFilename;
-		this.networkFilename = networkFilename;
-		this.lanesFilename = lanesFilename;
-		this.populationFilename = populationFilename;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.scenarioDescription = scenarioDescription;
-		this.outputDirectory = outputDirectory;
-		this.dateFormat = dateFormat;
-	}
-	
-	/**
-	 * constructor using a lot of fields
-	 * 
-	 * @param signalSystemsFilename
-	 * @param signalGroupsFilename
-	 * @param signalControlFilename
-	 * @param networkFilename
-	 * @param lanesFilename
-	 * @param populationFilename
-	 * @param startTime the start time of the simulation
-	 * @param endTime the end time of the simulation
-	 * @param signalsBoundingBoxOffset crossings outside the envelop including all 
-	 * signals plus this offset will not be expanded in the KS model
-	 * @param cuttingBoundingBoxOffset links outside the envelop including all signals
-	 * plus this offset will not be contained in the KS model
+	 * @param startTime
+	 * @param endTime
+	 * @param signalsBoundingBoxOffset outside this envelope all crossings stay unexpanded
+	 * @param cuttingBoundingBoxOffset
 	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
-	 * (links with this free speed won't be removed by the interior link filter)
-	 * @param useFreeSpeedTravelTime if true, the interior link filter won't remove 
-	 * links lying on shortest path between signals regarding travel time, if false, it
-	 * won't remove links lying on shortest path regarding distance
-	 * @param minCommodityFlow commodities with a lower flow value are skipped in the KS model
-	 * @param scenarioDescription the description for the ks model
+	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function: if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
+	 * @param maximalLinkLength restricts the NetworkSimplifier. Double.MAX_VALUE is no restriction.
+	 * @param matsimPopSampleSize 1.0 means a 100% sample
+	 * @param ksModelCommoditySampleSize 1.0 means that 1 vehicle is equivalent to 1 unit of flow
+	 * @param minCommodityFlow only commodities with at least this demand will be optimized in the BTU model
+	 * @param cellsX number of cells in x direction
+	 * @param cellsY number of cells in y direction
+	 * @param scenarioDescription
+	 * @param dateFormat
 	 * @param outputDirectory
-	 * @param dateFormat the date in format 2015-02-24
+	 * @throws Exception
 	 */
-	public TtMatsim2KS2015(String signalSystemsFilename,
-			String signalGroupsFilename, String signalControlFilename,
-			String networkFilename, String lanesFilename,
-			String populationFilename, double startTime, double endTime,
-			double signalsBoundingBoxOffset, double cuttingBoundingBoxOffset,
-			double freeSpeedFilter, boolean useFreeSpeedTravelTime,
-			double minCommodityFlow, String scenarioDescription, 
-			String outputDirectory, String dateFormat) {
-		
-		this(signalSystemsFilename, signalGroupsFilename, signalControlFilename, networkFilename, 
-				lanesFilename, populationFilename, startTime, endTime, scenarioDescription, outputDirectory, dateFormat);
-		
-		this.signalsBoundingBoxOffset = signalsBoundingBoxOffset;
-		this.cuttingBoundingBoxOffset = cuttingBoundingBoxOffset;
-		this.freeSpeedFilter = freeSpeedFilter;
-		this.useFreeSpeedTravelTime = useFreeSpeedTravelTime;
-		this.minCommodityFlow = minCommodityFlow;
-	}
-	
-	/**
-	 * constructor using all fields
-	 * 
-	 * @param signalSystemsFilename
-	 * @param signalGroupsFilename
-	 * @param signalControlFilename
-	 * @param networkFilename
-	 * @param lanesFilename
-	 * @param populationFilename
-	 * @param startTime the start time of the simulation
-	 * @param endTime the end time of the simulation
-	 * @param signalsBoundingBoxOffset crossings outside the envelop including all 
-	 * signals plus this offset will not be expanded in the KS model
-	 * @param cuttingBoundingBoxOffset links outside the envelop including all signals
-	 * plus this offset will not be contained in the KS model
-	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
-	 * (links with this free speed won't be removed by the interior link filter)
-	 * @param useFreeSpeedTravelTime if true, the interior link filter won't remove 
-	 * links lying on shortest path between signals regarding travel time, if false, it
-	 * won't remove links lying on shortest path regarding distance
-	 * @param maximalLinkLength
-	 * @param matsimPopSampleSize
-	 * @param ksModelCommoditySampleSize
-	 * @param minCommodityFlow commodities with a lower flow value are skipped in the KS model
-	 * @param cellsX
-	 * @param cellsY
-	 * @param scenarioDescription the description for the ks model
-	 * @param outputDirectory
-	 * @param dateFormat the date in format 2015-02-24
-	 */
-	public TtMatsim2KS2015(String signalSystemsFilename,
+	public static void convertMatsim2KS(String signalSystemsFilename,
 			String signalGroupsFilename, String signalControlFilename,
 			String networkFilename, String lanesFilename,
 			String populationFilename, double startTime, double endTime,
@@ -191,44 +69,16 @@ public class TtMatsim2KS2015 {
 			double maximalLinkLength, double matsimPopSampleSize,
 			double ksModelCommoditySampleSize, double minCommodityFlow,
 			int cellsX, int cellsY, String scenarioDescription,
-			String dateFormat, String outputDirectory) {
-
-		this(signalSystemsFilename, signalGroupsFilename, signalControlFilename, networkFilename, 
-				lanesFilename, populationFilename, startTime, endTime, signalsBoundingBoxOffset, 
-				cuttingBoundingBoxOffset, freeSpeedFilter, useFreeSpeedTravelTime,
-				minCommodityFlow, scenarioDescription, outputDirectory, dateFormat);
+			String dateFormat, String outputDirectory) throws Exception{
 		
-		this.maximalLinkLength = maximalLinkLength;
-		this.matsimPopSampleSize = matsimPopSampleSize;
-		this.ksModelCommoditySampleSize = ksModelCommoditySampleSize;
-		this.cellsX = cellsX;
-		this.cellsY = cellsY;
-	}
-
-	/* -------------------------------------------------------------- */
-
-	
-	/**
-	 * Initializes the fields that can be set automatically.
-	 */
-	private void init(){
-		spCost = "tt";
+		// init some variables
+		String spCost = "tt";
 		if (!useFreeSpeedTravelTime) spCost = "dist";
 		outputDirectory += dateFormat + "_minflow_" + minCommodityFlow + "_time" 
 				+ startTime + "-" + endTime + "_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
 				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset + "/";
-		ksModelOutputFilename = "ks2010_model_" + Double.toString(minCommodityFlow) + "_"
+		String ksModelOutputFilename = "ks2010_model_" + Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + "_" + Double.toString(cuttingBoundingBoxOffset) + ".xml";
-	}	
-	
-	/**
-	 * Runs the conversion process and writes the BTU output file.
-	 * 
-	 * @throws Exception 
-	 */
-	public void convertMatsim2KS() throws Exception{
-		
-		init();
 		
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);

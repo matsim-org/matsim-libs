@@ -32,7 +32,7 @@ import org.opengis.referencing.operation.TransformException;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -59,7 +59,7 @@ public class DeleteOutOfBounds implements ProxyPlanTask {
 	
 	@Override
 	public void apply(Episode plan) {
-		for(Element act : plan.getActivities()) {
+		for(Attributable act : plan.getActivities()) {
 			String coordStr = act.getAttribute(InvermoKeys.COORD);
 			if(coordStr != null) {
 				Point p = string2Point(coordStr);

@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -34,9 +34,9 @@ public class SetLegTimes implements ProxyPlanTask {
 	@Override
 	public void apply(Episode plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Element prev = plan.getActivities().get(i);
-			Element leg = plan.getLegs().get(i);
-			Element next = plan.getActivities().get(i+1);
+			Attributable prev = plan.getActivities().get(i);
+			Attributable leg = plan.getLegs().get(i);
+			Attributable next = plan.getActivities().get(i+1);
 			
 			leg.setAttribute(CommonKeys.LEG_START_TIME, prev.getAttribute(CommonKeys.ACTIVITY_END_TIME));
 			leg.setAttribute(CommonKeys.LEG_END_TIME, next.getAttribute(CommonKeys.ACTIVITY_START_TIME));

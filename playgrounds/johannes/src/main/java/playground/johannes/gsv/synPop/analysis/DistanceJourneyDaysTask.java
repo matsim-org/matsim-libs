@@ -26,7 +26,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -56,7 +56,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 				for (Episode plan : person.getEpisodes()) {
 					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
-						for (Element leg : plan.getLegs()) {
+						for (Attributable leg : plan.getLegs()) {
 							if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 								String distVal = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 								if (distVal != null) {

@@ -33,7 +33,7 @@ import java.io.IOException;
 public class Zones2Centroids {
 
     public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
+        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.geojson", "NO");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
         writer.write("id,name,lng,lat");

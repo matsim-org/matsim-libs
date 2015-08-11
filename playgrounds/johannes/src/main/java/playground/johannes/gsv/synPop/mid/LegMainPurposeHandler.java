@@ -46,7 +46,7 @@ public class LegMainPurposeHandler implements LegAttributeHandler {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.WORK);
 			
 		} else if(typeId.equalsIgnoreCase("dienstlich oder geschäftlich")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUISINESS);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS);
 			
 		} else if(typeId.equalsIgnoreCase("Erreichen der Ausbildungsstätte oder Schule")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION);

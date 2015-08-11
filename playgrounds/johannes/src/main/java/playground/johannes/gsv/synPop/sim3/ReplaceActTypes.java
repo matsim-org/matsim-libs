@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.sim3;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 			typeMapping.put("visit", ActivityType.LEISURE);
 			typeMapping.put("culture", ActivityType.LEISURE);
 			typeMapping.put("gastro", ActivityType.LEISURE);
-			typeMapping.put(ActivityType.BUISINESS, ActivityType.WORK);
+			typeMapping.put(ActivityType.BUSINESS, ActivityType.WORK);
 			typeMapping.put("private", ActivityType.MISC);
 			typeMapping.put("pickdrop", ActivityType.MISC);
 			typeMapping.put("sport", ActivityType.LEISURE);
@@ -58,7 +58,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 
 	@Override
 	public void apply(Episode plan) {
-		for (Element act : plan.getActivities()) {
+		for (Attributable act : plan.getActivities()) {
 			String origType = act.getAttribute(ORIGINAL_TYPE);
 			if (origType == null) {
 				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);

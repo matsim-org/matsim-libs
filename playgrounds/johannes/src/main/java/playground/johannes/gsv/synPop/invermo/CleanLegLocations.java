@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -34,7 +34,7 @@ public class CleanLegLocations implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(Episode plan) {
-		for(Element leg : plan.getLegs()) {
+		for(Attributable leg : plan.getLegs()) {
 			leg.removeAttribute(InvermoKeys.DESTINATION_LOCATION);
 			leg.removeAttribute(InvermoKeys.START_LOCATION);
 		}
