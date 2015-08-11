@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
@@ -90,8 +89,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 
 	private double walkSpeedMeterPerHour = -1;
-	private Benchmark benchmark;
-	
+
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
 
@@ -342,7 +340,7 @@ import java.util.concurrent.ConcurrentHashMap;
 					}
 				}
 
-				if ( this.urbansimMode ) {
+				if (writer != null) {
 					// writing measured accessibilities for current measuring point
 					writer.writeRecord(origin, fromNode, accessibilities ) ;
 					// (I think the above is the urbansim output.  Better not touch it. kai, feb'14)
@@ -438,15 +436,6 @@ import java.util.concurrent.ConcurrentHashMap;
 	public void setScheme(RoadPricingScheme scheme) {
 		this.scheme = scheme;
 	}
-
-	public Benchmark getBenchmark() {
-		return benchmark;
-	}
-
-	public void setBenchmark(Benchmark benchmark) {
-		this.benchmark = benchmark;
-	}
-
 
 	/**
 	 * stores travel disutilities for different modes

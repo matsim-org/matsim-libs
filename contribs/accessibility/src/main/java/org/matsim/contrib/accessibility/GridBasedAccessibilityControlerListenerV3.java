@@ -6,16 +6,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -114,18 +111,18 @@ import java.util.TreeMap;
  * 
  */
 public final class GridBasedAccessibilityControlerListenerV3
-		implements ShutdownListener, StartupListener {
+		implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	private final AccessibilityControlerListenerDelegate accessibilityControlerListener = new AccessibilityControlerListenerDelegate();
 	private final List<SpatialGridDataExchangeInterface> spatialGridDataExchangeListener = new ArrayList<>();
 
-	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
-		
+	private boolean urbanSimMode;
+
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -155,8 +152,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 		this.config = config ;
 		assert (network != null);
 
-		accessibilityControlerListener.setBenchmark(new Benchmark());
-
 		accessibilityControlerListener.initAccessibilityParameters(config);
 
 		// aggregating facilities to their nearest node on the road network
@@ -170,36 +165,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		// yyyy do we really need this?  do we really have to open the files if we don't start writing until notifyShutdown?  kai, may'15
-		
-		// I moved this from the constructor since it did actually NOT work in situations where the output directory hierarchy was not there
-		// from the beginning ... since the matsim Controler instantiates this not before the "run" statement ... which is the only way in which
-		// setOverwriteDirectories can be honoured.  kai, feb'14
-
-		// writing accessibility measures continuously into a csv file, which is not 
-		// dedicated for as input for UrbanSim, but for analysis purposes
-		
-		// in case multiple AccessibilityControlerListeners are added to the controller, e.g. if various calculations are done for
-		// different activity types subdirectories are required in order not to confuse the output. dz, '14
-		if (outputSubdirectory == null) {
-			if ( accessibilityControlerListener.urbansimMode ) {
-				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
-			}
-		} else {
-			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
-			file.mkdirs();
-			if ( accessibilityControlerListener.urbansimMode ) {
-				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
-						config.controler().getOutputDirectory() + "/" + outputSubdirectory);
-			}
-		}
-	}
-
-
-	private boolean alreadyActive = false ;
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
 	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<>() ;
 	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
@@ -207,12 +172,22 @@ public final class GridBasedAccessibilityControlerListenerV3
 	
 	
 	@Override
-	public void notifyShutdown(ShutdownEvent event){
-		if ( alreadyActive ) {
-			return ; // don't need this a second time, which can happen if the irregular shutdown is called within the regular shutdown
+	public void notifyShutdown(ShutdownEvent event) {
+		if (event.isUnexpected()) {
+			return;
 		}
-		alreadyActive = true ;
-		log.info("Entering notifyShutdown ...");
+		if (outputSubdirectory != null) {
+			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
+			file.mkdirs();
+		}
+		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
+		if (urbanSimMode) {
+			if (outputSubdirectory == null) {
+				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+			} else {
+				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
+			}
+		}
 		accessibilityControlerListener.initDefaultContributionCalculators(event.getControler());
 
 		// make sure that measuring points are set.
@@ -233,36 +208,13 @@ public final class GridBasedAccessibilityControlerListenerV3
 			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrids.getFirst(), spatialGrids.getSecond());
 		}
 
-		// get the controller and scenario
-		Controler controler = event.getControler();
-
-		int benchmarkID = accessibilityControlerListener.getBenchmark().addMeasure("cell-based accessibility computation");
-
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, controler.getScenario(), true);
-		System.out.println();
+		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, event.getControler().getScenario(), true);
 
-		if (accessibilityControlerListener.getBenchmark() != null && benchmarkID > 0) {
-			accessibilityControlerListener.getBenchmark().stoppMeasurement(benchmarkID);
-			log.info("Accessibility computation with "
-					+ accessibilityControlerListener.getMeasuringPoints().getFacilities().size()
-					+ " starting points (origins) and "
-					+ accessibilityControlerListener.getAggregatedOpportunities().length
-					+ " destinations (opportunities) took "
-					+ accessibilityControlerListener.getBenchmark().getDurationInSeconds(benchmarkID)
-					+ " seconds ("
-					+ accessibilityControlerListener.getBenchmark().getDurationInSeconds(benchmarkID)
-					/ 60. + " minutes).");
-		}
-		
-		
-		String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
-			
-
-		if ( accessibilityControlerListener.urbansimMode ) {
+		if (urbansimAccessibilityWriter != null) {
 			urbansimAccessibilityWriter.close();
 		}
 			
@@ -271,9 +223,9 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// various calculations are done for different activity types or different modes (or both) subdirectories are required
 		// in order not to confuse the output
 		if (outputSubdirectory == null) {
-			writePlottingData(matsimOutputDirectory);
+			writePlottingData(config.controler().getOutputDirectory());
 		} else {
-			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
+			writePlottingData(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 		}
 
 		log.info("Triggering " + spatialGridDataExchangeListener.size() + " SpatialGridDataExchangeListener(s) ...");
@@ -483,7 +435,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 	}
 
 	public void setUrbansimMode(boolean urbansimMode) {
-		accessibilityControlerListener.setUrbansimMode(urbansimMode);
+		this.urbanSimMode = urbansimMode;
 	}
 
 }

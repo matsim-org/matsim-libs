@@ -3,12 +3,12 @@ package org.matsim.contrib.accessibility;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.run.Benchmark;
 
 /**
  *  improvements feb'12
@@ -77,8 +77,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
 		assert(scenario != null);
 
-		delegate.setBenchmark(new Benchmark());
-		
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
@@ -121,9 +119,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-
-		int benchmarkID = delegate.getBenchmark().addMeasure("zone-based accessibility computation");
-
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
@@ -135,19 +130,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 			// finalizing/closing csv file containing accessibility measures
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			urbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
-			
-			if (delegate.getBenchmark() != null && benchmarkID > 0) {
-				delegate.getBenchmark().stoppMeasurement(benchmarkID);
-				log.info("Accessibility computation with " 
-						+ delegate.getMeasuringPoints().getFacilities().size()
-						+ " zones (origins) and "
-						+ delegate.getAggregatedOpportunities().length
-						+ " destinations (opportunities) took "
-						+ delegate.getBenchmark().getDurationInSeconds(benchmarkID)
-						+ " seconds ("
-						+ delegate.getBenchmark().getDurationInSeconds(benchmarkID)
-						/ 60. + " minutes).");
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
