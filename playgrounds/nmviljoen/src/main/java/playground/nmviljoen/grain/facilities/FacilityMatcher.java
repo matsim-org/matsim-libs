@@ -27,10 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -82,20 +80,32 @@ public class FacilityMatcher {
 			log.warn("Output file " + output + " will be overwritten!");
 			FileUtils.delete(file);
 		}
-		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(output);
+		File fileRange = new File(outputRange);
+		if(fileRange.exists()){
+			log.warn("Output file " + outputRange + " will be overwritten!");
+			FileUtils.delete(fileRange);
+		}
+		
+		/* Write headers. */
+		BufferedWriter bwOutput = IOUtils.getAppendingBufferedWriter(output);
+		BufferedWriter bwRange = IOUtils.getAppendingBufferedWriter(outputRange);
 		try{
 			/* Write the output file's header. */
-			bw.write("Input,Id,lon,lat,within50,within100,within250,within500,within1000");
-			bw.newLine();
+			bwOutput.write("Input,Id,lon,lat,within50,within100,within250,within500,within1000");
+			bwOutput.newLine();
+			
+			/* Write the range file's header. */
+			bwRange.write("oId,oLon,oLat,dId,dLon,dLat,Direction,Level");
+			bwRange.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + output);
+			throw new RuntimeException("Cannot write to output file(s)");
 		} finally{
 			try {
-				bw.close();
+				bwOutput.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + output);
+				throw new RuntimeException("Cannot close output file(s)");
 			}
 		}
 		
@@ -296,7 +306,8 @@ public class FacilityMatcher {
 			String output){
 		log.info("Evaluating the network reach...");
 		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+		CoordinateTransformation ctWgsToAlbers = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+		CoordinateTransformation ctAlbersToWgs = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		
 		Counter counter = new Counter("   producers # ");
 
@@ -314,7 +325,7 @@ public class FacilityMatcher {
 				} catch(ArrayIndexOutOfBoundsException eee){
 					log.debug("Ooops!!");
 				}
-				Coord cAlbers = ct.transform(cWgs);
+				Coord cAlbers = ctWgsToAlbers.transform(cWgs);
 				
 				Collection<ActivityFacility> withinRange = qt.get(cAlbers.getX(), cAlbers.getY(), rangeThreshold);
 				Iterator<ActivityFacility> iterator = withinRange.iterator();
@@ -326,9 +337,53 @@ public class FacilityMatcher {
 					/* Only check for facilities that do occur in the path-dependent network. */
 					if(network.getPathDependentNode(thisNodeId) != null){
 						
-						/* Check the first order range upstream. */
-						outputStrings.addAll(this.getUpstreamOutput(network, thisNodeId, 1));
+						/* Upstream, level 1 */
+						outputStrings.addAll(this.getUpstreamOutput(ctAlbersToWgs, network, thisNodeId, 1));
 						
+						/* Upstream, level 2 */
+						Iterator<Id<Node>> level1IteratorUp = network.getConnectedInNodeIds(thisNodeId).iterator();
+						while(level1IteratorUp.hasNext()){
+							Id<Node> level1IdUp = level1IteratorUp.next();
+							outputStrings.addAll(this.getUpstreamOutput(ctAlbersToWgs, network, level1IdUp, 2));
+							
+							/* Upstream, level 3 */
+							Iterator<Id<Node>> level2IteratorUp = network.getConnectedInNodeIds(level1IdUp).iterator();
+							while(level2IteratorUp.hasNext()){
+								Id<Node> level2IdUp = level2IteratorUp.next();
+								outputStrings.addAll(this.getUpstreamOutput(ctAlbersToWgs, network, level2IdUp, 3));
+								
+								/* Upstream, level 4 */
+								Iterator<Id<Node>> level3IteratorUp = network.getConnectedInNodeIds(level2IdUp).iterator();
+								while(level3IteratorUp.hasNext()){
+									Id<Node> level3IdUp = level3IteratorUp.next();
+									outputStrings.addAll(this.getUpstreamOutput(ctAlbersToWgs, network, level3IdUp, 4));
+								}
+							}
+						}
+						
+						/* Downstream, level 1. */
+						outputStrings.addAll(this.getDownstreamOutput(network, thisNodeId, 1));
+						
+						/* Downstream, level 2. */
+						Iterator<Id<Node>> level1IteratorDown = network.getConnectedOutNodeIds(thisNodeId).iterator();
+						while(level1IteratorDown.hasNext()){
+							Id<Node> level1IdDown = level1IteratorDown.next();
+							outputStrings.addAll(this.getDownstreamOutput(network, level1IdDown, 2));
+
+							/* Downstream, level 3. */
+							Iterator<Id<Node>> level2IteratorDown = network.getConnectedOutNodeIds(level1IdDown).iterator();
+							while(level2IteratorDown.hasNext()){
+								Id<Node> level2IdDown = level2IteratorDown.next();
+								outputStrings.addAll(this.getDownstreamOutput(network, level2IdDown, 3));
+								
+								/* Downstream, level 4. */
+								Iterator<Id<Node>> level3IteratorDown = network.getConnectedOutNodeIds(level2IdDown).iterator();
+								while(level3IteratorDown.hasNext()){
+									Id<Node> level3IdDown = level3IteratorDown.next();
+									outputStrings.addAll(this.getDownstreamOutput(network, level3IdDown, 4));
+								}
+							}
+						}
 						
 						/* Now write them all to file. */
 						for(String s : outputStrings){
@@ -357,10 +412,9 @@ public class FacilityMatcher {
 		log.info("Done evaluating network reach.");
 	}
 	
-	private List<String> getUpstreamOutput(PathDependentNetwork network, Id<Node> nodeId, int level){
+	private List<String> getUpstreamOutput(
+			CoordinateTransformation ct, PathDependentNetwork network, Id<Node> nodeId, int level){
 		List<String> list = new ArrayList<String>();
-
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		
 		Coord thisCoord = ct.transform(network.getPathDependentNode(nodeId).getCoord());
 
@@ -369,13 +423,17 @@ public class FacilityMatcher {
 			Id<Node> inNodeId = inIterator.next();
 			PathDependentNode inNode = network.getPathDependentNode(inNodeId);
 			
+			for(int i = 0; i < level; i++){
+				
+			}
+			
 			/*FIXME Remove after debugging. */
 			if(inNode == null){
 				log.debug("Oops!! Null node!!");
 			}
 			
 			Coord inCoord = ct.transform(inNode.getCoord());
-			String sIn = String.format("%s,%.6f,%.6f,%s,%.6f,%.6f,%d", 
+			String sIn = String.format("%s,%.6f,%.6f,%s,%.6f,%.6f,Up,%d", 
 					inNodeId.toString(),
 					inCoord.getX(),
 					inCoord.getY(),
@@ -389,4 +447,36 @@ public class FacilityMatcher {
 		return list;
 	}
 
+	private List<String> getDownstreamOutput(PathDependentNetwork network, Id<Node> nodeId, int level){
+		List<String> list = new ArrayList<String>();
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		
+		Coord thisCoord = ct.transform(network.getPathDependentNode(nodeId).getCoord());
+		
+		Iterator<Id<Node>> outIterator = network.getConnectedOutNodeIds(nodeId).iterator();
+		while(outIterator.hasNext()){
+			Id<Node> outNodeId = outIterator.next();
+			PathDependentNode outNode = network.getPathDependentNode(outNodeId);
+			
+			/*FIXME Remove after debugging. */
+			if(outNode == null){
+				log.debug("Oops!! Null node!!");
+			}
+			
+			Coord outCoord = ct.transform(outNode.getCoord());
+			String sOut = String.format("%s,%.6f,%.6f,%s,%.6f,%.6f,Down,%d", 
+					nodeId.toString(),
+					thisCoord.getX(),
+					thisCoord.getY(),
+					outNodeId.toString(),
+					outCoord.getX(),
+					outCoord.getY(),
+					level);
+			list.add(sOut);
+		}
+		
+		return list;
+	}
+	
 }

@@ -25,6 +25,8 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -34,7 +36,11 @@ import org.apache.log4j.Logger;
 /**
  * @author thomas
  *
+ * @deprecated To get a temporary directory for production, use {@link java.nio.file.Files#createTempDirectory(Path, String, FileAttribute[])}}.
+ * For tests, use the JUnit4 TemporaryFolder Rule.
+ *
  */
+@Deprecated
 public final class TempDirectoryUtil {
 	
 	// logger

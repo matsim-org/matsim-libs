@@ -2,25 +2,13 @@ package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.Benchmark;
-import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
-
-import java.util.Map;
 
 /**
  *  improvements feb'12
@@ -169,23 +157,8 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setComputingAccessibilityForMode(mode, val);
 	}
 
-	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
-		delegate.addSpatialGridDataExchangeListener(l);
-	}
-
 	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l) {
 		delegate.addZoneDataExchangeListener(l);
 	}
 
-	public void setUrbansimMode(boolean urbansimMode) {
-		delegate.setUrbansimMode(urbansimMode);
-	}
-
-	public Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
-		return delegate.getAccessibilityGrids();
-	}
-
-	public void addPtMatrix(PtMatrix ptMatrix) {
-		delegate.setPtMatrix(ptMatrix);
-	}
 }

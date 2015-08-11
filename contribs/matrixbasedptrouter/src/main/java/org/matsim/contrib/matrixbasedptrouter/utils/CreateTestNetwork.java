@@ -23,6 +23,10 @@
 package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,10 +111,10 @@ public final class CreateTestNetwork {
 	 * This method creates 4 pt stops for the test network from createTestNetwork().
 	 * The information about the coordinates will be written to a csv file.
 	 * The 4 pt stops are located as a square in the coordinate plane with a side length of 180 meter (see the sketch below).
-	 *  
+	 *
 	 * @return the location of the written csv file
 	 */
-	public static String createTestPtStationCSVFile(){
+	public static String createTestPtStationCSVFile(File file){
 
 		/*
 		 * (2)	    (5)------(8)
@@ -121,12 +125,8 @@ public final class CreateTestNetwork {
 		 * 	|(pt1)   |   (pt4)
 		 * (3)      (6)------(9)
 		 */
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 
-		String location = tempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
-		BufferedWriter bw = IOUtils.getBufferedWriter(location);
-
-		try{
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			bw.write("id,x,y"); 	// header
 			bw.newLine();
 			bw.write("1,10,10");	// pt stop next to node (3)
@@ -137,12 +137,10 @@ public final class CreateTestNetwork {
 			bw.newLine();
 			bw.write("4,190,10");  // pt stop next to node (9)
 			bw.newLine();
-			bw.close();
+			return file.getCanonicalPath();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		return location;
 	}
 
 	/**
@@ -153,16 +151,10 @@ public final class CreateTestNetwork {
 	 * 
 	 * @return the location of the written file
 	 */
-	public static String createTestPtTravelTimesAndDistancesCSVFile(){
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-
-
+	public static String createTestPtTravelTimesAndDistancesCSVFile(File file){
 		// set dummy travel times or distances to all possible pairs of pt stops
 
-		String location = tempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
-		BufferedWriter bw = IOUtils.getBufferedWriter(location);
-
-		try{
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(file.getCanonicalPath())) {
 			for (int origin = 1; origin <= 4; origin++){
 				for (int destination = 1; destination <= 4; destination++){
 					if (origin == destination) {
@@ -178,12 +170,10 @@ public final class CreateTestNetwork {
 				}
 			}
 			bw.flush();
-			bw.close();
+			return file.getCanonicalPath();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		return location;
 	}
 
 	/**

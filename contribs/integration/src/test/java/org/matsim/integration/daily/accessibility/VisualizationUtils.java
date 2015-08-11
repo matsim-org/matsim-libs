@@ -35,7 +35,7 @@ import org.matsim.core.utils.misc.ExeRunner;
  * @author nagel
  *
  */
-public class VisualizationUtils {
+class VisualizationUtils {
 	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
