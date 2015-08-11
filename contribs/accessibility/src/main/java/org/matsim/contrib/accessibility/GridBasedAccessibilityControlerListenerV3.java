@@ -112,7 +112,7 @@ import java.util.TreeMap;
 public final class GridBasedAccessibilityControlerListenerV3
 		implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
-	private final AccessibilityControlerListenerDelegate accessibilityControlerListener = new AccessibilityControlerListenerDelegate();
+	private final AccessibilityCalculator accessibilityControlerListener = new AccessibilityCalculator();
 	private final List<SpatialGridDataExchangeInterface> spatialGridDataExchangeListener = new ArrayList<>();
 
 	private Network network;
@@ -157,7 +157,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.initAccessibilityParameters(config);
 
 		// aggregating facilities to their nearest node on the road network
-		accessibilityControlerListener.setAggregatedOpportunities(accessibilityControlerListener.aggregatedOpportunities(opportunities, network));
+		accessibilityControlerListener.aggregateOpportunities(opportunities, network);
 		// yyyy ignores the "capacities" of the facilities.  kai, mar'14
 		
 		
@@ -186,8 +186,10 @@ public final class GridBasedAccessibilityControlerListenerV3
 		if (urbanSimMode) {
 			if (outputSubdirectory == null) {
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
 			} else {
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
+				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
 			}
 		}
 		accessibilityControlerListener.initDefaultContributionCalculators(event.getControler());
@@ -214,7 +216,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, event.getControler().getScenario());
+		accessibilityControlerListener.computeAccessibilities(event.getControler().getScenario());
 
 		if (urbansimAccessibilityWriter != null) {
 			urbansimAccessibilityWriter.close();

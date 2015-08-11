@@ -21,7 +21,6 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.roadpricing.RoadPricingScheme;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,14 +56,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author thomas, knagel
  *
  */
-/*package*/ final class AccessibilityControlerListenerDelegate {
+/*package*/ final class AccessibilityCalculator {
 
-	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerDelegate.class);
+	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
 
 	// measuring points (origins) for accessibility calculation
 	private ActivityFacilitiesImpl measuringPoints;
-	// containing parcel coordinates for accessibility feedback
-	private ActivityFacilitiesImpl parcels;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
@@ -73,9 +70,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 	private PtMatrix ptMatrix;
 
-	private RoadPricingScheme scheme ;
-
-	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = new ArrayList<>();
+	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
@@ -89,11 +84,16 @@ import java.util.concurrent.ConcurrentHashMap;
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
 
-	AccessibilityControlerListenerDelegate() {
+	AccessibilityCalculator() {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			this.isComputingMode.put( mode, false ) ;
 		}
 	}
+
+	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
+		this.zoneDataExchangeListeners.add(l);
+	}
+
 
 	// XXX Ugly but temporary
 	final void initDefaultContributionCalculators( final Controler controler ) {
@@ -102,7 +102,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				new NetworkModeAccessibilityContributionCalculator(
 						controler.getLinkTravelTimes(),
 						controler.getTravelDisutilityFactory(),
-						controler.getScenario() ) );
+						controler.getScenario()));
 		calculators.put(
 				Modes4Accessibility.freeSpeed,
 				new NetworkModeAccessibilityContributionCalculator(
@@ -118,7 +118,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				Modes4Accessibility.bike,
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.bike,
-						controler.getScenario() ) );
+						controler.getScenario()));
 		calculators.put(
 				Modes4Accessibility.pt,
 				new MatrixBasedPtAccessibilityContributionCalculator(
@@ -167,12 +167,13 @@ import java.util.concurrent.ConcurrentHashMap;
 	 *     |\
 	 *     | \
 	 *     k2 k3
-	 * 
+	 *
+	 * Calculates the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j
+	 *
 	 * @param opportunities such as workplaces, either given at a parcel- or zone-level
 	 * @param network giving the road network
-	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	final AggregationObject[] aggregatedOpportunities(final ActivityFacilities opportunities, Network network){
+	final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
 		// yyyy this method ignores the "capacities" of the facilities.  kai, mar'14
 
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
@@ -238,12 +239,11 @@ import java.util.concurrent.ConcurrentHashMap;
 			
 		}
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
-		return opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
+		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
 
 	
-	final void accessibilityComputation(
-			AccessibilityCSVWriter writer,
+	final void computeAccessibilities(
 			Scenario scenario) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
@@ -328,27 +328,9 @@ import java.util.concurrent.ConcurrentHashMap;
 					}
 				}
 
-				if (writer != null) {
-					// writing measured accessibilities for current measuring point
-					writer.writeRecord(origin, fromNode, accessibilities ) ;
-					// (I think the above is the urbansim output.  Better not touch it. kai, feb'14)
+				for (ZoneDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+					zoneDataExchangeInterface.setZoneAccessibilities(origin, fromNode, accessibilities);
 				}
-
-				for (ZoneDataExchangeInterface aZoneDataExchangeListenerList : this.zoneDataExchangeListenerList) {
-					aZoneDataExchangeListenerList.setZoneAccessibilities(origin, accessibilities);
-				}
-
-				// yy The above storage logic is a bit odd (probably historically grown and then never cleaned up):
-				// * For urbansim, the data is directly written to file and then forgotten.
-				// * In addition, the cell-based data is memorized for writing it in a different format (spatial grid, for R, not used any more).
-				// * Since the zone-based data is not memorized, there is a specific mechanism to set the value in registered listeners.
-				// * The zone-based listener also works for cell-based data.
-				// * I don't think that it is used anywhere except in one test.  Easiest would be to get rid of this but it may not be completely
-				//  easy to fix the test (maybe memorize all accessibility values in all cases).
-				// It might be a lot easier to just memorize all the data right away.
-				// kai, may'15
-
-
 			}
 
 		}
@@ -371,36 +353,8 @@ import java.util.concurrent.ConcurrentHashMap;
 		this.isComputingMode.put(mode, val) ;
 	}
 
-	/**
-	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
-	 * @param l
-	 */
-	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
-		this.zoneDataExchangeListenerList.add(l);
-	}
-
-	public ActivityFacilitiesImpl getParcels() {
-		return parcels;
-	}
-
-	public void setParcels(ActivityFacilitiesImpl parcels) {
-		this.parcels = parcels;
-	}
-
-	public void setAggregatedOpportunities(AggregationObject[] aggregatedOpportunities) {
-		this.aggregatedOpportunities = aggregatedOpportunities;
-	}
-
 	public Map<Modes4Accessibility, Boolean> getIsComputingMode() {
 		return isComputingMode;
-	}
-
-	public RoadPricingScheme getScheme() {
-		return scheme;
-	}
-
-	public void setScheme(RoadPricingScheme scheme) {
-		this.scheme = scheme;
 	}
 
 	/**
@@ -432,7 +386,6 @@ import java.util.concurrent.ConcurrentHashMap;
 	ActivityFacilitiesImpl getMeasuringPoints() {
 		return measuringPoints;
 	}
-
 
 	void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
