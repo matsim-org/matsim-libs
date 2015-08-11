@@ -24,6 +24,7 @@ import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
@@ -53,6 +54,8 @@ public class Episodes2Matrix {
 
     private static final String DIM_SEPARATOR = ".";
 
+    private static final String DBG_TOUCHED = "dbg_touched";
+
     public static void main(String[] args) throws IOException {
         String in = args[0];
         String rootDir = args[1];
@@ -66,11 +69,13 @@ public class Episodes2Matrix {
 
         logger.info("Restoring original activity types...");
         ProxyTaskRunner.run(new RestoreActTypes(), persons, true);
-        logger.info("Replaceing misc types...");
+        logger.info("Replacing misc types...");
         new ReplaceMiscType().apply(persons);
+        logger.info("Imputing month attributes...");
+        new ImputeMonth().apply(persons);
         logger.info("Assigning leg purposes...");
         ProxyTaskRunner.run(new SetLegPurposes(), persons);
-        logger.info("Infering wecommuter purpose...");
+        logger.info("Inferring wecommuter purpose...");
         ProxyTaskRunner.run(new InfereWeCommuter(100000), persons);
 
         Map<String, LegPredicate> modePreds = new LinkedHashMap<>();
@@ -79,7 +84,17 @@ public class Episodes2Matrix {
         Map<String, LegPredicate> purposePreds = new LinkedHashMap<>();
         purposePreds.put(ActivityType.BUSINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS));
         purposePreds.put(ActivityType.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION));
-        purposePreds.put(ActivityType.LEISURE, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE));
+
+        PredicateORComposite leisurePred = new PredicateORComposite();
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "visit"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "gastro"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "culture"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "private"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "pickdrop"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "sport"));
+
+        purposePreds.put(ActivityType.LEISURE, leisurePred);
         purposePreds.put(ActivityType.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.SHOP));
         purposePreds.put(ActivityType.WORK, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.WORK));
         purposePreds.put(ActivityType.VACATIONS_SHORT, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType
@@ -160,6 +175,22 @@ public class Episodes2Matrix {
             }
         }
 
+        int cnt = 0;
+        for(Person person : persons) {
+            for(Episode episode : person.getEpisodes()) {
+                for(Segment leg : episode.getLegs()) {
+                    String touched = leg.getAttribute(DBG_TOUCHED);
+                    if(touched == null) {
+                        leg.setAttribute(DBG_TOUCHED, "0");
+                        cnt++;
+                    }
+                }
+            }
+        }
+        logger.info(String.format("%s trips are untouched.", cnt));
+
+        XMLWriter writer = new XMLWriter();
+        writer.write(rootDir + "/plans.xml.gz", persons);
         logger.info("Done.");
     }
 
@@ -179,6 +210,11 @@ public class Episodes2Matrix {
 
                         if(origin != null && dest != null) {
                             m.add(origin, dest, 1);
+
+                            String touched = leg.getAttribute(DBG_TOUCHED);
+                            int cnt = 0;
+                            if(touched != null) cnt = Integer.parseInt(touched);
+                            leg.setAttribute(DBG_TOUCHED, String.valueOf(cnt + 1));
                         }
                     }
                 }
@@ -186,13 +222,5 @@ public class Episodes2Matrix {
         }
 
         return m;
-    }
-
-    private static class DummyPredicate implements LegPredicate {
-
-        @Override
-        public boolean test(Segment leg) {
-            return true;
-        }
     }
 }
