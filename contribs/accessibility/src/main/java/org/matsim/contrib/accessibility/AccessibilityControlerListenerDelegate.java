@@ -1,10 +1,5 @@
 package org.matsim.contrib.accessibility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -12,7 +7,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Benchmark;
@@ -30,6 +24,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * improvements aug'12<ul>
@@ -81,8 +80,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 	private RoadPricingScheme scheme ;
 
-	private ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
-	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
+	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = new ArrayList<>();
 
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
@@ -350,9 +348,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 					// (I think the above is the urbansim output.  Better not touch it. kai, feb'14)
 				}
 
-				if(this.zoneDataExchangeListenerList != null){
-					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
-						this.zoneDataExchangeListenerList.get(i).setZoneAccessibilities(origin, accessibilities );
+				for (ZoneDataExchangeInterface aZoneDataExchangeListenerList : this.zoneDataExchangeListenerList) {
+					aZoneDataExchangeListenerList.setZoneAccessibilities(origin, accessibilities);
 				}
 
 				// yy The above storage logic is a bit odd (probably historically grown and then never cleaned up):
@@ -385,38 +382,18 @@ import org.matsim.roadpricing.RoadPricingScheme;
 	}
 
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
-		this.isComputingMode.put( mode, val ) ;
+		this.isComputingMode.put(mode, val) ;
 	}
 
-
-	/**
-	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
-	 * @param l
-	 */
-	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l){
-		if(this.spatialGridDataExchangeListenerList == null)
-			this.spatialGridDataExchangeListenerList = new ArrayList<SpatialGridDataExchangeInterface>();
-
-		log.info("Adding new SpatialGridDataExchange listener...");
-		this.spatialGridDataExchangeListenerList.add(l);
-		log.info("... done!");
-	}
-
-	
 	/**
 	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
 	 * @param l
 	 */
 	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
-		if(this.zoneDataExchangeListenerList == null)
-			this.zoneDataExchangeListenerList = new ArrayList<ZoneDataExchangeInterface>();
-
-		log.info("Adding new SpatialGridDataExchange listener...");
 		this.zoneDataExchangeListenerList.add(l);
-		log.info("... done!");
 	}
 
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
@@ -460,10 +437,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 
 	public void setScheme(RoadPricingScheme scheme) {
 		this.scheme = scheme;
-	}
-
-	public ArrayList<SpatialGridDataExchangeInterface> getSpatialGridDataExchangeListenerList() {
-		return spatialGridDataExchangeListenerList;
 	}
 
 	public Benchmark getBenchmark() {

@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -118,6 +117,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		implements ShutdownListener, StartupListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	private final AccessibilityControlerListenerDelegate accessibilityControlerListener = new AccessibilityControlerListenerDelegate();
+	private final List<SpatialGridDataExchangeInterface> spatialGridDataExchangeListener = new ArrayList<>();
 
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
@@ -200,8 +200,8 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 
 	private boolean alreadyActive = false ;
-	private List<ActivityFacilities> additionalFacilityData = new ArrayList<ActivityFacilities>() ; 
-	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<String,Tuple<SpatialGrid,SpatialGrid>>() ;
+	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
+	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<>() ;
 	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
 	private boolean lockedForAdditionalFacilityData = false;
 	
@@ -276,10 +276,9 @@ public final class GridBasedAccessibilityControlerListenerV3
 			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
 		}
 
-		if(accessibilityControlerListener.getSpatialGridDataExchangeListenerList() != null){
-			log.info("Triggering " + accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size() + " SpatialGridDataExchangeListener(s) ...");
-			for(int i = 0; i < accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size(); i++)
-				accessibilityControlerListener.getSpatialGridDataExchangeListenerList().get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
+		log.info("Triggering " + spatialGridDataExchangeListener.size() + " SpatialGridDataExchangeListener(s) ...");
+		for (SpatialGridDataExchangeInterface spatialGridDataExchangeInterface : spatialGridDataExchangeListener) {
+			spatialGridDataExchangeInterface.setAndProcessSpatialGrids(accessibilityControlerListener.getAccessibilityGrids());
 		}
 
 	}
@@ -287,7 +286,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 */
-	private final void writePlottingData(String adaptedOutputDirectory) {
+	private void writePlottingData(String adaptedOutputDirectory) {
 
 		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
 		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
@@ -308,9 +307,9 @@ public final class GridBasedAccessibilityControlerListenerV3
 		
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeField(Labels.POPULATION_DENSITIY);
-		writer.writeNewLine(); 
+		writer.writeNewLine();
 
-		final SpatialGrid spatialGrid = this.getAccessibilityGrids().get( Modes4Accessibility.freeSpeed ) ;
+		final SpatialGrid spatialGrid = accessibilityControlerListener.getAccessibilityGrids().get(Modes4Accessibility.freeSpeed) ;
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
@@ -320,7 +319,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 					if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
+						final SpatialGrid theSpatialGrid = accessibilityControlerListener.getAccessibilityGrids().get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
 							writer.writeField( value ) ;
@@ -369,7 +368,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-				this.getAccessibilityGrids().put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
+				accessibilityControlerListener.getAccessibilityGrids().put(mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize)) ;
 			}
 		}
 	}
@@ -421,7 +420,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-				this.getAccessibilityGrids().put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
+				accessibilityControlerListener.getAccessibilityGrids().put(mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN)) ;
 			}
 		}
 		lockedForAdditionalFacilityData  = true ;
@@ -429,8 +428,8 @@ public final class GridBasedAccessibilityControlerListenerV3
 			if ( this.additionalSpatialGrids.get( facilities.getName() ) != null ) {
 				throw new RuntimeException("this should not yet exist ...") ;
 			}
-			Tuple<SpatialGrid,SpatialGrid> spatialGrids = new Tuple<SpatialGrid,SpatialGrid>(
-					new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) , new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) ) ;
+			Tuple<SpatialGrid,SpatialGrid> spatialGrids = new Tuple<>(
+					new SpatialGrid(minX, minY, maxX, maxY, cellSize, 0.), new SpatialGrid(minX, minY, maxX, maxY, cellSize, 0.)) ;
 			this.additionalSpatialGrids.put( facilities.getName(), spatialGrids ) ;
 		}
 	}
@@ -480,22 +479,11 @@ public final class GridBasedAccessibilityControlerListenerV3
 	}
 
 	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
-		accessibilityControlerListener.addSpatialGridDataExchangeListener(l);
-	}
-
-	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l) {
-		accessibilityControlerListener.addZoneDataExchangeListener(l);
+		this.spatialGridDataExchangeListener.add(l);
 	}
 
 	public void setUrbansimMode(boolean urbansimMode) {
 		accessibilityControlerListener.setUrbansimMode(urbansimMode);
 	}
 
-	public Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
-		return accessibilityControlerListener.getAccessibilityGrids();
-	}
-
-	public void addPtMatrix(PtMatrix ptMatrix) {
-		accessibilityControlerListener.setPtMatrix(ptMatrix);
-	}
 }
