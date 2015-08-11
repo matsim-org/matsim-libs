@@ -1,14 +1,14 @@
-package playground.dhosse.cl;
+package playground.dhosse.cl.population;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,12 +19,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -35,11 +37,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dhosse.cl.population.Etapa;
-import playground.dhosse.cl.population.Persona;
-import playground.dhosse.cl.population.Viaje;
+import playground.dhosse.cl.Constants;
+import playground.dhosse.cl.Constants.Modes;
 
-import com.sun.xml.bind.v2.schemagen.xmlschema.List;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
@@ -47,30 +47,36 @@ public class CSVToPlans {
 	private final String carAvail = "carAvail";
 	
 	private final String shapefile;
-	private final String ouputPlansFile;
+	private final String ouputDirectory;
 	
 	private Scenario scenario;
 	private ObjectAttributes agentAttributes;
 	
-	private int legCounter = 0;
-	
-	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
+	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", Constants.toCRS);
+	CoordinateTransformation transf = TransformationFactory.getCoordinateTransformation(Constants.toCRS, "EPSG:4326");
 	
 	private Map<String,Persona> personas = new HashMap<>();
 	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
 	private Map<String, Coord> hogarId2Coord = new HashMap<>();
+	private Map<String,String> comunaName2Id = new HashMap<>();
 	
-	public CSVToPlans(String outputFile){
+	private static final Logger log = Logger.getLogger(CSVToPlans.class);
+	private final Config config;
+	
+	private Map<String,Integer> legMode2NumberOfShotLegs = new HashMap<>();
+	private int legCounter = 0;
+	
+	public CSVToPlans(Config config, String outputFile){
 		
-		this(null, outputFile);
+		this(config, outputFile, null);
 		
 	}
 	
-	public CSVToPlans(String outputFile, String shapefileName){
+	public CSVToPlans(Config config, String outputDirectory, String shapefileName){
 		
+		this.config = config;
 		this.shapefile = shapefileName;
-		this.ouputPlansFile = outputFile;
-		
+		this.ouputDirectory = outputDirectory;
 	}
 	
 	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile){
@@ -82,11 +88,47 @@ public class CSVToPlans {
 		this.createPersons();
 		this.write();
 		
-		System.out.println("created " + Integer.toString(this.legCounter) + " legs!");
+	}
+	
+	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile, String comunasFile){
+		
+		this.readHogares(hogaresFile);
+		this.readPersonas(personasFile);
+		this.readViajes(viajesFile);
+		this.readEtapas(etapasFile);
+		this.readComunas(comunasFile);
+		this.createPersons();
+		this.write();
+		
+	}
+	
+	private void readComunas(String comunasFile){
+		
+		BufferedReader reader = IOUtils.getBufferedReader(comunasFile);	
+		
+		try {
+			
+			String line = reader.readLine();
+			
+			while( (line = reader.readLine()) != null ){
+				
+				String[] tokens = line.split(";");
+				
+				this.comunaName2Id.put(tokens[1], tokens[0]);
+				
+			}
+			
+			reader.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
 	private void readHogares(String hogaresFile){
+		
+		log.info("Reading households from file " + hogaresFile + "...");
 		
 		final int idxHogarId = 0;
 		final int idxCoordX = 4;
@@ -94,6 +136,8 @@ public class CSVToPlans {
 		final int idxNVeh = 11;
 		
 		BufferedReader reader = IOUtils.getBufferedReader(hogaresFile);
+		
+		int counter = 0;
 		
 		try {
 			
@@ -111,8 +155,11 @@ public class CSVToPlans {
 				String x = splittedLine[idxCoordX].replace("," , ".");
 				String y = splittedLine[idxCoordY].replace("," , ".");
 				this.hogarId2Coord.put(id, new CoordImpl(x, y));
+				counter++;
 				
 			}
+			
+			reader.close();
 			
 		} catch (IOException e) {
 			
@@ -120,9 +167,13 @@ public class CSVToPlans {
 			
 		}
 		
+		log.info("Read data of " + counter + " households...");
+		
 	}
 	
 	private void readPersonas(String personasFile){
+		
+		log.info("Reading persons from file " + personasFile + "...");
 		
 		final int idxHogarId = 0;
 		final int idxPersonId = 1;
@@ -132,6 +183,8 @@ public class CSVToPlans {
 		final int idxLicence = 6;
 		final int idxCoordX = 16;
 		final int idxCoordY = 17;
+		
+		int counter = 0;
 		
 		BufferedReader reader = IOUtils.getBufferedReader(personasFile);
 		
@@ -161,6 +214,7 @@ public class CSVToPlans {
 				}
 				
 				this.personas.put(id,persona);
+				counter++;
 				
 			}
 			
@@ -172,12 +226,16 @@ public class CSVToPlans {
 			
 		}
 		
+		log.info("Read data of " + counter + " persons...");
+		
 	}
 	
 	double latestStart = Double.NEGATIVE_INFINITY;
 	double latestEnd = Double.NEGATIVE_INFINITY;
 	
 	private void readViajes(String viajesFile){
+		
+		log.info("Reading trips from file " + viajesFile + "...");
 		
 		final int idxPersonId = 1;
 		final int idxId = 2;
@@ -191,11 +249,11 @@ public class CSVToPlans {
 		final int idxStartTime = 21;
 		final int idxEndTime = 22;
 		
+		int counter = 0;
+		
 		BufferedReader reader = IOUtils.getBufferedReader(viajesFile);
 		
 		try {
-			
-			int counter = 0;
 			
 			String line = reader.readLine();
 			
@@ -231,17 +289,19 @@ public class CSVToPlans {
 			
 			reader.close();
 			
-			System.out.println(counter);
-			
 		} catch (IOException e) {
 			
 			e.printStackTrace();
 			
 		}
 		
+		log.info("Read data of " + counter + " trips...");
+		
 	}
 	
 	private void readEtapas(String etapasFile){
+		
+		log.info("Reading stages from file " + etapasFile + "...");
 		
 		final int idxPersonId = 1;
 		final int idxViajeId = 2;
@@ -252,6 +312,8 @@ public class CSVToPlans {
 		final int idxDestX = 10;
 		final int idxDestY = 11;
 		final int idxMode = 12;
+		
+		int counter = 0;
 		
 		BufferedReader reader = IOUtils.getBufferedReader(etapasFile);
 		
@@ -282,6 +344,7 @@ public class CSVToPlans {
 					Etapa etapa = new Etapa(mode, comunaOrigen, comunaDestino, originX, originY, destinationX, destinationY);
 					
 					viaje.addEtapa(etapa);
+					counter++;
 					
 				}
 				
@@ -294,6 +357,8 @@ public class CSVToPlans {
 			e.printStackTrace();
 			
 		}
+		
+		log.info("Read data of " + counter + " stages...");
 		
 	}
 	
@@ -310,15 +375,6 @@ public class CSVToPlans {
 		
 		for(Persona persona : this.personas.values()){
 
-			boolean toAdd = true;
-			
-//			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
-//					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
-//					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
-//					persona.getId().equals("16709103")){
-//				continue;
-//			}
-			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
 			
 			Plan plan = popFactory.createPlan();
@@ -335,8 +391,31 @@ public class CSVToPlans {
 					
 					Coord origin = etapa.getOrigin();
 					Coord destination = etapa.getDestination();
+					
+					double reportedTravelTime = 0;
+					
+					if(viaje.getEtapas().size() < 2){
+						reportedTravelTime = viaje.getEndTime() - viaje.getStartTime();
+					}
+					
+					if(persona.getId().equals("13768103")){
+						System.out.println();
+					}
+					
+					String proposito = viaje.getProposito();
+					if(proposito.equals("home")){
+						destination = persona.getHomeCoord();
+						
+					} else if(persona.getWorkCoord() != null){
+						if(proposito.equals("work")){
+//							destination = persona.getWorkCoord();
+						}
+					}
+					
 					if(viaje.getEtapas().indexOf(etapa) >= viaje.getEtapas().size() - 1){
+						
 						destination = viaje.getDestination() != null ? viaje.getDestination() : etapa.getDestination();
+						
 					}
 					
 					if((origin == null || destination == null) || origin.getX() == 0 || origin.getY() == 0 || destination.getX() == 0 || destination.getY() == 0){
@@ -352,14 +431,22 @@ public class CSVToPlans {
 							if(gOrigin == null || gDest == null){
 								
 								origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
-								destination = destination == null ? new CoordImpl(0.0, 0.0) : destination;
-//								toAdd = false;
-//								break;
+								destination = etapa.getDestination() == null ? new CoordImpl(0.0, 0.0) : etapa.getDestination();
 								
 							} else{
 							
-								origin = ct.transform(shoot(gOrigin));
-								destination = this.ct.transform(shoot(gDest));
+								String legMode = this.getLegMode(Integer.parseInt(etapa.getMode()));
+								origin = lastActivity == null ? ct.transform(shoot(legMode, gOrigin)) : lastActivity.getCoord();
+								
+								if(viaje.getEndTime() != 0 && viaje.getStartTime() != 0 && !legMode.equals(TransportMode.car)){
+									destination = destination == null ? shootLegDestination(legMode, origin, gDest, reportedTravelTime) : destination;
+								} else{
+									if(legMode.equals(TransportMode.walk)){
+										destination = destination == null ? shootWalkTrip(origin, gDest) : destination;
+									} else{
+										destination = destination == null ? this.ct.transform(shoot(legMode, gDest)) : destination;
+									}
+								}
 							
 							}
 							
@@ -367,8 +454,7 @@ public class CSVToPlans {
 							
 							origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
 							destination = destination == null ? new CoordImpl(0.0, 0.0) : destination;
-//							toAdd = false;
-//							break;
+
 						}
 						
 					}
@@ -394,10 +480,6 @@ public class CSVToPlans {
 						}
 						
 						anterior = popFactory.createActivityFromCoord(actType, origin);
-						if(viaje.getStartTime() < 0){
-//							toAdd = false;
-//							break;
-						}
 						anterior.setEndTime(viaje.getStartTime());
 						
 					} else{
@@ -407,15 +489,6 @@ public class CSVToPlans {
 						if(!anterior.getType().equals("pt interaction")){
 						
 							double endTime = viaje.getStartTime();
-							
-							if(endTime < 0){
-//								toAdd = false;
-//								break;
-							}
-							
-//							if(endTime < anterior.getStartTime()){
-//								endTime += 24*3600;
-//							}
 							
 							anterior.setEndTime(endTime);
 						
@@ -427,24 +500,10 @@ public class CSVToPlans {
 					
 					if(idxEtapa >= viaje.getEtapas().size() - 1){
 						
-						String proposito = viaje.getProposito();
-						if(proposito.equals("home")){
-							destination = persona.getHomeCoord();
-						} else if(persona.getWorkCoord() != null){
-							if(proposito.equals("work")){
-								destination = persona.getWorkCoord();
-							}
-						}
-						
 						posterior = popFactory.createActivityFromCoord(proposito, destination);
 						
 						double startTime = viaje.getEndTime();
 						
-						if(startTime < 0){
-//							toAdd = false;
-//							break;
-						}
-
 						lastActivity = lastActivity == null ? anterior : lastActivity;
 						
 						if(startTime < lastActivity.getEndTime()){
@@ -469,9 +528,6 @@ public class CSVToPlans {
 						agentAttributes.putAttribute(person.getId().toString(), this.carAvail, this.carAvail);
 					}
 					
-					if(legMode.equals(TransportMode.walk) && (posterior.getType().equals("pt interaction") || posterior.getType().equals("pt interaction"))){
-						legMode = TransportMode.transit_walk;
-					}
 					Leg leg = popFactory.createLeg(legMode);
 					
 					if(anterior != null){
@@ -494,20 +550,16 @@ public class CSVToPlans {
 					
 				}
 				
-				if(!toAdd){
-					break;
-				}
-				
 				idx++;
 				
 			}
 			
 			int nLegs = 0;
-			for(PlanElement pE : planElements){
-				if(pE instanceof Activity){
-					plan.addActivity((Activity)pE);
-				} else{
-					plan.addLeg((Leg)pE);
+			for(PlanElement pe : planElements){
+				if(pe instanceof Activity){
+					plan.addActivity((Activity)pe);
+				}else{
+					plan.addLeg((Leg)pe);
 					nLegs++;
 				}
 			}
@@ -515,225 +567,26 @@ public class CSVToPlans {
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			
-			//a plan needs at least 3 plan elements (act - leg - act)
 			int add = 0;
-//			if(plan.getPlanElements().size() > 2){
-//				if(person.getId().toString().equals("11508001")){
-//					System.out.println("");
-//				}
-//				if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-//					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
-//					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
-//				}
-//				if(plan.getPlanElements().size() < 2) continue;
-//				else if(plan.getPlanElements().size() >= 2){
-//					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-//						continue;
-//					}
-//				}
-//				
-//				System.out.println(person.getId());
-//				if(person.getId().toString().equals("21009101")){
-//					System.out.println("");
-//				}
-//				Plan modifiedPlan = checkConsistencyOfPlan(person.getSelectedPlan());
-//				
-//				person.removePlan(plan);
-//				plan = modifiedPlan;
-//				person.addPlan(plan);
-//				person.setSelectedPlan(plan);
-//				
-//				if(plan.getPlanElements().size() > 2){
-//					if(plan.getPlanElements().get(plan.getPlanElements().size() - 1) instanceof Leg){
-//						plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
-//					}
-//					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-//						continue;
-//					}
-//				}
-//				if(plan.getPlanElements().size() <= 2) continue;
-				if(plan.getPlanElements().size() > 2){
-					for(PlanElement pe : plan.getPlanElements()){
-						if(pe instanceof Activity){
-							Activity act = (Activity)pe;
-							if(act.getCoord() == null){
-								System.out.println(person.getId().toString());
-							}
-						}
-					}
-					population.addPerson(person);
-				}
-//				add++;
-//			}
-//			this.legCounter += add * nLegs;
-			
-		}
-		
-	}
-	
-	private Plan checkConsistencyOfPlan(Plan plan){
-		
-		Plan newPlan = this.scenario.getPopulation().getFactory().createPlan();
-		java.util.List<PlanElement> planElements = new ArrayList<>();
-		
-		Activity firstAct = null;
-		double firstEndTime = Double.POSITIVE_INFINITY;
-		double lastStartTime = Double.NEGATIVE_INFINITY;
-		int indexToInsert = 0;
-		
-		boolean wrapAround = ((Activity)plan.getPlanElements().get(0)).getType().equals(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType());
-		
-		for(int ii = 0; ii < plan.getPlanElements().size(); ii++){
-
-			PlanElement pe = plan.getPlanElements().get(ii);
-			
-			if(pe instanceof Activity){
-				
-				Activity act = (Activity) pe;
-				
-				Activity wrappedAct = null;
-				
-				double startTime = act.getStartTime();
-				
-				double endTime = act.getEndTime();
-				
-				if(ii == 0){
-					
-					firstAct = act;
-					firstEndTime = endTime;
-				
-				} 
-				
-				if(startTime > lastStartTime){
-					
-					lastStartTime = startTime;
-					
-				}
-
-				if(startTime > 24 * 3600){
-					
-					if(!wrapAround) break;
-
-					double reducedStartTime = startTime - 24*3600;
-					
-					if(reducedStartTime >= firstEndTime){
-					
-						continue;
-						
-					} else{
-						
-						if(!act.getType().equals(firstAct.getType())){
-							act.setStartTime(reducedStartTime);
-							if(indexToInsert >= ii){
-								indexToInsert = 0;
-							}
-						} else{
-							
-							firstAct.setStartTime(reducedStartTime);
-							continue;
-							
-						}
-						
-					}
-					
-				}
-				
-				if(endTime > 24 * 3600){
-					
-					if(!wrapAround){
-						
-						act.setEndTime(24*3600);
-						
-					} else{
-						
-						double reducedEndTime = endTime - 24 * 3600;
-						
-						if(reducedEndTime >= firstEndTime){
-							
-							break;
-							
-						} else{
-							
-							if(act.getStartTime() <= reducedEndTime){
-								
-								act.setEndTime(reducedEndTime);
-								
-//								if(indexToInsert >= ii){
-//									indexToInsert = 0;
-//								}
-								
-							} else{
-								
-								Activity temp = act;
-								
-								act = this.scenario.getPopulation().getFactory().createActivityFromCoord(temp.getType(), temp.getCoord());
-								act.setStartTime(temp.getStartTime());
-								
-								wrappedAct = this.scenario.getPopulation().getFactory().createActivityFromCoord(temp.getType(), temp.getCoord());
-								wrappedAct.setEndTime(reducedEndTime);
-								
-							}
-							
-						}
-						
-					}
-					
-				}
-				
-				planElements.add(indexToInsert, act);
-				if(wrappedAct != null){
-					if(indexToInsert >= ii){
-						indexToInsert = 0;
-					}
-					planElements.add(indexToInsert, wrappedAct);
-						
-				}
-				
-			} else{
-				
-				planElements.add(indexToInsert, pe);
-				
+			//a plan needs at least 3 plan elements (act - leg - act)
+			if(plan.getPlanElements().size() > 2){
+				population.addPerson(person);
+				add = 1;
 			}
 			
-			indexToInsert++;
+			this.legCounter += add * nLegs;
 			
 		}
 		
-		for(PlanElement pe : planElements){
-			if(pe instanceof Activity){
-				newPlan.addActivity((Activity)pe);
-			} else{
-				newPlan.addLeg((Leg)pe);
-			}
+		log.info("Created " + population.getPersons().size() + " persons and " + this.legCounter + " legs.");
+		log.info("Dumping information about legs that were shot...");
+		for(String mode : this.legMode2NumberOfShotLegs.keySet()){
+			log.info("Shot " + this.legMode2NumberOfShotLegs.get(mode) + " " + mode + " legs.");
 		}
-		
-		return newPlan;
 		
 	}
 	
 	private Map<String, Geometry> createComunaGeometries() {
-		
-		BufferedReader reader = IOUtils.getBufferedReader("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/exportedFilesFromDatabase/comunas.csv");
-		
-		Map<String,String> comunaName2Id = new HashMap<>();
-		
-		try {
-			
-			String line = reader.readLine();
-			
-			while( (line = reader.readLine()) != null ){
-				
-				String[] tokens = line.split(";");
-				
-				comunaName2Id.put(tokens[1], tokens[0]);
-				
-			}
-			
-			reader.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(this.shapefile);
 		Map<String, Geometry> geometries = new HashMap<String, Geometry>();
@@ -758,8 +611,8 @@ public class CSVToPlans {
 	
 	private void write(){
 		
-		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
-		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputPlansFile);
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile(this.ouputDirectory + "agentAttributes.xml");
+		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputDirectory + "plans.xml.gz");
 		
 	}
 	
@@ -788,41 +641,22 @@ public class CSVToPlans {
 	private String getLegMode(int index){
 		
 		switch(index){
-//			case 1: return TransportMode.car;
-//			case 2: return TransportMode.pt;
-//			case 3: return TransportMode.pt;
-//			case 4: return TransportMode.pt;
-//			case 5: return "collective taxi";
-//			case 6: return TransportMode.pt;
-//			case 7: return "taxi";
-//			case 8: return TransportMode.walk;
-//			case 9: return TransportMode.bike;
-//			case 10: return "motorcycle";
-//			case 11: return TransportMode.pt;
-//			case 12: return TransportMode.pt;
-//			case 13: return TransportMode.pt;
-//			case 14: return TransportMode.pt;
-//			case 15: return "other";
-//			case 16: return TransportMode.pt;
-//			case 17: return TransportMode.ride;
-//			case 18: return TransportMode.ride;
-//			default: return TransportMode.other;
 			case 1: return TransportMode.car;
-			case 2: return "feeder bus";
-			case 3: return "main bus";
-			case 4: return "subway";
-			case 5: return "collective taxi";
-			case 6: return "school bus";
-			case 7: return "taxi";
+			case 2: return Constants.Modes.bus.toString();
+			case 3: return Constants.Modes.bus.toString();
+			case 4: return Constants.Modes.metro.toString();
+			case 5: return Constants.Modes.colectivo.toString();
+			case 6: return Constants.Modes.school_bus.toString();
+			case 7: return Constants.Modes.taxi.toString();
 			case 8: return TransportMode.walk;
 			case 9: return TransportMode.bike;
-			case 10: return "motorcycle";
-			case 11: return "institutional bus";
-			case 12: return "rural bus";
-			case 13: return "school bus";
-			case 14: return "urban bus";
-			case 15: return "other";
-			case 16: return "train";
+			case 10: return Constants.Modes.motorcycle.toString();
+			case 11: return TransportMode.other;
+			case 12: return TransportMode.other;
+			case 13: return Constants.Modes.school_bus.toString();
+			case 14: return TransportMode.other;
+			case 15: return TransportMode.other;
+			case 16: return Constants.Modes.train.toString();
 			case 17: return TransportMode.ride;
 			case 18: return TransportMode.ride;
 			default: return TransportMode.other;
@@ -832,13 +666,12 @@ public class CSVToPlans {
 	
 	private boolean isCarOrPTUser(String legMode){
 		
-//		return legMode.equals(TransportMode.car) || legMode.equals(TransportMode.pt);
-		return legMode.equals(TransportMode.car) || legMode.equals("feeder bus") || legMode.equals("main bus") || legMode.equals("subway")
-				|| legMode.equals("institutional bus") || legMode.equals("rural bus") || legMode.equals("urban bus") || legMode.equals("train");
+		return legMode.equals(TransportMode.car) || legMode.equals(Constants.Modes.bus.toString()) ||
+				legMode.equals(TransportMode.walk);
 		
 	}
 	
-	private Coord shoot(Geometry comuna){
+	private Coord shoot(String legMode, Geometry comuna){
 		
 		Random random = MatsimRandom.getRandom();
 	
@@ -851,17 +684,112 @@ public class CSVToPlans {
   	   } while (!comuna.contains(p));
   	   Coord coord = new CoordImpl(p.getX(), p.getY());
 		
+  	 if(!this.legMode2NumberOfShotLegs.containsKey(legMode + " w/ travel time")){
+			this.legMode2NumberOfShotLegs.put(legMode + " w/ travel time", 0);
+		}
+		int n = this.legMode2NumberOfShotLegs.get(legMode + " w/ travel time");
+		this.legMode2NumberOfShotLegs.put(legMode + " w/ travel time", n+1);
+  	   
 		return coord;
 		
 	}
 	
-	private final double maxWalkingDistance = 5000.0;
+	private final double lambda = 0.00160256410256410256410256410256;
 	
 	private Coord shootWalkTrip(Coord origin, Geometry comuna){
 		
+		if(origin.getX() < 0 && origin.getY() < 0){
+			origin = ct.transform(origin);
+		}
 		
+		Random random = MatsimRandom.getRandom();
 		
-		return null;
+		double d = 0.;
+		double p = 0.;
+		double pDistribution = 0.;
+		
+		do{
+			
+			p = random.nextDouble();
+			
+			d = (-Math.log(lambda/p)/p)/this.config.plansCalcRoute().getBeelineDistanceFactors().get(TransportMode.walk);
+			
+			pDistribution = lambda * Math.exp(- lambda * d);
+			
+		} while(p > pDistribution && d > 5000);
+		
+		int signX = 0;
+		double proba = random.nextDouble();
+		if(proba < 0.5){
+			signX = 1;
+		} else{
+			signX = -1;
+		}
+		
+		int signY = 0;
+		proba = random.nextDouble();
+		if(proba < 0.5){
+			signY = 1;
+		} else{
+			signY = -1;
+		}
+		
+		double x = signX * random.nextDouble() * d;
+		double y = signY * Math.sqrt(d*d - x*x);
+		
+		double resX = origin.getX() + x;
+		double resY = origin.getY() + y;
+		
+		return new CoordImpl(resX, resY);
+		
+	}
+	
+	private Coord shootLegDestination(String legMode, Coord origin, Geometry comuna, double reportedTravelTime){
+		
+		if(origin.getX() < 0 || origin.getY() < 0){
+			origin = this.ct.transform(origin);
+		}
+		
+		Random random = MatsimRandom.getRandom();
+		double range = reportedTravelTime * this.config.plansCalcRoute().getTeleportedModeSpeeds().get(legMode) / this.config.plansCalcRoute().getBeelineDistanceFactors().get(legMode);
+		
+		Coord res = null;
+
+//		do{
+		
+			int signX = 0;
+			double proba = random.nextDouble();
+			if(proba < 0.5){
+				signX = 1;
+			} else{
+				signX = -1;
+			}
+			
+			int signY = 0;
+			proba = random.nextDouble();
+			if(proba < 0.5){
+				signY = 1;
+			} else{
+				signY = -1;
+			}
+			
+			double x = signX * random.nextDouble() * range;
+			double y = signY * Math.sqrt(range*range - x*x);
+			
+			double resX = origin.getX() + x;
+			double resY = origin.getY() + y;
+			
+			res = new CoordImpl(resX, resY);
+		
+//		} while(!comuna.contains(MGC.coord2Point(res)));
+			
+		if(!this.legMode2NumberOfShotLegs.containsKey(legMode + " w/o travel time")){
+			this.legMode2NumberOfShotLegs.put(legMode + " w/o travel time", 0);
+		}
+		int n = this.legMode2NumberOfShotLegs.get(legMode + " w/o travel time");
+		this.legMode2NumberOfShotLegs.put(legMode + " w/o travel time", n+1);
+		
+		return res;
 		
 	}
 	
