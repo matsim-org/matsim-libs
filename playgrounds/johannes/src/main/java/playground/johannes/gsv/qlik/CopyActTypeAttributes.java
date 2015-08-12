@@ -17,18 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.gsv.qlik;
 
-import java.util.List;
+import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  */
-public interface Person extends Attributable {
+public class CopyActTypeAttributes implements ProxyPlanTask {
 
-    String getId();
+    public static final String PREV_ACT_TYPE = "prevType";
 
-    public List<Episode> getEpisodes();
+    public static final String NEXT_ACT_TYPE = "nextType";
 
-    public void addEpisode(Episode episode);
+    @Override
+    public void apply(Episode plan) {
+        for(int i = 0; i < plan.getLegs().size(); i++) {
+            String prev = plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
+            String next = plan.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
+
+            if(prev != null && next != null) {
+                plan.getLegs().get(i).setAttribute(PREV_ACT_TYPE, prev);
+                plan.getLegs().get(i).setAttribute(NEXT_ACT_TYPE, next);
+            }
+        }
+    }
 }

@@ -17,18 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.gsv.qlik;
 
-import java.util.List;
+import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public interface Person extends Attributable {
+public class CopyZoneAttributes implements ProxyPlanTask {
 
-    String getId();
+    public static final String FROM_ZONE_KEY = "fromZone";
 
-    public List<Episode> getEpisodes();
+    public static final String TO_ZONE_KEY = "toZone";
 
-    public void addEpisode(Episode episode);
+    @Override
+    public void apply(Episode plan) {
+        for(int i = 0; i < plan.getLegs().size(); i++) {
+            String from = plan.getActivities().get(i).getAttribute(SetZones.ZONE_KEY);
+            String to = plan.getActivities().get(i + 1).getAttribute(SetZones.ZONE_KEY);
+
+            if(from != null && to != null) {
+                plan.getLegs().get(i).setAttribute(FROM_ZONE_KEY, from);
+                plan.getLegs().get(i).setAttribute(TO_ZONE_KEY, to);
+            }
+        }
+    }
 }
