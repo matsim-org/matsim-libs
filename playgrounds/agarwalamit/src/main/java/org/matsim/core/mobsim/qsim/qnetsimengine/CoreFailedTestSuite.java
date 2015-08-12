@@ -26,7 +26,6 @@ import org.matsim.core.mobsim.qsim.QSimTest;
 import org.matsim.core.mobsim.qsim.TransitQueueNetworkTest;
 import org.matsim.core.replanning.ReRoutingTest;
 import org.matsim.examples.EquilTest;
-import org.matsim.integration.timevariantnetworks.QSimIntegrationTest;
 import org.matsim.modules.ScoreStatsModuleTest;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 
@@ -37,30 +36,16 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	
-	FlowStorageSpillbackTest.class, 
-	EquilTest.class,
-	TravelTimeCollectorTest.class,
-	StorageCapOnSimultaneousSpillBackTest.class,
-	ControlerTest.class,
-	ReRoutingTest.class, //(4)
-	ScoreStatsModuleTest.class,
-	QLinkTest.class,	
-	QSimTest.class, //(4)
-	QSimIntegrationTest.class, // bug fix for timeVarientNetwork and flowcap_accumulate.timeStep = bufferLastMoveTime
-	
-	// if flowcap_accumulate.timeStep = bufferLastMoveTime instead of bufferLastMoveTime -1 then failed tests are 
-	
-	FlowStorageSpillbackTest.class, 
-	EquilTest.class,
-	TravelTimeCollectorTest.class,
-	StorageCapOnSimultaneousSpillBackTest.class,
-	ReRoutingTest.class, //(4)
-	ScoreStatsModuleTest.class,
-	JavaRoundingErrorInQsimTest.class, // rounding error
-	QLinkTest.class,	
-	QSimTest.class, //(4)
-	TransitQueueNetworkTest.class
-	
+	FlowStorageSpillbackTest.class, //testFlowCongestion
+	EquilTest.class, //testEquil
+	TravelTimeCollectorTest.class, //testGetLinkTravelTime
+	ControlerTest.class, //testTravelTimeCalculation
+	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks
+	ScoreStatsModuleTest.class,//testScoreStats
+	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes
+	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed
+	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink
+	TransitQueueNetworkTest.class //testNonBlockingStop_FirstLink, testBlockingStop_FirstLink
 })
 
 public class CoreFailedTestSuite {

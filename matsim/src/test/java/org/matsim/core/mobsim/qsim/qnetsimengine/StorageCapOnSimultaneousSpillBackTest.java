@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -72,6 +73,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 * second will also be forced to move on next link. 
 		 * 
 		 */
+		MatsimRandom.reset();
 		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
 		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
