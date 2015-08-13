@@ -37,28 +37,30 @@ public class Converters {
         c.objectKey = objKey;
         c.converter = converter;
 
-        plainKeys.put(plainKey, c);
-        objKeys.put(objKey, c);
+        if(plainKeys.put(plainKey, c) != null) throw new RuntimeException("You are overwriting a plain-object " +
+                "key-pair!");
+        if(objKeys.put(objKey, c) != null) throw new RuntimeException("You are overwriting a plain-object " +
+                "key-pair!");
     }
 
-    static String getPlainKey(Object key) {
+    public static String getPlainKey(Object key) {
         Container c = objKeys.get(key);
         if(c != null) return c.plainKey;
         else return null;
     }
 
-    static Object getObjectKey(String key) {
+    public static Object getObjectKey(String key) {
         Container c = plainKeys.get(key);
         if(c != null) return c.objectKey;
         else return null;
     }
 
-    static String toString(Object key, Object value) {
+    public static String toString(Object key, Object value) {
         Container c = objKeys.get(key);
         return c.converter.toString(value);
     }
 
-    static Object toObject(String key, String value) {
+    public static Object toObject(String key, String value) {
         Container c = plainKeys.get(key);
         return c.converter.toObject(value);
     }

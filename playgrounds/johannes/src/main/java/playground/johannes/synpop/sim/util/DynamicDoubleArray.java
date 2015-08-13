@@ -64,4 +64,8 @@ public class DynamicDoubleArray {
     private boolean checkBounds(int index) {
         return array.length > index;
     }
+
+    public int size() {
+        return array.length;
+    }
 }
