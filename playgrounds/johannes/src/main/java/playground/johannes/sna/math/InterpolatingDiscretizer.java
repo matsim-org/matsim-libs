@@ -66,7 +66,7 @@ public class InterpolatingDiscretizer implements Discretizer {
 	 * @see playground.johannes.sna.math.Discretizer#index(double)
 	 */
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		return borders.index(value);
 	}
 

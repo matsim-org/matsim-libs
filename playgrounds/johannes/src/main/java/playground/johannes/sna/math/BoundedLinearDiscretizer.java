@@ -48,7 +48,7 @@ public class BoundedLinearDiscretizer extends LinearDiscretizer {
 	}
 
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		value = truncate(value);
 		return super.index(value);
 	}

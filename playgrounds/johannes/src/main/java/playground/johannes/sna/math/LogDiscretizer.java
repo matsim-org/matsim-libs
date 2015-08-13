@@ -104,9 +104,9 @@ public class LogDiscretizer implements Discretizer {
 	 * @see {@link Discretizer#index(double)}
 	 */
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		value = checkValue(value);
-		return Math.ceil(Math.log(value) / Math.log(base));
+		return (int)Math.ceil(Math.log(value) / Math.log(base));
 	}
 
 	private double checkValue(double value) {

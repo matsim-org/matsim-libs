@@ -112,7 +112,7 @@ public class FixedBordersDiscretizer implements Discretizer {
 	 * @see {@link Discretizer#index(double)}
 	 */
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		int idx = Arrays.binarySearch(borders, value);
 		if (idx > -1) {
 			return idx;

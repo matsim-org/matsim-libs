@@ -78,8 +78,8 @@ public class LinearDiscretizer implements Discretizer {
 	 * @see {@link Discretizer#index(double)}
 	 */
 	@Override
-	public double index(double value) {
-		return Math.ceil(value / binwidth);
+	public int index(double value) {
+		return (int)Math.ceil(value / binwidth);
 	}
 
 }

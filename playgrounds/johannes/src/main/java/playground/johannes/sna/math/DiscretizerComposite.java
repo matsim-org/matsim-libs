@@ -66,7 +66,7 @@ public class DiscretizerComposite implements Discretizer {
 	 * @see {@link Discretizer#index(double)}
 	 */
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		double bin = first.index(value);
 		return second.index(bin);
 	}

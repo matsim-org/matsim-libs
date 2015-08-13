@@ -42,7 +42,7 @@ public interface Discretizer {
 	 *            a value (within the bounds defined by the implementing class).
 	 * @return the index of the bin/categery.
 	 */
-	public double index(double value);
+	public int index(double value);
 
 	/**
 	 * 

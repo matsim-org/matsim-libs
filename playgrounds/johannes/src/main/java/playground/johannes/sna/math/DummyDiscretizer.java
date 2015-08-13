@@ -57,7 +57,7 @@ public class DummyDiscretizer implements Discretizer {
 	 * @throws {@link UnsupportedOperationException}
 	 */
 	@Override
-	public double index(double value) {
+	public int index(double value) {
 		throw new UnsupportedOperationException(
 				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
 	}
