@@ -76,7 +76,7 @@ public class Population2Tables {
 
         String[] legKeys = new String[] {CopyActTypeAttributes.PREV_ACT_TYPE, CopyActTypeAttributes.NEXT_ACT_TYPE,
                 CopyZoneAttributes.FROM_ZONE_KEY, CopyZoneAttributes.TO_ZONE_KEY, CommonKeys.LEG_START_TIME,
-                CommonKeys.LEG_END_TIME};
+                CommonKeys.LEG_END_TIME, CommonKeys.LEG_MODE, CommonKeys.LEG_GEO_DISTANCE, CommonKeys.LEG_ROUTE_DISTANCE};
 
         personWriter.write("personId,");
         personWriter.write(StringUtils.join(personKeys, SEPARATOR));
@@ -90,12 +90,13 @@ public class Population2Tables {
         actsWriter.write(StringUtils.join(actKeys, SEPARATOR));
         actsWriter.newLine();
 
-        legsWriter.write("personId,");
+        legsWriter.write("personId,legId,");
         legsWriter.write(StringUtils.join(legKeys, SEPARATOR));
         legsWriter.newLine();
 
         ProgressLogger.init(persons.size(), 2, 10);
 
+        int legCounter = 0;
         for(Person person : persons) {
             personWriter.write(person.getId());
             personWriter.write(SEPARATOR);
@@ -114,6 +115,8 @@ public class Population2Tables {
 
                 for(Segment leg : episode.getLegs()) {
                     legsWriter.write(leg.getEpisode().getPerson().getId());
+                    legsWriter.write(SEPARATOR);
+                    legsWriter.write(String.valueOf(legCounter++));
                     legsWriter.write(SEPARATOR);
                     writeAttributes(legsWriter, leg, legKeys);
                 }

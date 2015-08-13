@@ -17,34 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.sim.data;
+package playground.johannes.synpop.sim.util;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * @author johannes
  */
-public class CachedPerson extends CachedElement implements Person {
+public class DynamicDoubleArray {
 
-    public CachedPerson(Person delegate) {
-        super(delegate);
+    public final double naValue;
+
+    private double[] array;
+
+    public DynamicDoubleArray() {
+        naValue = Double.NaN;
+        array = new double[12];
+        Arrays.fill(array, naValue);
     }
 
-    @Override
-    public String getId() {
-        return ((Person)getDelegate()).getId();
+
+    public DynamicDoubleArray(int size, double naValue) {
+        this.naValue = naValue;
+        array = new double[size];
+        Arrays.fill(array, naValue);
     }
 
-    @Override
-    public List<Episode> getEpisodes() {
-        return ((Person)getDelegate()).getEpisodes();
+    public void set(int index, double value) {
+        if(checkBounds(index)) {
+            array[index] = value;
+        } else {
+            int newLength = index + 1;
+            double[] copy = new double[newLength];
+            Arrays.fill(copy, naValue);
+            System.arraycopy(array, 0, copy, 0, Math.min(array.length, newLength));
+            array = copy;
+            array[index] = value;
+        }
     }
 
-    @Override
-    public void addEpisode(Episode episode) {
-        ((Person)getDelegate()).addEpisode(episode);
+    public double get(int index) {
+        if(checkBounds(index)) return array[index];
+        else return naValue;
+    }
+
+    private boolean checkBounds(int index) {
+        return array.length > index;
     }
 }

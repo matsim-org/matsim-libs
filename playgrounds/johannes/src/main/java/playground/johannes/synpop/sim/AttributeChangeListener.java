@@ -17,34 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.sim.data;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-
-import java.util.List;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
 /**
  * @author johannes
  */
-public class CachedPerson extends CachedElement implements Person {
+public interface AttributeChangeListener {
 
-    public CachedPerson(Person delegate) {
-        super(delegate);
-    }
+    void onChange(Object dataKey, double oldValue, double newValue, CachedPerson person);
 
-    @Override
-    public String getId() {
-        return ((Person)getDelegate()).getId();
-    }
-
-    @Override
-    public List<Episode> getEpisodes() {
-        return ((Person)getDelegate()).getEpisodes();
-    }
-
-    @Override
-    public void addEpisode(Episode episode) {
-        ((Person)getDelegate()).addEpisode(episode);
-    }
 }

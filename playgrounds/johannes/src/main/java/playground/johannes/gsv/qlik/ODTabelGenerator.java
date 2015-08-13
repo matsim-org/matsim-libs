@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.qlik;
 
+import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
@@ -41,7 +42,7 @@ public class ODTabelGenerator {
     public static void main(String args[]) throws IOException {
         XMLParser reader = new XMLParser();
         reader.setValidating(false);
-        reader.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.qlik.xml");
+        reader.parse(args[0]);
 
         Collection<PlainPerson> persons = reader.getPersons();
 
@@ -50,17 +51,19 @@ public class ODTabelGenerator {
         for(Person person : persons) {
             for(Episode episode : person.getEpisodes()) {
                 for(Segment leg : episode.getLegs()) {
-                    String i = leg.getAttribute("fromZone");
-                    String j = leg.getAttribute("toZone");
-
-                    m.add(i, j, 1);
+//                    String i = leg.getAttribute(CopyZoneAttributes.FROM_ZONE_KEY);
+//                    String j = leg.getAttribute(CopyZoneAttributes.TO_ZONE_KEY);
+                    String i = leg.previous().getAttribute(SetZones.ZONE_KEY);
+                    String j = leg.next().getAttribute(SetZones.ZONE_KEY);
+                    if(i != null && j != null) {
+                        m.add(i, j, 1);
+                    }
                 }
             }
         }
 
         int counter = 0;
-        BufferedWriter writer = new BufferedWriter(new FileWriter
-                ("/home/johannes/gsv/germany-scenario/mid2008/pop/odtable.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
         writer.write("id,from,to");
         writer.newLine();
         Set<String> keys = m.keys();

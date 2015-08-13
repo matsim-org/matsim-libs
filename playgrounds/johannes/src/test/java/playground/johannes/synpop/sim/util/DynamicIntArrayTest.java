@@ -17,34 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.sim.data;
+package playground.johannes.synpop.sim.util;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-
-import java.util.List;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 /**
  * @author johannes
  */
-public class CachedPerson extends CachedElement implements Person {
+public class DynamicIntArrayTest extends TestCase {
 
-    public CachedPerson(Person delegate) {
-        super(delegate);
+    public void test1() {
+        DynamicIntArray array = new DynamicIntArray();
+
+        array.set(0, 100);
+        array.set(11, 111);
+        array.set(4, 104);
+
+        Assert.assertEquals(array.get(0), 100);
+        Assert.assertEquals(array.get(4), 104);
+        Assert.assertEquals(array.get(11), 111);
+        Assert.assertEquals(array.get(1), array.naValue);
+
+        array.set(23, 123);
+
+        Assert.assertEquals(array.get(23), 123);
+        Assert.assertEquals(array.get(4887), array.naValue);
     }
 
-    @Override
-    public String getId() {
-        return ((Person)getDelegate()).getId();
-    }
+    public void test2() {
+        DynamicIntArray array = new DynamicIntArray(100, 0);
 
-    @Override
-    public List<Episode> getEpisodes() {
-        return ((Person)getDelegate()).getEpisodes();
-    }
+        Assert.assertEquals(array.get(234), 0);
+        Assert.assertEquals(array.get(0), 0);
 
-    @Override
-    public void addEpisode(Episode episode) {
-        ((Person)getDelegate()).addEpisode(episode);
+        array.set(99, 2);
+        Assert.assertEquals(array.get(99), 2);
+
+        array.set(102, 4);
+        Assert.assertEquals(array.get(102), 4);
+
+        Assert.assertEquals(array.get(101), 0);
     }
 }
