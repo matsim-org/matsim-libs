@@ -39,7 +39,6 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.CellWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkLineWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
@@ -56,7 +55,6 @@ public class EmissionCostsBySubgroupAnalysis {
 	private String analysisCase = "zone30"; // base, zone30, pricing, exposurePricing, 983
 	final static int numberOfTimeBins = 1;
 	
-	private SpatialAveragingParameters sap;
 	private double timeBinSize;
 	private LinkWeightUtil linkweightUtil;
 	private SpatialAveragingInputData inputData;
@@ -77,8 +75,6 @@ public class EmissionCostsBySubgroupAnalysis {
 	}
 	
 	private void initialize(){
-		sap = new SpatialAveragingParameters();
-		
 		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
 		timeBinSize = inputData.getEndTime()/numberOfTimeBins;
 		
@@ -100,14 +96,14 @@ public class EmissionCostsBySubgroupAnalysis {
 		logger.info("Starting to calculate durations...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells, sap);
+		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells);
 		eventsManager.addHandler(intervalHandlerGroups);
 		eventsReader.parse(inputData.getEventsFileCompareCase());
 		
 		totalDurations = intervalHandlerGroups.getTotalDurations();
 		groupDurations = intervalHandlerGroups.getGroupDurations();
 		
-		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData, sap, false);
+		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData, false);
 		
 		for(int timeBin =0; timeBin<numberOfTimeBins; timeBin++){
 			logger.info(inputData.getScenarioInformation());

@@ -52,15 +52,12 @@ public class SpatialAveragingTollPayments {
 
 	private SpatialAveragingInputData inputData;
 	private LinkWeightUtil linkWeightUtil;
-	private SpatialAveragingParameters parameter;
 	
 	private void run() throws IOException{
-		
 		// init
 		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
-		parameter = new SpatialAveragingParameters();
-		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData, parameter);
-		linkWeightUtil = new LinkPointWeightUtil(inputData, parameter);
+		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData);
+		linkWeightUtil = new LinkPointWeightUtil(inputData);
 		
 		SpatialGrid spatialGrid = runCase(inputData.getPlansFileBaseCase());
 		

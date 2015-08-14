@@ -82,13 +82,11 @@ public class SpatialAveragingWriter {
 		if(this.useVisBoundary)	this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(inputData.getVisBoundaryShapeFile());
 	}
 
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
-			SpatialAveragingParameters parameters) {
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData) {
 		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), inputData.IsUsingVisBoundary());
 	}
 
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
-			SpatialAveragingParameters sap, boolean useVisBoundary) {
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData, boolean useVisBoundary) {
 		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), useVisBoundary);
 	}
 

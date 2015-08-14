@@ -66,7 +66,6 @@ public class SpatialAveragingDemandEmissions {
 	final boolean useLineMethod = true;
 	private boolean useCellMethod = false;
 
-	private SpatialAveragingParameters parameter;
 	private SpatialAveragingWriter saWriter;
 	private double simulationEndTime;
 	private Network network;
@@ -79,13 +78,12 @@ public class SpatialAveragingDemandEmissions {
 	
 	void run() throws IOException{
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
-		parameter = new SpatialAveragingParameters();
 		if(useLineMethod){
-			linkWeightUtil = new LinkLineWeightUtil(inputData, parameter);
+			linkWeightUtil = new LinkLineWeightUtil(inputData);
 		}else{
-			linkWeightUtil = new LinkPointWeightUtil(inputData, parameter);
+			linkWeightUtil = new LinkPointWeightUtil(inputData);
 		}
-		this.saWriter = new SpatialAveragingWriter(inputData, parameter);
+		this.saWriter = new SpatialAveragingWriter(inputData);
 		this.simulationEndTime = inputData.getEndTime();
 		this.network = loadNetwork(inputData.getNetworkFile());		
 		runBaseCase();

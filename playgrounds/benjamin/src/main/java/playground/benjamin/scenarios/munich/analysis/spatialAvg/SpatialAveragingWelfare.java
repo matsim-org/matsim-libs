@@ -41,7 +41,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkPointWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
@@ -62,16 +61,14 @@ public class SpatialAveragingWelfare {
 
 	private SpatialAveragingInputData inputData;
 	private LinkWeightUtil linkWeightUtil;
-	private SpatialAveragingParameters parameters;
 	private SpatialGrid baseCaseGrid, currentCaseGridNoRefund, currentCaseGridAvgRefund, currentCaseGridPersonalRefund;
 	
 	private void run() throws IOException{
 		
 		// init
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
-		parameters = new SpatialAveragingParameters();
-		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData, parameters);
-		linkWeightUtil = new LinkPointWeightUtil(inputData, parameters);
+		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData);
+		linkWeightUtil = new LinkPointWeightUtil(inputData);
 		
 		// base case
 		runCase(inputData.getPlansFileBaseCase(), inputData.getEventsFileBaseCase());
