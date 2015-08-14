@@ -12,6 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -28,20 +29,23 @@ public class NWtoShp {
 
 	/**
 	 * @author: Kturner
+	 * Converts MatSim-Network to .shp
 	 */
 
 
+	private static final String INPUT_DIR = "Z:/WinHome/Docs/Santiago/shared-svn/Kai_und_Daniel/inputFiles/network/";
+	private static final String OUTPUT_DIR = "Z:/WinHome/Docs/Santiago/shared-svn/Kai_und_Daniel/inputFiles/NetworkShp/";
 	
-	private static final String INPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/inputFiles/";
-	private static final String OUTPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/Visualisierungen/";
+//	private static final String INPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/inputFiles/network/";
+//	private static final String OUTPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/inputFiles/NetworkShp/";
 
 
 	//Dateinamen ohne XML-Endung
-	private static final String NETFILE_NAME = "santiago_tertiary" ;
+	private static final String NETFILE_NAME = "network_merged_cl" ;
 	//Ende  Namesdefinition Berlin
 
 	
-	private static final String NETFILE = INPUT_DIR + NETFILE_NAME + ".xml.gz" ;
+	private static final String NETFILE = INPUT_DIR + NETFILE_NAME + ".xml" ;
 
 	public static void main(String[] args) {
 		createDir(new File(OUTPUT_DIR));
@@ -54,8 +58,18 @@ public class NWtoShp {
 //		network = convertCoordinates(network, "EPSG:", "EPSG:"); //(network, fromCS, toCS ("EPSG:...")
 		convertNet2Shape(scenario.getNetwork(), OUTPUT_DIR); 
 		calcMinMaxCoord(scenario.getNetwork());
+		
+		generateZippedNW(scenario.getNetwork());
 
 		System.out.println("### ENDE ###");
+	}
+
+
+
+
+	private static void generateZippedNW(Network network) {
+		new NetworkWriter(network).write(INPUT_DIR + NETFILE_NAME +".xml.gz");
+		
 	}
 
 
