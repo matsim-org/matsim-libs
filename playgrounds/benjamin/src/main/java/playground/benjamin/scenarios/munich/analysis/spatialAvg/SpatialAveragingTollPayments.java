@@ -91,7 +91,7 @@ public class SpatialAveragingTollPayments {
 		
 		logger.info("Starting to distribute toll payments. This may take a while.");
 		
-		SpatialGrid spatialGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
+		SpatialGrid spatialGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 		for(Id<Person> personId: personId2paidToll.keySet()){
 			Person person = pop.getPersons().get(personId);
 			//multiply with -1.0 since toll payments are negative

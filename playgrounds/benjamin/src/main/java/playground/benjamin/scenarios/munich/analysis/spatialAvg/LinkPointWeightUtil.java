@@ -79,7 +79,7 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 
 	public LinkPointWeightUtil(SpatialAveragingInputData inputData,
 			SpatialAveragingParameters parameters) {
-		this(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins(), parameters.getSmoothingRadius_m());
+		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m());
 	}
 
 

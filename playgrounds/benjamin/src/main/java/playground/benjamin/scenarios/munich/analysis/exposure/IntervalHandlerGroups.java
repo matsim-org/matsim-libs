@@ -64,8 +64,8 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 		this.personFilter = new PersonFilter();
 		recognisedPersons = new HashSet<Id<Person>>();
 		this.timeBinSize = inputData.getEndTime()/numberOfTimeBins;
-		this.noOfXbins = parameter.getNoOfXbins();
-		this.noOfYbins = parameter.getNoOfYbins();
+		this.noOfXbins = inputData.getNoOfXbins();
+		this.noOfYbins = inputData.getNoOfYbins();
 		this.reset(0);
 	}
 

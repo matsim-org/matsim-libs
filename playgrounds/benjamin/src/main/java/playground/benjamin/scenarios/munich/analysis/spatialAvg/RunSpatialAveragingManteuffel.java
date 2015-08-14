@@ -19,15 +19,25 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
+import java.io.IOException;
+
 /**
  * @author benjamin
  *
  */
 public class RunSpatialAveragingManteuffel {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	private static SpatialAveragingInputData inputData;
 
+	public static void main(String[] args) throws IOException {
+		inputData = configure();
+		SpatialAveragingDemandEmissions sade = new SpatialAveragingDemandEmissions();
+		sade.setInputData(inputData);
+		sade.run();
 	}
 
+	private static SpatialAveragingInputData configure() {
+		
+		return inputData;
+	}
 }

@@ -84,12 +84,12 @@ public class SpatialAveragingWriter {
 
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
 			SpatialAveragingParameters parameters) {
-		this(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins(), parameters.getSmoothingRadius_m(), parameters.IsUsingVisBoundary());
+		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), inputData.IsUsingVisBoundary());
 	}
 
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
 			SpatialAveragingParameters sap, boolean useVisBoundary) {
-		this(inputData, sap.getNoOfXbins(), sap.getNoOfYbins(), sap.getSmoothingRadius_m(), useVisBoundary);
+		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), useVisBoundary);
 	}
 
 	public void writeRoutput(Double[][] doubles, String outputPathForR) {

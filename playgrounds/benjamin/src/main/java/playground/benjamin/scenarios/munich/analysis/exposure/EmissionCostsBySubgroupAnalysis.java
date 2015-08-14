@@ -89,7 +89,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		config.plans().setInputFile(inputData.getPlansFileCompareCase());
 		scenario = ScenarioUtils.loadScenario(config);
 		
-		sGrid = new SpatialGrid(inputData, sap.getNoOfXbins(), sap.getNoOfYbins());
+		sGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 		// map links to cells
 		links2cells = sGrid.getLinks2GridCells(scenario.getNetwork().getLinks().values());
 		logger.info("Mapped " + links2cells.size() + " links to cells. ");
@@ -139,7 +139,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		// calculate scaled (relative duration density, scenario scaling factor)
 		// emission costs -> timebin x subgroup x subgroup matrix
 		
-		linkweightUtil = new LinkLineWeightUtil(sap.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/sap.getNoOfBins());
+		linkweightUtil = new LinkLineWeightUtil(inputData.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/inputData.getNoOfBins());
 		linkweightUtil = new CellWeightUtil(links2cells, sGrid);
 		HashMap<Integer, GroupXGroupExposureCosts> timeBin2GroupEmissionCostMatrix = new HashMap<Integer, GroupXGroupExposureCosts>();
 		for(int i=0; i<numberOfTimeBins; i++){

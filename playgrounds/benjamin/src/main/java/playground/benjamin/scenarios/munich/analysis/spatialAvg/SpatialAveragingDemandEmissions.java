@@ -77,7 +77,7 @@ public class SpatialAveragingDemandEmissions {
 
 	private SpatialAveragingInputData inputData;
 	
-	private void run() throws IOException{
+	void run() throws IOException{
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
 		parameter = new SpatialAveragingParameters();
 		if(useLineMethod){
@@ -103,7 +103,8 @@ public class SpatialAveragingDemandEmissions {
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating grid values for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
-			SpatialGrid sGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
+			// TODO: change to inputData only?
+			SpatialGrid sGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 			if(useCellMethod){
 				linkWeightUtil = new CellWeightUtil((Collection<Link>) network.getLinks().values(), sGrid);
 			}
@@ -131,14 +132,14 @@ public class SpatialAveragingDemandEmissions {
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating differences to base case for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
-			SpatialGrid sGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
+			SpatialGrid sGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 			
 			for(Id<Link> linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor);
 			// calc differences
-			SpatialGrid differencesGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
+			SpatialGrid differencesGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
 			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
 			// print tables
@@ -180,7 +181,11 @@ public class SpatialAveragingDemandEmissions {
 		return scenario.getNetwork();
 	}
 
-	public static void main(String[] args) throws IOException{
-		new SpatialAveragingDemandEmissions().run();
+//	public static void main(String[] args) throws IOException{
+//		new SpatialAveragingDemandEmissions().run();
+//	}
+
+	public void setInputData(SpatialAveragingInputData inputData) {
+		this.inputData = inputData;
 	}
 }

@@ -160,7 +160,7 @@ public class SpatialAveragingWelfare {
 
 	private SpatialGrid getGridFromUtilities(Population pop,
 			Map<Id<Person>, Double> personId2Utility, LocationFilter lf) {
-		SpatialGrid spatialGrid = new SpatialGrid(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins());
+		SpatialGrid spatialGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 		for(Id<Person> personId: personId2Utility.keySet()){
 			Person person = pop.getPersons().get(personId);
 			Double unscaledUtilityValue = personId2Utility.get(personId);
