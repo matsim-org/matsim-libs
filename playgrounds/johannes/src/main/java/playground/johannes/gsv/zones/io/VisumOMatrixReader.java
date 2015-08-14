@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.gsv.zones.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,38 +31,40 @@ import playground.johannes.gsv.zones.KeyMatrix;
  */
 public class VisumOMatrixReader {
 
-	public static KeyMatrix read(String filename) throws IOException {
+	public static KeyMatrix read(KeyMatrix m, String filename) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 
-		int startLine = 8;
-//		int startLine = 29;
-		for(int i = 0; i < startLine; i++) reader.readLine();
+		String line = reader.readLine();
+		if(!line.equals("$O;D3")) throw new RuntimeException("Unknown matrix format.");
 
-		KeyMatrix m = new KeyMatrix();
+		boolean comment = false;
+		int sectionCount = 0;
 
-		String line;
 		while((line = reader.readLine()) != null) {
 			if(line.startsWith("*")) {
-				break;
-			}
-			else {
-				line = line.trim();
-				String[] tokens = line.split("\\s+");
-				String i = tokens[0];
-				String j = tokens[1];
-				Double val = new Double(tokens[2]);
+				comment = true;
+			} else {
+				if(comment) sectionCount++;
+				comment = false;
 
-				m.set(i, j, val);
+				if(sectionCount == 3) {
+					line = line.trim();
+					String[] tokens = line.split("\\s+");
+					String i = tokens[0];
+					String j = tokens[1];
+					Double val = new Double(tokens[2]);
+
+					m.set(i, j, val);
+				} else if(sectionCount > 3) {
+					break;
+				}
 			}
+
+
 		}
-
 
 		reader.close();
 
 		return m;
-	}
-
-	public static void main(String[] args) throws IOException {
-		VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/iv-2030.txt");
 	}
 }

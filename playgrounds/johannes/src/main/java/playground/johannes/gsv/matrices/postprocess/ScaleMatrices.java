@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
+import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -34,18 +35,20 @@ import java.util.Map;
  */
 public class ScaleMatrices {
 
+    private static final Logger logger = Logger.getLogger(ScaleMatrices.class);
+
     private static final double SCALE_FACTOR = 11.3;
 
     private static final double DIAGONAL_FACTOR = 1.3;
 
-    public static final String ALL_PATTERN = "all\\.all";
+    public static final String ALL_PATTERN = ".*\\.all\\.all\\..*";
 
     public static final void main(String args[]) throws IOException {
-        String fractionsFile = "";
-        String root = "";
+        String fractionsFile = args[1];
+        String root = args[0];
+        String outDir = args[2];
 
         Map<String, Double> upscaleFactors = new HashMap<>();
-        upscaleFactors.put(ALL_PATTERN, 1.0);
 
         Map<String, Double> dayFactors = new HashMap<>();
         dayFactors.put(Episodes2Matrix.SUMMER, 0.998);
@@ -57,26 +60,33 @@ public class ScaleMatrices {
         dayFactors.put(CommonKeys.SATURDAY, 0.95);
         dayFactors.put(CommonKeys.SUNDAY, 0.67);
 
+        logger.info("Loading volumes...");
         BufferedReader reader = new BufferedReader(new FileReader(fractionsFile));
         String line = reader.readLine();
         while ((line = reader.readLine()) != null) {
             String tokens[] = line.split("\t");
             double volume = Double.parseDouble(tokens[2]);
-            String pattern = String.format("%s\\.%s", tokens[0], tokens[1]);
+            String pattern = String.format(".*\\.%s\\.%s\\..*", tokens[0], tokens[1]);
             upscaleFactors.put(pattern, volume);
         }
         reader.close();
 
         File rootDir = new File(root);
         for(File file : rootDir.listFiles()) {
-            KeyMatrix m = new KeyMatrix();
-            KeyMatrixTxtIO.read(m, file.getAbsolutePath());
+            if(file.getName().startsWith("car")) {
+                logger.info(String.format("Loading matrix %s...", file.getName()));
+                KeyMatrix m = new KeyMatrix();
+                KeyMatrixTxtIO.read(m, file.getAbsolutePath());
 
-            double factor = getFactor(file.getName(), upscaleFactors, dayFactors);
+                double factor = getFactor(file.getName(), upscaleFactors, dayFactors);
 
-            MatrixOperations.applyFactor(m, SCALE_FACTOR);
-            MatrixOperations.applyDiagonalFactor(m, DIAGONAL_FACTOR);
-            MatrixOperations.applyFactor(m, factor);
+                MatrixOperations.applyFactor(m, SCALE_FACTOR);
+                MatrixOperations.applyDiagonalFactor(m, DIAGONAL_FACTOR);
+                MatrixOperations.applyFactor(m, factor);
+
+                logger.info(String.format("Writing scaled matrix %s...", file.getName()));
+                KeyMatrixTxtIO.write(m, String.format("%s/%s", outDir, file.getName()));
+            }
         }
     }
 

@@ -38,8 +38,8 @@ public class CalculateDayFractions {
     private static final Logger logger = Logger.getLogger(CalculateDayFractions.class);
 
     public static void main(String args[]) throws IOException {
-        String root = "/home/johannes/sge/prj/matsim/run/915/output/matrices/0/";//args[0];
-        String out = "/home/johannes/sge/prj/matsim/run/915/output/matrices/0/volumes.txt"; //args[1];
+        String root = args[0];
+        String out = args[1];
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(out));
         writer.write("day\tseason\tvolume");
