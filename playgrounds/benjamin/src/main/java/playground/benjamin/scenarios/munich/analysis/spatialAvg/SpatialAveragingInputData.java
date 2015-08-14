@@ -63,6 +63,12 @@ public class SpatialAveragingInputData {
 	private String netFile;
 //	private String munichShapeFile;
 	
+	private int numberOfXBins = 160;
+	private int numberOfYBins = 120;
+//	private double smoothingRadius_m = 250.;
+	private double smoothingRadius_m = 32.;
+	private boolean isUsingVisBoundary = false;
+	
 	private String runNumber1, runNumber2;
 	private String runDirectory1, runDirectory2;
 	private String configFile1;
@@ -258,6 +264,26 @@ public class SpatialAveragingInputData {
 		Double endTime = config.qsim().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
 		return endTime;
+	}
+
+	public int getNoOfXbins() {
+		return numberOfXBins;
+	}
+
+	public int getNoOfYbins() {
+		return numberOfYBins;
+	}
+
+	public Double getSmoothingRadius_m() {
+		return this.smoothingRadius_m;
+	}
+	
+	public boolean IsUsingVisBoundary() {
+		return isUsingVisBoundary ;
+	}
+	
+	public Double getNoOfBins() {
+		return new Double(numberOfXBins*numberOfYBins);
 	}
 	
 	public String getScenarioInformation(){
