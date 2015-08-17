@@ -85,11 +85,15 @@ public class SantiagoScenarioBuilder {
 	static final String popA0eAX = "A0equalAX";
 	static final String popA0neAX = "A0NoNequalAX";
 	
+	
+	
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 	
 	private static double n = 0.;
 	
-	private static final String outPlans = "plans_final";
+	private static final String pathForMatsim = "../../runs-svn/santiago/run9/";		//path within config file to the in-/output files 
+	private static final String outPlans = "plans_final";								//name of plan file
+	
 	
 	/**
 	 * Creates an initial population for the santiago scenario, executing the following steps:
@@ -660,7 +664,7 @@ public class SantiagoScenarioBuilder {
 		cc.setLastIteration(100);
 		
 		cc.setMobsim(MobsimType.qsim.name());
-		cc.setOutputDirectory("../output/"); //TODO
+		cc.setOutputDirectory(pathForMatsim + "output/"); //TODO
 		cc.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any text. (KT, 2015-08-17) 
 		
@@ -682,7 +686,7 @@ public class SantiagoScenarioBuilder {
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
-		counts.setCountsFileName("./counts_merged_VEH_C01.xml"); //TODO
+		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml"); //TODO
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(10);
 		
@@ -706,7 +710,7 @@ public class SantiagoScenarioBuilder {
 	private static void setNetworkParameters(NetworkConfigGroup net){
 		
 		net.setChangeEventInputFile(null);
-		net.setInputFile("./santiago_merged_cl.xml.gz"); //TODO
+		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz"); //TODO
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);
 		
@@ -823,7 +827,7 @@ public class SantiagoScenarioBuilder {
 		
 		plans.setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 		plans.setInputPersonAttributeFile(null); //TODO
-		plans.setInputFile("./" + outPlans + ".xml.gz"); //TODO
+		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
 		plans.setSubpopulationAttributeName(null); //TODO
 		plans.setRemovingUnneccessaryPlanAttributes(true);
