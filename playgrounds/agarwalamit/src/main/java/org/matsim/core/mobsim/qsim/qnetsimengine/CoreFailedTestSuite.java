@@ -42,8 +42,17 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 	ControlerTest.class, //testTravelTimeCalculation
 	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks
 	ScoreStatsModuleTest.class,//testScoreStats
-	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes
-	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed
+	
+	/*
+	 * flowacc must be updated before doSimStep(now) step. That's why both tests are failing.
+	 */
+	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes 
+
+	/*
+	 * rounding errors for e.g. remaining flowcap is 0.00000000001 and therefore can allow next vehicle.
+	 */
+	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed --
+	
 	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink
 	TransitQueueNetworkTest.class //testNonBlockingStop_FirstLink, testBlockingStop_FirstLink
 })

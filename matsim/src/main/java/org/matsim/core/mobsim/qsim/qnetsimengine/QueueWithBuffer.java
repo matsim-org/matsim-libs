@@ -343,7 +343,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-
+		
 		if(this.fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			return (
@@ -361,9 +361,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void updateFlowAccumulation(final double now){
-
+		
 		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0 && isNotOfferingVehicle() ){
-
+		
 			double flowCapSoFar = flowcap_accumulate.getValue();
 			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
 			double totalFlowCap = flowCapSoFar + newStoredFlowCap;
@@ -639,6 +639,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
+		flowcap_accumulate.timeStep = now;
 		return veh;
 	}
 
