@@ -27,6 +27,7 @@ import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -87,7 +88,9 @@ public class Simulator {
 
 		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
 //		factory.addFactory(new IncomeMutatorFactory(random));
-		HistogramSync1D histSyncAge = new HistogramSync1D(persons, simPersons, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, null);
+		HistogramSync1D histSyncAge = new HistogramSync1D((Set<PlainPerson>)persons, (Set<PlainPerson>)simPersons, CommonKeys.PERSON_AGE,
+				DistanceVector
+				.AGE_KEY, null);
 		HistogramSync1D histSyncIncome = new HistogramSync1D(persons, simPersons, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, null);
 
 		HistogramSync2D histSyncAgeIncomeMean = new HistogramSync2D(persons, simPersons, DistanceVector.AGE_KEY, DistanceVector.INCOME_KEY, new LinearDiscretizer(1.0));

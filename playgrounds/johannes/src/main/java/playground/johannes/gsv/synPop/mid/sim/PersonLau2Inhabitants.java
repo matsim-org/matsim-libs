@@ -30,6 +30,7 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Map;
@@ -53,7 +54,8 @@ public class PersonLau2Inhabitants implements Hamiltonian {
 	}
 	
 	@Override
-	public double evaluate(PlainPerson person) {
+	public double evaluate(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 		Integer inhabs = inhabitants.get(home);
 		if(inhabs == null) {

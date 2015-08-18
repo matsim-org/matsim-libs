@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -30,5 +31,5 @@ import java.util.List;
  */
 public interface PopulationSegmenter {
 
-	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments);
+	public List<Person>[] split(Collection<Person> persons, int segments);
 }

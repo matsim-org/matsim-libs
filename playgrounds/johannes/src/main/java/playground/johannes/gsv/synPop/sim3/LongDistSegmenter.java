@@ -23,6 +23,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -46,10 +47,10 @@ public class LongDistSegmenter implements PopulationSegmenter {
 	 * @see playground.johannes.gsv.synPop.sim3.PopulationSegmenter#split(java.util.Collection, int)
 	 */
 	@Override
-	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments) {
-		Set<PlainPerson> longDist = new HashSet<>(persons.size());
+	public List<Person>[] split(Collection<Person> persons, int segments) {
+		Set<Person> longDist = new HashSet<>(persons.size());
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			double max = 0;
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable leg : plan.getLegs()) {

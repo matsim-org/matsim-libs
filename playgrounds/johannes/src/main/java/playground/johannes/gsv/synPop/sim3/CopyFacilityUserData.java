@@ -22,10 +22,7 @@ package playground.johannes.gsv.synPop.sim3;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,12 +40,12 @@ public class CopyFacilityUserData implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		if (iter.get() % interval == 0) {
 			logger.debug("Copying facility user data to attributes...");
 			int cnt = 0;
 
-			for (PlainPerson person : population) {
+			for (Person person : population) {
 				for (Episode plan : person.getEpisodes()) {
 					for (Attributable act : plan.getActivities()) {
 						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator

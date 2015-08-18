@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
@@ -27,8 +27,8 @@ import playground.johannes.synpop.data.PlainPerson;
  */
 public interface SingleMutator {
 
-	public boolean mutate(PlainPerson person);
+	public boolean mutate(Person person);
 	
-	public void revert(PlainPerson person);
+	public void revert(Person person);
 	
 }

@@ -32,6 +32,7 @@ import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;

@@ -26,6 +26,6 @@ import playground.johannes.synpop.sim.data.CachedElement;
  */
 public interface AttributeChangeListener {
 
-    void onChange(Object dataKey, double oldValue, double newValue, CachedElement element);
+    void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element);
 
 }

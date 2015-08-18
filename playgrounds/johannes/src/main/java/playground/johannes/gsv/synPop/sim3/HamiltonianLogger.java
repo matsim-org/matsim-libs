@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.BufferedWriter;
@@ -76,12 +77,12 @@ public class HamiltonianLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		if(iter.get() % logInterval == 0) {
 			long iterNow = iter.get();
 			double[] values = new double[population.size()];
 			int i = 0;
-			for(PlainPerson person : population) {
+			for(Person person : population) {
 				values[i] = h.evaluate(person);
 				i++;
 			}

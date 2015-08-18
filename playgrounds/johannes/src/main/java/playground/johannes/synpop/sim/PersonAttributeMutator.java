@@ -17,50 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
+import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author johannes
- * 
  */
-public class SynchronizeUserData implements SamplerListener {
+public abstract class PersonAttributeMutator implements Mutator {
 
-	private final long interval;
+    private final Object dataKey;
 
-	private final AtomicLong iters;
+    private final AttributeChangeListener listener;
 
-	private final Map<Object, String> keys;
+    private Object oldValue;
 
-	public SynchronizeUserData(Map<Object, String> keys, long interval) {
-		this.keys = keys;
-		this.iters = new AtomicLong();
-		this.interval = interval;
-	}
+    private final List<Person> mutations;
 
-	@Override
-	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
-		if (iters.get() % interval == 0) {
-			for (Map.Entry<Object, String> keyPair : keys.entrySet()) {
-				for (Person person : population) {
-					Object value = ((PlainPerson)person).getUserData(keyPair.getKey());
-					if (value != null) {
-						person.setAttribute(keyPair.getValue(), String.valueOf(value));
-					} else {
-						person.setAttribute(keyPair.getValue(), null);
-					}
-				}
-			}
-		}
+    private final Random random;
 
-		iters.incrementAndGet();
-	}
+    public PersonAttributeMutator(Object dataKey, Random random, AttributeChangeListener listener) {
+        this.dataKey = dataKey;
+        this.random = random;
+        this.listener = listener;
 
+        mutations = new ArrayList<>(1);
+        mutations.add(null);
+    }
+
+    @Override
+    public List<Person> select(List<Person> persons) {
+        mutations.set(0, persons.get(random.nextInt(persons.size())));
+        return null;
+    }
+
+    @Override
+    public boolean modify(List<Person> persons) {
+        return false;
+    }
+
+    @Override
+    public void revert(List<Person> persons) {
+
+    }
 }

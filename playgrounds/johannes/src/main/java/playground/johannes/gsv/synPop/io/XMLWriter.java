@@ -35,13 +35,13 @@ import java.util.Map.Entry;
  */
 public class XMLWriter extends MatsimXmlWriter {
 	
-	public void write(String file, Collection<PlainPerson> persons) {
+	public void write(String file, Collection<? extends Person> persons) {
 		openFile(file);
 		
 		writeXmlHead();
 		
 		writeStartTag(Constants.PERSONS_TAG, null);
-		for (PlainPerson person : persons) {
+		for (Person person : persons) {
 			writePerson(person);
 		}
 		writeEndTag(Constants.PERSONS_TAG);
@@ -49,8 +49,8 @@ public class XMLWriter extends MatsimXmlWriter {
 		close();
 	}
 
-	private void writePerson(PlainPerson person) {
-		List<Tuple<String, String>> atts = getAttributes(person.getAttributes());
+	private void writePerson(Person person) {
+		List<Tuple<String, String>> atts = getAttributes(((PlainPerson)person).getAttributes());
 		
 		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
 		

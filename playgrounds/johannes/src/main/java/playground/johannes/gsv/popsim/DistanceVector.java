@@ -22,6 +22,7 @@ package playground.johannes.gsv.popsim;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.ArrayList;
@@ -83,8 +84,8 @@ public class DistanceVector implements Hamiltonian {
 	}
 
 	@Override
-	public double evaluate(PlainPerson person) {
-		Double age = getAttribute(person, CommonKeys.PERSON_AGE, AGE_KEY);
+	public double evaluate(Person person) {
+		Double age = getAttribute((PlainPerson)person, CommonKeys.PERSON_AGE, AGE_KEY);
 //		Double income = getAttribute(person, CommonKeys.HH_INCOME, INCOME_KEY);
 
 		double totalDelta = 0;

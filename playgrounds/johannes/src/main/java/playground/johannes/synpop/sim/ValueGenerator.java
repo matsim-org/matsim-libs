@@ -17,50 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import playground.johannes.synpop.sim.data.CachedElement;
 
 /**
  * @author johannes
- * 
  */
-public class SynchronizeUserData implements SamplerListener {
+public interface ValueGenerator {
 
-	private final long interval;
-
-	private final AtomicLong iters;
-
-	private final Map<Object, String> keys;
-
-	public SynchronizeUserData(Map<Object, String> keys, long interval) {
-		this.keys = keys;
-		this.iters = new AtomicLong();
-		this.interval = interval;
-	}
-
-	@Override
-	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
-		if (iters.get() % interval == 0) {
-			for (Map.Entry<Object, String> keyPair : keys.entrySet()) {
-				for (Person person : population) {
-					Object value = ((PlainPerson)person).getUserData(keyPair.getKey());
-					if (value != null) {
-						person.setAttribute(keyPair.getValue(), String.valueOf(value));
-					} else {
-						person.setAttribute(keyPair.getValue(), null);
-					}
-				}
-			}
-		}
-
-		iters.incrementAndGet();
-	}
+    Object newValue(CachedElement element);
 
 }

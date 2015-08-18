@@ -29,6 +29,7 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Map;
@@ -50,8 +51,9 @@ public class PersonNuts1Name implements Hamiltonian {
 	}
 
 	@Override
-	public double evaluate(PlainPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
+	public double evaluate(Person person) {
+		ActivityFacility home = (ActivityFacility) ((PlainPerson)person).getUserData(SwitchHomeLocation
+				.USER_FACILITY_KEY);
 		String name = nuts1Names.get(home);
 		
 		if(name == null) {

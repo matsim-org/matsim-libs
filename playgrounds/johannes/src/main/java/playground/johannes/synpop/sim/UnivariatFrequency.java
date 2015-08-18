@@ -19,16 +19,15 @@
 
 package playground.johannes.synpop.sim;
 
-import org.w3c.dom.Attr;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
 
-import javax.smartcardio.ATR;
 import java.util.Set;
 
 /**
@@ -86,12 +85,12 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     @Override
-    public void onChange(Object dataKey, double oldValue, double newValue, CachedElement person) {
+    public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
         if(this.dataKey.equals(dataKey)) {
-            int bucket = discretizer.index(oldValue);
+            int bucket = discretizer.index((Double)oldValue);
             double diff1 = changeBucketContent(bucket, -1);
 
-            bucket = discretizer.index(newValue);
+            bucket = discretizer.index((Double)newValue);
             double diff2 = changeBucketContent(bucket, 1);
 
             hamiltonianValue += (diff1 + diff2);
@@ -113,7 +112,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     @Override
-    public double evaluate(PlainPerson person) {
+    public double evaluate(Person person) {
         return hamiltonianValue;
     }
 }

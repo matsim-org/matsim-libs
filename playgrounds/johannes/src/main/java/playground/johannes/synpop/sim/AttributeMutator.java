@@ -17,24 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.data.CachedElement;
 
 /**
  * @author johannes
- *
  */
-public class HistEvaluator implements Hamiltonian {
+public class AttributeMutator {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
-	 */
-	@Override
-	public double evaluate(PlainPerson person) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    private Object dataKey;
+
+    private ValueGenerator generator;
+
+    private AttributeChangeListener listener;
+
+    private Object oldValue;
+
+    public void modify(CachedElement element) {
+        oldValue = element.getData(dataKey);
+        Object newValue = generator.newValue(element);
+        element.setData(dataKey, newValue);
+
+        if(listener != null) listener.onChange(dataKey, oldValue, newValue, element);
+    }
+
+    public void revert(CachedElement element) {
+        Object newValue = element.getData(dataKey);
+        element.setData(dataKey, oldValue);
+
+        if(listener != null) listener.onChange(dataKey, newValue, oldValue, element);
+    }
 
 }
