@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MultivariatMeanTest extends TestCase {
+public class BivariatMeanTest extends TestCase {
 
     public void test() {
         Person refPerson1 = new PlainPerson("1");
@@ -69,7 +69,7 @@ public class MultivariatMeanTest extends TestCase {
         Converters.register("attribute1", dataKey1, DoubleConverter.getInstance());
         Converters.register("attribute2", dataKey2, DoubleConverter.getInstance());
 
-        MultivariatMean mm = new MultivariatMean(refPersons, simPersons, "attribute1", "attribute2", new
+        BivariatMean mm = new BivariatMean(refPersons, simPersons, "attribute1", "attribute2", new
                 LinearDiscretizer(1));
 
         Assert.assertEquals(5.0, mm.evaluate(null));

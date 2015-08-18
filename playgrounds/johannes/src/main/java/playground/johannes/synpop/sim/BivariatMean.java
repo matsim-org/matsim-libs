@@ -24,8 +24,9 @@ import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
@@ -36,7 +37,7 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
+public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private Object xDataKey;
 
@@ -52,14 +53,14 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private double hamiltonianValue;
 
-    public MultivariatMean(Set<? extends Person> refPersons, Set<CachedPerson> simPersons, String xAttrKey, String
-            yAttrKey, Discretizer xDataDiscr) {
+    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements, String
+            xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
         this.xDataKey = Converters.getObjectKey(xAttrKey);
         this.yDataKey = Converters.getObjectKey(yAttrKey);
         this.xDataDiscr = xDataDiscr;
 
-        initReferenceValues(refPersons, xAttrKey, yAttrKey);
-        initSimulationValues(simPersons, xAttrKey, yAttrKey);
+        initReferenceValues(refElements, xAttrKey, yAttrKey);
+        initSimulationValues(simElements, xAttrKey, yAttrKey);
 
         // Calculate the initial hamiltonian value.
         hamiltonianValue = 0;
@@ -69,13 +70,13 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void initReferenceValues(Set<? extends Person> persons, String xAttrKey, String yAttrKey) {
+    private void initReferenceValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey) {
         referenceValues = new DynamicDoubleArray(100, Double.NaN);
 
         DynamicDoubleArray sums = new DynamicDoubleArray(100, Double.NaN);
         DynamicIntArray counts = new DynamicIntArray(100, -1);
 
-        calculateBuckets(persons, sums, counts, xAttrKey, yAttrKey);
+        calculateBuckets(elements, sums, counts, xAttrKey, yAttrKey);
 
         for(int i = 0; i < sums.size(); i++) {
             double sum = sums.get(i);
@@ -86,21 +87,21 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void initSimulationValues(Set<CachedPerson> persons, String xAttrKey, String yAttrKey) {
+    private void initSimulationValues(Set<? extends CachedElement> elements, String xAttrKey, String yAttrKey) {
         bucketSums = new DynamicDoubleArray(100, Double.NaN);
         bucketCounts = new DynamicIntArray(100, -1);
 
-        calculateBuckets(persons, bucketSums, bucketCounts, xAttrKey, yAttrKey);
+        calculateBuckets(elements, bucketSums, bucketCounts, xAttrKey, yAttrKey);
     }
 
-    private void calculateBuckets(Set<? extends Person> persons, DynamicDoubleArray sums, DynamicIntArray counts,
+    private void calculateBuckets(Set<? extends Attributable> elements, DynamicDoubleArray sums, DynamicIntArray counts,
                                   String xAttrKey, String yAttrKey) {
         TIntDoubleHashMap sumBuckets = new TIntDoubleHashMap();
         TIntIntHashMap countBuckets = new TIntIntHashMap();
 
-        for(Person person : persons) {
-            String xValStr = person.getAttribute(xAttrKey);
-            String yValStr = person.getAttribute(yAttrKey);
+        for(Attributable element : elements) {
+            String xValStr = element.getAttribute(xAttrKey);
+            String yValStr = element.getAttribute(yAttrKey);
 
             if(xValStr != null && yValStr != null) {
                 double xVal = Double.parseDouble(xValStr);
@@ -126,7 +127,7 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
     }
 
     @Override
-    public void onChange(Object dataKey, double oldValue, double newValue, CachedPerson person) {
+    public void onChange(Object dataKey, double oldValue, double newValue, CachedElement person) {
         if(dataKey.equals(yDataKey)) {
             onYValueChange(oldValue, newValue, person);
         } else if(dataKey.equals(xDataKey)) {
@@ -134,7 +135,7 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void onXValueChange(double oldValue, double newValue, CachedPerson person) {
+    private void onXValueChange(double oldValue, double newValue, CachedElement person) {
         Double yVal = (Double)person.getData(yDataKey);
         int oldBucketIndex = xDataDiscr.index(oldValue);
         double hValue1 = changeBucketContent(oldBucketIndex, yVal, false);
@@ -164,7 +165,7 @@ public class MultivariatMean implements Hamiltonian, AttributeChangeListener {
         return newDiff - oldDiff;
     }
 
-    private void onYValueChange(double oldValue, double newValue, CachedPerson person) {
+    private void onYValueChange(double oldValue, double newValue, CachedElement person) {
         Double xVal = (Double)person.getData(xDataKey);
         int bucketIndex = xDataDiscr.index(xVal);
 

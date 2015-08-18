@@ -19,13 +19,13 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.CachedElement;
 
 /**
  * @author johannes
  */
 public interface AttributeChangeListener {
 
-    void onChange(Object dataKey, double oldValue, double newValue, CachedPerson person);
+    void onChange(Object dataKey, double oldValue, double newValue, CachedElement element);
 
 }
