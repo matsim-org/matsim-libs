@@ -98,7 +98,10 @@ public class ScaleMatrices {
             }
         }
 
-        if(volume == 0) throw new RuntimeException("Cannot find factor for " + filename);
+        if(volume == 0) {
+            logger.warn(String.format("No factor found for %s...", filename));
+            return 1;
+        }
 
         double sum = factors.get(ALL_PATTERN);
         double upscaleFactor = sum/volume;

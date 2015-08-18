@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author johannes
  */
-public class CachedElement implements Attributable {
+public abstract class CachedElement implements Attributable {
 
     private Map<Object, Object> cache;
 

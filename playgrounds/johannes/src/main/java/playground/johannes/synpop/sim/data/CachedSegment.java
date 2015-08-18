@@ -17,68 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.synpop.sim.data;
 
-import java.util.List;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class PlainSegment extends PlainElement implements Segment {
+public class CachedSegment extends CachedElement implements Segment {
 
-    private Episode episode;
-
-    private boolean isLeg;
-
-//    private int index;
+    public CachedSegment(Segment delegate) {
+        super(delegate);
+    }
 
     @Override
     public Episode getEpisode() {
-        return episode;
+        throw new UnsupportedOperationException("Navigation not supported.");
     }
 
     @Override
     public Segment next() {
-        if(isLeg) {
-            int index = getEpisode().getLegs().indexOf(this);
-            if(index > -1) return getEpisode().getActivities().get(index + 1);
-            else return null;
-        } else {
-            int index = getEpisode().getActivities().indexOf(this);
-            if(index > -1 && index < getEpisode().getLegs().size()) {
-                return getEpisode().getLegs().get(index);
-            }
-            else return null;
-        }
+        throw new UnsupportedOperationException("Navigation not supported.");
     }
 
     @Override
     public Segment previous() {
-        if(isLeg) {
-            int index = getEpisode().getLegs().indexOf(this);
-            if(index > -1) return getEpisode().getActivities().get(index);
-            else return null;
-        } else {
-            int index = getEpisode().getActivities().indexOf(this);
-            if(index > 0) {
-                return getEpisode().getLegs().get(index - 1);
-            }
-            else return null;
-        }
-    }
-
-    void setEpisode(Episode episode, boolean isLeg) {
-        this.episode = episode;
-        this.isLeg = isLeg;
-    }
-
-    public PlainSegment clone() {
-        PlainSegment clone = new PlainSegment();
-
-        for(String key : keys()) {
-            clone.setAttribute(key, getAttribute(key));
-        }
-
-        return clone;
+        throw new UnsupportedOperationException("Navigation not supported.");
     }
 }
