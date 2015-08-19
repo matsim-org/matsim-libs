@@ -1,30 +1,47 @@
 package playground.dhosse.cl.network;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
 
-public class MergeNetworks {
+import com.vividsolutions.jts.geom.Coordinate;
+
+public class CreateMergedNetwork {
+	
+	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
+	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/network/";		//outputDir of this class -> input for Matsim (KT)
 
 	public static void main(String[] args) {
+		createDir(new File(outputDir));
 
 		String crs = "EPSG:32719";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
 		
 		double[] boundingBox1 = new double[]{-71.3607, -33.8875, -70.4169, -33.0144};
-		
 		double[] boundingBox2 = new double[]{-70.9, -33.67, -70.47, -33.27};
-		
 		double[] boundingBox3 = new double[]{-71.0108, -33.5274, -70.9181, -33.4615};
 		
 		NetworkImpl network = (NetworkImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
@@ -33,7 +50,7 @@ public class MergeNetworks {
 		onr.setHierarchyLayer(boundingBox2[3], boundingBox2[0], boundingBox2[1], boundingBox2[2], 5);
 		onr.setHierarchyLayer(boundingBox3[3], boundingBox3[0], boundingBox3[1], boundingBox3[2], 5);
 		
-		onr.parse("../../shared-svn/studies/countries/cl/santiago_pt_demand_matrix/network_dhosse/santiago_tertiary.osm");
+		onr.parse(workingDirInputFiles+"networkOSM/santiago_tertiary.osm");
 
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
@@ -143,12 +160,70 @@ public class MergeNetworks {
 		network.getLinks().get(Id.createLinkId("19485")).setCapacity(network.getLinks().get(Id.createLinkId("19485")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("19485")).getNumberOfLanes());
 		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
 		
-		new NetworkWriter(network).write("../../shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/network/network_merged.xml");
-		
 		new NetworkCleaner().run(network);
 		
-		new NetworkWriter(network).write("../../shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/network/network_merged_cl.xml");
+		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
 		
+		convertNet2Shape(network, crs, outputDir+"viz/"); 
+		calcMinMaxCoord(network);
+		
+		System.out.println("### Finished network creation. ###");
+		
+	}
+	
+	private static void convertNet2Shape(Network network, String crs, String outputDir){
+		
+		createDir(new File(outputDir));
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(crs)).
+				setName("link").
+				addAttribute("ID", String.class).
+				addAttribute("fromID", String.class).
+				addAttribute("toID", String.class).
+				addAttribute("length", Double.class).
+				addAttribute("type", String.class).
+				addAttribute("capacity", Double.class).
+				addAttribute("freespeed", Double.class).
+				create();
+
+		for (Link link : network.getLinks().values()) {
+			Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+			features.add(ft);
+		}   
+		ShapeFileWriter.writeGeometries(features, outputDir + "network_merged_cl_Links.shp");
+
+		features.clear();
+
+		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(crs)).
+				setName("nodes").
+				addAttribute("ID", String.class).
+				create();
+
+		for (Node node : network.getNodes().values()) {
+			SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
+			features.add(ft);
+		}
+		ShapeFileWriter.writeGeometries(features, outputDir + "network_merged_cl_Nodes.shp");
+	}
+	
+	private static void calcMinMaxCoord(Network network) {
+		double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
+		System.out.println("Network bounding box:");
+		System.out.println("minX "+ box[0]);
+		System.out.println("minY "+ box[1]);
+		System.out.println("maxX "+ box[2]);
+		System.out.println("maxY "+ box[3]);
+	}
+	
+	private static void createDir(File file) {
+		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
 
 }
