@@ -30,9 +30,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class CreateMergedNetwork {
 	
-	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
-	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/network/";		//outputDir of this class -> input for Matsim (KT)
+	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/network/";		//outputDir of this class -> input for Matsim (KT)
 
 	public static void main(String[] args) {
 		createDir(new File(outputDir));
