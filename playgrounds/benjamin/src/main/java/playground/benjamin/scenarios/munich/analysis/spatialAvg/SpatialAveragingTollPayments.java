@@ -61,7 +61,7 @@ public class SpatialAveragingTollPayments {
 		
 		SpatialGrid spatialGrid = runCase(inputData.getPlansFileBaseCase());
 		
-		logger.info(inputData.getScenarioInformation());
+//		logger.info(inputData.getScenarioInformation());
 		logger.info("Writing R output to " + inputData.getAnalysisOutPathForBaseCase());
 		String outputPathForR = inputData.getSpatialAveragingOutPathForCompareCase() + ".Routput." ;
 		sar.writeRoutput(spatialGrid.getWeightedValuesOfGrid(), outputPathForR + "TollPaymentsByHomeLocation.txt");

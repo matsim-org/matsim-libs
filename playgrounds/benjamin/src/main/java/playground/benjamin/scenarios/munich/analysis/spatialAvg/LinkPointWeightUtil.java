@@ -42,7 +42,6 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	
 	double smoothinRadiusSquared_m;
 	double area_in_smoothing_circle_sqkm;
-//	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
 
 	private double cellSizeSquareKm;
@@ -57,13 +56,11 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 		
 		this.smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 		this.area_in_smoothing_circle_sqkm = (Math.PI * smoothingRadius_m * smoothingRadius_m) / (1000. * 1000.);
-//		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
 		this.targetCRS = targetCRS;
 		this.cellSizeSquareKm = (xMax-xMin)/noOfXbins*(yMax-yMin)/noOfYbins / (1000.*1000.);
 		logger.info("Cell size in sqkm is " + this.cellSizeSquareKm);
 	}
 	
-
 	public LinkPointWeightUtil(SpatialAveragingInputData inputData, int noOfXbins2, int noOfYbins2, double smoothingRadius_m) {
 		this(inputData.getMinX(),
 			 inputData.getMaxX(), 
@@ -72,15 +69,12 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 			 noOfXbins2,
 			 noOfYbins2, 
 			 smoothingRadius_m, 
-//			 inputData.getMunichShapeFile(),
 			 inputData.getTargetCRS());
 	}
-
 
 	public LinkPointWeightUtil(SpatialAveragingInputData inputData) {
 		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m());
 	}
-
 
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
@@ -101,25 +95,8 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 
-	public boolean isInResearchArea(Coord coord) {
-		Double xCoord = coord.getX();
-		Double yCoord = coord.getY();
-		
-		if(xCoord > xMin && xCoord < xMax){
-			if(yCoord > yMin && yCoord < yMax){
-				return true;
-			}
-		}
-		return false;
-	}
-
-
 	@Override
 	public Double getWeightFromCoord(Coord emittingCoord, Coord receivingCoord) {
 		return calculateWeightOfPointForCell(emittingCoord.getX(), emittingCoord.getY(), receivingCoord.getX(), receivingCoord.getY());
 	}
-
-	
 }
-
-

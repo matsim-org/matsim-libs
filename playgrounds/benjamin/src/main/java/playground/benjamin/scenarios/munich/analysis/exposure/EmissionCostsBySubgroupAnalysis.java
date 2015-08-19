@@ -78,7 +78,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
 		timeBinSize = inputData.getEndTime()/numberOfTimeBins;
 		
-		logger.info(inputData.getScenarioInformation());
+//		logger.info(inputData.getScenarioInformation());
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputData.getNetworkFile());
@@ -103,10 +103,10 @@ public class EmissionCostsBySubgroupAnalysis {
 		totalDurations = intervalHandlerGroups.getTotalDurations();
 		groupDurations = intervalHandlerGroups.getGroupDurations();
 		
-		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData, false);
+		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData);
 		
 		for(int timeBin =0; timeBin<numberOfTimeBins; timeBin++){
-			logger.info(inputData.getScenarioInformation());
+//			logger.info(inputData.getScenarioInformation());
 			logger.info("Writing duration output for time interval " + timeBin + " of " + numberOfTimeBins + " time intervals.");
 			String timeIntervalEnd = Double.toString(((timeBin+1.0)*timeBinSize));
 			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
@@ -145,7 +145,7 @@ public class EmissionCostsBySubgroupAnalysis {
 			timeBin2GroupEmissionCostMatrix.get(i).calculateGroupCosts(timeBin2causingUserGroup2links2flatEmissionCosts.get(i),
 					groupDurations.get(i), linkweightUtil, averageDurationPerCell,
 					scenario.getNetwork().getLinks());
-			logger.info(inputData.getScenarioInformation());
+//			logger.info(inputData.getScenarioInformation());
 			Double intervalEndTime = (1.0+i)*timeBinSize;
 			timeBin2GroupEmissionCostMatrix.get(i).writeOutputFile(inputData.getExposureOutPathForCompareCase()+"."+intervalEndTime+".");
 		}

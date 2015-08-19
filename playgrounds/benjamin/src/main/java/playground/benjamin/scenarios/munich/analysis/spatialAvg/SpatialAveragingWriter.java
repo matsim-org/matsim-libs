@@ -43,51 +43,25 @@ public class SpatialAveragingWriter {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingWriter.class);
 
 	private CoordinateReferenceSystem targetCRS;
-	private int noOfXbins;
-	private int noOfYbins;
-
-	private Double yMin;
-	private Double yMax;
 	private Double xMin;
 	private Double xMax;
-	
+	private Double yMin;
+	private Double yMax;
+	private int noOfXbins;
+	private int noOfYbins;	
 	private boolean useVisBoundary;
 	Collection<SimpleFeature> featuresInVisBoundary;
 	
-//	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, 
-////			String munichShapeFile, 
-//			CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
-//		this.xMin = xMin;
-//		this.xMax = xMax;
-//		this.yMin = yMin;
-//		this.yMax = yMax;
-//		this.noOfXbins = noOfXbins;
-//		this.noOfYbins = noOfYbins;
-////		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
-//		this.targetCRS = targetCRS;
-//		this.useVisBoundary = useVisBoundary;
-//	}
-	
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m, boolean useVisBoundary) {
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData) {
+		this.targetCRS = inputData.getTargetCRS(); 
 		this.xMin = inputData.getMinX();
 		this.xMax = inputData.getMaxX(); 
 		this.yMin = inputData.getMinY();
 		this.yMax = inputData.getMaxY(); 
-		this.noOfXbins = noOfXbins;
-		this.noOfYbins = noOfYbins; 
-//		this.smoothingRadius = smoothingRadius_m; 
-//		inputData.getMunichShapeFile();
-		this.targetCRS = inputData.getTargetCRS(); 
+		this.noOfXbins = inputData.getNoOfXbins();
+		this.noOfYbins = inputData.getNoOfYbins(); 
 		this.useVisBoundary = inputData.isUseVisBoundary();
 		if(this.useVisBoundary)	this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(inputData.getVisBoundaryShapeFile());
-	}
-
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData) {
-		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), inputData.IsUsingVisBoundary());
-	}
-
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData, boolean useVisBoundary) {
-		this(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins(), inputData.getSmoothingRadius_m(), useVisBoundary);
 	}
 
 	public void writeRoutput(Double[][] doubles, String outputPathForR) {
