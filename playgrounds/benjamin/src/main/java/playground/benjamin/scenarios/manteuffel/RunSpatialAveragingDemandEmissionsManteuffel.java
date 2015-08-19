@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.scenarios.manteuffel;
 
 import java.io.IOException;
 
@@ -25,11 +25,14 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.benjamin.utils.spatialAvg.SpatialAveragingDemandEmissions;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+
 /**
  * @author benjamin
  *
  */
-public class RunSpatialAveragingManteuffel {
+public class RunSpatialAveragingDemandEmissionsManteuffel {
 
 	String inputPath = "../../runs-svn/manteuffelstrasse/";
 	
@@ -54,24 +57,21 @@ public class RunSpatialAveragingManteuffel {
 	private final String pollutant2analyze = WarmPollutant.NOX.toString();
 	
 	private final boolean useVisBoundary = true;
-	private final String visBoundaryShapeFile = inputPath + "bau/analysis/spatialAveraging/data/shapes/analysis-area.shp";;
+	private final String visBoundaryShapeFile = inputPath + "bau/analysis/spatialAveraging/data/shapes/analysis-area.shp";
 	private final double scalingFactor = 4.;
 	
 	
 	// ***BASE CASE***
 	private final String runNumber1 = "bau";
 	
-//	private final String runDirectory1;
-//	private final String runDirectory2;
-	
-	private final String configFile1 = inputPath + "bau/bvg.run190.25pct.dilution001.network20150727.v2.static.output_config.xml.gz";;
+	private final String configFile1 = inputPath + "bau/bvg.run190.25pct.dilution001.network20150727.v2.static.output_config.xml.gz";
 	private final Integer lastIteration1 = 30;
 	
 	private final String netFile = inputPath + "bau/bvg.run190.25pct.dilution001.network20150727.v2.static.emissionNetwork.xml.gz";
 //	private final String netFile = inputPath + "p3/bvg.run190.25pct.dilution001.network.20150731.LP2.III.emissionNetwork.xml.gz";
 //	private final String netFile = inputPath + "p4/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.emissionNetwork.xml.gz";;
 	
-	private final String emissionFile1 = inputPath + "bau/ITERS/it.30/bvg.run190.25pct.dilution001.network20150727.v2.static.30.emissionEvents.xml.gz";
+	private final String emissionFile1 = inputPath + "bau/ITERS/it.30/bvg.run190.25pct.dilution001.network20150727.v2.static.30.emissionEventsDay.xml.gz";
 //	private final String emissionFile1 = inputPath + "bau/ITERS/it.30/bvg.run190.25pct.dilution001.network20150727.v2.static.30.emissionEventsMorning.xml.gz";
 //	private final String emissionFile1 = inputPath + "bau/ITERS/it.30/bvg.run190.25pct.dilution001.network20150727.v2.static.30.emissionEventsEvening.xml.gz";;
 	
@@ -80,32 +80,32 @@ public class RunSpatialAveragingManteuffel {
 	
 	// ***COMPARE CASE***
 	private final String runNumber2 = "p1";
-	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.I.30.emissionEvents.xml.gz";
+	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.I.30.emissionEventsDay.xml.gz";
 //	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.I.30.emissionEventsMorning.xml.gz";
 //	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.I.30.emissionEventsEvening.xml.gz";
 	
 //	private final String runNumber2 = "p2";
-//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.II.30.emissionEvents.xml.gz";
+//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.II.30.emissionEventsDay.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.II.30.emissionEventsMorning.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.II.30.emissionEventsEvening.xml.gz";
 	
 //	private final String runNumber2 = "p3";
-//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.III.30.emissionEvents.xml.gz";
+//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.III.30.emissionEventsDay.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.III.30.emissionEventsMorning.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.III.30.emissionEventsEvening.xml.gz";
 	
 //	private final String runNumber2 = "p4";
-//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.30.emissionEvents.xml.gz";
+//	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.30.emissionEventsDay.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.30.emissionEventsMorning.xml.gz";
 ////	private final String emissionFile2 = inputPath + runNumber2 + "/ITERS/it.30/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.30.emissionEventsEvening.xml.gz";
 	
 	private final String fileNameAnalysisCompareCase = inputPath + "bau/analysis/spatialAveraging/data/" + runNumber2 + "." + lastIteration1 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 	
 //  ===
-	private SpatialAveragingInputData inputData;
+	private SpatialAveragingInputData inputData = new SpatialAveragingInputData();
 
 	public static void main(String[] args) throws IOException {
-		new RunSpatialAveragingManteuffel().configure();
+		new RunSpatialAveragingDemandEmissionsManteuffel().configure();
 	}
 
 	private void configure() throws IOException {
@@ -128,13 +128,9 @@ public class RunSpatialAveragingManteuffel {
 		this.inputData.setVisBoundaryShapeFile(visBoundaryShapeFile);
 		this.inputData.setScalingFactor(scalingFactor);
 		
-		this.inputData.setRunNumber1(runNumber1);
-		this.inputData.setRunNumber2(runNumber2);
-		
 		this.inputData.setConfigFile1(configFile1);
-		
-		this.inputData.setLastIteration1(lastIteration1);
 		this.inputData.setNetFile(netFile);
+		
 		this.inputData.setEmissionFile1(emissionFile1);
 		this.inputData.setEmissionFile2(emissionFile2);
 		

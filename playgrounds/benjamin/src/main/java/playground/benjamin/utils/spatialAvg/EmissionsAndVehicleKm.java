@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.utils.spatialAvg;
 
 public class EmissionsAndVehicleKm {
 	

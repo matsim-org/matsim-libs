@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.utils.spatialAvg.Cell;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.scenarios.munich.analysis.spatial;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,12 +38,12 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkPointWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
+import playground.benjamin.utils.spatialAvg.LinkPointWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkWeightUtil;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingWriter;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
@@ -66,7 +66,7 @@ public class SpatialAveragingWelfare {
 	private void run() throws IOException{
 		
 		// init
-		inputData = new SpatialAveragingInputData(baseCase, compareCase);
+//		inputData = new SpatialAveragingInputData(baseCase, compareCase);
 		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData);
 		linkWeightUtil = new LinkPointWeightUtil(inputData);
 		
@@ -74,8 +74,8 @@ public class SpatialAveragingWelfare {
 		runCase(inputData.getPlansFileBaseCase(), inputData.getEventsFileBaseCase());
 		baseCaseGrid = currentCaseGridNoRefund;
 		
-		logger.info("Writing R output to " + inputData.getAnalysisOutPathForBaseCase());
-		String outputPathForR = inputData.getAnalysisOutPathForBaseCase() + ".Routput." ;
+		logger.info("Writing R output to " + inputData.getAnalysisOutPathBaseCase());
+		String outputPathForR = inputData.getAnalysisOutPathBaseCase() + ".Routput." ;
 		sar.writeRoutput(baseCaseGrid.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits.txt");
 		sar.writeRoutput(baseCaseGrid.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage.txt");
 		sar.writeRoutput(currentCaseGridNoRefund.getWeightsOfGrid(), outputPathForR + "UserBenefitsWeights.txt");
@@ -85,8 +85,8 @@ public class SpatialAveragingWelfare {
 			
 			runCase(inputData.getPlansFileCompareCase(), inputData.getEventsFileCompareCase());
 			
-			logger.info("Writing R output for policy case to " + inputData.getAnalysisOutPathForBaseCase());
-			outputPathForR = inputData.getAnalysisOutPathForSpatialComparison() + ".Routput." ;
+			logger.info("Writing R output for policy case to " + inputData.getAnalysisOutPathBaseCase());
+			outputPathForR = inputData.getAnalysisOutPathCompareCase() + ".Routput." ;
 			
 			// write R output for policy case
 			sar.writeRoutput(currentCaseGridNoRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits_NoRefund.txt");
@@ -97,7 +97,7 @@ public class SpatialAveragingWelfare {
 			sar.writeRoutput(currentCaseGridAvgRefund.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage_AverageRefund.txt");
 			
 			// write differences policy <-> base case
-			logger.info("Writing R output for differences to " + inputData.getAnalysisOutPathForBaseCase());
+			logger.info("Writing R output for differences to " + inputData.getAnalysisOutPathBaseCase());
 			SpatialGrid differencesNoRefund = currentCaseGridNoRefund.getDifferencesAAverages(baseCaseGrid);
 			sar.writeRoutput(differencesNoRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefitsDifferencesNoRefund.txt");
 			sar.writeRoutput(differencesNoRefund.getAverageValuesOfGrid(), outputPathForR + "AvgUserBenefitsDifferencesNoRefund.txt");

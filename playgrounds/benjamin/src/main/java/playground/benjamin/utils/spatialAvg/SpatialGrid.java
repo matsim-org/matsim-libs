@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.utils.spatialAvg;
 
 import java.util.ArrayList;
 import java.util.Collection;

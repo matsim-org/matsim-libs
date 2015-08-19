@@ -34,13 +34,13 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.CellWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkLineWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.utils.spatialAvg.Cell;
+import playground.benjamin.utils.spatialAvg.CellWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkLineWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkWeightUtil;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingWriter;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * 
@@ -75,7 +75,7 @@ public class EmissionCostsBySubgroupAnalysis {
 	}
 	
 	private void initialize(){
-		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
+//		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
 		timeBinSize = inputData.getEndTime()/numberOfTimeBins;
 		
 //		logger.info(inputData.getScenarioInformation());
@@ -109,9 +109,9 @@ public class EmissionCostsBySubgroupAnalysis {
 //			logger.info(inputData.getScenarioInformation());
 			logger.info("Writing duration output for time interval " + timeBin + " of " + numberOfTimeBins + " time intervals.");
 			String timeIntervalEnd = Double.toString(((timeBin+1.0)*timeBinSize));
-			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathCompareCase()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			for(UserGroup ug: UserGroup.values()){
-				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathCompareCase()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			}
 		}
 		logger.info("Done calculating and writing durations.");

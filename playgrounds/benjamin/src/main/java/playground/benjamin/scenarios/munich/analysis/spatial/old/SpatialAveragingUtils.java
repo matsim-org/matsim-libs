@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.spatialAvg.old;
+package playground.benjamin.scenarios.munich.analysis.spatial.old;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

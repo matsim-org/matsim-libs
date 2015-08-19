@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.scenarios.munich.analysis.spatial;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,6 +38,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
+import playground.benjamin.utils.spatialAvg.LinkPointWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkWeightUtil;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingWriter;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * @author julia, benjamin
@@ -55,14 +60,14 @@ public class SpatialAveragingTollPayments {
 	
 	private void run() throws IOException{
 		// init
-		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
+//		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
 		SpatialAveragingWriter sar = new SpatialAveragingWriter(inputData);
 		linkWeightUtil = new LinkPointWeightUtil(inputData);
 		
 		SpatialGrid spatialGrid = runCase(inputData.getPlansFileBaseCase());
 		
 //		logger.info(inputData.getScenarioInformation());
-		logger.info("Writing R output to " + inputData.getAnalysisOutPathForBaseCase());
+		logger.info("Writing R output to " + inputData.getAnalysisOutPathBaseCase());
 		String outputPathForR = inputData.getSpatialAveragingOutPathForCompareCase() + ".Routput." ;
 		sar.writeRoutput(spatialGrid.getWeightedValuesOfGrid(), outputPathForR + "TollPaymentsByHomeLocation.txt");
 		sar.writeRoutput(spatialGrid.getAverageValuesOfGrid(), outputPathForR + "AverageTollPaymentsByHomeLocation.txt");

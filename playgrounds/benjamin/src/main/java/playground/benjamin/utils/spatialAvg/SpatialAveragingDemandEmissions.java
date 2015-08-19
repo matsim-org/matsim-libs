@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.spatialAvg;
+package playground.benjamin.utils.spatialAvg;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingWriter;
 
 
 /**
@@ -76,7 +76,7 @@ public class SpatialAveragingDemandEmissions {
 
 	private SpatialAveragingInputData inputData;
 	
-	void run() throws IOException{
+	public void run() throws IOException{
 //		inputData = new SpatialAveragingInputData(baseCase, compareCase);
 		if(useLineMethod){
 			linkWeightUtil = new LinkLineWeightUtil(inputData);
@@ -95,7 +95,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	@SuppressWarnings("unchecked")
 	private void runBaseCase() throws IOException{
-		outPathStub = inputData.getAnalysisOutPathForBaseCase();
+		outPathStub = inputData.getAnalysisOutPathBaseCase();
 		parseEmissionFile(inputData.getEmissionFileForBaseCase());
 		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		timeInterval2GridBaseCase= new SpatialGrid[inputData.getNoOfTimeBins()];
@@ -125,7 +125,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	private void runCompareCase(String emissionFile) throws IOException{
 		logger.info("Starting with compare case.");
-		outPathStub = inputData.getAnalysisOutPathForSpatialComparison();
+		outPathStub = inputData.getAnalysisOutPathCompareCase();
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
 		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
@@ -179,10 +179,6 @@ public class SpatialAveragingDemandEmissions {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario.getNetwork();
 	}
-
-//	public static void main(String[] args) throws IOException{
-//		new SpatialAveragingDemandEmissions().run();
-//	}
 
 	public void setInputData(SpatialAveragingInputData inputData) {
 		this.inputData = inputData;
