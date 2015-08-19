@@ -1,5 +1,6 @@
 package playground.dhosse.cl.population;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -70,24 +72,29 @@ import playground.dhosse.cl.Constants;
 
 public class SantiagoScenarioBuilder {
 
-	static String svnWorkingDir = "../../shared-svn/studies/countries/cl/";
-	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/";
+//	static String svnWorkingDir = "../../shared-svn/studies/countries/cl/";
+	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
 	static String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	static String matsimInputDir = workingDirInputFiles + "inputFiles/";
+	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/";		//outputDir of this class -> input for Matsim (KT)
 	
-	static String transitFilesDir = svnWorkingDir + "/santiago_pt_demand_matrix/pt_stops_schedule_2013/";
-	static String gtfsFilesDir = svnWorkingDir + "/santiago_pt_demand_matrix/gtfs_201306/";
+	static String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
+	static String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
 	
-	static final String popA0eAX = "A0equalAX";
-	static final String popA0neAX = "A0NoNequalAX";
+	static final String popA0eAX = "A0equalAX";			//Population with first Activity = last Activity
+	static final String popA0neAX = "A0NoNequalAX";		//Population with first Activity != last Activity
+	
+	
 	
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 	
 	private static double n = 0.;
 	
-	private static final String outPlans = "plans_final";
+	private static final String pathForMatsim = "../../runs-svn/santiago/run9/";		//path within config file to the in-/output files 
+	private static final String outPlans = "plans_final";								//name of plan file
+	
 	
 	/**
 	 * Creates an initial population for the santiago scenario, executing the following steps:
@@ -104,11 +111,13 @@ public class SantiagoScenarioBuilder {
 	 */
 	public static void main(String args[]){
 		
+		createDir(new File(outputDir));
+		
 		Config config = ConfigUtils.createConfig();
 		setUpConfigParameters(config);
 		
 		CSVToPlans converter = new CSVToPlans(	config,
-												matsimInputDir + "plans/",
+												outputDir + "plans/",
 												boundariesInputDir + "Boundaries_20150428_085038.shp");
 		converter.run(	databaseFilesDir + "Hogar.csv",
 						databaseFilesDir + "Persona.csv",
@@ -118,16 +127,16 @@ public class SantiagoScenarioBuilder {
 		
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(matsimInputDir + "plans/plans.xml.gz");
+		new MatsimPopulationReader(scenario).readFile(outputDir + "plans/plans.xml.gz");
 		
 		removePersons(scenario.getPopulation());
 		
 		Map<String, Population> populationMap = getPlansBeforeMidnight(scenario.getPopulation());
-		new PopulationWriter(populationMap.get(popA0eAX)).write(matsimInputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
+		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
 		
 		log.info("persons with a0 equal to aX: " + populationMap.get(popA0eAX).getPersons().size());
 		
-		new PopulationWriter(populationMap.get(popA0neAX)).write(matsimInputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
+		new PopulationWriter(populationMap.get(popA0neAX)).write(outputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
 		
 		log.info("persons with a0 non equal to aX: " + populationMap.get(popA0neAX).getPersons().size());
 		
@@ -135,18 +144,18 @@ public class SantiagoScenarioBuilder {
 		
 		setCountsParameters(config.counts());
 		setQSimParameters(config.qsim());
-		new ConfigWriter(config).write(matsimInputDir + "config_initial.xml");
+//		new ConfigWriter(config).write(outputDir + "config_initial.xml");
 		
 		Scenario scenarioOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population populationOut = scenarioOut.getPopulation();
-		new MatsimPopulationReader(scenarioOut).readFile(matsimInputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
-		new MatsimPopulationReader(scenarioOut).readFile(matsimInputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
+		new MatsimPopulationReader(scenarioOut).readFile(outputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
+		new MatsimPopulationReader(scenarioOut).readFile(outputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
 		
 		randomizeEndTime(populationOut);
 		
 		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioOut);
 		aap.run();
-		new PopulationWriter(aap.getOutPop()).write(matsimInputDir + "plans/plans_final.xml.gz");
+		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
 		
 		SortedMap<String, Tuple<Double, Double>> acts = aap.getActivityType2TypicalAndMinimalDuration();
 		
@@ -159,18 +168,21 @@ public class SantiagoScenarioBuilder {
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
+			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform); //TODO: Set to "uniform" or "relative"
 			config.planCalcScore().addActivityParams(params);
 		}
 		
-		new ConfigWriter(config).write(matsimInputDir + "config_final.xml");
+		new ConfigWriter(config).write(outputDir + "config_final.xml");
 		
 		Scenario scenarioFinal = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioFinal).readFile(matsimInputDir + "plans/plans_final.xml.gz");
+		new MatsimPopulationReader(scenarioFinal).readFile(outputDir + "plans/plans_final.xml.gz");
 		Population populationFinal = scenarioFinal.getPopulation();
 		
-		new PopulationWriter(populationFinal).write(matsimInputDir + "plans/" + outPlans + ".xml.gz");
+		new PopulationWriter(populationFinal).write(outputDir + "plans/" + outPlans + ".xml.gz");
 		
 		log.info("final: " + populationOut.getPersons().size());
+		
+		
 		
 	}
 	
@@ -654,9 +666,9 @@ public class SantiagoScenarioBuilder {
 		cc.setLastIteration(100);
 		
 		cc.setMobsim(MobsimType.qsim.name());
-		cc.setOutputDirectory("../output/"); //TODO
+		cc.setOutputDirectory(pathForMatsim + "output/"); //TODO
 		cc.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-		cc.setRunId("");
+		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any text. (KT, 2015-08-17) 
 		
 		Set<String> snapshotFormat = new HashSet<String>();
 		snapshotFormat.add("otfvis");
@@ -676,7 +688,7 @@ public class SantiagoScenarioBuilder {
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
-		counts.setCountsFileName("./counts_merged_VEH_C01.xml"); //TODO
+		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml"); //TODO
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(10);
 		
@@ -700,7 +712,7 @@ public class SantiagoScenarioBuilder {
 	private static void setNetworkParameters(NetworkConfigGroup net){
 		
 		net.setChangeEventInputFile(null);
-		net.setInputFile("./santiago_merged_cl.xml.gz"); //TODO
+		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz"); //TODO
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);
 		
@@ -817,7 +829,7 @@ public class SantiagoScenarioBuilder {
 		
 		plans.setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 		plans.setInputPersonAttributeFile(null); //TODO
-		plans.setInputFile("./" + outPlans + ".xml.gz"); //TODO
+		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
 		plans.setSubpopulationAttributeName(null); //TODO
 		plans.setRemovingUnneccessaryPlanAttributes(true);
@@ -970,6 +982,10 @@ public class SantiagoScenarioBuilder {
 		vsp.setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 		vsp.setWritingOutputEvents(true);
 		
+	}
+	
+	private static void createDir(File file) {
+		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
 
 }

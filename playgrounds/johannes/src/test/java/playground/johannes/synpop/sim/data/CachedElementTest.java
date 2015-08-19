@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
@@ -30,13 +31,13 @@ import playground.johannes.synpop.data.PlainSegment;
 public class CachedElementTest extends TestCase {
 
     public void testSynchronization() {
-        Attributable e = new PlainSegment();
+        Segment e = new PlainSegment();
 
         String plainKey = "key";
         String plainValue = "1.2";
         e.setAttribute(plainKey, plainValue);
 
-        CachedElement cache = new CachedElement(e);
+        CachedElement cache = new CachedSegment(e);
         Object objKey = new Object();
         Converters.register(plainKey, objKey, DoubleConverter.getInstance());
 

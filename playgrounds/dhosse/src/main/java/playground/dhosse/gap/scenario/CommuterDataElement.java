@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * CommuterDataElement
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,16 +17,73 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.johannes.synpop.sim;
-
-import playground.johannes.synpop.sim.data.CachedElement;
+package playground.dhosse.gap.scenario;
 
 /**
- * @author johannes
+ * @author dhosse
+ *
  */
-public interface AttributeChangeListener {
+public class CommuterDataElement {
+	private String fromId;
+	private String toId;
+	private String fromName;
+	private String toName;
+	private int commuters;
+	private int adminLevel;
+	
+	public CommuterDataElement(String fromId, String fromName,  String toId, String toName,  int commuters){
+		this.fromId = fromId;
+		this.toId = toId;
+		this.commuters = commuters;
+		this.fromName = fromName;
+		this.toName = toName;
+		this.adminLevel = fromId.length();
+	}
+	
+	
 
-    void onChange(Object dataKey, double oldValue, double newValue, CachedElement element);
+	public String getFromName() {
+		return fromName;
+	}
+
+
+
+	public void setFromName(String fromName) {
+		this.fromName = fromName;
+	}
+
+
+
+	public String getToName() {
+		return toName;
+	}
+
+
+
+	public void setToName(String toName) {
+		this.toName = toName;
+	}
+
+
+
+	public String getFromId() {
+		return fromId;
+	}
+
+	public String getToId() {
+		return toId;
+	}
+
+	public int getCommuters() {
+		return commuters;
+	}
+	
+	public String toString(){
+		return ("F: "+fromId+" T: "+toId+" C: "+commuters);
+	}
+	
+	public int getAdminLevel(){
+		return this.adminLevel;
+	}
 
 }

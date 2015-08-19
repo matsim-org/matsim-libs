@@ -22,6 +22,7 @@ package playground.johannes.synpop.sim.data;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,8 +30,15 @@ import java.util.List;
  */
 public class CachedPerson extends CachedElement implements Person {
 
+    private final List<Episode> episodes;
+
     public CachedPerson(Person delegate) {
         super(delegate);
+        episodes = new ArrayList<>(delegate.getEpisodes().size());
+        for(Episode episode : delegate.getEpisodes()) {
+            CachedEpisode cachedEpisode = new CachedEpisode(episode);
+            episodes.add(cachedEpisode);
+        }
     }
 
     @Override
@@ -40,11 +48,13 @@ public class CachedPerson extends CachedElement implements Person {
 
     @Override
     public List<Episode> getEpisodes() {
-        return ((Person)getDelegate()).getEpisodes();
+        return episodes;
+//        return ((Person)getDelegate()).getEpisodes();
     }
 
     @Override
     public void addEpisode(Episode episode) {
-        ((Person)getDelegate()).addEpisode(episode);
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+//        ((Person)getDelegate()).addEpisode(episode);
     }
 }
