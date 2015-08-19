@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunSpatialAveragingManteuffel.java
+ * RunSpatialAveragingDemandEmissionsMunich.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
