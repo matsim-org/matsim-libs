@@ -19,34 +19,18 @@
 
 package playground.johannes.synpop.sim;
 
+import playground.johannes.sna.util.Composite;
 import playground.johannes.synpop.sim.data.CachedElement;
 
 /**
  * @author johannes
  */
-public class AttributeMutator {
+public class AttributeChangeListenerComposite extends Composite<AttributeChangeListener> implements AttributeChangeListener {
 
-    private Object dataKey;
-
-    private ValueGenerator generator;
-
-    private AttributeChangeListener listener;
-
-    private Object oldValue;
-
-    public void modify(CachedElement element) {
-        oldValue = element.getData(dataKey);
-        Object newValue = generator.newValue(element);
-        element.setData(dataKey, newValue);
-
-        if(listener != null) listener.onChange(dataKey, oldValue, newValue, element);
+    @Override
+    public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
+        for(int i = 0; i < components.size(); i++) {
+            components.get(i).onChange(dataKey, oldValue, newValue, element);
+        }
     }
-
-    public void revert(CachedElement element) {
-        Object newValue = element.getData(dataKey);
-        element.setData(dataKey, oldValue);
-
-        if(listener != null) listener.onChange(dataKey, newValue, oldValue, element);
-    }
-
 }

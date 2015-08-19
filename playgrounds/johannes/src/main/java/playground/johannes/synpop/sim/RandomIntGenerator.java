@@ -17,44 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
+
+import playground.johannes.synpop.sim.data.CachedElement;
 
 import java.util.Random;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-import playground.johannes.synpop.sim.AttributeChangeListener;
-import playground.johannes.synpop.sim.PersonAttributeMutator;
-import playground.johannes.synpop.sim.RandomIntGenerator;
-import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.data.DoubleConverter;
-
 /**
  * @author johannes
- *
  */
-public class IncomeMutatorFactory implements MutatorFactory {
+public class RandomIntGenerator implements ValueGenerator {
 
-	public static final Object INCOME_DATA_KEY = new Object();
+    private final Random random;
 
-	private final Random random;
+    private final int offset;
 
-	private final RandomIntGenerator generator;
+    private final int factor;
 
-	private final AttributeChangeListener listener;
+    public RandomIntGenerator(Random random, int min, int max) {
+        this.random = random;
+        this.offset = min;
+        this.factor = (max - min);
+    }
 
-	public IncomeMutatorFactory(AttributeChangeListener listener, Random random) {
-		this.random = random;
-		this.listener = listener;
-		generator = new RandomIntGenerator(random, 500, 8000);
-
-		Converters.register(CommonKeys.HH_INCOME, INCOME_DATA_KEY, DoubleConverter.getInstance());
-	}
-
-	@Override
-	public Mutator newInstance() {
-		return new PersonAttributeMutator(INCOME_DATA_KEY, random, generator, listener);
-	}
-
+    @Override
+    public Object newValue(CachedElement element) {
+        return new Double(Math.floor(offset + (random.nextDouble() * factor)));
+    }
 }

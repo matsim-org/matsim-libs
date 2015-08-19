@@ -23,7 +23,6 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
@@ -39,11 +38,13 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private final DynamicIntArray simFreq;
 
-    private final double normFactor;
-
     private final double scaleFactor;
 
-    private final Object dataKey;
+    private final double normFactor;
+
+    private Object dataKey;
+
+    private final String attrKey;
 
     private final Discretizer discretizer;
 
@@ -52,20 +53,20 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements,
                               String attrKey, Discretizer discretizer) {
         this.discretizer = discretizer;
-        this.dataKey = Converters.getObjectKey(attrKey);
+        this.attrKey = attrKey;
 
         refFreq = initHistogram(refElements, attrKey);
-        normFactor = 1/(double)refElements.size();
-
         simFreq = initHistogram(simElements, attrKey);
-        scaleFactor = 1/(double)simElements.size();
+
+        scaleFactor = simElements.size()/(double)refElements.size();
+        normFactor = simElements.size();
 
         int size = Math.max(simFreq.size(), refFreq.size());
         for(int i = 0; i < size; i++) {
-            double simVal = simFreq.get(i) * scaleFactor;
-            double refVal = refFreq.get(i) * normFactor;
+            double simVal = simFreq.get(i);
+            double refVal = refFreq.get(i) * scaleFactor;
 
-            hamiltonianValue += Math.abs(simVal - refVal);
+            hamiltonianValue += Math.abs(simVal - refVal)/ normFactor;
         }
     }
 
@@ -86,6 +87,8 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
+        if(this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
+
         if(this.dataKey.equals(dataKey)) {
             int bucket = discretizer.index((Double)oldValue);
             double diff1 = changeBucketContent(bucket, -1);
@@ -93,22 +96,22 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
             bucket = discretizer.index((Double)newValue);
             double diff2 = changeBucketContent(bucket, 1);
 
-            hamiltonianValue += (diff1 + diff2);
+            hamiltonianValue += (diff1 + diff2)/ normFactor;
         }
     }
 
     private double changeBucketContent(int bucketIndex, int value) {
-        double simVal = simFreq.get(bucketIndex) * scaleFactor;
-        double refVal = refFreq.get(bucketIndex) * normFactor;
-        double olfDiff = Math.abs(simVal - refVal);
+        double simVal = simFreq.get(bucketIndex);
+        double refVal = refFreq.get(bucketIndex) * scaleFactor;
+        double oldDiff = Math.abs(simVal - refVal);
 
         simFreq.set(bucketIndex, simFreq.get(bucketIndex) + value);
 
-        simVal = simFreq.get(bucketIndex) * scaleFactor;
-        refVal = refFreq.get(bucketIndex) * normFactor;
+        simVal = simFreq.get(bucketIndex);
+        refVal = refFreq.get(bucketIndex) * scaleFactor;
         double newDiff = Math.abs(simVal - refVal);
 
-        return newDiff - olfDiff;
+        return newDiff - oldDiff;
     }
 
     @Override

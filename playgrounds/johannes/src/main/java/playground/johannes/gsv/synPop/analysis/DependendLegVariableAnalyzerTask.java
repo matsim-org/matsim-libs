@@ -28,6 +28,7 @@ import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
         TDoubleArrayList xVals = new TDoubleArrayList();
         TDoubleArrayList yVals = new TDoubleArrayList();
 
-        for(PlainPerson person : persons) {
+        for(Person person : persons) {
             for(Episode plan : person.getEpisodes()) {
                 for(Attributable leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(xKey);

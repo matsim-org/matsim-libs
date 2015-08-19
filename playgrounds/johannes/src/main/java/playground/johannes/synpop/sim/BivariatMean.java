@@ -43,7 +43,11 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private Object yDataKey;
 
-    private Discretizer xDataDiscr;
+    private final String xAttrKey;
+
+    private final String yAttrKey;
+
+    private final Discretizer xDataDiscr;
 
     private DynamicDoubleArray referenceValues;
 
@@ -55,8 +59,10 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     public BivariatMean(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
-        this.xDataKey = Converters.getObjectKey(xAttrKey);
-        this.yDataKey = Converters.getObjectKey(yAttrKey);
+//        this.xDataKey = Converters.getObjectKey(xAttrKey);
+//        this.yDataKey = Converters.getObjectKey(yAttrKey);
+        this.xAttrKey = xAttrKey;
+        this.yAttrKey = yAttrKey;
         this.xDataDiscr = xDataDiscr;
 
         initReferenceValues(refElements, xAttrKey, yAttrKey);
@@ -128,10 +134,13 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
-        if(dataKey.equals(yDataKey)) {
+        if(xDataKey == null) xDataKey = Converters.getObjectKey(xAttrKey);
+        if(yDataKey == null) yDataKey = Converters.getObjectKey(yAttrKey);
+
+        if(yDataKey.equals(dataKey)) {
             onYValueChange((Double)oldValue, (Double)newValue, person);
-        } else if(dataKey.equals(xDataKey)) {
-            onXValueChange((Double)oldValue, (Double)newValue, person);
+        } else if(xDataKey.equals(dataKey)) {
+            onXValueChange((Double) oldValue, (Double) newValue, person);
         }
     }
 
