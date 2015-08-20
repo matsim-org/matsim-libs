@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
-
-
-public class ElectricVehicleImpl
-    extends VehicleImpl
-    implements ElectricVehicle
+public class BatteryImpl
+    implements Battery
 {
-    private Battery battery;
+    private final double capacity;
+    private final double initialSoc;
+    private double soc;
 
 
-    public ElectricVehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1)
+    public BatteryImpl(double capacity, double initialSoc)
     {
-        super(id, startLink, capacity, t0, t1);
+        this.capacity = capacity;
+        this.initialSoc = initialSoc;
+        this.soc = initialSoc;
     }
 
 
     @Override
-    public Battery getBattery()
+    public double getCapacity()
     {
-        return battery;
+        return capacity;
     }
 
 
     @Override
-    public void setBattery(Battery battery)
+    public double getSoc()
     {
-        this.battery = battery;
+        return soc;
+    }
+
+
+    @Override
+    public void charge(double energy)
+    {
+        if (energy < 0 || energy > capacity - soc) {
+            throw new IllegalArgumentException();
+        }
+
+        soc += energy;
+    }
+
+
+    @Override
+    public void discharge(double energy)
+    {
+        if (energy < 0 || energy > soc) {
+            throw new IllegalStateException();
+        }
+
+        soc -= energy;
+    }
+
+
+    @Override
+    public void resetSoc()
+    {
+        soc = initialSoc;
     }
 }

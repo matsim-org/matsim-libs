@@ -108,7 +108,7 @@ public class ElectroCabLaunchUtils
         handlerGroup.addHandler(rankhandler);
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
-        for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
+        for (TaxiRank r : ((ETaxiData)context.getVrpData()).getTaxiRanks()) {
             rankhandler.addRank(r);
             //            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
             if (r.getId().toString().equals("249"))

@@ -4,15 +4,13 @@ import java.io.File;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
-import org.matsim.contrib.dvrp.extensions.electric.ElectricVehicleImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
 import playground.dhosse.prt.PrtConfigGroup;
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.TaxiRank;
+import playground.michalm.taxi.data.*;
 
 public class PrtVehicleFactory {
 
@@ -32,20 +30,20 @@ public class PrtVehicleFactory {
 		
 		if(event.getIteration() > 0){
 			
-			TaxiData data = new TaxiData();
+			ETaxiData data = new ETaxiData();
 			
-			for(TaxiRank rank : ((TaxiData)this.context.getVrpData()).getTaxiRanks()){
+			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks()){
 				data.addTaxiRank(rank);
 			}
 			
 			for(Vehicle vehicle : this.context.getVrpData().getVehicles()){
-				data.addVehicle(new ElectricVehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
+				data.addVehicle(new VehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
 						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(), vehicle.getT1()));
 			}
 			
 			double maxWTime = Double.NEGATIVE_INFINITY;
 			TaxiRank maxWTimeRank = null;
-			for(TaxiRank rank : ((TaxiData)this.context.getVrpData()).getTaxiRanks()){
+			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks()){
 				if(this.handler.rankIds2PassengerWaitingTimes.containsKey(rank.getId())){
 					double wtime = this.handler.rankIds2PassengerWaitingTimes.get(rank.getId()).getMax();
 					if(wtime > maxWTime){
@@ -56,7 +54,7 @@ public class PrtVehicleFactory {
 			}
 			
 			if(maxWTimeRank != null){
-				data.addVehicle(new ElectricVehicleImpl(Id.create(maxWTimeRank.getId() + "_" + data.getVehicles().size(),
+				data.addVehicle(new VehicleImpl(Id.create(maxWTimeRank.getId() + "_" + data.getVehicles().size(),
 						Vehicle.class), maxWTimeRank.getLink(), config.getVehicleCapacity(),
 						0, this.context.getScenario().getConfig().qsim().getEndTime()));
 			}

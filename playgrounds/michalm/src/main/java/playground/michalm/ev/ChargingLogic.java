@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import java.util.List;
-
-import org.matsim.contrib.dvrp.data.VrpData;
-
-
-public interface ElectricVrpData
-    extends VrpData
+public interface ChargingLogic
 {
-    List<Charger> getChargers();
-
-
-    void addCharger(Charger charger);
+    Charger getCharger();
+    
+    void chargeVehicles(double chargeTime);
 }

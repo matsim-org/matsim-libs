@@ -12,15 +12,16 @@
 <!ELEMENT rank (chargers)?>
 
 <!ATTLIST rank
-	id      CDATA   #REQUIRED
-	name    CDATA   #IMPLIED
-	link    CDATA   #REQUIRED>
+	id       CDATA   #REQUIRED
+	name     CDATA   #IMPLIED
+	capacity CDATA   #IMPLIED
+	link     CDATA   #REQUIRED>
 
 <!ELEMENT chargers (charger)*>
 
 <!ELEMENT charger EMPTY>
 
 <!ATTLIST charger
-	id      CDATA   #REQUIRED
-	power   CDATA   #IMPLIED>
-
+	id       CDATA   #REQUIRED
+	power    CDATA   #IMPLIED
+    capacity CDATA   #IMPLIED>

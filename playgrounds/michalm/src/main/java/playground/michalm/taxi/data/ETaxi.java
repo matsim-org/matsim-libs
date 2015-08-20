@@ -17,21 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.taxi.data;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.data.*;
+
+import playground.michalm.ev.*;
 
 
-public interface Charger
-    extends BasicLocation<Charger>
+public class ETaxi
+    extends VehicleImpl
+    implements ElectricVehicle
 {
-    Link getLink();
+    private final Battery battery;
+    private final DriveEnergyConsumption driveEnergyConsumption;
+    private final AuxEnergyConsumption auxEnergyConsumption;
 
 
-    double getPowerInWatts();
+    public ETaxi(Vehicle vehicle, Battery battery,
+            DriveEnergyConsumption driveEnergyConsumption,
+            AuxEnergyConsumption auxEnergyConsumption)
+    {
+        super(vehicle.getId(), vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(),
+                vehicle.getT1());
+
+        this.battery = battery;
+        this.driveEnergyConsumption = driveEnergyConsumption;
+        this.auxEnergyConsumption = auxEnergyConsumption;
+    }
 
 
-    ChargingSchedule<? extends StayTask> getSchedule();
+    @Override
+    public Battery getBattery()
+    {
+        return battery;
+    }
+
+
+    @Override
+    public DriveEnergyConsumption getDriveEnergyConsumption()
+    {
+        return driveEnergyConsumption;
+    }
+
+
+    @Override
+    public AuxEnergyConsumption getAuxEnergyConsumption()
+    {
+        return auxEnergyConsumption;
+    }
 }

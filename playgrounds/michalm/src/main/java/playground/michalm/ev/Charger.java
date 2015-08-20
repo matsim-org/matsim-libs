@@ -17,63 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.facilities.Facility;
 
 
-public class ChargerImpl
-    implements Charger
+public interface Charger
+    extends BasicLocation<Charger>
 {
-    private final Id<Charger> id;
-    private final double powerInWatts;
-    private final Link link;
-
-    private final ChargingSchedule<? extends ChargeTask> schedule;
-
-
-    public ChargerImpl(Id<Charger> id, double powerInWatts, Link link)
-    {
-        this.id = id;
-        this.powerInWatts = powerInWatts;
-        this.link = link;
-
-        schedule = new ChargingScheduleImpl<>(this);
-    }
+    ChargingLogic getLogic();
+    
+    
+    Link getLink();
 
 
-    @Override
-    public Id<Charger> getId()
-    {
-        return id;
-    }
+    /**
+     * @return max power at a single plug, in [W]
+     */
+    double getPower();
 
 
-    @Override
-    public double getPowerInWatts()
-    {
-        return powerInWatts;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return link.getCoord();
-    }
-
-
-    @Override
-    public ChargingSchedule<? extends ChargeTask> getSchedule()
-    {
-        return schedule;
-    }
+    /**
+     * @return capacity == number of plugs
+     */
+    int getCapacity();
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import java.util.List;
-
-
-public interface ChargingSchedule<T extends ChargeTask>
-{
-    Charger getCharger();
-
-
-    //tasks are time-ordered
-    List<T> getTasks();// unmodifiableList
-
-
-    //may fail if there the task overlaps with at least one of the already scheduled ones
-    void addTask(T task);
-
-
-    void removeTask(T task);
-
-
-    /**
-     * @return null if no vehicle is being charged now
-     */
-    T getCurrentTask();
-}
+/**
+ * All values used in this package use SI base and derived units. In particular:
+ * <ul>
+ * <li>distance - meter [m]</li>
+ * <li>time - second [s]</li>
+ * <li>energy - joule [J]</li>
+ * <li>power - watt [W]</li>
+ * </ul>
+ * <p>
+ * Particularly, use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh = 1 J * 1 s *
+ * 3,600,000
+ * <p>
+ * Consequently, energy consumption is measured in [J/m], instead of [kWh/100km] or [Wh/km], as
+ * usually in transport.
+ */

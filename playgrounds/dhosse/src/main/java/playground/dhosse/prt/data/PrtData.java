@@ -8,15 +8,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.TaxiRank;
 
-public class PrtData extends TaxiData {
+public class PrtData extends ETaxiData {
 	
 	private List<TaxiRank> vehicleRanks;
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
-	public PrtData(Network network, TaxiData data){
+	public PrtData(Network network, ETaxiData data){
 		this.vehicleRanks = data.getTaxiRanks();
 		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
 		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);

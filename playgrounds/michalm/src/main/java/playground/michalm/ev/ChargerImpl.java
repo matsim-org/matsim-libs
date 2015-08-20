@@ -17,19 +17,76 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 
 
-public interface ElectricVehicle
-    extends Vehicle
+public class ChargerImpl
+    implements Charger
 {
-    Battery getBattery();
+    private final Id<Charger> id;
+    private final double power;
+    private final int capacity;
+    private final Link link;
+
+    private ChargingLogic logic;
 
 
-    /**
-     * Used also for swapping batteries
-     */
-    void setBattery(Battery battery);
+    public ChargerImpl(Id<Charger> id, double power, int capacity, Link link)
+    {
+        this.id = id;
+        this.power = power;
+        this.capacity = capacity;
+        this.link = link;
+    }
+
+
+    @Override
+    public ChargingLogic getLogic()
+    {
+        return logic;
+    }
+
+
+    public void setLogic(ChargingLogic logic)
+    {
+        this.logic = logic;
+    }
+
+
+    @Override
+    public Id<Charger> getId()
+    {
+        return id;
+    }
+
+
+    @Override
+    public double getPower()
+    {
+        return power;
+    }
+
+
+    @Override
+    public int getCapacity()
+    {
+        return capacity;
+    }
+
+
+    @Override
+    public Link getLink()
+    {
+        return link;
+    }
+
+
+    @Override
+    public Coord getCoord()
+    {
+        return link.getCoord();
+    }
 }

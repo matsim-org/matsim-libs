@@ -21,6 +21,7 @@ package playground.michalm.taxi.util.stats;
 
 import java.io.*;
 
+import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 
@@ -28,7 +29,6 @@ import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-import playground.michalm.taxi.util.TaxicabUtils;
 
 
 public class IdleVehicleUnplannedRequestStats
@@ -56,9 +56,9 @@ public class IdleVehicleUnplannedRequestStats
     {
         int idx = (int)e.getSimulationTime();
         if (idx < MAX_TIME) {
-            TaxiData taxiData = (TaxiData)optimConfig.context.getVrpData();
+            ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
 
-            idleVehs[idx / STEP] += TaxicabUtils.countVehicles(taxiData.getVehicles(),
+            idleVehs[idx / STEP] += Vehicles.countVehicles(taxiData.getVehicles(),
                     TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler));
 
             unplannedReqs[idx / STEP] += TaxiRequests.countRequestsWithStatus(

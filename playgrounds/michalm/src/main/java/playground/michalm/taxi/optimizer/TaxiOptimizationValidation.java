@@ -19,10 +19,11 @@
 
 package playground.michalm.taxi.optimizer;
 
+import org.matsim.contrib.dvrp.data.Vehicles;
+
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-import playground.michalm.taxi.util.TaxicabUtils;
 
 
 public class TaxiOptimizationValidation
@@ -30,9 +31,9 @@ public class TaxiOptimizationValidation
     public static void assertNoUnplannedRequestsWhenIdleVehicles(
             TaxiOptimizerConfiguration optimConfig)
     {
-        TaxiData taxiData = (TaxiData)optimConfig.context.getVrpData();
+        ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
 
-        if (TaxicabUtils.countVehicles(taxiData.getVehicles(),
+        if (Vehicles.countVehicles(taxiData.getVehicles(),
                 TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)) == 0) {
             return;//OK
         }

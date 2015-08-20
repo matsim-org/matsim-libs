@@ -17,13 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-import org.matsim.contrib.dvrp.schedule.StayTask;
-
-
-public interface ChargeTask
-    extends StayTask
+public interface ElectricVehicle
 {
-    ChargingSchedule<? extends ChargeTask> getChargingSchedule();
+    DriveEnergyConsumption getDriveEnergyConsumption();
+
+
+    AuxEnergyConsumption getAuxEnergyConsumption();
+
+
+    Battery getBattery();
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.electric;
+package playground.michalm.ev;
 
-public class BatteryImpl
-    implements Battery
+public interface Battery
 {
-    private final double capacity;
-    private double energy;
+    double getCapacity();
 
 
-    public BatteryImpl(double energy, double capacity)
-    {
-        this.energy = energy;
-        this.capacity = capacity;
-    }
+    double getSoc();
 
 
-    @Override
-    public double getCapacity()
-    {
-        return capacity;
-    }
+    void charge(double energy);
 
 
-    @Override
-    public double getEnergy()
-    {
-        return energy;
-    }
+    void discharge(double energy);
 
 
-    @Override
-    public void setEnergy(double energy)
-    {
-        this.energy = energy;
-    }
+    void resetSoc();
 }

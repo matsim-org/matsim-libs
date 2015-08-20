@@ -19,7 +19,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.michalm.taxi.data.file.ElectricVehicleReader;
+import playground.michalm.taxi.data.file.ETaxiReader;
 
 public class PrtAnalyzer {
 	
@@ -47,7 +47,7 @@ public class PrtAnalyzer {
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
-		ElectricVehicleReader vehReader = new ElectricVehicleReader(scenario, data);
+		ETaxiReader vehReader = new ETaxiReader(scenario, data);
 		vehReader.parse("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
 		
 		EventsManager events = EventsUtils.createEventsManager();

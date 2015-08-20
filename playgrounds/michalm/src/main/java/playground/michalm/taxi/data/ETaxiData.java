@@ -22,12 +22,12 @@ package playground.michalm.taxi.data;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.VrpDataImpl;
-import org.matsim.contrib.dvrp.extensions.electric.*;
+
+import playground.michalm.ev.*;
 
 
-public class TaxiData
+public class ETaxiData
     extends VrpDataImpl
-    implements ElectricVrpData
 {
     private final List<TaxiRank> taxiRanks = new ArrayList<>();
     private final List<Charger> chargers = new ArrayList<>();
@@ -48,7 +48,7 @@ public class TaxiData
     }
 
 
-    public List<ElectricVehicle> getElectricVehicles()
+    public List<ETaxi> getETaxis()
     {
         return convertList(getVehicles());
     }
@@ -66,7 +66,6 @@ public class TaxiData
     }
 
 
-    @Override
     public void addCharger(Charger charger)
     {
         chargers.add(charger);
