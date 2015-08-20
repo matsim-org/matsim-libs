@@ -24,18 +24,18 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 
-import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.file.*;
 
 
 public class TaxiLauncherUtils
 {
-    public static TaxiData initTaxiData(Scenario scenario, String taxisFile,
+    public static ETaxiData initTaxiData(Scenario scenario, String taxisFile,
             String ranksFile)
     {
-        TaxiData taxiData = new TaxiData();
+        ETaxiData taxiData = new ETaxiData();
 
-        new ElectricVehicleReader(scenario, taxiData).parse(taxisFile);
+        new ETaxiReader(scenario, taxiData).parse(taxisFile);
         new TaxiRankReader(scenario, taxiData).parse(ranksFile);
 
         return taxiData;

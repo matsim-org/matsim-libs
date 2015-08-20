@@ -27,7 +27,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
-import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.TaxiRank;
 
 public class PrtRouterWrapper implements RoutingModule {

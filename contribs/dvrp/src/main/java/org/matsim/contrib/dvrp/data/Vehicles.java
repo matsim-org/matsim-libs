@@ -21,6 +21,9 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.Comparator;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 
 public class Vehicles
 {
@@ -37,4 +40,10 @@ public class Vehicles
             return Double.compare(v1.getT1(), v2.getT1());
         }
     };
+    
+    public static int countVehicles(Iterable<? extends Vehicle> vehicles,
+            Predicate<Vehicle> predicate)
+    {
+        return Iterables.size(Iterables.filter(vehicles, predicate));
+    }
 }

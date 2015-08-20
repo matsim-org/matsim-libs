@@ -27,12 +27,20 @@ public class ReaderUtils
     public static double getDouble(Attributes atts, String qName, double defaultValue)
     {
         String val = atts.getValue(qName);
+        return val != null ? Double.parseDouble(val) : defaultValue;
+    }
 
-        if (val != null) {
-            return Double.parseDouble(val);
-        }
-        else {
-            return defaultValue;
-        }
+
+    public static int getInt(Attributes atts, String qName, int defaultValue)
+    {
+        String val = atts.getValue(qName);
+        return val != null ? Integer.parseInt(val) : defaultValue;
+    }
+    
+    
+    public static String getString(Attributes atts, String qName, String defaultValue)
+    {
+        String val = atts.getValue(qName);
+        return val != null ? val : defaultValue;
     }
 }

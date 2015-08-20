@@ -35,6 +35,7 @@ import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -82,8 +83,8 @@ public class SantiagoScenarioBuilder {
 	static String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
 	static String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
 	
-	static final String popA0eAX = "A0equalAX";
-	static final String popA0neAX = "A0NoNequalAX";
+	static final String popA0eAX = "A0equalAX";			//Population with first Activity = last Activity
+	static final String popA0neAX = "A0NoNequalAX";		//Population with first Activity != last Activity
 	
 	
 	
@@ -143,7 +144,7 @@ public class SantiagoScenarioBuilder {
 		
 		setCountsParameters(config.counts());
 		setQSimParameters(config.qsim());
-		new ConfigWriter(config).write(outputDir + "config_initial.xml");
+//		new ConfigWriter(config).write(outputDir + "config_initial.xml");
 		
 		Scenario scenarioOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population populationOut = scenarioOut.getPopulation();
@@ -167,6 +168,7 @@ public class SantiagoScenarioBuilder {
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
+			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform); //TODO: Set to "uniform" or "relative"
 			config.planCalcScore().addActivityParams(params);
 		}
 		

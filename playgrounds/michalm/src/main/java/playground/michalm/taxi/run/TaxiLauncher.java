@@ -130,7 +130,7 @@ class TaxiLauncher
 
         contextImpl.setScenario(scenario);
 
-        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, params.taxisFile,
+        ETaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, params.taxisFile,
                 params.ranksFile);
         contextImpl.setVrpData(taxiData);
 
@@ -192,7 +192,7 @@ class TaxiLauncher
     {}
 
 
-    void validateResults(TaxiData taxiData)
+    void validateResults(ETaxiData taxiData)
     {
         // check if all reqs have been served
         for (TaxiRequest r : taxiData.getTaxiRequests()) {

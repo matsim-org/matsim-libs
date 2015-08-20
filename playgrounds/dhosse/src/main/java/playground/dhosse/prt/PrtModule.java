@@ -26,8 +26,8 @@ import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.file.ElectricVehicleReader;
+import playground.michalm.taxi.data.ETaxiData;
+import playground.michalm.taxi.data.file.ETaxiReader;
 import playground.michalm.taxi.data.file.TaxiRankReader;
 
 public class PrtModule {
@@ -76,10 +76,10 @@ public class PrtModule {
 		context = new MatsimVrpContextImpl();
 		context.setScenario(scenario);
 		
-		TaxiData data = new TaxiData();
+		ETaxiData data = new ETaxiData();
 		context.setVrpData(data);
-		new TaxiRankReader(context.getScenario(), (TaxiData) context.getVrpData()).parse(prtConfig.getRanksFile());
-		new ElectricVehicleReader(scenario, data).parse(prtConfig.getVehiclesFile());
+		new TaxiRankReader(context.getScenario(), (ETaxiData) context.getVrpData()).parse(prtConfig.getRanksFile());
+		new ETaxiReader(scenario, data).parse(prtConfig.getVehiclesFile());
 		
 		PrtData prtData = new PrtData(scenario.getNetwork(), data);
 		
