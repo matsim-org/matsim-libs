@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
- *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public interface Factory {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
+    Person newPerson(String id);
 
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
-		}
-		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
+    Episode newEpisode();
 
-	}
+    Segment newSegment();
 
 }

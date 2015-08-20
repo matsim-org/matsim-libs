@@ -25,10 +25,7 @@ package playground.johannes.gsv.synPop.mid;
  */
 public interface MIDKeys {
 
-	public static final String HOUSEHOLD_ID = "hhid";
-	
-	public static final String PERSON_ID = "pid";
-	
+
 	public static final String PERSON_MUNICIPALITY = "polgk";
 	
 	public static final String LEG_START_TIME_HOUR = "st_std";
@@ -55,7 +52,7 @@ public interface MIDKeys {
 	
 	public static final String PERSON_WEIGHT = "p_gew";
 	
-	public static final String SURVEY_DAY = "stichtag";
+
 	
 	public static final String PERSON_STATE = "state";
 	
@@ -99,11 +96,7 @@ public interface MIDKeys {
 	
 	public static final String HH_INCOME = "hheink";
 	
-	public static final String PERSON_AGE = "hp_alter";
-	
 	public static final String HH_MEMEBERS = "h02";
 
 	public static final String PERSON_SEX = "hp_sex";
-
-	public static final String PERSON_CARAVAIL = "p01_1";
 }

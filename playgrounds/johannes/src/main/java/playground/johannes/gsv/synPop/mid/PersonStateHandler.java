@@ -19,7 +19,8 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
 
 import java.util.Map;
 
@@ -30,10 +31,10 @@ import java.util.Map;
 public class PersonStateHandler implements PersonAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PersonAttributeHandler#handle(playground.johannes.synpop.data.PlainPerson, java.util.Map)
+	 * @see playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler#handle(playground.johannes.synpop.data.PlainPerson, java.util.Map)
 	 */
 	@Override
-	public void handle(PlainPerson person, Map<String, String> attributes) {
+	public void handle(Person person, Map<String, String> attributes) {
 		String state = attributes.get("bland");
 		if(state != null) {
 			person.setAttribute(MIDKeys.PERSON_STATE, state);

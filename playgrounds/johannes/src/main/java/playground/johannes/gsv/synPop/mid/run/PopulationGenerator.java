@@ -23,7 +23,12 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.*;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.generator.PersonAgeHandler;
+import playground.johannes.synpop.source.mid2008.generator.PersonCarAvailHandler;
+import playground.johannes.synpop.source.mid2008.generator.FileReader;
+import playground.johannes.synpop.source.mid2008.generator.PersonDayHandler;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -49,7 +54,7 @@ public class PopulationGenerator {
 		/*
 		 * setup text parser
 		 */
-		TXTReader reader = new TXTReader();
+		FileReader reader = new FileReader(new PlainFactory());
 		reader.addPersonAttributeHandler(new PersonMunicipalityClassHandler());
 		reader.addPersonAttributeHandler(new PersonWeightHandler());
 		reader.addPersonAttributeHandler(new PersonDayHandler());
@@ -75,12 +80,13 @@ public class PopulationGenerator {
 		reader.addJourneyAttributeHandler(new JourneyModeHandler());
 		reader.addJourneyAttributeHandler(new JourneyPurposeHandler());
 		
-		reader.addPlanAttributeHandler(new JourneyDaysHandler());
+		reader.addEpisodeAttributeHandler(new JourneyDaysHandler());
 		/*
 		 * read files
 		 */
 		logger.info("Reading persons...");
-		Collection<PlainPerson> persons = reader.read(personFile, legFile, journeyFile).values();
+		Collection<PlainPerson> persons = (Collection<PlainPerson>)reader.read(personFile, legFile,
+				journeyFile);
 		logger.info(String.format("Read %s persons.", persons.size()));
 		/*
 		 * sort legs

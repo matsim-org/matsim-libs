@@ -21,7 +21,8 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
@@ -30,7 +31,7 @@ import playground.johannes.synpop.data.PlainElement;
 public class LegSortedIdHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(PlainElement leg, Map<String, String> attributes) {
+	public void handle(Segment leg, Map<String, String> attributes) {
 		String sid = attributes.get("wsid");
 		leg.setAttribute(MIDKeys.LEG_INDEX, sid);
 	}

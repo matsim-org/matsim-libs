@@ -17,40 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
+
+import playground.johannes.synpop.data.Episode;
 
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
  *
  */
-public class LegEndTimeHandler implements LegAttributeHandler {
+public interface EpisodeAttributeHandler {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_END_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_END_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.END_NEXT_DAY);
-		
-		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
-			return;
-		
-		int time = Integer.parseInt(min) * 60 + Integer.parseInt(hour) * 60 * 60;
-
-		if(nextDay != null && nextDay.equalsIgnoreCase("Folgetag")) {
-			time += 86400;
-		}
-		
-		leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(time));
-
-	}
-
+	void handle(Episode episode, Map<String, String> attributes);
+	
 }

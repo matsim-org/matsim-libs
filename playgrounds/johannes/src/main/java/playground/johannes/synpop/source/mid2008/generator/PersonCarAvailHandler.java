@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
 
 import java.util.Map;
 
 /**
  * @author johannes
- *
  */
-public interface PersonAttributeHandler {
+public class PersonCarAvailHandler implements PersonAttributeHandler {
 
-	public void handle(PlainPerson person, Map<String, String> attributes);
-	
+    @Override
+    public void handle(Person person, Map<String, String> attributes) {
+        String val = attributes.get(VariableNames.PERSON_CARAVAIL);
+
+        if(val != null) {
+            if(val.equalsIgnoreCase("1")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.ALWAYS);
+            if(val.equalsIgnoreCase("2")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.SOMETIMES);
+            if(val.equalsIgnoreCase("3")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
+            if(val.equalsIgnoreCase("4")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
+        }
+    }
 }

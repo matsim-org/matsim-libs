@@ -17,40 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
+package playground.johannes.synpop.source.mid2008.generator;
 
 import java.util.Map;
+
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  *
  */
-public class PersonDayHandler implements PersonAttributeHandler {
+public interface LegAttributeHandler {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
-	 */
-	@Override
-	public void handle(PlainPerson person, Map<String, String> attributes) {
-		String day = attributes.get(MIDKeys.SURVEY_DAY);
-		if(day.equalsIgnoreCase("Montag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.MONDAY);
-		} else if(day.equalsIgnoreCase("Dienstag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.TUESDAY);
-		} else if(day.equalsIgnoreCase("Mittwoch")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.WEDNESDAY);
-		} else if(day.equalsIgnoreCase("Donnerstag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.THURSDAY);
-		} else if(day.equalsIgnoreCase("Freitag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.FRIDAY);
-		} else if(day.equalsIgnoreCase("Samstag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.SATURDAY);
-		} else if(day.equalsIgnoreCase("Sonntag")) {
-			person.setAttribute(CommonKeys.DAY, CommonKeys.SUNDAY);
-		}
-	}
-
+	void handle(Segment leg, Map<String, String> attributes);
 }

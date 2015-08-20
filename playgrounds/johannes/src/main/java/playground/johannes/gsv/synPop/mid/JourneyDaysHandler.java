@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.generator.EpisodeAttributeHandler;
 
 import java.util.Map;
 
@@ -27,13 +28,13 @@ import java.util.Map;
  * @author johannes
  *
  */
-public class JourneyDaysHandler implements PlanAttributeHandler {
+public class JourneyDaysHandler implements EpisodeAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.synpop.data.PlainEpisode, java.util.Map)
+	 * @see playground.johannes.synpop.source.mid2008.generator.EpisodeAttributeHandler#handle(playground.johannes.synpop.data.PlainEpisode, java.util.Map)
 	 */
 	@Override
-	public void hanle(Episode plan, Map<String, String> attributes) {
+	public void handle(Episode plan, Map<String, String> attributes) {
 		int nights = Integer.parseInt(attributes.get("p1014"));
 		
 		if(nights < 995)

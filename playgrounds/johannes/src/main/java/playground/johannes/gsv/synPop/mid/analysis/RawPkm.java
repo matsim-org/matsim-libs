@@ -27,7 +27,7 @@ import java.util.Map;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.gsv.synPop.mid.RowHandler;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
 
 /**
  * @author johannes
@@ -59,7 +59,7 @@ public class RawPkm {
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * playground.johannes.gsv.synPop.mid.RowHandler#handleRow(java.util
+		 * playground.johannes.synpop.source.mid2008.generator.RowHandler#handleRow(java.util
 		 * .Map)
 		 */
 		@Override

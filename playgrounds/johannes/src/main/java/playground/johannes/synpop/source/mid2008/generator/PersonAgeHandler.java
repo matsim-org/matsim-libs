@@ -17,26 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 import java.util.Map;
 
 /**
  * @author johannes
+ *
  */
-public class PersonCarAvailHandler implements PersonAttributeHandler {
-    @Override
-    public void handle(PlainPerson person, Map<String, String> attributes) {
-        String val = attributes.get(MIDKeys.PERSON_CARAVAIL);
+public class PersonAgeHandler implements PersonAttributeHandler {
 
-        if(val != null) {
-            if(val.equalsIgnoreCase("jederzeit")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.ALWAYS);
-            if(val.equalsIgnoreCase("gelegentlich")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.SOMETIMES);
-            if(val.equalsIgnoreCase("gar nicht")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
-            if(val.equalsIgnoreCase("habe keinen Führerschein")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
-        }
-    }
+	@Override
+	public void handle(Person person, Map<String, String> attributes) {
+		String val = attributes.get(VariableNames.PERSON_AGE);
+
+		if(val != null) {
+			Integer age = Integer.parseInt(val);
+			if(age > 0 && age < 102) {
+				person.setAttribute(CommonKeys.PERSON_AGE, String.valueOf(age));
+			}
+		}
+	}
+
 }

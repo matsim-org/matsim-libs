@@ -63,7 +63,7 @@ public class PlainPerson extends PlainElement implements Person {
 		return plans.get(0);
 	}
 	
-	public List<Episode> getEpisodes() {
+	public List<? extends Episode> getEpisodes() {
 		return plans;
 	}
 	

@@ -22,7 +22,8 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
@@ -31,7 +32,7 @@ import playground.johannes.synpop.data.PlainElement;
 public class JourneyModeHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(PlainElement leg, Map<String, String> attributes) {
+	public void handle(Segment leg, Map<String, String> attributes) {
 		String mode = attributes.get("hvm_r");
 		
 		if(mode.equalsIgnoreCase("Auto")) {

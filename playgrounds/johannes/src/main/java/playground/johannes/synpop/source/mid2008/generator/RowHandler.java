@@ -17,18 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.data.Episode;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public interface PlanAttributeHandler {
+public abstract class RowHandler {
 
-	public void hanle(Episode plan, Map<String, String> attributes);
+	private String separator = "\t";
 	
+	private int offset = 1;
+	
+	protected abstract void handleRow(Map<String, String> attributes);
+	
+	public void setSeparator(String separator) {
+		this.separator = separator;
+	}
+	
+	public void setColumnOffset(int offset) {
+		this.offset = offset;
+	}
+	
+	public void read(String file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		String line = reader.readLine();
+		String keys[] = line.split(separator, -1);
+		Map<String, String> attributes = new HashMap<String, String>(keys.length);
+		
+		int lineCount = 1;
+		while((line = reader.readLine()) != null) {
+			String tokens[] = line.split(separator, -1);
+			
+			if(tokens.length - offset > keys.length) // -1 because rows are numbered
+				throw new RuntimeException(String.format("Line %s has more fields (%s) than available keys (%s).", lineCount, tokens.length, keys.length));
+			
+			for(int i = offset; i < tokens.length; i++) {
+				attributes.put(keys[i - offset], tokens[i]);
+			}
+	
+			handleRow(attributes);
+		}
+		
+		reader.close();
+	}
 }
