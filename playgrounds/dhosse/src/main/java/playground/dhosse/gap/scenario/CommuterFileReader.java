@@ -150,7 +150,8 @@ public class CommuterFileReader {
 								
 								this.relationHashes.add(homeId + "_" + workId);
 								int commuters = Integer.parseInt(tokens[4]);
-								CommuterDataElement current = new CommuterDataElement(homeId, homeName, workId, workName, commuters);
+								double share = Double.parseDouble(tokens[5])/commuters;
+								CommuterDataElement current = new CommuterDataElement(homeId, homeName, workId, workName, commuters, share);
 						    	this.commuterRelations.add(current);
 								
 							} catch(NumberFormatException e){
