@@ -31,7 +31,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.trafficmonitoring.LinkSensorManager;
 import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;

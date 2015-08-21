@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.trafficmonitoring;
+package playground.dgrether.cmcf;
 
 import java.util.HashMap;
 import java.util.Map;

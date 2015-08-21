@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.trafficmonitoring;
+package playground.dgrether.cmcf;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
