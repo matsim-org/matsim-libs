@@ -96,7 +96,7 @@ public class GAPMain {
 		
 		//create population
 		Population population = GAPScenarioBuilder.createPlans(scenario, matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", false);
-		new PopulationWriter(population).write(matsimInputDir + "Pläne/plans.xml.gz");
+		new PopulationWriter(population).write(matsimInputDir + "Pläne/plans_mid.xml.gz");
 		GAPMain.n = population.getPersons().size();
 		
 		//TODO create counting stations

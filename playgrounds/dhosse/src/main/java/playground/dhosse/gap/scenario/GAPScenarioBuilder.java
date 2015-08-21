@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -17,8 +17,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -28,10 +30,21 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.dhosse.gap.Global;
+import playground.dhosse.gap.scenario.mid.MiDCSVReader;
+import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
+import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
+import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
+import playground.dhosse.utils.EgapHashGenerator;
 import playground.dhosse.utils.osm.OsmObjectsToFacilitiesParser;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,14 +58,25 @@ import com.vividsolutions.jts.geom.Point;
 
 public class GAPScenarioBuilder {
 	
+	private static final Logger log = Logger.getLogger(GAPScenarioBuilder.class);
+	
 	private static Map<String, Geometry> munId2Geometry = new HashMap<>();
 	private static Map<String, Geometry> munName2Geometry = new HashMap<>();
+	
+	private static Map<String, Geometry> geometries = new HashMap<>();
+	
 	static int counter = 0;
 	static boolean equal;
 	
-	private static List<String> linkOrigIdsToRemove = new ArrayList<>();
+//	private static List<String> linkOrigIdsToRemove = new ArrayList<>();
 	private static QuadTree<Geometry> homeLocations;
 	private static QuadTree<Geometry> workLocations;
+	
+	static QuadTree<ActivityFacility> educationQT;
+	static QuadTree<ActivityFacility> shopQT;
+	static QuadTree<ActivityFacility> leisureQT;
+	
+	private static ObjectAttributes agentAttributes = new ObjectAttributes();
 	
 	/**
 	 * Creates the scenario network.
@@ -178,7 +202,7 @@ public class GAPScenarioBuilder {
 		CommuterFileReader cdr = new CommuterFileReader();
 		
 //		cdr.setSpatialFilder("09180"); //Bayern
-//		cdr.addFilter("09180"); //GaPa (Kreis)
+		cdr.addFilter("09180"); //GaPa (Kreis)
 		cdr.addFilter("09180113"); //Bad Bayersoien
 		cdr.addFilter("09180112"); //Bad Kohlgrub
 		cdr.addFilter("09180114"); //Eschenlohe
@@ -207,7 +231,28 @@ public class GAPScenarioBuilder {
 		initMunicipalities();
 //		initLandUse();
 		
-		createPersons(population, cdr.getCommuterRelations());
+		log.info("Building amenity quad trees for...");
+		double[] bbox = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
+		
+		log.info("...education");
+		educationQT = new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]);
+		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.education.name()).values()){
+			educationQT.put(af.getCoord().getX(), af.getCoord().getY(), af);
+		}
+		log.info("...shop");
+		shopQT = new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]);
+		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.shop.name()).values()){
+			shopQT.put(af.getCoord().getX(), af.getCoord().getY(), af);
+		}
+		log.info("...leisure");
+		leisureQT = new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]);
+		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.leisure.name()).values()){
+			leisureQT.put(af.getCoord().getX(), af.getCoord().getY(), af);
+		}
+		log.info("...Done.");
+		
+		createPersonsWithDemographicData(scenario, cdr.getCommuterRelations());
+//		createPersons(population, cdr.getCommuterRelations());
 		
 		return population;
 		
@@ -475,6 +520,8 @@ public class GAPScenarioBuilder {
 		reader.writeFacilityAttributes(GAPMain.matsimInputDir + "facilities/facilityAttribues.xml");
 		reader.writeFacilityCoordinates(GAPMain.matsimInputDir + "facilities.csv");
 		
+		new FacilitiesReaderMatsimV1(scenario).readFile(GAPMain.matsimInputDir + "facilities/facilities.xml");
+		
 	}
 	
 	/**
@@ -560,6 +607,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
+		//read county shape file
 		Collection<SimpleFeature> features2 = new ShapeFileReader().readFileAndInitialize(GAPMain.adminBordersDir + "kreise_2009_12.shp");
 		
 		for(SimpleFeature feature : features2){
@@ -577,6 +625,8 @@ public class GAPScenarioBuilder {
 		
 		Collection<SimpleFeature> features3 = new ShapeFileReader().readFileAndInitialize(GAPMain.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
 		
+		Geometry allBuiltAreas = null;
+		
 		for(SimpleFeature feature : features3){
 			
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
@@ -584,7 +634,33 @@ public class GAPScenarioBuilder {
 			
 			munName2Geometry.put(name, geometry);
 			
+//			if(allBuiltAreas == null){
+//				
+//				allBuiltAreas = geometry;
+//				
+//			} else{
+//				
+//				allBuiltAreas = allBuiltAreas.union(geometry);
+//				
+//			}
+			
 		}
+		
+//		for(Entry<String,Geometry> gEntry : munId2Geometry.entrySet()){
+//			
+//			String key = gEntry.getKey();
+//			
+//			Geometry g = gEntry.getValue();
+//			
+//			Geometry intersection = g.intersection(allBuiltAreas);
+//			
+//			if(intersection != null){
+//				
+//				geometries.put(key, intersection);
+//				
+//			}
+//			
+//		}
 		
 	}
 	
@@ -595,7 +671,7 @@ public class GAPScenarioBuilder {
 	 * @param population
 	 * @param relations
 	 */
-	private static void createPersons(Population population, List<CommuterDataElement> relations){
+	private static void createCommuters(Population population, List<CommuterDataElement> relations){
 
 		PopulationFactoryImpl factory = (PopulationFactoryImpl) population.getFactory();
 		
@@ -701,16 +777,14 @@ public class GAPScenarioBuilder {
 					person.addPlan(plan);
 					person.setSelectedPlan(plan);
 					
-					person.getCustomAttributes().put("age", new Double(25));
-					
 					population.addPerson(person);
 					
 				}
 				
 			} else{
 				
-				Log.warn("Could not find geometries for:" + fromId + " (" + fromName + "), " + toId + " (" + toName + ").");
-				Log.warn("Continuing with next relation...");
+				log.warn("Could not find geometries for:" + fromId + " (" + fromName + "), " + toId + " (" + toName + ").");
+				log.warn("Continuing with next relation...");
 				
 			}
 			
@@ -718,70 +792,370 @@ public class GAPScenarioBuilder {
 		
 	}
 	
-	private static void createPersonsWithDemographicData(Population population, List<CommuterDataElement> relations){
+	private static void createPersonsWithDemographicData(Scenario scenario, List<CommuterDataElement> relations){
 		
-		PopulationFactoryImpl factory = (PopulationFactoryImpl) population.getFactory();
+		MiDCSVReader reader = new MiDCSVReader();
+		reader.read(GAPMain.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey.csv");
+		Map<String, MiDSurveyPerson> persons = reader.getPersons();
 		
-		//parse over commuter relations
-		for(CommuterDataElement relation : relations){
+		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
+		
+		for(MiDSurveyPerson person : persons.values()){
 			
-			//this is just for the reason that the shape file does not contain any diphtongs
-			//therefore, they are removed from the relation names as well
-			String[] diphtong = new String[]{"ä","ö","ü","ß"};
+			templates.handlePerson(person);
 			
-			String fromId = relation.getFromId();
-			String fromName = relation.getFromName();
-			String toId = relation.getToId();
-			String toName = relation.getToName();
+		}
+		
+		Map<String, MiDPersonGroupData> personGroupData = EgapPopulationUtils.createMiDPersonGroups();
+		
+//		createCommuters(scenario.getPopulation(), relations);
+		createPersonsFromGroup(0, 8577, scenario, personGroupData, templates);
+		createPersonsFromGroup(10, 13658, scenario, personGroupData, templates);
+		createPersonsFromGroup(20, 7606, scenario, personGroupData, templates);
+		createPersonsFromGroup(30, 8162, scenario, personGroupData, templates);
+		createPersonsFromGroup(40, 17516, scenario, personGroupData, templates);
+		createPersonsFromGroup(50, 13575, scenario, personGroupData, templates);
+		createPersonsFromGroup(60, 9383, scenario, personGroupData, templates);
+		createPersonsFromGroup(70, 5497, scenario, personGroupData, templates);
+		createPersonsFromGroup(80, 1472, scenario, personGroupData, templates);
+		
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile(GAPMain.matsimInputDir + "Pläne/agentAttributes.xml.gz");
+		
+	}
+
+	private static void createPersonsFromGroup(int a0, int amount, Scenario scenario, Map<String, MiDPersonGroupData> groupData, MiDPersonGroupTemplates templates){
+		
+		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		
+		for(int i = 0; i < amount; i++){
 			
-			if(fromName.contains(",")){
-				String[] f = fromName.split(",");
-				fromName = f[0];
+			Person person = factory.createPerson(Id.createPersonId(a0 + "_" + (a0 + 9) + "_" + i));
+			Plan plan = factory.createPlan();
+			
+			int age = (int)(a0 + GAPMain.random.nextDouble() * (a0 + 9));
+			agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
+			int sex = EgapPopulationUtils.setSex(age);
+			agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
+			
+			MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
+			
+			if(data == null){
+				i--;
+				continue;
 			}
 			
-			if(toName.contains(",")){
-				String[] f = toName.split(",");
-				toName = f[0];
-			}
+			boolean isEmployed = setBooleanAttribute(person.getId().toString(), data.getpEmployment(), Global.EMPLOYED);
+			boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
+			boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 			
-			for(String s : diphtong){
-				fromName.replace(s, "");
-				toName.replace(s, "");
-			}
+			String personHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
 			
-			//assert the transformation to be gauss-kruger (transformation of the county geometries)
-			String fromTransf = "GK4";
-			String toTransf = "GK4";
+			List<MiDSurveyPerson> templatePersons = templates.getPersonGroups().get(personHash);
 			
-			//get the geometries mapped to the keys specified in the relation
-			//this should be municipalities
-			Geometry from = munName2Geometry.get(fromName);
-			Geometry to = munName2Geometry.get(toName);
-			
-			//if any geometry is null, get the county geometry mapped to the key and set the transformation to utm32n
-			if(from == null){
-				from = munId2Geometry.get(toId);
-				fromTransf = "UTM";
-			}
-			
-			if(to == null){
-				to = munId2Geometry.get(toId);
-				toTransf = "UTM";
-			}
-			
-			//if still any geometry should be null, skip this entry
-			if(from != null && to != null){
+			if(templatePersons != null){
 				
-				//create as many persons as are specified in the commuter relation
-				for(int i = 0; i < relation.getCommuters(); i++){
+				if(templatePersons.size() > 0){
+					
+					MiDSurveyPerson templatePerson = null;
+					
+					do{
+						
+						int randomIndex = (int)(GAPMain.random.nextDouble() * templatePersons.size());
+						templatePerson = templatePersons.get(randomIndex);
+						
+					} while (templatePerson == null);
+					
+					//create a home activity as starting point
+					Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get("09180")));
+					Activity homeActivity = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
+
+					Leg firstLeg = (Leg) templatePerson.getPlan().getPlanElements().get(0);
+					
+					double timeShift = 0.;
+					
+					if(firstLeg.getDepartureTime() != Time.UNDEFINED_TIME){
+
+						do{
+
+							timeShift = createRandomEndTime();
+
+							if(firstLeg.getDepartureTime() + timeShift > 0){
+								homeActivity.setEndTime(firstLeg.getDepartureTime() + timeShift);
+							} else{
+								timeShift = 0;
+							}
+							
+						} while(timeShift == 0);
+						
+					}
+					
+					plan.addActivity(homeActivity);
+					
+					int index = 1;
+					
+					for(PlanElement pe : templatePerson.getPlan().getPlanElements()){
+						
+						if(pe instanceof Activity){
+							
+							Activity act = (Activity)pe;
+							
+							String type = act.getType();
+							double startTime = act.getStartTime();
+							double endTime = act.getEndTime();
+							
+							Coord c = null;
+							
+							if(type.equals(Global.ActType.home.name())){
+								
+								c = homeCoord;
+								
+							} else if(type.equals(Global.ActType.other.name()) || type.equals(Global.ActType.work.name())){ //if the act type equals "other" or "work", shoot a random coordinate
+								
+								Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
+								
+								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
+								
+								double x = GAPMain.random.nextDouble() * distance;
+								double y = Math.sqrt(distance * distance - x * x);
+								
+								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+								
+							} else{ //for all activities apart from "other" and "home", shoot a random coordinate and get the nearest activity facility
+								
+								Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
+								
+								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
+								
+								ActivityFacility facility = null;
+								
+								do{
+									
+									double x = GAPMain.random.nextDouble() * distance;
+									double y = Math.sqrt(distance * distance - x * x);
+									
+									if(type.equals(Global.ActType.education.name())){
+										
+										facility = educationQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									} else if(type.equals(Global.ActType.shop.name())){
+										
+										facility = shopQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									} else if(type.equals(Global.ActType.leisure.name())){
+										
+										facility = leisureQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									}
+									
+								}while(facility == null);
+								
+								c = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
+								
+							}
+							
+							Activity newAct = factory.createActivityFromCoord(type, c);
+							
+							newAct.setStartTime(startTime + timeShift);
+							
+							//acts must not have zero duration, a minimum duration of 0.5 hours is assumed...
+							if(act.getEndTime() - act.getStartTime() <= 0){
+								timeShift += 1800;
+							}
+							
+							newAct.setEndTime(endTime + timeShift);
+							plan.addActivity(newAct);
+							
+						} else{
+							
+							Leg leg = (Leg)pe;
+							
+							
+							plan.addLeg(factory.createLeg(leg.getMode()));
+							
+						}
+						
+						index++;
+						
+					}
+					
+					person.addPlan(plan);
+					
+					scenario.getPopulation().addPerson(person);
+					
+				} else{
+					
+					i--;
 					
 				}
+				
+			} else{
+				
+				i--;
 				
 			}
 			
 		}
 		
 	}
+	
+	private static boolean setBooleanAttribute(String personId, double proba, String attribute){
+		
+		double random = GAPMain.random.nextDouble();
+		boolean attr = random <= proba ? true : false;
+		agentAttributes.putAttribute(personId, attribute, attr);
+		
+		return attr;
+		
+	}
+	
+//	private static void createPersons(int a0, int aX, int amount, Scenario scenario, PopulationFactory factory, Set<MiDPersonGroupData> personGroupData){
+//		
+//		for(int i = 0; i < 7606; i++){
+//			
+//			Person p = factory.createPerson(Id.createPersonId(a0 + "_" + aX + "_" + i));
+//			
+//			Plan plan = factory.createPlan();
+//			
+//			int ag = (int) (a0 + GAPMain.random.nextDouble() * aX);
+//			agentAttributes.putAttribute(p.getId().toString(), Global.AGE, ag);
+//			int sex = EgapPopulationUtils.setSex(ag);
+//			agentAttributes.putAttribute(p.getId().toString(), Global.SEX, sex);
+//			
+//			Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get("09180")));
+//			
+//			Activity home = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
+//			plan.addActivity(home);
+//			
+//			int planIndex = 0;
+//			
+//			for(MiDPersonGroupData pgd : personGroupData){
+//				
+//				if(pgd.getA0() == a0 && pgd.getAX() == aX && pgd.getSex() == sex){
+//					
+//					double rnd = GAPMain.random.nextDouble();
+//					
+//					if(pgd.getData().size() < 1) continue;
+//					
+//					MiDData template = pgd.getData().get((int)(rnd*(pgd.getData().size() - 1)));
+//					
+//					MiDStatsContainer stats = null;
+//					
+//					for(MiDWaypoint wp : template.getWayPoints()){
+//						
+//						planIndex+=2;
+//						
+//						String purpose = wp.getPurpose();
+//						
+//						if(purpose.equalsIgnoreCase(Global.ActType.home.name())){
+//							
+//							stats = pgd.getHomeStats();
+//							
+//						} else if(purpose.equalsIgnoreCase(Global.ActType.work.name())){
+//							
+//							stats = pgd.getWorkStats();
+//							
+//						} else if(purpose.equalsIgnoreCase(Global.ActType.education.name())){
+//							
+//							stats = pgd.getEducationStats();
+//							
+//						} else if(purpose.equalsIgnoreCase(Global.ActType.shop.name())){
+//							
+//							stats = pgd.getShopStats();
+//							
+//						} else if(purpose.equalsIgnoreCase(Global.ActType.leisure.name())){
+//							
+//							stats = pgd.getLeisureStats();
+//							
+//						} else {
+//							
+//							purpose = Global.ActType.other.name();
+//							stats = pgd.getOtherStats();
+//							
+//						}
+//						
+//						String mode = wp.getMode();
+//						if(wp.getMode().equals("car (passenger)")){
+//							
+//							mode = TransportMode.ride;
+//							
+//						}
+//						
+//						double startTime = 0.;
+//						
+//						int cnt = 0;
+//						
+//						do{
+//							startTime = wp.getStartTime() + createRandomEndTime();
+//							cnt++;
+//						} while(startTime <= 0 && cnt < 10);
+//						
+//						if(cnt >= 10){
+//							
+//							startTime = wp.getStartTime();
+//							
+//						}
+//						
+//						double endTime = startTime + (wp.getEndTime() - wp.getStartTime());
+//						if(endTime < startTime){
+//							endTime = 24*3600;
+//						}
+//						
+//						Leg leg = factory.createLeg(mode);
+//						plan.addLeg(leg);
+//						
+//						double distance = wp.getDistance() != Double.NEGATIVE_INFINITY ? wp.getDistance() : 500.;
+//						
+//						double xD = 2 * (GAPMain.random.nextDouble() - 0.5) * distance;
+//						double yD = Math.sqrt(distance*distance - xD*xD);
+//						
+//						Activity lastAct = (Activity) plan.getPlanElements().get(planIndex - 2);
+//						
+//						if(startTime != Time.UNDEFINED_TIME){
+//							lastAct.setEndTime(startTime);
+//						} else{
+//							lastAct.setMaximumDuration(3600);
+//						}
+//						
+//						Coord c = new CoordImpl(lastAct.getCoord().getX() + xD, lastAct.getCoord().getY() + yD);
+//						
+//						if(purpose.equals(Global.ActType.home.name())){
+//							
+//							c = home.getCoord();
+//							
+//						} else if(purpose.equals(Global.ActType.education)){
+//							
+//							c = educationQT.get(c.getX(), c.getY()).getCoord();
+//							
+//						} else if(purpose.equals(Global.ActType.shop)){
+//							
+//							c = shopQT.get(c.getX(), c.getY()).getCoord();
+//							
+//						} else if(purpose.equals(Global.ActType.leisure)){
+//							
+//							c = leisureQT.get(c.getX(), c.getY()).getCoord();
+//							
+//						}
+//						
+//						Activity act = factory.createActivityFromCoord(purpose, c);
+//						act.setStartTime(endTime);
+//						plan.addActivity(act);
+//						
+//					}
+//					
+//					break;
+//					
+//				}
+//				
+//			}
+//			
+//			p.addPlan(plan);
+//			p.setSelectedPlan(plan);
+//			
+//			scenario.getPopulation().addPerson(p);
+//			
+//		}
+//		
+//	}
 	
 	private static Coord shoot(Geometry geometry){
 		
@@ -820,52 +1194,17 @@ public class GAPScenarioBuilder {
 		
 	}
 	
-	private static final double thresholdWalk = 0.2029384757;
-	private static final double thresholdBike = 0.269768391;
-	private static final double thresholdRide = 0.446587083;
-	private static final double thresholdCar = 0.9345985104;
-	
-	private static String setLegModeForPerson(double traveldistance){
+	private static double createRandomEndTime(){
 		
-		String mode = "";
+		//draw two random numbers [0;1] from uniform distribution
+		double r1 = GAPMain.random.nextDouble();
+		double r2 = GAPMain.random.nextDouble();
 		
-		do{
-			
-			double weight = GAPMain.random.nextDouble();
+		//Box-Muller-Method in order to get a normally distributed variable
+		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+		double endTime = 20*60 * normal;
 		
-			if(weight <= thresholdWalk){
-				
-				if(traveldistance < 5000){
-					
-					mode = TransportMode.walk;
-					
-				}
-				
-			} else if(weight > thresholdWalk && weight <= thresholdBike){
-				
-				if(traveldistance < 15000){
-					
-					mode = TransportMode.bike;
-					
-				}
-				
-			} else if(weight > thresholdBike && weight <= thresholdRide){
-				
-				mode = TransportMode.ride;
-				
-			} else if(weight > thresholdRide && weight <= thresholdCar){
-				
-				mode = TransportMode.car;
-				
-			} else{
-				
-				mode = TransportMode.pt;
-				
-			}
-			
-		}while(mode.equals(""));
-		
-		return mode;
+		return endTime;
 		
 	}
 	

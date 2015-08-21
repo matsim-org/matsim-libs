@@ -30,6 +30,7 @@ public class CommuterDataElement {
 	private String toName;
 	private int commuters;
 	private int adminLevel;
+	private double shareOfMaleCommuters;
 	
 	public CommuterDataElement(String fromId, String fromName,  String toId, String toName,  int commuters){
 		this.fromId = fromId;
@@ -38,6 +39,16 @@ public class CommuterDataElement {
 		this.fromName = fromName;
 		this.toName = toName;
 		this.adminLevel = fromId.length();
+	}
+	
+	public CommuterDataElement(String fromId, String fromName,  String toId, String toName,  int commuters, double shareOfMaleCommuters){
+		this.fromId = fromId;
+		this.toId = toId;
+		this.commuters = commuters;
+		this.fromName = fromName;
+		this.toName = toName;
+		this.adminLevel = fromId.length();
+		this.shareOfMaleCommuters = shareOfMaleCommuters;
 	}
 	
 	
@@ -84,6 +95,10 @@ public class CommuterDataElement {
 	
 	public int getAdminLevel(){
 		return this.adminLevel;
+	}
+	
+	public double getShareOfMaleCommuters(){
+		return this.shareOfMaleCommuters;
 	}
 
 }
