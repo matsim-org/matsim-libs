@@ -14,8 +14,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
-import au.com.bytecode.opencsv.CSVParser;
-
 public class CSVToCountingStations {
 	
 	private final String ouputCSFile;
@@ -55,8 +53,7 @@ public class CSVToCountingStations {
 			String line = r.readLine();
 
 			while((line = r.readLine()) != null){	
-				CSVParser csvParser = new CSVParser(';');
-				String[] splittedLine = csvParser.parseLine(line);
+				String[] splittedLine = line.split(";");
 				String cs_id = splittedLine[0];		//Name of CS in Database
 				String link_id = splittedLine[1];		//Link of CS
 
@@ -85,12 +82,13 @@ public class CSVToCountingStations {
 	
 	void readCountsFromCSV(){	
 		BufferedReader r = IOUtils.getBufferedReader(csDataFile);
-		CSVParser csvParser = new CSVParser(';');
-		String[] splittedLine = null;
+//		CSVParser csvParser = new CSVParser(';');
+//		String[] splittedLine = null;
 		try{
 			//headline
 			String line = r.readLine();
-			splittedLine = csvParser.parseLine(line);
+//			splittedLine = csvParser.parseLine(line);
+			String[] splittedLine = line.split(";");
 			for (int i=0; i < splittedLine.length; i++){
 				catColumnInCSVFile.put(splittedLine[i], i);
 			}
@@ -102,7 +100,7 @@ public class CSVToCountingStations {
 			
 			//data lines
 			while((line = r.readLine()) != null){	
-				splittedLine = csvParser.parseLine(line);
+				splittedLine = line.split(";");
 				String id = splittedLine[catColumnInCSVFile.get("PC")];
 				String time = splittedLine[catColumnInCSVFile.get("HORA")];
 				int vol = Integer.parseInt(splittedLine[catColumnInCSVFile.get(vehCat)]);
