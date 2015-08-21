@@ -57,4 +57,9 @@ public class CachedPerson extends CachedElement implements Person {
         throw new UnsupportedOperationException("Structural modification not allowed.");
 //        ((Person)getDelegate()).addEpisode(episode);
     }
+
+    @Override
+    public void removeEpisode(Episode episode) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
 }

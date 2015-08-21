@@ -23,13 +23,16 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.IsolateEpisodes;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.source.mid2008.generator.FileReader;
-import playground.johannes.synpop.source.mid2008.generator.PersonAgeHandler;
-import playground.johannes.synpop.source.mid2008.generator.PersonCarAvailHandler;
+import playground.johannes.synpop.source.mid2008.generator.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,18 +61,48 @@ public class Generator {
         String journeysFile = config.getParam(MODULE_NAME, JOURNEYS_FILE);
         String outDir = config.getParam(MODULE_NAME, OUTPUT_DIR);
 
-        FileReader fileReader = new FileReader(new PlainFactory());
+        PlainFactory factory = new PlainFactory();
+        FileReader fileReader = new FileReader(factory);
 
         fileReader.addPersonAttributeHandler(new PersonAgeHandler());
         fileReader.addPersonAttributeHandler(new PersonCarAvailHandler());
+        fileReader.addPersonAttributeHandler(new PersonDayHandler());
+        fileReader.addPersonAttributeHandler(new PersonHHIncomeHandler());
+        fileReader.addPersonAttributeHandler(new PersonHHMembersHandler());
+        fileReader.addPersonAttributeHandler(new PersonMonthHandler());
+        fileReader.addPersonAttributeHandler(new PersonMunicipalityClassHandler());
+        fileReader.addPersonAttributeHandler(new PersonSexHandler());
+        fileReader.addPersonAttributeHandler(new PersonNUTS1Handler());
+        fileReader.addPersonAttributeHandler(new PersonWeightHandler());
+
+        fileReader.addLegAttributeHandler(new LegDistanceHandler());
+        fileReader.addLegAttributeHandler(new LegTimeHandler());
+        fileReader.addLegAttributeHandler(new LegPurposeHandler());
+        fileReader.addLegAttributeHandler(new LegDestinationHandler());
+        fileReader.addLegAttributeHandler(new LegOriginHandler());
+        fileReader.addLegAttributeHandler(new LegModeHandler());
+        fileReader.addLegAttributeHandler(new LegIndexHandler());
 
         logger.info("Generating persons...");
         Set<PlainPerson> persons = (Set<PlainPerson>)fileReader.read(personsFile, tripsFile, journeysFile);
         logger.info(String.format("Generated %s persons.", persons.size()));
 
+        logger.info("Inserting dummy activities...");
+        TaskRunner.run(new InsertActivitiesTask(factory), persons);
+
         logger.info("Writing persons...");
         XMLWriter writer = new XMLWriter();
         writer.write(String.format("%s/mid2008.xml", outDir), persons);
+
+        logger.info("Isolating persons...");
+        IsolateEpisodes isolator = new IsolateEpisodes(CommonKeys.DATA_SOURCE, factory);
+        TaskRunner.run(isolator, persons);
+        Map<String, Set<Person>> populations = isolator.getPopulations();
+        for(Map.Entry<String, Set<Person>> entry : populations.entrySet()) {
+            logger.info(String.format("Writing persons %s...", entry.getKey()));
+            writer.write(String.format("%s/mid2008.%s.xml", outDir, entry.getKey()), entry.getValue());
+        }
+
         logger.info("Done.");
     }
 }

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;

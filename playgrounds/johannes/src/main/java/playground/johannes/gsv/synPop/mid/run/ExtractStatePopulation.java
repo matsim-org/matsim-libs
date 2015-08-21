@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.Set;
 
@@ -51,7 +52,7 @@ public class ExtractStatePopulation {
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Applying filter...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeletePersonKeyValue("state", state), persons);
+		persons = TaskRunner.runAndDeletePerson(new DeletePersonKeyValue("state", state), persons);
 		logger.info(String.format("Population size: %s", persons.size()));
 		
 		XMLWriter writer = new XMLWriter();

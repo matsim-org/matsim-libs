@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.Attributable;

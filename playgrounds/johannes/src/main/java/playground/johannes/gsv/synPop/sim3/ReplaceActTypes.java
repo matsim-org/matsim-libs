@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author johannes
  * 
  */
-public class ReplaceActTypes implements ProxyPlanTask {
+public class ReplaceActTypes implements EpisodeTask {
 
 	public static final String ORIGINAL_TYPE = "origType";
 

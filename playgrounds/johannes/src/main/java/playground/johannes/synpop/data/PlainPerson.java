@@ -57,7 +57,12 @@ public class PlainPerson extends PlainElement implements Person {
 		plans.add(plan);
 		((PlainEpisode)plan).setPerson(this);
 	}
-	
+
+	public void removeEpisode(Episode episode) {
+		plans.remove(episode);
+		((PlainEpisode)episode).setPerson(null);
+	}
+
 	public Episode getPlan() {
 //		return plan;
 		return plans.get(0);

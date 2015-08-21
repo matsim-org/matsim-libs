@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.misc.QuadTree;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -39,7 +39,7 @@ import java.util.Random;
  * @author johannes
  * 
  */
-public class InitHomeBasedActLocations implements ProxyPlanTask {
+public class InitHomeBasedActLocations implements EpisodeTask {
 
 	private final double error = 0.1;
 

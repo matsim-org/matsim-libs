@@ -21,9 +21,10 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 /**
  * @author johannes
@@ -36,9 +37,9 @@ public class LegStartTimeHandler implements LegAttributeHandler {
 	 */
 	@Override
 	public void handle(Segment leg, Map<String, String> attributes) {
-		String hour = attributes.get(MIDKeys.LEG_START_TIME_HOUR);
-		String min = attributes.get(MIDKeys.LEG_START_TIME_MIN);
-		String nextDay = attributes.get(MIDKeys.START_NEXT_DAY);
+		String hour = attributes.get(VariableNames.LEG_START_TIME_HOUR);
+		String min = attributes.get(VariableNames.LEG_START_TIME_MIN);
+		String nextDay = attributes.get(VariableNames.START_NEXT_DAY);
 		
 		if(hour.equalsIgnoreCase("301") || min.equalsIgnoreCase("301"))
 			return;

@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import gnu.trove.TObjectDoubleHashMap;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.PlainPerson;
 

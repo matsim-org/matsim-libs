@@ -20,15 +20,15 @@
 package playground.johannes.gsv.matrices.episodes2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  */
-public class SetLegPurposes implements ProxyPlanTask {
+public class SetLegPurposes implements EpisodeTask {
 
 
     @Override

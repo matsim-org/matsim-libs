@@ -22,13 +22,9 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -44,7 +40,7 @@ public class ImputeMonth implements ProxyPersonsTask {
         TObjectIntHashMap<String> monthCounts = new TObjectIntHashMap<>();
 
         for(PlainPerson person : persons) {
-            String month = person.getAttribute(MIDKeys.PERSON_MONTH);
+            String month = person.getAttribute(MiDKeys.PERSON_MONTH);
             if(month != null) {
                 monthCounts.adjustOrPutValue(month, 1, 1);
             }
@@ -58,8 +54,8 @@ public class ImputeMonth implements ProxyPersonsTask {
         }
 
         for(Person person : persons) {
-            if(person.getAttribute(MIDKeys.PERSON_MONTH) == null) {
-                person.setAttribute(MIDKeys.PERSON_MONTH, months.randomWeightedChoice());
+            if(person.getAttribute(MiDKeys.PERSON_MONTH) == null) {
+                person.setAttribute(MiDKeys.PERSON_MONTH, months.randomWeightedChoice());
             }
         }
     }

@@ -19,10 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.List;
  * @author johannes
  *
  */
-public class RoundTripTask implements ProxyPlanTask {
+public class RoundTripTask implements EpisodeTask {
 
 	private static final String ROUNDTRIP_SUFFIX = "";//":roundTrip";
 	
@@ -41,7 +39,7 @@ public class RoundTripTask implements ProxyPlanTask {
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
 			Attributable leg = plan.getLegs().get(i);
-			Boolean val = Boolean.parseBoolean(leg.getAttribute(CommonKeys.LEG_ROUNDTRIP)); 
+			Boolean val = Boolean.parseBoolean(leg.getAttribute(CommonKeys.LEG_ROUNDTRIP));
 			if(val != null && val == true) {
 				Attributable act = plan.getActivities().get(i+1);
 				String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);

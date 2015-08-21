@@ -31,7 +31,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
@@ -80,7 +80,7 @@ public class Facilities2Zones {
         MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
         SetZones task = new SetZones(zones, scenario.getActivityFacilities(), zoneIdKey, transform);
 
-        ProxyTaskRunner.run(task, persons, true);
+        TaskRunner.run(task, persons, true);
 
         logger.info(String.format("%s activities could not be located in a zone.", task.getNotFound()));
 

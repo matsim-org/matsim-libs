@@ -22,11 +22,13 @@ package playground.johannes.gsv.synPop.mid.analysis;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,17 +49,17 @@ public class SeasonsTask extends AnalyzerTask {
 		TObjectIntHashMap<String> map = new TObjectIntHashMap<String>();
 		
 		for(PlainPerson person : persons) {
-			String month = person.getAttribute(MIDKeys.PERSON_MONTH);
+			String month = person.getAttribute(MiDKeys.PERSON_MONTH);
 			String season = "NA";
-			if(MIDKeys.NOVEMBER.equalsIgnoreCase(month)) {
+			if(MiDValues.NOVEMBER.equalsIgnoreCase(month)) {
 				season = "win";
-			} else if(MIDKeys.DECEMBER.equalsIgnoreCase(month)) {
+			} else if(MiDValues.DECEMBER.equalsIgnoreCase(month)) {
 				season = "win";
-			} else if(MIDKeys.JANUARY.equalsIgnoreCase(month)) {
+			} else if(MiDValues.JANUARY.equalsIgnoreCase(month)) {
 				season = "win";
-			} else if(MIDKeys.FEBRUARY.equalsIgnoreCase(month)) {
+			} else if(MiDValues.FEBRUARY.equalsIgnoreCase(month)) {
 				season = "win";
-			} else if(MIDKeys.MARCH.equalsIgnoreCase(month)) {
+			} else if(MiDValues.MARCH.equalsIgnoreCase(month)) {
 				season = "win";
 			} else if(month != null) {
 				season = "sum";
@@ -65,9 +67,9 @@ public class SeasonsTask extends AnalyzerTask {
 			
 			String day = person.getAttribute(CommonKeys.DAY);
 			String week = "wkday";
-			if(CommonKeys.SATURDAY.equalsIgnoreCase(day)) {
+			if(CommonValues.SATURDAY.equalsIgnoreCase(day)) {
 				week = "wkend";
-			} else if(CommonKeys.SUNDAY.equalsIgnoreCase(day)) {
+			} else if(CommonValues.SUNDAY.equalsIgnoreCase(day)) {
 				week = "wkend";
 			}
 			

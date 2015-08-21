@@ -24,8 +24,8 @@ import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.generator.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
@@ -69,7 +69,7 @@ public class PersonLau2Inhabitants implements Hamiltonian {
 		
 		Integer intObj = (Integer) person.getUserData(USER_DAT_KEY);
 		if(intObj == null) {
-			intObj = new Integer(person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS));
+			intObj = new Integer(person.getAttribute(MiDKeys.PERSON_LAU2_CLASS));
 			person.setUserData(USER_DAT_KEY, intObj);
 		}
 		

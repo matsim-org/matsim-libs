@@ -19,9 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
@@ -32,7 +33,7 @@ import java.util.Set;
  * @author johannes
  * 
  */
-public class JourneyPlans2PersonTask implements ProxyPersonTask {
+public class JourneyPlans2PersonTask implements PersonTask {
 
 	private Set<PlainPerson> newPersons = new HashSet<>();
 
@@ -43,7 +44,8 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson) person1;
 		int counter = 0;
 		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 

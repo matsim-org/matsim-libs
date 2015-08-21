@@ -22,10 +22,9 @@ package playground.johannes.gsv.qlik;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.*;
 
@@ -33,7 +32,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author johannes
@@ -55,9 +53,9 @@ public class Population2Tables {
         Collection<PlainPerson> persons = reader.getPersons();
 
         logger.info("Copying zone attributes...");
-        ProxyTaskRunner.run(new CopyZoneAttributes(), persons);
+        TaskRunner.run(new CopyZoneAttributes(), persons);
         logger.info("Copying act type attributes...");
-        ProxyTaskRunner.run(new CopyActTypeAttributes(), persons);
+        TaskRunner.run(new CopyActTypeAttributes(), persons);
 
         logger.info("Writing tables...");
 

@@ -21,7 +21,8 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
@@ -36,17 +37,17 @@ public class JourneyModeHandler implements LegAttributeHandler {
 		String mode = attributes.get("hvm_r");
 		
 		if(mode.equalsIgnoreCase("Auto")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_CAR);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
 		} else if(mode.equalsIgnoreCase("Bahn")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		} else if(mode.equalsIgnoreCase("Reisebus")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		} else if(mode.equalsIgnoreCase("Flugzeug")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		} else if(mode.equalsIgnoreCase("Schiff")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		} else if(mode.equalsIgnoreCase("Schiff")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		} else {
 			leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
 		}

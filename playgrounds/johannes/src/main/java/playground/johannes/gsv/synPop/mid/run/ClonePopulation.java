@@ -56,7 +56,7 @@ public class ClonePopulation {
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
 //		logger.info("Deleting persons with no legs..." );
-//		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+//		persons = TaskRunner.runAndDeleteEpisode(new DeleteNoLegs(), persons);
 //		logger.info("Population size = " + persons.size());
 		
 		XMLWriter writer = new XMLWriter();

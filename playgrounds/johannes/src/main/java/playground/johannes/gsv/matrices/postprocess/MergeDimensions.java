@@ -24,9 +24,9 @@ import playground.johannes.gsv.matrices.episodes2matrix.DirectionPredicate;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
 import playground.johannes.gsv.matrices.episodes2matrix.InfereWeCommuter;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.data.CommonValues;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -63,11 +63,11 @@ public class MergeDimensions {
         purposes.put(InfereWeCommuter.WECOMMUTER, "WE");
 
         Map<String, String> days = new HashMap<>();
-        days.put(CommonKeys.MONDAY, "1");
+        days.put(CommonValues.MONDAY, "1");
         days.put(Episodes2Matrix.DIMIDO, "2");
-        days.put(CommonKeys.FRIDAY, "5");
-        days.put(CommonKeys.SATURDAY, "6");
-        days.put(CommonKeys.SUNDAY, "7");
+        days.put(CommonValues.FRIDAY, "5");
+        days.put(CommonValues.SATURDAY, "6");
+        days.put(CommonValues.SUNDAY, "7");
 
         Map<String, String> seasons = new HashMap<>();
         seasons.put(Episodes2Matrix.SUMMER, "S");

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.invermo.sim;
 
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.synpop.data.Attributable;

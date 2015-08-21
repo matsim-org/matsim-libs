@@ -15,10 +15,6 @@
 		<param name="inputPlansFile" value="test/input/playground/thibautd/tsplanoptimizer/timemodechooser/traveltimeestimation/population.xml" />
 	</module>
 
-	<module name="scenario">
-		<param name="useTransit" value="true" />
-	</module>
-
 	<module name="controler">
 		<param name="outputDirectory" value="./output/pt-tutorial" />
 		<param name="firstIteration" value="0" />
@@ -87,6 +83,7 @@
 	</module>
 
 	<module name="transit">
+		<param name="useTransit" value="true" />
 		<param name="transitScheduleFile" value="test/input/playground/thibautd/tsplanoptimizer/timemodechooser/traveltimeestimation/transitschedule.xml" />
 		<param name="vehiclesFile" value="test/input/playground/thibautd/tsplanoptimizer/timemodechooser/traveltimeestimation/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />

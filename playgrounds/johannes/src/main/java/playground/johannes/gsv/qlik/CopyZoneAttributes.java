@@ -20,14 +20,13 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class CopyZoneAttributes implements ProxyPlanTask {
+public class CopyZoneAttributes implements EpisodeTask {
 
     public static final String FROM_ZONE_KEY = "fromZone";
 

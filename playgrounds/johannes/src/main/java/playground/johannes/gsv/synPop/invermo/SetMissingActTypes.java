@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -29,7 +29,7 @@ import playground.johannes.synpop.data.Episode;
  * @author johannes
  *
  */
-public class SetMissingActTypes implements ProxyPlanTask {
+public class SetMissingActTypes implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {
