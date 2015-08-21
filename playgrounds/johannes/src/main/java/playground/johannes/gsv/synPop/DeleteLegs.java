@@ -19,15 +19,14 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 
 /**
  * @author johannes
  *
  */
-public class DeleteLegs implements ProxyPersonTask {
+public class DeleteLegs implements PersonTask {
 
 	private final String mode;
 	
@@ -36,7 +35,8 @@ public class DeleteLegs implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		Episode plan = person.getPlan();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {

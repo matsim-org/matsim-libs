@@ -17,38 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+package playground.johannes.synpop.source.mid2008;
 
 /**
  * @author johannes
  *
  */
-public class LegModeHandler implements LegAttributeHandler {
+public interface MiDKeys {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String mode = attributes.get(MIDKeys.LEG_MODE);
-		if(mode.equalsIgnoreCase("zu Fuß")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PED);
-		} else if(mode.equalsIgnoreCase("Fahrrad")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_BIKE);
-		} else if(mode.equalsIgnoreCase("MIV (Mitfahrer)")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_RIDE);
-		} else if(mode.equalsIgnoreCase("MIV (Fahrer)")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_CAR);
-		} else if(mode.equalsIgnoreCase("ÖPV")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
-		}
+	String PERSON_LAU2_CLASS = "lau2Class";
 
-	}
+	String PERSON_NUTS1 = "nuts1";
+	
+	String LEG_INDEX = "index";
 
+	String PERSON_MONTH = "month";
+
+	String JOURNEY_DAYS = "journeydays";
+
+	String LEG_ORIGIN = "origin";
+
+	String LEG_DESTINATION = "destination";
 }

@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
@@ -47,7 +47,7 @@ public class ConcurrentProxyTaskRunner {
 		ProgressLogger.init(persons.size(), 1, 10);
 		Thread[] threads = new Thread[numThreads];
 		for(int i = 0; i < numThreads; i++) {
-			final ProxyPlanTask task = factory.getInstance();
+			final EpisodeTask task = factory.getInstance();
 			final List<PlainPerson> subPersons = segments[i];
 			threads[i] = new Thread(new Runnable() {
 				

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
+package playground.johannes.synpop.source.mid2008.generator;
 
 import java.util.Map;
+
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  *
  */
-public class PersonHHMembersHandler implements PersonAttributeHandler {
+public class LegModeHandler implements LegAttributeHandler {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler#handle(playground.johannes.synpop.data.PlainPerson, java.util.Map)
-	 */
 	@Override
-	public void handle(Person person, Map<String, String> attributes) {
-		String val = attributes.get(MIDKeys.HH_MEMEBERS);
-		if(val != null) {
-			int num = Integer.parseInt(val);
-			
-			if(num >= 1 && num <= 11) {
-				person.setAttribute(CommonKeys.HH_MEMBERS, String.valueOf(num));
-			}
+	public void handle(Segment leg, Map<String, String> attributes) {
+		String mode = attributes.get(VariableNames.LEG_MODE);
+		if(mode.equalsIgnoreCase("1")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PED);
+		} else if(mode.equalsIgnoreCase("2")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_BIKE);
+		} else if(mode.equalsIgnoreCase("3")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_RIDE);
+		} else if(mode.equalsIgnoreCase("4")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
+		} else if(mode.equalsIgnoreCase("5")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
 		}
 
 	}

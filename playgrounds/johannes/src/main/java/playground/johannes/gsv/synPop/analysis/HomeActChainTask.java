@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;

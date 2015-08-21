@@ -22,8 +22,8 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
@@ -54,7 +54,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 
 			for (PlainPerson person : persons) {
 				for (Episode plan : person.getEpisodes()) {
-					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
+					String dayVal = plan.getAttribute(MiDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
 						for (Attributable leg : plan.getLegs()) {
 							if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {

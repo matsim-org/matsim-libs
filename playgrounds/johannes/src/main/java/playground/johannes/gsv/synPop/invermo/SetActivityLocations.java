@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -27,13 +27,13 @@ import playground.johannes.synpop.data.Episode;
  * @author johannes
  * 
  */
-public class SetActivityLocations implements ProxyPlanTask {
+public class SetActivityLocations implements EpisodeTask {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override

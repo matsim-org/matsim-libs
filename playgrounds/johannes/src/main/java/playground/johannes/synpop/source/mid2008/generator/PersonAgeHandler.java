@@ -19,10 +19,8 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
-import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 import java.util.Map;
 

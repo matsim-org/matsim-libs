@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.generator.EpisodeAttributeHandler;
 
 import java.util.Map;
@@ -38,7 +39,7 @@ public class JourneyDaysHandler implements EpisodeAttributeHandler {
 		int nights = Integer.parseInt(attributes.get("p1014"));
 		
 		if(nights < 995)
-			plan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+			plan.setAttribute(MiDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 	}
 
 }

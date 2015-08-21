@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -113,7 +113,7 @@ public class ActivityLocationMutator implements SingleMutator {
 //	
 //				if (prevFac.equals(nextFac)) {
 //					PlainElement leg = person.getPlan().getLegs().get(idx - 1);
-//					String value = leg.getAttribute(MIDKeys.LEG_ROUTE_DISTANCE);
+//					String value = leg.getAttribute(MiDKeys.LEG_ROUTE_DISTANCE);
 //					if (value != null) {
 //						double dist = Double.parseDouble(value);
 //						// QuadTree<ActivityFacility> quadTree =

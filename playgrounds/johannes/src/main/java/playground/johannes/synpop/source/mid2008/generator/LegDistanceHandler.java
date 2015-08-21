@@ -17,23 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
 import java.util.Map;
 
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class LegSortedIdHandler implements LegAttributeHandler {
+public class LegDistanceHandler implements LegAttributeHandler {
 
 	@Override
 	public void handle(Segment leg, Map<String, String> attributes) {
-		String sid = attributes.get("wsid");
-		leg.setAttribute(MIDKeys.LEG_INDEX, sid);
-	}
+		String att = attributes.get(VariableNames.LEG_DISTANCE);
 
+		double d = Double.parseDouble(att);
+		if (d <= 950) {
+			d = d * 1000;
+			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(d));
+		} else {
+			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, null);
+		}
+	}
 }

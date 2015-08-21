@@ -17,14 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid.run;
+package playground.johannes.synpop.source.mid2008.processing;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.*;
 
@@ -32,23 +30,22 @@ import java.util.*;
  * @author johannes
  *
  */
-public class ProxyTaskRunner {
+public class TaskRunner {
 
-	public static void run(ProxyPersonTask task, Collection<PlainPerson> persons) {
-		for(PlainPerson person : persons)
-			task.apply(person);
+	public static void run(PersonTask task, Collection<? extends Person> persons) {
+		for(Person person : persons) task.apply(person);
 	}
 	
-	public static void run(ProxyPlanTask task, Collection<PlainPerson> persons) {
+	public static void run(EpisodeTask task, Collection<? extends Person> persons) {
 		run(task, persons, false);
 	}
 	
-	public static void run(ProxyPlanTask task, Collection<PlainPerson> persons, boolean verbose) {
+	public static void run(EpisodeTask task, Collection<? extends Person> persons, boolean verbose) {
 		if(verbose) {
 			ProgressLogger.init(persons.size(), 2, 10);
 		}
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			for(Episode plan : person.getEpisodes())
 				task.apply(plan);
 			
@@ -60,12 +57,13 @@ public class ProxyTaskRunner {
 			ProgressLogger.termiante();
 	}
 	
-	public static Set<PlainPerson> runAndDeletePerson(ProxyPersonTask task, Collection<PlainPerson> persons) {
-		Set<PlainPerson> newPersons = new HashSet<PlainPerson>(persons.size());
+	public static <P extends Person> Set<P> runAndDeletePerson(PersonTask task, Collection<P>
+			persons) {
+		Set<P> newPersons = new HashSet<>(persons.size());
 		
 		run(task, persons);
 		
-		for(PlainPerson person : persons) {
+		for(P person : persons) {
 			if(!"true".equalsIgnoreCase(person.getAttribute(CommonKeys.DELETE))) {
 				newPersons.add(person);
 			}
@@ -74,10 +72,10 @@ public class ProxyTaskRunner {
 		return newPersons;
 	}
 	
-	public static void runAndDeletePerson(ProxyPlanTask task, Collection<PlainPerson> persons) {
+	public static void runAndDeleteEpisode(EpisodeTask task, Collection<? extends Person> persons) {
 		run(task, persons);
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			List<Episode> remove = new ArrayList<>();
 			for(Episode plan : person.getEpisodes()) {
 				if("true".equalsIgnoreCase(plan.getAttribute(CommonKeys.DELETE))) {

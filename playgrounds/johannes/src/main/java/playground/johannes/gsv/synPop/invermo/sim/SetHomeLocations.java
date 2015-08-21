@@ -29,10 +29,9 @@ import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -84,11 +83,11 @@ public class SetHomeLocations {
 		/*
 		 * Assign facilities to the geocoded home locations.
 		 */
-		ProxyTaskRunner.run(new AssignHomeFacilities(dataPool), persons);
+		TaskRunner.run(new AssignHomeFacilities(dataPool), persons);
 		/*
 		 * Calculate the target population density.
 		 */
-		ProxyTaskRunner.run(new InitializeTargetDensity(dataPool), persons);
+		TaskRunner.run(new InitializeTargetDensity(dataPool), persons);
 		/*
 		 * Distribute population according to zone values.
 		 */

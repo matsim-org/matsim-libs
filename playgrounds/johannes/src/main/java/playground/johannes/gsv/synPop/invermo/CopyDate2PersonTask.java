@@ -19,25 +19,25 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  * 
  */
-public class CopyDate2PersonTask implements ProxyPersonTask {
+public class CopyDate2PersonTask implements PersonTask {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		if (person.getEpisodes().size() > 0) {
 			Episode plan = person.getEpisodes().get(0);
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
-
-import playground.johannes.synpop.data.Episode;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
- *
  */
-public interface ProxyPlanTask {
+public interface CommonValues {
 
-	public void apply(Episode plan);
+    String MONDAY = "mon";
+
+    String TUESDAY = "tue";
+
+    String WEDNESDAY = "wed";
+
+    String THURSDAY = "thu";
+
+    String FRIDAY = "fri";
+
+    String SATURDAY = "sat";
+
+    String SUNDAY = "sun";
+
+    String MALE = "male";
+
+    String FEMALE = "female";
+
+    String ALWAYS = "always";
+
+    String SOMETIMES = "sometimes";
+
+    String NEVER = "never";
+    String LEG_MODE_PED = "walk";
+    String LEG_MODE_BIKE = "bike";
+    String LEG_MODE_CAR = "car";
+    String LEG_MODE_RIDE = "ride";
+    String LEG_MODE_PT = "pt";
 }

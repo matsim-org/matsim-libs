@@ -17,24 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
+package playground.johannes.synpop.source.mid2008.generator;
 
 import java.util.Map;
+
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  *
  */
-public class PersonWeightHandler implements PersonAttributeHandler {
+public class LegIndexHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(Person person, Map<String, String> attributes) {
-		double w = Double.parseDouble(attributes.get(MIDKeys.PERSON_WEIGHT));
-		person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
+	public void handle(Segment leg, Map<String, String> attributes) {
+		String sid = attributes.get(VariableNames.LEG_INDEX);
+		leg.setAttribute(MiDKeys.LEG_INDEX, sid);
 	}
 
 }

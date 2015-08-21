@@ -17,15 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.data.Person;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public interface ProxyPersonTask {
+public class PersonNUTS1Handler implements PersonAttributeHandler {
 
-	public void apply(PlainPerson person);
+	private static Map<String, String> labels = new HashMap<>();
+
+	static {
+		labels.put("1", "Schleswig-Holstein");
+		labels.put("2", "Hamburg");
+		labels.put("3", "Niedersachsen");
+		labels.put("4", "Bremen");
+		labels.put("5", "Nordrhein-Westfalen");
+		labels.put("6", "Hessen");
+		labels.put("7", "Rheinland-Pfalz");
+		labels.put("8", "Baden-Württemberg");
+		labels.put("9", "Bayern");
+		labels.put("10", "Saarland");
+		labels.put("11", "Berlin");
+		labels.put("12", "Brandenburg");
+		labels.put("13", "Mecklenburg-Vorpommern");
+		labels.put("14", "Sachsen");
+		labels.put("15", "Sachsen-Anhalt");
+		labels.put("16", "Thüringen");
+	}
+
+	@Override
+	public void handle(Person person, Map<String, String> attributes) {
+		String val = attributes.get(VariableNames.PERSON_STATE);
+		if(val != null) {
+			person.setAttribute(MiDKeys.PERSON_NUTS1, labels.get(val));
+		}
+
+	}
+
 }

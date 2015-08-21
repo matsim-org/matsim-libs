@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.synpop.source.mid2008.generator.RowHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 /**
  * @author johannes
@@ -64,15 +64,15 @@ public class RawPkm {
 		 */
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			String mode = attributes.get(MIDKeys.LEG_MODE);
+			String mode = attributes.get(VariableNames.LEG_MODE);
 			if (mode.equalsIgnoreCase("MIV (Fahrer)") || mode.equalsIgnoreCase("MIV (Mitfahrer)")) {
-				String distStr = attributes.get(MIDKeys.LEG_DISTANCE);
+				String distStr = attributes.get(VariableNames.LEG_DISTANCE);
 				if (distStr != null) {
 					double d = Double.parseDouble(distStr);
 					if (d < 9994) {
 						d = d * 1000;
-						String type = attributes.get(MIDKeys.LEG_MAIN_TYPE);
-						String subtype = attributes.get(MIDKeys.LEG_SUB_TYPE);
+						String type = attributes.get(VariableNames.LEG_MAIN_TYPE);
+						String subtype = attributes.get(VariableNames.LEG_SUB_TYPE);
 						type = convertType(type, subtype);
 						
 						String gew = attributes.get("w_gew");

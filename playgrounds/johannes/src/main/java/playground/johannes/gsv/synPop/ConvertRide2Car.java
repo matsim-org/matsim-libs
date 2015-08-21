@@ -21,13 +21,15 @@ package playground.johannes.gsv.synPop;
 
 import org.matsim.api.core.v01.TransportMode;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class ConvertRide2Car implements ProxyPlanTask {
+public class ConvertRide2Car implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {

@@ -20,19 +20,23 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 
 /**
  * @author johannes
  *
  */
-public class DeleteMissingTimesTask implements ProxyPersonTask {
+public class DeleteMissingTimesTask implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		for(Attributable leg : person.getPlan().getLegs()) {
 			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);

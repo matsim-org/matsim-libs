@@ -25,14 +25,12 @@ import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.generator.InsertActivitiesTask;
 import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
 import playground.johannes.synpop.source.mid2008.generator.RowHandler;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.*;
@@ -218,8 +216,8 @@ public class TXTReader {
 		
 		logger.info(String.format("Parsed %s persons.", persons.size()));
 		
-		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
-		composite.addComponent(new InsertActivitiesTask());
+		EpisodeTaskComposite composite = new EpisodeTaskComposite();
+		composite.addComponent(new InsertActivitiesTask(new PlainFactory()));
 		composite.addComponent(new ValidateDatesTask());
 		composite.addComponent(new ComposeTimeTask());
 		composite.addComponent(new SetActivityLocations());
@@ -233,9 +231,9 @@ public class TXTReader {
 		
 		
 		logger.info("Applying person tasks...");
-		ProxyTaskRunner.run(composite, persons);
+		TaskRunner.run(composite, persons);
 		
-		ProxyPersonTaskComposite personTasks = new ProxyPersonTaskComposite();
+		PersonTaskComposite personTasks = new PersonTaskComposite();
 		
 		GeocodeLocationsTask geoTask = new GeocodeLocationsTask("localhost", 3128);
 		geoTask.setCacheFile("/home/johannes/gsv/invermo/txt-utf8/geocache.txt");
@@ -250,13 +248,13 @@ public class TXTReader {
 //		personTasks.addComponent(plans2Persons);
 		
 		
-		ProxyTaskRunner.run(personTasks, persons);
+		TaskRunner.run(personTasks, persons);
 		
 		geoTask.writeCache();
 		
 		new DeleteNoWeight().apply(persons);
 		
-		ProxyTaskRunner.run(plans2Persons, persons);
+		TaskRunner.run(plans2Persons, persons);
 		for(PlainPerson person : plans2Persons.getNewPersons()) {
 			persons.add(person);
 		}
@@ -270,7 +268,7 @@ public class TXTReader {
 //		}
 //		logger.info(String.format("Sum of weigths = %s.", wsum));
 		
-		composite = new ProxyPlanTaskComposite();
+		composite = new EpisodeTaskComposite();
 		composite.addComponent(new Date2TimeTask());
 		composite.addComponent(new SetActivityTimeTask());
 		composite.addComponent(new FixMissingActTimesTask());
@@ -278,9 +276,9 @@ public class TXTReader {
 		composite.addComponent(new SetLegTimes());
 		composite.addComponent(new SetMissingActTypes());
 		
-		ProxyTaskRunner.run(composite, persons);
+		TaskRunner.run(composite, persons);
 		
-		ProxyTaskRunner.run(new CopyDate2PersonTask(), persons);
+		TaskRunner.run(new CopyDate2PersonTask(), persons);
 		
 		logger.info("Done.");
 		XMLWriter writer = new XMLWriter();
@@ -288,8 +286,8 @@ public class TXTReader {
 		
 		logger.info("Deleting plans with out of bounds trips.");
 		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
-		ProxyTaskRunner.runAndDeletePerson(new DeleteOutOfBounds(bounds), persons);
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoPlans(), persons);
+		TaskRunner.runAndDeleteEpisode(new DeleteOutOfBounds(bounds), persons);
+		persons = TaskRunner.runAndDeletePerson(new DeleteNoPlans(), persons);
 		logger.info("Population size = " + persons.size());
 		
 //		logger.info("Cloning persons...");
@@ -298,16 +296,16 @@ public class TXTReader {
 //		logger.info("Population size = " + persons.size());
 				
 		logger.info("Deleting person with no legs...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		persons = TaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
 		logger.info("Population size = " + persons.size());
 		
 		logger.info("Initializing target distances...");
-		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
+		TaskRunner.run(new InitializeTargetDistance(), persons);
 		
 		writer.write("/home/johannes/gsv/invermo/pop.de.xml", persons);
 		
 		logger.info("Deleting persons with no car legs...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
+		persons = TaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
 		logger.info("Population size = " + persons.size());
 		
 		

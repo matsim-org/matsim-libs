@@ -17,25 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.mid2008.processing;
 
-import playground.johannes.sna.util.Composite;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  *
  */
-public class ProxyPlanTaskComposite extends Composite<ProxyPlanTask> implements ProxyPlanTask {
+public interface EpisodeTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
-	 */
-	@Override
-	public void apply(Episode plan) {
-		for(ProxyPlanTask task : components) {
-			task.apply(plan);
-		}
-	}
-
+	void apply(Episode episode);
 }

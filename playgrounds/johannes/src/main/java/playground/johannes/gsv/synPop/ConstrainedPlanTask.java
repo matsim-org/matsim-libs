@@ -20,20 +20,21 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class ConstrainedPlanTask implements ProxyPlanTask {
+public class ConstrainedPlanTask implements EpisodeTask {
 
 	private final String key;
 	
 	private final String value;
 	
-	private final ProxyPlanTask delegate;
+	private final EpisodeTask delegate;
 	
-	public ConstrainedPlanTask(String key, String value, ProxyPlanTask delegate) {
+	public ConstrainedPlanTask(String key, String value, EpisodeTask delegate) {
 		this.key = key;
 		this.value = value;
 		this.delegate = delegate;

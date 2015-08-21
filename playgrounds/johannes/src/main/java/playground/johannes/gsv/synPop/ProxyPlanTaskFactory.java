@@ -19,12 +19,14 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+
 /**
  * @author johannes
  *
  */
 public interface ProxyPlanTaskFactory {
 
-	public ProxyPlanTask getInstance();
+	public EpisodeTask getInstance();
 	
 }

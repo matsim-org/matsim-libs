@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
+
+import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public class InsertActivitiesTask implements ProxyPlanTask {
+public class PersonHHMembersHandler implements PersonAttributeHandler {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
-	 */
 	@Override
-	public void apply(Episode plan) {
-		int nLegs = plan.getLegs().size();
-		
-		for(int i = 0; i < nLegs+1; i++) {
-			PlainSegment activity = new PlainSegment();
-			plan.addActivity(activity);
+	public void handle(Person person, Map<String, String> attributes) {
+		String val = attributes.get(VariableNames.HH_MEMEBERS);
+		if(val != null) {
+			int num = Integer.parseInt(val);
+			
+			if(num >= 1 && num <= 11) {
+				person.setAttribute(CommonKeys.HH_MEMBERS, String.valueOf(num));
+			}
 		}
 
 	}

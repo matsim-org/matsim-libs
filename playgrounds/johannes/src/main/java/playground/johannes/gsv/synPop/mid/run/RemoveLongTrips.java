@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;

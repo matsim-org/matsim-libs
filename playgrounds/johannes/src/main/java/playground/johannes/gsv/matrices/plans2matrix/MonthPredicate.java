@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -37,7 +37,7 @@ public class MonthPredicate implements Predicate {
 
 	@Override
 	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
-		if (month == null || month.equalsIgnoreCase(person.getAttribute(MIDKeys.PERSON_MONTH))) {
+		if (month == null || month.equalsIgnoreCase(person.getAttribute(MiDKeys.PERSON_MONTH))) {
 			return true;
 		} else {
 			return false;

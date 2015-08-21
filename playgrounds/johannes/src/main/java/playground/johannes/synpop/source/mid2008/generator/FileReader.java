@@ -21,9 +21,10 @@ package playground.johannes.synpop.source.mid2008.generator;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.*;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.io.IOException;
 import java.util.*;
@@ -130,7 +131,7 @@ public class FileReader {
 		    * add an empty plan to each person
 		    */
             Episode episode = factory.newEpisode();
-            episode.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_TRIPS);
+            episode.setAttribute(CommonKeys.DATA_SOURCE, MiDValues.MID_TRIPS);
             person.addEpisode(episode);
 
             persons.put(person.getId(), person);
@@ -146,7 +147,7 @@ public class FileReader {
             Person person = persons.get(id);
 
             Episode episode = factory.newEpisode();
-            episode.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_JOUNREYS);
+            episode.setAttribute(CommonKeys.DATA_SOURCE, MiDValues.MID_JOUNREYS);
             for (EpisodeAttributeHandler handler : episodeAttHandlers) {
                 handler.handle(episode, attributes);
             }
@@ -155,7 +156,7 @@ public class FileReader {
 
             Segment leg = factory.newSegment();
             episode.addLeg(leg);
-            leg.setAttribute(CommonKeys.LEG_ORIGIN, ActivityType.HOME);
+            leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityType.HOME);
             for (LegAttributeHandler handler : journeyAttHandlers) {
                 handler.handle(leg, attributes);
             }

@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,10 +31,10 @@ import java.util.Set;
  * @author johannes
  * 
  */
-public class DeletePlansDestination implements ProxyPersonTask {
+public class DeletePlansDestination implements PersonTask {
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		Set<Episode> remove = new HashSet<>();
 
 		for (Episode plan : person.getEpisodes()) {

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainPerson;

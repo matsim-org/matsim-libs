@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -31,7 +31,7 @@ import java.util.Date;
  * @author johannes
  * 
  */
-public class ComposeTimeTask implements ProxyPlanTask {
+public class ComposeTimeTask implements EpisodeTask {
 
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -39,7 +39,7 @@ public class ComposeTimeTask implements ProxyPlanTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes
+	 * playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes
 	 * .gsv.synPop.PlainEpisode)
 	 */
 	@Override

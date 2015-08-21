@@ -19,18 +19,18 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class DeleteNoPlans implements ProxyPersonTask {
+public class DeleteNoPlans implements PersonTask {
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		if(person.getEpisodes().size() == 0) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}

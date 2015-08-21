@@ -33,4 +33,33 @@ public interface VariableNames {
     String PERSON_CARAVAIL = "p01_1";
 
     String SURVEY_DAY = "stichtag";
+
+    String SURVEY_MONTH = "stich_m";
+
+    String HH_INCOME = "hheink";
+
+    String HH_MEMEBERS = "h02";
+
+    String PERSON_LAU2_CLASS = "polgk";
+
+    String PERSON_SEX = "hp_sex";
+
+    String PERSON_STATE = "bland";
+
+    String PERSON_WEIGHT = "p_gew";
+
+    String LEG_DISTANCE = "wegkm_k";
+
+    String LEG_MODE = "hvm";
+    String LEG_MAIN_TYPE = "w04";
+    String LEG_SUB_TYPE = "w04_dzw";
+    String LEG_ORIGIN = "w01";
+    String LEG_DESTINATION = "w13";
+    String LEG_INDEX = "wsid";
+    String LEG_START_TIME_HOUR = "st_std";
+    String LEG_START_TIME_MIN = "st_min";
+    String LEG_END_TIME_HOUR = "en_std";
+    String LEG_END_TIME_MIN = "en_min";
+    String START_NEXT_DAY = "st_dat";
+    String END_NEXT_DAY = "en_dat";
 }

@@ -19,24 +19,20 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 
 /**
  * @author johannes
  *
  */
-public class InsertHomePlanTask implements ProxyPersonTask {
+public class InsertHomePlanTask implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		if(person.getEpisodes().isEmpty()) {
 			Episode plan = new PlainEpisode();
 			PlainSegment act = new PlainSegment();

@@ -24,7 +24,7 @@ import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
@@ -64,7 +64,7 @@ public class PersonNuts1Name implements Hamiltonian {
 			return Double.POSITIVE_INFINITY;
 		}
 		
-		String targetName = person.getAttribute(MIDKeys.PERSON_STATE);
+		String targetName = person.getAttribute(MiDKeys.PERSON_NUTS1);
 
 		if (name.equalsIgnoreCase(targetName)) {
 			return 0;

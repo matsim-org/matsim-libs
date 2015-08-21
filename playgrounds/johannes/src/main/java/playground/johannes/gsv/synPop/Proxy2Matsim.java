@@ -34,9 +34,10 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -69,7 +70,7 @@ public class Proxy2Matsim {
 		parser.setValidating(false);
 		parser.parse(args[0]);
 
-		ProxyTaskRunner.run(new Convert2MatsimModes(), parser.getPersons());
+		TaskRunner.run(new Convert2MatsimModes(), parser.getPersons());
 
 		ProgressLogger.init(parser.getPersons().size(), 1, 10);
 

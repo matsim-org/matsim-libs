@@ -17,39 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegDistanceHandler implements LegAttributeHandler {
+public interface CommonKeys {
+	
+	String PERSON_WEIGHT = "weight";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String att = attributes.get(MIDKeys.LEG_DISTANCE);
+	String LEG_START_TIME = "startTime";
+	
+	String LEG_END_TIME = "endTime";
+	
+	String LEG_PURPOSE = "purpose";
 
-		double d = Double.parseDouble(att);
-		if (d < 9994) {
-			d = d * 1000;
-			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(d));
-		} else {
-			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, null);
-		}
+	String LEG_ROUNDTRIP = "roundTrip";
+	
+	String LEG_ROUTE_DISTANCE = "routeDistance";
 
-	}
+	String LEG_GEO_DISTANCE = "geoDistance";
+
+	String LEG_MODE = "mode";
+
+	String ACTIVITY_TYPE = "type";
+	
+	String ACTIVITY_START_TIME = "startTime";
+	
+	String ACTIVITY_END_TIME = "endTime";
+	
+	String ACTIVITY_FACILITY = "activityFacility";
+	
+	String DELETE = "delete";
+	
+	String DAY = "day";
+
+	String DATA_SOURCE = "datasource";
+	
+	String HH_INCOME = "hhincome";
+	
+	String HH_MEMBERS = "hhmembers";
+	
+	String PERSON_AGE = "age";
+
+	String PERSON_SEX = "sex";
+
+	String PERSON_CARAVAIL = "caravail";
 
 }

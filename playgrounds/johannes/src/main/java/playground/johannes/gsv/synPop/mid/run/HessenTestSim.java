@@ -34,6 +34,7 @@ import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
 
 import java.io.IOException;
 import java.util.Random;
@@ -66,7 +67,7 @@ public class HessenTestSim {
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		logger.info("Replacing activity types...");
-		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
+		TaskRunner.run(new ReplaceActTypes(), persons);
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
@@ -97,7 +98,7 @@ public class HessenTestSim {
 		logger.info("Initializing activity locations...");
 		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 //		ConcurrentProxyTaskRunner.run(new InitHomeBasedActLocsFactory(dataPool, random), persons, numThreads);
-		ProxyTaskRunner.run(new InitActivitLocations(dataPool), persons);
+		TaskRunner.run(new InitActivitLocations(dataPool), persons);
 		/*
 		 * Build a hamiltonian to evaluate the target LAU2 zone
 		 */

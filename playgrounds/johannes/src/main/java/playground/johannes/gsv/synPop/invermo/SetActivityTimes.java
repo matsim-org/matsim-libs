@@ -19,17 +19,17 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimes implements ProxyPlanTask {
+public class SetActivityTimes implements EpisodeTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {

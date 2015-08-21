@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.Attributable;
@@ -32,7 +32,7 @@ import playground.johannes.synpop.data.PlainPerson;
  * @author johannes
  * 
  */
-public class DeleteShortLongTrips implements ProxyPlanTask {
+public class DeleteShortLongTrips implements EpisodeTask {
 
 	private final double threshold;
 

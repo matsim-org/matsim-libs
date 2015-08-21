@@ -28,17 +28,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -78,7 +76,7 @@ public class PopGeoExtract {
 		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
 
 		logger.info("Applying filter...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new GeoFilter(fData.getAll(), zones.iterator().next().getGeometry()), persons);
+		persons = TaskRunner.runAndDeletePerson(new GeoFilter(fData.getAll(), zones.iterator().next().getGeometry()), persons);
 		logger.info(String.format("Population size: %s", persons.size()));
 
 		XMLWriter writer = new XMLWriter();
@@ -86,7 +84,7 @@ public class PopGeoExtract {
 
 	}
 
-	private static class GeoFilter implements ProxyPersonTask {
+	private static class GeoFilter implements PersonTask {
 
 		private ActivityFacilities facilities;
 
@@ -98,7 +96,7 @@ public class PopGeoExtract {
 		}
 
 		@Override
-		public void apply(PlainPerson person) {
+		public void apply(Person person) {
 			boolean keep = false;
 
 			for (Episode plan : person.getEpisodes()) {

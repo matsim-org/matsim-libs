@@ -19,19 +19,23 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 
 /**
  * @author johannes
  *
  */
-public class DeleteNoLegs implements ProxyPersonTask {
+public class DeleteNoLegs implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		if(person.getPlan().getLegs().size() == 0) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}

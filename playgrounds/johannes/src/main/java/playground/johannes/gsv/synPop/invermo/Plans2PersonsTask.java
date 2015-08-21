@@ -19,11 +19,8 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.data.*;
 
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -33,7 +30,7 @@ import java.util.Set;
  * @author johannes
  * 
  */
-public class Plans2PersonsTask implements ProxyPersonTask {
+public class Plans2PersonsTask implements PersonTask {
 
 	private Set<PlainPerson> newPersons;
 
@@ -46,7 +43,8 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 	}
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		int counter = 0;
 		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 

@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author johannes
  *
  */
-public class ValidateDatesTask implements ProxyPlanTask {
+public class ValidateDatesTask implements EpisodeTask {
 
 	private final Map<String, String> replacements;
 	

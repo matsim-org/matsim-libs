@@ -20,11 +20,11 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import com.google.code.geocoder.model.LatLng;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.io.*;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import java.util.Map.Entry;
  * @author johannes
  * 
  */
-public class GeocodeLocationsTask implements ProxyPersonTask {
+public class GeocodeLocationsTask implements PersonTask {
 
 	private final GoogleGeoCoder geoCoder;
 
@@ -71,7 +71,7 @@ public class GeocodeLocationsTask implements ProxyPersonTask {
 	}
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		geocodeField(InvermoKeys.HOME_LOCATION, InvermoKeys.HOME_COORD, person);
 		for (Episode plan : person.getEpisodes()) {
 			for (Attributable act : plan.getActivities()) {

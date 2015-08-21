@@ -20,13 +20,15 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class FixMissingActTimesTask implements ProxyPlanTask {
+public class FixMissingActTimesTask implements EpisodeTask {
 
 	private static final int MIN_LEG_DURATION = 1;
 	

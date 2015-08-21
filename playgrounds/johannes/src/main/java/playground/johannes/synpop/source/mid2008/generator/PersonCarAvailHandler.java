@@ -19,10 +19,9 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
 
 import java.util.Map;
 
@@ -36,10 +35,10 @@ public class PersonCarAvailHandler implements PersonAttributeHandler {
         String val = attributes.get(VariableNames.PERSON_CARAVAIL);
 
         if(val != null) {
-            if(val.equalsIgnoreCase("1")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.ALWAYS);
-            if(val.equalsIgnoreCase("2")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.SOMETIMES);
-            if(val.equalsIgnoreCase("3")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
-            if(val.equalsIgnoreCase("4")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonKeys.NEVER);
+            if(val.equalsIgnoreCase("1")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonValues.ALWAYS);
+            if(val.equalsIgnoreCase("2")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonValues.SOMETIMES);
+            if(val.equalsIgnoreCase("3")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonValues.NEVER);
+            if(val.equalsIgnoreCase("4")) person.setAttribute(CommonKeys.PERSON_CARAVAIL, CommonValues.NEVER);
         }
     }
 }

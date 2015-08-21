@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
-
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+package playground.johannes.synpop.source.mid2008;
 
 /**
  * @author johannes
- *
  */
-public class LegOriginHandler implements LegAttributeHandler {
+public interface MiDValues {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String origin = attributes.get(MIDKeys.LEG_ORIGIN);
-		if(origin.equalsIgnoreCase("zu Hause"))
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "home");
-		else if(origin.equalsIgnoreCase("Arbeitsplatz"))
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "work");
-		else if(origin.equalsIgnoreCase("woanders innerhalb des Ortes"))
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "intown");
-		else if(origin.equalsIgnoreCase("woanders außerhalb"))
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "outoftown");
-		else
-			leg.setAttribute(CommonKeys.LEG_ORIGIN, "unknown");
-	}
-
+    String IN_TOWN = "inTown";
+    String OUT_OF_TOWN = "outOfTown";
+    String ROUND_TRIP = "roundTrip";
+    String JANUARY = "jan";
+    String FEBRUARY = "feb";
+    String MARCH = "mar";
+    String APRIL = "apr";
+    String MAY = "may";
+    String JUNE = "jun";
+    String JULY = "jul";
+    String AUGUST = "aug";
+    String SEPTEMBER = "sep";
+    String OCTOBER = "oct";
+    String NOVEMBER = "nov";
+    String DECEMBER = "dec";
+    String MID_JOUNREYS = "midjourneys";
+    String MID_TRIPS = "midtrips";
 }

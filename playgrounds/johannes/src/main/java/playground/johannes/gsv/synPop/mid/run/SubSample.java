@@ -21,10 +21,11 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.DeleteRandom;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
+import playground.johannes.gsv.synPop.PersonTaskComposite;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
 
 import java.util.Collection;
 
@@ -59,10 +60,10 @@ public class SubSample {
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		double proba = Double.parseDouble(args[1]);
-		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
+		PersonTaskComposite tasks = new PersonTaskComposite();
 		tasks.addComponent(new DeleteRandom(1-proba));
 		
-		Collection<PlainPerson> subset = ProxyTaskRunner.runAndDeletePerson(tasks, parser.getPersons());
+		Collection<PlainPerson> subset = TaskRunner.runAndDeletePerson(tasks, parser.getPersons());
 		logger.info(String.format("New population: %s persons.", subset.size()));
 		
 		logger.info("Writing population...");

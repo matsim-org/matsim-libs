@@ -22,11 +22,10 @@ package playground.johannes.gsv.matrices.postprocess;
 ;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.data.CommonValues;
 
 import java.io.*;
 
@@ -54,8 +53,8 @@ public class CalculateDayFractions {
         File rootDir = new File(root);
 
         String seasons[] = new String[] {Episodes2Matrix.SUMMER, Episodes2Matrix.WINTER};
-        String days[] = new String[] {CommonKeys.MONDAY, Episodes2Matrix.DIMIDO, CommonKeys.FRIDAY, CommonKeys
-                .SATURDAY, CommonKeys.SUNDAY};
+        String days[] = new String[] {CommonValues.MONDAY, Episodes2Matrix.DIMIDO, CommonValues.FRIDAY, CommonValues
+                .SATURDAY, CommonValues.SUNDAY};
         int count = 0;
         for(String season : seasons) {
             for(String day : days) {

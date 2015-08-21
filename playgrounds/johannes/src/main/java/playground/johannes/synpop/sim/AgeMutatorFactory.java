@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.gsv.synPop.sim3.MutatorFactory;
 import playground.johannes.synpop.sim.data.Converters;

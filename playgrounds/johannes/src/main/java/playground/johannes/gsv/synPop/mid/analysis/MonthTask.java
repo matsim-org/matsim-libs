@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.mid.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -47,7 +47,7 @@ public class MonthTask extends AnalyzerTask {
 	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> values = new TObjectDoubleHashMap<>();
 		for (PlainPerson person : persons) {
-			String month = person.getAttribute(MIDKeys.PERSON_MONTH);
+			String month = person.getAttribute(MiDKeys.PERSON_MONTH);
 			if (month != null) {
 				values.adjustOrPutValue(month, 1.0, 1.0);
 			}

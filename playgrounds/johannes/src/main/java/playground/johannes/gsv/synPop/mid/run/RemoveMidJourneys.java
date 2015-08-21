@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -55,7 +55,7 @@ public class RemoveMidJourneys {
 		
 		for(PlainPerson person : persons) {
 			for(Episode plan : person.getEpisodes()) {
-				if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
+				if(MiDValues.MID_JOUNREYS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
 						remove.add(person);
 						break;

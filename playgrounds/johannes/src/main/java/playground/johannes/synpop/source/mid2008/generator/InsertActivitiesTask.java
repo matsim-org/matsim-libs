@@ -17,26 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.sna.util.Composite;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Factory;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
- *
  */
-public class ProxyPersonTaskComposite extends Composite<ProxyPersonTask> implements	ProxyPersonTask {
+public class InsertActivitiesTask implements EpisodeTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
-	 */
-	@Override
-	public void apply(PlainPerson person) {
-		for(ProxyPersonTask task : components) {
-			task.apply(person);
-		}
+    private final Factory factory;
 
-	}
+    public InsertActivitiesTask(Factory factory) {
+        this.factory = factory;
+    }
+
+    @Override
+    public void apply(Episode episode) {
+        int nLegs = episode.getLegs().size();
+
+        for (int i = 0; i < nLegs + 1; i++) {
+            Segment activity = factory.newSegment();
+            episode.addActivity(activity);
+        }
+
+    }
 
 }

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.*;
 
 import java.util.Collection;

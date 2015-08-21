@@ -17,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Map;
 
@@ -32,32 +33,32 @@ public class PersonMonthHandler implements PersonAttributeHandler {
 
 	@Override
 	public void handle(Person person, Map<String, String> attributes) {
-		String val = attributes.get("stich_m");
+		String val = attributes.get(VariableNames.SURVEY_MONTH);
 		if(val != null) {
-			if(val.equalsIgnoreCase("Januar")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.JANUARY);
-			} else if(val.equalsIgnoreCase("Februar")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.FEBRUARY);
-			} else if(val.equalsIgnoreCase("März")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.MARCH);
-			} else if(val.equalsIgnoreCase("April")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.APRIL);
-			} else if(val.equalsIgnoreCase("Mai")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.MAY);
-			} else if(val.equalsIgnoreCase("Juni")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.JUNE);
-			} else if(val.equalsIgnoreCase("July")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.JULY);
-			} else if(val.equalsIgnoreCase("August")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.AUGUST);
-			} else if(val.equalsIgnoreCase("September")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.SEPTEMBER);
-			} else if(val.equalsIgnoreCase("Oktober")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.OCTOBER);
-			} else if(val.equalsIgnoreCase("November")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.NOVEMBER);
-			} else if(val.equalsIgnoreCase("Dezember")) {
-				person.setAttribute(MIDKeys.PERSON_MONTH, MIDKeys.DECEMBER);
+			if(val.equalsIgnoreCase("1")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.JANUARY);
+			} else if(val.equalsIgnoreCase("2")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.FEBRUARY);
+			} else if(val.equalsIgnoreCase("3")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.MARCH);
+			} else if(val.equalsIgnoreCase("4")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.APRIL);
+			} else if(val.equalsIgnoreCase("5")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.MAY);
+			} else if(val.equalsIgnoreCase("6")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.JUNE);
+			} else if(val.equalsIgnoreCase("7")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.JULY);
+			} else if(val.equalsIgnoreCase("8")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.AUGUST);
+			} else if(val.equalsIgnoreCase("9")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.SEPTEMBER);
+			} else if(val.equalsIgnoreCase("10")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.OCTOBER);
+			} else if(val.equalsIgnoreCase("11")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.NOVEMBER);
+			} else if(val.equalsIgnoreCase("12")) {
+				person.setAttribute(MiDKeys.PERSON_MONTH, MiDValues.DECEMBER);
 			}
 		}
 

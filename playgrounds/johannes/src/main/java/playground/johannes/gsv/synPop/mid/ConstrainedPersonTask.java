@@ -19,29 +19,29 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class ConstrainedPersonTask implements ProxyPersonTask {
+public class ConstrainedPersonTask implements PersonTask {
 
 	private final String key;
 	
 	private final String value;
 	
-	private final ProxyPersonTask delegate;
+	private final PersonTask delegate;
 	
-	public ConstrainedPersonTask(String key, String value, ProxyPersonTask delegate) {
+	public ConstrainedPersonTask(String key, String value, PersonTask delegate) {
 		this.key = key;
 		this.value = value;
 		this.delegate = delegate;
 	}
 	
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		String val = person.getAttribute(key);
 		if(value.equals(val)) {
 			delegate.apply(person);

@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -28,10 +28,10 @@ import playground.johannes.synpop.data.Episode;
  * @author johannes
  *
  */
-public class SetActivityTypes implements ProxyPlanTask {
+public class SetActivityTypes implements EpisodeTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {
