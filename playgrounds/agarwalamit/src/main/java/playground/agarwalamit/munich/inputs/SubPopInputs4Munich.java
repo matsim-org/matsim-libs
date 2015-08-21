@@ -48,19 +48,19 @@ public class SubPopInputs4Munich {
 
 	PersonFilter pf = new PersonFilter();
 	private final String subPopAttributeName = "userGroup";
+	private String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz";
 
 	public static void main(String[] args) {
 		SubPopInputs4Munich inputs = new SubPopInputs4Munich();
 		inputs.writePersonAttributes();
-//		inputs.modifyConfig();
+		inputs.modifyConfig();
 	}
 
 	private void writePersonAttributes(){
 
 		// read plans with subActivities (basically these are inital plans from different sources + subActivities)
-		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
-		String outPopAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz";
-		String outPlansFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_subPop.xml.gz";
+		String initialPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
+		String outPlansFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 		Population pop = sc.getPopulation();	
@@ -93,13 +93,13 @@ public class SubPopInputs4Munich {
 	private void modifyConfig(){
 
 		// I think, config with all sub activities info can be taken.
-		String existingConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_baseCase_msa.xml"; 
-		String outConfigFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_wrappedSubAct_baseCase_msa.xml"; // need manual verification later
+		String existingConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_baseCase_msa.xml"; 
+		String outConfigFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_usrGrp_baseCase_msa.xml"; // need manual verification later
 
 		Config config =  ConfigUtils.loadConfig(existingConfig);
 
 		config.plans().setSubpopulationAttributeName(subPopAttributeName); // if this is set then, one have to set same strategy for all sub pops.
-		config.plans().setInputPersonAttributeFile("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_usrGrp.xml.gz");
+		config.plans().setInputPersonAttributeFile(outPopAttributeFile);
 
 		String usrGrps [] = {"OTHERS","COMMUTER_REV_COMMUTER"};
 
@@ -127,7 +127,7 @@ public class SubPopInputs4Munich {
 		// first use existing pt mode parameters and set them as new pt mode parameters
 		ModeParams ptParams = config.planCalcScore().getModes().get(TransportMode.pt);
 
-		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setConstant(-0.5);
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setConstant(-0.3);
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfDistance(ptParams.getMarginalUtilityOfDistance());
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfTraveling(ptParams.getMarginalUtilityOfTraveling());
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMonetaryDistanceCostRate(ptParams.getMonetaryDistanceCostRate());
@@ -139,8 +139,9 @@ public class SubPopInputs4Munich {
 
 		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file. For e.g. "
 				+ "\n 1) existing strategies are taken for urban and freight and for reverse commuters and commuters new modules are added."
-				+ "\n 2) At the moment, same module name can not be used for two different sub populations and \n therefore parameters are added with different name in config "
-				+ " and then added to controler directly.");
+//				+ "\n 2) At the moment, same module name can not be used for two different sub populations and \n therefore parameters are added with different name in config "
+//				+ " and then added to controler directly."
+				);
 
 		new ConfigWriter(config).write(outConfigFile);
 	}

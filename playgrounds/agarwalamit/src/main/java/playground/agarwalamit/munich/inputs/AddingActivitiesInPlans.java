@@ -61,17 +61,6 @@ public class AddingActivitiesInPlans {
 	private Scenario scOut;
 	private PersonFilter pf = new PersonFilter();
 
-	public static void main(String[] args) {
-		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
-
-		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc);
-		newPlansInfo.run();
-		newPlansInfo.writePlans(outPlans);
-	}
-
 	/**
 	 * @return activity type to typical and minimum duration respectively
 	 */
@@ -277,7 +266,7 @@ public class AddingActivitiesInPlans {
 		return this.scOut.getPopulation();
 	}
 
-	private void writePlans( String outplans){
+	void writePlans( String outplans){
 		new PopulationWriter(scOut.getPopulation()).write(outplans);
 		log.info("File is written to "+outplans);
 	}
