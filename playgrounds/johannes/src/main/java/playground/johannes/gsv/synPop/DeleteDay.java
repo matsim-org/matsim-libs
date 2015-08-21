@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 
 import java.util.HashSet;
 import java.util.Set;

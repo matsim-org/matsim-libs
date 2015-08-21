@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.*;
 

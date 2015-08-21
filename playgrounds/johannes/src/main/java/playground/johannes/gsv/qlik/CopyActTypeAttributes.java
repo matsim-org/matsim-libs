@@ -20,7 +20,7 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 
 /**

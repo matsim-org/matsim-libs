@@ -17,35 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.episodes2matrix;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
  */
-public class SetLegPurposes implements EpisodeTask {
+public class PersonUtils {
 
+    public static Person shallowCopy(Person person, Factory factory) {
+        return shallowCopy(person, person.getId(), factory);
+    }
 
-    @Override
-    public void apply(Episode episode) {
-        for(int i = 0; i < episode.getLegs().size(); i++) {
-            Attributable leg = episode.getLegs().get(i);
-            String nextType = episode.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
-            /*
-            If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use
-            the next activity type.
-             */
-            if(ActivityType.HOME.equalsIgnoreCase(nextType)) {
-                String prevType = episode.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, prevType);
-            } else {
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, nextType);
-            }
+    public static Person shallowCopy(Person person, String id, Factory factory) {
+        Person clone = factory.newPerson(id);
+        for(String key : person.keys()) {
+            clone.setAttribute(key, person.getAttribute(key));
         }
+
+        return clone;
+    }
+
+    public static Episode deepCopy(Episode episode, Factory factory) {
+        Episode clone = factory.newEpisode();
+        for(String key : episode.keys()) {
+            clone.setAttribute(key, episode.getAttribute(key));
+        }
+
+        for(Segment act : episode.getActivities()) {
+            Segment actClone = shallowCopy(act, factory);
+            clone.addActivity(actClone);
+        }
+
+        for(Segment leg : episode.getLegs()) {
+            Segment legClone = shallowCopy(leg, factory);
+            clone.addLeg(legClone);
+        }
+
+        return clone;
+    }
+
+    public static Segment shallowCopy(Segment segment, Factory factory) {
+        Segment clone = factory.newSegment();
+        for(String key : segment.keys()) {
+            clone.setAttribute(key, segment.getAttribute(key));
+        }
+
+        return clone;
     }
 }

@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.source.mid2008.MiDKeys;

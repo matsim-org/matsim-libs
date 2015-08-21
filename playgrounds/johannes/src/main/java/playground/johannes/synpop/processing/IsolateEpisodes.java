@@ -17,35 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.episodes2matrix;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Factory;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.PersonUtils;
+
+import java.util.*;
 
 /**
  * @author johannes
  */
-public class SetLegPurposes implements EpisodeTask {
+public class IsolateEpisodes implements PersonTask {
 
+    private final String attrKey;
+
+    private final Factory factory;
+
+    private final Map<String, Set<Person>> populations;
+
+    public IsolateEpisodes(String attrKey, Factory factory) {
+        this.attrKey = attrKey;
+        this.factory = factory;
+        populations = new HashMap<>();
+    }
 
     @Override
-    public void apply(Episode episode) {
-        for(int i = 0; i < episode.getLegs().size(); i++) {
-            Attributable leg = episode.getLegs().get(i);
-            String nextType = episode.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
-            /*
-            If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use
-            the next activity type.
-             */
-            if(ActivityType.HOME.equalsIgnoreCase(nextType)) {
-                String prevType = episode.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, prevType);
-            } else {
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, nextType);
+    public void apply(Person person) {
+        int idCnt = 0;
+
+        for(Episode episode : person.getEpisodes()) {
+            String key = episode.getAttribute(attrKey);
+            Set<Person> persons = populations.get(key);
+            if(persons == null) {
+                persons = new HashSet<>();
+                populations.put(key, persons);
             }
+
+            String id = person.getId();
+            if(person.getEpisodes().size() > 1) {
+                id = String.format("%s.%s", person.getId(), idCnt);
+                idCnt++;
+            }
+            Person clone = PersonUtils.shallowCopy(person, id, factory);
+            clone.addEpisode(PersonUtils.deepCopy(episode, factory));
+
+            persons.add(clone);
         }
+    }
+
+    public Map<String, Set<Person>> getPopulations() {
+        return populations;
     }
 }

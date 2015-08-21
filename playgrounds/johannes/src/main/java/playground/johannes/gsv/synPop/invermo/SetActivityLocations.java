@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -33,7 +33,7 @@ public class SetActivityLocations implements EpisodeTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override

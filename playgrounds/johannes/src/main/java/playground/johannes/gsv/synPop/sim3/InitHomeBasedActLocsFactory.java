@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Random;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;

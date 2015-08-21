@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes
@@ -29,7 +29,7 @@ import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 public class InsertHomePlanTask implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
 	public void apply(Person person) {

@@ -23,12 +23,16 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.IsolateEpisodes;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.generator.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -89,6 +93,16 @@ public class Generator {
         logger.info("Writing persons...");
         XMLWriter writer = new XMLWriter();
         writer.write(String.format("%s/mid2008.xml", outDir), persons);
+
+        logger.info("Isolating persons...");
+        IsolateEpisodes isolator = new IsolateEpisodes(CommonKeys.DATA_SOURCE, factory);
+        TaskRunner.run(isolator, persons);
+        Map<String, Set<Person>> populations = isolator.getPopulations();
+        for(Map.Entry<String, Set<Person>> entry : populations.entrySet()) {
+            logger.info(String.format("Writing persons %s...", entry.getKey()));
+            writer.write(String.format("%s/mid2008.%s.xml", outDir, entry.getKey()), entry.getValue());
+        }
+
         logger.info("Done.");
     }
 }

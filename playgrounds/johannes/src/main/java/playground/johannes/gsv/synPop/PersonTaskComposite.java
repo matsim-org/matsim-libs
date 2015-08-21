@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop;
 
 import playground.johannes.sna.util.Composite;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 public class PersonTaskComposite extends Composite<PersonTask> implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
 	public void apply(Person person) {

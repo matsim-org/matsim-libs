@@ -25,7 +25,7 @@ import playground.johannes.gsv.synPop.PersonTaskComposite;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.Collection;
 

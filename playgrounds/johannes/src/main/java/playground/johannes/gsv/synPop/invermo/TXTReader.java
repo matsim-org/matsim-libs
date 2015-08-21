@@ -25,7 +25,7 @@ import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.source.mid2008.generator.InsertActivitiesTask;
 import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;

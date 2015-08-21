@@ -29,7 +29,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.synpop.data.Attributable;

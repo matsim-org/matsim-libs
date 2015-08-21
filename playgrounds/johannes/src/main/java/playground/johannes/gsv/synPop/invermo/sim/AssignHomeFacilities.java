@@ -28,7 +28,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;

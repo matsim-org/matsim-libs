@@ -35,7 +35,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import playground.johannes.synpop.data.*;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.Zone;

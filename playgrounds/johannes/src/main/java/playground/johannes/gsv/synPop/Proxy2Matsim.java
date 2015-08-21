@@ -34,7 +34,7 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;

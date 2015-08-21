@@ -34,7 +34,7 @@ import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
 import java.util.Random;

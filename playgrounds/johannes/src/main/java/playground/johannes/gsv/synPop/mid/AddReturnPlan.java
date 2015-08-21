@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainEpisode;
@@ -38,7 +38,7 @@ public class AddReturnPlan implements PersonTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override

@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 
@@ -33,7 +33,7 @@ public class CopyDate2PersonTask implements PersonTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.synpop.source.mid2008.processing.PersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override

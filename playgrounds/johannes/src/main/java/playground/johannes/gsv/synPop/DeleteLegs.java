@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes

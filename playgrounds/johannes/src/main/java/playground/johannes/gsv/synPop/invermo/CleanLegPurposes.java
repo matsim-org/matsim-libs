@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
@@ -31,7 +31,7 @@ import playground.johannes.synpop.data.Episode;
 public class CleanLegPurposes implements EpisodeTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {

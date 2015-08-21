@@ -31,4 +31,6 @@ public interface Person extends Attributable {
     List<? extends Episode> getEpisodes();
 
     void addEpisode(Episode episode);
+
+    void removeEpisode(Episode episode);
 }

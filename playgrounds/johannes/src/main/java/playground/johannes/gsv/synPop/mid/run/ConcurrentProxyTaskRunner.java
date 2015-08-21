@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;

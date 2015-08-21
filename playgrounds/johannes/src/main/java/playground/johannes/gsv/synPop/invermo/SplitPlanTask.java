@@ -24,7 +24,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.*;
 

@@ -17,15 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008.processing;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public interface EpisodeTask {
+public interface PersonTask {
 
-	void apply(Episode episode);
+	void apply(Person person);
 }

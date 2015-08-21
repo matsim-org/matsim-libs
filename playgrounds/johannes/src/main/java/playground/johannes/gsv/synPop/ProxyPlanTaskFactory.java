@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes

@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo.sim;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;

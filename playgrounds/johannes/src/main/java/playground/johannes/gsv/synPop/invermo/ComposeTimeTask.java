@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -39,7 +39,7 @@ public class ComposeTimeTask implements EpisodeTask {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes
 	 * .gsv.synPop.PlainEpisode)
 	 */
 	@Override

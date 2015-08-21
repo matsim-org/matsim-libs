@@ -26,7 +26,7 @@ import playground.johannes.gsv.synPop.mid.*;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.generator.*;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
 import java.util.Collection;

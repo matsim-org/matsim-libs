@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008.processing;
+package playground.johannes.synpop.processing;
 
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.ProgressLogger;

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.processing.EpisodeTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;

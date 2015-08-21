@@ -22,7 +22,7 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.source.mid2008.processing.TaskRunner;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.*;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;

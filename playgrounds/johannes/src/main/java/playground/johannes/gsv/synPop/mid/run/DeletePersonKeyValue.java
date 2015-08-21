@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Person;
 
 /**

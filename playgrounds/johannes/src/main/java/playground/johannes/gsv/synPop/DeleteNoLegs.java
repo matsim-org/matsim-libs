@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.source.mid2008.processing.PersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes
@@ -31,7 +31,7 @@ import playground.johannes.synpop.source.mid2008.processing.PersonTask;
 public class DeleteNoLegs implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Person person1) {
