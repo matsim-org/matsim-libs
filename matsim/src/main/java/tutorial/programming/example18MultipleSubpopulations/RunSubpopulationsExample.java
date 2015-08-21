@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -134,9 +135,11 @@ public class RunSubpopulationsExample {
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 		}
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		/* Run the model. */
 		Controler controler = new Controler(config);
+		
 		controler.run();
 	}
 
