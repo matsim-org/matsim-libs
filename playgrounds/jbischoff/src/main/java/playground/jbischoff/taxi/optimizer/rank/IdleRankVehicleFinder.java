@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
+import org.matsim.contrib.util.DistanceUtils;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;

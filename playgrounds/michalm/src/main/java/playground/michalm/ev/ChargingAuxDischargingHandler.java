@@ -28,15 +28,15 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 public class ChargingAuxDischargingHandler
     implements MobsimAfterSimStepListener
 {
-    private final List<Charger> chargers;
+    private final List<? extends Charger> chargers;
     private final int chargePeriod;
 
-    private final List<ElectricVehicle> vehicles;
+    private final List<? extends ElectricVehicle> vehicles;
     private final int auxDischargePeriod;
 
 
-    public ChargingAuxDischargingHandler(List<Charger> chargers, int chargePeriod,
-            List<ElectricVehicle> vehicles, int auxDischargePeriod)
+    public ChargingAuxDischargingHandler(List<? extends Charger> chargers, int chargePeriod,
+            List<? extends ElectricVehicle> vehicles, int auxDischargePeriod)
     {
         this.chargers = chargers;
         this.chargePeriod = chargePeriod;
@@ -51,8 +51,7 @@ public class ChargingAuxDischargingHandler
     {
         if (lastSimStepInPeriod(e.getSimulationTime(), auxDischargePeriod)) {
             for (ElectricVehicle v : vehicles) {
-                double energy = v.getAuxEnergyConsumption().calcEnergy(auxDischargePeriod);
-                v.getBattery().discharge(energy);
+                v.getAuxEnergyConsumption().useEnergy(auxDischargePeriod);
             }
         }
 

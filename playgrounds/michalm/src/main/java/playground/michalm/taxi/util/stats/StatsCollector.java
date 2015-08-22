@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,49 +20,48 @@
 package playground.michalm.taxi.util.stats;
 
 import java.io.*;
+import java.util.*;
 
-import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 
-
-public class IdleVehicleUnplannedRequestStats
+public class StatsCollector<T>
     implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener
 {
-    private static final int MAX_TIME = 30 * 60 * 60;
-    private static final int STEP = 60;
+    public interface StatsCalculator<S>
+    {
+        S calculateStat();
+    }
 
-    private final double[] idleVehs = new double[MAX_TIME / STEP];
-    private final double[] unplannedReqs = new double[MAX_TIME / STEP];
 
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final StatsCalculator<T> calculator;
+    private final List<T> stats = new ArrayList<>();
+    private final int step;
+    private final String name;
     private final String file;
 
 
-    public IdleVehicleUnplannedRequestStats(TaxiOptimizerConfiguration optimConfig, String file)
+    public StatsCollector(StatsCalculator<T> calculator, int step, String name, String file)
     {
-        this.optimConfig = optimConfig;
+        this.calculator = calculator;
+        this.step = step;
+        this.name = name;
         this.file = file;
+    }
+
+
+    public List<T> getStats()
+    {
+        return stats;
     }
 
 
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        int idx = (int)e.getSimulationTime();
-        if (idx < MAX_TIME) {
-            ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
-
-            idleVehs[idx / STEP] += Vehicles.countVehicles(taxiData.getVehicles(),
-                    TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler));
-
-            unplannedReqs[idx / STEP] += TaxiRequests.countRequestsWithStatus(
-                    taxiData.getTaxiRequests(), TaxiRequestStatus.UNPLANNED);
+        if (e.getSimulationTime() % step == 0) {
+            stats.add(calculator.calculateStat());
         }
     }
 
@@ -71,10 +70,10 @@ public class IdleVehicleUnplannedRequestStats
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         try (PrintWriter pw = new PrintWriter(file)) {
-            pw.println("time\tidleVehs\tunplReqs");
+            pw.println("time\t" + name);
 
-            for (int i = 0; i < idleVehs.length; i++) {
-                pw.println(i + "\t" + idleVehs[i] / STEP + "\t" + unplannedReqs[i] / STEP);
+            for (int i = 0; i < stats.size(); i++) {
+                pw.println(i * step + "\t" + stats.get(i));
             }
         }
         catch (FileNotFoundException e1) {

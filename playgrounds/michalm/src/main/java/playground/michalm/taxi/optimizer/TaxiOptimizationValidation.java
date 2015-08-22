@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer;
 
-import org.matsim.contrib.dvrp.data.Vehicles;
+import com.google.common.collect.Iterables;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
@@ -33,8 +33,10 @@ public class TaxiOptimizationValidation
     {
         ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
 
-        if (Vehicles.countVehicles(taxiData.getVehicles(),
-                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)) == 0) {
+        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles(),
+                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+
+        if (vehCount == 0) {
             return;//OK
         }
 

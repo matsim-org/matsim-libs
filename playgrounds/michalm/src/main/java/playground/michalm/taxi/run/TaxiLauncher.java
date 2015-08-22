@@ -28,8 +28,8 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
-import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -44,6 +44,8 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 import playground.michalm.zone.*;
 
@@ -54,10 +56,12 @@ class TaxiLauncher
     MatsimVrpContext context;
     final Scenario scenario;
     final Map<Id<Zone>, Zone> zones;
-    
+
     TravelTimeCalculator travelTimeCalculator;
     LeastCostPathCalculatorWithCache routerWithCache;
     VrpPathCalculator pathCalculator;
+
+    private TravelTime travelTime;
 
 
     TaxiLauncher(TaxiLauncherParams params)
@@ -77,7 +81,7 @@ class TaxiLauncher
                     .readTaxiCustomerIds(params.taxiCustomersFile);
             VrpPopulationUtils.convertLegModes(passengerIds, TaxiUtils.TAXI_MODE, scenario);
         }
-        
+
         if (params.zonesXmlFile != null && params.zonesShpFile != null) {
             zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
             System.err.println("No conversion of SRS is done");
@@ -95,22 +99,20 @@ class TaxiLauncher
         TimeDiscretizer timeDiscretizer = TaxiLauncherUtils.getTimeDiscretizer(scenario,
                 params.algorithmConfig.ttimeSource, params.algorithmConfig.tdisSource);
 
-        TravelTime travelTime;
-
         if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
             travelTime = new FreeSpeedTravelTime();
         }
         else {// TravelTimeSource.EVENTS
             if (travelTimeCalculator == null) {
-                travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(
-                        scenario, params.eventsFile, timeDiscretizer.getTimeInterval());
+                travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
+                        params.eventsFile, timeDiscretizer.getTimeInterval());
             }
 
             travelTime = travelTimeCalculator.getLinkTravelTimes();
         }
 
-        TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
-                params.algorithmConfig.tdisSource, travelTime);
+        TravelDisutility travelDisutility = VrpLauncherUtils
+                .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
 
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
@@ -162,6 +164,20 @@ class TaxiLauncher
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
+        //////////////////////////////////
+
+        TaxiLauncherUtils.initChargersAndVehicles(taxiData);
+        TaxiLauncherUtils.initChargingAndDischargingHandlers(taxiData, scenario.getNetwork(), qSim,
+                travelTime);
+
+        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculator(
+                StatsCalculators.createMeanSocCalculator(taxiData),
+                StatsCalculators.createDischargedVehiclesCounter(taxiData));
+        qSim.addQueueSimulationListeners(new StatsCollector<>(socStatsCalc, 600,
+                "mean [kWh]\tdischarged", params.outputDir + "SOC_stats"));
+
+        /////////////////////////////////
+
         beforeQSim(qSim);
         qSim.run();
         qSim.getEventsManager().finishProcessing();
@@ -175,7 +191,8 @@ class TaxiLauncher
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
                 params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
         TaxiScheduler scheduler = new TaxiScheduler(context, pathCalculator, schedulerParams);
-        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator,
+                scheduler);
         FilterFactory filterFactory = new DefaultFilterFactory(scheduler,
                 params.nearestRequestsLimit, params.nearestVehiclesLimit);
 

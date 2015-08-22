@@ -52,7 +52,7 @@ public class BatteryImpl
     @Override
     public void charge(double energy)
     {
-        if (energy < 0 || energy > capacity - soc) {
+        if (energy > capacity - soc) {
             throw new IllegalArgumentException();
         }
 
@@ -63,7 +63,7 @@ public class BatteryImpl
     @Override
     public void discharge(double energy)
     {
-        if (energy < 0 || energy > soc) {
+        if (energy > soc) {
             throw new IllegalStateException();
         }
 

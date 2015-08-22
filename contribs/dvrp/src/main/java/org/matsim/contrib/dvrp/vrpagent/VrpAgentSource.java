@@ -21,15 +21,13 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.util.schedule.VrpSchedulePlanFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.util.DynAgentWithPlan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -44,8 +42,6 @@ public class VrpAgentSource
     private final MatsimVrpContext context;
     private final VrpOptimizer optimizer;
     private final QSim qSim;
-
-    private VrpSchedulePlanFactory planFactory = null;
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpContext context,
@@ -78,18 +74,7 @@ public class VrpAgentSource
             mobsimVehicle.setDriver(vrpAgent);
 
             qSim.addParkedVehicle(mobsimVehicle, startLinkId);
-            if (planFactory != null) {
-                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(vrpAgent, planFactory));
-            }
-            else {
-                qSim.insertAgentIntoMobsim(vrpAgent);
-            }
+            qSim.insertAgentIntoMobsim(vrpAgent);
         }
-    }
-
-
-    public void useDynAgentWithPlan(Scenario scenario)
-    {
-        planFactory = new VrpSchedulePlanFactory(scenario);
     }
 }

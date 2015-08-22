@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,13 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent.util;
+package playground.michalm.taxi.data;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+
+import playground.michalm.ev.AuxEnergyConsumption;
 
 
-public interface DynPlanFactory
+public class ETaxiAuxEnergyConsumption
+    implements AuxEnergyConsumption
 {
-    Plan create(DynAgent agent);
+    private final ETaxi taxi;
+    private final double auxPower;
+
+
+    public ETaxiAuxEnergyConsumption(ETaxi taxi, double auxPower)
+    {
+        this.taxi = taxi;
+        this.auxPower = auxPower;
+    }
+
+
+    @Override
+    public void useEnergy(double period)
+    {
+        if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {
+            taxi.getBattery().discharge(auxPower * period);
+        }
+    }
 }

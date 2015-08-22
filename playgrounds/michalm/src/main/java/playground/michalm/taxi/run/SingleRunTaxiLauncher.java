@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.chart.ChartWindowUtils;
-import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
+import org.matsim.contrib.dvrp.util.Schedules2GIS;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.util.chart.ChartWindowUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;

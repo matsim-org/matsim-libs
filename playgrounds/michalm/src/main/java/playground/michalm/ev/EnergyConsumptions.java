@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.schedule;
+package playground.michalm.ev;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.util.DynPlanFactory;
+import org.matsim.api.core.v01.network.Link;
 
 
-public class VrpSchedulePlanFactory
-    implements DynPlanFactory
+public class EnergyConsumptions
 {
-    private Scenario scenario;
-
-
-    public VrpSchedulePlanFactory(Scenario scenario)
+    public static DriveEnergyConsumption createFixedDriveEnergyConsumption(final ElectricVehicle ev,
+            final double rate)
     {
-        this.scenario = scenario;
+        return new DriveEnergyConsumption() {
+            public void useEnergy(Link link, double travelTime)
+            {
+                ev.getBattery().discharge(rate * link.getLength());
+            }
+        };
     }
 
 
-    @Override
-    public Plan create(DynAgent agent)
+    public static AuxEnergyConsumption createFixedAuxEnergyConsumption(final ElectricVehicle ev,
+            final double auxPower)
     {
-        VrpAgentLogic agentLogic = (VrpAgentLogic)agent.getAgentLogic();
-        return new VrpSchedulePlan(agentLogic.getVehicle(), scenario);
+        return new AuxEnergyConsumption() {
+            public void useEnergy(double period)
+            {
+                ev.getBattery().discharge(auxPower * period);
+            }
+        };
     }
 }

@@ -21,58 +21,17 @@ package org.matsim.contrib.dvrp.util.chart;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 
 import com.google.common.collect.Lists;
 
 
-public class LinkSources
+public class ScheduleCoordSources
 {
-    public static abstract class AbstractCoordSource<T>
-        implements CoordSource
-    {
-        private List<T> list;
-
-
-        public AbstractCoordSource(List<T> list)
-        {
-            this.list = list;
-        }
-
-
-        @Override
-        public int getCount()
-        {
-            return list.size();
-        }
-
-
-        @Override
-        public Coord getCoord(int index)
-        {
-            return getCoord(list.get(index));
-        }
-
-
-        protected abstract Coord getCoord(T item);
-    }
-
-
-    public static <T extends BasicLocation<T>> CoordSource createFromBasicLocations(
-            final List<T> basicLocations)
-    {
-        return new AbstractCoordSource<T>(basicLocations) {
-            protected Coord getCoord(T item)
-            {
-                return item.getCoord();
-            };
-        };
-    }
-
-
     // n DriveTasks -> n+1 Links
-    public static CoordSource createFromDriveTasks(final List<DriveTask> tasks)
+    public static CoordSource createCoordSource(final List<DriveTask> tasks)
     {
         return new CoordSource() {
 
@@ -98,9 +57,9 @@ public class LinkSources
 
 
     // Schedule -> n DriveTasks -> n+1 Links
-    public static CoordSource createLinkSource(Schedule<?> schedule)
+    public static CoordSource createCoordSource(Schedule<?> schedule)
     {
-        List<DriveTask> tasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
-        return LinkSources.createFromDriveTasks(tasks);
+        List<DriveTask> driveTasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
+        return ScheduleCoordSources.createCoordSource(driveTasks);
     }
 }

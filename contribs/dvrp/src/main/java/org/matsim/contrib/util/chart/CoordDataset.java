@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.chart;
+package org.matsim.contrib.util.chart;
 
 import java.util.*;
 
@@ -34,6 +34,15 @@ public class CoordDataset
     extends AbstractXYDataset
     implements XYDataset
 {
+    public interface CoordSource
+    {
+        int getCount();
+
+
+        Coord getCoord(int item);
+    }
+
+
     private List<Comparable<String>> seriesKeys;
     private List<CoordSource> seriesList;
 

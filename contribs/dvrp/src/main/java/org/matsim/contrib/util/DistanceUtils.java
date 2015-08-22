@@ -1,4 +1,4 @@
-package org.matsim.contrib.dvrp.util;
+package org.matsim.contrib.util;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;

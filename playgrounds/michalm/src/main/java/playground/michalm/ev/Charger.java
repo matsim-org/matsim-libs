@@ -21,15 +21,17 @@ package playground.michalm.ev;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.facilities.Facility;
 
 
 public interface Charger
     extends BasicLocation<Charger>
 {
     ChargingLogic getLogic();
-    
-    
+
+
+    void setLogic(ChargingLogic logic);
+
+
     Link getLink();
 
 

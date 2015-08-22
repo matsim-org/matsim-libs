@@ -32,6 +32,8 @@ import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.util.chart.CoordDataset;
+import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 
 
 /**
@@ -45,7 +47,7 @@ public class RouteChartUtils
 
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
-            lData.addSeries(Integer.toString(i), LinkSources.createLinkSource(schedule));
+            lData.addSeries(Integer.toString(i), ScheduleCoordSources.createCoordSource(schedule));
         }
 
         JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData,
@@ -166,7 +168,7 @@ public class RouteChartUtils
         Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {
-            linkSourceByStatus.put(ts, LinkSources.createFromDriveTasks(taskListByStatus.get(ts)));
+            linkSourceByStatus.put(ts, ScheduleCoordSources.createCoordSource(taskListByStatus.get(ts)));
         }
 
         return linkSourceByStatus;

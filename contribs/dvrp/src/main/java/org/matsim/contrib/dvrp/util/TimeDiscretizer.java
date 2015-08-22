@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.time;
+package org.matsim.contrib.dvrp.util;
 
 public class TimeDiscretizer
 {

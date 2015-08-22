@@ -32,19 +32,19 @@ public class PartialFastChargingWithQueueingLogic
 {
     private static final double MAX_RELATIVE_SOC = 0.8;
 
-    private final ChargerImpl charger;
+    private final Charger charger;
     private final Queue<ElectricVehicle> vehicles = new LinkedList<>();
     private final Iterable<ElectricVehicle> pluggedVehicles;
 
 
-    public PartialFastChargingWithQueueingLogic(ChargerImpl charger)
+    public PartialFastChargingWithQueueingLogic(Charger charger)
     {
         this.charger = charger;
         pluggedVehicles = Iterables.limit(vehicles, charger.getCapacity());
+        charger.setLogic(this);
     }
 
 
-    @Override
     public Charger getCharger()
     {
         return charger;

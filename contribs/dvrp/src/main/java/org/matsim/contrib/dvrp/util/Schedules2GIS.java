@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.gis;
+package org.matsim.contrib.dvrp.util;
 
 import java.io.File;
 import java.util.*;

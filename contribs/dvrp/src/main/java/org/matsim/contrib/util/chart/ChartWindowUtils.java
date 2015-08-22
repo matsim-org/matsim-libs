@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.chart;
+package org.matsim.contrib.util.chart;
 
 import java.awt.Dimension;
 
