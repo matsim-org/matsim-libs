@@ -19,8 +19,7 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -33,18 +32,18 @@ class KNTaxiLauncher
 {
     /**
      * @param removeNonPassengers if {@code true}, only taxi traffic is simulated
- * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0
- * @param useOTFVis TODO
- * @param file path to the configuration file (e.g. param.in)
+     * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0
+     * @param useOTFVis TODO
+     * @param file path to the configuration file (e.g. param.in)
      */
     public static void run(TaxiLauncherParams params, boolean removeNonPassengers,
             boolean endActivitiesAtTimeZero, boolean useOTFVis)
     {
 
         SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
-        
-//        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in" ;
-//        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
+
+        //        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in" ;
+        //        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
 
         if (removeNonPassengers) {
             VrpPopulationUtils.removePersonsNotUsingMode(TaxiUtils.TAXI_MODE, launcher.scenario);
@@ -54,10 +53,10 @@ class KNTaxiLauncher
             }
         }
 
-        if ( useOTFVis ) {
-      	  OTFVisConfigGroup otfConfig = new OTFVisConfigGroup();
-      	  launcher.scenario.getConfig().addModule(otfConfig);
-      	  otfConfig.setLinkWidth(2);
+        if (useOTFVis) {
+            OTFVisConfigGroup otfConfig = new OTFVisConfigGroup();
+            launcher.scenario.getConfig().addModule(otfConfig);
+            otfConfig.setLinkWidth(2);
         }
 
         launcher.initVrpPathCalculator();
@@ -100,7 +99,7 @@ class KNTaxiLauncher
         params.put("histogramOutDirName", "histograms");
 
         params.put("writeSimEvents", "!true");
-        
+
         return new TaxiLauncherParams(params);
     }
 
@@ -122,9 +121,9 @@ class KNTaxiLauncher
         //path pattern: mielec-2-peaks-new-$supply$-$demand$
         //String file = "./src/main/resources/mielec-2-peaks_2014_02/params-gui.in";
         //String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
-//        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in";
-//        TaxiLauncherParams params = TaxiLauncherParams.readParams(file);
-        
+        //        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in";
+        //        TaxiLauncherParams params = TaxiLauncherParams.readParams(file);
+
         TaxiLauncherParams params = createParams();
         run(params, true, false, true);
     }

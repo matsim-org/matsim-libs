@@ -37,7 +37,8 @@ public class RunVehicleCount
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         VrpData data = new VrpDataImpl();
         VehicleReader reader = new VehicleReader(scenario, data);
-        reader.parse("d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
+        reader.parse(
+                "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 
         VehicleCounter counter = new VehicleCounter(data.getVehicles());
         List<Integer> counts = counter.countVehiclesOverTime(5 * 60);

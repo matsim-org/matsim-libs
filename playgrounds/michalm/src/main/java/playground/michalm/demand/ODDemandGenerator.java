@@ -117,7 +117,8 @@ public class ODDemandGenerator
 
 
     public void generateMultiplePeriods(Matrix[] matrices, String fromActivityType,
-            String toActivityType, String mode, double startTime, double duration, double flowCoeffs)
+            String toActivityType, String mode, double startTime, double duration,
+            double flowCoeffs)
     {
         for (int i = 0; i < matrices.length; i++) {
             generateSinglePeriod(matrices[i], fromActivityType, toActivityType, mode, startTime,

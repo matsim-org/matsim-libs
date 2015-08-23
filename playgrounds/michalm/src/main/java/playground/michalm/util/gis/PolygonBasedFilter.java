@@ -66,11 +66,11 @@ public class PolygonBasedFilter
     }
 
 
-    public static Iterable<? extends Link> filterLinksOutsidePolygon(
-            Iterable<? extends Link> links, Geometry polygonGeometry, boolean includeBorderLinks)
+    public static Iterable<? extends Link> filterLinksOutsidePolygon(Iterable<? extends Link> links,
+            Geometry polygonGeometry, boolean includeBorderLinks)
     {
-        return Iterables.filter(links, Predicates.not(createLinkInsidePolygonPredicate(
-                polygonGeometry, !includeBorderLinks)));// includeBorderLinks must be negated
+        return Iterables.filter(links, Predicates
+                .not(createLinkInsidePolygonPredicate(polygonGeometry, !includeBorderLinks)));// includeBorderLinks must be negated
     }
 
 

@@ -41,7 +41,7 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 	public PrtControllerListener(PrtConfigGroup config, Controler controler, MatsimVrpContextImpl context,
 			PrtData data) {
 		
-		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(), context.getVrpData().getVehicles(),
+		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(),
 				config.getFixedCost(), config.getVariableCostsD());
 		this.cc = new CostContainers2PersonMoneyEvent(controler, cch);
 		this.rsh = new PrtRankAndPassengerStatsHandler(context, data);

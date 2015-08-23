@@ -30,7 +30,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 

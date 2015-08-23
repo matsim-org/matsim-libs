@@ -128,7 +128,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 
 	}
 	
-	private void resetSchedules(List<Vehicle> vehicles) {
+	private void resetSchedules(Iterable<Vehicle> vehicles) {
 
     	for (Vehicle v : vehicles){
     		VehicleImpl vi = (VehicleImpl) v;

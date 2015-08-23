@@ -90,7 +90,7 @@ public class VrpLeg
         if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
             throw new IllegalStateException();
         }
-        
+
         //divertedPath must be derived from the original one 
         if (divertedPath.getOriginalPath() != path) {
             throw new IllegalArgumentException();

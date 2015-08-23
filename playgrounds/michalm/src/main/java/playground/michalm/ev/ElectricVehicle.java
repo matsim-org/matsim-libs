@@ -28,8 +28,8 @@ public interface ElectricVehicle
 
 
     Battery getBattery();
-    
-    
+
+
     //used for swapping
     void setBattery(Battery battery);
 }

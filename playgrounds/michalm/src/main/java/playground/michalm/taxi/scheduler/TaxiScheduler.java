@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -67,7 +67,8 @@ public class TaxiScheduler
     public boolean isIdle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
-        if (context.getTime() >= vehicle.getT1() || schedule.getStatus() != ScheduleStatus.STARTED) {
+        if (context.getTime() >= vehicle.getT1()
+                || schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
@@ -514,7 +515,8 @@ public class TaxiScheduler
                     return 0;
                 }
 
-                if (TaxiSchedules.getNextTaxiTask(currentTask).getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                if (TaxiSchedules.getNextTaxiTask(currentTask)
+                        .getTaxiTaskType() == TaxiTaskType.PICKUP) {
                     //if no diversion and driving to pick up sb then serve that request
                     return params.destinationKnown ? 3 : null;
                 }

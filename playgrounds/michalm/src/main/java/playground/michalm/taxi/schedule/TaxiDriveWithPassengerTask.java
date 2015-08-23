@@ -36,7 +36,8 @@ public class TaxiDriveWithPassengerTask
     {
         super(path);
 
-        if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
+        if (request.getFromLink() != path.getFromLink()
+                && request.getToLink() != path.getToLink()) {
             throw new IllegalArgumentException();
         }
 

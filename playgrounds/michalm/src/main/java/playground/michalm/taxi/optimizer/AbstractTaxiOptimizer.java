@@ -68,11 +68,11 @@ public abstract class AbstractTaxiOptimizer
             }
 
             scheduleUnplannedRequests();
-            
+
             if (doUnscheduleAwaitingRequests && vehicleDiversion) {
                 handleAimlessDriveTasks();
             }
-            
+
             requiresReoptimization = false;
         }
     }
@@ -88,12 +88,12 @@ public abstract class AbstractTaxiOptimizer
 
     protected abstract void scheduleUnplannedRequests();
 
-    
+
     protected void handleAimlessDriveTasks()
     {
         optimConfig.scheduler.stopAllAimlessDriveTasks();
     }
-    
+
 
     @Override
     public void requestSubmitted(Request request)

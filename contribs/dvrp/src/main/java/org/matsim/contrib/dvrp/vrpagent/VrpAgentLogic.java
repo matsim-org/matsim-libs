@@ -118,6 +118,7 @@ public class VrpAgentLogic
 
     private DynActivity createAfterScheduleActivity()
     {
-        return new StaticDynActivity("After schedule: " + vehicle.getId(), Double.POSITIVE_INFINITY);
+        return new StaticDynActivity("After schedule: " + vehicle.getId(),
+                Double.POSITIVE_INFINITY);
     }
 }

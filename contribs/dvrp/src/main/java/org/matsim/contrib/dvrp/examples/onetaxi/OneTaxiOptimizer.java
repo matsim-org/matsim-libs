@@ -51,10 +51,10 @@ public class OneTaxiOptimizer
         this.context = context;
         this.pathCalculator = calculator;
 
-        vehicle = context.getVrpData().getVehicles().get(0);
+        vehicle = context.getVrpData().getVehicles().iterator().next();
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
-        schedule.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(),
-                "wait"));
+        schedule.addTask(
+                new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
     }
 
 

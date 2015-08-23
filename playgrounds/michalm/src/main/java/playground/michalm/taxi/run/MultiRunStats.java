@@ -44,23 +44,24 @@ public class MultiRunStats
 
     void printStats(PrintWriter pw, String cfg, VrpData data)
     {
-        pw.printf("%20s\t%d\t%d\t"//
-                + "%.0f\t"//
-                + "%.0f\t"//
-                + "%.0f\t"//
-                + "%.0f\t"//
-                + "%.2f\t"//
-                + "%.1f\n",//
-                cfg,//
-                data.getRequests().size(),//
-                data.getVehicles().size(),//
+        pw.printf(
+                "%20s\t%d\t%d\t"//
+                        + "%.0f\t"//
+                        + "%.0f\t"//
+                        + "%.0f\t"//
+                        + "%.0f\t"//
+                        + "%.2f\t"//
+                        + "%.1f\n", //
+                cfg, //
+                data.getRequests().size(), //
+                data.getVehicles().size(), //
                 //
-                passengerWaitTime.getMean(),//
+                passengerWaitTime.getMean(), //
                 pc95PassengerWaitTime.getMean(), //
-                maxPassengerWaitTime.getMean(),//
+                maxPassengerWaitTime.getMean(), //
                 //
-                driveWithPassengerTime.getMean(),//
-                driveEmptyRatio.getMean() * 100,//in [%]
+                driveWithPassengerTime.getMean(), //
+                driveEmptyRatio.getMean() * 100, //in [%]
                 //
                 computationTime.getMean());
     }

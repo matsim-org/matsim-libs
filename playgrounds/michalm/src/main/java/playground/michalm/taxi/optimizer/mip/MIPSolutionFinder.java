@@ -24,13 +24,13 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
+import com.google.common.collect.Iterables;
+
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.fifo.FifoSchedulingProblem;
 import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
 import playground.michalm.taxi.schedule.*;
-
-import com.google.common.collect.Iterables;
 
 
 class MIPSolutionFinder
@@ -65,7 +65,8 @@ class MIPSolutionFinder
         double t_P = optimConfig.scheduler.getParams().pickupDuration;
 
         for (int k = 0; k < m; k++) {
-            Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vData.entries.get(k).vehicle.getSchedule());
+            Schedule<TaxiTask> schedule = TaxiSchedules
+                    .asTaxiSchedule(vData.entries.get(k).vehicle.getSchedule());
             Iterable<TaxiRequest> reqs = TaxiSchedules.getTaxiRequests(schedule);
             Iterable<TaxiRequest> plannedReqs = Iterables.filter(reqs, TaxiRequests.IS_PLANNED);
 

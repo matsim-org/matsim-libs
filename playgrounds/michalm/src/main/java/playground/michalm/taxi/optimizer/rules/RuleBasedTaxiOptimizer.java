@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.data.*;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.*;
 
@@ -126,8 +126,8 @@ public class RuleBasedTaxiOptimizer
         while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
             Vehicle veh = vehIter.next();
 
-            Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(
-                    unplannedRequests, veh);
+            Iterable<TaxiRequest> filteredReqs = requestFilter
+                    .filterRequestsForVehicle(unplannedRequests, veh);
             VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
                     filteredReqs, VehicleRequestPaths.TP_COST);
 

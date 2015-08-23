@@ -21,11 +21,11 @@ package playground.michalm.taxi.schedule;
 
 import org.matsim.contrib.dvrp.schedule.*;
 
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-
 import com.google.common.base.*;
 import com.google.common.collect.Iterables;
+
+import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class TaxiSchedules

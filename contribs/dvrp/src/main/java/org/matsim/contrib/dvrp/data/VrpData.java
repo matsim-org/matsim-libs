@@ -19,15 +19,15 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.List;
+import java.util.Collection;
 
 
 public interface VrpData
 {
-    List<Vehicle> getVehicles();
+    Collection<Vehicle> getVehicles();
 
 
-    List<Request> getRequests();
+    Collection<Request> getRequests();
 
 
     void addVehicle(Vehicle vehicle);

@@ -55,7 +55,7 @@ class MielecMultiThreadMultiRunTaxiLauncher
                 service.execute(new Runnable() {
                     public void run()
                     {
-                        MultiRunTaxiLauncher.runAll(RUNS, params,//
+                        MultiRunTaxiLauncher.runAll(RUNS, params, //
                                 RULE_TW_xx, //
                                 RULE_TP_xx, //
                                 RULE_DSE_xx);

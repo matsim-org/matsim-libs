@@ -19,18 +19,16 @@
 
 package playground.michalm.util.gis;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 public class SubNetworkCreator
@@ -50,8 +48,8 @@ public class SubNetworkCreator
         List<Link> allLinks = new ArrayList<>(network.getLinks().values());
 
         Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
-        Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(
-                allLinks, polygonGeometry, true);
+        Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(allLinks,
+                polygonGeometry, true);
 
         for (Link link : outerLinks) {
             network.removeLink(link.getId());

@@ -36,11 +36,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class Schedules2GIS
 {
-    private final List<? extends Vehicle> vehicles;
+    private final Iterable<? extends Vehicle> vehicles;
     private final PolylineFeatureFactory factory;
 
 
-    public Schedules2GIS(List<? extends Vehicle> vehicles, String coordSystem)
+    public Schedules2GIS(Iterable<? extends Vehicle> vehicles, String coordSystem)
     {
         this.vehicles = vehicles;
 

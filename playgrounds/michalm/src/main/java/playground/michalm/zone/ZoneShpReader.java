@@ -51,8 +51,8 @@ public class ZoneShpReader
         Collection<SimpleFeature> features = shpReader.readFileAndInitialize(file);
 
         if (features.size() != zones.size()) {
-            throw new RuntimeException("Features#: " + features.size() + "; zones#: "
-                    + zones.size());
+            throw new RuntimeException(
+                    "Features#: " + features.size() + "; zones#: " + zones.size());
         }
 
         for (SimpleFeature ft : features) {

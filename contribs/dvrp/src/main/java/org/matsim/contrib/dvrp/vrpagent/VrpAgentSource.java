@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -57,10 +55,8 @@ public class VrpAgentSource
     @Override
     public void insertAgentsIntoMobsim()
     {
-        List<Vehicle> vehicles = context.getVrpData().getVehicles();
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
-
-        for (Vehicle vrpVeh : vehicles) {
+        for (Vehicle vrpVeh : context.getVrpData().getVehicles()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 

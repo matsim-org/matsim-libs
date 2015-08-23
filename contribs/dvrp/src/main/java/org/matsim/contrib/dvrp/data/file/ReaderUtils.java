@@ -36,8 +36,8 @@ public class ReaderUtils
         String val = atts.getValue(qName);
         return val != null ? Integer.parseInt(val) : defaultValue;
     }
-    
-    
+
+
     public static String getString(Attributes atts, String qName, String defaultValue)
     {
         String val = atts.getValue(qName);

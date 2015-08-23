@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.data.VrpDataImpl;
 
-import playground.michalm.ev.*;
+import playground.michalm.ev.Charger;
 
 
 public class ETaxiData

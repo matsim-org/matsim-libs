@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.michalm.zone.*;
-
 import com.vividsolutions.jts.geom.MultiPolygon;
+
+import playground.michalm.zone.*;
 
 
 public class PoznanZones

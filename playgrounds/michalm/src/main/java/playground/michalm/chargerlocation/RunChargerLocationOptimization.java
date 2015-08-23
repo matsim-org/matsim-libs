@@ -134,8 +134,8 @@ public class RunChargerLocationOptimization
         double totalEnergyConsumed = //
         Math.max(eScenario.energyPerVehicle - (includeDeltaSoc ? DELTA_SOC : 0), 0)
                 * HORIZON.vehicleCount;
-        ZoneData zoneData = new ZoneData(zones, zonePotentials, totalEnergyConsumed
-                / totalPotential);
+        ZoneData zoneData = new ZoneData(zones, zonePotentials,
+                totalEnergyConsumed / totalPotential);
 
         //read/create stations at either zone centroids or ranks 
         List<ChargingStation> stations = new ArrayList<>();
@@ -155,7 +155,8 @@ public class RunChargerLocationOptimization
     }
 
 
-    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile, TimeHorizon horizon)
+    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile,
+            TimeHorizon horizon)
     {
         if (horizon == TimeHorizon._24H) {
             //TODO does not work for 24h: should be Mon 4am till Fri 4am
@@ -208,8 +209,8 @@ public class RunChargerLocationOptimization
     {
         String dir = "d:/PP-rad/berlin/chargerLocation/";
         String name = eScenario.name() + (includeDeltaSoc ? "_DeltaSOC" : "_noDeltaSOC");
-        writeChargers(solution.x, dir + "chargers_out_of_" + problem.maxChargers + "_" + name
-                + ".csv");
+        writeChargers(solution.x,
+                dir + "chargers_out_of_" + problem.maxChargers + "_" + name + ".csv");
         writeFlows(solution.f, dir + "flows_" + name + ".csv");
     }
 
@@ -258,7 +259,7 @@ public class RunChargerLocationOptimization
     {
         for (EScenario es : EScenario.values()) {
             System.err.println("==========================" + es.name());
-//            new RunChargerLocationOptimization(es, true).solveProblem();
+            //            new RunChargerLocationOptimization(es, true).solveProblem();
             new RunChargerLocationOptimization(es, false).solveProblem();
         }
     }
