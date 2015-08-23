@@ -54,7 +54,7 @@ public class NPersonsProblem {
             TaxiRequest req = unplannedRequests.peek();
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles(), vrpComparator);
+                    optimConfig.context.getVrpData().getVehicles().values(), vrpComparator);
 
             if (best == null) {
 //            	log.info("No vrp found for request " + req.getId().toString() + " at " + 

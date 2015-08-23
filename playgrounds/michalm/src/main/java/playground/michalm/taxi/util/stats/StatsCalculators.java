@@ -59,7 +59,7 @@ public class StatsCalculators
             public Integer calculateStat()
             {
                 return Iterables
-                        .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles(),
+                        .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
                                 TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
             }
         };
@@ -73,7 +73,7 @@ public class StatsCalculators
             @Override
             public Integer calculateStat()
             {
-                return TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests(),
+                return TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
                         requestStatus);
             }
         };
@@ -87,7 +87,7 @@ public class StatsCalculators
             public Integer calculateStat()
             {
                 int count = 0;
-                for (ETaxi t : taxiData.getETaxis()) {
+                for (ETaxi t : taxiData.getETaxis().values()) {
                     if (t.getBattery().getSoc() < 0) {
                         count++;
                     }
@@ -105,7 +105,7 @@ public class StatsCalculators
             public Double calculateStat()
             {
                 Mean mean = new Mean();
-                for (ETaxi t : taxiData.getETaxis()) {
+                for (ETaxi t : taxiData.getETaxis().values()) {
                     mean.increment(t.getBattery().getSoc());
                 }
                 return mean.getResult() / UnitConversionRatios.J_PER_kWh;//print out in [kWh]

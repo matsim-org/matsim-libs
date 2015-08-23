@@ -63,7 +63,7 @@ public abstract class AbstractTaxiOptimizer
                 unscheduleAwaitingRequests();
             }
 
-            for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+            for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
                 optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
             }
 

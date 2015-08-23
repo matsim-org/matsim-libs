@@ -21,7 +21,8 @@ package playground.michalm.taxi.data;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.*;
 
 import playground.michalm.ev.Charger;
 
@@ -29,53 +30,55 @@ import playground.michalm.ev.Charger;
 public class ETaxiData
     extends VrpDataImpl
 {
-    private final Collection<TaxiRank> taxiRanks = new ArrayList<>();
-    private final Collection<Charger> chargers = new ArrayList<>();
+    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
+    private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 
-    private final Collection<TaxiRank> unmodifiableTaxiRanks = Collections.unmodifiableCollection(taxiRanks);
-    private final Collection<Charger> unmodifiableChargers = Collections.unmodifiableCollection(chargers);
+    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
+            .unmodifiableMap(taxiRanks);
+    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
+            .unmodifiableMap(chargers);
 
 
-    public Collection<TaxiRank> getTaxiRanks()
+    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
     {
         return unmodifiableTaxiRanks;
     }
 
 
-    public Collection<Charger> getChargers()
+    public Map<Id<Charger>, Charger> getChargers()
     {
         return unmodifiableChargers;
     }
 
 
-    public Collection<ETaxi> getETaxis()
+    public Map<Id<Vehicle>, ETaxi> getETaxis()
     {
-        return convertCollection(getVehicles());
+        return convertMap(getVehicles());
     }
 
 
-    public Collection<TaxiRequest> getTaxiRequests()
+    public Map<Id<Request>, TaxiRequest> getTaxiRequests()
     {
-        return convertCollection(getRequests());
+        return convertMap(getRequests());
     }
 
 
     public void addTaxiRank(TaxiRank taxiRank)
     {
-        taxiRanks.add(taxiRank);
+        taxiRanks.put(taxiRank.getId(), taxiRank);
     }
 
 
     public void addCharger(Charger charger)
     {
-        chargers.add(charger);
+        chargers.put(charger.getId(), charger);
     }
 
 
     //casts Collection of supertype S to Collection of type T
     @SuppressWarnings("unchecked")
-    private static <S, T> Collection<T> convertCollection(Collection<S> collection)
+    private static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
     {
-        return (Collection<T>)collection;
+        return (Map<I, T>)collection;
     }
 }

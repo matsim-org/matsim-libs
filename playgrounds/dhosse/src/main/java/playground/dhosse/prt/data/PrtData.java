@@ -17,7 +17,7 @@ public class PrtData extends ETaxiData {
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
 	public PrtData(Network network, ETaxiData data){
-		this.vehicleRanks = data.getTaxiRanks();
+		this.vehicleRanks = data.getTaxiRanks().values();
 		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
 		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);
 	}

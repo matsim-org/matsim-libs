@@ -56,7 +56,7 @@ public class VrpAgentSource
     public void insertAgentsIntoMobsim()
     {
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
-        for (Vehicle vrpVeh : context.getVrpData().getVehicles()) {
+        for (Vehicle vrpVeh : context.getVrpData().getVehicles().values()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 

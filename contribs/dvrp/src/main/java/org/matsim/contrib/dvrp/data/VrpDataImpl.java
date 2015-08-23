@@ -21,6 +21,8 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
+
 
 /**
  * @author michalm
@@ -28,22 +30,24 @@ import java.util.*;
 public class VrpDataImpl
     implements VrpData
 {
-    private final Collection<Vehicle> vehicles = new ArrayList<>();
-    private final Collection<Request> requests = new ArrayList<>();
+    private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
+    private final Map<Id<Request>, Request> requests = new LinkedHashMap<>();
 
-    private final Collection<Vehicle> unmodifiableVehicles = Collections.unmodifiableCollection(vehicles);
-    private final Collection<Request> unmodifiableRequests = Collections.unmodifiableCollection(requests);
+    private final Map<Id<Vehicle>, Vehicle> unmodifiableVehicles = Collections
+            .unmodifiableMap(vehicles);
+    private final Map<Id<Request>, Request> unmodifiableRequests = Collections
+            .unmodifiableMap(requests);
 
 
     @Override
-    public Collection<Vehicle> getVehicles()
+    public Map<Id<Vehicle>, Vehicle> getVehicles()
     {
         return unmodifiableVehicles;
     }
 
 
     @Override
-    public Collection<Request> getRequests()
+    public Map<Id<Request>, Request> getRequests()
     {
         return unmodifiableRequests;
     }
@@ -52,13 +56,13 @@ public class VrpDataImpl
     @Override
     public void addVehicle(Vehicle vehicle)
     {
-        vehicles.add(vehicle);
+        vehicles.put(vehicle.getId(), vehicle);
     }
 
 
     @Override
     public void addRequest(Request request)
     {
-        requests.add(request);
+        requests.put(request.getId(), request);
     }
 }

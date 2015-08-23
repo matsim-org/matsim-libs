@@ -212,7 +212,7 @@ class TaxiLauncher
     void validateResults(ETaxiData taxiData)
     {
         // check if all reqs have been served
-        for (TaxiRequest r : taxiData.getTaxiRequests()) {
+        for (TaxiRequest r : taxiData.getTaxiRequests().values()) {
             if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }

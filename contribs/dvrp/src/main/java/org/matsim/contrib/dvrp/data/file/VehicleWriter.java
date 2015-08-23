@@ -22,7 +22,7 @@ public class VehicleWriter
     public void write(String file)
     {
         openFile(file);
-        writeDoctype("vehicles", "http://matsim.org/files/dtd/vehicles_v1.dtd");
+        writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd");
         writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
         writeVehicles();
         writeEndTag("vehicles");

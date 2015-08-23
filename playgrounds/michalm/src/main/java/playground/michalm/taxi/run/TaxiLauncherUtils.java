@@ -67,7 +67,7 @@ public class TaxiLauncherUtils
     public static void initChargersAndVehicles(ETaxiData taxiData)
     {
         // TODO reduce charging speed in winter
-        for (Charger c : taxiData.getChargers()) {
+        for (Charger c : taxiData.getChargers().values()) {
             new PartialFastChargingWithQueueingLogic(c);
         }
 
@@ -77,7 +77,7 @@ public class TaxiLauncherUtils
         double driveRate = 150. * 3.6; //15 kWh / 100 km == 150 Wh/km; converted into J/m
         double auxPower = 500; //0.5 kW 
 
-        for (ETaxi t : taxiData.getETaxis()) {
+        for (ETaxi t : taxiData.getETaxis().values()) {
             t.setDriveEnergyConsumption(
                     EnergyConsumptions.createFixedDriveEnergyConsumption(t, driveRate));
             t.setAuxEnergyConsumption(new ETaxiAuxEnergyConsumption(t, auxPower));
@@ -94,15 +94,15 @@ public class TaxiLauncherUtils
             QSim qSim, TravelTime travelTime)
     {
         Map<Id<Person>, ETaxi> driverToTaxi = new HashMap<>();
-        for (ETaxi t : taxiData.getETaxis()) {
+        for (ETaxi t : taxiData.getETaxis().values()) {
             driverToTaxi.put(Id.createPersonId(t.getId()), t);
         }
 
         qSim.getEventsManager()
                 .addHandler(new DriveDischargingHandler(driverToTaxi, network, travelTime));
 
-        qSim.addQueueSimulationListeners(new ChargingAuxDischargingHandler(taxiData.getChargers(),
-                CHARGE_TIME_STEP, taxiData.getETaxis(), AUX_DISCHARGE_TIME_STEP));
+        qSim.addQueueSimulationListeners(new ChargingAuxDischargingHandler(taxiData.getChargers().values(),
+                CHARGE_TIME_STEP, taxiData.getETaxis().values(), AUX_DISCHARGE_TIME_STEP));
     }
 
 }

@@ -117,7 +117,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestDistance = 1e9;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : vehicles) {
@@ -155,7 +155,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
@@ -179,7 +179,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
@@ -210,7 +210,7 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestFIFOVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;
@@ -245,7 +245,7 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestWillingVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;

@@ -51,7 +51,7 @@ public class TaxiScheduler
         this.calculator = calculator;
         this.params = params;
 
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
             schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
@@ -247,7 +247,7 @@ public class TaxiScheduler
      */
     public void stopAllAimlessDriveTasks()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             if (getImmediateDiversion(veh) != null) {
                 stopVehicle(veh);
             }
@@ -431,7 +431,7 @@ public class TaxiScheduler
     public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             removeAwaitingRequestsImpl(TaxiSchedules.asTaxiSchedule(veh.getSchedule()));
         }
 

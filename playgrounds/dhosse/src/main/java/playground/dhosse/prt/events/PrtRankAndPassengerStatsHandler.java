@@ -68,7 +68,7 @@ public class PrtRankAndPassengerStatsHandler implements ActivityStartEventHandle
 		if(!vehicleId.toString().equals(event.getPersonId().toString())){
 			//it's not the driver
 		    Vehicle vehicle = null;
-			for(Vehicle v : this.context.getVrpData().getVehicles()){
+			for(Vehicle v : this.context.getVrpData().getVehicles().values()){
 				if(v.getId().equals(vehicleId)){
 				    vehicle = v;
 					break;
@@ -125,7 +125,7 @@ public class PrtRankAndPassengerStatsHandler implements ActivityStartEventHandle
 		if(!vehicleId.toString().equals(event.getPersonId().toString())){
 			//it's not the driver
 			Vehicle vehicle = null;
-			for(Vehicle v : this.context.getVrpData().getVehicles()){
+			for(Vehicle v : this.context.getVrpData().getVehicles().values()){
 				if(v.getId().equals(vehicleId)){
 				    vehicle = v;
 					break;

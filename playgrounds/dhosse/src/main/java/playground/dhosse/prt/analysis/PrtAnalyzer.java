@@ -124,7 +124,7 @@ public class PrtAnalyzer {
 			writer.write("vehicle id;ttime;tdis;n passengers");
 			writer.newLine();
 			
-			for(Vehicle vehicle : data.getVehicles()){
+			for(Vehicle vehicle : data.getVehicles().values()){
 				
 				String vehIdString = vehicle.getId().toString();
 				String ttimeString = Double.toString(handler.travelTimesPerVehicle.get(vehicle.getId()));

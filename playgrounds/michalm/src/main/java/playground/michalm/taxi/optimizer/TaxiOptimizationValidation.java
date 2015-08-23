@@ -33,14 +33,14 @@ public class TaxiOptimizationValidation
     {
         ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
 
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles(),
+        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
                 TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
 
         if (vehCount == 0) {
             return;//OK
         }
 
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests(),
+        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
                 TaxiRequestStatus.UNPLANNED) == 0) {
             return; //OK
         }

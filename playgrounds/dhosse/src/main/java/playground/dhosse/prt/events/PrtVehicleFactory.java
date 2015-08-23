@@ -32,18 +32,18 @@ public class PrtVehicleFactory {
 			
 			ETaxiData data = new ETaxiData();
 			
-			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks()){
+			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks().values()){
 				data.addTaxiRank(rank);
 			}
 			
-			for(Vehicle vehicle : this.context.getVrpData().getVehicles()){
+			for(Vehicle vehicle : this.context.getVrpData().getVehicles().values()){
 				data.addVehicle(new VehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
 						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(), vehicle.getT1()));
 			}
 			
 			double maxWTime = Double.NEGATIVE_INFINITY;
 			TaxiRank maxWTimeRank = null;
-			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks()){
+			for(TaxiRank rank : ((ETaxiData)this.context.getVrpData()).getTaxiRanks().values()){
 				if(this.handler.rankIds2PassengerWaitingTimes.containsKey(rank.getId())){
 					double wtime = this.handler.rankIds2PassengerWaitingTimes.get(rank.getId()).getMax();
 					if(wtime > maxWTime){
@@ -59,7 +59,7 @@ public class PrtVehicleFactory {
 						0, this.context.getScenario().getConfig().qsim().getEndTime()));
 			}
 			
-			VehicleWriter writer = new VehicleWriter(data.getVehicles());
+			VehicleWriter writer = new VehicleWriter(data.getVehicles().values());
 			
 			String path = this.config.getPrtOutputDirectory() + "it." + event.getIteration() + "/";
 			File f = new File(path);

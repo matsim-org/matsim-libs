@@ -40,7 +40,7 @@ public class RunVehicleCount
         reader.parse(
                 "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 
-        VehicleCounter counter = new VehicleCounter(data.getVehicles());
+        VehicleCounter counter = new VehicleCounter(data.getVehicles().values());
         List<Integer> counts = counter.countVehiclesOverTime(5 * 60);
 
         File file = new File(

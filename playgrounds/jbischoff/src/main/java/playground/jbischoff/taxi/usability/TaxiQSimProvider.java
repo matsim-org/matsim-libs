@@ -105,7 +105,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 		TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(), tcg.isVehicleDiversion(),
 				tcg.getPickupDuration(), tcg.getDropoffDuration());
 		
-		resetSchedules(context.getVrpData().getVehicles());
+		resetSchedules(context.getVrpData().getVehicles().values());
 		
 		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
 				.getNetwork(), travelDisutility, travelTime);
