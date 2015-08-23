@@ -28,22 +28,22 @@ import java.util.*;
 public class VrpDataImpl
     implements VrpData
 {
-    private final List<Vehicle> vehicles = new ArrayList<>();
-    private final List<Request> requests = new ArrayList<>();
+    private final Collection<Vehicle> vehicles = new ArrayList<>();
+    private final Collection<Request> requests = new ArrayList<>();
 
-    private final List<Vehicle> unmodifiableVehicles = Collections.unmodifiableList(vehicles);
-    private final List<Request> unmodifiableRequests = Collections.unmodifiableList(requests);
+    private final Collection<Vehicle> unmodifiableVehicles = Collections.unmodifiableCollection(vehicles);
+    private final Collection<Request> unmodifiableRequests = Collections.unmodifiableCollection(requests);
 
 
     @Override
-    public List<Vehicle> getVehicles()
+    public Collection<Vehicle> getVehicles()
     {
         return unmodifiableVehicles;
     }
 
 
     @Override
-    public List<Request> getRequests()
+    public Collection<Request> getRequests()
     {
         return unmodifiableRequests;
     }

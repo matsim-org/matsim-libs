@@ -29,34 +29,34 @@ import playground.michalm.ev.Charger;
 public class ETaxiData
     extends VrpDataImpl
 {
-    private final List<TaxiRank> taxiRanks = new ArrayList<>();
-    private final List<Charger> chargers = new ArrayList<>();
+    private final Collection<TaxiRank> taxiRanks = new ArrayList<>();
+    private final Collection<Charger> chargers = new ArrayList<>();
 
-    private final List<TaxiRank> unmodifiableTaxiRanks = Collections.unmodifiableList(taxiRanks);
-    private final List<Charger> unmodifiableChargers = Collections.unmodifiableList(chargers);
+    private final Collection<TaxiRank> unmodifiableTaxiRanks = Collections.unmodifiableCollection(taxiRanks);
+    private final Collection<Charger> unmodifiableChargers = Collections.unmodifiableCollection(chargers);
 
 
-    public List<TaxiRank> getTaxiRanks()
+    public Collection<TaxiRank> getTaxiRanks()
     {
         return unmodifiableTaxiRanks;
     }
 
 
-    public List<Charger> getChargers()
+    public Collection<Charger> getChargers()
     {
         return unmodifiableChargers;
     }
 
 
-    public List<ETaxi> getETaxis()
+    public Collection<ETaxi> getETaxis()
     {
-        return convertList(getVehicles());
+        return convertCollection(getVehicles());
     }
 
 
-    public List<TaxiRequest> getTaxiRequests()
+    public Collection<TaxiRequest> getTaxiRequests()
     {
-        return convertList(getRequests());
+        return convertCollection(getRequests());
     }
 
 
@@ -72,10 +72,10 @@ public class ETaxiData
     }
 
 
-    //casts List of supertype S to List of type T
+    //casts Collection of supertype S to Collection of type T
     @SuppressWarnings("unchecked")
-    private static <S, T> List<T> convertList(List<S> list)
+    private static <S, T> Collection<T> convertCollection(Collection<S> collection)
     {
-        return (List<T>)list;
+        return (Collection<T>)collection;
     }
 }

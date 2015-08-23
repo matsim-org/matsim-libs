@@ -1,6 +1,6 @@
 package playground.dhosse.prt.data;
 
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -13,7 +13,7 @@ import playground.michalm.taxi.data.TaxiRank;
 
 public class PrtData extends ETaxiData {
 	
-	private List<TaxiRank> vehicleRanks;
+	private Collection<TaxiRank> vehicleRanks;
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
 	public PrtData(Network network, ETaxiData data){

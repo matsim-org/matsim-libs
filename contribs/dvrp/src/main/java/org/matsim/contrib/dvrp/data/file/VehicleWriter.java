@@ -10,10 +10,10 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class VehicleWriter
     extends MatsimXmlWriter
 {
-    private List<Vehicle> vehicles;
+    private Iterable<Vehicle> vehicles;
 
 
-    public VehicleWriter(List<Vehicle> vehicles)
+    public VehicleWriter(Iterable<Vehicle> vehicles)
     {
         this.vehicles = vehicles;
     }

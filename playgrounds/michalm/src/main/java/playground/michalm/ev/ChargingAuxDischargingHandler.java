@@ -19,8 +19,6 @@
 
 package playground.michalm.ev;
 
-import java.util.List;
-
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -28,15 +26,15 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 public class ChargingAuxDischargingHandler
     implements MobsimAfterSimStepListener
 {
-    private final List<? extends Charger> chargers;
+    private final Iterable<? extends Charger> chargers;
     private final int chargePeriod;
 
-    private final List<? extends ElectricVehicle> vehicles;
+    private final Iterable<? extends ElectricVehicle> vehicles;
     private final int auxDischargePeriod;
 
 
-    public ChargingAuxDischargingHandler(List<? extends Charger> chargers, int chargePeriod,
-            List<? extends ElectricVehicle> vehicles, int auxDischargePeriod)
+    public ChargingAuxDischargingHandler(Iterable<? extends Charger> chargers, int chargePeriod,
+            Iterable<? extends ElectricVehicle> vehicles, int auxDischargePeriod)
     {
         this.chargers = chargers;
         this.chargePeriod = chargePeriod;
