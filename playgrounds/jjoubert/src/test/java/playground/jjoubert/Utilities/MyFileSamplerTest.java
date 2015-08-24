@@ -29,8 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 
 public class MyFileSamplerTest extends MatsimTestCase{
