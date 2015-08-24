@@ -32,7 +32,7 @@ public class CreateMergedNetwork {
 	
 	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/network/";		//outputDir of this class -> input for Matsim (KT)
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
 
 	public static void main(String[] args) {
 		createDir(new File(outputDir));
@@ -164,7 +164,7 @@ public class CreateMergedNetwork {
 		
 		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
 		
-		convertNet2Shape(network, crs, outputDir+"viz/"); 
+		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
 		calcMinMaxCoord(network);
 		
 		System.out.println("### Finished network creation. ###");

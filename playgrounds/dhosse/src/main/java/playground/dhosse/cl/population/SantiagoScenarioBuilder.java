@@ -78,7 +78,7 @@ public class SantiagoScenarioBuilder {
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
 	static String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/";		//outputDir of this class -> input for Matsim (KT)
+	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";		//outputDir of this class -> input for Matsim (KT)
 	
 	static String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
 	static String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
