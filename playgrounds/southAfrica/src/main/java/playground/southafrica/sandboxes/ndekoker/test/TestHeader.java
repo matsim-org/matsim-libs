@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ndekoker.test;
+package playground.southafrica.sandboxes.ndekoker.test;
 
 import org.apache.log4j.Logger;
 

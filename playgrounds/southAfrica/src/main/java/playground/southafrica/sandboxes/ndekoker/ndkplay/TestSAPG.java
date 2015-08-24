@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ndekoker.ndkplay;
+package playground.southafrica.sandboxes.ndekoker.ndkplay;
 
 import javax.swing.*;
 

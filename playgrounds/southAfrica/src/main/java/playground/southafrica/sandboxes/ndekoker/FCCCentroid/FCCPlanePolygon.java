@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ndekoker.FCCCentroid;
+package playground.southafrica.sandboxes.ndekoker.FCCCentroid;
 
 
 class FCCPlanePolygon {

@@ -11,7 +11,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ndekoker.FCCCentroid;
+package playground.southafrica.sandboxes.ndekoker.FCCCentroid;
 
 import java.io.File;
 import java.io.IOException;

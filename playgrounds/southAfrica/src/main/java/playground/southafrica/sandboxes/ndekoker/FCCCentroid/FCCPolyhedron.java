@@ -1,7 +1,7 @@
 //Nico de Koker, University of Pretoria, August 2014
 
 
-package playground.ndekoker.FCCCentroid;
+package playground.southafrica.sandboxes.ndekoker.FCCCentroid;
 
 class FCCPolyhedron {
 
