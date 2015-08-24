@@ -69,7 +69,7 @@ public class CNControler {
 			log.info("Config file: " + configFile);
 			
 			congestionPricing = Boolean.parseBoolean(args[1]);
-			log.info("Noise Pricing: " + congestionPricing);
+			log.info("Congestion Pricing: " + congestionPricing);
 			
 			noisePricing = Boolean.parseBoolean(args[2]);
 			log.info("Noise Pricing: " + noisePricing);
@@ -179,6 +179,7 @@ public class CNControler {
 		if (noisePricing && congestionPricing) {
 			// simultaneous noise and congestion pricing
 			
+			// router considers external congestion and noise cost
 			final CNTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CNTollDisutilityCalculatorFactory(noiseContext, congestionTollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -187,12 +188,16 @@ public class CNControler {
 				}
 			});
 			
+			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			
+			// computation of congestion events + consideration in scoring
 			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 		
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
 			
+			// router considers external noise cost
 			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -200,12 +205,17 @@ public class CNControler {
 					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
+			
+			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			
+			// computation of congestion events + NO consideration in scoring
 			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing) {
 			// only congestion pricing
 			
+			// router considers external congestion cost
 			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -213,13 +223,22 @@ public class CNControler {
 					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
+			
+			// computation of noise events + NO consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			
+			// computation of congestion events + consideration in scoring
 			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
 			
+			// default router
+			
+			// computation of noise events + NO consideration in scoring	
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			
+			// computation of congestion events + NO consideration in scoring
 			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
 		} else {
