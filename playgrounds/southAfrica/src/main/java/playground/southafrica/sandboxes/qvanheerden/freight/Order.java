@@ -1,4 +1,4 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -16,8 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.southafrica.sandboxes.kai.utils;
+
 /**
  * @author nagel
  *
  */
-package playground.qvanheerden.sandbox;
+public class KNGbl {
+	
+	private KNGbl(){} // do not instantiate
+	
+	public static void debug( String str ) {
+		System.out.flush();
+		System.err.println(str);
+		System.err.flush();
+	}
+
+}

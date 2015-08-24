@@ -39,7 +39,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
 
 public class MyCountingStationParser {
 	private final Logger log;

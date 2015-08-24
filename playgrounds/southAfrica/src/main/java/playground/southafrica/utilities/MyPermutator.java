@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.southafrica.utilities;
 
 import java.util.ArrayList;
 

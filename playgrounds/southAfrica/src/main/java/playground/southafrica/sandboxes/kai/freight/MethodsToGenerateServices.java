@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.freight;
+package playground.southafrica.sandboxes.kai.freight;
 
 import java.util.Collection;
 

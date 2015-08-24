@@ -8,7 +8,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

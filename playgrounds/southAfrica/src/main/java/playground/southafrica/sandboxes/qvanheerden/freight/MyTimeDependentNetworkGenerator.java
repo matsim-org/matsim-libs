@@ -1,4 +1,4 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;

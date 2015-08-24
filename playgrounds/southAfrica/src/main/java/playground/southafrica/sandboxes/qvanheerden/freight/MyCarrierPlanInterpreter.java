@@ -1,4 +1,4 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,9 +31,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 public class MyCarrierPlanInterpreter {
 

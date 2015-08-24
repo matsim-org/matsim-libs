@@ -1,14 +1,16 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,9 +29,10 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 import java.io.BufferedReader;
 import java.io.File;

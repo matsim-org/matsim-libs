@@ -1,4 +1,4 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

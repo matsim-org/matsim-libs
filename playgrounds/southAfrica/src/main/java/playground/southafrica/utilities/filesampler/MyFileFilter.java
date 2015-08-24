@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities.FileSampler;
+package playground.southafrica.utilities.filesampler;
 
 import java.io.File;
 import java.io.FilenameFilter;

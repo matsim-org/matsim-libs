@@ -1,4 +1,4 @@
-package playground.qvanheerden.freight;
+package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,9 +14,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 public class MyDemandAnalyser {
 

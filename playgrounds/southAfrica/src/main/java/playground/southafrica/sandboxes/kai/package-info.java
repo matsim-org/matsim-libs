@@ -16,20 +16,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.kai.utils;
-
 /**
+ * Package for material that I do in collaboration with the South Africa team.  Main reason for not putting it
+ * into my own playground is that my own playground depends (experimentally) on outside maven projects,
+ * but the SA team has, because of their special maven setup, problems to get access to those projects.
+ * 
  * @author nagel
  *
  */
-public class KNGbl {
-	
-	private KNGbl(){} // do not instantiate
-	
-	public static void debug( String str ) {
-		System.out.flush();
-		System.err.println(str);
-		System.err.flush();
-	}
-
-}
+package playground.southafrica.sandboxes.kai;

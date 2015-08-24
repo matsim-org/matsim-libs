@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities.FileSampler;
+package playground.southafrica.utilities.filesampler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import playground.jjoubert.Utilities.MyPermutator;
+import playground.southafrica.utilities.MyPermutator;
 
 /**
  * This class allows you to randomly sample files from a specified <i>input</i> folder.
