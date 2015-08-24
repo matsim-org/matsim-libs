@@ -32,6 +32,8 @@ import org.matsim.core.router.util.TravelTime;
 import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.file.*;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
 
 public class TaxiLauncherUtils
@@ -101,8 +103,18 @@ public class TaxiLauncherUtils
         qSim.getEventsManager()
                 .addHandler(new DriveDischargingHandler(driverToTaxi, network, travelTime));
 
-        qSim.addQueueSimulationListeners(new ChargingAuxDischargingHandler(taxiData.getChargers().values(),
-                CHARGE_TIME_STEP, taxiData.getETaxis().values(), AUX_DISCHARGE_TIME_STEP));
+        qSim.addQueueSimulationListeners(
+                new ChargingAuxDischargingHandler(taxiData.getChargers().values(), CHARGE_TIME_STEP,
+                        taxiData.getETaxis().values(), AUX_DISCHARGE_TIME_STEP));
     }
 
+
+    public static void initStatsCollection(ETaxiData taxiData, QSim qSim, String output)
+    {
+        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculator(
+                StatsCalculators.createMeanSocCalculator(taxiData),
+                StatsCalculators.createDischargedVehiclesCounter(taxiData));
+        qSim.addQueueSimulationListeners(
+                new StatsCollector<>(socStatsCalc, 600, "mean [kWh]\tdischarged", output));
+    }
 }

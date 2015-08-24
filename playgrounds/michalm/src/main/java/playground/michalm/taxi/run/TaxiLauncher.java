@@ -44,8 +44,6 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
-import playground.michalm.taxi.util.stats.*;
-import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 import playground.michalm.zone.*;
 
@@ -67,11 +65,6 @@ class TaxiLauncher
     TaxiLauncher(TaxiLauncherParams params)
     {
         this.params = params;
-
-        if (params.changeEventsFile != null && params.onlineVehicleTracker) {
-            System.err.println("Online vehicle tracking may not be useful -- "
-                    + "travel times should be (almost?) deterministic for a time variant network");
-        }
 
         scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
                 params.changeEventsFile);
@@ -164,19 +157,12 @@ class TaxiLauncher
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
-        //////////////////////////////////
-
-        TaxiLauncherUtils.initChargersAndVehicles(taxiData);
-        TaxiLauncherUtils.initChargingAndDischargingHandlers(taxiData, scenario.getNetwork(), qSim,
-                travelTime);
-
-        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculator(
-                StatsCalculators.createMeanSocCalculator(taxiData),
-                StatsCalculators.createDischargedVehiclesCounter(taxiData));
-        qSim.addQueueSimulationListeners(new StatsCollector<>(socStatsCalc, 600,
-                "mean [kWh]\tdischarged", params.outputDir + "SOC_stats"));
-
-        /////////////////////////////////
+        if (params.batteryChargingDischarging) {
+            TaxiLauncherUtils.initChargersAndVehicles(taxiData);
+            TaxiLauncherUtils.initChargingAndDischargingHandlers(taxiData, scenario.getNetwork(),
+                    qSim, travelTime);
+            TaxiLauncherUtils.initStatsCollection(taxiData, qSim, null);
+        }
 
         beforeQSim(qSim);
         qSim.run();

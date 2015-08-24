@@ -57,6 +57,8 @@ class TaxiLauncherParams
     Double pickupDuration;
     Double dropoffDuration;
 
+    Boolean batteryChargingDischarging;
+
     Boolean otfVis;
 
     String outputDir;
@@ -69,6 +71,10 @@ class TaxiLauncherParams
     public static final String PLANS_FILE = "plansFile";
 
     public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
+
+
+    TaxiLauncherParams()
+    {}
 
 
     TaxiLauncherParams(Map<String, String> params)
@@ -105,6 +111,8 @@ class TaxiLauncherParams
 
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
+
+        batteryChargingDischarging = getBoolean("batteryChargingDischarging");
 
         otfVis = getBoolean("otfVis");
 

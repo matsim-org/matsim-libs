@@ -42,6 +42,12 @@ public class StatsCollector<T>
     private final String file;
 
 
+    public StatsCollector(StatsCalculator<T> calculator, int step, String name)
+    {
+        this(calculator, step, name, null);
+    }
+
+
     public StatsCollector(StatsCalculator<T> calculator, int step, String name, String file)
     {
         this.calculator = calculator;
@@ -69,7 +75,7 @@ public class StatsCollector<T>
     @Override
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
-        try (PrintWriter pw = new PrintWriter(file)) {
+        try (PrintWriter pw = createPrintWriter()) {
             pw.println("time\t" + name);
 
             for (int i = 0; i < stats.size(); i++) {
@@ -78,6 +84,18 @@ public class StatsCollector<T>
         }
         catch (FileNotFoundException e1) {
             throw new RuntimeException(e1);
+        }
+    }
+
+
+    private PrintWriter createPrintWriter()
+        throws FileNotFoundException
+    {
+        if (file != null) {
+            return new PrintWriter(file);
+        }
+        else {
+            return new PrintWriter(System.out);
         }
     }
 }

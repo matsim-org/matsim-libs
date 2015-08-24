@@ -64,8 +64,7 @@ public class BatteryImpl
     public void discharge(double energy)
     {
         if (energy > soc) {
-            System.err.println("IllegalStateException - coming soon:)");
-            //throw new IllegalStateException();
+            throw new IllegalStateException();
         }
 
         soc -= energy;
