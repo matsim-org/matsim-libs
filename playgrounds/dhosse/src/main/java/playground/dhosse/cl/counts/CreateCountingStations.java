@@ -21,17 +21,16 @@ public class CreateCountingStations {
 	private static final Logger log = Logger.getLogger(CreateCountingStations.class) ;
 
 	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
-	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/counts/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/counts/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/counts/" ; //outputDir of this class -> input for Matsim (KT)
 
-	//Position (linkId) of Counting Stations
+	//A: Position (linkId) of counting stations
 	private static final String CSIdFILE_NAME = "CSId-LinkId_merged";		
-	private static final String CSIdFILE = workingDirInputFiles + CSIdFILE_NAME + ".csv" ;
+	private static final String CSIdFILE = workingDirInputFiles + "../counts/" + CSIdFILE_NAME + ".csv" ;
 
-	//Network-File
+	//B: recent network-File
 	private static final String NETFILE = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/network_merged_cl.xml.gz";	
-	//	//test with same network used for coordinate generation 
-	//	private static final String NETFILE = workingDirInputFiles + "santiago_merged_cl.xml.gz";	
+
 
 	//TODO: Integrate this class to the network creation? (kt 2015-08-15)
 	//TODO: clean up the both variants A and B  - maybe allow user to choose by a switch (kt 2015-08-15)
@@ -44,30 +43,35 @@ public class CreateCountingStations {
 		String countfile_Name;
 		String csDataFile;
 
-		//#Counts in persons
-		csDataFile_Name = "T_VIAJESTEMP"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
-		csDataFile = workingDirInputFiles + csDataFile_Name + ".csv" ;
-		countfile_Name = "counts_merged_PERS" ;	//Output-Countfile_name
-
-		//Variante A: Use Id-relation from file
-		//		createCsFilesWithIdFile(countfile_Name, csDataFile);
+//		//Variante A: Use Id-relation from file
+//		//#Counts in persons
+//		csDataFile_Name = "T_VIAJESTEMP"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
+//		csDataFile = workingDirInputFiles + csDataFile_Name + ".csv" ;
+//		countfile_Name = "counts_merged_PERS" ;	//Output-Countfile_name
+//		createCsFilesWithIdFile(countfile_Name, csDataFile);
+//		
+//		//#Counts in vehicles
+//		csDataFile_Name = "T_FLUJO_TASA"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
+//		csDataFile = workingDirInputFiles + csDataFile_Name + ".csv" ;
+//		countfile_Name = "counts_merged_VEH" ;	//Output-Countfile_name
+//		createCsFilesWithIdFile(countfile_Name, csDataFile);
 
 		//Variante B: Use Id-relation from map
 		//Network-Stuff
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(NETFILE);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		//#Counts in persons
+		csDataFile_Name = "T_VIAJESTEMP"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
+		csDataFile = workingDirInputFiles + csDataFile_Name + ".csv" ;
+		countfile_Name = "counts_merged_PERS" ;	//Output-Countfile_name
 		createCsFilesWithoutIdFile(countfile_Name, csDataFile, scenario.getNetwork());
 
 		//#Counts in vehicles
 		csDataFile_Name = "T_FLUJO_TASA"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
 		csDataFile = workingDirInputFiles + csDataFile_Name + ".csv" ;
 		countfile_Name = "counts_merged_VEH" ;	//Output-Countfile_name
-
-		//Variante A: Use Id-relation from file
-		//		createCsFilesWithIdFile(countfile_Name, csDataFile);
-
-		//Variante B: Use Id-relation from map
 		createCsFilesWithoutIdFile(countfile_Name, csDataFile, scenario.getNetwork());
 
 		log.info("### Done. ###");
@@ -173,10 +177,10 @@ public class CreateCountingStations {
 							if (link.getToNode().getCoord().getY() == csIdString2LinkCoordinates.get(csIdString).get(3)){
 								linkId = link.getId();
 								System.out.println("Link for CS:  " + csIdString + " is : " + linkId);
-							} // else System.out.println("ToY doesn't fit: " + link.getToNode().getCoord().getY() + " ; " + csIdString2LinkCoordinates.get(csIdString).get(3));
-						} //else System.out.println("ToX doesn't fit: " + link.getToNode().getCoord().getX() + " ; " + csIdString2LinkCoordinates.get(csIdString).get(2));
-					} //else System.out.println("FromY doesn't fit: " + link.getFromNode().getCoord().getY() + " ; " + csIdString2LinkCoordinates.get(csIdString).get(1));
-				} //else System.out.println("FromX doesn't fit: " + link.getFromNode().getCoord().getX() + " ; " + csIdString2LinkCoordinates.get(csIdString).get(0));
+							} 
+						} 
+					} 
+				} 
 			}
 
 			if (linkId != null) {
