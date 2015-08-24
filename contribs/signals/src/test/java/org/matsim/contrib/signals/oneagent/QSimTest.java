@@ -75,7 +75,7 @@ public class QSimTest implements
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
-		this.link2EnterTime = 37.0;
+		this.link2EnterTime = 38.0;
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
