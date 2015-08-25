@@ -24,11 +24,12 @@ import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.DependendLegVariableAnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.AgeMutatorFactory;
@@ -48,11 +49,11 @@ public class Simulator {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 
-		Set<PlainPerson> refPersons = parser.getPersons();
+		Set<PlainPerson> refPersons = (Set<PlainPerson>)parser.getPersons();
 
 //		for(PlainPerson person : persons) {
 //			String age = person.getAttribute(CommonKeys.PERSON_AGE);

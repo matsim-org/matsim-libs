@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.io;
+package playground.johannes.synpop.data.io;
 
 /**
  * @author johannes
@@ -25,16 +25,16 @@ package playground.johannes.gsv.synPop.io;
  */
 interface Constants {
 
-	static final String PERSONS_TAG = "persons";
+	String PERSONS_TAG = "persons";
 	
-	static final String PERSON_TAG = "person";
+	String PERSON_TAG = "person";
 	
-	static final String ID_KEY = "id";
+	String ID_KEY = "id";
 	
-	static final String PLAN_TAG = "plan";
+	String PLAN_TAG = "plan";
 	
-	static final String ACTIVITY_TAG = "activity";
+	String ACTIVITY_TAG = "activity";
 	
-	static final String LEG_TAG = "leg";
+	String LEG_TAG = "leg";
 	
 }

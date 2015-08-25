@@ -17,15 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.io;
+package playground.johannes.synpop.data.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.data.*;
 
 import java.util.*;
 
@@ -33,19 +30,25 @@ import java.util.*;
  * @author johannes
  * 
  */
-public class XMLParser extends MatsimXmlParser {
+public class XMLHandler extends MatsimXmlParser {
 
-	private static final Logger logger = Logger.getLogger(XMLParser.class);
+	private static final Logger logger = Logger.getLogger(XMLHandler.class);
 
-	private Set<PlainPerson> persons;
+	private Set<Person> persons;
 
-	private PlainPerson person;
+	private Person person;
 
 	private Episode plan;
 
 	private List<String> blacklist = new ArrayList<>();
 
-	public Set<PlainPerson> getPersons() {
+	private final Factory factory;
+
+	public XMLHandler(Factory factory) {
+		this.factory = factory;
+	}
+
+	public Set<? extends Person> getPersons() {
 		return persons;
 	}
 
@@ -53,19 +56,14 @@ public class XMLParser extends MatsimXmlParser {
 		blacklist.add(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.core.utils.io.MatsimXmlParser#startTag(java.lang.String,
-	 * org.xml.sax.Attributes, java.util.Stack)
-	 */
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equalsIgnoreCase(Constants.PERSONS_TAG)) {
-			persons = new HashSet<PlainPerson>();
+			persons = new HashSet<>();
 
 		} else if (name.equalsIgnoreCase(Constants.PERSON_TAG)) {
-			person = new PlainPerson((String) getAttribute(Constants.ID_KEY, atts));
+			person = factory.newPerson(getAttribute(Constants.ID_KEY, atts));
+
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!type.equalsIgnoreCase(Constants.ID_KEY)) {
@@ -74,8 +72,10 @@ public class XMLParser extends MatsimXmlParser {
 					}
 				}
 			}
+
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
-			plan = new PlainEpisode();
+			plan = factory.newEpisode();
+
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 
@@ -86,7 +86,8 @@ public class XMLParser extends MatsimXmlParser {
 			}
 
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
-			PlainSegment act = new PlainSegment();
+			Segment act = factory.newSegment();
+
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {
@@ -96,7 +97,8 @@ public class XMLParser extends MatsimXmlParser {
 			plan.addActivity(act);
 
 		} else if (name.equalsIgnoreCase(Constants.LEG_TAG)) {
-			PlainSegment leg = new PlainSegment();
+			Segment leg = factory.newSegment();
+
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {
@@ -108,12 +110,6 @@ public class XMLParser extends MatsimXmlParser {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.core.utils.io.MatsimXmlParser#endTag(java.lang.String,
-	 * java.lang.String, java.util.Stack)
-	 */
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if (name.equalsIgnoreCase(Constants.PERSON_TAG)) {
@@ -123,7 +119,6 @@ public class XMLParser extends MatsimXmlParser {
 			if (persons.size() % 50000 == 0)
 				logger.info(String.format("Parsed %s persons...", persons.size()));
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
-//			person.setPlan(plan);
 			person.addEpisode(plan);
 			plan = null;
 		}

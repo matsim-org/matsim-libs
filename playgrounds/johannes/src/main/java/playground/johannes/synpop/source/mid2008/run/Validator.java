@@ -17,55 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.analysis;
+package playground.johannes.synpop.source.mid2008.run;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.processing.SortLegsTask;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
- *
  */
-public class ActivityDistanceTruncatedTask extends ActivityDistanceTask {
+public class Validator {
 
-	private final double threshold;
-	
-	@Override
-	protected DescriptiveStatistics statistics(Collection<? extends Person> persons, String purpose, String mode) {
-		DescriptiveStatistics stats = super.statistics(persons, purpose, mode);
+    public static final void main(String args[]) {
+        Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], new PlainFactory());
 
-		if (threshold > 0) {
-			DescriptiveStatistics newStats = new DescriptiveStatistics();
-			for (int i = 0; i < stats.getN(); i++) {
-				double val = stats.getElement(i);
-				if (val >= threshold) {
-					newStats.addValue(val);
-				}
-			}
+        TaskRunner.run(new SortLegsTask(MiDKeys.LEG_INDEX, new SortLegsTask.IntComparator()), persons);
 
-			return newStats;
-		} else {
-			return stats;
-		}
-	}
-
-	@Override
-	protected String getKey(String type) {
-		String key = super.getKey(type);
-		if(threshold > 0) {
-			key = String.format("%s.%d", key, (int)threshold);
-		}
-		
-		return key;
-	}
-
-	public ActivityDistanceTruncatedTask(ActivityFacilities facilities, String mode, double threshold) {
-		super(facilities, mode);
-		this.threshold = threshold;
-	}
-
+        PopulationIO.writeToXML(args[1], persons);
+    }
 }

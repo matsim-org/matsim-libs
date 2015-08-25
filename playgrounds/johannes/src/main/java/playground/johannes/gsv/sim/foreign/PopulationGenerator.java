@@ -34,7 +34,7 @@ import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.synpop.data.*;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;

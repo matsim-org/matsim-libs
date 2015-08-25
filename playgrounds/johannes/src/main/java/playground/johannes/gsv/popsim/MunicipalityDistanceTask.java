@@ -30,7 +30,6 @@ import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class MunicipalityDistanceTask extends AnalyzerTask {
     @Override
-    public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList xVals = new TDoubleArrayList();
         TDoubleArrayList yVals = new TDoubleArrayList();
 

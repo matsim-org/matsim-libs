@@ -20,11 +20,8 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Collection;
@@ -45,9 +42,9 @@ public class PkmTaskSeason extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> seasons = new HashSet<String>();
-		for (PlainPerson person : persons) {
+		for (Person person : persons) {
 			String month = (String) person.getAttribute(MiDKeys.PERSON_MONTH);
 			if(month != null) {
 				String season = "winter";
@@ -75,7 +72,7 @@ public class PkmTaskSeason extends AnalyzerTask {
 
 		for (String season : seasons) {
 			double pkm = 0;
-			for (PlainPerson person : persons) {
+			for (Person person : persons) {
 				String theSeason = person.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
 				Episode plan = person.getEpisodes().get(0);
