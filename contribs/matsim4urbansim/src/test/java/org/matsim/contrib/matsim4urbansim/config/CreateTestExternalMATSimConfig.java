@@ -40,7 +40,7 @@ import java.math.BigInteger;
  * @author thomas
  *
  */
-public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
+public class CreateTestExternalMATSimConfig {
 	
 	public static final String DUMMY_FILE_2 = "/dummy2.xml";
 	
@@ -109,6 +109,18 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	public final double teleportedModeSpeedBikeValue= 4.0;
 	public final String teleportedModeSpeedPtParamName= "teleportedModeSpeed_pt";
 	public final double teleportedModeSpeedPtValue	= 7.0;
+
+	private String networkInputFileName;
+
+	private long lastIteration;
+
+	private String inputPlansFileName;
+
+	private long firstIteration = 0 ;
+
+	private String dummyPath;
+
+	private String matsim4opusOutput;
 	
 	/**
 	 * constructor
@@ -117,24 +129,23 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
 	public CreateTestExternalMATSimConfig(final int startMode, String path){
-		super(startMode, path);
-		
+		this.dummyPath = path ;
+		this.matsim4opusOutput = path ;
 		this.urbanSimZoneShapefileLocationDistribution = path + DUMMY_FILE_2;
 		this.ptStops 			= path + DUMMY_FILE_2;
 		this.usePtStops 		= "FALSE";
 		this.ptTravelTimes 		= path + DUMMY_FILE_2;
 		this.ptTravelDistances 	= path + DUMMY_FILE_2;
 		this.useTravelTimesAndDistances = "FALSE";
-		this.networkInputFileName	= path + DUMMY_FILE_2;
-		this.lastIteration     	= new BigInteger("100");
+		this.networkInputFileName = path + DUMMY_FILE_2 ;
+		this.lastIteration     	= 100 ;
 		this.inputPlansFileName		= path + DUMMY_FILE_2;
 	}
 
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
-	@Override
-	public String generateConfigV2(){
+	public String generateMATSimConfig(){
 		
 		// creating an empty MASim config
 		Config config = new Config();
@@ -189,18 +200,18 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		
 		// network module
 		ConfigGroup networkModule = config.createModule(NetworkConfigGroup.GROUP_NAME);
-		networkModule.addParam(networkParamName, networkInputFileName);
+		networkModule.addParam(networkParamName, this.getNetworkInputFileName() );
 		
 		// controler module 
 		ConfigGroup contolerModule = config.createModule(ControlerConfigGroup.GROUP_NAME);
-		contolerModule.addParam(controlerFirstIterationPramName, firstIteration.toString());
-		contolerModule.addParam(controlerLastIterationPramName, lastIteration.toString());
+		contolerModule.addParam(controlerFirstIterationPramName, Long.toString(getFirstIteration()) );
+		contolerModule.addParam(controlerLastIterationPramName, Long.toString(lastIteration) );
 		
 		// plan calc score module 
 		ConfigGroup planCalcScoreModule = config.createModule(PlanCalcScoreConfigGroup.GROUP_NAME);
-		planCalcScoreModule.addParam(activityType0ParamName, activityType_0);
+		planCalcScoreModule.addParam(activityType0ParamName, "home");
 		planCalcScoreModule.addParam(activityTypicalDuration0ParamName, activityTypicalDuration0Value);
-		planCalcScoreModule.addParam(activityType1ParamName, activityType_1);
+		planCalcScoreModule.addParam(activityType1ParamName, "work");
 		planCalcScoreModule.addParam(activityTypicalDuration1ParamName, activityTypicalDuration1Value);
 		planCalcScoreModule.addParam(activityOpeningTime1ParamName, activityTypicalDuration1Value);
 		planCalcScoreModule.addParam(activityLatestStartTime1ParamName, activityLatestStartTime1Value);
@@ -230,8 +241,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
-	@Override
-	public String generateMinimalConfig(){
+	public String generateMinimalMATSimConfig(){
 		
 		// creating an empty MASim config
 		Config config = new Config();
@@ -277,7 +287,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	}
 	
 	
-	public AccessibilityConfigGroup getAccessibilityParameterConfig(Config config) {
+	public static AccessibilityConfigGroup getAccessibilityParameterConfig(Config config) {
 		ConfigGroup m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);
 		if (m instanceof AccessibilityConfigGroup) {
 			return (AccessibilityConfigGroup) m;
@@ -287,7 +297,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		return apcm;
 	}
 	
-	public M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
+	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
 		ConfigGroup m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
@@ -297,7 +307,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		return mccm;
 	}
 	
-	public UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig(Config config) {
+	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig(Config config) {
 		ConfigGroup m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
@@ -306,22 +316,29 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
 	}
-	
-	
-	/**
-	 * for quick tests
-	 * @param args
-	 */
-	public static void main(String args[]){
-		
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-		
-		String tmpPath = tempDirectoryUtil.createCustomTempDirectory("tmp");
-		
-		CreateTestExternalMATSimConfig configGenerator = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, tmpPath);
-		System.out.println("Config stored at: " + configGenerator.generateMinimalConfig() );
-		
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+
+	String getNetworkInputFileName() {
+		return networkInputFileName;
+	}
+
+	long getLastIteration() {
+		return lastIteration;
+	}
+
+	long getFirstIteration() {
+		return firstIteration;
+	}
+
+	String getInputPlansFileName() {
+		return inputPlansFileName;
+	}
+
+	void setInputPlansFileName(String inputPlansFileName) {
+		this.inputPlansFileName = inputPlansFileName;
+	}
+
+	String getMatsim4opusOutput() {
+		return matsim4opusOutput;
 	}
 
 }
