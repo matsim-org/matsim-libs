@@ -25,6 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
@@ -46,24 +47,21 @@ public final class TempDirectoryUtil {
 	// logger
 	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);
 	// storage for created custom directories
-	private ArrayList<File> tempDirectoryList = null;
+	private static ArrayList<File> tempDirectoryList = null;
 	
 	/**
 	 * creates a custom temp directory
 	 * @param customDirectory
 	 * @return canonical path of the custom temp directory
 	 */
-	public String createCustomTempDirectory(String customDirectory){
+	public static String createCustomTempDirectory(String customDirectory){
 		
 		log.info("Creating a custom temp directory");
 		
 		try {
-			String tempPath = checkPathEnding( System.getProperty("java.io.tmpdir") );
-			
-			log.info("Creating directory \"" + customDirectory + "\" in temp path \"" + tempPath + "\".");
-		
-			File tempFile = new File(tempPath + customDirectory);
-			
+			Path tempDirectory = Files.createTempDirectory(customDirectory);
+			File tempFile = tempDirectory.toFile();
+
 			// Add custom directory to the list for the cleaning up method
 			if(tempDirectoryList == null)
 				tempDirectoryList = new ArrayList<File>();
@@ -74,10 +72,8 @@ public final class TempDirectoryUtil {
 			log.info("Finished creating custom temp directory " + tempFile.getCanonicalPath());
 			return tempFile.getCanonicalPath();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		log.equals("Creating custom temp directory faild."); 
-		return null;
 	}
 	
 	/**
