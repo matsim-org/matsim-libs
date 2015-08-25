@@ -22,7 +22,9 @@ package org.matsim.contrib.dynagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public interface DriverDynLeg extends DynLeg
+
+public interface DriverDynLeg
+    extends DynLeg
 {
     Id<Link> getNextLinkId();
 

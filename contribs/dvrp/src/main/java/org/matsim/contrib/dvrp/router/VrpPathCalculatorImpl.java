@@ -48,7 +48,8 @@ public class VrpPathCalculatorImpl
     public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
     {
         if (fromLink == toLink) {
-            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new double[] { 0 });
+            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink },
+                    new double[] { 0 });
         }
 
         //calc path for departureTime+1 (we need 1 second to move over the node)

@@ -41,7 +41,7 @@ public class AdvancedRequestStorage
     }
 
 
-   public void storeAdvancedRequest(PassengerRequest request)
+    public void storeAdvancedRequest(PassengerRequest request)
     {
         Id<Person> passengerId = request.getPassenger().getId();
         Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);

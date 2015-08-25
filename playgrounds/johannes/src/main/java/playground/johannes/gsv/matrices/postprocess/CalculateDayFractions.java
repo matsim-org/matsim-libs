@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
 import playground.johannes.gsv.zones.KeyMatrix;

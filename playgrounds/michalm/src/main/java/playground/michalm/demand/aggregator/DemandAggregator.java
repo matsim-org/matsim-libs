@@ -63,8 +63,8 @@ public class DemandAggregator
         counters.get(type).increment();
 
         if (type == TripType.INTERNAL) {
-            addTrip(dateDiscretizer.discretize(date), fromZone.getId().toString(), toZone.getId()
-                    .toString());
+            addTrip(dateDiscretizer.discretize(date), fromZone.getId().toString(),
+                    toZone.getId().toString());
         }
     }
 

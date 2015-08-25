@@ -32,8 +32,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.contrib.dvrp.util.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -242,7 +241,7 @@ import playground.michalm.util.MovingAgentsRegister;
         waitList.add(run + "\t" + olutils.writeStatisticsToFiles(electricStatsDir) + "\n");
 
         // check if all reqs have been served
-        for (Request r : context.getVrpData().getRequests()) {
+        for (Request r : context.getVrpData().getRequests().values()) {
             TaxiRequest tr = (TaxiRequest)r;
             if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 //                throw new IllegalStateException();
@@ -255,12 +254,12 @@ import playground.michalm.util.MovingAgentsRegister;
     {
         PrintWriter pw = new PrintWriter(System.out);
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles()).getStats();
+        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
         pw.println(stats);
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(context.getVrpData().getVehicles(),
+            new Schedules2GIS(context.getVrpData().getVehicles().values(),
                     TransformationFactory.WGS84_UTM33N).write(vrpOutDirName);
         }
 

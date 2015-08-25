@@ -28,12 +28,12 @@ import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 
+import com.google.common.base.Function;
+
 import playground.michalm.demand.aggregator.*;
 import playground.michalm.poznan.zone.PoznanZones;
 import playground.michalm.util.matrices.*;
 import playground.michalm.zone.*;
-
-import com.google.common.base.Function;
 
 
 public class ServedRequestsAggregator
@@ -84,8 +84,8 @@ public class ServedRequestsAggregator
                     @Override
                     public String apply(String key)
                     {
-                        return StringUtils.leftPad(hourlyDateDiscretizer.parseDiscretizedDate(key)
-                                .getHours() + "", 2);
+                        return StringUtils.leftPad(
+                                hourlyDateDiscretizer.parseDiscretizedDate(key).getHours() + "", 2);
                     };
                 });
 

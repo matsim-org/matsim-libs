@@ -65,13 +65,13 @@ public class ZoneDistanceMatrixCalculator
         new MatsimNetworkReader(scenario).readFile(networkFile);
 
         DistanceCalculator calculator = DistanceCalculators.//
-                //        BEELINE_DISTANCE_CALCULATOR;
-                //        matrixFile += "beeline_";
+        //        BEELINE_DISTANCE_CALCULATOR;
+        //        matrixFile += "beeline_";
 
-                //        crateFreespeedDistanceCalculator(scenario.getNetwork());
-                //        matrixFile += "shortest_";
+        //        crateFreespeedDistanceCalculator(scenario.getNetwork());
+        //        matrixFile += "shortest_";
 
-                crateFreespeedTimeCalculator(scenario.getNetwork());
+        crateFreespeedTimeCalculator(scenario.getNetwork());
         matrixFile += "fastest_";
 
         Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);

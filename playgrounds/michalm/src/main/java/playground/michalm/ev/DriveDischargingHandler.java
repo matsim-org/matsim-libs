@@ -35,11 +35,11 @@ public class DriveDischargingHandler
     private final Network network;
     private final TravelTime travelTime;
 
-    private final Map<Id<Person>, ElectricVehicle> driverToVehicle;
+    private final Map<Id<Person>, ? extends ElectricVehicle> driverToVehicle;
     private final Map<Id<Person>, Double> linkEnterTimes = new HashMap<>();
 
 
-    public DriveDischargingHandler(Map<Id<Person>, ElectricVehicle> driverToVehicle,
+    public DriveDischargingHandler(Map<Id<Person>, ? extends ElectricVehicle> driverToVehicle,
             Network network, TravelTime travelTime)
     {
         this.driverToVehicle = driverToVehicle;
@@ -83,8 +83,7 @@ public class DriveDischargingHandler
                     travelTime.getLinkTravelTime(link, linkEnterTime, null, null)
                     : event.getTime() - linkEnterTime;
 
-            double energy = ev.getDriveEnergyConsumption().calcEnergy(link, tt);
-            ev.getBattery().discharge(energy);
+            ev.getDriveEnergyConsumption().useEnergy(link, tt);
 
             if (arrival) {
                 linkEnterTimes.remove(driverId);

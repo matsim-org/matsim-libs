@@ -80,8 +80,8 @@ public class RunOneTaxiExample
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
                 new OneTaxiRequestCreator(), optimizer, context, qSim);
 
-        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new OneTaxiActionCreator(
-                passengerEngine, qSim.getSimTimer()));
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
+                new OneTaxiActionCreator(passengerEngine, qSim.getSimTimer()));
 
         EventsManager events = qSim.getEventsManager();
 

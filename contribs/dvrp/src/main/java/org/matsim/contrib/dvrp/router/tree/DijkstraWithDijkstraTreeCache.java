@@ -24,7 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 

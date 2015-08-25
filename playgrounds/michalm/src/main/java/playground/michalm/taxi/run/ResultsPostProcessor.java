@@ -203,20 +203,20 @@ public class ResultsPostProcessor
         String subDirPrefix = "mielec-2-peaks-new-";
 
         new ResultsPostProcessor(//
-                "10-50",//
-                "15-50",//
-                "20-50",//
-                "25-50",//
-                "30-50",//
-                "35-50",//
-                "40-50",//
-                null,// empty column
-                "10-25",//
-                "15-25",//
-                "20-25",//
-                "25-25",//
-                "30-25",//
-                "35-25",//
+                "10-50", //
+                "15-50", //
+                "20-50", //
+                "25-50", //
+                "30-50", //
+                "35-50", //
+                "40-50", //
+                null, // empty column
+                "10-25", //
+                "15-25", //
+                "20-25", //
+                "25-25", //
+                "30-25", //
+                "35-25", //
                 "40-25"//
         ).process(dir, subDirPrefix, "stats");
     }
@@ -228,14 +228,14 @@ public class ResultsPostProcessor
         String subDirPrefix = "demand_";
 
         new ResultsPostProcessor(//
-                "1.0",//
-                "1.5",//
-                "2.0",//
-                "2.5",//
-                "3.0",//
-                "3.5",//
-                "4.0",//
-                "4.5",//
+                "1.0", //
+                "1.5", //
+                "2.0", //
+                "2.5", //
+                "3.0", //
+                "3.5", //
+                "4.0", //
+                "4.5", //
                 "5.0"//
         ).process(dir, subDirPrefix, "stats");
     }

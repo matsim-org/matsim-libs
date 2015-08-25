@@ -34,7 +34,8 @@ public class DijkstraTree
     private double startTime;
 
 
-    public DijkstraTree(Network network, TravelDisutility costFunction, final TravelTime timeFunction)
+    public DijkstraTree(Network network, TravelDisutility costFunction,
+            final TravelTime timeFunction)
     {
         super(network, costFunction, timeFunction);
     }
@@ -62,7 +63,7 @@ public class DijkstraTree
         visitNode(fromNode, data, pendingNodes, startTime, 0, null);
     }
 
-    
+
     @Override
     public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person,
             Vehicle vehicle)

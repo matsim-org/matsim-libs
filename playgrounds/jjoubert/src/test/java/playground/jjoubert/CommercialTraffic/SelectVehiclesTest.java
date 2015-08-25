@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

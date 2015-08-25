@@ -130,6 +130,7 @@ class OnlineDriveTaskTrackerImpl
 
     private double predictLinkExitTime()
     {
-        return Math.max(timer.getTimeOfDay(), linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
+        return Math.max(timer.getTimeOfDay(),
+                linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
     }
 }

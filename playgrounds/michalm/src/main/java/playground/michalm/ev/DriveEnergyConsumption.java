@@ -28,5 +28,5 @@ import org.matsim.api.core.v01.network.Link;
  */
 public interface DriveEnergyConsumption
 {
-    double calcEnergy(Link link, double travelTime);
+    void useEnergy(Link link, double travelTime);
 }

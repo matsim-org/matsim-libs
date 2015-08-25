@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.chart.ChartWindowUtils;
-import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
+import org.matsim.contrib.dvrp.util.Schedules2GIS;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.util.chart.ChartWindowUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -14,7 +14,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
-import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.util.MovingAgentsRegister;
 
@@ -80,18 +80,18 @@ public class SingleRunTaxiLauncher
         pw.println("m\t" + context.getVrpData().getVehicles().size());
         pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles()).getStats();
+        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
         pw.println(stats);
         pw.flush();
 
         if (params.vrpOutDir != null) {
-            new Schedules2GIS(context.getVrpData().getVehicles(),
+            new Schedules2GIS(context.getVrpData().getVehicles().values(),
                     TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartWindowUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
-                .getVehicles()));
+        ChartWindowUtils.showFrame(
+                TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles().values()));
 
         if (params.histogramOutDir != null) {
             VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);

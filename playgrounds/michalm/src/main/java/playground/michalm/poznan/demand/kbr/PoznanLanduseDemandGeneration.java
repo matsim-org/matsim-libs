@@ -33,15 +33,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 
+import com.vividsolutions.jts.geom.*;
+
 import playground.michalm.demand.*;
-import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
-import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
+import playground.michalm.demand.DefaultActivityCreator.*;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumMatrixReader;
 import playground.michalm.zone.*;
 import playground.michalm.zone.util.SubzoneUtils;
-
-import com.vividsolutions.jts.geom.*;
 
 
 public class PoznanLanduseDemandGeneration
@@ -140,7 +139,7 @@ public class PoznanLanduseDemandGeneration
     private Map<Id<Zone>, Zone> zones;
     private Map<Id<Zone>, ZoneLanduseValidation> zoneLanduseValidation;
     private EnumMap<ActivityPair, Double> prtCoeffs;
-    
+
     private String transportMode;
 
     private Map<Id<Zone>, List<Polygon>> forestByZone;
@@ -160,7 +159,7 @@ public class PoznanLanduseDemandGeneration
     public void generate(String inputDir, String plansFile, String transportMode)
     {
         this.transportMode = transportMode;
-        
+
         String networkFile = inputDir + "Matsim_2013_06/network-cleaned-extra-lanes.xml";
         String zonesXmlFile = inputDir + "Matsim_2013_06/zones.xml";
         String zonesShpFile = inputDir + "Osm_2013_06/zones.SHP";
@@ -234,8 +233,8 @@ public class PoznanLanduseDemandGeneration
 
     private void initSelection()
     {
-        selectionTable = WeightedRandomSelectionTable.createWithArrayTable(
-                zoneLanduseValidation.keySet(), constrainedActivities);
+        selectionTable = WeightedRandomSelectionTable
+                .createWithArrayTable(zoneLanduseValidation.keySet(), constrainedActivities);
 
         for (Entry<Id<Zone>, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
             Id<Zone> zoneId = e.getKey();
@@ -327,10 +326,10 @@ public class PoznanLanduseDemandGeneration
             System.out.println("Generation for " + odMatrixFile);
 
             double[][] visumODMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
-            Matrix odMatrix = MatrixUtils
-                    .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
-            dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, transportMode, i * 3600,
-                    3600, flowCoeff);
+            Matrix odMatrix = MatrixUtils.createSparseMatrix("m" + i, zones.keySet(),
+                    visumODMatrix);
+            dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, transportMode, i * 3600, 3600,
+                    flowCoeff);
         }
     }
 

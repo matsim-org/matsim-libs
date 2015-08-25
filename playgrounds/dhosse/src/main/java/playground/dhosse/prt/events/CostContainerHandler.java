@@ -31,7 +31,7 @@ public class CostContainerHandler implements PersonEntersVehicleEventHandler, Pe
 	
 	Map<Id<Vehicle>, CostContainer> vehicleId2TaskContainers = new HashMap<Id<Vehicle>, CostContainer>();
 	
-	public CostContainerHandler(Network network, List<Vehicle> vehicles, double costPerDay, double costPerMeter){
+	public CostContainerHandler(Network network, double costPerDay, double costPerMeter){
 		
 		this.network = network;
 		this.costPerDay = costPerDay;

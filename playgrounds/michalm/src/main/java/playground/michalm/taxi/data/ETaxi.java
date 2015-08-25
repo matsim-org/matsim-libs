@@ -28,21 +28,18 @@ public class ETaxi
     extends VehicleImpl
     implements ElectricVehicle
 {
-    private final Battery battery;
-    private final DriveEnergyConsumption driveEnergyConsumption;
-    private final AuxEnergyConsumption auxEnergyConsumption;
+    private Battery battery;//not final -- can be swapped
+
+    private DriveEnergyConsumption driveEnergyConsumption;
+    private AuxEnergyConsumption auxEnergyConsumption;
 
 
-    public ETaxi(Vehicle vehicle, Battery battery,
-            DriveEnergyConsumption driveEnergyConsumption,
-            AuxEnergyConsumption auxEnergyConsumption)
+    public ETaxi(Vehicle vehicle, Battery battery)
     {
         super(vehicle.getId(), vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(),
                 vehicle.getT1());
 
         this.battery = battery;
-        this.driveEnergyConsumption = driveEnergyConsumption;
-        this.auxEnergyConsumption = auxEnergyConsumption;
     }
 
 
@@ -64,5 +61,24 @@ public class ETaxi
     public AuxEnergyConsumption getAuxEnergyConsumption()
     {
         return auxEnergyConsumption;
+    }
+
+
+    @Override
+    public void setBattery(Battery battery)
+    {
+        this.battery = battery;
+    }
+
+
+    public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption)
+    {
+        this.driveEnergyConsumption = driveEnergyConsumption;
+    }
+
+
+    public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption)
+    {
+        this.auxEnergyConsumption = auxEnergyConsumption;
     }
 }

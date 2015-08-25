@@ -50,6 +50,7 @@ public class ChargerImpl
     }
 
 
+    @Override
     public void setLogic(ChargingLogic logic)
     {
         this.logic = logic;

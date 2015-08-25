@@ -21,8 +21,7 @@ package playground.michalm.util.sim;
 
 import java.util.Arrays;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 
 
 public class SimLauncher
@@ -43,15 +42,15 @@ public class SimLauncher
             cfgFile = args[1];
         }
         else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+            throw new IllegalArgumentException(
+                    "Incorrect program arguments: " + Arrays.toString(args));
         }
 
         Controler controler = new Controler(new String[] { dir + cfgFile });
-        controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+        controler.getConfig().controler()
+                .setOverwriteFileSetting(true
+                        ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+                        : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
         controler.run();
     }
 }

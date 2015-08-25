@@ -21,7 +21,5 @@ package playground.michalm.ev;
 
 public interface ChargingLogic
 {
-    Charger getCharger();
-    
     void chargeVehicles(double chargeTime);
 }

@@ -85,7 +85,7 @@ public class ServedRequestsShpWriter
         String originsShpFile = shpPath + "origins_2014_02.shp";
         String destinationsShpFile = shpPath + "destinations_2014_02.shp";
 
-        new ServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N).write(
-                originsShpFile, destinationsShpFile);
+        new ServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N)
+                .write(originsShpFile, destinationsShpFile);
     }
 }

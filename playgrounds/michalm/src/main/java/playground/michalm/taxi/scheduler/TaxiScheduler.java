@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -51,7 +51,7 @@ public class TaxiScheduler
         this.calculator = calculator;
         this.params = params;
 
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
             schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
@@ -67,7 +67,8 @@ public class TaxiScheduler
     public boolean isIdle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
-        if (context.getTime() >= vehicle.getT1() || schedule.getStatus() != ScheduleStatus.STARTED) {
+        if (context.getTime() >= vehicle.getT1()
+                || schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
@@ -246,7 +247,7 @@ public class TaxiScheduler
      */
     public void stopAllAimlessDriveTasks()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             if (getImmediateDiversion(veh) != null) {
                 stopVehicle(veh);
             }
@@ -430,7 +431,7 @@ public class TaxiScheduler
     public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             removeAwaitingRequestsImpl(TaxiSchedules.asTaxiSchedule(veh.getSchedule()));
         }
 
@@ -514,7 +515,8 @@ public class TaxiScheduler
                     return 0;
                 }
 
-                if (TaxiSchedules.getNextTaxiTask(currentTask).getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                if (TaxiSchedules.getNextTaxiTask(currentTask)
+                        .getTaxiTaskType() == TaxiTaskType.PICKUP) {
                     //if no diversion and driving to pick up sb then serve that request
                     return params.destinationKnown ? 3 : null;
                 }

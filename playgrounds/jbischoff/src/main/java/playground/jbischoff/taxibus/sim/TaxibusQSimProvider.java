@@ -33,7 +33,7 @@ import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -109,7 +109,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		TaxiSchedulerParams params = new TaxiSchedulerParams(tbcg.isDestinationKnown(), tbcg.isVehicleDiversion(),
 				tbcg.getPickupDuration(), tbcg.getDropoffDuration());
 		
-		resetSchedules(context.getVrpData().getVehicles());
+		resetSchedules(context.getVrpData().getVehicles().values());
 		
 		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
 				.getNetwork(), travelDisutility, travelTime);
@@ -132,7 +132,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 
 	}
 	
-	private void resetSchedules(List<Vehicle> vehicles) {
+	private void resetSchedules(Iterable<Vehicle> vehicles) {
 
     	for (Vehicle v : vehicles){
     		VehicleImpl vi = (VehicleImpl) v;

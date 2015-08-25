@@ -32,7 +32,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
-import org.matsim.contrib.dvrp.util.DistanceUtils;
+import org.matsim.contrib.util.DistanceUtils;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.optimizer.*;
@@ -188,7 +188,7 @@ public class NOSRankTaxiOptimizer
     private void checkWaitingVehiclesBatteryState(double time)
     {
 
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
 
             if (!optimConfig.scheduler.isIdle(veh))
                 continue;
@@ -361,7 +361,7 @@ public class NOSRankTaxiOptimizer
 
     public void sendIdlingTaxisBackToRank(double time)
     {
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
             if (!optimConfig.scheduler.isIdle(veh))
                 continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
@@ -390,7 +390,7 @@ public class NOSRankTaxiOptimizer
     private void sendIdlingTaxisHome(double time)
     {
         int homeboundthishour = 0;
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
             if (time + 3600 < veh.getT1())
                 continue;
             if (!optimConfig.scheduler.isIdle(veh))

@@ -84,6 +84,7 @@ public class MIPProblem
     //static final Mode MODE = Mode.OFFLINE_INIT_OPTIM;
     static final Mode MODE = Mode.ONLINE_1;
 
+
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
             PathTreeBasedTravelTimeCalculator pathTravelTimeCalc)
     {
@@ -223,8 +224,8 @@ public class MIPProblem
     {
         return rData.dimension;
     }
-    
-    
+
+
     boolean isPlanningHorizonFull()
     {
         return getPlanningHorizon() == getPlannedRequestCount();

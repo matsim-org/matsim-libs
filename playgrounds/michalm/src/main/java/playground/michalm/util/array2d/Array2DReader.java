@@ -50,7 +50,8 @@ public class Array2DReader
     }
 
 
-    public static Object getArray(BufferedReader br, int cols, Strategy strategy) throws IOException
+    public static Object getArray(BufferedReader br, int cols, Strategy strategy)
+        throws IOException
     {
         List<Object> rows = new ArrayList<>();
         boolean endOfArray = false;
