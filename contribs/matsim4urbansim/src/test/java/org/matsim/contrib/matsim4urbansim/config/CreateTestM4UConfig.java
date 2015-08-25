@@ -23,40 +23,20 @@
 package org.matsim.contrib.matsim4urbansim.config;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ConfigType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ControlerType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.FileType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.InputPlansFileType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.Matsim4UrbansimContolerType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.MatsimConfigType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ObjectFactory;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.PlanCalcScoreType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.UrbansimParameterType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
-import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -76,6 +56,7 @@ public class CreateTestM4UConfig {
 	String dummyPath;
 	
 	// yy why is all of this public?  could you please write a comment why that design decision was made?  thx.  kai, apr'13
+	// changed to package-private.  Not optimal, but better.  kai, aug'15
 	
 	private String matsimExternalConfigFileName 				= "";
 	 private String networkInputFileName 	 					= "";
@@ -122,24 +103,6 @@ public class CreateTestM4UConfig {
 	boolean useWalkParameterFromMATSim			= true;
 	boolean useRawSumsWithoutLn					= false;
 	Double logitScaleParameter					= 1.0;
-	Double betaCarTravelTime						= 0.;
-	Double betaCarTravelTimePower2				= 0.;
-	Double betaCarLnTravelTime					= 0.;
-	Double betaCarTravelDistance					= 0.;
-	Double betaCarTravelDistancePower2			= 0.;
-	Double betaCarLnTravelDistance				= 0.;
-	Double betaCarTravelCost						= 0.;
-	Double betaCarTravelCostPower2				= 0.;
-	Double betaCarLnTravelCost					= 0.;
-	Double betaWalkTravelTime					= 0.;
-	Double betaWalkTravelTimePower2				= 0.;
-	Double betaWalkLnTravelTime					= 0.;
-	Double betaWalkTravelDistance				= 0.;
-	Double betaWalkTravelDistancePower2			= 0.;
-	Double betaWalkLnTravelDistance				= 0.;
-	Double betaWalkTravelCost					= 0.;
-	Double betaWalkTravelCostPower2				= 0.;
-	Double betaWalkLnTravelCost					= 0.;
 	
 	/**
 	 * constructor
@@ -381,8 +344,4 @@ public class CreateTestM4UConfig {
 		return inputPlansFileName;
 	}
 
-	void setInputPlansFileName(String inputPlansFileName) {
-		this.inputPlansFileName = inputPlansFileName;
-	}
-	
 }
