@@ -591,8 +591,7 @@ public class CreateTestM4UConfig {
 			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			if(file2XSD == null || !file2XSD.exists()){
-				log.error("Did not find xml schema!");
-				System.exit(1);
+				throw new RuntimeException("Did not find xml schema!");
 			}
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
 			
