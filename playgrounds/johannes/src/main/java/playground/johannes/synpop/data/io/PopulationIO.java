@@ -17,55 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.analysis;
+package playground.johannes.synpop.data.io;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.facilities.ActivityFacilities;
+import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
- *
  */
-public class ActivityDistanceTruncatedTask extends ActivityDistanceTask {
+public class PopulationIO {
 
-	private final double threshold;
-	
-	@Override
-	protected DescriptiveStatistics statistics(Collection<? extends Person> persons, String purpose, String mode) {
-		DescriptiveStatistics stats = super.statistics(persons, purpose, mode);
+    private static final Logger logger = Logger.getLogger(PopulationIO.class);
 
-		if (threshold > 0) {
-			DescriptiveStatistics newStats = new DescriptiveStatistics();
-			for (int i = 0; i < stats.getN(); i++) {
-				double val = stats.getElement(i);
-				if (val >= threshold) {
-					newStats.addValue(val);
-				}
-			}
+    public static Set<? extends Person> loadFromXML(String file, Factory factory) {
+        XMLHandler parser = new XMLHandler(factory);
+        parser.setValidating(false);
+        parser.parse(file);
 
-			return newStats;
-		} else {
-			return stats;
-		}
-	}
+        Set<? extends Person> persons = parser.getPersons();
+        logger.info(String.format("Loaded %s persons.", persons.size()));
+        return persons;
+    }
 
-	@Override
-	protected String getKey(String type) {
-		String key = super.getKey(type);
-		if(threshold > 0) {
-			key = String.format("%s.%d", key, (int)threshold);
-		}
-		
-		return key;
-	}
-
-	public ActivityDistanceTruncatedTask(ActivityFacilities facilities, String mode, double threshold) {
-		super(facilities, mode);
-		this.threshold = threshold;
-	}
-
+    public static void writeToXML(String file, Collection<? extends Person> population) {
+        XMLWriter writer = new XMLWriter();
+        writer.write(file, population);
+    }
 }

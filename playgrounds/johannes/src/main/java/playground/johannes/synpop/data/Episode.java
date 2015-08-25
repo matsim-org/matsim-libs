@@ -26,13 +26,17 @@ import java.util.List;
  */
 public interface Episode extends Attributable {
 
-    public List<Segment> getActivities();
+    List<Segment> getActivities();
 
-    public List<Segment> getLegs();
+    List<Segment> getLegs();
 
-    public void addActivity(Segment activity);
+    void addActivity(Segment activity);
 
-    public void addLeg(Segment leg);
+    void addLeg(Segment leg);
 
-    public Person getPerson();
+    void removeActivity(Segment activity);
+
+    void removeLeg(Segment leg);
+
+    Person getPerson();
 }

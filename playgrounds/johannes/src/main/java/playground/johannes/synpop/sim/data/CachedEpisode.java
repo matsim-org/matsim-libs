@@ -74,6 +74,16 @@ public class CachedEpisode extends CachedElement implements Episode {
     }
 
     @Override
+    public void removeActivity(Segment activity) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void removeLeg(Segment leg) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
     public Person getPerson() {
         throw new UnsupportedOperationException("Navigation not supported.");
 //        return ((Episode)getDelegate()).getPerson();

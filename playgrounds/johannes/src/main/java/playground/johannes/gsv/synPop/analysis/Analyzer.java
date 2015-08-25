@@ -20,9 +20,10 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.mid.analysis.MonthTask;
 import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -46,12 +47,12 @@ public class Analyzer {
 		String personFile = args[0];
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.car.trips.xml";
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		
 		parser.parse(personFile);
 
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		
 		Set<PlainPerson> remove = new HashSet<>();
 		for(PlainPerson person : persons) {

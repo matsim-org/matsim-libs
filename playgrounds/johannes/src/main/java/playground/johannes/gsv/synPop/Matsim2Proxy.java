@@ -30,12 +30,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,25 +58,25 @@ public class Matsim2Proxy {
 		logger.info(String.format("Loaded %s matsim persons.", scenario.getPopulation().getPersons().size()));
 		
 		logger.info("Loading proxy persons...");
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[1]);
 		logger.info(String.format("Loaded %s proxy persons.", parser.getPersons().size()));
 		
 		Map<Id<Person>, ? extends Person> matsimPersons = scenario.getPopulation().getPersons();
-		Map<String, PlainPerson> proxyPresons = new HashMap<>(matsimPersons.size());
+		Map<String, playground.johannes.synpop.data.Person> proxyPresons = new HashMap<>(matsimPersons.size());
 		
-		for(PlainPerson person : parser.getPersons()) {
+		for(playground.johannes.synpop.data.Person person : parser.getPersons()) {
 			proxyPresons.put(person.getId(), person);
 		}
 		
-		Set<PlainPerson> newPlainPersons = new HashSet<>(matsimPersons.size());
+		Set<playground.johannes.synpop.data.Person> newPlainPersons = new HashSet<>(matsimPersons.size());
 		
 		int cntReplan = 0;
 		
 		logger.info("Converting persons...");
 		for(Person matsimPerson : matsimPersons.values()) {
-			PlainPerson plainPerson = proxyPresons.get(matsimPerson.getId().toString());
+			playground.johannes.synpop.data.Person plainPerson = proxyPresons.get(matsimPerson.getId().toString());
 			newPlainPersons.add(plainPerson);
 			
 			Episode proxyPlan = plainPerson.getEpisodes().get(0);

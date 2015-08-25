@@ -32,8 +32,8 @@ import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.processing.TaskRunner;
@@ -61,12 +61,12 @@ public class PopGeoExtract {
 
 		Logger logger = Logger.getLogger(PopGeoExtract.class);
 
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		logger.info("Loading persons...");
 		parser.parse(infile);
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		FacilityDataLoader loader = new FacilityDataLoader(facFile, null);

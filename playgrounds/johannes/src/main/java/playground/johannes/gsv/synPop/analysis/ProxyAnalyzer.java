@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.BufferedWriter;
@@ -40,7 +41,7 @@ public class ProxyAnalyzer {
 		ProxyAnalyzer.append = append;
 	}
 
-	public static Map<String, DescriptiveStatistics> analyze(Collection<PlainPerson> person, AnalyzerTask task) {
+	public static Map<String, DescriptiveStatistics> analyze(Collection<? extends Person> person, AnalyzerTask task) {
 		Map<String, DescriptiveStatistics> results = new HashMap<String, DescriptiveStatistics>();
 		task.analyze(person, results);
 		return results;

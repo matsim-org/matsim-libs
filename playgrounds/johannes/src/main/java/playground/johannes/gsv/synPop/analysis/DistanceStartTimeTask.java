@@ -22,12 +22,9 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -38,11 +35,11 @@ import java.util.Map;
  */
 public class DistanceStartTimeTask extends AnalyzerTask {
     @Override
-    public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList distVals = new TDoubleArrayList();
         TDoubleArrayList startVals = new TDoubleArrayList();
 
-        for(PlainPerson person : persons) {
+        for(Person person : persons) {
             for(Episode plan : person.getEpisodes()) {
                 for(Attributable leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
