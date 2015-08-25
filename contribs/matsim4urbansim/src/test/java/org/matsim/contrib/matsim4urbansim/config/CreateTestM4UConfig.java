@@ -79,7 +79,7 @@ public class CreateTestM4UConfig {
 	
 	private String matsimExternalConfigFileName 				= "";
 	 private String networkInputFileName 	 					= "";
-	 String inputPlansFileName 						= "";
+	 private String inputPlansFileName 						= "";
 	 String hotstartPlansFileName						= "";
 	 BigInteger firstIteration					= new BigInteger("0");
 	 BigInteger lastIteration						= new BigInteger("1");
@@ -375,6 +375,14 @@ public class CreateTestM4UConfig {
 
 	void setNetworkInputFileName(String networkInputFileName) {
 		this.networkInputFileName = networkInputFileName;
+	}
+
+	String getInputPlansFileName() {
+		return inputPlansFileName;
+	}
+
+	void setInputPlansFileName(String inputPlansFileName) {
+		this.inputPlansFileName = inputPlansFileName;
 	}
 	
 }

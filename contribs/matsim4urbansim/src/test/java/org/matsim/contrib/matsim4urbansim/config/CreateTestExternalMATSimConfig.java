@@ -24,17 +24,20 @@ package org.matsim.contrib.matsim4urbansim.config;
 
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.*;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import java.math.BigInteger;
 
 /**
  * @author thomas
@@ -42,73 +45,55 @@ import java.math.BigInteger;
  */
 public class CreateTestExternalMATSimConfig {
 	
-	public static final String DUMMY_FILE_2 = "/dummy2.xml";
+	 static final String DUMMY_FILE_2 = "/dummy2.xml";
 	
-	public final int timeOfDay 						= 10000;
-//	public final double betaBikeTravelTime 			= -12.;
-//	public final double betaBikeTravelTimePower2 	= 0.;
-//	public final double betaBikeLnTravelTime		= 0.;
-//	public final double betaBikeTravelDistance		= 0.;
-//	public final double betaBikeTravelDistancePower2= 0.;
-//	public final double betaBikeLnTravelDistance	= 0.;
-//	public final double betaBikeTravelCost			= 0.;
-//	public final double betaBikeTravelCostPower2	= 0.;
-//	public final double betaBikeLnTravelCost		= 0.;
-//	public final double betaPtTravelTime			= -12.;
-//	public final double betaPtTravelTimePower2		= 0.;
-//	public final double betaPtLnTravelTime			= 0.;
-//	public final double betaPtTravelDistance		= 0.;
-//	public final double betaPtTravelDistancePower2	= 0.;
-//	public final double betaPtLnTravelDistance		= 0.;
-//	public final double betaPtTravelCost			= 0.;
-//	public final double betaPtTravelCostPower2		= 0.;
-//	public final double betaPtLnTravelCost			= 0.;
-	public final String urbanSimZoneShapefileLocationDistribution;
-	public final String ptStops;
-	public final String usePtStops;
-	public final String ptTravelTimes;
-	public final String ptTravelDistances;
-	public final String useTravelTimesAndDistances;
-	public final String changeLegModeModuleName 	= "changeLegMode";
-	public final String changeLegModeParamName		= "modes";
-	public final String changeLegModeValue			= "car,pt";
-	public final String strategyModuleName 			= "strategy";
-	public final String startegyModule4ProbabilityPramName= "ModuleProbability_4";
-	public final double startegyModuleProbabilityValue= 0.1;
-	public final String startegyModule4ParamName	= "Module_4";
+	 final int timeOfDay 						= 10000;
+	 final String urbanSimZoneShapefileLocationDistribution;
+	 final String ptStops;
+	 final String usePtStops;
+	 final String ptTravelTimes;
+	 final String ptTravelDistances;
+	 final String useTravelTimesAndDistances;
+	 final String changeLegModeModuleName 	= "changeLegMode";
+	 final String changeLegModeParamName		= "modes";
+	 final String changeLegModeValue			= "car,pt";
+	 final String strategyModuleName 			= "strategy";
+	 final String startegyModule4ProbabilityPramName= "ModuleProbability_4";
+	 final double startegyModuleProbabilityValue= 0.1;
+	 final String startegyModule4ParamName	= "Module_4";
 //	private final String startegyModule4Value		= "ChangeLegMode"; // use from PlanStrategyRegistrar instead.  kai, may'13
-	public final String networkParamName			= "inputNetworkFile";
-	public final String controlerFirstIterationPramName = "firstIteration";
-	public final String controlerLastIterationPramName = "lastIteration";
-	public final String activityType0ParamName		= "activityType_0"; 
-	public final String activityTypicalDuration0ParamName= "activityTypicalDuration_0";
-	public final String activityTypicalDuration0Value= "10:00:00";
-	public final String activityType1ParamName		= "activityType_1";
-	public final String activityTypicalDuration1ParamName= "activityTypicalDuration_1";
-	public final String activityTypicalDuration1Value = "10:00:00";
-	public final String activityOpeningTime1ParamName = "activityOpeningTime_1";
-	public final String activityOpeningTime1Value 	= "10:00:00";
-	public final String activityLatestStartTime1ParamName = "activityLatestStartTime_1";
-	public final String activityLatestStartTime1Value = "10:00:00";
-	public final String plansPramName 				= "inputPlansFile";
-	public final String qsimNumberOfThreadsPramName	= "numberOfThreads";
-	public final int  qsimNumberOfThreadsValue		= 3;
-	public final String flowCapacityFactorParamName	= "flowCapacityFactor";
-	public final double flowCapacityFactorValue		= 0.15;
-	public final String storageCapacityFactorParamName= "storageCapacityFactor";
-	public final double storageCapacityFactorValue	= 0.2;
-	public final String stuckTimeParamName			= "stuckTime";
-	public final double stuckTimeValue				= 9.;
-	public final String endTimeParamName			= "endTime";
-	public final String endTimeValue				= "30:00:00";
-	public final String beelineDistanceFactorParamName= "beelineDistanceFactor";
-	public final double beelineDistanceFactorValue	= 1.5;
-	public final String teleportedModeSpeedWalkParamName = "teleportedModeSpeed_walk";
-	public final double teleportedModeSpeedWalkValue= 1.4;
-	public final String teleportedModeSpeedBikeParamName = "teleportedModeSpeed_bike";
-	public final double teleportedModeSpeedBikeValue= 4.0;
-	public final String teleportedModeSpeedPtParamName= "teleportedModeSpeed_pt";
-	public final double teleportedModeSpeedPtValue	= 7.0;
+	 final String networkParamName			= "inputNetworkFile";
+	 final String controlerFirstIterationPramName = "firstIteration";
+	 final String controlerLastIterationPramName = "lastIteration";
+	 final String activityType0ParamName		= "activityType_0"; 
+	 final String activityTypicalDuration0ParamName= "activityTypicalDuration_0";
+	 final String activityTypicalDuration0Value= "10:00:00";
+	 final String activityType1ParamName		= "activityType_1";
+	 final String activityTypicalDuration1ParamName= "activityTypicalDuration_1";
+	 final String activityTypicalDuration1Value = "10:00:00";
+	 final String activityOpeningTime1ParamName = "activityOpeningTime_1";
+	 final String activityOpeningTime1Value 	= "10:00:00";
+	 final String activityLatestStartTime1ParamName = "activityLatestStartTime_1";
+	 final String activityLatestStartTime1Value = "10:00:00";
+	 final String plansPramName 				= "inputPlansFile";
+	 final String qsimNumberOfThreadsPramName	= "numberOfThreads";
+	 final int  qsimNumberOfThreadsValue		= 3;
+	 final String flowCapacityFactorParamName	= "flowCapacityFactor";
+	 final double flowCapacityFactorValue		= 0.15;
+	 final String storageCapacityFactorParamName= "storageCapacityFactor";
+	 final double storageCapacityFactorValue	= 0.2;
+	 final String stuckTimeParamName			= "stuckTime";
+	 final double stuckTimeValue				= 9.;
+	 final String endTimeParamName			= "endTime";
+	 final String endTimeValue				= "30:00:00";
+	 final String beelineDistanceFactorParamName= "beelineDistanceFactor";
+	 final double beelineDistanceFactorValue	= 1.5;
+	 final String teleportedModeSpeedWalkParamName = "teleportedModeSpeed_walk";
+	 final double teleportedModeSpeedWalkValue= 1.4;
+	 final String teleportedModeSpeedBikeParamName = "teleportedModeSpeed_bike";
+	 final double teleportedModeSpeedBikeValue= 4.0;
+	 final String teleportedModeSpeedPtParamName= "teleportedModeSpeed_pt";
+	 final double teleportedModeSpeedPtValue	= 7.0;
 
 	private String networkInputFileName;
 
@@ -150,7 +135,8 @@ public class CreateTestExternalMATSimConfig {
 		// creating an empty MASim config
 		Config config = new Config();
 		
-		// !! note that the modules are deliberately anonymous (i.e. not typed) since we test the effect of incomplete entries !!
+		// !! note that the modules are deliberately anonymous (i.e. not typed) since we test the effect of incomplete entries
+		// (i.e. config groups that are not fully specified in the file).  [[Not sure why this is needed??]]
 		
 		// matsim4urbansimParameter module
 		ConfigGroup matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
@@ -163,29 +149,8 @@ public class CreateTestExternalMATSimConfig {
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
-		// tnicolai: this are no default parameters anymore.
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_TIME, this.betaBikeLnTravelTime + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE, this.betaBikeTravelDistance + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE_POWER2, this.betaBikeTravelDistancePower2 + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_DISTANCE, this.betaBikeLnTravelDistance + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_MONETARY_COST, this.betaBikeTravelCost + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_MONETARY_COST_POWER2, this.betaBikeTravelCostPower2+ "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_MONETARY_COST, this.betaBikeLnTravelCost + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME, this.betaPtTravelTime + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME_POWER2, this.betaPtTravelTimePower2 + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_TIME, this.betaPtLnTravelTime + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE, this.betaPtTravelDistance + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE_POWER2, this.betaPtTravelDistancePower2 + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_DISTANCE, this.betaPtLnTravelDistance + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST, this.betaPtTravelCost + "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST_POWER2, this.betaPtTravelCostPower2+ "");
-//		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_MONETARY_COST, this.betaPtLnTravelCost + "");
-		
 		ConfigGroup acm = config.createModule( AccessibilityConfigGroup.GROUP_NAME ) ;
 		acm.addParam(AccessibilityConfigGroup.TIME_OF_DAY, this.timeOfDay + "");
-		
 		
 		// changeLegMode module
 		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
@@ -246,7 +211,8 @@ public class CreateTestExternalMATSimConfig {
 		// creating an empty MASim config
 		Config config = new Config();
 		
-
+		// !! note that the modules are deliberately anonymous (i.e. not typed) since we test the effect of incomplete entries !!
+		
 		// improved pseudo pt:
 		ConfigGroup ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
@@ -256,12 +222,6 @@ public class CreateTestExternalMATSimConfig {
 		// changeLegMode module
 		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
 		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
-		
-//		// strategy module
-//		Module strategyModule = config.createModule(strategyModuleName);
-//		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
-//		strategyModule.addParam(startegyModule4ParamName, startegyModule4Value);
-		// I don't think this is part of the "minimal" external config. kai, may'13
 		
 		return writeConfigFile(config);
 	}
@@ -288,33 +248,15 @@ public class CreateTestExternalMATSimConfig {
 	
 	
 	public static AccessibilityConfigGroup getAccessibilityParameterConfig(Config config) {
-		ConfigGroup m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);
-		if (m instanceof AccessibilityConfigGroup) {
-			return (AccessibilityConfigGroup) m;
-		}
-		AccessibilityConfigGroup apcm = new AccessibilityConfigGroup();
-		config.getModules().put(AccessibilityConfigGroup.GROUP_NAME, apcm);
-		return apcm;
+		return ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class ) ;
 	}
 	
 	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
-		ConfigGroup m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof M4UControlerConfigModuleV3) {
-			return (M4UControlerConfigModuleV3) m;
-		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
-		config.getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
-		return mccm;
+		return ConfigUtils.addOrGetModule(config, M4UControlerConfigModuleV3.GROUP_NAME, M4UControlerConfigModuleV3.class );
 	}
 	
 	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig(Config config) {
-		ConfigGroup m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-		if (m instanceof UrbanSimParameterConfigModuleV3) {
-			return (UrbanSimParameterConfigModuleV3) m;
-		}
-		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
-		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
-		return upcm;
+		return ConfigUtils.addOrGetModule(config, UrbanSimParameterConfigModuleV3.GROUP_NAME, UrbanSimParameterConfigModuleV3.class );
 	}
 
 	String getNetworkInputFileName() {
