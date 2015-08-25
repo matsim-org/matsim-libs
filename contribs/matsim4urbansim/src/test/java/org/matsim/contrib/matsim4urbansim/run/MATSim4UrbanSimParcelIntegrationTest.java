@@ -65,9 +65,9 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		writer.write( networkFilename);
 		
 		CreateTestM4UConfig creator = new CreateTestM4UConfig(path, networkFilename ) ;
-		String result = creator.generateConfigV3() ;
+		String filename = creator.generateConfigV3() ;
 		
-		String[] args = { result } ;
+		String[] args = { filename } ;
 		MATSim4UrbanSimParcel.main( args ); 
 				
 		final String ACCESSIBILITY_INDICATORS = "accessibility_indicators.csv" ;

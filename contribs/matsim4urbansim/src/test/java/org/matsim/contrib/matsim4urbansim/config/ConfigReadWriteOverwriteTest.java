@@ -67,6 +67,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@SuppressWarnings("static-method")
 	@Before
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();		
@@ -82,9 +83,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	public void testLoadMATSim4UrbanSimMinimalConfig(){
 
 		M4UConfigurationConverterV4 connector = null;
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 
-		String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
+		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 		log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 
@@ -132,7 +132,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 
 
 		log.info("done") ;
@@ -149,10 +149,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
 
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-
 		try{
-			String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 
@@ -177,7 +175,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 		log.info("done") ;
 	}
 
@@ -192,8 +190,6 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	@Test
 	//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testExternalMATSimConfig(){
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-
 		M4UConfigurationConverterV4 converter = null;
 
 		String path = utils.getOutputDirectory() + "/tmp" ;
@@ -252,7 +248,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 	}
 
 	// Helper method for get the file content

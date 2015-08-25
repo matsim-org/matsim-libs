@@ -243,8 +243,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	
-	final void computeAccessibilities(
-			Scenario scenario) {
+	final void computeAccessibilities( Scenario scenario ) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -302,10 +301,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				// --------------------------------------------------------------------------------------------------------------
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
 				for (final AggregationObject aggregatedFacility : this.aggregatedOpportunities) {
-					computeAndAddExpUtilContributions(
-							gcs,
-							origin,
-							aggregatedFacility);
+					computeAndAddExpUtilContributions( gcs, origin, aggregatedFacility );
 				}
 				// --------------------------------------------------------------------------------------------------------------
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -339,9 +335,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	
-	private void computeAndAddExpUtilContributions(
-			SumOfExpUtils[] gcs,
-			ActivityFacility origin,
+	private void computeAndAddExpUtilContributions( SumOfExpUtils[] gcs, ActivityFacility origin, 
 			final AggregationObject aggregatedFacility) {
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			if ( !isComputingMode.get( calculatorEntry.getKey() ) ) continue; // XXX should be configured by adding only the relevant calculators
