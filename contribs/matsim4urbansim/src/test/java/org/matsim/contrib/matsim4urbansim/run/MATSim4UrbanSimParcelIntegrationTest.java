@@ -21,6 +21,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +37,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import junit.framework.Assert;
 
 /**
  * @author nagel
@@ -73,11 +76,21 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		final String ZONES = "zones.csv" ;
 		final String PARCELS = "parcels.csv" ;
 		
-		compareFiles(ACCESSIBILITY_INDICATORS) ;
+		log.info("comparing travel data ...");
 		compareFiles(TRAVEL_DATA) ;
+		log.info("... done.");
+		log.info("comparing persons data ...");
 		compareFiles(PERSONS) ;
+		log.info("... done.");
+		log.info("comparing zones data ...");
 		compareFiles(ZONES) ;
+		log.info("... done.");
+		log.info("comparing parcels data ...");
 		compareFiles(PARCELS) ;
+		log.info("... done.");
+		log.info("comparing accessibility indicators ...");
+		compareFiles(ACCESSIBILITY_INDICATORS) ;
+		log.info("... done.");
 	}
 
 
@@ -106,6 +119,7 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 				System.err.flush() ;
 			}
 		}
+		Assert.assertEquals( originalCheckSum,  revisedCheckSum );
 		log.info("done") ;
 	}
 	

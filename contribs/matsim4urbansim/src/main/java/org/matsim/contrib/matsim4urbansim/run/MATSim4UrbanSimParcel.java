@@ -25,9 +25,16 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
@@ -95,7 +102,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcel.class);
 
 	// MATSim scenario
-	ScenarioImpl scenario = null;
+	Scenario scenario = null;
 	// MATSim4UrbanSim configuration converter
 	M4UConfigurationConverterV4 connector = null;
 	// Reads UrbanSim Parcel output files
@@ -141,10 +148,10 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		connector = new M4UConfigurationConverterV4( matsimConfiFile );
 		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
-			System.exit(-1);
+			throw new RuntimeException("An error occured while initializing MATSim scenario ...") ;
 		}
 		
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario( connector.getConfig() );
+		scenario = ScenarioUtils.createScenario( connector.getConfig() );
 		ScenarioUtils.loadScenario(scenario);
 		setControlerSettings(args);
 		// init Benchmark as default
@@ -202,7 +209,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
-		scenario.setPopulation(newPopulation);
+		((ScenarioImpl) scenario).setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels, opportunities);
@@ -286,9 +293,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			// (newly constructed) matsim4Urbansim config section.  kai & michael z, sep'14
 		}
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.getConfig().controler().setCreateGraphs(true);
 
         PtMatrix ptMatrix = null ;
@@ -380,10 +385,10 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		
 		if(computeGridBasedAccessibility){
 			// initializing grid based accessibility controler listener
-			GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( opportunities,
-																											 ptMatrix,
-																											 scenario.getConfig(), 
-																											 scenario.getNetwork() );
+			GridBasedAccessibilityControlerListenerV3 gbacl = 
+					new GridBasedAccessibilityControlerListenerV3( opportunities, ptMatrix, scenario.getConfig(), scenario.getNetwork() );
+			gbacl.setUrbansimMode(true);
+			
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 				gbacl.setComputingAccessibilityForMode(mode, true);
 			}

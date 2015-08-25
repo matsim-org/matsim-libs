@@ -319,7 +319,7 @@ import java.util.concurrent.ConcurrentHashMap;
 						if(!useRawSum){ 	// get log sum
 							accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
 						} else {
-							// this was used by IVT within SustainCity.  Not sure if we should main this; they could, after all, just exp the log results. kai, may'15
+							// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
 							accessibilities.put( mode, gcs[mode.ordinal()].getSum() ) ;
 //							accessibilities.put( mode, inverseOfLogitScaleParameter * gcs[mode.ordinal()].getSum() ) ;
 							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
@@ -329,6 +329,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				}
 
 				for (ZoneDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+					log.info("here");
 					zoneDataExchangeInterface.setZoneAccessibilities(origin, fromNode, accessibilities);
 				}
 			}
