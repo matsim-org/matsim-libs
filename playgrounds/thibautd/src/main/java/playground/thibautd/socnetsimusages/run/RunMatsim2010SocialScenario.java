@@ -46,6 +46,7 @@ import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistr
 import org.matsim.contrib.socnetsim.run.RunUtils;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
+import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
 import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquityModule;
 
@@ -134,6 +135,7 @@ public class RunMatsim2010SocialScenario {
 		//Matsim2030Utils.addDefaultGroups( config );
 		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new SocialDilutionConfigGroup() );
+		config.addModule( new EquityConfigGroup() );
 		new ConfigReader( config ).parse( configFile );
 		return config;
 	}
