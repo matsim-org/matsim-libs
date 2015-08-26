@@ -3,8 +3,10 @@ package playground.dhosse.gap.scenario;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
@@ -28,14 +30,15 @@ public class CommuterFileReader {
 	private static final Logger log = Logger.getLogger(CommuterDataReader.class);
 	private List<String> filteredMunicipalities;
 	private String spatialFilter;
-	private List<CommuterDataElement> commuterRelations;
+	private Map<String, CommuterDataElement> homeId2commuterRelations;
 	private int currentAdminLevel;
 	private int previousAdminLevel = -1;
 	
 	private List<String> relationHashes = new ArrayList<>();
 
 	public CommuterFileReader(){
-		this.commuterRelations = new ArrayList<CommuterDataElement>();
+//		this.homeId2commuterRelations = new ArrayList<CommuterDataElement>();
+		this.homeId2commuterRelations = new HashMap<String, CommuterDataElement>();
 		this.filteredMunicipalities = new LinkedList<String>();
 		this.relationHashes = new ArrayList<>();
 		this.spatialFilter = "";
@@ -61,14 +64,16 @@ public class CommuterFileReader {
 	}
 		
 	public void printMunicipalities(){
-		for (CommuterDataElement cde : this.commuterRelations){
+		for (CommuterDataElement cde : this.homeId2commuterRelations.values()){
 			System.out.println(cde);
 		}
 	}
 	
+	private String previousId = null;
+	
 	public void read(String filename, boolean reverse){
 	
-		log.info("Reading commuter da from " + filename);
+		log.info("Reading commuter data from " + filename);
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		
@@ -89,12 +94,12 @@ public class CommuterFileReader {
 					
 					if(reverse){
 						
-						homeId = tokens[0];
+						homeId = "0" + tokens[0];
 						homeName = tokens[1];
 						
 					} else{
 						
-						workId = tokens[0];
+						workId = "0" + tokens[0];
 						workName = tokens[1];
 						
 					}
@@ -113,12 +118,12 @@ public class CommuterFileReader {
 						
 						if(reverse){
 							
-							workId = tokens[2];
+							workId = "0" + tokens[2];
 							workName = tokens[3];
 							
 						} else{
 							
-							homeId = tokens[2];
+							homeId = "0" + tokens[2];
 							homeName = tokens[3];
 							
 						}
@@ -135,9 +140,14 @@ public class CommuterFileReader {
 										continue;
 									}
 									
+								} else{
+									
+									if(tokens[2].equals(previousId)) continue;
+									
 								}
 								
 							}
+							
 						} catch(NumberFormatException e){
 							log.info("Reached the end of this block. Continue...");
 							continue;
@@ -152,7 +162,7 @@ public class CommuterFileReader {
 								int commuters = Integer.parseInt(tokens[4]);
 								double share = Double.parseDouble(tokens[5])/commuters;
 								CommuterDataElement current = new CommuterDataElement(homeId, homeName, workId, workName, commuters, share);
-						    	this.commuterRelations.add(current);
+						    	this.homeId2commuterRelations.put(homeId + "_" + workId, current);
 								
 							} catch(NumberFormatException e){
 								log.info("Invalid number format. Will skip this line...");
@@ -165,6 +175,7 @@ public class CommuterFileReader {
 					
 				}
 			
+				this.previousId = tokens[2];
 				this.previousAdminLevel = this.currentAdminLevel;
 				
 			}
@@ -177,12 +188,24 @@ public class CommuterFileReader {
 			
 		}
 		
-		log.info("read " + this.commuterRelations.size() + " commuter relations");
+		log.info("read " + this.homeId2commuterRelations.size() + " commuter relations");
 		
 	}
 	
-	public List<CommuterDataElement> getCommuterRelations() {
-		return commuterRelations;
+	public Map<String, CommuterDataElement> getCommuterRelations() {
+		return homeId2commuterRelations;
+	}
+	
+	public CommuterDataElement getCommuterRelation(String id){
+		
+		return this.homeId2commuterRelations.get(id);
+		
+	}
+	
+	public CommuterDataElement getCommuterRelationAndRemove(String id){
+		
+		return this.homeId2commuterRelations.remove(id);
+		
 	}
 
 }
