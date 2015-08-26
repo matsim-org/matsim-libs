@@ -60,17 +60,11 @@ public class PoznanServedRequests
         //April - 1-14 + 23-29 (3 full weeks), exclude: 15-22, 30 (Easter and May's long weekend)
 
         @SuppressWarnings("unchecked")
-        //TODO WEIRD JAVAC COMPILER PROBLEM:
-        //necessary casting from Predicate<ServedRequest> to Predicate<? super ServedRequest>
-        Predicate<? super ServedRequest> orPredicate = Predicates.or(
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
+        Predicate<ServedRequest> orPredicate = Predicates.or(
+                ServedRequests.createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
+                ServedRequests.createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
+                ServedRequests.createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
+                ServedRequests.createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
 
         return Iterables.filter(requests, Predicates.not(orPredicate));
     }

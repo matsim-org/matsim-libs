@@ -180,7 +180,7 @@ public class PoznanLanduseDemandGeneration
 
         scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
         readValidatedZones(zonesWithLanduseFile);
 

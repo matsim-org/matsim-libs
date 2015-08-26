@@ -55,7 +55,7 @@ public class PoznanDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
         ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, false);
 
