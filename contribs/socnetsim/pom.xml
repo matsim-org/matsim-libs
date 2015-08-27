@@ -8,4 +8,18 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>socnetsim</artifactId>
   <name>socnetsim</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/*IntegrationTest.java</exclude>
+          </excludes>
+          <argLine>-Xmx700m -Djava.awt.headless=true</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
