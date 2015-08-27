@@ -91,8 +91,8 @@ public class BerlinTaxiVehicleCreatorV3
         btv.minTime = 4.0 * 3600;
         btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
-//        btv.createAverages(SDF.parse("2014-10-15 03:30:00"), 1);
-        btv.createAverages(SDF.parse("2013-04-16 03:30:00"), 1);
+//        btv.createAverages(SDF.parse("2014-10-15 03:30:00"));
+        btv.createAverages(SDF.parse("2013-04-16 03:30:00"));
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
         btv.prepareMatrices(statusMatrixFile);
         btv.createVehicles();
@@ -134,7 +134,7 @@ public class BerlinTaxiVehicleCreatorV3
 
 
     @SuppressWarnings("deprecation")
-    private void createAverages(Date start, int days)
+    private void createAverages(Date start)
     {
         if (start.getMinutes() != 30 || start.getSeconds() != 0) {
             //we want to obtain estimates for full hours, i.e. 4:00 or 5:00
@@ -142,10 +142,12 @@ public class BerlinTaxiVehicleCreatorV3
             throw new RuntimeException("Must start with hh:30:00");
         }
 
+        final int HOURS = 25;//we want to have vehicles for full 24 hours, e.g. 4am to 4am next day  
+        
         long startTime = start.getTime() / 1000;//in seconds
-        long endTime = startTime + days * 24 * 3600;//in seconds
+        long endTime = startTime + HOURS * 3600;//in seconds
 
-        taxisOverTimeHourlyAverage = new double[24];
+        taxisOverTimeHourlyAverage = new double[HOURS];
         int sum = 0;
         int hour = 0;
         int n = 0;
@@ -155,15 +157,15 @@ public class BerlinTaxiVehicleCreatorV3
                 sum += this.taxisOverTime.get(new Date(t * 1000));//seconds -> milliseconds
                 n++;
             }
-            if ( (t + 1801) % 3600 == 0) {
-                taxisOverTimeHourlyAverage[hour % 24] += (double)sum / n / days;
+            if ( t % 3600 == 1799) {//t == hh:29:59
+                taxisOverTimeHourlyAverage[hour] += (double)sum / n;
                 sum = 0;
                 hour++;
                 n = 0;
             }
         }
 
-        for (int i = 0; i<24;i++){
+        for (int i = 0; i<HOURS;i++){
             System.out.println(i+ " : "+ taxisOverTimeHourlyAverage[i]);
         }
     }
