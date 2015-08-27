@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -74,9 +75,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author thibautd
  */
-public class JointTravelingSimulationTest {
+public class JointTravelingSimulationIntegrationTest {
 	private static final Logger log =
-		Logger.getLogger(JointTravelingSimulationTest.class);
+		Logger.getLogger(JointTravelingSimulationIntegrationTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();

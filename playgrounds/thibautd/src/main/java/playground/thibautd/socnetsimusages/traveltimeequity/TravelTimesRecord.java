@@ -87,6 +87,13 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 				factory).getTravelTimeBefore( time );
 	}
 
+	public boolean alreadyKnowsTravelTimeAfter( final Id<Person> person , final double time ) {
+		return MapUtils.getArbitraryObject(
+				person,
+				times,
+				factory).alreadyKnowsTravelTimeAfter(time);
+	}
+
 	public double getTravelTimeAfter( final Id<Person> person , final double time ) {
 		return MapUtils.getArbitraryObject(
 				person,
@@ -115,7 +122,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 		public double getTravelTimeBefore( final double time ) {
 			final int bs = arrivals.binarySearch( time );
-			final int index = bs < 0 ? -bs - 1 : bs;
+			final int index = bs < 0 ? -bs - 2 : bs;
 
 			final double tt = arrivals.get( index ) - departures.get( index );
 			assert tt >= 0;
@@ -123,9 +130,13 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			return tt;
 		}
 
+		public boolean alreadyKnowsTravelTimeAfter( final double time ) {
+			return departures.get( departures.size() - 1 ) >= time;
+
+		}
 		public double getTravelTimeAfter( final double time ) {
 			final int bs = departures.binarySearch( time );
-			final int index = bs < 0 ? -bs : bs;
+			final int index = bs < 0 ? -bs -1 : bs;
 
 			final double tt = arrivals.get( index ) - departures.get( index );
 			assert tt >= 0;
