@@ -19,83 +19,47 @@
 
 package playground.michalm.berlin;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.google.common.base.Predicate;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.prep.PreparedPolygon;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 public class BerlinTaxiRequests
 {
-    public static boolean isWithinArea(Person person, PreparedPolygon preparedPolygon)
-    {
-        return isWithinArea(person.getPlans().get(0), preparedPolygon);
-    }
-
-
-    public static boolean isWithinArea(Plan plan, PreparedPolygon preparedPolygon)
-    {
-        Activity fromActivity = (Activity)plan.getPlanElements().get(0);
-        Activity toActivity = (Activity)plan.getPlanElements().get(2);
-
-        Point from = MGC.coord2Point(fromActivity.getCoord());
-        Point to = MGC.coord2Point(toActivity.getCoord());
-        return preparedPolygon.contains(from) && preparedPolygon.contains(to);
-    }
-
-
-    public static Predicate<Plan> createWithinAreaPredicate(MultiPolygon area)
-    {
-        final PreparedPolygon preparedPolygon = new PreparedPolygon(area);
-        return new Predicate<Plan>() {
-            public boolean apply(Plan plan)
-            {
-                return isWithinArea(plan, preparedPolygon);
-            }
-        };
-    }
-
-
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
-    private static final String BERLIN_SHP_FILE = DIR + "shp_merged/berlin_DHDN_GK4.shp";
     private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
-
-
-    public static MultiPolygon readBerlinArea()
-    {
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(BERLIN_SHP_FILE);
-        if (features.size() != 1) {
-            throw new RuntimeException();
-        }
-
-        return (MultiPolygon)features.iterator().next().getDefaultGeometry();
-    }
+    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/berlin.xml.gz";
 
 
     public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
     {
-        final PreparedPolygon preparedPolygon = new PreparedPolygon(readBerlinArea());
+        Scenario berlinBrBScenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE,
+                DIR + allPlansFile);
 
-        Scenario scenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE, DIR + allPlansFile);
-        Population populationWithinBerlin = PopulationUtils.createPopulation(scenario.getConfig(),
-                scenario.getNetwork());
+        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        new MatsimNetworkReader(onlyBerlinScenario).readFile(ONLY_BERLIN_NET_FILE);
+        Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
+                onlyBerlinScenario.getNetwork());
+        Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
 
-        for (Person p : scenario.getPopulation().getPersons().values()) {
-            if (isWithinArea(p.getPlans().get(0), preparedPolygon)) {
-                populationWithinBerlin.addPerson(p);
+        for (Person p : berlinBrBScenario.getPopulation().getPersons().values()) {
+            Plan plan = p.getPlans().get(0);
+            Activity fromActivity = (Activity)plan.getPlanElements().get(0);
+            Activity toActivity = (Activity)plan.getPlanElements().get(2);
+
+            if (onlyBerlinLinks.containsKey(fromActivity.getLinkId())
+                    && onlyBerlinLinks.containsKey(toActivity.getLinkId())) {
+                onlyBerlinPop.addPerson(p);
             }
         }
 
-        new PopulationWriter(populationWithinBerlin, scenario.getNetwork())
+        new PopulationWriter(onlyBerlinPop, onlyBerlinScenario.getNetwork())
                 .write(DIR + berlinPlansFile);
     }
 
