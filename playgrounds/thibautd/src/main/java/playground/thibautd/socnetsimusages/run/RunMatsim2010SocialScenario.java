@@ -78,19 +78,31 @@ public class RunMatsim2010SocialScenario {
 					@Override
 					public void install() {
 						install(new JointDecisionProcessModule());
+					}
+				} );
+		controller.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
 						install(new SocnetsimDefaultAnalysisModule());
 						install(new JointActivitiesScoringModule());
 						install(new DefaultGroupStrategyRegistryModule());
 						install(new JointTripsModule());
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
-						install(new KtiScoringWithEquityModule() );
 					}
 				});
+		controller.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install(new KtiScoringWithEquityModule());
+					}
+				} );
 
 
-		controller.run();
-	}
+					controller.run();
+				}
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );

@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.usage.replanning;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -36,7 +37,9 @@ import java.util.Map;
  * @author thibautd
  */
 public class DefaultGroupStrategyRegistryModule extends AbstractModule {
-    @Override
+	private static Logger log = Logger.getLogger( DefaultGroupStrategyRegistryModule.class );
+
+	@Override
     public void install() {
         install(new DefaultJointStrategiesModule());
         bind(GroupStrategyRegistry.class).toProvider(GroupStrategyRegistryFiller.class).in(Singleton.class);
@@ -68,8 +71,15 @@ public class DefaultGroupStrategyRegistryModule extends AbstractModule {
 			strategyRegistry.setExtraPlanRemover( removers.get( weights.getSelectorForRemoval() ).get() );
 
 			for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
+				final Provider<GroupPlanStrategy> provider = strategies.get( set.getStrategyName() );
+
+				if ( provider == null ) {
+					log.error( "Could not find strategy "+set.getStrategyName() );
+					log.error( "valid strategy names are "+strategies.keySet() );
+					throw new RuntimeException( "Could not find strategy "+set.getStrategyName() );
+				}
 				strategyRegistry.addStrategy(
-						strategies.get( set.getStrategyName() ).get(),
+						provider.get(),
 						set.getSubpopulation(),
 						set.getWeight(),
 						set.isInnovative() ?

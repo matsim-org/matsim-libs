@@ -37,6 +37,7 @@ public class KtiScoringWithEquityModule extends AbstractModule {
 								PtConstants.TRANSIT_ACTIVITY_TYPE,
 								JointActingTypes.INTERACTION
 						)) );
+		addEventHandlerBinding().to( TravelTimesRecord.class );
 		binder().bind(ScoringFunctionFactory.class).to(KtiScoringFunctionFactoryWithJointModesAndEquity.class);
 	}
 }

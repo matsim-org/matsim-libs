@@ -66,7 +66,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory ).arrivals.add(event.getTime());
+					factory ).addArrival(event.getTime());
 		}
 	}
 
@@ -76,7 +76,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory).departures.add(event.getTime());
+					factory).addDeparture(event.getTime());
 		}
 	}
 
