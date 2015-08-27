@@ -2,6 +2,7 @@
 /.project
 *.DS_Store
 
+# IntelliJ Files
 *.iml
 /.idea
 

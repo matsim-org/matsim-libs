@@ -42,7 +42,7 @@ public class EquityConfigGroup extends ReflectiveConfigGroup {
 		return betaStandardDev;
 	}
 
-	@StringGetter( "betaStandardDev" )
+	@StringSetter( "betaStandardDev" )
 	public void setBetaStandardDev(double betaStandardDev) {
 		this.betaStandardDev = betaStandardDev;
 	}
