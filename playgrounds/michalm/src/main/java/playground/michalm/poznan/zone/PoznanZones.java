@@ -32,19 +32,19 @@ import playground.michalm.zone.*;
 
 public class PoznanZones
 {
-    public static Map<Id<Zone>, Zone> readVisumZones(Scenario scenario)
+    public static Map<Id<Zone>, Zone> readVisumZones()
     {
         String zonesXmlFile = "d:/eTaxi/Poznan_MATSim/zones.xml";
         String zonesShpFile = "d:/eTaxi/Poznan_MATSim/GIS/zones.shp";
-        return Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        return Zones.readZones(zonesXmlFile, zonesShpFile);
     }
 
 
-    public static Map<Id<Zone>, Zone> readTaxiZones(Scenario scenario)
+    public static Map<Id<Zone>, Zone> readTaxiZones()
     {
         String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
         String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
-        return Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        return Zones.readZones(zonesXmlFile, zonesShpFile);
     }
 
 

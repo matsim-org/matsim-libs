@@ -37,9 +37,8 @@ import org.matsim.core.api.internal.MatsimWriter;
  */
 public abstract class MatsimJaxbXmlWriter implements MatsimWriter {
 
-	public void setMarshallerProperties(String schemaLocation, Marshaller m) throws PropertyException  {
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, 
-				Boolean.TRUE); 
+	public static final void setMarshallerProperties(String schemaLocation, Marshaller m) throws PropertyException  {
+		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); 
 		m.setProperty("jaxb.schemaLocation", MatsimXmlWriter.MATSIM_NAMESPACE + " " + schemaLocation);
 	}
 

@@ -32,6 +32,9 @@ public class CommuterDataElement {
 	private int adminLevel;
 	private double shareOfMaleCommuters;
 	
+	private int malePersonsCreated = 0;
+	private int femalePersonsCreated = 0;
+	
 	public CommuterDataElement(String fromId, String fromName,  String toId, String toName,  int commuters){
 		this.fromId = fromId;
 		this.toId = toId;
@@ -99,6 +102,26 @@ public class CommuterDataElement {
 	
 	public double getShareOfMaleCommuters(){
 		return this.shareOfMaleCommuters;
+	}
+	
+	public int getMalePersonsCreated(){
+		
+		return this.malePersonsCreated;
+		
+	}
+	
+	public void incMalePersonsCreated(){
+		this.malePersonsCreated++;
+	}
+	
+	public int getFemalePersonsCreated(){
+		
+		return this.femalePersonsCreated;
+		
+	}
+	
+	public void incFemalePersonsCreated(){
+		this.femalePersonsCreated++;
 	}
 
 }

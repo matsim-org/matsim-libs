@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class ActivityDistanceTruncatedTask extends ActivityDistanceTask {
 	private final double threshold;
 	
 	@Override
-	protected DescriptiveStatistics statistics(Collection<PlainPerson> persons, String purpose, String mode) {
+	protected DescriptiveStatistics statistics(Collection<? extends Person> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = super.statistics(persons, purpose, mode);
 
 		if (threshold > 0) {

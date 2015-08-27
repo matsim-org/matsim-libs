@@ -55,10 +55,9 @@ public class BerlinZoneUtils
     private static final Coord SXF_CENTROID = new CoordImpl(4603210.22153, 5807381.44468);
 
 
-    public static Map<Id<Zone>, Zone> readZones(Scenario scenario, String zonesXmlFile,
-            String zonesShpFile)
+    public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile)
     {
-        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
         Zone txlZone = zones.get(TXL_LOR_ID);
         if (txlZone != null) {

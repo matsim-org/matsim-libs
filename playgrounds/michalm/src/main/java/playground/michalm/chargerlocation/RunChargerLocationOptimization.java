@@ -128,7 +128,7 @@ public class RunChargerLocationOptimization
         //                .crateFreespeedDistanceCalculator(scenario.getNetwork());
         DistanceCalculator calculator = DistanceCalculators.BEELINE_DISTANCE_CALCULATOR;
 
-        Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
         readPotentials(zones, potentialFile, HORIZON);
 
         double totalEnergyConsumed = //

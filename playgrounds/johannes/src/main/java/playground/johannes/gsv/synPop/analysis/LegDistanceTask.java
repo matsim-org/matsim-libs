@@ -21,11 +21,8 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -50,13 +47,13 @@ public class LegDistanceTask extends AnalyzerTask {
 		this.mode = mode;
 	}
 	
-	protected DescriptiveStatistics statistics(Collection<PlainPerson> persons, String purpose, String mode) {
+	protected DescriptiveStatistics statistics(Collection<? extends Person> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
 		int cntNoVal = 0;
 
-		for (PlainPerson person : persons) {
-			Episode plan = person.getPlan();
+		for (Person person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 
 			for(int i = 0; i < plan.getLegs().size(); i++) {
 				Attributable leg = plan.getLegs().get(i);
@@ -96,10 +93,10 @@ public class LegDistanceTask extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
-		for (PlainPerson person : persons) {
-			Episode plan = person.getPlan();
+		for (Person person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}

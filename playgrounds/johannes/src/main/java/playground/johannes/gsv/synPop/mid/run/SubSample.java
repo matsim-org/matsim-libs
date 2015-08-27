@@ -22,12 +22,14 @@ package playground.johannes.gsv.synPop.mid.run;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.DeleteRandom;
 import playground.johannes.gsv.synPop.PersonTaskComposite;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -40,7 +42,7 @@ public class SubSample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		
 		parser.addToBlacklist("workLoc");
@@ -63,7 +65,7 @@ public class SubSample {
 		PersonTaskComposite tasks = new PersonTaskComposite();
 		tasks.addComponent(new DeleteRandom(1-proba));
 		
-		Collection<PlainPerson> subset = TaskRunner.runAndDeletePerson(tasks, parser.getPersons());
+		Collection<PlainPerson> subset = TaskRunner.runAndDeletePerson(tasks, (Set<PlainPerson>)parser.getPersons());
 		logger.info(String.format("New population: %s persons.", subset.size()));
 		
 		logger.info("Writing population...");

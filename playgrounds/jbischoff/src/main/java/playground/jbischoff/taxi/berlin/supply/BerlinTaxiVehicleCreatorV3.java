@@ -63,15 +63,27 @@ public class BerlinTaxiVehicleCreatorV3
     public static void main(String[] args)
         throws ParseException
     {
-        String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
+        //String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
+        String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
+        
+        
 //        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt";
-//        String taxisOverTimeFile = dir + "/taxi_berlin/2013/status/taxisovertime.csv";
-        String taxisOverTimeFile = dir + "/taxi_berlin/2013/vehicles/taxisweekly.csv";
-        String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
+//        String taxisOverTimeFile = dir + "taxi_berlin/2013/status/taxisovertime.csv";
+        String taxisOverTimeFile = dir + "taxi_berlin/2013/vehicles/taxisweekly.csv";
+
+        //String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
+        String networkFile = dir + "network/berlin.xml";//only Berlin!!!
+        
+        
+        
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
-        String vehicleFile = dir + "scenarios/2015_02_basic_scenario_v6/taxis4to4_EV";
-        String statusMatrixFile = dir+ "/taxi_berlin/2013/status/statusMatrixAvg.xml";
+        
+        //String vehicleFile = dir + "scenarios/2015_02_basic_scenario_v6/taxis4to4_EV";
+        String vehicleFile = dir + "scenarios/2015_08_only_berlin_v1/taxis4to4_EV";
+        
+        
+        String statusMatrixFile = dir + "taxi_berlin/2013/status/statusMatrixAvg.xml";
         
         
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
@@ -93,7 +105,7 @@ public class BerlinTaxiVehicleCreatorV3
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        zones = BerlinZoneUtils.readZones(scenario, zoneXmlFile, zoneShpFile);
+        zones = BerlinZoneUtils.readZones(zoneXmlFile, zoneShpFile);
     }
 
 
@@ -163,7 +175,9 @@ public class BerlinTaxiVehicleCreatorV3
         Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("avg");
 
         for (Map.Entry<String, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
-            wrs.add(Id.create(fromLOR.getKey(), Zone.class), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
+            if (BerlinZoneUtils.isInBerlin(fromLOR.getKey())) {
+                wrs.add(Id.create(fromLOR.getKey(), Zone.class), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
+            }
         }
     }
 

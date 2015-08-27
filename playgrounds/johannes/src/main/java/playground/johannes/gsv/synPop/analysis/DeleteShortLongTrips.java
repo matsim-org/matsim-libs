@@ -20,13 +20,12 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+
+import java.util.Set;
 
 /**
  * @author johannes
@@ -161,13 +160,13 @@ public class DeleteShortLongTrips implements EpisodeTask {
 	}
 
 	public static void main(String args[]) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		parser.parse("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
 
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
-		for (PlainPerson person : parser.getPersons()) {
+		for (PlainPerson person : (Set<PlainPerson>)parser.getPersons()) {
 			task.apply(person.getEpisodes().get(0));
 		}
 

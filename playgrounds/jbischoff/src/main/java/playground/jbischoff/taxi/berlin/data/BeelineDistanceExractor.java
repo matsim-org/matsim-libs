@@ -19,26 +19,20 @@
 
 package playground.jbischoff.taxi.berlin.data;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.util.DistanceUtils;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
+import com.vividsolutions.jts.geom.Point;
+
 import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
-
-import com.vividsolutions.jts.geom.Point;
 
 public class BeelineDistanceExractor
 {
@@ -50,9 +44,8 @@ public class BeelineDistanceExractor
      */
     public BeelineDistanceExractor()
     {
-        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         this.zones = new TreeMap<>();
-        this.zones.putAll(BerlinZoneUtils.readZones(scenario, "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.xml",
+        this.zones.putAll(BerlinZoneUtils.readZones("C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.xml",
                 "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.shp"));                 
         
         

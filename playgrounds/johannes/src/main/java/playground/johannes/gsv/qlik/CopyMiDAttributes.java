@@ -21,15 +21,17 @@ package playground.johannes.gsv.qlik;
 
 import org.apache.log4j.Logger;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -43,16 +45,16 @@ public class CopyMiDAttributes {
         String midIn = args[1];
         String simOut = args[2];
 
-        XMLParser reader = new XMLParser();
+        XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
 
         logger.info("Loading sim persons...");
         reader.parse(simIn);
-        Collection<PlainPerson> simPersons = reader.getPersons();
+        Collection<PlainPerson> simPersons = (Set<PlainPerson>)reader.getPersons();
 
         logger.info("Loading mid persons...");
         reader.parse(midIn);
-        Collection<PlainPerson> tmpPerson = reader.getPersons();
+        Collection<PlainPerson> tmpPerson = (Set<PlainPerson>)reader.getPersons();
 
         Map<String, Person> midPersons = new HashMap<>();
         for(Person person : tmpPerson) {

@@ -19,9 +19,8 @@
 
 package playground.michalm.util.gis;
 
-import java.io.IOException;
+import java.util.Collection;
 
-import org.geotools.data.simple.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -103,20 +102,11 @@ public class PolygonBasedFilter
 
     public static Geometry readPolygonGeometry(String file)
     {
-        SimpleFeatureSource fts = ShapeFileReader.readDataFile(file);
-        SimpleFeatureCollection ftColl;
-        try {
-            ftColl = fts.getFeatures();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        Collection<SimpleFeature> ftColl = ShapeFileReader.getAllFeatures(file);
         if (ftColl.size() != 1) {
-            throw new RuntimeException("No. of Features: " + ftColl.size() + "; should be 1");
+            throw new RuntimeException("No. of features: " + ftColl.size() + "; should be 1");
         }
 
-        SimpleFeature polygon = ftColl.features().next();
-        return (Geometry)polygon.getDefaultGeometry();
+        return (Geometry)ftColl.iterator().next().getDefaultGeometry();
     }
 }

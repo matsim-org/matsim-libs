@@ -83,9 +83,13 @@ public class OsmObjectsToFacilitiesParser {
 			bw.newLine();
 			for(Id<ActivityFacility> id : this.facilities.getFacilities().keySet()){
 				ActivityFacility facility = this.facilities.getFacilities().get(id);
+				String ao = "";
+				for(String s : facility.getActivityOptions().keySet()){
+					ao += s + "_";
+				}
 				bw.write(id.toString());
 				bw.write(",");
-				bw.write(String.format("%.0f,%.0f\n", facility.getCoord().getX(), facility.getCoord().getY()));
+				bw.write(String.format("%.0f,%.0f", facility.getCoord().getX(), facility.getCoord().getY()) + "," + ao + "\n");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Could not write to BufferedWriter " + out);

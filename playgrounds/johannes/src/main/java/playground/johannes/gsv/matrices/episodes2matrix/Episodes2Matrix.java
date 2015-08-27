@@ -24,8 +24,8 @@ import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.*;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -58,10 +58,10 @@ public class Episodes2Matrix {
         String rootDir = args[1];
 
         logger.info("Loading persons...");
-        XMLParser reader = new XMLParser();
+        XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
         reader.parse(in);
-        Collection<PlainPerson> persons = reader.getPersons();
+        Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
         logger.info(String.format("Loaded %s persons.", persons.size()));
 
         logger.info("Restoring original activity types...");

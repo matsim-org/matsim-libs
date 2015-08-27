@@ -25,8 +25,9 @@ import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 import playground.johannes.synpop.processing.TaskRunner;
@@ -45,14 +46,14 @@ public class PersonFilter {
 	public static void main(String args[]) {
 		String outDir = "/home/johannes/gsv/mid2008/pop/";
 //		String outDir = "/Users/jillenberger/Dropbox/work/raw/";
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
 		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
 //		parser.parse("/Users/jillenberger/Dropbox/work/raw/pop.xml");
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 //		logger.info("Cloning persons...");

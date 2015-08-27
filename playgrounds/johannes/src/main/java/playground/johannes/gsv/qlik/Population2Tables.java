@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.*;
@@ -32,6 +32,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -46,11 +47,11 @@ public class Population2Tables {
         String inPop = args[0];
         String outDir = args[1];
 
-        XMLParser reader = new XMLParser();
+        XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
         reader.parse(inPop);
 
-        Collection<PlainPerson> persons = reader.getPersons();
+        Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
 
         logger.info("Copying zone attributes...");
         TaskRunner.run(new CopyZoneAttributes(), persons);

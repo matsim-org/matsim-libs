@@ -20,8 +20,9 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.processing.TaskRunner;
 
@@ -43,12 +44,12 @@ public class ExtractStatePopulation {
 		String outfile = args[1];
 		String state = args[2];
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
 		parser.parse(infile);
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Applying filter...");

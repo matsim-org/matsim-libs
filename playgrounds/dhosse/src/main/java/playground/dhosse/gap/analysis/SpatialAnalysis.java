@@ -52,7 +52,7 @@ public class SpatialAnalysis {
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, "/home/dhosse/Dokumente/01_eGAP/MATSim_input/pop.shp");
+		ShapeFileWriter.writeGeometries(features, outputShapefile);
 		
 	}
 	

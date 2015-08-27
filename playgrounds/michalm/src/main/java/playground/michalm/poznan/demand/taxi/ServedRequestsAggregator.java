@@ -40,10 +40,8 @@ public class ServedRequestsAggregator
 {
     public static void main(String[] args)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-
-        //Map<Id, Zone> zones = PoznanZones.readTaxiZones(scenario);
-        Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones(scenario);
+        //Map<Id, Zone> zones = PoznanZones.readTaxiZones();
+        Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones();
 
         Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
         requests = PoznanServedRequests.filterNormalPeriods(requests);

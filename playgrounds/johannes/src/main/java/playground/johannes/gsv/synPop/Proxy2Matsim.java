@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -33,16 +34,14 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -66,7 +65,7 @@ public class Proxy2Matsim {
 		facReader.readFile(args[1]);
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[0]);
 
@@ -79,7 +78,7 @@ public class Proxy2Matsim {
 		int legs = 0;
 		int plans = 0;
 
-		for (PlainPerson plainPerson : parser.getPersons()) {
+		for (PlainPerson plainPerson : (Set<PlainPerson>)parser.getPersons()) {
 			Person person = factory.createPerson(Id.create(plainPerson.getId(), Person.class));
 			pop.addPerson(person);
 

@@ -21,5 +21,9 @@ public class Global {
 	public static final String EMPLOYED = "employed";
 	public static final String CAR_AVAIL = "carAvail";
 	public static final String LICENSE = "license";
+	
+	public static final String INHABITANT = "inhabitant";
+	public static final String COMMUTER = "carCommuter";
+	public static final String POTENTIAL_CARSHARING_USER = "carSharing";
 
 }

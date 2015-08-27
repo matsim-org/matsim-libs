@@ -22,12 +22,9 @@ package playground.johannes.gsv.synPop.mid.analysis;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Collection;
@@ -45,10 +42,10 @@ public class SeasonsTask extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectIntHashMap<String> map = new TObjectIntHashMap<String>();
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			String month = person.getAttribute(MiDKeys.PERSON_MONTH);
 			String season = "NA";
 			if(MiDValues.NOVEMBER.equalsIgnoreCase(month)) {
@@ -74,7 +71,7 @@ public class SeasonsTask extends AnalyzerTask {
 			}
 			
 			Set<String> modes = new HashSet<String>();
-			for(Attributable leg : person.getPlan().getLegs()) {
+			for(Attributable leg : person.getEpisodes().get(0).getLegs()) {
 				modes.add(leg.getAttribute(CommonKeys.LEG_MODE));
 			}
 			

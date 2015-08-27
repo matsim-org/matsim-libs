@@ -48,7 +48,6 @@ public class BerlinTaxiCreator
     private static final Random RND = new Random(42);
     private static final double PAXPERCAR = 4;
 
-    private final Scenario scenario;
     private final Map<Id<Zone>, Zone> zones;
     private final NetworkImpl network;
     private final WeightedRandomSelection<Id<Zone>> lorSelection;
@@ -60,7 +59,6 @@ public class BerlinTaxiCreator
     public BerlinTaxiCreator(Scenario scenario, Map<Id<Zone>, Zone> zones,
             WeightedRandomSelection<Id<Zone>> lorSelection, double evShare)
     {
-        this.scenario = scenario;
         this.zones = zones;
         this.lorSelection = lorSelection;
         this.evShare = evShare;

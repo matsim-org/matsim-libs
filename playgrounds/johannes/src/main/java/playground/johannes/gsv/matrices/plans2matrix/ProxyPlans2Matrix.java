@@ -34,7 +34,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import playground.johannes.synpop.data.*;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -175,12 +175,12 @@ public class ProxyPlans2Matrix {
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 
 		logger.info("Loading persons...");
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
 		logger.info("Restoring original activity types...");
 		TaskRunner.run(new RestoreActTypes(), persons, true);

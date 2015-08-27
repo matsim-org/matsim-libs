@@ -66,11 +66,10 @@ public class ServedRequests
     public static Predicate<ServedRequest> createWithinAreaPredicate(MultiPolygon area)
     {
         final PreparedPolygon preparedPolygon = new PreparedPolygon(area);
-
         return new Predicate<ServedRequest>() {
             public boolean apply(ServedRequest request)
             {
-                return ServedRequests.isWithinArea(request, preparedPolygon);
+                return isWithinArea(request, preparedPolygon);
             }
         };
     }
