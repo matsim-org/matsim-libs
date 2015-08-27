@@ -30,7 +30,6 @@ import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,7 +45,7 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TDoubleArrayList ages = new TDoubleArrayList();
 		TDoubleArrayList incomes = new TDoubleArrayList();
 		

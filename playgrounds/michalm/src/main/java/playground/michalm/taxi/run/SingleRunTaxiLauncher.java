@@ -97,12 +97,17 @@ public class SingleRunTaxiLauncher
             VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);
         }
     }
+    
+    
+    static void run(TaxiLauncherParams params)
+    {
+        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
+        launcher.run();
+    }
 
 
     public static void main(String... args)
     {
-        TaxiLauncherParams params = TaxiLauncherParams.readParams(args[0]);
-        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
-        launcher.run();
+        SingleRunTaxiLauncher.run(TaxiLauncherParams.readParams(args[0]));
     }
 }

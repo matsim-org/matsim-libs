@@ -144,7 +144,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 			assert departureTimes.size() == departurePersons.size();
 			for ( int i=0; i < departureTimes.size(); i++ ) {
 				final double tt =
-						travelTimesRecord.getTravelTimeBefore(
+						travelTimesRecord.getTravelTimeAfter(
 								departurePersons.get( i ),
 								departureTimes.get( i ) );
 

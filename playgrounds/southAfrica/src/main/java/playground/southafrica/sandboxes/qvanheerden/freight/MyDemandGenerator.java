@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;

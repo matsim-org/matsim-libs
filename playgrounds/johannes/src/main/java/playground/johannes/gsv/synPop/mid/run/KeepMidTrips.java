@@ -21,10 +21,11 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
@@ -41,11 +42,11 @@ public class KeepMidTrips {
 	private static final Logger logger = Logger.getLogger(KeepMidTrips.class);
 	
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		
 		logger.info(String.format("Loaded %s perons.", persons.size()));
 		

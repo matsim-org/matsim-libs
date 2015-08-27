@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.*;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.*;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;

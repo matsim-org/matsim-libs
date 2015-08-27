@@ -57,7 +57,7 @@ public class MielecSimpleDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
         ActivityCreator ac = new DefaultActivityCreator(scenario);
         PersonCreatorWithRandomTaxiMode pc = new PersonCreatorWithRandomTaxiMode(scenario,

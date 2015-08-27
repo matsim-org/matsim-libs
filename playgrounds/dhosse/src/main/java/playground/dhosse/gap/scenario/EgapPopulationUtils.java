@@ -26,6 +26,8 @@ public class EgapPopulationUtils {
 	private static final double thresholdAge60_69 = 0.1098;
 	private static final double thresholdAge70_79 = 0.0643;
 	
+	private static final double thresholdsAge[] = {0.1004, 0.1598, 0.089, 0.0955, 0.205, 0.1589, 0.1098, 0.0643};
+	
 	//transport mode distribution
 	private static final double thresholdWalk = 0.2029384757;
 	private static final double thresholdBike = 0.269768391;
@@ -78,11 +80,47 @@ public class EgapPopulationUtils {
 			pgd.setpLicense(0.);
 			pgd.setpCarAvail(0.);
 			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.);
+				pgd.setpEducationLegs(.2648);
+				pgd.setpShopLegs(0.0449);
+				pgd.setpLeisureLegs(0.3428);
+				pgd.setpOtherLegs(0.3475);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.);
+				pgd.setpEducationLegs(.2993);
+				pgd.setpShopLegs(0.0371);
+				pgd.setpLeisureLegs(0.3573);
+				pgd.setpOtherLegs(0.3063);
+				
+			}
+			
 		} else if(pgd.getA0() >= 10 && pgd.getAX() < 20){
 			
 			pgd.setpEmployment(0.9899856938);
 			pgd.setpLicense(0.2253218884);
 			pgd.setpCarAvail(0.8063492063);
+			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.0619);
+				pgd.setpEducationLegs(.292);
+				pgd.setpShopLegs(0.0693);
+				pgd.setpLeisureLegs(0.413);
+				pgd.setpOtherLegs(0.1637);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.0501);
+				pgd.setpEducationLegs(.2629);
+				pgd.setpShopLegs(0.0876);
+				pgd.setpLeisureLegs(0.4214);
+				pgd.setpOtherLegs(0.178);
+				
+			}
 			
 		} else if(pgd.getA0() >= 20 && pgd.getAX() < 30){
 			
@@ -90,11 +128,47 @@ public class EgapPopulationUtils {
 			pgd.setpLicense(0.9567627494);
 			pgd.setpCarAvail(0.8505214368);
 			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.2168);
+				pgd.setpEducationLegs(.0561);
+				pgd.setpShopLegs(0.0991);
+				pgd.setpLeisureLegs(0.2953);
+				pgd.setpOtherLegs(0.3327);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.2752);
+				pgd.setpEducationLegs(.0518);
+				pgd.setpShopLegs(0.1417);
+				pgd.setpLeisureLegs(0.3215);
+				pgd.setpOtherLegs(0.2098);
+				
+			}
+			
 		} else if(pgd.getA0() >= 30 && pgd.getAX() < 40){
 			
 			pgd.setpEmployment(0.8368725869);
 			pgd.setpLicense(0.9951737452);
 			pgd.setpCarAvail(0.9291949564);
+			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.3091);
+				pgd.setpEducationLegs(.0041);
+				pgd.setpShopLegs(0.1473);
+				pgd.setpLeisureLegs(0.2801);
+				pgd.setpOtherLegs(0.2593);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.1715);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.213);
+				pgd.setpLeisureLegs(0.3375);
+				pgd.setpOtherLegs(0.278);
+				
+			}
 			
 		} else if(pgd.getA0() >= 40 && pgd.getAX() < 50){
 			
@@ -102,11 +176,47 @@ public class EgapPopulationUtils {
 			pgd.setpLicense(0.9855729596);
 			pgd.setpCarAvail(0.9297365119);
 			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.2479);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.1511);
+				pgd.setpLeisureLegs(0.2521);
+				pgd.setpOtherLegs(0.3489);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.1538);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.2516);
+				pgd.setpLeisureLegs(0.2067);
+				pgd.setpOtherLegs(0.3878);
+				
+			}
+			
 		} else if(pgd.getA0() >= 50 && pgd.getAX() < 60){
 			
 			pgd.setpEmployment(0.7721837634);
 			pgd.setpLicense(0.9704216488);
 			pgd.setpCarAvail(0.9260700389);
+			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.2673);
+				pgd.setpEducationLegs(0.0025);
+				pgd.setpShopLegs(0.1568);
+				pgd.setpLeisureLegs(0.2427);
+				pgd.setpOtherLegs(0.3262);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.1692);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.25);
+				pgd.setpLeisureLegs(0.3119);
+				pgd.setpOtherLegs(0.2689);
+				
+			}
 			
 		} else if(pgd.getA0() >= 60 && pgd.getAX() < 70){
 			
@@ -114,17 +224,71 @@ public class EgapPopulationUtils {
 			pgd.setpLicense(0.9169110459);
 			pgd.setpCarAvail(0.8880597015);
 			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.0424);
+				pgd.setpEducationLegs(.0018);
+				pgd.setpShopLegs(0.2898);
+				pgd.setpLeisureLegs(0.3498);
+				pgd.setpOtherLegs(0.3163);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.0769);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.2681);
+				pgd.setpLeisureLegs(0.3604);
+				pgd.setpOtherLegs(0.2945);
+				
+			}
+			
 		} else if(pgd.getA0() >= 70 && pgd.getAX() < 80){
 			
 			pgd.setpEmployment(0.0319361277);
 			pgd.setpLicense(0.8363273453);
 			pgd.setpCarAvail(0.9021479714);
 			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.0066);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.299);
+				pgd.setpLeisureLegs(0.4319);
+				pgd.setpOtherLegs(0.2625);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.015);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.355);
+				pgd.setpLeisureLegs(0.33);
+				pgd.setpOtherLegs(0.3);
+				
+			}
+			
 		} else{
 			
 			pgd.setpEmployment(0.);
 			pgd.setpLicense(0.7466666667);
 			pgd.setpCarAvail(0.7142857143);
+			
+			if(pgd.getSex() == 0){
+				
+				pgd.setpWorkLegs(0.0233);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.3023);
+				pgd.setpLeisureLegs(0.3953);
+				pgd.setpOtherLegs(0.2791);
+				
+			} else{
+				
+				pgd.setpWorkLegs(0.);
+				pgd.setpEducationLegs(0.);
+				pgd.setpShopLegs(0.3125);
+				pgd.setpLeisureLegs(0.5938);
+				pgd.setpOtherLegs(0.0938);
+				
+			}
 			
 		}
 		
@@ -293,6 +457,45 @@ public class EgapPopulationUtils {
 		
 	}
 	
+	public static int setAge(int lowerBound, int upperBound){
+		
+		int startIndex = lowerBound / 10;
+		int endIndex = upperBound / 10;
+		
+		double totalThreshold = 1.;
+		
+		for(int i = 0; i < startIndex; i++){
+			
+			totalThreshold -= thresholdsAge[i];
+			
+		}
+		
+		for(int i = endIndex + 1; i < thresholdsAge.length; i++){
+			
+			totalThreshold -= thresholdsAge[i];
+			
+		}
+
+		double rnd = GAPMain.random.nextDouble() * totalThreshold;
+		
+		double accumulatedWeight = 0.;
+		
+		for(int i = startIndex; i < endIndex; i++){
+			
+			accumulatedWeight += thresholdsAge[i];
+			
+			if(accumulatedWeight >= rnd){
+				
+				return (int) (i * 10 + GAPMain.random.nextDouble() * 9);
+				
+			}
+			
+		}
+		
+		return 0;
+		
+	}
+	
 	/**
 	 * Sets an agent's sex according to MiD survey data. 
 	 * 
@@ -415,55 +618,4 @@ public class EgapPopulationUtils {
 		
 	}
 	
-	/**
-	 * Sets the transport mode of an agent's leg according to the modal split surveyed in MiD.
-	 * 
-	 * @param traveldistance The beeline distance between the activity locations
-	 * @return The string representation of the leg mode.
-	 */
-	
-	public static String setLegModeForPerson(double traveldistance){
-		
-		String mode = "";
-		
-		do{
-			
-			double weight = GAPMain.random.nextDouble();
-		
-			if(weight <= thresholdWalk){
-				
-				if(traveldistance < 5000){
-					
-					mode = TransportMode.walk;
-					
-				}
-				
-			} else if(weight > thresholdWalk && weight <= thresholdBike){
-				
-				if(traveldistance < 15000){
-					
-					mode = TransportMode.bike;
-					
-				}
-				
-			} else if(weight > thresholdBike && weight <= thresholdRide){
-				
-				mode = TransportMode.ride;
-				
-			} else if(weight > thresholdRide && weight <= thresholdCar){
-				
-				mode = TransportMode.car;
-				
-			} else{
-				
-				mode = TransportMode.pt;
-				
-			}
-			
-		} while(mode.equals(""));
-		
-		return mode;
-		
-	}
-
 }

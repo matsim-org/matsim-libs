@@ -21,22 +21,17 @@ package playground.jbischoff.taxi.berlin.demand;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatsimMatricesReader;
+import org.matsim.matrices.*;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.demand.DefaultPersonCreator;
-import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.demand.*;
 import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
 
 
 public class TaxiDemandGenerator
@@ -127,7 +122,7 @@ public class TaxiDemandGenerator
         new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
         this.matrices = new Matrices();
         new MatsimMatricesReader(matrices, scenario).readFile(ODMATRIX);
-        this.zones = BerlinZoneUtils.readZones(scenario, ZONESXML, ZONESSHP);
+        this.zones = BerlinZoneUtils.readZones(ZONESXML, ZONESSHP);
         this.odd = new ODDemandGenerator(scenario, zones,
                 true, new BerlinTaxiActivityCreator(scenario), new DefaultPersonCreator(scenario, "p%05d"));
     }

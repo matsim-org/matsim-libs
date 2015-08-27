@@ -28,11 +28,12 @@ import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.processing.TaskRunner;
 
@@ -58,12 +59,12 @@ public class HessenTestSim {
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, args[0]);
 
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		logger.info("Replacing activity types...");

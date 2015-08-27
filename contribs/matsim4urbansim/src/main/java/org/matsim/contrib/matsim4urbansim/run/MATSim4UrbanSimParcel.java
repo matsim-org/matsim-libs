@@ -25,9 +25,16 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
@@ -89,13 +96,13 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
  * - Other improvements:
  * 	For a better readability of code some functionality is outsourced into helper classes
  */
- class MATSim4UrbanSimParcel{
+class MATSim4UrbanSimParcel{
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcel.class);
 
 	// MATSim scenario
-	ScenarioImpl scenario = null;
+	Scenario scenario = null;
 	// MATSim4UrbanSim configuration converter
 	M4UConfigurationConverterV4 connector = null;
 	// Reads UrbanSim Parcel output files
@@ -106,7 +113,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 	static boolean isSuccessfulMATSimRun 			 = false;
 	// needed for controler listeners
 	AggregationObject[] aggregatedOpportunities = null;
-	
+
 	boolean isParcelMode = true;
 
 	// run selected controler
@@ -119,7 +126,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
 	BoundingBox nwBoundaryBox				 = null;
-	
+
 	/**
 	 * constructor
 	 * 
@@ -132,33 +139,33 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 
 		Gbl.printBuildInfo("matsim4urbansim", "/org/matsim/contrib/matsim4urbansim/revision.txt");
-		
+
 		// Stores location of MATSim configuration file
 		String matsimConfiFile = (args!= null && args.length==1) ? args[0].trim():null;
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
-		
+
 		connector = new M4UConfigurationConverterV4( matsimConfiFile );
 		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
-			System.exit(-1);
+			throw new RuntimeException("An error occured while initializing MATSim scenario ...") ;
 		}
-		
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario( connector.getConfig() );
+
+		scenario = ScenarioUtils.createScenario( connector.getConfig() );
 		ScenarioUtils.loadScenario(scenario);
-		setControlerSettings(args);
+		setControlerSettings();
 		// init Benchmark as default
 		benchmark = new Benchmark();
 	}
-	
+
 	/////////////////////////////////////////////////////
 	// MATSim preparation
 	/////////////////////////////////////////////////////
-	
+
 	/**
 	 * prepare MATSim for iterations ...
 	 */
-//	@SuppressWarnings("deprecation") // why should these warnings be suppressed? kai, may'12
+	//	@SuppressWarnings("deprecation") // why should these warnings be suppressed? kai, may'12
 	void run(){
 		log.info("Starting MATSim from Urbansim");	
 
@@ -167,15 +174,15 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		Network network = scenario.getNetwork();
 		modifyNetwork(network);
 		cleanNetwork(network);
-		
+
 		// get the data from UrbanSim (parcels and persons)
 		readFromUrbanSim();
-		
+
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = null;
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
-		
+
 		// initializing parcels and zones from UrbanSim input
 		//readUrbansimParcelModel(parcels, zones);
 		if(isParcelMode){
@@ -191,7 +198,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			// initializing opportunity facilities (like work places) on zone level
 			readFromUrbansim.readJobs(opportunities, zones, this.isParcelMode);
 		}
-		
+
 		// population generation
 		int pc = benchmark.addMeasure("Population construction");
 		Population newPopulation = readUrbansimPersons(parcels, zones, network);
@@ -202,31 +209,31 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
-		scenario.setPopulation(newPopulation);
+		((ScenarioImpl) scenario).setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels, opportunities);
 	}
-	
+
 	/**
 	 * 
 	 */
-	 void readFromUrbanSim() {
+	void readFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
 		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-														  getMATSim4UrbanSimControlerConfig().getUrbansimZoneRandomLocationDistributionShapeFile(),
-														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
-														  this.scenario.getConfig());
+					getMATSim4UrbanSimControlerConfig().getUrbansimZoneRandomLocationDistributionShapeFile(),
+					getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+					this.scenario.getConfig());
 		}
 		else{
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-														  null,
-														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
-														  this.scenario.getConfig());
+					null,
+					getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+					this.scenario.getConfig());
 		}
 	}
-	
+
 	/**
 	 * read person table from urbansim and build MATSim population
 	 * 
@@ -238,7 +245,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 	Population readUrbansimPersons(ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones, Network network){
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
-		
+
 		UrbanSimParameterConfigModuleV3 uspModule = getUrbanSimParameterConfig();
 
 		// check for existing plans file
@@ -262,43 +269,40 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			newPopulation = readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, uspModule.getPopulationSampleRate() );
 		else
 			newPopulation = readFromUrbansim.readPersonsZone( oldPopulation, zones, network, uspModule.getPopulationSampleRate() );
-		
+
 		// clean
 		oldPopulation=null;
 		System.gc();
-		
+
 		return newPopulation;
 	}
-	
+
 	/**
 	 * run simulation
 	 */
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels,ActivityFacilitiesImpl opportunities){
-		
+
 		Controler controler = new Controler(scenario);
-        if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
-            controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-            //  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
+		if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+			//  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
-			
+
 			// this is now no longer a hack but something that should be reasonably stable.  NOTE: You have to switch on/off roadpricing now in a 
 			// (newly constructed) matsim4Urbansim config section.  kai & michael z, sep'14
 		}
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.getConfig().controler().setCreateGraphs(true);
 
-        PtMatrix ptMatrix = null ;
+		PtMatrix ptMatrix = null ;
 		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(scenario.getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			BoundingBox nbb = BoundingBox.createBoundingBox(controler.getScenario().getNetwork());
 			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
-			
+
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {
 				for ( Plan plan : person.getPlans() ) {
@@ -315,14 +319,14 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 					}
 				}
 			}
-			
+
 		}
-			
+
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, opportunities, controler, ptMatrix);
 		addFurtherControlerListener(zones, parcels, controler);
 		log.info("Adding controler listener done!");
-	
+
 		// run the iterations, including post-processing:
 		controler.run() ;
 	}
@@ -340,29 +344,29 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		if(computeZone2ZoneImpedance || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX) {
 			// (for the time being, this is computed for the Brussels scenario no matter what, since it is needed for the travel time 
 			// comparisons. kai, apr'13)
-			
+
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
-																					  parcels,
-																					  ptMatrix,
-																					  this.benchmark) );
+					parcels,
+					ptMatrix,
+					this.benchmark) );
 		}
-		
+
 		if(computeAgentPerformance) {
 			// creates a persons.csv output for UrbanSim
 			UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(controler.getConfig());
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 		}
-		
+
 		if(computeZoneBasedAccessibilities){
 			// creates zone based table of log sums
 			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) controler.
 					getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 			ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
-																											 opportunities,
-																											 ptMatrix,
-																											 module.getMATSim4OpusTemp(),
-																											 this.scenario);
+					opportunities,
+					ptMatrix,
+					module.getMATSim4OpusTemp(),
+					this.scenario);
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 				zbacl.setComputingAccessibilityForMode(mode, true);
 			}
@@ -370,20 +374,20 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 				zbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 				// somewhat stupid fix. kai, jan'2015
 			}
-			
+
 			controler.addControlerListener( zbacl );
-			
+
 			log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
 					"to the same file!!!!  Check, and fix if true.  kai, jul'13") ;
-			
+
 		}
-		
+
 		if(computeGridBasedAccessibility){
 			// initializing grid based accessibility controler listener
-			GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( opportunities,
-																											 ptMatrix,
-																											 scenario.getConfig(), 
-																											 scenario.getNetwork() );
+			GridBasedAccessibilityControlerListenerV3 gbacl = 
+					new GridBasedAccessibilityControlerListenerV3( opportunities, ptMatrix, scenario.getConfig(), scenario.getNetwork() );
+			gbacl.setUrbansimMode(true);
+
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 				gbacl.setComputingAccessibilityForMode(mode, true);
 			}
@@ -391,17 +395,17 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 				gbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 				// somewhat stupid fix. kai, jan'2015
 			}
-			
+
 			if(computeGridBasedAccessibilitiesUsingShapeFile)
 				gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
 			else if(computeGridBasedAccessibilityUsingBoundingBox)
 				gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 			else
 				gbacl.generateGridsAndMeasuringPointsByNetwork(cellSizeInMeter);
-			
+
 			// accessibility calculations will be triggered when mobsim finished
 			controler.addControlerListener( gbacl );
-			
+
 			if(isParcelMode){
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
 				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels,controler.getConfig());
@@ -411,18 +415,18 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			}
 
 		}
-		
+
 		// From here outputs are for analysis/debugging purposes only
 		{ // dump population in csv format
-		if(isParcelMode)
-            readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getScenario().getNetwork());
-//		else
-//			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+			if(isParcelMode)
+				readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getScenario().getNetwork());
+			//		else
+			//			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
 			// I don't think that this has a chance to work: uses the parcel model keys to extract info from a zone 
-		// model person file.  kai, jul'13
+			// model person file.  kai, jul'13
 		}
 	}
-	
+
 	/**
 	 * This method allows to add additional listener
 	 * This needs to be implemented by another class
@@ -434,13 +438,11 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}
-	
+
 	/**
 	 * Getting parameter  
-	 * 
-	 * @param args
 	 */
-	void setControlerSettings(String[] args) {
+	void setControlerSettings() {
 
 		AccessibilityConfigGroup moduleAccessibility = getAccessibilityParameterConfig();
 		UrbanSimParameterConfigModuleV3 moduleUrbanSim = getUrbanSimParameterConfig();
@@ -449,7 +451,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		this.computeZone2ZoneImpedance	= moduleUrbanSim.usingZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleUrbanSim.usingZoneBasedAccessibility();
 		this.computeGridBasedAccessibility	= moduleUrbanSim.usingGridBasedAccessibility();
-		
+
 		if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ) {
 			this.computeGridBasedAccessibilityUsingBoundingBox = true ;
 		} else if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromShapeFile.toString() ) ) {
@@ -457,26 +459,26 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		} 
 		// if the other two are false, then network is used.
 
-		
+
 		// this.computeGridBasedAccessibilitiesUsingNetworkBoundary = moduleAccessibility.isCellBasedAccessibilityNetwork();
 		this.cellSizeInMeter 			= moduleAccessibility.getCellSizeCellBasedAccessibility();
 		this.shapeFile					= moduleAccessibility.getShapeFileCellBasedAccessibility();
-		
+
 		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
 			nwBoundaryBox = BoundingBox.createBoundingBox(moduleAccessibility.getBoundingBoxLeft(), 
-													moduleAccessibility.getBoundingBoxBottom(), 
-													moduleAccessibility.getBoundingBoxRight(), 
-													moduleAccessibility.getBoundingBoxTop());
+					moduleAccessibility.getBoundingBoxBottom(), 
+					moduleAccessibility.getBoundingBoxRight(), 
+					moduleAccessibility.getBoundingBoxTop());
 		}
 		else{	// no boundary box defined using boundary of hole network for accessibility computation
 			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 		}
 	}
-	
+
 	/**
 	 * cleaning matsim network
 	 * @param network
@@ -489,7 +491,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		log.info("");
 		// (new NetworkRemoveUnusedNodes()).run(network); // tnicolai feb'12 not necessary for ivtch-network
 	}
-	
+
 	/**
 	 * This method allows to modify the MATSim network
 	 * This needs to be implemented by another class
@@ -500,7 +502,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}
-	
+
 	/**
 	 * This method allows to modify the population
 	 * This needs to be implemented by another class
@@ -511,7 +513,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}
-	
+
 	/**
 	 * triggers backup of MATSim and UrbanSim Output
 	 */
@@ -519,7 +521,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		BackupMATSimOutput.prepareHotStart(scenario);
 		BackupMATSimOutput.runBackup(scenario);
 	}
-	
+
 	/**
 	 * access to AccessibilityParameterConfigModule and related parameter settings
 	 * @return AccessibilityParameterConfigModule
@@ -533,7 +535,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		this.scenario.getConfig().getModules().put(AccessibilityConfigGroup.GROUP_NAME, apcm);
 		return apcm;
 	}
-	
+
 	/**
 	 * access to MATSim4UrbanSimControlerConfigModuleV3 and related parameter settings
 	 * @return MATSim4UrbanSimControlerConfigModuleV3
@@ -547,7 +549,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}
-	
+
 	/**
 	 * access to UrbanSimParameterConfigModuleV3 and related parameter settings
 	 * @return UrbanSimParameterConfigModuleV3
@@ -561,20 +563,20 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
 	}
-	
+
 	/**
 	 * Entry point
 	 * @param args UrbanSim command prompt
 	 */
 	public static void main(String args[]){
-		
+
 		long start = System.currentTimeMillis();
-		
+
 		MATSim4UrbanSimParcel m4u = new MATSim4UrbanSimParcel(args);
 		m4u.run();
 		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimParcel.isSuccessfulMATSimRun = Boolean.TRUE;
-		
+
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 }

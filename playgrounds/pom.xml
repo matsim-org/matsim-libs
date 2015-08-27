@@ -90,7 +90,7 @@
 		<module>dziemke</module>
 		<!--<module>fhuelsmann</module>-->
 		<module>gregor</module>
-		<!--<module>gunnar</module>-->
+		<module>gunnar</module>
 		<!--<module>hbecker</module>-->
 		<module>ikaddoura</module>
 		<module>imob</module>
@@ -123,7 +123,7 @@
 		<module>smetzler</module>
 		<module>southAfrica</module>
 		<!--<module>staheale</module>-->
-		<!--<module>stockholm</module>-->
+		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tobiqui</module>
@@ -153,7 +153,12 @@
 		<repository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>

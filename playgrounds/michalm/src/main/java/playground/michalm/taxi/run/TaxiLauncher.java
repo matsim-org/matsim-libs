@@ -76,7 +76,7 @@ class TaxiLauncher
         }
 
         if (params.zonesXmlFile != null && params.zonesShpFile != null) {
-            zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
+            zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
             System.err.println("No conversion of SRS is done");
         }
         else {

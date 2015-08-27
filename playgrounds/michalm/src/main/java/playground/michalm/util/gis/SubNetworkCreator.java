@@ -35,10 +35,15 @@ public class SubNetworkCreator
 {
     public static void main(String[] args)
     {
-        String dir = "D:\\PP-rad\\poznan\\";
-        String networkFile = dir + "network.xml";
-        String polygonFile = dir + "poznan_polygon\\poznan_city_polygon.shp";
-        String subNetworkFile = dir + "sub-network-2.xml";
+//        String dir = "D:/PP-rad/poznan/";
+//        String networkFile = dir + "network.xml";
+//        String polygonFile = dir + "poznan_polygon/poznan_city_polygon.shp";
+//        String subNetworkFile = dir + "sub-network-2.xml";
+
+        String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
+        String networkFile = dir + "network/berlin_brb.xml.gz";
+        String polygonFile = dir + "shp_merged/berlin_zones_convex_hull_with_buffer_DHDN_GK4.shp";
+        String subNetworkFile = dir + "network/berlin.xml.gz";
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
@@ -49,7 +54,7 @@ public class SubNetworkCreator
 
         Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
         Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(allLinks,
-                polygonGeometry, true);
+                polygonGeometry, false);
 
         for (Link link : outerLinks) {
             network.removeLink(link.getId());

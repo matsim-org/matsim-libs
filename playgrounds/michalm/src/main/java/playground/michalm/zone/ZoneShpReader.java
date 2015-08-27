@@ -21,7 +21,7 @@ package playground.michalm.zone;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -33,7 +33,7 @@ public class ZoneShpReader
     private final Map<Id<Zone>, Zone> zones;
 
 
-    public ZoneShpReader(Scenario scenario, Map<Id<Zone>, Zone> zones)
+    public ZoneShpReader(Map<Id<Zone>, Zone> zones)
     {
         this.zones = zones;
     }
@@ -47,9 +47,7 @@ public class ZoneShpReader
 
     public void readZones(String file, String idHeader)
     {
-        ShapeFileReader shpReader = new ShapeFileReader();
-        Collection<SimpleFeature> features = shpReader.readFileAndInitialize(file);
-
+        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
         if (features.size() != zones.size()) {
             throw new RuntimeException(
                     "Features#: " + features.size() + "; zones#: " + zones.size());

@@ -15,7 +15,7 @@ import org.matsim.facilities.ActivityFacility;
 final class UrbansimCellBasedAccessibilityCSVWriterV2 implements ZoneDataExchangeInterface {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
-	private static final String FILE_NAME= "accessibility_indicators.csv";
+	private static final String ACCESSIBILITY_INDICATORS= "accessibility_indicators.csv";
 
 	private BufferedWriter accessibilityDataWriter ;
 
@@ -25,7 +25,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements ZoneDataExchang
 	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
 		log.info("Initializing  ...");
 		try {
-		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + FILE_NAME );
+		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			throw new RuntimeException("writer could not be instantiated") ;
@@ -62,7 +62,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements ZoneDataExchang
 	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory, String modeName){
 		try{
 			log.info("Initializing ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + "accessibility_indicators" + "_" + modeName + ".csv" );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS + "_" + modeName + ".csv" );
 			// yyyyyy in some calling sequences, this is called too early, and the directory is not yet there. kai, feb'14
 
 			// create header
@@ -89,6 +89,8 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements ZoneDataExchang
 	@Override
 	public void setZoneAccessibilities(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
+		
+		log.info( "here2");
 
 		try{
 			assert(accessibilityDataWriter != null);

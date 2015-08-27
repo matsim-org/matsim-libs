@@ -20,13 +20,9 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -40,11 +36,11 @@ import java.util.Set;
 public class ODTabelGenerator {
 
     public static void main(String args[]) throws IOException {
-        XMLParser reader = new XMLParser();
+        XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
         reader.parse(args[0]);
 
-        Collection<PlainPerson> persons = reader.getPersons();
+        Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
 
         KeyMatrix m = new KeyMatrix();
 

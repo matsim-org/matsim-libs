@@ -29,8 +29,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
@@ -70,12 +71,12 @@ public class Facilities2Zones {
         zones.setPrimaryKey(zoneIdKey);
 
         logger.info("Loading persons...");
-        XMLParser parser = new XMLParser();
+        XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
         parser.parse(popIn);
         logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-        Set<PlainPerson> persons = parser.getPersons();
+        Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
         MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
         SetZones task = new SetZones(zones, scenario.getActivityFacilities(), zoneIdKey, transform);
