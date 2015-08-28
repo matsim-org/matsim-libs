@@ -87,6 +87,9 @@ public class CreateAutomatedFDTest {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
+		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
@@ -110,7 +113,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return Id.createLinkId("work");
+			return DESTINATION_LINK_ID;
 		}
 
 		@Override
@@ -125,17 +128,17 @@ public class CreateAutomatedFDTest {
 			}
 
 			if(this.getCurrentLinkId().equals(Id.createLinkId("home"))){
-				return Id.createLinkId(0);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(0))){
+				return BASE_LINK_ID;
+			} else if( BASE_LINK_ID.equals( this.getCurrentLinkId() ) ) {
 				if ( isArriving) {
-					return Id.createLinkId("work") ;
+					return DESTINATION_LINK_ID ;
 				} else {
 					return Id.createLinkId(1) ;
 				}
 			} else if(this.getCurrentLinkId().equals(Id.createLinkId(1))){
 				return Id.createLinkId(2);
 			} else if(this.getCurrentLinkId().equals(Id.createLinkId(2))){
-				return Id.createLinkId(0);
+				return BASE_LINK_ID;
 			} else return null; // returning null so that agent will arrive.
 
 		}
