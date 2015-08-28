@@ -177,7 +177,7 @@ import playground.michalm.util.MovingAgentsRegister;
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
 
-        LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
+        LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
                 router, new TimeDiscretizer(31 * 4, 15 * 60, false));
 
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
