@@ -17,9 +17,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+
 public class XMLWriter {
-	//To convert from WGS84 into RT90, as recommended in Matsim specifications to avoid using spherical coordinates. TransformationFactory and MGC classes have been changed to accomodate this new type of transformation and must be committed. 
-	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84);
+	//To convert from WGS84 into RT90, as recommended in Matsim specifications to avoid using spherical coordinates. 
+	CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_RT90);
 	public Document createDocument(String rootname){
 		Element element = new Element(rootname);
 		Document doc = new Document();

@@ -3,13 +3,12 @@ package saleem.stockholmscenario.teleportation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 public class NetworkAndPopulationConverter {
 	public static void main(String[] args) {
-		//The commented transformation is correct. Commented for committing to avoid compile errors. Have to stay this way till the code is committed to TransformationFactory and MGC. Use the commented line when doing transformation.
-		//CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SWEREF99, TransformationFactory.WGS84);
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84);
+		CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84);
 		Coord coord = new CoordImpl(8269530.886710928, 1980468.5454298481 );
 		 coord = ct.transform(coord);
 		 System.out.println(coord.getX() + "........." + coord.getY());
