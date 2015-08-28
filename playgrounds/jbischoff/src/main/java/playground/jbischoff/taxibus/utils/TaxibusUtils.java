@@ -18,6 +18,11 @@
  * *********************************************************************** */
 
 package playground.jbischoff.taxibus.utils;
+
+import java.util.ArrayList;
+
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+
 /**
  * @author  jbischoff
  *
@@ -25,4 +30,15 @@ package playground.jbischoff.taxibus.utils;
 public class TaxibusUtils {
     public static final String TAXIBUS_MODE = "taxibus";
 
+
+
+public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
+	double cost = 0.0;
+	
+	for (VrpPathWithTravelData path : newPath){
+		cost += path.getTravelCost();
+	}
+	
+	return cost;
+}
 }

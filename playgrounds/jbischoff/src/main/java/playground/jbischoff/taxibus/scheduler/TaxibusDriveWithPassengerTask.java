@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,69 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package playground.jbischoff.taxibus.scheduler;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import java.util.Set;
+
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+
+import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class RunConfigBasedExample {
-
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+public class TaxibusDriveWithPassengerTask extends DriveTaskImpl implements TaxibusTaskWithRequests {
 	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+	private Set<TaxibusRequest> requests;
+	
+	public TaxibusDriveWithPassengerTask(Set<TaxibusRequest> requests, VrpPathWithTravelData path) {
+		super(path);
+		this.requests = requests;
+		for (TaxibusRequest req: this.requests){
+			req.addDriveWithPassengerTask(this);
+		}
+		}
 
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
+	
+
+	@Override
+	public TaxibusTaskType getTaxibusTaskType() {
+		
+		return TaxibusTaskType.DRIVE_WITH_PASSENGER;
 	}
+	
+	
+
+	@Override
+	public Set<TaxibusRequest> getRequests() {
+		return requests;
+	}
+	
+
+	
+
+	@Override
+	public void removeFromRequest(TaxibusRequest request) {
+		
+		request.addDriveWithPassengerTask(null);
+		this.requests.remove(request);
+
+	}
+
+	@Override
+	public void removeFromAllRequests() {
+		for (TaxibusRequest request : this.requests){
+			request.addDriveWithPassengerTask(null);
+			
+		}
+		this.requests.clear();
+	}
+
+
+	
+
 }

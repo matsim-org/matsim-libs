@@ -25,14 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 
 import playground.jbischoff.taxibus.utils.TaxibusUtils;
 
@@ -56,7 +54,11 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		MobsimAgent mobsimAgent = qSim.getAgentMap().get(Id.create(event.getPersonId(), MobsimAgent.class));
+		Id<MobsimAgent> mid = Id.create(event.getPersonId(), MobsimAgent.class);
+		if (qSim.getAgentMap().containsKey(mid))
+		//to filter out drivers without an agent plan
+		{
+		MobsimAgent mobsimAgent = qSim.getAgentMap().get(mid);
 		if (mobsimAgent instanceof PlanAgent){
 			PlanAgent agent = (PlanAgent) mobsimAgent;
 			Leg leg = (Leg) agent.getNextPlanElement();
@@ -69,7 +71,7 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
 			}
 		}
 			}
-		
+		}
 	}
 	
 	@Override
@@ -95,9 +97,7 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
          	throw new IllegalStateException("There is no Activity before the leg or the activity has no end time.");
          } 
 		 System.out.println("taxi trip booked for " + mobsimAgent.getId());
-		 leg.setDepartureTime(departureTime);
-		 //Leg Departure time must be set
-		 this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent)mobsimAgent, leg);
+		 this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent)mobsimAgent, leg.getRoute().getStartLinkId(),leg.getRoute().getEndLinkId(), departureTime);
 		
 		 
 	}

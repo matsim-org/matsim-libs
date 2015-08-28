@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package playground.jbischoff.taxibus.scheduler;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.dvrp.schedule.*;
 
-/**
- * @author jbischoff
- *
- */
-public class RunConfigBasedExample {
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+public interface TaxibusTask
+    extends Task
+{
+    static enum TaxibusTaskType
+    {
+    	        DRIVE_EMPTY, // drive empty might be needed later.
+        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
+    }
 
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
-	}
+
+    TaxibusTaskType getTaxibusTaskType();
 }
