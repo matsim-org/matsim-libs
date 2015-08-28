@@ -630,20 +630,29 @@ public class GenerateFundamentalDiagramData {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
+		private static final Id<Link> FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR);
+		private static final Id<Link> LAST_LINK_ID_OF_BASE = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
+		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
+		private static final Id<Link> FIRST_LINK_LINK_ID_OF_BASE = Id.createLinkId(0);
+		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
 			this.actEndTime = actEndTime;
+			this.plannedVehicleId = Id.create(agentId, Vehicle.class);
 		}
 
 		private final Id<Person> personId;
+		private final Id<Vehicle> plannedVehicleId;
 		private final String mode;
 		private final double actEndTime;
 
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
 
-		private Id<Link> currentLinkId = Id.createLinkId("home");
+		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
 		private State agentState= MobsimAgent.State.ACTIVITY;;
 
 		@Override
@@ -653,7 +662,7 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return Id.createLinkId("work");
+			return DESTINATION_LINK_ID;
 		}
 
 		@Override
@@ -671,16 +680,16 @@ public class GenerateFundamentalDiagramData {
 				isArriving = true; 
 			}
 
-			if( this.getCurrentLinkId().equals(Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1)) || this.currentLinkId.equals(Id.createLinkId("home"))){
+			if( LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId) || ORIGIN_LINK_ID.equals(this.currentLinkId)){
 				//person departing from home OR last link of the track
-				return Id.createLinkId(0);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1))){ //last link of base
+				return FIRST_LINK_LINK_ID_OF_BASE;
+			} else if(LAST_LINK_ID_OF_BASE.equals(LAST_LINK_ID_OF_BASE)){
 				if ( isArriving) {
-					return Id.createLinkId("work") ;
+					return DESTINATION_LINK_ID ;
 				} else {
-					return Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR) ;
+					return FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK ;
 				}
-			}  else if (this.getCurrentLinkId().equals(Id.createLinkId("work"))){
+			}  else if (DESTINATION_LINK_ID.equals(this.currentLinkId)){
 				return null;// this will send agent for arrival
 			} else {
 				Id<Link> existingLInkId = this.currentLinkId;
@@ -714,7 +723,7 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
-			return Id.create(this.getId(), Vehicle.class);
+			return this.plannedVehicleId;
 		}
 
 		@Override
