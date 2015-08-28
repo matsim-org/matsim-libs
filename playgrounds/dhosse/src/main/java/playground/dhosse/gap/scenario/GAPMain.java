@@ -53,8 +53,12 @@ public class GAPMain {
 	
 //	Main class for the generation of the Garmisch-Partenkirchen scenario.
 	
+	//84948
+	
 	static double n = 0;
 	static final int N = 86336;
+	
+	double factor2005_2009 = 0.9883802132;
 
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -79,6 +83,8 @@ public class GAPMain {
 	
 	public static void main(String[] args) {
 		
+		MatsimRandom.reset(4711);
+		
 		Config config = ConfigUtils.createConfig();
 		
 		configureConfig(config);
@@ -91,7 +97,7 @@ public class GAPMain {
 		
 		//create network
 //		Network network = GAPScenarioBuilder.createNetwork(scenario, networkDataDir + "merged-network.osm");
-//		new NetworkWriter(network).write(matsimInputDir + "Netzwerk/network.xml");
+//		new NetworkWriter(network).write(matsimInputDir + "Netzwerk/network_final.xml");
 		
 		double fractionOfStudents = 0.614213;
 		Municipalities.addEntry("09180112", (int) (446*fractionOfStudents), 1559, 526);						//Bad Kohlgrub
@@ -273,18 +279,6 @@ public class GAPMain {
 		
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setPerforming_utils_hr(6.0);
-		
-		ActivityParams home = new ActivityParams();
-		home.setActivityType("home");
-		home.setTypicalDuration(12 * 3600);
-		home.setMinimalDuration(6*3600);
-		pcs.addActivityParams(home);
-		
-		ActivityParams work = new ActivityParams();
-		work.setActivityType("work");
-		work.setMinimalDuration(4*3600);
-		work.setTypicalDuration(8*3600);
-		pcs.addActivityParams(work);
 		
 	}
 	
