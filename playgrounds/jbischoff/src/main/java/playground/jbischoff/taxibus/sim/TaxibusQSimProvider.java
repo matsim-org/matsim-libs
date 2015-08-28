@@ -26,7 +26,6 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
@@ -42,19 +41,20 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.jbischoff.taxibus.TaxibusActionCreator;
+import playground.jbischoff.taxibus.optimizer.DefaultTaxibusOptimizer;
+import playground.jbischoff.taxibus.optimizer.TaxibusOptimizerConfiguration;
+import playground.jbischoff.taxibus.optimizer.TaxibusOptimizerConfiguration.Goal;
+import playground.jbischoff.taxibus.optimizer.filter.DefaultTaxibusFilterFactory;
+import playground.jbischoff.taxibus.optimizer.filter.TaxibusFilterFactory;
+import playground.jbischoff.taxibus.passenger.TaxibusPassengerEngine;
+import playground.jbischoff.taxibus.passenger.TaxibusPassengerOrderManager;
 import playground.jbischoff.taxibus.passenger.TaxibusRequestCreator;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
+import playground.jbischoff.taxibus.scheduler.TaxibusSchedulerParams;
 import playground.jbischoff.taxibus.utils.TaxibusUtils;
-import playground.michalm.taxi.TaxiActionCreator;
-import playground.michalm.taxi.TaxiRequestCreator;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
-import playground.michalm.taxi.optimizer.filter.FilterFactory;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPathFinder;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -67,7 +67,7 @@ import com.google.inject.Provider;
 public class TaxibusQSimProvider implements Provider<QSim> {
 	private TaxibusConfigGroup tbcg;
 	private MatsimVrpContextImpl context;
-	private RuleBasedTaxiOptimizer optimizer;
+	private DefaultTaxibusOptimizer optimizer;
 	private EventsManager events;
 	private TravelTime travelTime;
 
@@ -86,12 +86,16 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		qSim.addQueueSimulationListeners(optimizer);
 		
 		context.setMobsimTimer(qSim.getSimTimer());
-		PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-				TaxibusUtils.TAXIBUS_MODE, new TaxibusRequestCreator(), optimizer,
-				context, qSim);
+		
+		TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, eventsManager, new TaxibusRequestCreator(), optimizer, context);
+		qSim.addMobsimEngine(passengerEngine);
+		qSim.addDepartureHandler(passengerEngine);
+		TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager(passengerEngine);
+		qSim.addQueueSimulationListeners(orderManager);
+		eventsManager.addHandler(orderManager);
 		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim
 				.getSimTimer());
-		TaxiActionCreator actionCreator = new TaxiActionCreator(
+		TaxibusActionCreator actionCreator = new TaxibusActionCreator(
 				passengerEngine, legCreator, tbcg.getPickupDuration());
 		VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
 				actionCreator);
@@ -103,8 +107,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 		
 		
-		TaxiSchedulerParams params = new TaxiSchedulerParams(tbcg.isDestinationKnown(), tbcg.isVehicleDiversion(),
-				tbcg.getPickupDuration(), tbcg.getDropoffDuration());
+		TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
 		
 		resetSchedules(context.getVrpData().getVehicles().values());
 		
@@ -116,16 +119,16 @@ public class TaxibusQSimProvider implements Provider<QSim> {
  
 		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
 				routerWithCache, travelTime, travelDisutility);
-		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
-		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(
+		TaxibusScheduler scheduler = new TaxibusScheduler(context, calculator, params);
+		TaxibusVehicleRequestPathFinder vrpFinder = new TaxibusVehicleRequestPathFinder(
 				calculator, scheduler);
 
-		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, tbcg.getNearestRequestsLimit(), tbcg.getNearestVehiclesLimit());
+		TaxibusFilterFactory filterFactory = new DefaultTaxibusFilterFactory(scheduler, tbcg.getNearestRequestsLimit(), tbcg.getNearestVehiclesLimit());
 
-		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
+		TaxibusOptimizerConfiguration optimConfig = new TaxibusOptimizerConfiguration(
 				context, calculator, scheduler, vrpFinder, filterFactory,
-				Goal.MIN_WAIT_TIME, tbcg.getOutputDir(), null);
-		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
+				Goal.MIN_WAIT_TIME, tbcg.getOutputDir());
+		optimizer = new DefaultTaxibusOptimizer(optimConfig,  false);
 
 	}
 	

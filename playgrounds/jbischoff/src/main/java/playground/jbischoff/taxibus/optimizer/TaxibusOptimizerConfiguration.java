@@ -3,15 +3,25 @@ package playground.jbischoff.taxibus.optimizer;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.filter.FilterFactory;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.jbischoff.taxibus.optimizer.filter.TaxibusFilterFactory;
+import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPathFinder;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathCost;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPaths;
 
 
-public class TaxibusOptimizerConfiguration extends TaxiOptimizerConfiguration
+public class TaxibusOptimizerConfiguration 
 {
-    
+	   public final MatsimVrpContext context;
+
+	    public final VrpPathCalculator calculator;
+	    public final TaxibusScheduler scheduler;
+	    public final TaxibusVehicleRequestPathFinder vrpFinder;
+	    public final TaxibusFilterFactory filterFactory;
+
+	    public final Goal goal;
+
+	    public final String workingDirectory;
 
 
     public static enum Goal
@@ -20,13 +30,22 @@ public class TaxibusOptimizerConfiguration extends TaxiOptimizerConfiguration
     };
 
     public TaxibusOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
-            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder,
-            FilterFactory filterFactory, Goal goal, String workingDirectory)
+    		TaxibusScheduler scheduler, TaxibusVehicleRequestPathFinder vrpFinder,
+    		TaxibusFilterFactory filterFactory, Goal goal, String workingDirectory)
     {
-       super (context, calculator, scheduler, vrpFinder, filterFactory, null, workingDirectory, null);
-       
-    }
+        this.context = context;
 
+        this.calculator = calculator;
+        this.scheduler = scheduler;
+        this.vrpFinder = vrpFinder;
+        this.filterFactory = filterFactory;
+
+        this.goal = goal;
+
+        this.workingDirectory = workingDirectory;
+    }
+    
+ 
 
     public VehicleRequestPathCost getVrpCost()
     {
@@ -43,5 +62,6 @@ public class TaxibusOptimizerConfiguration extends TaxiOptimizerConfiguration
             default:
                 throw new IllegalStateException();
         }
+        
     }
 }

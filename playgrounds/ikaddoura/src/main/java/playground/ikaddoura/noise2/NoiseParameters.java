@@ -56,6 +56,7 @@ public class NoiseParameters {
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
 	private boolean useActualSpeedLevel = true;
+	private boolean allowForSpeedsOutsideTheValidRange = false;
 	
 	private boolean throwNoiseEventsAffected = true;
 	private boolean computeNoiseDamages = true;
@@ -168,6 +169,13 @@ public class NoiseParameters {
 			}
 			
 			log.info("Reading tunnel link Id file... Done.");
+		}
+		
+		if (this.useActualSpeedLevel && this.allowForSpeedsOutsideTheValidRange) {
+			log.warn("Using the actual vehicle speeds for the noise computation may result in very low speed levels due to congestion."
+					+ " The RLS computation approach defines a range of valid speed levels: for cars: 30-130 km/h; for HGV: 30-80 km/h."
+					+ " 20 km/h or 10 km/h may still result in an 'okay' estimate of the traffic noise. However, 1 km/h or lower speeds will definitly make no sense."
+					+ " It is therefore recommended not to use speeds outside of the range of valid parameters!");
 		}
 	}
 	
@@ -324,6 +332,15 @@ public class NoiseParameters {
 	public void setComputePopulationUnits(boolean computePopulationUnits) {
 		log.info("Computing population units: " + computePopulationUnits);
 		this.computePopulationUnits = computePopulationUnits;
+	}
+
+	public boolean isAllowForSpeedsOutsideTheValidRange() {
+		return allowForSpeedsOutsideTheValidRange;
+	}
+
+	public void setAllowForSpeedsOutsideTheValidRange(boolean allowForSpeedsOutsideTheValidRange) {
+		log.info("Allowing for speeds above or below the valid range (cars: 30-130 km/h; HGV: 30-80 km/h): " + allowForSpeedsOutsideTheValidRange);
+		this.allowForSpeedsOutsideTheValidRange = allowForSpeedsOutsideTheValidRange;
 	}
 	
 }
