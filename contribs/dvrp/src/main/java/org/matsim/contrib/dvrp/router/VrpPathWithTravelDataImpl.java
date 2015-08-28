@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import com.google.common.collect.Iterators;
 
 
-public class VrpPathImpl
+public class VrpPathWithTravelDataImpl
     implements VrpPathWithTravelData
 {
     private final double departureTime;
@@ -36,7 +36,7 @@ public class VrpPathImpl
     private final double[] linkTTs;//accumulated link travel times
 
 
-    public VrpPathImpl(double departureTime, double travelTime, double travelCost, Link[] links,
+    public VrpPathWithTravelDataImpl(double departureTime, double travelTime, double travelCost, Link[] links,
             double[] linkTT)
     {
         if (links.length == 0 || links.length != linkTT.length) {

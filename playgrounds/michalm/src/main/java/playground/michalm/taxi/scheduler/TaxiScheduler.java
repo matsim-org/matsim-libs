@@ -266,7 +266,7 @@ public class TaxiScheduler
 
         OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
         LinkTimePair stopPoint = tracker.getDiversionPoint();
-        tracker.divertPath(new VrpPathImpl(stopPoint.time, 0, 0, new Link[] { stopPoint.link },
+        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0, 0, new Link[] { stopPoint.link },
                 new double[] { 0 }));
 
         appendStayTask(schedule);

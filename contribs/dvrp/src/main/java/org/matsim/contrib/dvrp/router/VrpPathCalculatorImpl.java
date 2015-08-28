@@ -48,7 +48,7 @@ public class VrpPathCalculatorImpl
     public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
     {
         if (fromLink == toLink) {
-            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink },
+            return new VrpPathWithTravelDataImpl(departureTime, 0, 0, new Link[] { fromLink },
                     new double[] { 0 });
         }
 
@@ -88,6 +88,6 @@ public class VrpPathCalculatorImpl
         double totalCost = path.travelCost
                 + travelDisutility.getLinkMinimumTravelDisutility(toLink);
 
-        return new VrpPathImpl(departureTime, totalTT, totalCost, links, linkTT);
+        return new VrpPathWithTravelDataImpl(departureTime, totalTT, totalCost, links, linkTT);
     }
 }
