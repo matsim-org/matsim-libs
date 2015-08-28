@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package playground.jbischoff.taxibus.optimizer.filter;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import java.util.Collection;
 
-/**
- * @author jbischoff
- *
- */
-public class RunConfigBasedExample {
+import org.matsim.contrib.dvrp.data.Vehicle;
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
+import playground.michalm.taxi.data.TaxiRequest;
 
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
-	}
+
+public interface TaxibusRequestFilter
+{
+    TaxibusRequestFilter NO_FILTER = new TaxibusRequestFilter() {
+
+		@Override
+		public Iterable<TaxibusRequest> filterRequestsForVehicle(Iterable<TaxibusRequest> requests, Vehicle vehicle) {
+			return requests;
+		}
+
+		@Override
+		public Iterable<TaxibusRequest> filterRequestsForBestRequest(Iterable<TaxibusRequest> unplannedRequests,
+				TaxibusVehicleRequestPath best) {
+			return unplannedRequests;
+		}
+    };
+
+
+    Iterable<TaxibusRequest> filterRequestsForVehicle(Iterable<TaxibusRequest> requests, Vehicle vehicle);
+
+
+	Iterable<TaxibusRequest> filterRequestsForBestRequest(Iterable<TaxibusRequest> unplannedRequests, TaxibusVehicleRequestPath best);
 }

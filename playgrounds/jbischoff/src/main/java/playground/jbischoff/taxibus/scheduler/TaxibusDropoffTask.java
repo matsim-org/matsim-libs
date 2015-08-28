@@ -17,15 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer;
+package playground.jbischoff.taxibus.scheduler;
 
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import java.util.TreeSet;
+
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+
+import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 
 
-/**
- * @author michalm, jbischoff
- */
-public interface TaxibusOptimizer
-    extends VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
-{}
+public class TaxibusDropoffTask
+    extends StayTaskImpl
+    implements TaxibusTaskWithRequests
+{
+    private final TaxibusRequest request;
+
+
+    public TaxibusDropoffTask(double beginTime, double endTime, TaxibusRequest request)
+    {
+        super(beginTime, endTime, request.getFromLink());
+
+        this.request = request;
+        request.setDropoffTask(this);
+    }
+
+    @Override
+    public TaxibusTaskType getTaxibusTaskType()
+    {
+        return TaxibusTaskType.DROPOFF;
+    }
+
+
+    public TaxibusRequest getRequest()
+    {
+        return request;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxibusTaskType().name() + "]" + super.commonToString();
+    }
+
+
+	@Override
+	public TreeSet<TaxibusRequest> getRequests() {
+		TreeSet<TaxibusRequest> t = new TreeSet<>();
+		t.add(request);
+		return t;
+	}
+
+
+	@Override
+	public void removeFromRequest(TaxibusRequest request) {
+		if (request!=this.request) {
+			throw new IllegalStateException();
+		}
+		request.setDropoffTask(null);
+		
+	}
+	@Override
+	public void removeFromAllRequests() {
+		removeFromRequest(this.request);
+	}
+}

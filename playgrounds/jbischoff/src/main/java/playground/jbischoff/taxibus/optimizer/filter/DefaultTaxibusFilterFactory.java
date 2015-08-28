@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package playground.jbischoff.taxibus.optimizer.filter;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
 
-/**
- * @author jbischoff
- *
- */
-public class RunConfigBasedExample {
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+public class DefaultTaxibusFilterFactory
+    implements TaxibusFilterFactory
+{
+    private final TaxibusScheduler scheduler;
+    private final int nearestVehiclesLimit;
+    private final int nearestRequestsLimit;
 
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
-	}
+    public DefaultTaxibusFilterFactory(TaxibusScheduler scheduler, int nearestRequestsLimit,
+            int nearestVehiclesLimit)
+    {
+        this.scheduler = scheduler;
+        this.nearestRequestsLimit = nearestRequestsLimit;
+        this.nearestVehiclesLimit = nearestVehiclesLimit;
+    }
+
+
+    @Override
+    public TaxibusVehicleFilter createVehicleFilter()
+    {
+        return nearestVehiclesLimit <= 0 ? TaxibusVehicleFilter.NO_FILTER
+                : new KStraightLineNearestVehicleFilter(scheduler, nearestVehiclesLimit);
+    }
+    @Override
+    public TaxibusRequestFilter createRequestFilter()
+    {
+        return nearestRequestsLimit <= 0 ? TaxibusRequestFilter.NO_FILTER
+                : new KStraightLineNearestRequestFilter(scheduler, nearestRequestsLimit);
+    }
+
+   
 }

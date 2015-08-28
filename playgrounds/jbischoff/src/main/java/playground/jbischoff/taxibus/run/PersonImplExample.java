@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.jbischoff.taxibus.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class RunConfigBasedExample {
+public class PersonImplExample {
 
 	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Population population = scenario.getPopulation();
+		ObjectAttributes pa = scenario.getPopulation().getPersonAttributes();
 		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
+		Person p =  population.getFactory().createPerson(Id.createPersonId("1"));
+		
+		pa.putAttribute("1", "license", "yes");
+		new ObjectAttributesXmlWriter(pa).writeFile("attributes.xml");
+		
 	}
+
 }
