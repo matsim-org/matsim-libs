@@ -33,8 +33,8 @@ public class LeastCostPathCalculatorCacheStats
 
     public void updateStats(LeastCostPathCalculatorWithCache calculatorWithCache)
     {
-        hitStats.addValue(calculatorWithCache.getCacheHits());
-        missStats.addValue(calculatorWithCache.getCacheMisses());
+        hitStats.addValue(calculatorWithCache.getCacheStats().getHits());
+        missStats.addValue(calculatorWithCache.getCacheStats().getMisses());
     }
 
 

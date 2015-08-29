@@ -36,8 +36,7 @@ public class DefaultLeastCostPathCalculatorWithCache
     private final TimeDiscretizer timeDiscretizer;
     private final Table<Id<Node>, Id<Node>, Path>[] pathCache;
 
-    private int cacheHits = 0;
-    private int cacheMisses = 0;
+    private CacheStats cacheStats = new CacheStats();
 
 
     @SuppressWarnings("unchecked")
@@ -62,13 +61,13 @@ public class DefaultLeastCostPathCalculatorWithCache
         Path path = spCacheSlice.get(fromNode.getId(), toNode.getId());
 
         if (path == null) {
-            cacheMisses++;
+            cacheStats.incMisses();
             path = calculator.calcLeastCostPath(fromNode, toNode,
                     timeDiscretizer.discretize(startTime), person, vehicle);
             spCacheSlice.put(fromNode.getId(), toNode.getId(), path);
         }
         else {
-            cacheHits++;
+            cacheStats.incHits();
         }
 
         return path;
@@ -76,15 +75,8 @@ public class DefaultLeastCostPathCalculatorWithCache
 
 
     @Override
-    public int getCacheHits()
+    public CacheStats getCacheStats()
     {
-        return cacheHits;
-    }
-
-
-    @Override
-    public int getCacheMisses()
-    {
-        return cacheMisses;
+        return cacheStats;
     }
 }

@@ -25,8 +25,36 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 public interface LeastCostPathCalculatorWithCache
     extends LeastCostPathCalculator
 {
-    int getCacheHits();
+    class CacheStats
+    {
+        private int hits = 0;
+        private int misses = 0;
 
 
-    int getCacheMisses();
+        public void incHits()
+        {
+            hits++;
+        }
+
+
+        public void incMisses()
+        {
+            misses++;
+        }
+
+
+        public int getHits()
+        {
+            return hits;
+        }
+
+
+        public int getMisses()
+        {
+            return misses;
+        }
+    }
+
+
+    CacheStats getCacheStats();
 }

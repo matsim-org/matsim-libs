@@ -40,8 +40,7 @@ public class DijkstraWithDijkstraTreeCache
     private final TimeDiscretizer timeDiscretizer;
     private final Map<Id<Node>, DijkstraTree>[] treeCache;
 
-    private int cacheHits = 0;
-    private int cacheMisses = 0;
+    private CacheStats cacheStats = new CacheStats();
 
 
     @SuppressWarnings("unchecked")
@@ -75,13 +74,13 @@ public class DijkstraWithDijkstraTreeCache
         DijkstraTree tree = treeCacheSlice.get(fromNode.getId());
 
         if (tree == null) {
-            cacheMisses++;
+            cacheStats.incMisses();
             tree = new DijkstraTree(network, costFunction, timeFunction);
             tree.calcLeastCostPathTree(fromNode, timeDiscretizer.discretize(startTime));
             treeCacheSlice.put(fromNode.getId(), tree);
         }
         else {
-            cacheHits++;
+            cacheStats.incHits();
         }
 
         return tree;
@@ -89,15 +88,8 @@ public class DijkstraWithDijkstraTreeCache
 
 
     @Override
-    public int getCacheHits()
+    public CacheStats getCacheStats()
     {
-        return cacheHits;
-    }
-
-
-    @Override
-    public int getCacheMisses()
-    {
-        return cacheMisses;
+        return cacheStats;
     }
 }
