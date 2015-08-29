@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
@@ -180,8 +181,8 @@ import playground.michalm.util.MovingAgentsRegister;
         LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
                 router, new TimeDiscretizer(31 * 4, 15 * 60, false));
 
-        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
-                travelDisutility);
+        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime,
+                travelDisutility));
 
         ETaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(vrpData);

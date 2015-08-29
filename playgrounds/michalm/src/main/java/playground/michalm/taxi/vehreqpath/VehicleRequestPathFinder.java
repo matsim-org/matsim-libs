@@ -1,6 +1,7 @@
 package playground.michalm.taxi.vehreqpath;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 

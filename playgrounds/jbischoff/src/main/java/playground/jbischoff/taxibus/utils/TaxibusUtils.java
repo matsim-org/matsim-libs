@@ -21,7 +21,7 @@ package playground.jbischoff.taxibus.utils;
 
 import java.util.ArrayList;
 
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 /**
  * @author  jbischoff

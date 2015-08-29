@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router.tree;
+package org.matsim.contrib.dvrp.router;
 
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;

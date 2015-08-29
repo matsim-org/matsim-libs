@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
@@ -111,7 +112,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
 
 		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
-				routerWithCache, travelTime, travelDisutility);
+				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
 		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
 		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(
 				calculator, scheduler);

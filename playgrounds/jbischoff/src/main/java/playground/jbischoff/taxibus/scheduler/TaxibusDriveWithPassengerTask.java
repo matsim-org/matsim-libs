@@ -21,7 +21,7 @@ package playground.jbischoff.taxibus.scheduler;
 
 import java.util.Set;
 
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;

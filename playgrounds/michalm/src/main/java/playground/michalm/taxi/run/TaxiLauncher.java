@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.router.tree.DijkstraWithDijkstraTreeCache;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
@@ -119,7 +119,7 @@ class TaxiLauncher
             routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, timeDiscretizer);
         }
 
-        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
+        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
     }
 
 

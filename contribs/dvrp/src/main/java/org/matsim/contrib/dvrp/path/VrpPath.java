@@ -17,38 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.contrib.dvrp.path;
 
-import java.util.Comparator;
+import org.matsim.api.core.v01.network.Link;
 
 
-public class VrpPaths
+public interface VrpPath
+    extends Iterable<Link>
 {
-    public static final Comparator<VrpPathWithTravelData> TRAVEL_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getTravelTime(), p2.getTravelTime());
-        }
-    };
+    int getLinkCount();
 
-    public static final Comparator<VrpPathWithTravelData> ARRIVAL_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getArrivalTime(), p2.getArrivalTime());
-        }
-    };
 
-    public static final Comparator<VrpPathWithTravelData> DEPARTURE_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getDepartureTime(), p2.getDepartureTime());
-        }
-    };
+    Link getLink(int idx);
 
-    public static final Comparator<VrpPathWithTravelData> TRAVEL_COST_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getTravelCost(), p2.getTravelCost());
-        }
-    };
+
+    double getLinkTravelTime(int idx);
+
+
+    Link getFromLink();
+
+
+    Link getToLink();
 }

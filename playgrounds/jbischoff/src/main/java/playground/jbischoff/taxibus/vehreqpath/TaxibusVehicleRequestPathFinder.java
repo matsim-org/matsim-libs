@@ -7,8 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.utils.collections.Tuple;
 

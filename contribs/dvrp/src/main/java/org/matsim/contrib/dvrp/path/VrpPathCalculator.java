@@ -17,19 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.contrib.dvrp.path;
 
-public interface VrpPathWithTravelData
-    extends VrpPath
+import org.matsim.api.core.v01.network.Link;
+
+
+public interface VrpPathCalculator
 {
-    public double getDepartureTime();
-
-
-    public double getTravelTime();
-
-
-    public double getArrivalTime();
-
-
-    public double getTravelCost();
+    /**
+     * ASSUMPTION: A vehicle departs and arrives at links' ends (link.getToNode())
+     */
+    VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime);
 }

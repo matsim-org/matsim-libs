@@ -1,7 +1,7 @@
 package playground.jbischoff.taxibus.optimizer;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.path.VrpPathCalculator;
 
 import playground.jbischoff.taxibus.optimizer.filter.TaxibusFilterFactory;
 import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.contrib.dvrp.path;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
-public interface VrpPath
-    extends Iterable<Link>
+public class VrpPathCalculatorImpl
+    implements VrpPathCalculator
 {
-    int getLinkCount();
+    private final LeastCostPathCalculator router;
+    private final VrpPathFactory vrpPathFactory;
 
 
-    Link getLink(int idx);
+    public VrpPathCalculatorImpl(LeastCostPathCalculator router, VrpPathFactory vrpPathFactory)
+    {
+        this.router = router;
+        this.vrpPathFactory = vrpPathFactory;
+    }
 
 
-    double getLinkTravelTime(int idx);
+    /**
+     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+     */
+    @Override
+    public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
+    {
+        Path path = null;
+        if (fromLink != toLink) {
+            //calc path for departureTime+1 (we need 1 second to move over the node)
+            path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
+                    departureTime + 1, null, null);
+        }
 
-
-    Link getFromLink();
-
-
-    Link getToLink();
+        return vrpPathFactory.createPath(fromLink, toLink, departureTime, path);
+    }
 }

@@ -27,7 +27,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;

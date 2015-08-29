@@ -19,7 +19,7 @@
 
 package playground.jbischoff.taxibus.scheduler;
 
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 /**

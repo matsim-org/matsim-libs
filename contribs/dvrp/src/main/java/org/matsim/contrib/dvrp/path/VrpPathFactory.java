@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.schedule;
+package org.matsim.contrib.dvrp.path;
 
-import org.matsim.contrib.dvrp.path.VrpPath;
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
-public interface DriveTask
-    extends Task
+public interface VrpPathFactory
 {
-    VrpPath getPath();
 
+    VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path);
 
-    /**
-     * Vehicle changes its path. Can be used for: <br/>
-     * - changing destination (while keepen the current task active) <br/>
-     * - stopping it as soon as possible (i.e. at the end of the current/next link) <br/>
-     * - random walk, roaming/crusing around <br/>
-     * - ...
-     */
-    void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
 }

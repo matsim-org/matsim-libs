@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.contrib.dvrp.path;
 
 import java.util.Iterator;
 
