@@ -19,19 +19,12 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.vehicles.Vehicle;
 
 
 public interface LeastCostPathCalculatorWithCache
     extends LeastCostPathCalculator
 {
-    Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person,
-            Vehicle vehicle);
-
-
     int getCacheHits();
 
 

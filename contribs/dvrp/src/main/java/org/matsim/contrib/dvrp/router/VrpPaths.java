@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.router;
 import java.util.Comparator;
 
 
-public class VrpPathWithTravelDataComparators
+public class VrpPaths
 {
     public static final Comparator<VrpPathWithTravelData> TRAVEL_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
         public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)

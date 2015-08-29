@@ -37,9 +37,9 @@ public class VrpPathWithTravelDataImpl
 
 
     public VrpPathWithTravelDataImpl(double departureTime, double travelTime, double travelCost, Link[] links,
-            double[] linkTT)
+            double[] linkTTs)
     {
-        if (links.length == 0 || links.length != linkTT.length) {
+        if (links.length == 0 || links.length != linkTTs.length) {
             throw new IllegalArgumentException();
         }
 
@@ -47,7 +47,7 @@ public class VrpPathWithTravelDataImpl
         this.travelTime = travelTime;
         this.travelCost = travelCost;
         this.links = links;
-        this.linkTTs = linkTT;
+        this.linkTTs = linkTTs;
     }
 
 

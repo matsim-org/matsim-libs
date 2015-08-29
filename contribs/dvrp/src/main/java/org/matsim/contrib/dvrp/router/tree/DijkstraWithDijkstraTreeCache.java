@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 
 
 public class DijkstraWithDijkstraTreeCache
-    implements LeastCostPathCalculator, LeastCostPathCalculatorWithCache
+    implements LeastCostPathCalculatorWithCache
 {
     private final Network network;
     private final TravelDisutility costFunction;

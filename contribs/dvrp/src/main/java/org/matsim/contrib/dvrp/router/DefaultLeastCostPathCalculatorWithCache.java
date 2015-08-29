@@ -30,7 +30,7 @@ import com.google.common.collect.*;
 
 
 public class DefaultLeastCostPathCalculatorWithCache
-    implements LeastCostPathCalculator, LeastCostPathCalculatorWithCache
+    implements LeastCostPathCalculatorWithCache
 {
     private final LeastCostPathCalculator calculator;
     private final TimeDiscretizer timeDiscretizer;
