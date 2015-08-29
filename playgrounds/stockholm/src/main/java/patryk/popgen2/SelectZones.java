@@ -1,5 +1,7 @@
 package patryk.popgen2;
 
+import gunnar.ihop2.regent.demandreading.Zone;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
