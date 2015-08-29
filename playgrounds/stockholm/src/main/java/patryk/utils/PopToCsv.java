@@ -1,11 +1,5 @@
 package patryk.utils;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
-
-import org.hsqldb.util.CSVWriter;
 
 public class PopToCsv {
 //	final static String inputFile= "agentdata.txt";
