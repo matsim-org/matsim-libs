@@ -72,68 +72,6 @@ public class StockholmMGC extends MGC{
 
 	}
 
-
-	/**
-	 * Converts a MATSim {@link org.matsim.api.core.v01.Coord} into a Geotools <code>Coordinate</code>
-	 * @param coord MATSim coordinate
-	 * @return Geotools coordinate
-	 */
-	public static Coordinate coord2Coordinate(final Coord coord) {
-		return new Coordinate(coord.getX(), coord.getY());
-	}
-
-	/**
-	 * Converts a Geotools <code>Coordinate</code> into a MATSim {@link org.matsim.api.core.v01.Coord}
-	 * @param coord MATSim coordinate
-	 * @return Geotools coordinate
-	 */
-	public static Coord coordinate2Coord(final Coordinate coord) {
-		return new CoordImpl(coord.x, coord.y);
-	}
-
-	/**
-	 * Converts a MATSim {@link org.matsim.api.core.v01.Coord} into a Geotools <code>Point</code>
-	 * @param coord MATSim coordinate
-	 * @return Geotools point
-	 */
-	public static Point coord2Point(final Coord coord) {
-		return geoFac.createPoint(coord2Coordinate(coord));
-	}
-
-	/**
-	 * Converts a Geotools coordinate into a <code>Point</code>
-	 * @return Geotools point
-	 */
-	public static Point coordinate2Point(Coordinate coordinate) {
-		return geoFac.createPoint(coordinate);
-	}
-	
-	/**
-	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.api.core.v01.Coord}
-	 * @param point Geotools point
-	 * @return MATSim coordinate
-	 */
-	public static Coord point2Coord(final Point point) {
-		return new CoordImpl(point.getX(), point.getY());
-	}
-
-	/**
-	 * Converts x, y Coordinates to Geotools
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public static Point xy2Point(final double x, final double y) {
-		return geoFac.createPoint(new Coordinate(x, y));
-	}
-
-	/**
-	 * Generates a Geotools <code>CoordinateReferenceSystem</code> from a coordinate system <code>String</code>. The coordinate system
-	 * can either be specified as shortened names, as defined in {@link TransformationFactory}, as EPSG Code or as
-	 * Well-Known-Text (WKT) as supported by the GeoTools.
-	 * @param wktOrAuthorityCodeOrShorthandName
-	 * @return crs
-	 */
 	public static CoordinateReferenceSystem getCRS(final String wktOrAuthorityCodeOrShorthandName) {
 		String wktOrAuthorityCode = COORDINATE_REFERENCE_SYSTEMS.get(wktOrAuthorityCodeOrShorthandName);
 		if (wktOrAuthorityCode == null) {
@@ -152,23 +90,4 @@ public class StockholmMGC extends MGC{
 		}
 		return crs;
 	}
-
-	/**
-	 * Guesses the  Universal Transverse Mercator (UTM) zone for a given WGS 84 coordinate, returns the corresponding 
-	 * EPSG code  
-	 * @param lon the longitude of the WGS 84 coordinate
-	 * @param lat the latitude of the WGS 84 coordinate
-	 * @return EPSG code
-	 */
-	public static String getUTMEPSGCodeForWGS84Coordinate(final double lon, final double lat) {
-		int utmZone = (int) (Math.ceil((180+lon) / 6)+0.5);
-		String epsgCode = null;
-		if (lat > 0 ) { //northern hemisphere 
-		  epsgCode = "EPSG:326" + utmZone;
-		} else { //southern hemisphere
-		  epsgCode = "EPSG:327" + utmZone;
-		}
-		return epsgCode;
-	}
-
 }
