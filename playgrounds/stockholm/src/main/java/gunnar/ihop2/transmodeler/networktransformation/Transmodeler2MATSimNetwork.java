@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,14 +15,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.Units;
 
 /**
@@ -112,12 +110,22 @@ public class Transmodeler2MATSimNetwork {
 		 * (2b) Create and add all MATSim nodes.
 		 */
 
+		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory
+				.getCoordinateTransformation(
+						StockholmTransformationFactory.WGS84,
+						StockholmTransformationFactory.WGS84_SWEREF99);
+
 		for (TransmodelerNode transmodelerNode : nodesReader.getNodes()
 				.values()) {
-			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(
-					transmodelerNode.getId(), Node.class),
-					new CoordImpl(transmodelerNode.getLongitude(),
-							transmodelerNode.getLatitude()));
+
+			final Coord coord = coordinateTransform.transform(new CoordImpl(
+					transmodelerNode.getLongitude(), transmodelerNode
+							.getLatitude()));
+
+			final Node matsimNode = matsimNetworkFactory.createNode(
+					Id.create(transmodelerNode.getId(), Node.class), coord);
+			// new CoordImpl(transmodelerNode.getLongitude(),
+			// transmodelerNode.getLatitude()));
 			matsimNetwork.addNode(matsimNode);
 		}
 
@@ -187,19 +195,19 @@ public class Transmodeler2MATSimNetwork {
 		 * (4) Create shape file.
 		 */
 
-		 final FeatureGeneratorBuilderImpl builder = new
-		 FeatureGeneratorBuilderImpl(
-		 matsimNetwork, TransformationFactory.WGS84);
-		 builder.setWidthCoefficient(0.01);
-		 builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-		 builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
-
-//		new Nodes2ESRIShape(matsimNetwork, this.shapeFileName,
-//				TransformationFactory.WGS84).write();
-
-		 final Links2ESRIShape esriWriter = new Links2ESRIShape(matsimNetwork,
-		 this.shapeFileName, builder);
-		 esriWriter.write();
+		// final FeatureGeneratorBuilderImpl builder = new
+		// FeatureGeneratorBuilderImpl(
+		// matsimNetwork, StockholmTransformationFactory.WGS84_SWEREF99);
+		// builder.setWidthCoefficient(0.01);
+		// builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		// builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+		//
+		// // new Nodes2ESRIShape(matsimNetwork, this.shapeFileName,
+		// // TransformationFactory.WGS84).write();
+		//
+		// final Links2ESRIShape esriWriter = new Links2ESRIShape(matsimNetwork,
+		// this.shapeFileName, builder);
+		// esriWriter.write();
 
 	}
 

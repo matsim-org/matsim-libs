@@ -16,6 +16,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +36,7 @@ import patryk.utils.LinksRemover;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import floetteroed.utilities.math.Covariance;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
 
@@ -75,6 +77,12 @@ public class PopulationCreator {
 
 	private PrintWriter agentWorkXYWriter = null;
 
+	private Covariance netCoordStats = new Covariance(2, 2);
+
+	private Covariance homeCoordStats = new Covariance(2, 2);
+
+	private Covariance workCoordStats = new Covariance(2, 2);
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public PopulationCreator(final String networkFileName,
@@ -83,6 +91,12 @@ public class PopulationCreator {
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(this.scenario)).readFile(networkFileName);
+
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
+			final Vector coords = new Vector(node.getCoord().getX(), node
+					.getCoord().getY());
+			this.netCoordStats.add(coords, coords);
+		}
 
 		this.zonalSystem = new ZonalSystem(zoneShapeFileName);
 
@@ -279,6 +293,11 @@ public class PopulationCreator {
 
 		// do coordinate logging if needed
 
+		this.homeCoordStats.add(new Vector(homeCoord.getX(), homeCoord.getY()),
+				new Vector(homeCoord.getX(), homeCoord.getY()));
+		this.workCoordStats.add(new Vector(workCoord.getX(), workCoord.getY()),
+				new Vector(workCoord.getX(), workCoord.getY()));
+
 		if (this.agentHomeXYWriter != null) {
 			this.agentHomeXYWriter.print(homeCoord.getX());
 			this.agentHomeXYWriter.print(";");
@@ -332,7 +351,7 @@ public class PopulationCreator {
 					personId, WORKTOURMODE_ATTRIBUTE);
 
 			// TODO ONLY PT WORK TRIPS !!!
-			
+
 			if (id2clippedZone.keySet().contains(homeZone)
 					&& id2clippedZone.keySet().contains(workZone)
 					&& RegentPopulationReader.PT_ATTRIBUTEVALUE
@@ -399,9 +418,23 @@ public class PopulationCreator {
 		pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
 		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
-		pc.setPopulationSampleFactor(0.001);
+		
+		pc.setPopulationSampleFactor(1.0);
 
 		pc.run(initialPlansFile);
+
+		System.out.println("NETWORK NODE COORDINATE STATISTICS");
+		System.out.println("center point: " + pc.netCoordStats.getMeanX()
+				+ ", " + pc.netCoordStats.getMeanY());
+		System.out.println("standard dev: "
+				+ Math.sqrt(pc.netCoordStats.getCovariance().get(0, 0)) + ", "
+				+ Math.sqrt(pc.netCoordStats.getCovariance().get(1, 1)));
+		System.out.println();
+		System.out.println("POPULATION HOME COORDINATE STATISTICS");
+		System.out.println("center point: " + pc.homeCoordStats.getMeanX());
+		System.out.println("standard dev: "
+				+ Math.sqrt(pc.homeCoordStats.getCovariance().get(0, 0)) + ", "
+				+ Math.sqrt(pc.homeCoordStats.getCovariance().get(1, 1)));
 
 		System.out.println("... DONE");
 	}
