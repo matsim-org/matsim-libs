@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.simpleadaptivesignalengine;
+package tutorial.programming.simpleadaptivesignalengine;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -140,7 +140,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 	}
 
 	static public void main( String[] args ) {
-		Main.main( args ) ;
+		RunSimpleAdaptiveSignalExample.main( args ) ;
 	}
 
 }
