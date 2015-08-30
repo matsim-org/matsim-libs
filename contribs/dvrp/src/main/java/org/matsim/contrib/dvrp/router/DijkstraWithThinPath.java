@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.router.Dijkstra;
@@ -53,13 +53,15 @@ public class DijkstraWithThinPath
         Link tmpLink = getData(toNode).getPrevLink();
         if (tmpLink != null) {
             while (tmpLink.getFromNode() != fromNode) {
-                links.add(0, tmpLink);
+                links.add(tmpLink);
 //                nodes.add(0, tmpLink.getFromNode());
                 tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
             }
-            links.add(0, tmpLink);
+            links.add(tmpLink);
 //            nodes.add(0, tmpLink.getFromNode());
         }
+        
+        Collections.reverse(links);
 
         DijkstraNodeData toNodeData = getData(toNode);
         Path path = new Path(null, links, arrivalTime - startTime, toNodeData.getCost());

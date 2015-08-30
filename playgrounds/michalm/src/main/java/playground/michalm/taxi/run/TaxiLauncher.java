@@ -114,7 +114,7 @@ class TaxiLauncher
                     travelDisutility, travelTime, timeDiscretizer);
         }
         else {
-            LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
+            LeastCostPathCalculator router = new DijkstraWithThinPath(scenario.getNetwork(), travelDisutility,
                     travelTime);
             routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, timeDiscretizer);
         }
