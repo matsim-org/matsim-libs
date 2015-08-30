@@ -15,6 +15,7 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 public class StockholmTransformationFactory extends TransformationFactory{
 	public final static String WGS84_RT90 = "WGS84toRT90";
 	public final static String WGS84_SWEREF99 = "WGS84toSWEREF99";
+	public final static String WGS84_EPSG3857 = "WGS84_EPSG3857";
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
 	 * coordinate system to another one.

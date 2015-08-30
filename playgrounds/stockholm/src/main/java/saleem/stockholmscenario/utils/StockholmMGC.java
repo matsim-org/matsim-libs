@@ -69,6 +69,8 @@ public class StockholmMGC extends MGC{
 				"PROJCS[\"RT90 2.5 gon V\", GEOGCS[\"RT90\", DATUM[\"Rikets_koordinatsystem_1990\", SPHEROID[\"Bessel 1841\",6377397.155,299.1528128, AUTHORITY[\"EPSG\",\"7004\"]], AUTHORITY[\"EPSG\",\"6124\"]], PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]], UNIT[\"degree\",0.01745329251994328, AUTHORITY[\"EPSG\",\"9122\"]], AUTHORITY[\"EPSG\",\"4124\"]], UNIT[\"metre\",1, AUTHORITY[\"EPSG\",\"9001\"]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",0], PARAMETER[\"central_meridian\",15.80827777777778], PARAMETER[\"scale_factor\",1], PARAMETER[\"false_easting\",1500000], PARAMETER[\"false_northing\",0], AUTHORITY[\"EPSG\",\"3021\"], AXIS[\"Y\",EAST], AXIS[\"X\",NORTH]]");
 		COORDINATE_REFERENCE_SYSTEMS.put(StockholmTransformationFactory.WGS84_SWEREF99, // Stockholm
 				"PROJCS[\"SWEREF99 TM\", GEOGCS[\"SWEREF99\", DATUM[\"SWEREF99\", SPHEROID[\"GRS 1980\",6378137,298.257222101, AUTHORITY[\"EPSG\",\"7019\"]], TOWGS84[0,0,0,0,0,0,0],  AUTHORITY[\"EPSG\",\"6619\"]], PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]], UNIT[\"degree\",0.01745329251994328, AUTHORITY[\"EPSG\",\"9122\"]], AUTHORITY[\"EPSG\",\"4619\"]], UNIT[\"metre\",1, AUTHORITY[\"EPSG\",\"9001\"]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",0], PARAMETER[\"central_meridian\",15], PARAMETER[\"scale_factor\",0.9996], PARAMETER[\"false_easting\",500000], PARAMETER[\"false_northing\",0], AUTHORITY[\"EPSG\",\"3006\"], AXIS[\"y\",EAST], AXIS[\"x\",NORTH]]");
+		COORDINATE_REFERENCE_SYSTEMS.put(StockholmTransformationFactory.WGS84_EPSG3857, // For Stockholm Population File
+				"EPSG:3857");
 
 	}
 
