@@ -118,7 +118,7 @@ public abstract class AbstractCongestionHandler implements
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public final void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
 		this.delayNotInternalized_storageCapacity = 0.0;
@@ -129,19 +129,19 @@ public abstract class AbstractCongestionHandler implements
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
+	public final void handleEvent(TransitDriverStartsEvent event) {
 		if (!this.ptVehicleIDs.contains(event.getVehicleId())){
 			this.ptVehicleIDs.add(event.getVehicleId());
 		}
 	}
 	
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
+	public final void handleEvent(PersonStuckEvent event) {
 		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects: " + event.toString());
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!
 			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
@@ -156,7 +156,7 @@ public abstract class AbstractCongestionHandler implements
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	public final void handleEvent(LinkEnterEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		
@@ -174,7 +174,7 @@ public abstract class AbstractCongestionHandler implements
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+	public final void handleEvent(LinkLeaveEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		
@@ -198,10 +198,10 @@ public abstract class AbstractCongestionHandler implements
 	
 	// ############################################################################################################################################################
 	
-	void updateTrackingMarginalDelays(LinkLeaveEvent event) {
+	final void updateTrackingMarginalDelays(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
-		if (linkInfo.getLeavingAgents().size() == 0) {
+		if (linkInfo.getLeavingAgents().isEmpty() ) {
 			// No agent is being tracked for that link.
 			
 		} else {
@@ -224,7 +224,7 @@ public abstract class AbstractCongestionHandler implements
 		}
 	}
 	
-	double throwFlowCongestionEventsAndReturnStorageDelay(double totalDelay, LinkLeaveEvent event) {
+	final double throwFlowCongestionEventsAndReturnStorageDelay(double totalDelay, LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
@@ -271,7 +271,7 @@ public abstract class AbstractCongestionHandler implements
 		return delayToPayFor;
 	}
 	
-	void trackMarginalDelay(LinkLeaveEvent event) {
+	final void trackMarginalDelay(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		// Start tracking delays caused by that agent leaving the link.
 		
@@ -289,7 +289,7 @@ public abstract class AbstractCongestionHandler implements
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 	}
 
-	void collectLinkInfos(Id<Link> linkId) {
+	final void collectLinkInfos(Id<Link> linkId) {
 		LinkCongestionInfo linkInfo = new LinkCongestionInfo();	
 
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
@@ -318,7 +318,7 @@ public abstract class AbstractCongestionHandler implements
 		return lastLeavingFromThatLink;
 	}
 	
-	public void writeCongestionStats(String fileName) {
+	public final void writeCongestionStats(String fileName) {
 		File file = new File(fileName);
 		
 		try {
@@ -342,19 +342,19 @@ public abstract class AbstractCongestionHandler implements
 		log.info("Congestion statistics written to " + fileName);		
 	}
 	
-	public double getTotalInternalizedDelay() {
+	public final double getTotalInternalizedDelay() {
 		return totalInternalizedDelay;
 	}
 
-	public double getTotalDelay() {
+	public final double getTotalDelay() {
 		return totalDelay;
 	}
 		
-	public double getDelayNotInternalizedRoundingErrors() {
+	public final double getDelayNotInternalizedRoundingErrors() {
 		return delayNotInternalized_roundingErrors;
 	}
 	
-	public double getDelayNotInternalizedSpillbackNoCausingAgent() {
+	public final double getDelayNotInternalizedSpillbackNoCausingAgent() {
 		return delayNotInternalized_spillbackNoCausingAgent;
 	}
 
