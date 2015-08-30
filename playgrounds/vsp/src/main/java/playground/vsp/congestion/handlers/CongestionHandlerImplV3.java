@@ -43,7 +43,7 @@ import playground.vsp.congestion.LinkCongestionInfo;
  * @author ikaddoura
  *
  */
-public class CongestionHandlerImplV3 extends CongestionHandler implements ActivityEndEventHandler {
+public final class CongestionHandlerImplV3 extends AbstractCongestionHandler implements ActivityEndEventHandler {
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	
@@ -51,6 +51,7 @@ public class CongestionHandlerImplV3 extends CongestionHandler implements Activi
 		super(events, scenario);
 	}
 	
+	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());

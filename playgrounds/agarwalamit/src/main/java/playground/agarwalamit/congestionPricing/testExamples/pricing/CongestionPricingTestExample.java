@@ -140,7 +140,7 @@ class CongestionPricingTestExample {
 		config.controler().setLastIteration(20);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setMobsim("qsim");
-		config.controler().setOverwriteFileSetting(true ? OverwriteFileSetting.deleteDirectoryIfExists:OverwriteFileSetting.failIfDirectoryExists);
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		config.qsim().setEndTime(9*3600.);
 

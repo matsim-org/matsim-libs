@@ -66,14 +66,14 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-public abstract class CongestionHandler implements
+public abstract class AbstractCongestionHandler implements
 	LinkEnterEventHandler,
 	LinkLeaveEventHandler,
 	TransitDriverStartsEventHandler,
 	PersonDepartureEventHandler, 
 	PersonStuckEventHandler {
 	
-	final static Logger log = Logger.getLogger(CongestionHandler.class);
+	private final static Logger log = Logger.getLogger(AbstractCongestionHandler.class);
 	
 	// If the following parameter is false, a Runtime Exception is thrown in case an agent is delayed by the storage capacity.
 	final boolean allowForStorageCapacityConstraint = true;
@@ -93,7 +93,7 @@ public abstract class CongestionHandler implements
 	double delayNotInternalized_roundingErrors = 0.0;
 	double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		
-	public CongestionHandler(EventsManager events, ScenarioImpl scenario) {
+	public AbstractCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 		
@@ -307,7 +307,7 @@ public abstract class CongestionHandler implements
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
 	}
 	
-	double getLastLeavingTime(Map<Id<Person>, Double> personId2LinkLeaveTime) {
+	static double getLastLeavingTime(Map<Id<Person>, Double> personId2LinkLeaveTime) {
 		
 		double lastLeavingFromThatLink = Double.NEGATIVE_INFINITY;
 		for (Id<Person> id : personId2LinkLeaveTime.keySet()){

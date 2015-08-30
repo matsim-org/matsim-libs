@@ -73,7 +73,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 /**
  * @author amit
  */
-public class TestNetworkExperiment {
+class TestNetworkExperiment {
 	final Logger log = Logger.getLogger(TestNetworkExperiment.class);
 
 
@@ -83,7 +83,7 @@ public class TestNetworkExperiment {
 //		testEx.printData();
 	}
 
-	public void test4MarginalCongestionCosts(){
+	void test4MarginalCongestionCosts(){
 		String outputDir = "./output/pop10/";
 		new File(outputDir).mkdirs();
 
@@ -106,16 +106,16 @@ public class TestNetworkExperiment {
 	}
 
 
-	public void printData(){
-		Map<Id<Person>, Double> personId2AffectedDelays_v3 = getPersonId2Delays("v3", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v4 = getPersonId2Delays("v4", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v5 = getPersonId2Delays("v5", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v6 = getPersonId2Delays("v6", "affected");
+	void printData(){
+		Map<Id<Person>, Double> personId2AffectedDelays_v3 = generatePersonId2Delays("v3", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v4 = generatePersonId2Delays("v4", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v5 = generatePersonId2Delays("v5", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v6 = generatePersonId2Delays("v6", "affected");
 
-		Map<Id<Person>, Double> personId2CausingDelays_v3 = getPersonId2Delays("v3", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v4 = getPersonId2Delays("v4", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v5 = getPersonId2Delays("v5", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v6 = getPersonId2Delays("v6", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v3 = generatePersonId2Delays("v3", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v4 = generatePersonId2Delays("v4", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v5 = generatePersonId2Delays("v5", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v6 = generatePersonId2Delays("v6", "causing");
 
 		BufferedWriter  writer = IOUtils.getBufferedWriter("./output/comparisonOfPricingImpls.txt");
 		try {
@@ -133,6 +133,7 @@ public class TestNetworkExperiment {
 		personIds.addAll(personId2CausingDelays_v5.keySet());
 		personIds.addAll(personId2AffectedDelays_v3.keySet());
 		personIds.addAll(personId2CausingDelays_v3.keySet());
+		// yy why is v6 not added? kai, aug'15
 
 
 		try {
@@ -147,7 +148,7 @@ public class TestNetworkExperiment {
 		}
 	}
 
-	public Map<Id<Person>, Double> getPersonId2Delays(String congestionPricingImpl, String affectedOrCausing){
+	Map<Id<Person>, Double> generatePersonId2Delays(String congestionPricingImpl, String affectedOrCausing){
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
@@ -192,7 +193,7 @@ public class TestNetworkExperiment {
 		return personId2Delay;
 	}
 
-	private QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
+	private static QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);

@@ -49,7 +49,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  * Simplest version of congestion handler, if a person is delayed, it will charge everything to the person who just left before.
  */
 
-public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public final class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV5.class);
 
@@ -160,7 +160,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	 * @param travelMode to get maximum speed of vehicle
 	 * @return minimum travel time on above link depending on the allowed link speed and vehicle speed
 	 */
-	private double getEarliestLinkExitTime(Link link, String travelMode){
+	private static double getEarliestLinkExitTime(Link link, String travelMode){
 		if(!travelMode.equals(TransportMode.car)) throw new RuntimeException("Travel mode other than car is not implemented yet. Thus aborting ...");
 		double linkLength = link.getLength(); // see org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator.java
 		//		Id<VehicleType> vehTyp = Id.create(travelMode,VehicleType.class);

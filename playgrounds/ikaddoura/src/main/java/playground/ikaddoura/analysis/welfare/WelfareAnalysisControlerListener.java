@@ -24,25 +24,26 @@
 
 package playground.ikaddoura.analysis.welfare;
 
-import org.apache.log4j.Logger;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.charts.XYLineChart;
-import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
-import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
-import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.charts.XYLineChart;
+
+import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 
 /**
@@ -53,7 +54,7 @@ import java.util.TreeMap;
 public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener {
 	private static final Logger log = Logger.getLogger(WelfareAnalysisControlerListener.class);
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
 	
@@ -75,7 +76,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
 
 	
-	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
+	public WelfareAnalysisControlerListener(Scenario scenario){
 		this.scenario = scenario;
 	}
 	
