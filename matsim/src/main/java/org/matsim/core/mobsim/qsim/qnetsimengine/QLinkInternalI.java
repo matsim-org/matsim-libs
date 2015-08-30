@@ -42,6 +42,10 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
+/**
+ * @author nagel
+ *
+ */
 abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 	
 
@@ -49,6 +53,9 @@ abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 
 	/**
 	 * add vehicle at "activity" location
+	 * <br>
+	 * Seems ok as public interface function. 
+	 * Rename to "addToParking(...)".  kai, aug'15
 	 */
 	abstract void addParkedVehicle(MobsimVehicle vehicle) ;
 	
@@ -76,6 +83,8 @@ abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 	/**
 	 * return all agents/vehicles/... that are NOT in traffic.
 	 * Probably only used for visualization, but no guarantee.
+	 * <br>
+	 * Seems ok as public interface function. kai, aug'15
 	 */
 	abstract Collection<MobsimAgent> getAdditionalAgentsOnLink() ;
 	
@@ -107,6 +116,11 @@ abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 	 */
 	abstract void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
 	abstract MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
+
+	
+	/**
+	 * yy Can't we get this functionality from {@link #getAdditionalAgentsOnLink()}?
+	 */
 	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
 
 }
