@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,6 +61,9 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
+ * This class consists of a bunch of static methods that create a scenario for
+ * Garmisch-Partenkirchen, Bavaria, Germany.
+ * 
  * @author dhosse
  *
  */
@@ -72,9 +76,6 @@ public class GAPScenarioBuilder {
 	
 	private static QuadTree<Geometry> builtAreaQT;
 	
-	static int counter = 0;
-	static boolean equal;
-	
 	static int nPersons = 0;
 	
 	static QuadTree<ActivityFacility> workLocations;
@@ -83,6 +84,8 @@ public class GAPScenarioBuilder {
 	static QuadTree<ActivityFacility> leisureQT;
 	
 	private static ObjectAttributes agentAttributes = new ObjectAttributes();
+	//this attributes object stores data about age, sex, car availability etc.
+	private static ObjectAttributes demographicAttributes = new ObjectAttributes();
 	
 	/**
 	 * Creates the scenario network.
@@ -120,10 +123,11 @@ public class GAPScenarioBuilder {
 		OsmNetworkReader onr = new OsmNetworkReader(network, GAPMain.ct);
 		
 		//hierarchy layers...
-		onr.setHierarchyLayer(48.879, 9.739, 47.130, 12.1, 3); //primary network from oberbayern
+		onr.setHierarchyLayer(48.879, 9.739, 47.130, 12.1, 3); //primary network of oberbayern
 		onr.setHierarchyLayer(47.9936, 10.5112, 47.130, 11.7114, 4);
-		onr.setHierarchyLayer(47.7389, 10.8662, 47.3793, 11.4251, 6); //complete ways from lk garmisch-partenkirchen
-		onr.setHierarchyLayer(47.4330, 11.1034, 47.2871, 11.2788, 6); //complete ways from seefeld & leutasch
+		onr.setHierarchyLayer(47.7389, 10.8662, 47.3793, 11.4251, 6); //complete ways of lk garmisch-partenkirchen
+		onr.setHierarchyLayer(47.4330, 11.1034, 47.2871, 11.2788, 6); //complete ways of seefeld & leutasch
+		onr.setKeepPaths(true);
 		
 		onr.parse(osmFile);
 		
@@ -188,6 +192,7 @@ public class GAPScenarioBuilder {
 	
 	/**
 	 * Creates initial plans with home-work-home journeys at the moment.
+	 * dhosse, Aug 10
 	 * 
 	 * @param scenario The scenario containing the population to be created.
 	 * @param commuterFilename The text (csv) file containing information about the commuters.
@@ -198,16 +203,14 @@ public class GAPScenarioBuilder {
 	public static Population createPlans(Scenario scenario, String commuterFilename, String reverseCommuterFilename, boolean equallyDistributedEndTimes){
 		
 		double[] boundary = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
-//		homeLocations = new QuadTree<Geometry>(boundary[0], boundary[1], boundary[2], boundary[3]);
 		workLocations = new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]);
-		
-		equal = equallyDistributedEndTimes;
 		
 		Population population = scenario.getPopulation();
 
+		//create a commuter reader and add municipalities to the filter in order to create commuter relations
+		//that start or end in these municipalities
 		CommuterFileReader cdr = new CommuterFileReader();
 		
-//		cdr.setSpatialFilder("09180"); //Bayern
 		cdr.addFilter("09180"); //GaPa (Kreis)
 		cdr.addFilter("09180113"); //Bad Bayersoien
 		cdr.addFilter("09180112"); //Bad Kohlgrub
@@ -234,10 +237,13 @@ public class GAPScenarioBuilder {
 		cdr.read(reverseCommuterFilename, true);
 		cdr.read(commuterFilename, false);
 		
+		//initialize the municipal geometries from shape files
 		initMunicipalities(scenario);
 		
+		//create facilities for workplaces inside the county of Garmisch-Partenkirchen and fill the work quad tree
 		readWorkplaces(scenario, GAPMain.dataDir + "20150112_Unternehmen_Adressen_geokoordiniert.csv");
 		
+		//create quat trees for all activity types apart from home and other which are shot randomly
 		log.info("Building amenity quad trees for...");
 		double[] bbox = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
 		
@@ -258,8 +264,8 @@ public class GAPScenarioBuilder {
 		}
 		log.info("...Done.");
 		
+		//the actual demand generation
 		createPersonsWithDemographicData(scenario, cdr.getCommuterRelations());
-//		createPersons(population, cdr.getCommuterRelations());
 		
 		return population;
 		
@@ -715,32 +721,30 @@ public class GAPScenarioBuilder {
 					Person person = factory.createPerson(Id.createPersonId(fromId + "_" + toId + "_" + i));
 					
 					int age = EgapPopulationUtils.setAge(20, 79);
-					agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
+//					agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
 					int sex = EgapPopulationUtils.setSex(age);
-					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
+//					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
 					
 					MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
 
 					boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 					boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
 					
-					agentAttributes.putAttribute(person.getId().toString(), Global.EMPLOYED, true);
-					agentAttributes.putAttribute(person.getId().toString(), Global.LICENSE, hasLicense);
-					agentAttributes.putAttribute(person.getId().toString(), Global.CAR_AVAIL, carAvail);
-					
-					if(fromId.contains("09180")){
-						agentAttributes.putAttribute(person.getId().toString(), Global.INHABITANT, true);
-					}
-					
-					if(hasLicense){
+					if(fromId.startsWith("09180") && toId.startsWith("09810")){
 						
-						agentAttributes.putAttribute(person.getId().toString(), Global.POTENTIAL_CARSHARING_USER, true);
-						
-						if(carAvail){
+						if(hasLicense){
 							
-							agentAttributes.putAttribute(person.getId().toString(), Global.COMMUTER, true);
+							if(carAvail){
+								
+								agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
+								
+							}
 							
 						}
+						
+					} else {
+						
+						agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.COMMUTER);
 						
 					}
 					
@@ -781,6 +785,7 @@ public class GAPScenarioBuilder {
 		
 		Coord homeCoord = null;
 		Coord workCoord = null;
+		Coord otherCoord = null;
 		
 		//shoot the activity coords inside the given geometries
 		if(fromTransf.equals("GK4")){
@@ -790,8 +795,10 @@ public class GAPScenarioBuilder {
 		}
 		if(toTransf.equals("GK4")){
 			workCoord = GAPMain.gk4ToUTM32N.transform(shoot(to));
+			otherCoord = GAPMain.gk4ToUTM32N.transform(shoot(to));
 		} else{
 			workCoord = GAPMain.ct.transform(shoot(to));
+			otherCoord = GAPMain.ct.transform(shoot(to));
 		}
 		
 		if(fromId.length() < 8 && !fromId.contains("A")){
@@ -818,12 +825,13 @@ public class GAPScenarioBuilder {
 		
 		//create an activity end time (they can either be equally or normally distributed, depending on the boolean that
 		//has been passed to the method
-		double endTime = 0.;
-		if(equal){
-			endTime = createEquallyDistributedTime(5);
-		} else{
-			endTime = createNormallyDistributedTime(7);
-		}
+		double endTime = 0;
+		
+		do{
+
+			endTime = 8*3600 + createRandomTimeShift();
+			
+		}while(endTime <= 0);
 		
 		actHome.setEndTime(endTime);
 		plan.addActivity(actHome);
@@ -833,14 +841,34 @@ public class GAPScenarioBuilder {
 		//create other activity and set the end time nine hours after the first activity's end time
 		Activity actWork = factory.createActivityFromCoord("work", workCoord);
 		actWork.setStartTime(actHome.getEndTime() + 3600);
-		endTime = endTime + (9 + 2*GAPMain.random.nextDouble())*3600;
+		endTime = endTime + 9 * 3600;
 		actWork.setEndTime(endTime);
 		plan.addActivity(actWork);
 		
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		
+//		if(toId.startsWith("09180")){
+//		
+//		Activity actOther = factory.createActivityFromCoord(Global.ActType.other.name(), otherCoord);
+//		actOther.setStartTime(endTime + 10 * 60);
+//		endTime += 70 * 60;
+//		actOther.setEndTime(endTime);
+//		plan.addActivity(actOther);
+//		
+//		plan.addLeg(factory.createLeg(TransportMode.car));
+//		
+//		Activity work2 =  factory.createActivityFromCoord("work", workCoord);
+//		work2.setStartTime(actOther.getEndTime() + 10 * 60);
+//		endTime += 4 * 3600;
+//		work2.setEndTime(endTime);
+//		plan.addActivity(work2);
+//		
+//		plan.addLeg(factory.createLeg(TransportMode.car));
+//		
+//		}
+		
 		actHome = factory.createActivityFromCoord("home", homeCoord);
-		actHome.setStartTime(actWork.getEndTime() + 3600);
+		actHome.setStartTime(endTime + 3600);
 		plan.addActivity(actHome);
 		
 		person.addPlan(plan);
@@ -851,7 +879,7 @@ public class GAPScenarioBuilder {
 	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
 		
 		MiDCSVReader reader = new MiDCSVReader();
-		reader.read(GAPMain.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey.csv");
+		reader.read(GAPMain.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
 		Map<String, MiDSurveyPerson> persons = reader.getPersons();
 		
 		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
@@ -873,11 +901,18 @@ public class GAPScenarioBuilder {
 			
 			for(String relation : relations.keySet()){
 				
+				String[] relationParts = relation.split("_");
+				
 				if(relation.startsWith(entry.getKey())){
 
 					nCommuters += relations.get(relation).getCommuters();
-					createCommutersFromKey(scenario, relations.get(relation), personGroupData, templates);
-					keysToRemove.add(relation);
+					
+					if(relationParts[1].startsWith("09180")){
+						
+						createCommutersFromKey(scenario, relations.get(relation), personGroupData, templates);
+						keysToRemove.add(relation);
+						
+					}
 					
 				}
 				
@@ -895,17 +930,6 @@ public class GAPScenarioBuilder {
 		nPersons = scenario.getPopulation().getPersons().size();
 		
 		createCommuters(scenario.getPopulation(), relations.values(), personGroupData);
-		
-//		createCommuters(scenario.getPopulation(), relations, personGroupData);
-//		createPersonsFromPersonGroup(0, 8577, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(10, 13658, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(20, 7606, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(30, 8162, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(40, 17516, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(50, 13575, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(60, 9383, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(70, 5497, scenario, personGroupData, templates);
-//		createPersonsFromPersonGroup(80, 1472, scenario, personGroupData, templates);
 		
 		new ObjectAttributesXmlWriter(agentAttributes).writeFile(GAPMain.matsimInputDir + "Pläne/agentAttributes.xml.gz");
 		
@@ -965,9 +989,9 @@ public class GAPScenarioBuilder {
 					Person person = factory.createPerson(Id.createPersonId(fromId + "_" + toId + "_" + i));
 					
 					int age = EgapPopulationUtils.setAge(20, 79);
-					agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
+//					agentAttributes.putAttribute(person.getId().toString(), Global.AGE, Integer.toString(age));
 					int sex = EgapPopulationUtils.setSex(age);
-					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
+//					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
 					
 					MiDPersonGroupData data = personGroupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
 
@@ -981,24 +1005,22 @@ public class GAPScenarioBuilder {
 					boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 					boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
 					
-					agentAttributes.putAttribute(person.getId().toString(), Global.EMPLOYED, true);
-					agentAttributes.putAttribute(person.getId().toString(), Global.LICENSE, hasLicense);
-					agentAttributes.putAttribute(person.getId().toString(), Global.CAR_AVAIL, carAvail);
+					if(fromId.startsWith("09180") && toId.startsWith("09810")){
 					
-					if(fromId.contains("09180")){
-						agentAttributes.putAttribute(person.getId().toString(), Global.INHABITANT, true);
-					}
-					
-					if(hasLicense){
-						
-						agentAttributes.putAttribute(person.getId().toString(), Global.POTENTIAL_CARSHARING_USER, true);
-						
-						if(carAvail){
+						if(hasLicense){
 							
-							agentAttributes.putAttribute(person.getId().toString(), Global.COMMUTER, true);
+							if(carAvail){
+								
+								agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
+								
+							}
 							
 						}
-						
+					
+					} else {
+					
+						agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.COMMUTER);
+					
 					}
 					
 					List<MiDSurveyPerson> templatePersons = templates.getPersonGroups().get(EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, true));
@@ -1064,8 +1086,6 @@ public class GAPScenarioBuilder {
 						
 					}
 					
-//					DayPlanCreator.createArea(templatePerson.getPlan(), homeCoord, workCoord);
-					
 					Activity actHome = factory.createActivityFromCoord("home", homeCoord);
 					actHome.setStartTime(0.);
 					
@@ -1077,7 +1097,7 @@ public class GAPScenarioBuilder {
 
 						do{
 
-							timeShift = createRandomEndTime();
+							timeShift = createRandomTimeShift(20);
 
 							if(firstLeg.getDepartureTime() + timeShift > 0){
 								
@@ -1119,6 +1139,14 @@ public class GAPScenarioBuilder {
 								
 								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
 								
+//								do{
+//								
+//								Coord otherCoord = shoot(munId2Geometry.get("09180"));
+//								Geometry nearestToWork = builtAreaQT.get(otherCoord.getX(), otherCoord.getY());
+//								c = GAPMain.gk4ToUTM32N.transform(shoot(nearestToWork));
+//								
+//								}while (CoordUtils.calcDistance(lastAct.getCoord(), c) > distance);
+								
 								double rndX = GAPMain.random.nextDouble();
 								int signX = rndX >= 0.5 ? -1 : 1;
 								double rndY = GAPMain.random.nextDouble();
@@ -1132,7 +1160,6 @@ public class GAPScenarioBuilder {
 								c = GAPMain.UTM32NtoGK4.transform(c);
 								Geometry nearest = builtAreaQT.get(c.getX(), c.getY());
 								c = GAPMain.gk4ToUTM32N.transform(shoot(nearest));
-									
 								
 							} else if(type.equals(Global.ActType.work.name())){
 								
@@ -1262,18 +1289,276 @@ public class GAPScenarioBuilder {
 			Plan plan = factory.createPlan();
 			
 			int age = EgapPopulationUtils.setAge(a0, aR);
-			agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
+//			agentAttributes.putAttribute(person.getId().toString(), Global.AGE, Integer.toString(age));
 			int sex = EgapPopulationUtils.setSex(age);
-			agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
+//			agentAttributes.putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
 			
 			MiDPersonGroupData data = personGroupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
+			
+			if(data == null){
+				
+				i--;
+				continue;
+				
+			}
+			
+			boolean isEmployed = false;
+			boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
+			boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
+			
+			if(mName.startsWith("09180")){
+				
+				if(hasLicense){
+					
+					if(carAvail){
+						
+						agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
+						
+					}
+					
+				}
+				
+			} else {
+				
+				agentAttributes.putAttribute(person.getId().toString(), Global.USER_GROUP, Global.COMMUTER);
+				
+			}
+			
+			String personHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
+			
+			List<MiDSurveyPerson> templatePersons = templates.getPersonGroups().get(personHash);
+			
+			if(templatePersons != null){
+				
+				if(templatePersons.size() > 0){
+					
+					MiDSurveyPerson templatePerson = null;
+					
+					do{
+						
+						int randomIndex = (int)(GAPMain.random.nextDouble() * templatePersons.size());
+						templatePerson = templatePersons.get(randomIndex);
+						
+					} while (templatePerson == null);
+					
+					String firstAct = null;
+					if(((Activity)templatePerson.getPlan().getPlanElements().get(1)).getType().equals(Global.ActType.home.name())){
+						firstAct = Global.ActType.other.name();
+					} else{
+						firstAct = Global.ActType.home.name();
+					}
+					
+					//create a home activity as starting point
+					Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get(mName)));
+					Coord firstCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get(mName)));
+					Activity firstActivity = factory.createActivityFromCoord(firstAct, firstCoord);
+					firstActivity.setStartTime(0.);
+
+					Leg firstLeg = (Leg) templatePerson.getPlan().getPlanElements().get(0);
+					
+					double timeShift = 0.;
+					
+					if(firstLeg.getDepartureTime() != Time.UNDEFINED_TIME){
+
+						do{
+
+							timeShift = createRandomTimeShift(20);
+
+							if(firstLeg.getDepartureTime() + timeShift > 0){
+								
+								firstActivity.setEndTime(firstLeg.getDepartureTime() + timeShift);
+								
+							} else{
+								
+								timeShift = 0;
+								
+							}
+							
+						} while(timeShift == 0);
+						
+					}
+					
+					plan.addActivity(firstActivity);
+					
+					int index = 1;
+					
+					for(PlanElement pe : templatePerson.getPlan().getPlanElements()){
+						
+						if(pe instanceof Activity){
+							
+							Activity act = (Activity)pe;
+							
+							String type = act.getType();
+							double startTime = act.getStartTime();
+							double endTime = act.getEndTime();
+							
+							double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
+							
+							if(!carAvail || !hasLicense){
+								
+								distance = Math.min(distance, 6000);
+								
+							}
+							
+							Coord c = null;
+							
+							Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
+							
+							if(type.equals(Global.ActType.home.name())){
+								
+								c = homeCoord;
+								
+							} else if(type.equals(Global.ActType.other.name()) || type.equals(Global.ActType.work.name())){ //if the act type equals "other" or "work", shoot a random coordinate
+								
+								double rndX = GAPMain.random.nextDouble();
+								int signX = rndX >= 0.5 ? 1 : -1;
+								double rndY = GAPMain.random.nextDouble();
+								int signY = rndY >= 0.5 ? 1: -1;
+								
+								double x = signX * GAPMain.random.nextDouble() * distance;
+								double y = signY * Math.sqrt(distance * distance - x * x);
+								
+								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+								
+								
+								if(type.equals(Global.ActType.work.name())){
+									
+									c = workLocations.get(c.getX(), c.getY()).getCoord();
+									
+								} else{
+									
+									c = GAPMain.UTM32NtoGK4.transform(c);
+									Geometry nearest = builtAreaQT.get(c.getX(), c.getY());
+									c = GAPMain.gk4ToUTM32N.transform(shoot(nearest));
+									
+								}
+								
+							} else{ //for all activities apart from "other" and "home", shoot a random coordinate and get the nearest activity facility
+								
+								ActivityFacility facility = null;
+								
+								do{
+									
+									double rndX = GAPMain.random.nextDouble();
+									int signX = rndX >= 0.5 ? 1 : -1;
+									double rndY = GAPMain.random.nextDouble();
+									int signY = rndY >= 0.5 ? 1: -1;
+									
+									double x = signX * GAPMain.random.nextDouble() * distance;
+									double y = signY * Math.sqrt(distance * distance - x * x);
+									
+									if(type.equals(Global.ActType.education.name())){
+										
+										facility = educationQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									} else if(type.equals(Global.ActType.shop.name())){
+										
+										facility = shopQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									} else if(type.equals(Global.ActType.leisure.name())){
+										
+										facility = leisureQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										
+									}
+									
+								} while(facility == null);
+								
+								c = facility.getCoord();
+								
+							}
+							
+							//create a new activity at the position
+							Activity newAct = factory.createActivityFromCoord(type, c);
+							
+							if(startTime + timeShift > 24 * 3600 || endTime + timeShift > 24*3600){
+								
+								plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+								break;
+								
+							}
+							
+							newAct.setStartTime(startTime + timeShift);
+							
+							//the end time has either not been read correctly or there simply was none given in the mid survey file
+							if(endTime <= 0. || endTime + timeShift <= 0){
+								
+								endTime = startTime + timeShift + 1800;
+								
+							}
+							
+							//acts must not have zero or negative duration, a minimum duration of 0.5 hours is assumed...
+							if(endTime - startTime <= 0){
+								
+								timeShift += 1800;
+								
+								if(endTime + timeShift - newAct.getStartTime() <= 0){
+									
+									newAct.setEndTime(24 * 3600);
+									plan.addActivity(newAct);
+									break;
+									
+								}
+								
+							}
+							
+							newAct.setEndTime(endTime + timeShift);
+							plan.addActivity(newAct);
+							
+						} else{
+							
+							Leg leg = (Leg)pe;
+							
+							
+							plan.addLeg(factory.createLeg(leg.getMode()));
+							
+						}
+						
+						index++;
+						
+					}
+					
+					person.addPlan(plan);
+					
+					scenario.getPopulation().addPerson(person);
+					
+				} else{
+					
+					i--;
+					
+				}
+				
+			} else{
+				
+				i--;
+				
+			}
+			
+		}
+		
+	}
+	
+	private static void createPersonsFromPersonGroup(int a0, int amount, Scenario scenario, Map<String, MiDPersonGroupData> groupData, MiDPersonGroupTemplates templates){
+		
+		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		
+		for(int i = 0; i < amount; i++){
+			
+			Person person = factory.createPerson(Id.createPersonId(a0 + "_" + (a0 + 9) + "_" + i));
+			Plan plan = factory.createPlan();
+			
+			int age = (int)(a0 + GAPMain.random.nextDouble() * (a0 + 9));
+			agentAttributes.putAttribute(person.getId().toString(), Global.AGE, Integer.toString(age));
+			int sex = EgapPopulationUtils.setSex(age);
+			agentAttributes.putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
+			
+			MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
 			
 			if(data == null){
 				i--;
 				continue;
 			}
 			
-			boolean isEmployed = false;
+			boolean isEmployed = setBooleanAttribute(person.getId().toString(), data.getpEmployment(), Global.EMPLOYED);
 			boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
 			boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 			
@@ -1295,7 +1580,7 @@ public class GAPScenarioBuilder {
 					} while (templatePerson == null);
 					
 					//create a home activity as starting point
-					Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get(mName)));
+					Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get("09180")));
 					Activity homeActivity = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 
 					Leg firstLeg = (Leg) templatePerson.getPlan().getPlanElements().get(0);
@@ -1306,7 +1591,7 @@ public class GAPScenarioBuilder {
 
 						do{
 
-							timeShift = createRandomEndTime();
+							timeShift = createRandomTimeShift(20);
 
 							if(firstLeg.getDepartureTime() + timeShift > 0){
 								
@@ -1348,27 +1633,10 @@ public class GAPScenarioBuilder {
 								
 								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
 								
-								double rndX = GAPMain.random.nextDouble();
-								int signX = rndX >= 0.5 ? 1 : -1;
-								double rndY = GAPMain.random.nextDouble();
-								int signY = rndY >= 0.5 ? 1: -1;
-								
-								double x = signX * GAPMain.random.nextDouble() * distance;
-								double y = signY * Math.sqrt(distance * distance - x * x);
+								double x = GAPMain.random.nextDouble() * distance;
+								double y = Math.sqrt(distance * distance - x * x);
 								
 								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
-								
-								if(type.equals(Global.ActType.work.name())){
-									
-									c = workLocations.get(c.getX(), c.getY()).getCoord();
-									
-								} else{
-									
-									c = GAPMain.UTM32NtoGK4.transform(c);
-									Geometry nearest = builtAreaQT.get(c.getX(), c.getY());
-									c = GAPMain.gk4ToUTM32N.transform(shoot(nearest));
-									
-								}
 								
 							} else{ //for all activities apart from "other" and "home", shoot a random coordinate and get the nearest activity facility
 								
@@ -1378,13 +1646,8 @@ public class GAPScenarioBuilder {
 								
 								do{
 									
-									double rndX = GAPMain.random.nextDouble();
-									int signX = rndX >= 0.5 ? 1 : -1;
-									double rndY = GAPMain.random.nextDouble();
-									int signY = rndY >= 0.5 ? 1: -1;
-									
-									double x = signX * GAPMain.random.nextDouble() * distance;
-									double y = signY * Math.sqrt(distance * distance - x * x);
+									double x = GAPMain.random.nextDouble() * distance;
+									double y = Math.sqrt(distance * distance - x * x);
 									
 									if(type.equals(Global.ActType.education.name())){
 										
@@ -1476,212 +1739,11 @@ public class GAPScenarioBuilder {
 		
 	}
 	
-	private static void createPersonsFromPersonGroup(int a0, int amount, Scenario scenario, Map<String, MiDPersonGroupData> groupData, MiDPersonGroupTemplates templates){
-		
-		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		
-		for(int i = 0; i < amount; i++){
-			
-			Person person = factory.createPerson(Id.createPersonId(a0 + "_" + (a0 + 9) + "_" + i));
-			Plan plan = factory.createPlan();
-			
-			int age = (int)(a0 + GAPMain.random.nextDouble() * (a0 + 9));
-			agentAttributes.putAttribute(person.getId().toString(), Global.AGE, age);
-			int sex = EgapPopulationUtils.setSex(age);
-			agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
-			
-			MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
-			
-			if(data == null){
-				i--;
-				continue;
-			}
-			
-			boolean isEmployed = setBooleanAttribute(person.getId().toString(), data.getpEmployment(), Global.EMPLOYED);
-			boolean carAvail = setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
-			boolean hasLicense = setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
-			
-			String personHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
-			
-			List<MiDSurveyPerson> templatePersons = templates.getPersonGroups().get(personHash);
-			
-			if(templatePersons != null){
-				
-				if(templatePersons.size() > 0){
-					
-					MiDSurveyPerson templatePerson = null;
-					
-					do{
-						
-						int randomIndex = (int)(GAPMain.random.nextDouble() * templatePersons.size());
-						templatePerson = templatePersons.get(randomIndex);
-						
-					} while (templatePerson == null);
-					
-					//create a home activity as starting point
-					Coord homeCoord = GAPMain.gk4ToUTM32N.transform(shoot(munId2Geometry.get("09180")));
-					Activity homeActivity = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
-
-					Leg firstLeg = (Leg) templatePerson.getPlan().getPlanElements().get(0);
-					
-					double timeShift = 0.;
-					
-					if(firstLeg.getDepartureTime() != Time.UNDEFINED_TIME){
-
-						do{
-
-							timeShift = createRandomEndTime();
-
-							if(firstLeg.getDepartureTime() + timeShift > 0){
-								
-								homeActivity.setEndTime(firstLeg.getDepartureTime() + timeShift);
-								
-							} else{
-								
-								timeShift = 0;
-								
-							}
-							
-						} while(timeShift == 0);
-						
-					}
-					
-					plan.addActivity(homeActivity);
-					
-					int index = 1;
-					
-					for(PlanElement pe : templatePerson.getPlan().getPlanElements()){
-						
-						if(pe instanceof Activity){
-							
-							Activity act = (Activity)pe;
-							
-							String type = act.getType();
-							double startTime = act.getStartTime();
-							double endTime = act.getEndTime();
-							
-							Coord c = null;
-							
-							Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
-							
-							if(type.equals(Global.ActType.home.name())){
-								
-								c = homeCoord;
-								
-							} else if(type.equals(Global.ActType.other.name()) || type.equals(Global.ActType.work.name())){ //if the act type equals "other" or "work", shoot a random coordinate
-								
-								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
-								
-								double x = GAPMain.random.nextDouble() * distance;
-								double y = Math.sqrt(distance * distance - x * x);
-								
-								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
-								
-							} else{ //for all activities apart from "other" and "home", shoot a random coordinate and get the nearest activity facility
-								
-								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
-								
-								ActivityFacility facility = null;
-								
-								do{
-									
-									double x = GAPMain.random.nextDouble() * distance;
-									double y = Math.sqrt(distance * distance - x * x);
-									
-									if(type.equals(Global.ActType.education.name())){
-										
-										facility = educationQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
-										
-									} else if(type.equals(Global.ActType.shop.name())){
-										
-										facility = shopQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
-										
-									} else if(type.equals(Global.ActType.leisure.name())){
-										
-										facility = leisureQT.get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
-										
-									}
-									
-								}while(facility == null);
-								
-								c = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
-								
-							}
-							
-							//create a new activity at the position
-							Activity newAct = factory.createActivityFromCoord(type, c);
-							
-							if(lastAct.getEndTime() > startTime + timeShift){
-								
-								timeShift += 24 * 3600;
-								
-							}
-							
-							newAct.setStartTime(startTime + timeShift);
-							
-							//the end time has either not been read correctly or there simply was none given in the mid survey file
-							if(endTime <= 0. || endTime + timeShift <= 0){
-								
-								endTime = startTime + timeShift + 1800;
-								
-							}
-							
-							//acts must not have zero or negative duration, a minimum duration of 0.5 hours is assumed...
-							if(endTime - startTime <= 0){
-								
-								timeShift += 1800;
-								
-								if(endTime + timeShift - newAct.getStartTime() <= 0){
-									
-									newAct.setEndTime(24 * 3600);
-									plan.addActivity(newAct);
-									break;
-									
-								}
-								
-							}
-							
-							newAct.setEndTime(endTime + timeShift);
-							plan.addActivity(newAct);
-							
-						} else{
-							
-							Leg leg = (Leg)pe;
-							
-							
-							plan.addLeg(factory.createLeg(leg.getMode()));
-							
-						}
-						
-						index++;
-						
-					}
-					
-					person.addPlan(plan);
-					
-					scenario.getPopulation().addPerson(person);
-					
-				} else{
-					
-					i--;
-					
-				}
-				
-			} else{
-				
-				i--;
-				
-			}
-			
-		}
-		
-	}
-	
 	private static boolean setBooleanAttribute(String personId, double proba, String attribute){
 		
 		double random = GAPMain.random.nextDouble();
 		boolean attr = random <= proba ? true : false;
-		agentAttributes.putAttribute(personId, attribute, attr);
+//		agentAttributes.putAttribute(personId, attribute, attr);
 		
 		return attr;
 		
@@ -1704,27 +1766,21 @@ public class GAPScenarioBuilder {
 		
 	}
 	
-	private static double createEquallyDistributedTime( double from){
-		
-		return from * 3600 + GAPMain.random.nextDouble() * 2 * 3600;
-		
-	}
+//	private static double createNormallyDistributedTime(double mean){
+//		
+//		double r1 = GAPMain.random.nextDouble();
+//		double r2 = GAPMain.random.nextDouble();
+//		
+//		//Box-Muller-Method in order to get a normally distributed variable
+//		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+//		
+//		double endTime = 60*60 * normal + mean * 3600;
+//		
+//		return endTime;
+//		
+//	}
 	
-	private static double createNormallyDistributedTime(double mean){
-		
-		double r1 = GAPMain.random.nextDouble();
-		double r2 = GAPMain.random.nextDouble();
-		
-		//Box-Muller-Method in order to get a normally distributed variable
-		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		
-		double endTime = 60*60 * normal + mean * 3600;
-		
-		return endTime;
-		
-	}
-	
-	private static double createRandomEndTime(){
+	private static double createRandomTimeShift(){
 		
 		//draw two random numbers [0;1] from uniform distribution
 		double r1 = GAPMain.random.nextDouble();
@@ -1732,7 +1788,21 @@ public class GAPScenarioBuilder {
 		
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 20*60 * normal;
+		double endTime = 60*60 * normal;
+		
+		return endTime;
+		
+	}
+	
+	private static double createRandomTimeShift(double variance){
+		
+		//draw two random numbers [0;1] from uniform distribution
+		double r1 = GAPMain.random.nextDouble();
+		double r2 = GAPMain.random.nextDouble();
+		
+		//Box-Muller-Method in order to get a normally distributed variable
+		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+		double endTime = variance*60 * normal;
 		
 		return endTime;
 		

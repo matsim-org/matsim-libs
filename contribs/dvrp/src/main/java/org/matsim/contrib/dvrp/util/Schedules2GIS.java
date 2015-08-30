@@ -25,7 +25,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;

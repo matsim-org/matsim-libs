@@ -17,15 +17,13 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import saleem.stockholmscenario.utils.CoordinateSystemConverter;
 import saleem.stockholmscenario.utils.DistanceCalculation;
-
-import com.opencsv.CSVWriter;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import au.com.bytecode.opencsv.CSVWriter;
 
 public class XMLReaderWriter {
 	Map<String, Element> nodesmap = new HashMap<String, Element>();
@@ -44,9 +42,7 @@ public class XMLReaderWriter {
 		
 	}
 	public Document modifyPopulation(Document document){//Converts Population into RT90 from SWEREF99
-		//The commented transformation is correct. Commented for committing to avoid compile errors. Have to stay this way till the code is committed to TransformationFactory and MGC. Use the commented line when doing transformation.
-		//CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SWEREF99, TransformationFactory.WGS84_RT90);
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84);
+		CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84_RT90);
 		Element rootElement = document.getRootElement();
 		List persons = rootElement.getChildren("person");
 		for (int i = 0; i < persons.size(); i++) {

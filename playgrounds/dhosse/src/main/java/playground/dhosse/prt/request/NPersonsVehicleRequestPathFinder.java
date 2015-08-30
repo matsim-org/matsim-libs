@@ -1,8 +1,7 @@
 package playground.dhosse.prt.request;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;

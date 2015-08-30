@@ -245,7 +245,7 @@ class CongestionPricingTestExample {
 		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 15, 1500, 1);
 
 		// an alternative link with higher disutility
-		network.createAndAddLink(Id.createLinkId(5), n1, n6, 17000, 20, 2700, 1);
+		network.createAndAddLink(Id.createLinkId(5), n1, n6, 12750, 15, 2700, 1);
 
 		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}

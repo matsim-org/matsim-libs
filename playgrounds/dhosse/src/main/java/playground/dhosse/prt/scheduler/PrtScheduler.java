@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;

@@ -128,7 +128,7 @@ public final class RunWithRoadPricing {
 		 * Patryk, jag har tittat på den nya versionen av RunCadyts4CarExample.
 		 * Det ser ut som om man helt enkelt inte behöver den nedanstående koden
 		 * längre och istället skulle nu lägga till en normal ExpBetaPlanChanger
-		 * i config filen. Vore det mögligt att du tästa om jag har rätt med
+		 * i config filen. Vore det mögligt att du testar om jag har rätt med
 		 * detta? Gunnar
 		 */
 

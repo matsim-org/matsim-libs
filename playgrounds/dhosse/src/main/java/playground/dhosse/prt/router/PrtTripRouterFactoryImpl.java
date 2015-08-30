@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
+import org.matsim.contrib.dvrp.path.VrpPathCalculatorImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;

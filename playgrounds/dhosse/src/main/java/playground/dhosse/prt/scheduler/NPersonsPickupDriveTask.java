@@ -2,7 +2,7 @@ package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
