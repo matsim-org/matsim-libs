@@ -55,10 +55,10 @@ public class GAPMain {
 	
 	//84948
 	
-	static double n = 0;
-	static final int N = 86336;
+	public static double n = 0;
+	public static final int N = 86336;
 	
-	double factor2005_2009 = 0.9883802132;
+	final double factor2005_2009 = 0.9883802132;
 
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -67,7 +67,7 @@ public class GAPMain {
 	public static final String toCrs = "EPSG:32632";
 	public final String GK4 = TransformationFactory.DHDN_GK4;
 	
-	static final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCrs, toCrs);
+	public static final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCrs, toCrs);
 	static final CoordinateTransformation reverseCt = TransformationFactory.getCoordinateTransformation(toCrs, fromCrs);
 	static final CoordinateTransformation gk4ToUTM32N = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, toCrs);
 	static final CoordinateTransformation UTM32NtoGK4 = TransformationFactory.getCoordinateTransformation(toCrs, TransformationFactory.DHDN_GK4);
@@ -78,8 +78,8 @@ public class GAPMain {
 	static final String dataDir = projectDir + "20_Datengrundlage/";
 	static final String networkDataDir = dataDir + "Netzwerk/";
 	static final String matsimDir = projectDir + "30_Modellierung/";
-	static final String matsimInputDir = matsimDir + "INPUT/";
-	static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output";
+	public static final String matsimInputDir = matsimDir + "INPUT/";
+	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output";
 	
 	public static void main(String[] args) {
 		
@@ -87,7 +87,7 @@ public class GAPMain {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		configureConfig(config);
+//		configureConfig(config);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
@@ -173,8 +173,8 @@ public class GAPMain {
 //		new CountsWriter(counts).write(matsimInputDir + "Counts/counts.xml");
 		
 		//configure flow / storage cap factor, counts scale factor
-		configureCountsConfigGroup(config.counts());
-		configureQSimConfigGroup(config.qsim());
+//		configureCountsConfigGroup(config.counts());
+//		configureQSimConfigGroup(config.qsim());
 		
 		new ConfigWriter(config).write(matsimInputDir + "config.xml");
 		
@@ -203,147 +203,6 @@ public class GAPMain {
 		
 	}
 	
-	private static void configureConfig(Config config){
-		
-//		TODO configure config groups
-		configureGlobalConfigGroup(config.global());
-		configureParallelEventsHandlingConfigGroup(config.parallelEventHandling());
-		configureControlerConfigGroup(config.controler());
-		configurePlanCalcScoreConfigGroup(config.planCalcScore());
-		configureStrategyConfigGroup(config.strategy());
-		configureTransitConfigGroup(config.transit());
-		configureFacilitiesConfigGroup(config.facilities());
-		configurePlansConfigGroup(config.plans());
-		configureNetworkConfigGroup(config.network());
-		
-	}
-	
-	private static void configureNetworkConfigGroup(NetworkConfigGroup network){
-		
-		network.setInputFile(matsimInputDir + "Netzwerk/network.xml");
-		
-	}
-	
-	private static void configurePlansConfigGroup(PlansConfigGroup plans){
-		
-		plans.setInputFile(matsimInputDir + "Pläne/plans_mid.xml.gz");
-		
-	}
-	
-	private static void configureFacilitiesConfigGroup(FacilitiesConfigGroup facilities){
-		
-//		facilities.setInputFile(GAPMain.matsimInputDir + "facilities/facilities.xml");
-//		facilities.setInputFacilitiesAttributesFile(GAPMain.matsimInputDir + "facilities/facilityAttributes.xml");
-		
-	}
-	
-	private static void configureTransitConfigGroup(TransitConfigGroup transit){
-		transit.setUseTransit(true); //TODO
-		transit.setTransitScheduleFile(matsimInputDir + "transit/scheduleComplete.xml"); //TODO
-		transit.setVehiclesFile(matsimInputDir + "transit/transitVehicles.xml"); //TODO
-	}
-	
-	private static void configureGlobalConfigGroup(GlobalConfigGroup global){
-		
-		global.setCoordinateSystem(toCrs);
-		global.setNumberOfThreads(2);
-		
-	}
-	
-	private static void configureParallelEventsHandlingConfigGroup(ParallelEventHandlingConfigGroup peh){
-		
-		peh.setNumberOfThreads(2);
-		
-	}
-	
-	private static void configureControlerConfigGroup(ControlerConfigGroup controler){
-		
-		controler.setFirstIteration(0);
-		controler.setLastIteration(0);
-		controler.setOutputDirectory(matsimOutputDir);
-		controler.setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
-		controler.setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-		
-	}
-	
-	private static void configurePlanCalcScoreConfigGroup(PlanCalcScoreConfigGroup pcs){
-		
-		pcs.setBrainExpBeta(1);
-		pcs.setEarlyDeparture_utils_hr(-0);
-		pcs.setFractionOfIterationsToStartScoreMSA(0.8);
-		pcs.setLateArrival_utils_hr(-12);
-		pcs.setLearningRate(1);
-		pcs.setMarginalUtilityOfMoney(1);
-		pcs.setPathSizeLogitBeta(1);
-		pcs.setUsingOldScoringBelowZeroUtilityDuration(false);
-		
-		pcs.setTraveling_utils_hr(-6.0);
-		pcs.setPerforming_utils_hr(6.0);
-		
-	}
-	
-	private static void configureStrategyConfigGroup(StrategyConfigGroup strategy){
-		
-		strategy.setFractionOfIterationsToDisableInnovation(0.8);
-		strategy.setMaxAgentPlanMemorySize(5);
-		
-		StrategySettings changeExp = new StrategySettings();
-		changeExp.setDisableAfter(-1);
-		changeExp.setStrategyName("ChangeExpBeta");
-		changeExp.setWeight(0.7);
-		strategy.addStrategySettings(changeExp);
-		
-		StrategySettings reroute = new StrategySettings();
-		reroute.setStrategyName("ReRoute");
-		reroute.setWeight(0.3);
-		strategy.addStrategySettings(reroute);
-		
-	}
-	
-	private static void configureCountsConfigGroup(CountsConfigGroup counts){
-		
-		counts.setAnalyzedModes(TransportMode.car);
-		counts.setAverageCountsOverIterations(1);
-		counts.setCountsFileName(matsimInputDir + "Counts/counts.xml"); //TODO
-		counts.setCountsScaleFactor(GAPMain.N/GAPMain.n);
-		counts.setDistanceFilter(null);
-		counts.setDistanceFilterCenterNode(null);
-		counts.setFilterModes(false);
-		counts.setOutputFormat("all");
-		counts.setWriteCountsInterval(10);
-		
-	}
-	
-	private static void configureQSimConfigGroup(QSimConfigGroup qsim){
-	
-		qsim.setEndTime(Time.UNDEFINED_TIME);
-		qsim.setFlowCapFactor(GAPMain.n/GAPMain.N); // TODO
-		qsim.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
-		qsim.setLinkDynamics(LinkDynamics.FIFO.name());
-		qsim.setLinkWidth(30L);
-		Set<String> mainModes = new HashSet<>();
-		mainModes.add(TransportMode.car);
-		qsim.setMainModes(mainModes);
-		qsim.setNodeOffset(0);
-		qsim.setNumberOfThreads(2);
-		qsim.setRemoveStuckVehicles(false);
-		qsim.setSimStarttimeInterpretation(StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd);
-		qsim.setSnapshotPeriod(0);
-		qsim.setSnapshotStyle(SnapshotStyle.queue);
-		qsim.setStartTime(Time.UNDEFINED_TIME);
-		qsim.setStorageCapFactor(GAPMain.n/GAPMain.N); // TODO
-		qsim.setStuckTime(10);
-		qsim.setTimeStepSize(1);
-		qsim.setTrafficDynamics(TrafficDynamics.queue);
-		qsim.setUseLanes(false);
-		qsim.setUsePersonIdForMissingVehicleId(true);
-		qsim.setUsingFastCapacityUpdate(false);
-		qsim.setUsingThreadpool(false);
-		qsim.setVehicleBehavior(VehicleBehavior.teleport);
-		qsim.setVehiclesSource(VehiclesSource.defaultVehicle);
-		
-	}
-
 }
 //run osmosis to filter ways from the osm file
 //maybe better to be run from shell

@@ -26,10 +26,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -47,10 +50,12 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dhosse.gap.Global;
+import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.mid.MiDCSVReader;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
+import playground.dhosse.gap.scenario.network.NetworkCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
 import playground.dhosse.gap.scenario.population.Municipality;
 import playground.dhosse.utils.EgapHashGenerator;
@@ -86,6 +91,18 @@ public class GAPScenarioBuilder {
 	private static ObjectAttributes agentAttributes = new ObjectAttributes();
 	//this attributes object stores data about age, sex, car availability etc.
 	private static ObjectAttributes demographicAttributes = new ObjectAttributes();
+	
+	public static void main(String args[]){
+		
+		Config config = ConfigUtils.createConfig();
+		ConfigCreator.configureConfig(config);
+		
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		NetworkCreator.createAndAddNetwork(scenario, "/home/dhosse/Dokumente/01_eGAP/n4/merged-network.osm");
+		new NetworkWriter(scenario.getNetwork()).write("/home/dhosse/Dokumente/01_eGAP/n4/merged-network.xml");
+		
+	}
 	
 	/**
 	 * Creates the scenario network.

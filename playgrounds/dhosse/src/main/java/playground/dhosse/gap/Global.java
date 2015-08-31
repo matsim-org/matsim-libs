@@ -8,12 +8,9 @@ public class Global {
 	public static enum ActType{
 		home,
 		work,
-//		business,
 		education,
 		shop,
-//		errand,
 		leisure,
-//		accompaniment,
 		other
 	};
 	
@@ -53,9 +50,7 @@ public class Global {
 	//status of residence
 	public static final String RESIDENCE = "RESIDENCE";
 	public static final String INHABITANT = "INHABITANT";
-//	public static final String COMMUTER = "COMMUTER";
 	
 	public static final String CAR_OPTION = "CAR_OPTION";
-	
 	
 }
