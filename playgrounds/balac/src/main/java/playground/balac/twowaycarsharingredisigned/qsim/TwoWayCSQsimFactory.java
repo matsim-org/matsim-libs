@@ -75,7 +75,7 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-				TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]), vehIDs);
+				TwoWayCSStation f = new TwoWayCSStation(l, l.getCoord(), Integer.parseInt(arr[6]), vehIDs);
 		    	
 				twvehiclesLocation.add(f);
 		    	s = reader.readLine();

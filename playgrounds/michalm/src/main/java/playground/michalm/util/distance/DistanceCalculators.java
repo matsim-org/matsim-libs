@@ -22,7 +22,6 @@ package playground.michalm.util.distance;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.router.tree.DijkstraWithDijkstraTreeCache;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.DistanceUtils;
 import org.matsim.core.network.NetworkImpl;

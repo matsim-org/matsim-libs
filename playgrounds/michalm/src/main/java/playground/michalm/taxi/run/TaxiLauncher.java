@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -107,11 +108,18 @@ class TaxiLauncher
         TravelDisutility travelDisutility = VrpLauncherUtils
                 .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
 
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
-                travelTime);
+        boolean useTree = true;//TODO let's try out trees
+        if (useTree) {
+            routerWithCache = new DijkstraWithDijkstraTreeCache(scenario.getNetwork(),
+                    travelDisutility, travelTime, timeDiscretizer);
+        }
+        else {
+            LeastCostPathCalculator router = new DijkstraWithThinPath(scenario.getNetwork(), travelDisutility,
+                    travelTime);
+            routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, timeDiscretizer);
+        }
 
-        routerWithCache = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
-        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
+        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
     }
 
 

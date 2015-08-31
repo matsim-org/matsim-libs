@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,7 +32,7 @@ public class CarSharingVehicles {
 	
 	public CarSharingVehicles(Scenario scenario) throws IOException {
 		this.scenario = scenario;
-		readVehicleLocations();
+		//readVehicleLocations();
 	}
 	
 	public FreeFloatingVehiclesLocation getFreeFLoatingVehicles() {
@@ -115,7 +114,7 @@ public class CarSharingVehicles {
 		    		i++;
 		    	}
 		    	//add parking spaces
-		    	OneWayCarsharingRDWithParkingStation f = new OneWayCarsharingRDWithParkingStation(l, Integer.parseInt(arr[6]), vehIDs, Integer.parseInt(arr[6]) * 2);
+		    	OneWayCarsharingRDWithParkingStation f = new OneWayCarsharingRDWithParkingStation(l, Integer.parseInt(arr[6]), vehIDs, Integer.parseInt(arr[7]));
 		    	
 		    	owStations.add(f);
 		    	s = reader.readLine();
@@ -134,7 +133,7 @@ public class CarSharingVehicles {
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+		    	Coord coordStart = new CoordImpl(arr[2], arr[3]);
 		    	Link l = linkUtils.getClosestLink(coordStart);			    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -142,7 +141,7 @@ public class CarSharingVehicles {
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-				TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]), vehIDs);
+				TwoWayCSStation f = new TwoWayCSStation(l, coordStart, Integer.parseInt(arr[6]), vehIDs);
 		    	
 				twStations.add(f);
 		    	s = reader.readLine();

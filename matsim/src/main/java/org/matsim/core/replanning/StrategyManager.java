@@ -39,7 +39,7 @@ import java.util.List;
 @Singleton
 public class StrategyManager implements MatsimManager {
 
-	protected final GenericStrategyManager<Plan, Person> delegate;
+	private final GenericStrategyManager<Plan, Person> delegate;
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManager<>();
@@ -131,6 +131,10 @@ public class StrategyManager implements MatsimManager {
 		run(population, replanningContext);
 	}
 
+	/**
+	 * @param population  
+	 * @param replanningContext 
+	 */
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		// left empty for inheritance
 	}
@@ -146,6 +150,9 @@ public class StrategyManager implements MatsimManager {
 		afterRunHook(population);
 	}
 
+	/**
+	 * @param population  
+	 */
 	protected void afterRunHook(Population population) {
 		// left empty for inheritance
 	}
