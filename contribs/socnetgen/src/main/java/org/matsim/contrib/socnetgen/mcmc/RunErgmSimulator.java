@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.studies.mcmc;
+package org.matsim.contrib.socnetgen.mcmc;
 
 import java.io.IOException;
 import java.util.HashSet;
