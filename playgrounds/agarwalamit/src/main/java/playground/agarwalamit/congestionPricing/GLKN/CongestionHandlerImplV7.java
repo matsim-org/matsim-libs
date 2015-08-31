@@ -25,6 +25,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
+/**
+ * Based on Laemmel2011Diss
+ */
+
 public class CongestionHandlerImplV7 implements PersonDepartureEventHandler,
 LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArrivalEventHandler {
 
