@@ -32,11 +32,17 @@ import playground.vsp.congestion.events.CongestionEvent;
 public class CongestionHandlerImplV7 implements PersonDepartureEventHandler,
 LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArrivalEventHandler {
 
+	public enum CongestionImpls {
+		KN, // no documentation yet, see email
+		GL; // Laemmel2011Diss
+	}
+	
 	private final Logger log = Logger.getLogger(CongestionHandlerImplV7.class);
 
-	public CongestionHandlerImplV7(EventsManager events, Scenario scenario){
+	public CongestionHandlerImplV7(EventsManager events, Scenario scenario, CongestionImpls congestionImpl){
 		this.events = events;
 		this.scenario = scenario;
+		this.congestionImpl = congestionImpl;
 
 		this.congestedModes.addAll(this.scenario.getConfig().qsim().getMainModes());
 		if (congestedModes.size()>1) throw new RuntimeException("Mixed traffic is not tested yet.");
@@ -61,6 +67,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 	private Map<Id<Link>,LinkCongestionInfo> link2LinkCongestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
 	private double totalDelay = 0;
 	private double totalInternalizedDelay = 0;
+	private CongestionImpls congestionImpl ;
 
 	@Override
 	public void reset(int iteration) {
@@ -82,6 +89,8 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		double linkLeaveTime = event.getTime();
 
 		LinkCongestionInfo lci = link2LinkCongestionInfo.get(linkId);
+		lci.getPersonId2linkLeaveTime().put(pId, linkLeaveTime);
+		
 		double freeSpeedLeaveTime = lci.getPersonId2freeSpeedLeaveTime().get(pId);
 
 		double delay = linkLeaveTime - freeSpeedLeaveTime;
@@ -94,7 +103,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 			if( isThisLastAgentOnLink ) { // last agent on the link is delayed, thus, queue will dissolve immediately.
 
-				throwCongestionEvents(event);
+					throwCongestionEvents(event);	
 
 			} else { // check for the headway i.e. if more agents will be queued, continue
 				// nextFreeSpeedLinkLeaveTime - current leave time < timeHeadway ==> charge later.
@@ -156,22 +165,48 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 	}
 
 	private void throwCongestionEvents(LinkLeaveEvent event) {
-		//charge here
 		LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
 		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getLeavingAgents());
 		Id<Person> nullAffectedAgent = Id.createPersonId("NullAgent");
 
-		double queueDissolveTime = event.getTime() /*+ lci.getMarginalDelayPerLeavingVehicle_sec()*/; // not yet sure, if this is right.
-		
-		for(Id<Person> person : leavingAgents){
-			double delayToPayFor = queueDissolveTime - lci.getPersonId2freeSpeedLeaveTime().get(person);
-			this.totalInternalizedDelay += delayToPayFor;
-			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "GL_Approach", person, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(person));
-			this.events.processEvent(congestionEvent);
-			lci.getPersonId2freeSpeedLeaveTime().remove(person);
-		}
+		switch (congestionImpl) {
+		case GL:
+		{
+			double queueDissolveTime = event.getTime() /*+ lci.getMarginalDelayPerLeavingVehicle_sec()*/; // not yet sure, if this is right.
+			
+			for(Id<Person> person : leavingAgents){
+				double delayToPayFor = queueDissolveTime - lci.getPersonId2freeSpeedLeaveTime().get(person);
+				this.totalInternalizedDelay += delayToPayFor;
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "GL_Approach", person, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(person));
+				this.events.processEvent(congestionEvent);
+				lci.getPersonId2freeSpeedLeaveTime().remove(person);
+			}
 
-		lci.getLeavingAgents().clear();
+			lci.getLeavingAgents().clear();
+		}
+			break;
+		case KN:
+		{
+			int noOfDelayedAgents = leavingAgents.size();
+			
+			if(noOfDelayedAgents < 2) return; // can't calculate headway from one agent only
+			int thisPesonDelayingOtherPersons = 0;
+			
+			for(int ii = noOfDelayedAgents-2; ii>=0;ii--){
+				Id<Person> thisPerson = leavingAgents.get(ii);
+				thisPesonDelayingOtherPersons++;
+				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
+				double delayToPayFor = thisPesonDelayingOtherPersons * headway;
+				
+				this.totalInternalizedDelay += delayToPayFor;
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "KN_Approach", thisPerson, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(thisPerson));
+				this.events.processEvent(congestionEvent);
+			}
+		}
+			break;
+		default:
+			throw new RuntimeException(congestionImpl+" is not known. Aborting...");
+		}
 	}
 
 	public double getTotalDelay() {
