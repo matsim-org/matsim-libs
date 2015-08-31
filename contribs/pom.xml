@@ -112,6 +112,7 @@
 		<module>matrixbasedptrouter</module>
 		<module>parking</module>
 		<module>socnetsim</module>
+		<module>socnetgen</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
 		<module>multimodal</module>

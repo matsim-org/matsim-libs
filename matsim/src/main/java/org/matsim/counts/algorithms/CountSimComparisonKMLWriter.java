@@ -77,7 +77,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private static final String COUNTVALUE = "Count Value: ";
 	private static final String MATSIMVALUE = "MATSim Value: ";
 	private static final String RELERROR = "Relative Error: ";
-	private static final String IMG = "<img src=\"./";
+	private static final String IMG = "<img src=\"../";
 	private static final String IMGEND = "\">";
 	private static final String H24OVERVIEW = "24 h overview";
 	private static final String DETAILSFROM = "Details from ";

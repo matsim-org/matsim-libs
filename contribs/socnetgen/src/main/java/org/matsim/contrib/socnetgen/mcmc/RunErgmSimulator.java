@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.studies.mcmc;
+package org.matsim.contrib.socnetgen.mcmc;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -67,11 +67,11 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVerte
  * @author illenberger
  *
  */
-public class ErgmSimulator {
+public class RunErgmSimulator {
 
 	private static final String MODULE_NAME = "ergm";
 
-	private static final Logger logger = Logger.getLogger(ErgmSimulator.class);
+	private static final Logger logger = Logger.getLogger(RunErgmSimulator.class);
 	
 	/**
 	 * @param args
