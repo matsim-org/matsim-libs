@@ -54,7 +54,7 @@ public class NoiseParameters {
 	private Set<String> busIdPrefixes = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	private String tunnelLinkIdFile = null;
-	private int writeOutputIteration = 1;
+	private int writeOutputIteration = 10;
 	private boolean useActualSpeedLevel = true;
 	private boolean allowForSpeedsOutsideTheValidRange = false;
 	
