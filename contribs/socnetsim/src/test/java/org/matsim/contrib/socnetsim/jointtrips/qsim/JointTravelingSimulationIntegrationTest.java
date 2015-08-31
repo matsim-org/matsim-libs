@@ -101,6 +101,7 @@ public class JointTravelingSimulationIntegrationTest {
 		log.setLevel( Level.WARN );
 	}
 
+	private static final int N_RANDOM_SCENARIOS = 20;
 	private static final int N_LAPS = 5;
 
 	private static final Id<Link> ORIGIN_LINK = Id.create("origin", Link.class);
@@ -187,7 +188,7 @@ public class JointTravelingSimulationIntegrationTest {
 		// To make the output more readable (otherwise, warning that driver mode
 		// is added as a main mode is logged each time)
 		Logger.getLogger( JointQSimFactory.class ).setLevel( Level.ERROR );
-		for (int i=0; i < 50; i++) {
+		for (int i=0; i < N_RANDOM_SCENARIOS; i++) {
 			log.info( "random test scenario "+i );
 			final Scenario sc =
 				createTestScenario(
@@ -306,7 +307,7 @@ public class JointTravelingSimulationIntegrationTest {
 	private void testNumberOfEnterLeaveVehicle(final RouteType routeType) {
 		final Random random = new Random( 1234 );
 
-		for (int i=0; i < 50; i++) {
+		for (int i=0; i < N_RANDOM_SCENARIOS; i++) {
 			log.info( "random test scenario "+i );
 			final Scenario sc = createTestScenario( createFixture( false , routeType ) , random );
 			final EventsManager events = EventsUtils.createEventsManager();
