@@ -27,13 +27,19 @@ import playground.dhosse.gap.analysis.SpatialAnalysis;
 
 public class GAPScenarioRunner {
 
-	private static final String inputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/INPUT/";
-	private static final String simInputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/run6b/input/";
-	private static final String outputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
+	private static final String inputPath = Global.matsimDir + "INPUT/";
+	private static final String simInputPath = Global.matsimDir + "OUTPUT/" + Global.runID +"/input/";
+	private static final String outputPath = "/run/user/1007/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
 	
+	/**
+	 * edit the static method executed in the main method
+	 * to run a different case
+	 * 
+	 * @param args
+	 */
 	public static void main(String args[]){
 		
-		runBaseCaseRouteChoiceAndModeChoice();
+		runBaseCaseRouteChoiceOnly();
 		
 	}
 

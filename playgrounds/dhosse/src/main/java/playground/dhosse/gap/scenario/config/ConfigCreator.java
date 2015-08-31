@@ -6,6 +6,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -14,20 +15,19 @@ import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import playground.dhosse.gap.scenario.GAPMain;
+import playground.dhosse.gap.Global;
 
 public class ConfigCreator {
 	
@@ -55,13 +55,13 @@ public class ConfigCreator {
 	
 	private static void configureNetworkConfigGroup(NetworkConfigGroup network){
 		
-		network.setInputFile(GAPMain.matsimInputDir + "Netzwerk/network.xml");
+		network.setInputFile(Global.matsimInputDir + "Netzwerk/network_merged.xml.gz");
 		
 	}
 	
 	private static void configurePlansConfigGroup(PlansConfigGroup plans){
 		
-		plans.setInputFile(GAPMain.matsimInputDir + "Pläne/plans_mid.xml.gz");
+		plans.setInputFile(Global.matsimInputDir + "Pläne/plans_mid.xml.gz");
 		
 	}
 	
@@ -74,13 +74,13 @@ public class ConfigCreator {
 	
 	private static void configureTransitConfigGroup(TransitConfigGroup transit){
 		transit.setUseTransit(true);
-		transit.setTransitScheduleFile(GAPMain.matsimInputDir + "transit/scheduleComplete.xml");
-		transit.setVehiclesFile(GAPMain.matsimInputDir + "transit/transitVehicles.xml");
+		transit.setTransitScheduleFile(Global.matsimInputDir + "transit/scheduleComplete.xml");
+		transit.setVehiclesFile(Global.matsimInputDir + "transit/transitVehicles.xml");
 	}
 	
 	private static void configureGlobalConfigGroup(GlobalConfigGroup global){
 		
-		global.setCoordinateSystem(GAPMain.toCrs);
+		global.setCoordinateSystem(Global.toCrs);
 		global.setNumberOfThreads(2);
 		
 	}
@@ -95,7 +95,7 @@ public class ConfigCreator {
 		
 		controler.setFirstIteration(0);
 		controler.setLastIteration(0);
-		controler.setOutputDirectory(GAPMain.matsimOutputDir);
+		controler.setOutputDirectory(Global.matsimOutputDir);
 		controler.setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		controler.setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		
@@ -139,8 +139,8 @@ public class ConfigCreator {
 		
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(1);
-		counts.setCountsFileName(GAPMain.matsimInputDir + "Counts/counts.xml");
-		counts.setCountsScaleFactor(GAPMain.N/GAPMain.n);
+		counts.setCountsFileName(Global.matsimInputDir + "Counts/counts.xml");
+		counts.setCountsScaleFactor(Global.N/Global.getN());
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
@@ -152,7 +152,7 @@ public class ConfigCreator {
 	private static void configureQSimConfigGroup(QSimConfigGroup qsim){
 	
 		qsim.setEndTime(Time.UNDEFINED_TIME);
-		qsim.setFlowCapFactor(GAPMain.n/GAPMain.N);
+		qsim.setFlowCapFactor(Global.getN()/Global.N);
 		qsim.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
 		qsim.setLinkDynamics(LinkDynamics.FIFO.name());
 		qsim.setLinkWidth(30L);
@@ -166,7 +166,7 @@ public class ConfigCreator {
 		qsim.setSnapshotPeriod(0);
 		qsim.setSnapshotStyle(SnapshotStyle.queue);
 		qsim.setStartTime(Time.UNDEFINED_TIME);
-		qsim.setStorageCapFactor(GAPMain.n/GAPMain.N);
+		qsim.setStorageCapFactor(Global.getN()/Global.N);
 		qsim.setStuckTime(10);
 		qsim.setTimeStepSize(1);
 		qsim.setTrafficDynamics(TrafficDynamics.queue);

@@ -31,6 +31,14 @@ public class OsmObjectsToFacilitiesParser {
 	private final Set<String> keysOfInterest;
 	
 	private final String file;
+	
+	public ActivityFacilities getFacilities() {
+		return facilities;
+	}
+
+	public ObjectAttributes getFacilityAttributes() {
+		return facilityAttributes;
+	}
 
 	public OsmObjectsToFacilitiesParser(String file, CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap, Set<String> keysOfInterest){
 		

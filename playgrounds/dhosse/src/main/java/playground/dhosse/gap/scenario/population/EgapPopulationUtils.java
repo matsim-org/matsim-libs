@@ -1,10 +1,9 @@
-package playground.dhosse.gap.scenario;
+package playground.dhosse.gap.scenario.population;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.TransportMode;
-
+import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
 import playground.dhosse.utils.EgapHashGenerator;
 
@@ -415,43 +414,43 @@ public class EgapPopulationUtils {
 	 */
 	public static int setAge(){
 		
-		double rnd = GAPMain.random.nextDouble();
+		double rnd = Global.random.nextDouble();
 		
 		if(rnd <= thresholdAge0_9){
 			
-			return (int) (0 + GAPMain.random.nextDouble() * 9);
+			return (int) (0 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge0_9 && rnd <= thresholdAge10_19){
 			
-			return (int) (10 + GAPMain.random.nextDouble() * 9);
+			return (int) (10 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge10_19 && rnd <= thresholdAge20_29){
 			
-			return (int) (20 + GAPMain.random.nextDouble() * 9);
+			return (int) (20 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge20_29 && rnd <= thresholdAge30_39){
 			
-			return (int) (30 + GAPMain.random.nextDouble() * 9);
+			return (int) (30 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge30_39 && rnd <= thresholdAge40_49){
 			
-			return (int) (40 + GAPMain.random.nextDouble() * 9);
+			return (int) (40 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge40_49 && rnd <= thresholdAge50_59){
 			
-			return (int) (50 + GAPMain.random.nextDouble() * 9);
+			return (int) (50 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge50_59 && rnd <= thresholdAge60_69){
 			
-			return (int) (60 + GAPMain.random.nextDouble() * 9);
+			return (int) (60 + Global.random.nextDouble() * 9);
 			
 		} else if(rnd > thresholdAge60_69 && rnd <= thresholdAge70_79){
 			
-			return (int) (70 + GAPMain.random.nextDouble() * 9);
+			return (int) (70 + Global.random.nextDouble() * 9);
 			
 		} else {
 			
-			return (int) (80 + GAPMain.random.nextDouble() * 9);
+			return (int) (80 + Global.random.nextDouble() * 9);
 			
 		}
 		
@@ -476,7 +475,7 @@ public class EgapPopulationUtils {
 			
 		}
 
-		double rnd = GAPMain.random.nextDouble() * totalThreshold;
+		double rnd = Global.random.nextDouble() * totalThreshold;
 		
 		double accumulatedWeight = 0.;
 		
@@ -486,7 +485,7 @@ public class EgapPopulationUtils {
 			
 			if(accumulatedWeight >= rnd){
 				
-				return (int) (i * 10 + GAPMain.random.nextDouble() * 9);
+				return (int) (i * 10 + Global.random.nextDouble() * 9);
 				
 			}
 			
@@ -504,7 +503,7 @@ public class EgapPopulationUtils {
 	 */
 	public static int setSex(int age){
 		
-		double rnd = GAPMain.random.nextDouble();
+		double rnd = Global.random.nextDouble();
 		
 		if(age < 10){
 			

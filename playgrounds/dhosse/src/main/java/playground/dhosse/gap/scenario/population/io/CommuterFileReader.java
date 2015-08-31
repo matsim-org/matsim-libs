@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario;
+package playground.dhosse.gap.scenario.population.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
