@@ -2,8 +2,6 @@ package playground.balac.allcsmodestest.controler.listeneronlymembers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -26,7 +24,6 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 	HashMap<Id<Person>, ArrayList<RentalInfoFF>> rtRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
 	ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
 	
-	Set<Id<Person>> currentRentals = new TreeSet<Id<Person>>();
 	
 	
 	@Override
@@ -34,7 +31,6 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 		// TODO Auto-generated method stub
 		rtRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
 		arr = new ArrayList<RentalInfoFF>();
-		currentRentals = new TreeSet<Id<Person>>();
 	}
 
 	@Override
@@ -42,26 +38,11 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 		// TODO Auto-generated method stub
 		
 		if (event.getLegMode().equals("walk_ff")) {
+				
 			
-			if (currentRentals.contains(event.getPersonId())) {
-				
-				RentalInfoFF rentalInfo = this.rtRentalsStats.get(event.getPersonId()).get(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
-				
-				rentalInfo.egressEndTime = event.getTime();
-				
-				currentRentals.remove(event.getPersonId());
-				this.rtRentalsStats.get(event.getPersonId()).remove(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
-				arr.add(rentalInfo);
-				
-			}
-			else {
-				
-				currentRentals.add(event.getPersonId());
-				
-				RentalInfoFF rentalInfo = this.rtRentalsStats.get(event.getPersonId()).get(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
+			RentalInfoFF rentalInfo = this.rtRentalsStats.get(event.getPersonId()).get(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
 
-				rentalInfo.accessEndTime = event.getTime();
-			}
+			rentalInfo.accessEndTime = event.getTime();			
 			
 		}
 		
@@ -69,41 +50,30 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		// TODO Auto-generated method stub
 		
 		if (event.getLegMode().equals("walk_ff")) {
+						
+			RentalInfoFF rentalInfo = new RentalInfoFF();
 			
-			if (currentRentals.contains(event.getPersonId())) {
+			rentalInfo.personId = event.getPersonId();
+			
+			rentalInfo.accessStartTime = event.getTime();
+			
+			if (this.rtRentalsStats.get(event.getPersonId()) != null) {
 				
-				RentalInfoFF rentalInfo = this.rtRentalsStats.get(event.getPersonId()).get(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
-				
-				rentalInfo.egressStartTime = event.getTime();
-				
+				this.rtRentalsStats.get(event.getPersonId()).add(rentalInfo);
 				
 			}
 			else {
-				RentalInfoFF rentalInfo = new RentalInfoFF();
 				
-				rentalInfo.personId = event.getPersonId();
+				ArrayList<RentalInfoFF> temp = new ArrayList<RentalInfoFF>();
 				
-				rentalInfo.accessStartTime = event.getTime();
+				temp.add(rentalInfo);
 				
-				if (this.rtRentalsStats.get(event.getPersonId()) != null) {
-					
-					this.rtRentalsStats.get(event.getPersonId()).add(rentalInfo);
-					
-				}
-				else {
-					
-					ArrayList<RentalInfoFF> temp = new ArrayList<RentalInfoFF>();
-					
-					temp.add(rentalInfo);
-					
-					this.rtRentalsStats.put(event.getPersonId(), temp);
+				this.rtRentalsStats.put(event.getPersonId(), temp);
 
-				}
-				
-			}
+			}	
+			
 			
 		}
 		
@@ -119,6 +89,8 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 		
 			rentalInfo.endTime = event.getTime();
 			rentalInfo.endLinkId = event.getLinkId();
+			arr.add(rentalInfo);
+
 		}
 	}
 
@@ -141,7 +113,7 @@ public class FFEventsHandler implements StartRentalEventHandler, EndRentalEventH
 	@Override
 	public void handleEvent(CarsharingLegFinishedEvent event) {
 
-		if (event.getvehicleId().toString().startsWith("FF") && currentRentals.contains(event.getPersonId())){
+		if (event.getvehicleId().toString().startsWith("FF")){
 		
 			RentalInfoFF rentalInfo = this.rtRentalsStats.get(event.getPersonId()).get(this.rtRentalsStats.get(event.getPersonId()).size() - 1);
 

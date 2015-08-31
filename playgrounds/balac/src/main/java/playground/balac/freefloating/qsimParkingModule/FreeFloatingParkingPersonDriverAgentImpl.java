@@ -113,7 +113,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		this.scenario = scenario;
 		this.parkingModule = parkingModule;
 		
-		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
+		beelineFactor = ((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
 		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		
 		

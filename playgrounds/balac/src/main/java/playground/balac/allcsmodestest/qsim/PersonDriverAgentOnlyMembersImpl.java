@@ -216,7 +216,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 			 else if (currentLeg.getMode().equals("walk_rb") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
 				 this.simulation.getEventsManager().processEvent(
 							new StartRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("TW_"+(this.twVehId), Vehicle.class)));
-			 else if (currentLeg.getMode().equals("freefloating") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
+			 else if (currentLeg.getMode().equals("freefloating")) {// && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 				
 				 this.simulation.getEventsManager().processEvent(
 							new EndRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("FF_"+(this.ffVehId), Vehicle.class)));

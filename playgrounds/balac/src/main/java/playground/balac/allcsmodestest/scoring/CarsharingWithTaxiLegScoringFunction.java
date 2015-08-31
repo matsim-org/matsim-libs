@@ -125,11 +125,16 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 			for(Stats s:owcsRentals) {
 			
 				distance += s.distance;
-				time += (s.endTime - s.startTime);
+				//imposing minimum rental time of 20min
+				if (s.endTime - s.startTime < 1200)
+					time += 1200;
+				else
+					time += (s.endTime - s.startTime);
 
 			}
 			
 			score += distance * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("distanceFeeOneWayCarsharing"));
+			
 			score += time * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeFeeOneWayCarsharing"));
 			score += walkingOW * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeParkingFeeOneWayCarsharing"));
 
