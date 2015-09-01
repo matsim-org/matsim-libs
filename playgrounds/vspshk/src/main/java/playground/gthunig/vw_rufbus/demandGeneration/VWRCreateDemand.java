@@ -50,9 +50,19 @@ public class VWRCreateDemand {
 	private Map<String, Coord> schools;
 	private Map<String, Coord> universities;
 	
+	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation( 
+			TransformationFactory.WGS84, "EPSG:25832");
+	private Coord vwWorkplace1 = ct.transform(new CoordImpl(52.432153, 10.762568));
+	private Coord vwWorkplace2 = ct.transform(new CoordImpl(52.429693, 10.776129));
+	private Coord vwWorkplace3 = ct.transform(new CoordImpl(52.435188, 10.796041));
+	private Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
+	private Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
+	
 	private int commuterCounter = 0;
 	private int vwWorkerCounter = 0;
 	private int workerCounter = 0;
+	
+	private Random random = MatsimRandom.getRandom();
 	
 	public VWRCreateDemand (VWRConfig config){
 		this.config = config;
@@ -69,6 +79,7 @@ public class VWRCreateDemand {
 		this.retail = geometryMapToCoordMap(readShapeFile(config.getRetailFileString(), "osm_id"));
 		this.schools = geometryMapToCoordMap(readShapeFile(config.getSchoolsFileString(), "osm_id"));
 		this.universities = geometryMapToCoordMap(readShapeFile(config.getUniversitiesFileString(), "osm_id"));
+		
 	}
 	
 	public static void main(String[] args) {
@@ -334,6 +345,7 @@ public class VWRCreateDemand {
 			if (to == "WB") workerCounter++;
 			if (to == "WB" && wvWorkerOrNot < 0.6363) {
 				vwWorkerCounter++;
+//				TODO matsim random
 				double shiftOrFlexitime = Math.random();
 				if (shiftOrFlexitime < 0.6666) {
 					createOneVWFlexitimeWorker(commuterCounter, homeC, mode, from + "_" + to);
@@ -414,6 +426,7 @@ public class VWRCreateDemand {
 	}
 	
 	private void createOneVWFlexitimeWorker(int i, Coord homeC, String mode, String fromToPrefix) {
+		
 		Id<Person> personId = Id.createPersonId(fromToPrefix + i + "vw");
 		Person person = scenario.getPopulation().getFactory().createPerson(personId);
  
@@ -423,6 +436,7 @@ public class VWRCreateDemand {
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 //		home.setEndTime(7*60*60);
 //		TODO lieber doch mit endTime?? wenn ja wie?
+//		 bis 17:40 arbeiten
 		plan.addActivity(home);
  
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -446,6 +460,7 @@ public class VWRCreateDemand {
 	}
 	
 	private void createOneVWShiftWorker(int i, Coord homeC, String mode, String fromToPrefix) {
+		
 		Id<Person> personId = Id.createPersonId(fromToPrefix + i + "vw");
 		Person person = scenario.getPopulation().getFactory().createPerson(personId);
  
@@ -455,6 +470,7 @@ public class VWRCreateDemand {
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 //		home.setEndTime(7*60*60);
 //		TODO lieber doch mit endTime??
+//		schichtarbeiter bis 15 min vor ende
 		plan.addActivity(home);
 		
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -475,6 +491,7 @@ public class VWRCreateDemand {
 				plan.addActivity(shift2);
 				break;
 			case 3:
+//				TODO schicht rausnehmen
 				Activity shift3 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3", calcVWWorkCoord());
 				shift3.setStartTime(22*60*60);
 				shift3.setEndTime(5*60*60+40*60);
@@ -493,13 +510,7 @@ public class VWRCreateDemand {
 	}
 	
 	private Coord calcVWWorkCoord() {
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation( 
-				TransformationFactory.WGS84, "EPSG:25832");
-		Coord vwWorkplace1 = ct.transform(new CoordImpl(52.432153, 10.762568));
-		Coord vwWorkplace2 = ct.transform(new CoordImpl(52.429693, 10.776129));
-		Coord vwWorkplace3 = ct.transform(new CoordImpl(52.435188, 10.796041));
-		Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
-		Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
+		
 		int random = (int) ((Math.random()*5)+1);
 		switch (random) {
 			case 1:
