@@ -45,25 +45,18 @@ public class VWRCreateDemand {
 	
 	private Map<String, Coord> commercial;
 	private Map<String, Coord> industrial;
+	private Map<String, Coord> industrialByName;
 	private Map<String, Coord> residential;
 	private Map<String, Coord> retail;
 	private Map<String, Coord> schools;
 	private Map<String, Coord> universities;
-	
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation( 
-			TransformationFactory.WGS84, "EPSG:25832");
-	private Coord vwWorkplace1 = ct.transform(new CoordImpl(52.432153, 10.762568));
-	private Coord vwWorkplace2 = ct.transform(new CoordImpl(52.429693, 10.776129));
-	private Coord vwWorkplace3 = ct.transform(new CoordImpl(52.435188, 10.796041));
-	private Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
-	private Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
 	
 	private Random random = MatsimRandom.getRandom();
 	
 	private int commuterCounter = 0;
 	private int vwWorkerCounter = 0;
 	private int workerCounter = 0;
-	
+
 	public VWRCreateDemand (VWRConfig config){
 		this.config = config;
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -75,6 +68,7 @@ public class VWRCreateDemand {
 
 		this.commercial = geometryMapToCoordMap(readShapeFile(config.getCommercialFileString(), "osm_id"));
 		this.industrial = geometryMapToCoordMap(readShapeFile(config.getIndustrialFileString(), "osm_id"));
+		this.industrialByName = geometryMapToCoordMap(readShapeFile(config.getIndustrialFileString(), "name"));
 		this.residential = geometryMapToCoordMap(readShapeFile(config.getResidentialFileString(), "osm_id"));
 		this.retail = geometryMapToCoordMap(readShapeFile(config.getRetailFileString(), "osm_id"));
 		this.schools = geometryMapToCoordMap(readShapeFile(config.getSchoolsFileString(), "osm_id"));
@@ -94,7 +88,7 @@ public class VWRCreateDemand {
 		String schools = "landuse/schools.shp";
 		String universities = "landuse/universities.shp";
 		String plansOutputComplete = basedir + "plans_output.xml";
-		double scalefactor = 0.1;
+		double scalefactor = 1.0;
 		
 		VWRConfig config = new VWRConfig(basedir, network, counties, commercial, industrial, 
 											residential, retail, schools, universities, plansOutputComplete, scalefactor);
@@ -139,7 +133,7 @@ public class VWRCreateDemand {
 		
 //		Wolfsburg, Stadt - Wolfsburg, Stadt | work
 		createWorkers("WB", "WB", 41470*config.getScalefactor(), 0.55, 0.13, 0.22, "03103", "03103");
-		
+	
 //		Wolfsburg, Stadt - Wolfsburg, Stadt | school
 		createPupils("WB", "WB", 13867*config.getScalefactor(), 0.2, 0.3, 0.2, "03103", "03103");
 		
@@ -342,10 +336,9 @@ public class VWRCreateDemand {
 			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 			
 			double wvWorkerOrNot = random.nextDouble();
-			if (to == "WB") workerCounter++;
 			if (to == "WB" && wvWorkerOrNot < 0.6363) {
 				vwWorkerCounter++;
-				double shiftOrFlexitime = random.nextDouble();
+				double shiftOrFlexitime =random.nextDouble();
 				if (shiftOrFlexitime < 0.6666) {
 					createOneVWFlexitimeWorker(commuterCounter, homeC, mode, from + "_" + to);
 				} else {
@@ -360,6 +353,7 @@ public class VWRCreateDemand {
 				
 				createOneWorker(commuterCounter, homeC, commuteDestinationC, mode, from + "_" + to);
 			}
+			workerCounter++;
 			commuterCounter++;
 		}
 	}
@@ -431,7 +425,6 @@ public class VWRCreateDemand {
  
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
  
-		
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 		home.setEndTime(5*60*60+30*60);
 		plan.addActivity(home);
@@ -439,10 +432,8 @@ public class VWRCreateDemand {
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 		plan.addLeg(outboundTrip);
  
-//		int rand = random.nextInt(151);
 		Activity work = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_flexitime", calcVWWorkCoord());
 		work.setMaximumDuration(10*60*60+10*60);
-//		work.setEndTime(15*60*60+10*60 + rand*60);
 		plan.addActivity(work);
  
 		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -500,21 +491,36 @@ public class VWRCreateDemand {
 	}
 	
 	private Coord calcVWWorkCoord() {
+		if (!this.industrialByName.containsKey("Volkswagen AG")) System.out.println("Volkswagen AG does not exist");
+		return this.industrialByName.get("Volkswagen AG");
 		
-		int rand = random.nextInt(4)+1;
-		switch (rand) {
-			case 1:
-				return vwWorkplace1;
-			case 2:
-				return vwWorkplace2;
-			case 3:
-				return vwWorkplace3;
-			case 4:
-				return vwWorkplace4;
-			case 5:
-				return vwWorkplace5;
-		}
-		return vwWorkplace1;
+//		
+//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation( 
+//				TransformationFactory.WGS84, "EPSG:25832");
+//		Coord vwWorkplace1 = ct.transform(new CoordImpl(52.432153, 10.762568));
+//		Coord vwWorkplace2 = ct.transform(new CoordImpl(52.429693, 10.776129));
+//		Coord vwWorkplace3 = ct.transform(new CoordImpl(52.435188, 10.796041));
+//		Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
+//		Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
+//		
+//		int rand = random.nextInt(4)+1;
+//		switch (rand) {
+//			case 1:
+//				CoordinateTransformation ct2 = TransformationFactory.getCoordinateTransformation( 
+//						"EPSG:25832", TransformationFactory.WGS84);
+//				Coord temp = findClosestCoordFromMap(vwWorkplace1, this.industrial);
+//				System.out.println("x: " + ct2.transform(temp).getX() + " y: " + ct2.transform(temp).getY());
+//				return temp;
+//			case 2:
+//				return findClosestCoordFromMap(vwWorkplace2, this.industrial);
+//			case 3:
+//				return findClosestCoordFromMap(vwWorkplace3, this.industrial);
+//			case 4:
+//				return findClosestCoordFromMap(vwWorkplace4, this.industrial);
+//			case 5:
+//				return findClosestCoordFromMap(vwWorkplace5, this.industrial);
+//		}
+//		return vwWorkplace1;
 	}
 
 	private void createOneWorker(int i, Coord homeC, Coord coordWork, String mode, String fromToPrefix) {
@@ -605,7 +611,7 @@ public class VWRCreateDemand {
 	}
 	
 	private  Coord drawRandomPointFromGeometry(Geometry g) {
-		   Point p;
+		Point p;
 		   double x, y;
 		   do {
 		      x = g.getEnvelopeInternal().getMinX() +  random.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());

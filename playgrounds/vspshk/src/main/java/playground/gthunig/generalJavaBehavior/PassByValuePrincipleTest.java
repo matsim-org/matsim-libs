@@ -9,12 +9,18 @@ public class PassByValuePrincipleTest {
 	@Test
 	public void testPassByValue() {
 		boolean bool = true;
+//		bool = getChangedValue(bool);
 		changeValue(bool);
 		Assert.assertEquals(true, bool);
 	}
 	
+	private boolean getChangedValue(boolean bool) {
+		bool = false;
+		return bool;
+	}
+
 	private void changeValue(boolean bool) {
-		bool = !bool;
+		bool = false;
 	}
 	
 }
