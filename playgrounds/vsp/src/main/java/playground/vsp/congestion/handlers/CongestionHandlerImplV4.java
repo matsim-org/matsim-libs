@@ -230,16 +230,23 @@ PersonStuckEventHandler
 
 		List<Id<Person>> agentsAlreadyLeft = new ArrayList<Id<Person>>(linkInfo.getLeavingAgents()); 
 		Collections.reverse(agentsAlreadyLeft);
+		// (leavingAgents is something like all agents in queue before current agent)
 		
 		// if the difference between free speed leave time of two agents is more than min time headway, no delay 
 		double freeSpeedLeaveTimeOfNowAgent = personId2FreeSpeedTime.get(Id.createPersonId(event.getVehicleId()));
 		
 		for( Id<Person> agentId : agentsAlreadyLeft ){
+			// (so we go through some (see below) agents in queue before current agent ...)
+			
 			double freeSpeedLeaveTimeAgentInList = personId2FreeSpeedTime.get(agentId);
 			double timeHeadway = freeSpeedLeaveTimeOfNowAgent - freeSpeedLeaveTimeAgentInList;
 			
 			if (timeHeadway < minTimeHeadway){
 				linkInfo.getAgentsCausingFlowDelays().add(agentId);
+				// (... and add them to the agents causing FLOW delays if their time headway is small)
+				// yyyy but I don't find the timeHeadway < minTimeHeadway very logical.  This can really
+				// only happen if there is spillback and downstream fluctuations (movement from buffer
+				// across node). kai, sep'15
 			}
 			freeSpeedLeaveTimeOfNowAgent = freeSpeedLeaveTimeAgentInList;
 		}
@@ -251,6 +258,7 @@ PersonStuckEventHandler
 			
 			if (event.getTime() > Math.floor(earliestLeaveTime)+1 ){// Flow congestion has disappeared on that link.
 				// Deleting the information of agents previously leaving that link.
+				// yyyy however, agentsCausingFlowDelays will survive?!?!
 				linkInfo.getLeavingAgents().clear();
 			}
 		}
@@ -259,7 +267,6 @@ PersonStuckEventHandler
 		 *  TODO [AA] Might be make more sense to store persons only in one map (getAgentsCausingFlowDelays) and
 		 *  use the above if statement to get the spill back causing link.
 		 */
-		// absolutely. kai, sep'15
 		
 		//remove agents present in both the lists to avoid duplicate congestion events.		
 		linkInfo.getAgentsCausingFlowDelays().removeAll(linkInfo.getLeavingAgents());
