@@ -34,7 +34,7 @@ public class BerlinTaxiRequests
 {
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
     private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
-    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/berlin.xml.gz";
+    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/only_berlin.xml.gz";
 
 
     public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
