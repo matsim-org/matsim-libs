@@ -55,27 +55,29 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 	void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		
+		// global book-keeping:
 		this.totalDelay = this.totalDelay + delayOnThisLink;
 		
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
-		double totalDelayWithDelaysOnPreviousLinks = 0.;
+		double agentDelayWithDelaysOnPreviousLinks = 0.;
 		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
 			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
 		}
 		
-		if (totalDelayWithDelaysOnPreviousLinks < 0.) {
+		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
 			throw new RuntimeException("The total delay is below 0. Aborting...");
 			
-		} else if (totalDelayWithDelaysOnPreviousLinks == 0.) {
+		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
 			// The agent was leaving the link without a delay.
 			
 		} else {
 			// The agent was leaving the link with a delay.
 						
-			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(totalDelayWithDelaysOnPreviousLinks, event);
+			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(agentDelayWithDelaysOnPreviousLinks, event);
 			
 			if (storageDelay < 0.) {
 				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
@@ -84,8 +86,8 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 				// The delay resulting from the storage capacity is 0.
 				
 			} else if (storageDelay > 0.) {	
-				if (this.allowForStorageCapacityConstraint) {
-					if (this.calculateStorageCapacityConstraints) {
+				if (this.isAllowingForStorageCapacityConstraint()) {
+					if (this.isCalculatingStorageCapacityConstraints()) {
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
 						this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
 					} else {
