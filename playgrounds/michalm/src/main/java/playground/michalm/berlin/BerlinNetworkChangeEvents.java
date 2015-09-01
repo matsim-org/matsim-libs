@@ -19,58 +19,59 @@
 
 package playground.michalm.berlin;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class BerlinTaxiRequests
+public class BerlinNetworkChangeEvents
 {
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
     private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
     private static final String ONLY_BERLIN_NET_FILE = DIR + "network/berlin.xml.gz";
 
 
-    public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
+    public static void filterEventsWithinBerlin(String allChangeEventsFile,
+            String berlinChangeEventsFile)
     {
-        Scenario berlinBrbScenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE,
-                DIR + allPlansFile);
+        Scenario berlinBrbScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        new MatsimNetworkReader(berlinBrbScenario).readFile(BERLIN_BRB_NET_FILE);
 
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(onlyBerlinScenario).readFile(ONLY_BERLIN_NET_FILE);
-        Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
-                onlyBerlinScenario.getNetwork());
+
+        List<NetworkChangeEvent> berlinBrbEvents = new NetworkChangeEventsParser(
+                berlinBrbScenario.getNetwork()).parseEvents(DIR + allChangeEventsFile);
+
+        List<NetworkChangeEvent> onlyBerlinEvents = new ArrayList<>();
         Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
 
-        for (Person p : berlinBrbScenario.getPopulation().getPersons().values()) {
-            Plan plan = p.getPlans().get(0);
-            Activity fromActivity = (Activity)plan.getPlanElements().get(0);
-            Activity toActivity = (Activity)plan.getPlanElements().get(2);
+        for (NetworkChangeEvent e : berlinBrbEvents) {
+            if (e.getLinks().size() != 1) {
+                throw new RuntimeException("Only 1 link per event supported");
+            }
 
-            if (onlyBerlinLinks.containsKey(fromActivity.getLinkId())
-                    && onlyBerlinLinks.containsKey(toActivity.getLinkId())) {
-                onlyBerlinPop.addPerson(p);
+            Link l = e.getLinks().iterator().next();
+            if (onlyBerlinLinks.containsKey(l.getId())) {
+                onlyBerlinEvents.add(e);
             }
         }
 
-        new PopulationWriter(onlyBerlinPop, onlyBerlinScenario.getNetwork())
-                .write(DIR + berlinPlansFile);
+        new NetworkChangeEventsWriter().write(DIR + berlinChangeEventsFile, onlyBerlinEvents);
     }
 
 
     public static void main(String[] args)
     {
-        for (double i = 10; i < 51; i++) {
-            String suffix = "/plans/plans4to3_" + (i / 10) + ".xml.gz";
-            String in = "scenarios/2014_10_basic_scenario_v4" + suffix;
-            String out = "scenarios/2015_08_only_berlin_v1" + suffix;
-            filterRequestsWithinBerlin(in, out);
+        String[] files = { "changeevents", "changeevents_min" };
+        for (String f : files) {
+            String in = "scenarios/2014_10_basic_scenario_v4/" + f + ".xml.gz";
+            String out = "scenarios/2015_08_only_berlin_v1/" + f + ".xml.gz";
+            filterEventsWithinBerlin(in, out);
         }
     }
 }
