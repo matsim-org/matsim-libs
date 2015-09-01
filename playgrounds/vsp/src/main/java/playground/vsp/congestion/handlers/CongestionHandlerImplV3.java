@@ -53,11 +53,11 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 	
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		
 		// global book-keeping:
-		this.totalDelay = this.totalDelay + delayOnThisLink;
+		this.addToTotalDelay( delayOnThisLink );
 		
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
 		double agentDelayWithDelaysOnPreviousLinks = 0.;
@@ -77,7 +77,7 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 		} else {
 			// The agent was leaving the link with a delay.
 						
-			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(agentDelayWithDelaysOnPreviousLinks, event);
+			double storageDelay = computeFlowCongestionAndReturnStorageDelay(agentDelayWithDelaysOnPreviousLinks, event);
 			
 			if (storageDelay < 0.) {
 				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
@@ -91,8 +91,8 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
 						this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
 					} else {
-						this.delayNotInternalized_storageCapacity += storageDelay;
-						log.warn("Delay which is not internalized: " + this.delayNotInternalized_storageCapacity);
+						this.addToDelayNotInternalized_storageCapacity( storageDelay ) ;
+						log.warn("Delay which is not internalized: " + this.getDelayNotInternalized_storageCapacity());
 					}
 					
 				} else {
@@ -111,7 +111,7 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
 //				log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
-				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
+				this.addToDelayNotInternalized_spillbackNoCausingAgent( this.agentId2storageDelay.get(event.getPersonId()) ) ;
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
 		}
