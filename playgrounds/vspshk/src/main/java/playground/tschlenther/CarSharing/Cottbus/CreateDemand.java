@@ -358,7 +358,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			 System.out.println("writing VehicleLocations to:\t" + file.getCanonicalPath());
 			writer = new BufferedWriter(new FileWriter(file));
 			String newline = System.getProperty("line.separator");
-			writer.write("???\t???\tX\tY\t???\t???\t#Vehicles");
+			writer.write("Ort\tStandort\tGeoX\tGeoY\tPLZ\tStaoNr\t#Vehicles");
 			writer.write(newline);
 			for(Geometry g : this.shapeMap.values()){
 				Coord station = this.drawRandomPointFromGeometry(g);

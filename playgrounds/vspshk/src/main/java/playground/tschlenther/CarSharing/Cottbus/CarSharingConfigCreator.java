@@ -123,6 +123,7 @@ public class CarSharingConfigCreator {
     	config.addModule(twconfigGroup);
     	
     	CarsharingConfigGroup configGroupAll = new CarsharingConfigGroup();
+    	configGroupAll.setStatsWriterFrequency("1");
     	config.addModule(configGroupAll);
     	
 		ControlerConfigGroup controler = config.controler();
