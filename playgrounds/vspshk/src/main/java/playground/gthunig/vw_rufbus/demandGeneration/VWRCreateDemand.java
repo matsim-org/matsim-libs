@@ -58,11 +58,11 @@ public class VWRCreateDemand {
 	private Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
 	private Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
 	
+	private Random random = MatsimRandom.getRandom();
+	
 	private int commuterCounter = 0;
 	private int vwWorkerCounter = 0;
 	private int workerCounter = 0;
-	
-	private Random random = MatsimRandom.getRandom();
 	
 	public VWRCreateDemand (VWRConfig config){
 		this.config = config;
@@ -341,12 +341,11 @@ public class VWRCreateDemand {
 			
 			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 			
-			double wvWorkerOrNot = Math.random();
+			double wvWorkerOrNot = random.nextDouble();
 			if (to == "WB") workerCounter++;
 			if (to == "WB" && wvWorkerOrNot < 0.6363) {
 				vwWorkerCounter++;
-//				TODO matsim random
-				double shiftOrFlexitime = Math.random();
+				double shiftOrFlexitime = random.nextDouble();
 				if (shiftOrFlexitime < 0.6666) {
 					createOneVWFlexitimeWorker(commuterCounter, homeC, mode, from + "_" + to);
 				} else {
@@ -434,19 +433,16 @@ public class VWRCreateDemand {
  
 		
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
-//		home.setEndTime(7*60*60);
-//		TODO lieber doch mit endTime?? wenn ja wie?
-//		 bis 17:40 arbeiten
+		home.setEndTime(5*60*60+30*60);
 		plan.addActivity(home);
  
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 		plan.addLeg(outboundTrip);
  
-		int random = (int) ((Math.random()*91));
+//		int rand = random.nextInt(151);
 		Activity work = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_flexitime", calcVWWorkCoord());
-		double startTime = 7*60*60 + 30*60 + random*60;
-		work.setStartTime(startTime);
-		work.setEndTime(startTime + 7*60*60+40*60);
+		work.setMaximumDuration(10*60*60+10*60);
+//		work.setEndTime(15*60*60+10*60 + rand*60);
 		plan.addActivity(work);
  
 		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -465,37 +461,31 @@ public class VWRCreateDemand {
 		Person person = scenario.getPopulation().getFactory().createPerson(personId);
  
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
- 
 		
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
-//		home.setEndTime(7*60*60);
-//		TODO lieber doch mit endTime??
-//		schichtarbeiter bis 15 min vor ende
-		plan.addActivity(home);
-		
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
-		plan.addLeg(outboundTrip);
- 
-		int random = (int) ((Math.random()*3)+1);
-		switch (random) {
+		
+		int rand = random.nextInt(1)+1;
+		switch (rand) {
 			case 1:
+				home.setEndTime(5*60*60);
+				plan.addActivity(home);
+				
+				plan.addLeg(outboundTrip);
+				
 				Activity shift1 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift1", calcVWWorkCoord());
-				shift1.setStartTime(6*60*60);
 				shift1.setEndTime(13*60*60+40*60);
 				plan.addActivity(shift1);
 				break;
 			case 2:
+				home.setEndTime(13*60*60);
+				plan.addActivity(home);
+				
+				plan.addLeg(outboundTrip);
+				
 				Activity shift2 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift2", calcVWWorkCoord());
-				shift2.setStartTime(14*60*60);
 				shift2.setEndTime(21*60*60+40*60);
 				plan.addActivity(shift2);
-				break;
-			case 3:
-//				TODO schicht rausnehmen
-				Activity shift3 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3", calcVWWorkCoord());
-				shift3.setStartTime(22*60*60);
-				shift3.setEndTime(5*60*60+40*60);
-				plan.addActivity(shift3);
 				break;
 		}
  
@@ -511,8 +501,8 @@ public class VWRCreateDemand {
 	
 	private Coord calcVWWorkCoord() {
 		
-		int random = (int) ((Math.random()*5)+1);
-		switch (random) {
+		int rand = random.nextInt(4)+1;
+		switch (rand) {
 			case 1:
 				return vwWorkplace1;
 			case 2:
@@ -541,9 +531,9 @@ public class VWRCreateDemand {
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 		plan.addLeg(outboundTrip);
 		
-		int random = (int) ((Math.random()*91));
+		int rand = random.nextInt(91);
 		Activity work = scenario.getPopulation().getFactory().createActivityFromCoord("work", coordWork);
-		double startTime = 7*60*60 + 30*60 + random*60;
+		double startTime = 7*60*60 + 30*60 + rand*60;
 		work.setStartTime(startTime);
 		work.setEndTime(startTime + 7*60*60+40*60);
 		plan.addActivity(work);
@@ -615,12 +605,11 @@ public class VWRCreateDemand {
 	}
 	
 	private  Coord drawRandomPointFromGeometry(Geometry g) {
-		   Random rnd = MatsimRandom.getLocalInstance();
 		   Point p;
 		   double x, y;
 		   do {
-		      x = g.getEnvelopeInternal().getMinX() +  rnd.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
-		      y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
+		      x = g.getEnvelopeInternal().getMinX() +  random.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
+		      y = g.getEnvelopeInternal().getMinY() + random.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 		      p = MGC.xy2Point(x, y);
 		   } while (!g.contains(p));
 		   Coord coord = new CoordImpl(p.getX(), p.getY());
