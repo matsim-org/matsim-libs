@@ -77,7 +77,7 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 		} else {
 			// The agent was leaving the link with a delay.
 						
-			double storageDelay = computeFlowCongestionAndReturnStorageDelay(agentDelayWithDelaysOnPreviousLinks, event);
+			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), agentDelayWithDelaysOnPreviousLinks);
 			
 			if (storageDelay < 0.) {
 				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");

@@ -218,8 +218,8 @@ PersonStuckEventHandler {
 		}
 	}
 
-	final double computeFlowCongestionAndReturnStorageDelay(double agentDelay, LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> vehicleId, double agentDelay) {
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId);
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
 		List<Id<Person>> reverseList = new ArrayList<Id<Person>>();
@@ -230,12 +230,12 @@ PersonStuckEventHandler {
 			double delayForThisPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
 			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
 
-			if (event.getVehicleId().toString().equals(personId.toString())) {
+			if (vehicleId.toString().equals(personId.toString())) {
 				//					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", personId, 
-						Id.createPersonId(event.getVehicleId()), delayForThisPerson, event.getLinkId(), 
+				CongestionEvent congestionEvent = new CongestionEvent(now, "flowStorageCapacity", personId, 
+						Id.createPersonId(vehicleId), delayForThisPerson, linkId, 
 						linkInfo.getPersonId2linkEnterTime().get(personId));
 				this.events.processEvent(congestionEvent);
 				this.totalInternalizedDelay += delayForThisPerson ;
