@@ -23,6 +23,7 @@
 package playground.vsp.congestion.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,8 +80,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
 		}
 	}
-	
-	
+
+
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
 
@@ -97,8 +98,12 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
 			 * first removing the link (optional operation) and then adding it to the end of the list.
 			 */
-			this.linkId2SpillBackCausingLink.get(event.getLinkId()).remove(spillBackCausingLink);
-			this.linkId2SpillBackCausingLink.get(event.getLinkId()).add(spillBackCausingLink);
+			if( this.linkId2SpillBackCausingLink.containsKey(event.getLinkId()) ) {
+				this.linkId2SpillBackCausingLink.get(event.getLinkId()).remove(spillBackCausingLink);
+				this.linkId2SpillBackCausingLink.get(event.getLinkId()).add(spillBackCausingLink);
+			} else {
+				this.linkId2SpillBackCausingLink.put(event.getLinkId(), new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
+			}
 
 		} else {
 
@@ -108,11 +113,11 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 				double remainingStorageDelay = allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
 				if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
-				
+
 			} else {
-				
+
 				this.addToDelayNotInternalized_storageCapacity(storageDelay);
-			
+
 			}
 		}
 	}
@@ -129,23 +134,23 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		while (remainingDelay > 0. && spillBackLinkIterator.hasNext()){
 			Id<Link> spillBackCausingLink = spillBackLinkIterator.next();
-			
+
 			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
-			
+
 			if(remainingDelay==0) break;
 			else {
 				remainingDelay = allocateStorageDelayToUpstreamLinks(remainingDelay, spillBackCausingLink, event);
 			}
 		}
-		
+
 		return remainingDelay;
 	}
 
 	private double processSpillbackDelays(double delayToChargeFor, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
-		
+
 		double remainingDelay = delayToChargeFor;
 		Id<Person> affectedPerson = Id.createPersonId(event.getVehicleId().toString());
-		
+
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
 		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2freeSpeedLeaveTime().keySet()); 
@@ -153,32 +158,31 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
 		double marginalDelaysPerLeavingVehicle = spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec();
-		
+
 		while(remainingDelay > 0  && enteredPersonsListIterator.hasNext()){
-			
+
 			Id<Person> causingPerson = enteredPersonsListIterator.next();
-			
+
 			double agentDelay = Math.min(marginalDelaysPerLeavingVehicle, remainingDelay);
-			
+
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
 			this.events.processEvent(congestionEvent);
 			remainingDelay = remainingDelay - agentDelay;
 		}
-		
+
 		if(remainingDelay>0){
 			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
 		}
-		
+
 		return remainingDelay;
 	}
 
 
 	private Id<Link> getUpstreamLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
-//		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
-//		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
-		return Id.createLinkId("UpstreamLink");
+		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
+		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
 	}
 
 }

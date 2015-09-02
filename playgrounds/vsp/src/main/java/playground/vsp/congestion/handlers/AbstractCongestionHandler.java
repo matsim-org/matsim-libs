@@ -94,6 +94,9 @@ PersonStuckEventHandler {
 	private double delayNotInternalized_roundingErrors = 0.0;
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 
+	Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
+	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
+
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
@@ -154,6 +157,16 @@ PersonStuckEventHandler {
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
+
+		//--
+		final Integer cnt = this.personId2legNr.get( event.getPersonId() );
+		if ( cnt == null ) {
+			this.personId2legNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
+		} else {
+			this.personId2legNr.put( event.getPersonId(), cnt + 1 ) ; 
+		}
+		this.personId2linkNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
+
 	}
 
 	@Override
@@ -171,7 +184,10 @@ PersonStuckEventHandler {
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());	
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
-		}	
+		}
+		// ---
+		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
+		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
 	}
 
 	@Override
@@ -190,6 +206,7 @@ PersonStuckEventHandler {
 			calculateCongestion(event);
 			addAgentToFlowQueue(event);
 		}
+		
 	}
 
 
@@ -272,6 +289,7 @@ PersonStuckEventHandler {
 		linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
+		linkInfo.getPersonId2linkEnterTime().remove(event.getPersonId());
 	}
 
 	private final void createLinkInfo(Id<Link> linkId) {
@@ -361,7 +379,7 @@ PersonStuckEventHandler {
 	final Map<Id<Link>, LinkCongestionInfo> getLinkId2congestionInfo() {
 		return linkId2congestionInfo;
 	}
-	
+
 	final void addToDelayNotInternalized_storageCapacity( double val ) {
 		this.delayNotInternalized_storageCapacity += val ;
 	}
