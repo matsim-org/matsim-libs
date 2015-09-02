@@ -87,20 +87,28 @@ public class CreateAutomatedFDTest {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
+		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private static final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
+		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
+		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
 			this.actEndTime = actEndTime;
+			this.plannedVehicleId = Id.create(agentId, Vehicle.class);
 		}
 
 		private final Id<Person> personId;
+		private final Id<Vehicle> plannedVehicleId;
 		private final String mode;
 		private final double actEndTime;
 
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
 
-		private Id<Link> currentLinkId = Id.createLinkId("home");
+		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
 		private State agentState= MobsimAgent.State.ACTIVITY;;
 
 		@Override
@@ -110,7 +118,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return Id.createLinkId("work");
+			return DESTINATION_LINK_ID;
 		}
 
 		@Override
@@ -124,18 +132,18 @@ public class CreateAutomatedFDTest {
 				isArriving = true; 
 			}
 
-			if(this.getCurrentLinkId().equals(Id.createLinkId("home"))){
-				return Id.createLinkId(0);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(0))){
+			if( ORIGIN_LINK_ID.equals(this.currentLinkId ) ){
+				return BASE_LINK_ID;
+			} else if( BASE_LINK_ID.equals( this.currentLinkId ) ) {
 				if ( isArriving) {
-					return Id.createLinkId("work") ;
+					return DESTINATION_LINK_ID ;
 				} else {
-					return Id.createLinkId(1) ;
+					return MIDDEL_LINK_ID_OF_TRACK ;
 				}
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(1))){
-				return Id.createLinkId(2);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(2))){
-				return Id.createLinkId(0);
+			} else if(MIDDEL_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
+				return LAST_LINK_ID_OF_TRACK;
+			} else if(LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
+				return BASE_LINK_ID;
 			} else return null; // returning null so that agent will arrive.
 
 		}
@@ -166,7 +174,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
-			return Id.create(this.getId(), Vehicle.class);
+			return this.plannedVehicleId;
 		}
 
 		@Override
@@ -213,7 +221,6 @@ public class CreateAutomatedFDTest {
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			throw new RuntimeException("not implemented");
 		}
-
 	}
 
 	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {

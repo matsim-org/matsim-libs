@@ -55,7 +55,7 @@ public class CSStationsLocationSHP {
 	    	
 	    }
 		
-        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/stations_greaterzurich_unlimited.shp");
+        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/TRB2016/stations_zurich_service_area.shp");
 
 		
 	}

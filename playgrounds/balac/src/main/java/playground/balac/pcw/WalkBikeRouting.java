@@ -104,9 +104,9 @@ public class WalkBikeRouting {
 		RoutingModule routingModuleWalk = tripRouter.getRoutingModule("walk");
 		RoutingModule routingModuleBike = tripRouter.getRoutingModule("bike");
 
-		BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/geo_coded_fucker.txt");
+		BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/geo_coded_SC_wave1_referencevalues_sexyage_1008.txt");
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/walkbike_fucker.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/walkbike_wave1_sexyage_1008.txt");
 
 		NetworkImpl subNetworkWalk = NetworkImpl.createNetwork();
 		Set<String> restrictions = new HashSet<>();

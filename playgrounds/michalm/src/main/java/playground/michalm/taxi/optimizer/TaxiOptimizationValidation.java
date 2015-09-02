@@ -19,10 +19,11 @@
 
 package playground.michalm.taxi.optimizer;
 
+import com.google.common.collect.Iterables;
+
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-import playground.michalm.taxi.util.TaxicabUtils;
 
 
 public class TaxiOptimizationValidation
@@ -30,14 +31,16 @@ public class TaxiOptimizationValidation
     public static void assertNoUnplannedRequestsWhenIdleVehicles(
             TaxiOptimizerConfiguration optimConfig)
     {
-        TaxiData taxiData = (TaxiData)optimConfig.context.getVrpData();
+        ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
 
-        if (TaxicabUtils.countVehicles(taxiData.getVehicles(),
-                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)) == 0) {
+        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+
+        if (vehCount == 0) {
             return;//OK
         }
 
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests(),
+        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
                 TaxiRequestStatus.UNPLANNED) == 0) {
             return; //OK
         }

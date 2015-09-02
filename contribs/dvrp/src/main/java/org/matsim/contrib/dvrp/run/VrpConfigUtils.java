@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.run;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dynagent.run.DynConfigUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 
 public class VrpConfigUtils

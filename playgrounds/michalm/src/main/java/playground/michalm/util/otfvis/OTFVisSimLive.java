@@ -41,8 +41,8 @@ public class OTFVisSimLive
             cfgFile = args[1];
         }
         else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+            throw new IllegalArgumentException(
+                    "Incorrect program arguments: " + Arrays.toString(args));
         }
 
         OTFVis.playConfig(dir + cfgFile);

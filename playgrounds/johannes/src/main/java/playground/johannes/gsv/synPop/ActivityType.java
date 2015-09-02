@@ -25,22 +25,34 @@ package playground.johannes.gsv.synPop;
  */
 public interface ActivityType {
 
-	public static final String HOME = "home";
+	String HOME = "home";
 
-	public static final String WORK = "work";
+	String WORK = "work";
 	
-	public static final String BUSINESS = "buisiness";
+	String BUSINESS = "buisiness";
 	
-	public static final String LEISURE = "leisure";
+	String LEISURE = "leisure";
 	
-	public static final String EDUCATION = "edu";
+	String EDUCATION = "edu";
 	
-	public static final String SHOP = "shop";
+	String SHOP = "shop";
 	
-	public static final String MISC = "misc";
+	String MISC = "misc";
 
 	String VACATIONS_SHORT = "vacations_short";
 
 	String VACATIONS_LONG = "vacations_long";
+
+	String VISIT = "visit";
+
+	String CULTURE = "culture";
+
+	String SPORT = "sport";
+
+	String GASTRO = "gastro";
+
+	String PRIVATE = "private";
+
+	String PICKDROP = "pickdrop";
 	
 }

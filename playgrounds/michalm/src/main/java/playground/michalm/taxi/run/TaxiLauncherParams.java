@@ -38,7 +38,7 @@ class TaxiLauncherParams
     String taxiCustomersFile;
     String taxisFile;
     String ranksFile;
-    
+
     String zonesXmlFile;
     String zonesShpFile;
 
@@ -57,6 +57,8 @@ class TaxiLauncherParams
     Double pickupDuration;
     Double dropoffDuration;
 
+    Boolean batteryChargingDischarging;
+
     Boolean otfVis;
 
     String outputDir;
@@ -71,6 +73,10 @@ class TaxiLauncherParams
     public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
 
 
+    TaxiLauncherParams()
+    {}
+
+
     TaxiLauncherParams(Map<String, String> params)
     {
         this.params = params;
@@ -82,7 +88,7 @@ class TaxiLauncherParams
         taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
         ranksFile = getInputPath("ranksFile");
         taxisFile = getInputPath("taxisFile");
-        
+
         zonesXmlFile = getInputPath("zonesXmlFile");
         zonesShpFile = getInputPath("zonesShpFile");
 
@@ -105,6 +111,8 @@ class TaxiLauncherParams
 
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
+
+        batteryChargingDischarging = getBoolean("batteryChargingDischarging");
 
         otfVis = getBoolean("otfVis");
 

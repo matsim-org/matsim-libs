@@ -24,17 +24,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.invermo.InvermoKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Set;
 
@@ -42,7 +39,7 @@ import java.util.Set;
  * @author johannes
  *
  */
-public class InitializeTargetDistance implements ProxyPlanTask {
+public class InitializeTargetDistance implements EpisodeTask {
 
 	private final GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 	
@@ -92,7 +89,7 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	public static void main(String args[]) {
 		Logger logger = Logger.getLogger(InitializeTargetDistance.class);
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 	
 		parser.addToBlacklist("workLoc");
@@ -109,11 +106,11 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 		
 		logger.info("Loading persons...");
 		parser.parse("/home/johannes/gsv/invermo/5.pop.xml");
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
-//		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
-		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
+//		TaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+		TaskRunner.run(new InitializeTargetDistance(), persons);
 		
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/5.pop.dist.xml", persons);

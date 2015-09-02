@@ -19,15 +19,14 @@
 
 package playground.johannes.gsv.qlik;
 
-import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  */
-public class CopyActTypeAttributes implements ProxyPlanTask {
+public class CopyActTypeAttributes implements EpisodeTask {
 
     public static final String PREV_ACT_TYPE = "prevType";
 

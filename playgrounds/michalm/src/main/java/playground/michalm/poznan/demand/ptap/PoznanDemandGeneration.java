@@ -38,14 +38,14 @@ public class PoznanDemandGeneration
     public void generate(String inputDir, String plansFile, String transportMode)
     {
         String networkFile = inputDir + "Matsim_2015_02/only_A/pt_network.xml";
-//        String networkFile = inputDir + "Matsim_2015_02/Poznan_2015_02_05_all.xml";
-        
+        //        String networkFile = inputDir + "Matsim_2015_02/Poznan_2015_02_05_all.xml";
+
         String zonesXmlFile = inputDir + "Matsim_2015_02/zones.xml";
         String zonesShpFile = inputDir + "Osm_2015_02/zones.SHP";
-        
+
         String demandDir = inputDir + "Visum_2014/demand/";
-//        String hourlySharesFile = demandDir + "hourly_shares_KI.txt";
-//        String bindingsFile = demandDir + "bindings_KI-poj.txt";
+        //        String hourlySharesFile = demandDir + "hourly_shares_KI.txt";
+        //        String bindingsFile = demandDir + "bindings_KI-poj.txt";
         String hourlySharesFile = demandDir + "hourly_shares_KZ.txt";
         String activityPairsFile = demandDir + "activity_pairs_KZ.txt";
         String bindingsFile = demandDir + "bindings_KZ.txt";
@@ -55,7 +55,7 @@ public class PoznanDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
         ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, false);
 
@@ -79,8 +79,8 @@ public class PoznanDemandGeneration
             int countBefore = scenario.getPopulation().getPersons().size();
 
             for (int i = 0; i < shares.length; i++) {
-                dg.generateSinglePeriod(odMatrix, activityPair.getFirst(),
-                        activityPair.getSecond(), transportMode, i * 3600, 3600, shares[i]);
+                dg.generateSinglePeriod(odMatrix, activityPair.getFirst(), activityPair.getSecond(),
+                        transportMode, i * 3600, 3600, shares[i]);
             }
 
             int countAfter = scenario.getPopulation().getPersons().size();
@@ -95,12 +95,12 @@ public class PoznanDemandGeneration
     public static void main(String[] args)
     {
         String inputDir = "d:/GoogleDrive/Poznan/";
-//        String plansFile = "d:/PP-rad/poznan/test/pt_plans.xml.gz";
-//        String transportMode = TransportMode.pt;
-        
+        //        String plansFile = "d:/PP-rad/poznan/test/pt_plans.xml.gz";
+        //        String transportMode = TransportMode.pt;
+
         String plansFile = "d:/PP-rad/poznan/test/KI-poj_plans.xml.gz";
         String transportMode = TransportMode.car;
-        
+
         new PoznanDemandGeneration().generate(inputDir, plansFile, transportMode);
     }
 }

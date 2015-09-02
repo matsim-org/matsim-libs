@@ -20,12 +20,10 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,19 +43,19 @@ public class CopyAttributes {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 //		subsample = true;
 		parser.parse(args[0]);
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
-		parser = new XMLParser();
+		parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 //		subsample = false;
 		parser.parse(args[1]);
 
 		Map<String, PlainPerson> templates = new HashMap<>();
-		for (PlainPerson person : parser.getPersons()) {
+		for (PlainPerson person : (Set<PlainPerson>)parser.getPersons()) {
 			String id = person.getId(); // extractId(person);
 			templates.put(id, person);
 		}

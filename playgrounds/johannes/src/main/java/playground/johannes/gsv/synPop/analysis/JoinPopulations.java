@@ -20,8 +20,9 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
@@ -36,18 +37,18 @@ public class JoinPopulations {
 	private static final Logger logger = Logger.getLogger(JoinPopulations.class);
 	
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons 1...");
 		parser.parse(args[0]);
-		Set<PlainPerson> persons = new HashSet<>(parser.getPersons());
+		Set<PlainPerson> persons = new HashSet<>((Set<PlainPerson>)parser.getPersons());
 		
 		logger.info("Loading persons 2...");
-		parser = new XMLParser();
+		parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[1]);
-		persons.addAll(parser.getPersons());
+		persons.addAll((Set<PlainPerson>)parser.getPersons());
 		
 		logger.info("Writing persons...");
 		XMLWriter writer = new XMLWriter();

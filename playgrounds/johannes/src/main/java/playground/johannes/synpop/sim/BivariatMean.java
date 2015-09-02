@@ -25,9 +25,9 @@ import gnu.trove.TIntIntHashMap;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.data.CachedElement;
-import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
@@ -43,7 +43,11 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private Object yDataKey;
 
-    private Discretizer xDataDiscr;
+    private final String xAttrKey;
+
+    private final String yAttrKey;
+
+    private final Discretizer xDataDiscr;
 
     private DynamicDoubleArray referenceValues;
 
@@ -55,8 +59,10 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     public BivariatMean(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
-        this.xDataKey = Converters.getObjectKey(xAttrKey);
-        this.yDataKey = Converters.getObjectKey(yAttrKey);
+//        this.xDataKey = Converters.getObjectKey(xAttrKey);
+//        this.yDataKey = Converters.getObjectKey(yAttrKey);
+        this.xAttrKey = xAttrKey;
+        this.yAttrKey = yAttrKey;
         this.xDataDiscr = xDataDiscr;
 
         initReferenceValues(refElements, xAttrKey, yAttrKey);
@@ -127,11 +133,14 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
     }
 
     @Override
-    public void onChange(Object dataKey, double oldValue, double newValue, CachedElement person) {
-        if(dataKey.equals(yDataKey)) {
-            onYValueChange(oldValue, newValue, person);
-        } else if(dataKey.equals(xDataKey)) {
-            onXValueChange(oldValue, newValue, person);
+    public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
+        if(xDataKey == null) xDataKey = Converters.getObjectKey(xAttrKey);
+        if(yDataKey == null) yDataKey = Converters.getObjectKey(yAttrKey);
+
+        if(yDataKey.equals(dataKey)) {
+            onYValueChange((Double)oldValue, (Double)newValue, person);
+        } else if(xDataKey.equals(dataKey)) {
+            onXValueChange((Double) oldValue, (Double) newValue, person);
         }
     }
 
@@ -181,7 +190,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
     }
 
     @Override
-    public double evaluate(PlainPerson person) {
+    public double evaluate(Person person) {
         return hamiltonianValue;
     }
 

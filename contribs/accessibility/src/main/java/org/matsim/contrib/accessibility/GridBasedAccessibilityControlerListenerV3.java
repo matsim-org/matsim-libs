@@ -109,8 +109,7 @@ import java.util.TreeMap;
  * @author thomas
  * 
  */
-public final class GridBasedAccessibilityControlerListenerV3
-		implements ShutdownListener {
+public final class GridBasedAccessibilityControlerListenerV3 implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	private final AccessibilityCalculator accessibilityControlerListener = new AccessibilityCalculator();
 	private final List<SpatialGridDataExchangeInterface> spatialGridDataExchangeListener = new ArrayList<>();
@@ -183,14 +182,20 @@ public final class GridBasedAccessibilityControlerListenerV3
 			file.mkdirs();
 		}
 		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
+		log.warn("here-1") ;
 		if (urbanSimMode) {
 			if (outputSubdirectory == null) {
+				log.warn("here0");
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
 				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
 			} else {
+				log.warn("here0b");
+				System.exit(-1) ;
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
 			}
+			// yyyy having the above depend on the existence of outputSubdirectory is too indirect ... could you pls use a boolean switch 
+			// with a "telling" name?  thanks.  kai, aug'15
 		}
 		accessibilityControlerListener.initDefaultContributionCalculators(event.getControler());
 

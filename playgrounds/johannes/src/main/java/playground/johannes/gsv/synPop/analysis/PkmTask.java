@@ -20,10 +20,7 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,10 +40,10 @@ public class PkmTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
-		for (PlainPerson person : persons) {
-			Episode plan = person.getPlan();
+		for (Person person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
@@ -56,7 +53,7 @@ public class PkmTask extends AnalyzerTask {
 
 		for (String purpose : purposes) {
 			double pkm = 0;
-			for (PlainPerson person : persons) {
+			for (Person person : persons) {
 				Episode plan = person.getEpisodes().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {

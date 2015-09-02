@@ -25,11 +25,12 @@ import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -55,7 +56,7 @@ public class SetActivityLocations {
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, args[0]);
 
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		parser.addToBlacklist("workLoc");
@@ -73,20 +74,20 @@ public class SetActivityLocations {
 
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		logger.info("Replacing activity types...");
-		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
+		TaskRunner.run(new ReplaceActTypes(), persons);
 
 		logger.info("Calculating geo distances from route distances...");
 		double A = Double.parseDouble(config.getParam(MODULE_NAME, "A"));
 		double alpha = Double.parseDouble(config.getParam(MODULE_NAME, "alpha"));
 		double min = Double.parseDouble(config.getParam(MODULE_NAME, "min"));
-		ProxyTaskRunner.run(new Route2GeoDistance(A, alpha, min), persons);
+		TaskRunner.run(new Route2GeoDistance(A, alpha, min), persons);
 
 		logger.info("Truncating distances...");
-		ProxyTaskRunner.run(new TruncateDistances(1000000), persons);
+		TaskRunner.run(new TruncateDistances(1000000), persons);
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));

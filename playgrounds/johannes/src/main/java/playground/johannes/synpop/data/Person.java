@@ -28,7 +28,9 @@ public interface Person extends Attributable {
 
     String getId();
 
-    public List<Episode> getEpisodes();
+    List<? extends Episode> getEpisodes();
 
-    public void addEpisode(Episode episode);
+    void addEpisode(Episode episode);
+
+    void removeEpisode(Episode episode);
 }

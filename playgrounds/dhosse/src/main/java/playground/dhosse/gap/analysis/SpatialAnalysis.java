@@ -1,25 +1,30 @@
 package playground.dhosse.gap.analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory.Builder;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.counts.Counts;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dhosse.gap.scenario.GAPMain;
-import playground.michalm.util.postprocess.LinkStatsReader;
-import playground.michalm.util.postprocess.LinkStatsReader.LinkStats;
+import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.dhosse.gap.Global;
 
 public class SpatialAnalysis {
 
@@ -29,7 +34,7 @@ public class SpatialAnalysis {
 		new MatsimPopulationReader(scenario).parse(plansFile);
 
 		Builder builder = new Builder();
-		builder.setCrs(MGC.getCRS(GAPMain.toCrs));
+		builder.setCrs(MGC.getCRS(Global.toCrs));
 		builder.addAttribute("personId", String.class);
 		builder.addAttribute("actType", String.class);
 		PointFeatureFactory pff = builder.create();
@@ -52,17 +57,44 @@ public class SpatialAnalysis {
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, "/home/dhosse/Dokumente/01_eGAP/MATSim_input/pop.shp");
+		ShapeFileWriter.writeGeometries(features, outputShapefile);
 		
 	}
 	
-	public static void createLinkWithVolumes(String linkStatsFile, String outputShapefile){
+	public static void writeNetworkToShape(String networkFile, String outputShapefile){
 		
-		List<? extends LinkStats> linkStatsList = LinkStatsReader.readLinkStats(linkStatsFile);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		for(LinkStats linkStats : linkStatsList){
-			//TODO
+		Network network = scenario.getNetwork();
+		
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		
+		org.matsim.core.utils.gis.PolylineFeatureFactory.Builder builder = new PolylineFeatureFactory.Builder();
+		builder.setCrs(MGC.getCRS(Global.toCrs));
+		builder.addAttribute("id", String.class);
+		builder.addAttribute("length", Double.class);
+		builder.addAttribute("capacity", Double.class);
+		builder.addAttribute("freespeed", Double.class);
+		builder.addAttribute("nLanes", Double.class);
+		PolylineFeatureFactory factory = builder.create();
+		
+		List<SimpleFeature> features = new ArrayList<>();
+		
+		for(Link link : network.getLinks().values()){
+			
+			Map<String, Object> atts = new HashMap<>();
+			atts.put("id", link.getId().toString());
+			atts.put("length", link.getLength());
+			atts.put("capacity", link.getCapacity());
+			atts.put("freespeed", link.getFreespeed());
+			atts.put("nLanes", link.getNumberOfLanes());
+			
+			features.add(factory.createPolyline(new Coordinate[]{MGC.coord2Coordinate(link.getFromNode().getCoord()),
+					MGC.coord2Coordinate(link.getToNode().getCoord())}, atts, link.getId().toString()));
+			
 		}
+		
+		ShapeFileWriter.writeGeometries(features, outputShapefile);
 		
 	}
 	

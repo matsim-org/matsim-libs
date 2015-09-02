@@ -26,6 +26,7 @@ import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.InterpolatingDiscretizer;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -126,7 +127,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public double evaluate(PlainPerson person) {
+	public double evaluate(Person person) {
 //		return currentDelta;
 		return fullDiff();
 	}
@@ -135,7 +136,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 	 * @see playground.johannes.gsv.synPop.sim3.SamplerListener#afterStep(java.util.Collection, java.util.Collection, boolean)
 	 */
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		// TODO Auto-generated method stub
 
 	}

@@ -21,13 +21,15 @@ package playground.johannes.gsv.synPop;
 
 
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class Convert2MatsimModes implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {

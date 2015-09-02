@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim;
 
 import playground.johannes.gsv.synPop.sim3.Mutator;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public abstract class AttributeMutator implements Mutator {
 
 	private final Random random;
 
-	private final ArrayList<PlainPerson> mutations;
+	private final ArrayList<Person> mutations;
 
 	private Double prevValue;
 
@@ -55,14 +56,14 @@ public abstract class AttributeMutator implements Mutator {
 	}
 
 	@Override
-	public List<PlainPerson> select(List<PlainPerson> persons) {
+	public List<Person> select(List<Person> persons) {
 		mutations.set(0, persons.get(random.nextInt(persons.size())));
 		return mutations;
 	}
 
 	@Override
-	public boolean modify(List<PlainPerson> persons) {
-		PlainPerson person = persons.get(0);
+	public boolean modify(List<Person> persons) {
+		PlainPerson person = (PlainPerson)persons.get(0);
 		prevValue = getAttribute(person, strKey, objKey);
 		double newValue = newValue(person);
 		person.setUserData(objKey, newValue);
@@ -73,8 +74,8 @@ public abstract class AttributeMutator implements Mutator {
 	}
 
 	@Override
-	public void revert(List<PlainPerson> persons) {
-		PlainPerson person = persons.get(0);
+	public void revert(List<Person> persons) {
+		PlainPerson person = (PlainPerson)persons.get(0);
 
 		double val = getAttribute(person, strKey, objKey);
 		person.setUserData(objKey, prevValue);

@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;

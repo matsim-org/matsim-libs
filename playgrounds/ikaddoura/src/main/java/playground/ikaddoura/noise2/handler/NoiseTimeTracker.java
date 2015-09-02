@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -442,13 +443,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			int nHdvAgents = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 				nHdvAgents = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsEntering();
-			}
+			}	
 			
-			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
-			double vHdv = vCar;
-				
-			// If different speeds for different vehicle types have to be considered, adapt the calculation here.
-			// For example, a maximum speed for hdv-vehicles could be set here (for instance for German highways) 
+			Tuple<Double, Double> vCarVHdv = getV(linkId);
+			double vCar = vCarVHdv.getFirst();
+			double vHdv = vCarVHdv.getSecond();
 				
 			double lCar = NoiseEquations.calculateLCar(vCar);
 			double lHdv = NoiseEquations.calculateLHdv(vHdv);
@@ -519,18 +518,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> thisLink : rp.getLinkId2IsolatedImmission().keySet()) {
 										
-//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
-//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
-//					
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.putAll(rp.getLinkId2IsolatedImmission());
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.putAll(rp.getLinkId2IsolatedImmission());
-//					
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
-//										
-//					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
-//					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
-					
 					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), rp.getLinkId2IsolatedImmission().get(thisLink), rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
 					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), rp.getLinkId2IsolatedImmission().get(thisLink), rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
 					
@@ -743,42 +730,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	 */
 	private void calculateNoiseEmission() {
 				
-		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()){
-			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
-			double vHdv = vCar;
-						
-			double freespeedCar = vCar;
-
-			if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-				
-				// use the actual speed level if possible
-				if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-					
-					// Car
-					if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() == 0) {
-						// use the maximum speed level
-						
-					} else {
-						double averageTravelTimeCar_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() / this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving();	
-						vCar = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeCar_sec );
-					}
-					
-					// HGV
-					if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving() == 0) {
-						// use the actual car speed level
-						vHdv = vCar;
-		
-					} else {
-						double averageTravelTimeHGV_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() / this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving();
-						vHdv = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeHGV_sec );
-					}		
-					
-				}
-			}
-					
-			if (vCar > freespeedCar) {
-				throw new RuntimeException(vCar + " > " + freespeedCar + ". This should not be possible. Aborting...");
-			}
+		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
+			
+			Tuple<Double, Double> vCarVHdv = getV(linkId);
+			double vCar = vCarVHdv.getFirst();
+			double vHdv = vCarVHdv.getSecond();
 							
 			double noiseEmission = 0.;
 			double noiseEmissionPlusOneCar = 0.;
@@ -850,6 +806,68 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		}
 	}
 	
+	private Tuple<Double, Double> getV(Id<Link> linkId) {
+		
+		double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
+		double vHdv = vCar;
+					
+		double freespeedCar = vCar;
+
+		if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+			
+			// use the actual speed level if possible
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				
+				// Car
+				if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() == 0) {
+					// use the maximum speed level
+					
+				} else {
+					double averageTravelTimeCar_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() / this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving();	
+					vCar = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeCar_sec );
+				}
+				
+				// HGV
+				if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving() == 0) {
+					// use the actual car speed level
+					vHdv = vCar;
+	
+				} else {
+					double averageTravelTimeHGV_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() / this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving();
+					vHdv = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeHGV_sec );
+				}		
+			}
+		}
+				
+		if (vCar > freespeedCar) {
+			throw new RuntimeException(vCar + " > " + freespeedCar + ". This should not be possible. Aborting...");
+		}
+		
+		if (this.noiseContext.getNoiseParams().isAllowForSpeedsOutsideTheValidRange() == false) {
+			
+			// shifting the speed into the allowed range defined by the RLS-90 computation approach
+			
+			if (vCar < 30.) {
+				vCar = 30.;
+			}
+			
+			if (vHdv < 30.) {
+				vHdv = 30.;
+			}
+			
+			if (vCar > 130.) {
+				vCar = 130.;
+			}
+			
+			if (vHdv > 80.) {
+				vHdv = 80.;
+			}
+		}
+		
+		Tuple<Double, Double> vCarVHdv = new Tuple<>(vCar, vHdv);
+		return vCarVHdv;
+	}
+
 	public void computeFinalTimeIntervals() {
 		
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= 30 * 3600.) {

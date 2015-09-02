@@ -20,7 +20,7 @@
 package playground.michalm.taxi.vehreqpath;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.michalm.taxi.data.TaxiRequest;
 

@@ -47,7 +47,7 @@ public class CachedPerson extends CachedElement implements Person {
     }
 
     @Override
-    public List<Episode> getEpisodes() {
+    public List<? extends Episode> getEpisodes() {
         return episodes;
 //        return ((Person)getDelegate()).getEpisodes();
     }
@@ -56,5 +56,10 @@ public class CachedPerson extends CachedElement implements Person {
     public void addEpisode(Episode episode) {
         throw new UnsupportedOperationException("Structural modification not allowed.");
 //        ((Person)getDelegate()).addEpisode(episode);
+    }
+
+    @Override
+    public void removeEpisode(Episode episode) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
     }
 }

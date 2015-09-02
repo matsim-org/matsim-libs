@@ -57,6 +57,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -78,13 +79,12 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public class CongestionHandlerImplV4  implements
+public final class CongestionHandlerImplV4  implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 PersonDepartureEventHandler,
 PersonArrivalEventHandler,
-PersonStuckEventHandler,
-ActivityEndEventHandler
+PersonStuckEventHandler
 {
 
 	final static Logger log = Logger.getLogger(CongestionHandlerImplV4.class);
@@ -92,13 +92,15 @@ ActivityEndEventHandler
 	private final EventsManager events;
 	private final List<Id<Vehicle>> nonCarVehicleIDs = new ArrayList<Id<Vehicle>>();
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<>();
-	private Map<Id<Person>, List<Tuple<String, Double>>> personId2ActType2ActEndTime = new HashMap<>();
 	private int roundingErrorWarnCount =0;
 	private int sameAffectedCausingAgentWarnCount =0;
 
 	private double totalInternalizedDelay = 0.0;
 	private double totalDelay = 0.0;
 	private double delayNotInternalized_roundingErrors = 0.0;
+
+	private Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
+	private Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -122,7 +124,6 @@ ActivityEndEventHandler
 		this.totalInternalizedDelay = 0.0;
 		this.delayNotInternalized_roundingErrors = 0.0;
 		this.linkId2congestionInfo.clear();
-		this.personId2ActType2ActEndTime.clear();
 
 		storeLinkInfo();
 	}
@@ -143,19 +144,6 @@ ActivityEndEventHandler
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		//require for the multiple next link in route of the same person
-		if(personId2ActType2ActEndTime.containsKey(event.getPersonId())){
-			List<Tuple<String, Double>> listSoFar = personId2ActType2ActEndTime.get(event.getPersonId());
-			listSoFar.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
-		} else {
-			List<Tuple<String, Double>> listNow = new ArrayList<Tuple<String,Double>>();
-			listNow.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
-			personId2ActType2ActEndTime.put(event.getPersonId(), listNow);
-		}
-	}
-
-	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects "
 				+ "because there are no linkLeaveEvents for stucked agents.: \n" + event.toString());
@@ -171,6 +159,14 @@ ActivityEndEventHandler
 		} else {
 			this.nonCarVehicleIDs.add(Id.create(event.getPersonId(),Vehicle.class));
 		}
+		//--
+		final Integer cnt = this.personId2legNr.get( event.getPersonId() );
+		if ( cnt == null ) {
+			this.personId2legNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
+		} else {
+			this.personId2legNr.put( event.getPersonId(), cnt + 1 ) ; 
+		}
+		this.personId2linkNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
 	}
 	
 	@Override
@@ -191,6 +187,10 @@ ActivityEndEventHandler
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		}	
+		// ---
+		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
+		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
+		
 	}
 
 	@Override
@@ -220,6 +220,59 @@ ActivityEndEventHandler
 		}
 	}
 
+	private void updateAgentsTracking(LinkLeaveEvent event){
+		
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+
+		Map<Id<Person>,Double> personId2FreeSpeedTime = linkInfo.getPersonId2freeSpeedLeaveTime();
+		
+		double minTimeHeadway = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+
+		List<Id<Person>> agentsAlreadyLeft = new ArrayList<Id<Person>>(linkInfo.getLeavingAgents()); 
+		Collections.reverse(agentsAlreadyLeft);
+		// (leavingAgents is something like all agents in queue before current agent)
+		
+		// if the difference between free speed leave time of two agents is more than min time headway, no delay 
+		double freeSpeedLeaveTimeOfNowAgent = personId2FreeSpeedTime.get(Id.createPersonId(event.getVehicleId()));
+		
+		for( Id<Person> agentId : agentsAlreadyLeft ){
+			// (so we go through some (see below) agents in queue before current agent ...)
+			
+			double freeSpeedLeaveTimeAgentInList = personId2FreeSpeedTime.get(agentId);
+			double timeHeadway = freeSpeedLeaveTimeOfNowAgent - freeSpeedLeaveTimeAgentInList;
+			
+			if (timeHeadway < minTimeHeadway){
+				linkInfo.getAgentsCausingFlowDelays().add(agentId);
+				// (... and add them to the agents causing FLOW delays if their time headway is small)
+				// yyyy but I don't find the timeHeadway < minTimeHeadway very logical.  This can really
+				// only happen if there is spillback and downstream fluctuations (movement from buffer
+				// across node). kai, sep'15
+			}
+			freeSpeedLeaveTimeOfNowAgent = freeSpeedLeaveTimeAgentInList;
+		}
+		
+		if (linkInfo.getLeavingAgents().size() != 0) {
+			// Clear tracking of persons leaving that link previously.
+			double lastLeavingFromCurrentLink = linkInfo.getLastLeaveTime();
+			double earliestLeaveTime = lastLeavingFromCurrentLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+			
+			if (event.getTime() > Math.floor(earliestLeaveTime)+1 ){// Flow congestion has disappeared on that link.
+				// Deleting the information of agents previously leaving that link.
+				// yyyy however, agentsCausingFlowDelays will survive?!?!
+				linkInfo.getLeavingAgents().clear();
+			}
+		}
+		
+		/*
+		 *  TODO [AA] Might be make more sense to store persons only in one map (getAgentsCausingFlowDelays) and
+		 *  use the above if statement to get the spill back causing link.
+		 */
+		
+		//remove agents present in both the lists to avoid duplicate congestion events.		
+		linkInfo.getAgentsCausingFlowDelays().removeAll(linkInfo.getLeavingAgents());
+	}
+	
+	
 	/**
 	 * @param event
 	 */
@@ -251,7 +304,7 @@ ActivityEndEventHandler
 				}
 			}
 			// get spill back causing link now
-			Id<Link> spillBackCausingLink = getNextLinkInRoute(delayedPerson, event.getLinkId());
+			Id<Link> spillBackCausingLink = getNextLinkInRoute(delayedPerson);
 			// remove previous occurance of this spillback causing link if any in order to update the order
 			if(linkInfo.getSpillBackCausingLinks().contains(spillBackCausingLink)) linkInfo.getSpillBackCausingLinks().remove(spillBackCausingLink);	
 			linkInfo.getSpillBackCausingLinks().add(spillBackCausingLink);  			
@@ -293,49 +346,6 @@ ActivityEndEventHandler
 			log.warn("Delay to pay for is "+delayToPayFor+". Including them in non Internalizing delays. This happened during event \n "+event.toString());
 		}
 	}
-
-	private void updateAgentsTracking(LinkLeaveEvent event){
-
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		Map<Id<Person>,Double> personId2FreeSpeedTime = linkInfo.getPersonId2freeSpeedLeaveTime();
-
-		double minTimeHeadway = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-		List<Id<Person>> agentsAlreadyLeft = new ArrayList<Id<Person>>(linkInfo.getLeavingAgents()); 
-		Collections.reverse(agentsAlreadyLeft);
-
-		// if the difference between free speed leave time of two agents is more than min time headway, no delay 
-		double freeSpeedLeaveTimeOfNowAgent = personId2FreeSpeedTime.get(Id.createPersonId(event.getVehicleId()));
-
-		for(int i=0; i < agentsAlreadyLeft.size();i++){
-			Id<Person> agentId = agentsAlreadyLeft.get(i);
-			double freeSpeedLeaveTimeAgentInList = personId2FreeSpeedTime.get(agentId);
-			double timeHeadway = freeSpeedLeaveTimeOfNowAgent - freeSpeedLeaveTimeAgentInList;
-
-			if (timeHeadway < minTimeHeadway){
-				linkInfo.getAgentsCausingFlowDelays().add(agentId);
-			}
-			freeSpeedLeaveTimeOfNowAgent = freeSpeedLeaveTimeAgentInList;
-		}
-
-		if (linkInfo.getLeavingAgents().size() != 0) {
-			// Clear tracking of persons leaving that link previously.
-			double lastLeavingFromCurrentLink = linkInfo.getLastLeaveTime();
-			double earliestLeaveTime = lastLeavingFromCurrentLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-
-			if (event.getTime() > Math.floor(earliestLeaveTime)+1 ){// Flow congestion has disappeared on that link.
-				// Deleting the information of agents previously leaving that link.
-				linkInfo.getLeavingAgents().clear();
-			}
-		}
-
-		/*
-		 *  TODO [AA] Might be make more sense to store persons only in one map (getAgentsCausingFlowDelays) and
-		 *  use the above if statement to get the spill back causing link.
-		 */
-		//remove agents present in both the lists to avoid duplicate congestion events.		
-		linkInfo.getAgentsCausingFlowDelays().removeAll(linkInfo.getLeavingAgents());
-	}
-
 
 	private void identifyAndProcessSpillBackCausingLink(LinkLeaveEvent event, LinkCongestionInfo linkCongestionInfo){
 
@@ -436,62 +446,10 @@ ActivityEndEventHandler
 		linkInfo.getPersonId2DelaysToPayFor().put(delayedPerson, delayToPayFor);
 	}
 
-	/**
-	 * @return next link in the route of the person, which is currently on given link.
-	 */
-	private Id<Link> getNextLinkInRoute(Id<Person> personId, Id<Link> linkId){
+	private Id<Link> getNextLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
-
-		List<Tuple<String, Double>> personActInfos = personId2ActType2ActEndTime.get(personId);
-		int numberOfActEnded = personActInfos.size();
-
-		String currentAct = personId2ActType2ActEndTime.get(personId).get(numberOfActEnded-1).getFirst();
-		int noOfOccuranceOfCurrentAct = 0;
-
-		SortedSet<Double> actEndTimes = new TreeSet<Double>();
-
-		for(int i =0;i<numberOfActEnded;i++){ // last stored act is currentAct
-			Tuple<String, Double> actInfo = personId2ActType2ActEndTime.get(personId).get(i);
-			if(currentAct.equals(actInfo.getFirst())) {
-				actEndTimes.add(actInfo.getSecond());
-				noOfOccuranceOfCurrentAct++;
-			}
-		}
-
-		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
-		int actIndex = 0;
-
-		for(PlanElement pe :planElements){
-			if(pe instanceof Activity && actIndex < noOfOccuranceOfCurrentAct){
-				if(((Activity)pe).getType().equals(currentAct)) actIndex ++;	
-			}
-
-			if(pe instanceof Leg && actIndex == noOfOccuranceOfCurrentAct){
-				/*
-				 * The following is necessary where a person makes several trips with different modes and thus non car trips are not instance of NetworkRoute.
-				 */
-				if(!((Leg)pe).getMode().equals(TransportMode.car)) continue; 
-
-				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
-				routeLinks.add(nRoute.getStartLinkId());
-				routeLinks.addAll(nRoute.getLinkIds());  
-				routeLinks.add(nRoute.getEndLinkId());
-				break;
-			}
-		}
-
-		Id<Link> nextLinkInRoute =  Id.create("NA",Link.class);
-		Iterator<Id<Link>> it = routeLinks.iterator();
-		do{
-			if(it.next().equals(linkId) && it.hasNext()){
-				nextLinkInRoute = it.next();
-				break;
-			}
-		} while(it.hasNext());
-
-		if (nextLinkInRoute.equals(Id.create("NA",Link.class))){ 
-			throw new RuntimeException("Next link in the route of person "+personId+" is not found. Person is on the link "+linkId+". Aborting ...");
-		} else return nextLinkInRoute;
+		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
+		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
 	}
 
 	public void writeCongestionStats(String fileName) {

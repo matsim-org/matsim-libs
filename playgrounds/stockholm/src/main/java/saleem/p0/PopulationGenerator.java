@@ -58,7 +58,7 @@ public class PopulationGenerator {
 		 */
 		
 		long key =1;
-		for(long i=1; i<700;i++){
+		for(long i=1; i<2400;i++){
 			key=i;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
@@ -75,7 +75,7 @@ public class PopulationGenerator {
 			 */
 			Coord homeCoordinates = sc.createCoord(686661.13571, 4827510.51845);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600 + i*5.143); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
+			activity1.setEndTime(21600 + i*1.5); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			
@@ -99,14 +99,14 @@ public class PopulationGenerator {
 
 		}
 		
-		 for(long i=1; i<600;i++){
-			key=i+700;
+		 for(long i=1; i<1800;i++){
+			key=i+2400;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
 			Plan plan = populationFactory.createPlan();
 			Coord homeCoordinates = sc.createCoord(686661.13571, 4826063.88649);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600+ i*6); // leave at 6 o'clock
+			activity1.setEndTime(21600+ i*2); // leave at 6 o'clock
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			plan.addLeg(populationFactory.createLeg("car"));

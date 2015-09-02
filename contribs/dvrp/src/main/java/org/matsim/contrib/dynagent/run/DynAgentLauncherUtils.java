@@ -22,17 +22,13 @@ package org.matsim.contrib.dynagent.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.*;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 public class DynAgentLauncherUtils
@@ -40,10 +36,10 @@ public class DynAgentLauncherUtils
     public static QSim initQSim(Scenario scenario)
     {
         EventsManager events = EventsUtils.createEventsManager();
-        return initQSim(scenario,events);
+        return initQSim(scenario, events);
     }
-    
-    
+
+
     public static QSim initQSim(Scenario scenario, EventsManager events)
     {
         QSim qSim = new QSim(scenario, events);
@@ -55,7 +51,7 @@ public class DynAgentLauncherUtils
         QNetsimEngineModule.configure(qSim);
 
         qSim.addMobsimEngine(new TeleportationEngine(scenario, events));
-        
+
         if (scenario.getConfig().network().isTimeVariantNetwork()) {
             qSim.addMobsimEngine(new NetworkChangeEventsEngine());
         }

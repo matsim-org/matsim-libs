@@ -22,8 +22,9 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
@@ -32,7 +33,7 @@ import playground.johannes.synpop.data.PlainElement;
 public class JourneyPurposeHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(PlainElement leg, Map<String, String> attributes) {
+	public void handle(Segment leg, Map<String, String> attributes) {
 		String purpose = attributes.get("p101");
 		
 		if(purpose.equalsIgnoreCase("Ausflug, Urlaub, Kurzreise zu touristischen Zielen")) {

@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.synpop.data.PlainPerson;
 

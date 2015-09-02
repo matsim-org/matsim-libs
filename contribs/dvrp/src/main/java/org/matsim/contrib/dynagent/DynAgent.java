@@ -93,8 +93,8 @@ public class DynAgent
             dynActivity = (DynActivity)nextDynAction;
             state = MobsimAgent.State.ACTIVITY;
 
-            events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity
-                    .getActivityType()));
+            events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null,
+                    dynActivity.getActivityType()));
         }
         else {
             dynLeg = (DynLeg)nextDynAction;
@@ -106,8 +106,8 @@ public class DynAgent
     @Override
     public void endActivityAndComputeNextState(double now)
     {
-        events.processEvent(new ActivityEndEvent(now, id, currentLinkId, null, dynActivity
-                .getActivityType()));
+        events.processEvent(
+                new ActivityEndEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
 
         computeNextAction(dynActivity, now);
     }

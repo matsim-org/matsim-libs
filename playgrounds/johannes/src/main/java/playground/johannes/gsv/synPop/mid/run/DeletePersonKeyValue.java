@@ -19,15 +19,15 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class DeletePersonKeyValue implements ProxyPersonTask {
+public class DeletePersonKeyValue implements PersonTask {
 
 	private final String key;
 	
@@ -39,7 +39,7 @@ public class DeletePersonKeyValue implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		String val = person.getAttribute(key);
 		if(!value.equalsIgnoreCase(val)) {
 			person.setAttribute(CommonKeys.DELETE, "true");

@@ -34,7 +34,7 @@ public class BerlinTaxiRankCreator
     private final static String RANKFILE = "C:/local_jb/data/network/taxiranks_greaterberlin-1.csv";
     private final static String OUTPUTFILE = "C:/local_jb/data/network/berlin_ranks.xml";
     private final static String OUTPUTFILETXT = "C:/local_jb/data/network/berlin_ranks.csv";
-
+    
 
     public static void main(String[] args)
     {
@@ -115,6 +115,7 @@ public class BerlinTaxiRankCreator
 class RankReader
     implements TabularFileHandler
 {
+    private final static int RANK_CAPACITY = 100;
 
     private NetworkImpl network;
     private List<TaxiRank> ranks = new ArrayList<TaxiRank>();
@@ -137,7 +138,7 @@ class RankReader
         if (id.equals("21"))
             link = network.getLinks().get(Id.create("-35954", Link.class));
         //Exception for Tegel Airport
-        TaxiRank rank = new TaxiRank(id, name, link);
+        TaxiRank rank = new TaxiRank(id, name, link, RANK_CAPACITY);
         ranks.add(rank);
     }
 

@@ -24,8 +24,7 @@ import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
 import static playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
 
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;

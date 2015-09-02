@@ -91,4 +91,8 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler {
 		}
 	}
 
+	public Map<Id<Link>, Integer> getLinkId2demand() {
+		return linkId2demand;
+	}
+
 }

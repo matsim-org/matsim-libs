@@ -36,11 +36,11 @@ import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.Utilities.Clustering.ClusterPoint;
 import playground.jjoubert.Utilities.Clustering.DJCluster;
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.jjoubert.Utilities.DateString;
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.MyXmlConverter;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileSampler;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;

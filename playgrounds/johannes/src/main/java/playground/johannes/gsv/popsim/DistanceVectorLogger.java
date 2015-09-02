@@ -20,7 +20,7 @@
 package playground.johannes.gsv.popsim;
 
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
 
@@ -34,7 +34,7 @@ public class DistanceVectorLogger implements SamplerListener {
 	 * @see playground.johannes.gsv.synPop.sim3.SamplerListener#afterStep(java.util.Collection, java.util.Collection, boolean)
 	 */
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		// TODO Auto-generated method stub
 
 	}

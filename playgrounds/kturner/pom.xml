@@ -21,11 +21,6 @@
 			<artifactId>freight</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.1</version>
-		</dependency>
 		<!--  Jsprit 1.4.2
 		<dependency>
 			<groupId>jsprit</groupId>

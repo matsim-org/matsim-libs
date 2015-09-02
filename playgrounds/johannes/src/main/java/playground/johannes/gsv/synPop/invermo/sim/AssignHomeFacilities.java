@@ -28,19 +28,20 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
  * 
  */
-public class AssignHomeFacilities implements ProxyPersonTask {
+public class AssignHomeFacilities implements PersonTask {
 
 	private final FacilityData facilities;
 
@@ -72,7 +73,8 @@ public class AssignHomeFacilities implements ProxyPersonTask {
 	}
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		String str = person.getAttribute("homeCoord");
 		ActivityFacility fac;
 		if(str != null) {

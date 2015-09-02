@@ -21,19 +21,23 @@ package playground.johannes.gsv.synPop;
 
 
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes
  *
  */
-public class DeleteOverlappingLegsTask implements ProxyPersonTask {
+public class DeleteOverlappingLegsTask implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person1) {
+		PlainPerson person = (PlainPerson)person1;
 		/*
 		 * Check for overlapping legs.
 		 */

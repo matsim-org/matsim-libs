@@ -84,8 +84,10 @@ public class TaxiRankHandler
             return;
         if (!this.isMonitoredVehicle(event.getPersonId()))
             return;
-        this.ranks.get(event.getLinkId()).addTaxi(vehicles.get(event.getPersonId()));
-
+        TaxiRank rank = this.ranks.get(event.getLinkId());
+        if (rank.hasCapacity()) {
+            rank.addTaxi(vehicles.get(event.getPersonId()));
+        }
     }
 
 

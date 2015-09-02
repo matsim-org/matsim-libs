@@ -27,9 +27,9 @@ import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.michalm.zone.*;
-
 import com.vividsolutions.jts.geom.*;
+
+import playground.michalm.zone.*;
 
 
 public class PoznanTaxiZoneReader

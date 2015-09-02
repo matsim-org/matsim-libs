@@ -59,6 +59,16 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
         return activities;
     }
 
+    public void removeActivity(Segment activity) {
+        activities.remove(activity);
+        ((PlainSegment)activity).setEpisode(null, false);
+    }
+
+    public void removeLeg(Segment leg) {
+        legs.remove(leg);
+        ((PlainSegment)leg).setEpisode(null, true);
+    }
+
     public PlainEpisode clone() {
         PlainEpisode clone = new PlainEpisode();
 //        clone.setPerson(person); not clear if should do this here.

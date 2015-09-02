@@ -20,15 +20,16 @@
 package playground.johannes.gsv.matrices.episodes2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  */
-public class InfereWeCommuter implements ProxyPlanTask {
+public class InfereWeCommuter implements EpisodeTask {
 
     public static final String WECOMMUTER = "wecommuter";
 
@@ -42,8 +43,8 @@ public class InfereWeCommuter implements ProxyPlanTask {
     public void apply(Episode plan) {
         String day = plan.getPerson().getAttribute(CommonKeys.DAY);
 
-        if(day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day
-                .equalsIgnoreCase(CommonKeys.SATURDAY) || day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
+        if(day.equalsIgnoreCase(CommonValues.THURSDAY) || day.equalsIgnoreCase(CommonValues.FRIDAY) || day
+                .equalsIgnoreCase(CommonValues.SATURDAY) || day.equalsIgnoreCase(CommonValues.SUNDAY)) {
 
             for(int i = 0; i < plan.getLegs().size(); i++) {
                 Attributable leg = plan.getLegs().get(i);

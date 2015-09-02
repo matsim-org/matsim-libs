@@ -27,8 +27,8 @@ public class WeightedRandomSelectionTable<R, C, V>
     public static <R, C, V> WeightedRandomSelectionTable<R, C, V> createWithArrayTable(
             Iterable<? extends R> rowKeys, Iterable<? extends C> colKeys)
     {
-        Table<R, C, WeightedRandomSelection<V>> selectionTable = ArrayTable
-                .create(rowKeys, colKeys);
+        Table<R, C, WeightedRandomSelection<V>> selectionTable = ArrayTable.create(rowKeys,
+                colKeys);
         return new WeightedRandomSelectionTable<R, C, V>(selectionTable);
     }
 

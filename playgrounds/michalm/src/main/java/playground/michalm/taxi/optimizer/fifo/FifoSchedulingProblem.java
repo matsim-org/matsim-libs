@@ -45,7 +45,7 @@ public class FifoSchedulingProblem
             TaxiRequest req = unplannedRequests.peek();
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles(), vrpCost);
+                    optimConfig.context.getVrpData().getVehicles().values(), vrpCost);
 
             if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
                 return;

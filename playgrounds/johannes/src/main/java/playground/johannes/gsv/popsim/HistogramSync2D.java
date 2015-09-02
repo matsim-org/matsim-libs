@@ -22,6 +22,7 @@ package playground.johannes.gsv.popsim;
 import gnu.trove.*;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Arrays;
@@ -188,7 +189,7 @@ public class HistogramSync2D implements Hamiltonian, HistogramSync {
 
 
     @Override
-    public double evaluate(PlainPerson person) {
+    public double evaluate(Person person) {
         return hValue;
 //        return calcFullDiff();
     }

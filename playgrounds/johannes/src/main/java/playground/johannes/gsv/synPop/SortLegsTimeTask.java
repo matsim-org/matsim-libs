@@ -1,14 +1,16 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class SortLegsTimeTask implements ProxyPlanTask {
+public class SortLegsTimeTask implements EpisodeTask {
 
 	private static final Logger logger = Logger.getLogger(SortLegsTimeTask.class);
 	
