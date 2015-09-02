@@ -32,7 +32,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -59,7 +62,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public final class CongestionHandlerImplV4  extends AbstractCongestionHandler {
+public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler{
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
@@ -71,6 +74,13 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler {
 	private EventsManager events ;
 	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLink = new HashMap<Id<Link>, List<Id<Link>>>();
 
+	public void handleEvent(PersonArrivalEvent event){
+		if(event.getLegMode().equals(TransportMode.car)) {
+			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
+		}
+	}
+	
+	
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
 
@@ -94,7 +104,16 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler {
 
 			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnThisLink);
 
-			if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0) allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
+			if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
+
+				double remainingStorageDelay = allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
+				if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
+				
+			} else {
+				
+				this.addToDelayNotInternalized_storageCapacity(storageDelay);
+			
+			}
 		}
 	}
 
@@ -129,7 +148,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler {
 		
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
-		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getEnteringAgents()); 
+		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2freeSpeedLeaveTime().keySet()); 
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();

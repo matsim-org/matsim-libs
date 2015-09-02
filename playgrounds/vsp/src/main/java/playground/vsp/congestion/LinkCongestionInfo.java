@@ -24,6 +24,7 @@ package playground.vsp.congestion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,18 +47,12 @@ public final class LinkCongestionInfo {
 	private Map<Id<Person>, Double> personId2linkLeaveTime = new HashMap<Id<Person>, Double>();
 	private List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>();
 	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> personId2linkEnterTime = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
 	private Id<Person> lastLeavingAgent;
 
-	private List<Id<Person>> enteringAgents = new ArrayList<Id<Person>>();
-	private Map<Id<Person>, Double> personId2DelaysToPayFor = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Id<Link>> personId2CausingLinkId = new HashMap<>();
 	private double storageCapacityCars;
 	private Id<Person> lastEnteredAgent;
 	private double lastLeaveTime;
-	
-	private List<Id<Link>> spillBackCausingLinks = new ArrayList<Id<Link>>();
-	private List<Id<Person>> agentsCausingFlowDelays = new ArrayList<Id<Person>>();
 	
 	public Id<Link> getLinkId() {
 		return linkId;
@@ -119,18 +114,6 @@ public final class LinkCongestionInfo {
 		this.lastEnteredAgent = lastEnteredAgent;
 	}
 
-	public List<Id<Person>> getEnteringAgents() {
-		return enteringAgents;
-	}
-
-	public Map<Id<Person> , Double> getPersonId2DelaysToPayFor(){
-		return personId2DelaysToPayFor;
-	}
-
-	public Map<Id<Person>, Id<Link>> getPersonId2CausingLinkId(){
-		return personId2CausingLinkId;
-	}
-
 	public double getStorageCapacityCars() {
 		return storageCapacityCars;
 	}
@@ -158,12 +141,4 @@ public final class LinkCongestionInfo {
 		
 		return isLinkFree;
 	}
-	
-	public List<Id<Link>> getSpillBackCausingLinks() {
-		return spillBackCausingLinks;
-	}
-	public List<Id<Person>> getAgentsCausingFlowDelays() {
-		return agentsCausingFlowDelays;
-	}
-		
 }

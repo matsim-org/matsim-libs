@@ -118,7 +118,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			totalDelay += delay;
 			lci.getLeavingAgents().add(pId);
 
-			boolean isThisLastAgentOnLink = lci.getEnteringAgents().size() - 1 == 0 ? true :false;
+			List<Id<Person>> enteringAgentsList = new ArrayList<Id<Person>>(lci.getPersonId2linkEnterTime().keySet());
+			
+			boolean isThisLastAgentOnLink = enteringAgentsList.size() - 1 == 0 ? true :false;
 
 			if( isThisLastAgentOnLink ) { // last agent on the link is delayed, thus, queue will dissolve immediately.
 
@@ -126,7 +128,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 			} else { // check for the headway i.e. if more agents will be queued, continue
 				// nextFreeSpeedLinkLeaveTime - current leave time < timeHeadway ==> charge later.
-				Id<Person> nextAgent = lci.getEnteringAgents().get(1);
+				Id<Person> nextAgent = enteringAgentsList.get(1);
 				double nextFreeSpeedLinkLeaveTime = lci.getPersonId2freeSpeedLeaveTime().get(nextAgent); 
 
 				if( nextFreeSpeedLinkLeaveTime - linkLeaveTime >= lci.getMarginalDelayPerLeavingVehicle_sec() ){
@@ -141,7 +143,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			lci.getPersonId2freeSpeedLeaveTime().remove(pId);
 		}
 
-		lci.getEnteringAgents().remove(pId);
+		lci.getPersonId2linkEnterTime().remove(pId);
 		
 	}
 
@@ -154,7 +156,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		double minLinkTravelTime = Math.floor(link.getLength()/link.getFreespeed());
 
 		lci.getPersonId2freeSpeedLeaveTime().put(personId, event.getTime()+ minLinkTravelTime + 1.0);
-		lci.getEnteringAgents().add(personId);
 		lci.getPersonId2linkEnterTime().put(personId, event.getTime());
 	}
 
@@ -165,7 +166,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		if(congestedModes.contains(travelMode)){
 			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
 			lci.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
-			lci.getEnteringAgents().add(event.getPersonId());
 			lci.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
 
@@ -177,7 +177,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 		if(congestedModes.contains(travelMode)){
 			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-			lci.getEnteringAgents().remove(event.getPersonId());
+			lci.getPersonId2linkEnterTime().remove(event.getPersonId());
 			lci.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
 		}
 
