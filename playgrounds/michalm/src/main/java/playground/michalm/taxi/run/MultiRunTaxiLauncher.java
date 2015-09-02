@@ -155,6 +155,7 @@ class MultiRunTaxiLauncher
     {
         for (AlgorithmConfig cfg : configs) {
             params.algorithmConfig = cfg;
+            params.validate();
             run(runs);
         }
     }
