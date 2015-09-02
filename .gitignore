@@ -1,3 +1,7 @@
 /.settings/
 /.project
+/.metadata
 *.DS_Store
+detailedEval
+runs-svn
+shared-svn
