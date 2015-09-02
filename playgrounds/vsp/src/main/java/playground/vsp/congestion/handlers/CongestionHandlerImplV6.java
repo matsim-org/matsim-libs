@@ -65,11 +65,11 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		Id<Link> causingLink;
 		String congestionType;
 		
-//		if(linkInfo.isLinkFree(event.getPersonId(), event.getTime())){
+//		if(isLinkFree(event)){
 		if(linkInfo.getLeavingAgents().isEmpty()){
 			/*
-			 * Instead of the above if statement, I should use the commented if statement. So that, 
-			 * if an agent is first delayed by flowCapacity and then storageCapacity, it charges right agent.
+			 * Instead of the above if statement, I should use the commented if statement (isLinkFree). So that, 
+			 * if an agent is first delayed by flowCapacity and then storageCapacity, it charges correct agent.
 			 * Right now (sep 15), the method linkInfo.isLinkFree(..) throws runtimeException because
 			 * Map containing freeSpeedLeaveTime is cleared beforehand.
 			 */
@@ -82,6 +82,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			if (causingAgent==null) {
 				if(delay==1){
 					//		roundingErrors+=delay;
+					// TODO : need a method to update global roundingErrors.
 					return;
 				}else {
 					throw new RuntimeException("Delay for person "+event.getPersonId()+" is "+ delay+" sec. But causing agent could not be located. This happened during event "+event.toString()+" Aborting...");
@@ -99,6 +100,43 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), congestionType, causingAgent, 
 				event.getPersonId(), delay, causingLink, this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
 		this.events.processEvent(congestionEvent);
+		
+	}
+	
+	private boolean isLinkFree( LinkLeaveEvent event ){
+		
+		boolean isLinkFree = false;
+
+		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
+		if(linkInfo.getLastLeavingAgent() == null) return true;
+		
+		// first check if agent will be delayed because of flowCapacity
+		double freeSpeedLeaveTimeOfLastLeftAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(linkInfo.getLastLeavingAgent());
+		double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+		
+		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
+		double minTimeHeadway = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+		
+		if (timeHeadway < minTimeHeadway) isLinkFree = false;
+		else isLinkFree = true;
+		
+		double lastLeaveTime = linkInfo.getPersonId2linkLeaveTime().get(linkInfo.getLastLeavingAgent()); 
+		/*
+		 *  TODO : yet to fix this, at the moment (sep 15), lastLeaveTime will throw NullPointException because
+		 *  this map is cleared in AbstractCongestionHandler before the calculateCongestion() call.
+		 */
+		
+		/*
+		 * the following check ensures that the time gap between the current agent and last left agent is more than MarginalDelayPerLeavingVehicle_sec
+		 * i.e. agent is now delayed due to storage capacity
+		 */
+		
+		double earliestLeaveTime = Math.floor(lastLeaveTime+ linkInfo.getMarginalDelayPerLeavingVehicle_sec()) +1;
+		if(event.getTime() > earliestLeaveTime){
+			isLinkFree = true;
+		} else isLinkFree = false;
+		
+		return isLinkFree;
 		
 	}
 	

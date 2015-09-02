@@ -51,7 +51,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.LinkCongestionInfo;
@@ -289,7 +288,6 @@ PersonStuckEventHandler {
 		linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
-//		linkInfo.getPersonId2linkEnterTime().remove(event.getPersonId());
 	}
 
 	private final void createLinkInfo(Id<Link> linkId) {

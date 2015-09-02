@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * Collects all link specific informations which are required for the calculation of external congestion effects.
  * 
- * @author ikaddoura, amit
+ * @author ikaddoura
  *
  */
 public final class LinkCongestionInfo {
@@ -51,8 +51,6 @@ public final class LinkCongestionInfo {
 	private Id<Person> lastLeavingAgent;
 
 	private double storageCapacityCars;
-	private Id<Person> lastEnteredAgent;
-	private double lastLeaveTime;
 	
 	public Id<Link> getLinkId() {
 		return linkId;
@@ -98,21 +96,6 @@ public final class LinkCongestionInfo {
 	public void setPersonId2linkEnterTime(Map<Id<Person>, Double> personId2linkEnterTime) {
 		this.personId2linkEnterTime = personId2linkEnterTime;
 	}
-	public double getLastLeaveTime() {
-		return lastLeaveTime;
-	}
-
-	public void setLastLeaveTime(double lastLeaveTime) {
-		this.lastLeaveTime = lastLeaveTime;
-	}
-
-	public Id<Person> getLastEnteredAgent() {
-		return lastEnteredAgent;
-	}
-
-	public void setLastEnteredAgent(Id<Person> lastEnteredAgent) {
-		this.lastEnteredAgent = lastEnteredAgent;
-	}
 
 	public double getStorageCapacityCars() {
 		return storageCapacityCars;
@@ -120,25 +103,5 @@ public final class LinkCongestionInfo {
 
 	public void setStorageCapacityCars(double storageCapacityCars) {
 		this.storageCapacityCars = storageCapacityCars;
-	}
-
-	public boolean isLinkFree(Id<Person> nowLeavingAgent, double time){
-		boolean isLinkFree = false;
-		if(lastLeavingAgent == null) return true;
-		
-		double freeSpeedLeaveTimeOfLastLeftAgent = this.personId2freeSpeedLeaveTime.get(lastLeavingAgent);
-		double freeSpeedLeaveTimeOfNowAgent = this.personId2freeSpeedLeaveTime.get(nowLeavingAgent);
-		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
-		double minTimeHeadway = this.marginalDelayPerLeavingVehicle_sec;
-		
-		if (timeHeadway < minTimeHeadway) isLinkFree = false;
-		else isLinkFree = true;
-		
-		double earliestLeaveTime = Math.floor(lastLeaveTime+ marginalDelayPerLeavingVehicle_sec) +1;
-		if(time > earliestLeaveTime){
-			isLinkFree = true;
-		} else isLinkFree = false;
-		
-		return isLinkFree;
 	}
 }
