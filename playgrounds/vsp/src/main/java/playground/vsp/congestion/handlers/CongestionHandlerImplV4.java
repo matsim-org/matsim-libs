@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +41,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
@@ -91,9 +89,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
 
-		// identify if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
 		if( linkInfo.getLeavingAgents().isEmpty()){
-
+			// identifying if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
 			Id<Link> spillBackCausingLink = getUpstreamLinkInRoute(delayedPerson);
 
 			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
@@ -107,6 +104,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			}
 		} 
 
+		//charge for the flow delay and remaining delays are said to be storage delay
 		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnTheLink);
 
 		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
@@ -117,7 +115,6 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		} else {
 
 			this.addToDelayNotInternalized_storageCapacity(storageDelay);
-
 
 		}
 	}
@@ -178,6 +175,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		}
 
 		if(remainingDelay>0){
+			// now charge leaving agents
+			// TODO here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
 			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
 		}
 
