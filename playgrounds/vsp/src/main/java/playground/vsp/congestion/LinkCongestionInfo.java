@@ -159,9 +159,11 @@ public final class LinkCongestionInfo {
 		return isLinkFree;
 	}
 	
+	@Deprecated
 	public List<Id<Link>> getSpillBackCausingLinks() {
 		return spillBackCausingLinks;
 	}
+	@Deprecated
 	public List<Id<Person>> getAgentsCausingFlowDelays() {
 		return agentsCausingFlowDelays;
 	}
