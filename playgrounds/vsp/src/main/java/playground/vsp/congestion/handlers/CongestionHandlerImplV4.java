@@ -171,7 +171,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
-			this.events.processEvent(congestionEvent);
+			this.events.processEvent(congestionEvent); // this is a work around but for this to work, eventManager of AbstractCongestionHandler should not be private. 
+			//TODO: if eventManager of AbstractCongestionHandler is not be private anymore, remove the eventsManager object from this class.
 
 			remainingDelay = remainingDelay - agentDelay;
 		}
