@@ -88,10 +88,11 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		if(delayOnTheLink==0) return;
 
 		// identify if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
-		if(linkInfo.getLeavingAgents().isEmpty()){
+		if( linkInfo.getLeavingAgents().isEmpty()){
 
 			Id<Link> spillBackCausingLink = getUpstreamLinkInRoute(delayedPerson);
 
@@ -104,21 +105,20 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			} else {
 				this.linkId2SpillBackCausingLink.put(event.getLinkId(), new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
 			}
+		} 
+
+		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnTheLink);
+
+		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
+
+			double remainingStorageDelay = allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
+			if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
 
 		} else {
 
-			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnThisLink);
+			this.addToDelayNotInternalized_storageCapacity(storageDelay);
 
-			if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
 
-				double remainingStorageDelay = allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
-				if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
-
-			} else {
-
-				this.addToDelayNotInternalized_storageCapacity(storageDelay);
-
-			}
 		}
 	}
 
@@ -126,6 +126,10 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		double remainingDelay = storageDelay;
 
+		if(! this.linkId2SpillBackCausingLink.containsKey(startAllocationFromThisLink)) {
+			return remainingDelay;
+		}
+		
 		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLink.get(startAllocationFromThisLink));
 		if(spillBackCausingLinks.isEmpty()) return remainingDelay;
 		Collections.reverse(spillBackCausingLinks);
@@ -168,6 +172,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
 			this.events.processEvent(congestionEvent);
+
 			remainingDelay = remainingDelay - agentDelay;
 		}
 

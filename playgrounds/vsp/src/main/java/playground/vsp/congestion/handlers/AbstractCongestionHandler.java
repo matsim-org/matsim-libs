@@ -289,7 +289,7 @@ PersonStuckEventHandler {
 		linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
-		linkInfo.getPersonId2linkEnterTime().remove(event.getPersonId());
+//		linkInfo.getPersonId2linkEnterTime().remove(event.getPersonId());
 	}
 
 	private final void createLinkInfo(Id<Link> linkId) {
@@ -389,7 +389,5 @@ PersonStuckEventHandler {
 	final void addToDelayNotInternalized_spillbackNoCausingAgent(double val) {
 		this.delayNotInternalized_spillbackNoCausingAgent += val ;
 	}
-
-
 
 }
