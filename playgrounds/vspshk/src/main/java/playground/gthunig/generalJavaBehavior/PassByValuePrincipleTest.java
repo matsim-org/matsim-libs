@@ -12,6 +12,7 @@ public class PassByValuePrincipleTest {
 //		bool = getChangedValue(bool);
 		changeValue(bool);
 		Assert.assertEquals(true, bool);
+//		TODO mit nichtprimitivem Datentyp testen
 	}
 	
 	private boolean getChangedValue(boolean bool) {

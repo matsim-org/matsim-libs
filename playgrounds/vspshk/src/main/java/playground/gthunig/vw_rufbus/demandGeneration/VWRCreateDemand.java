@@ -9,6 +9,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -45,11 +46,15 @@ public class VWRCreateDemand {
 	
 	private Map<String, Coord> commercial;
 	private Map<String, Coord> industrial;
-	private Map<String, Coord> industrialByName;
 	private Map<String, Coord> residential;
 	private Map<String, Coord> retail;
 	private Map<String, Coord> schools;
 	private Map<String, Coord> universities;
+	
+	private Id<Link> vwGate1LinkID = Id.createLinkId(43996);
+	private Id<Link> vwGate2LinkID = Id.createLinkId(2611);
+	private Id<Link> vwGate3LinkID = Id.createLinkId(42267);
+	private Id<Link> vwGate4LinkID = Id.createLinkId(63449);
 	
 	private Random random = MatsimRandom.getRandom();
 	
@@ -62,13 +67,11 @@ public class VWRCreateDemand {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario).readFile(config.getNetworkFileString());
-//		TODO why is this working? pass by value priciple
 		
 		this.counties = readShapeFile(config.getCountiesFileString(), "RS");
 
 		this.commercial = geometryMapToCoordMap(readShapeFile(config.getCommercialFileString(), "osm_id"));
 		this.industrial = geometryMapToCoordMap(readShapeFile(config.getIndustrialFileString(), "osm_id"));
-		this.industrialByName = geometryMapToCoordMap(readShapeFile(config.getIndustrialFileString(), "name"));
 		this.residential = geometryMapToCoordMap(readShapeFile(config.getResidentialFileString(), "osm_id"));
 		this.retail = geometryMapToCoordMap(readShapeFile(config.getRetailFileString(), "osm_id"));
 		this.schools = geometryMapToCoordMap(readShapeFile(config.getSchoolsFileString(), "osm_id"));
@@ -121,6 +124,7 @@ public class VWRCreateDemand {
 //		Jerochower Land				- JL
 //		Osnabrück, Stadt			- OB
 //		Osterode am Harz			- OR
+		
 		
 //		Braunschweig, Stadt - Braunschweig, Stadt | work
 		createWorkers("BS", "BS", 62158*config.getScalefactor(), 0.45, 0.2, 0.2, "03101", "03101");
@@ -338,7 +342,7 @@ public class VWRCreateDemand {
 			double wvWorkerOrNot = random.nextDouble();
 			if (to == "WB" && wvWorkerOrNot < 0.6363) {
 				vwWorkerCounter++;
-				double shiftOrFlexitime =random.nextDouble();
+				double shiftOrFlexitime = random.nextDouble();
 				if (shiftOrFlexitime < 0.6666) {
 					createOneVWFlexitimeWorker(commuterCounter, homeC, mode, from + "_" + to);
 				} else {
@@ -491,36 +495,19 @@ public class VWRCreateDemand {
 	}
 	
 	private Coord calcVWWorkCoord() {
-		if (!this.industrialByName.containsKey("Volkswagen AG")) System.out.println("Volkswagen AG does not exist");
-		return this.industrialByName.get("Volkswagen AG");
 		
-//		
-//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation( 
-//				TransformationFactory.WGS84, "EPSG:25832");
-//		Coord vwWorkplace1 = ct.transform(new CoordImpl(52.432153, 10.762568));
-//		Coord vwWorkplace2 = ct.transform(new CoordImpl(52.429693, 10.776129));
-//		Coord vwWorkplace3 = ct.transform(new CoordImpl(52.435188, 10.796041));
-//		Coord vwWorkplace4 = ct.transform(new CoordImpl(52.439531, 10.783768));
-//		Coord vwWorkplace5 = ct.transform(new CoordImpl(52.436444, 10.744801));
-//		
-//		int rand = random.nextInt(4)+1;
-//		switch (rand) {
-//			case 1:
-//				CoordinateTransformation ct2 = TransformationFactory.getCoordinateTransformation( 
-//						"EPSG:25832", TransformationFactory.WGS84);
-//				Coord temp = findClosestCoordFromMap(vwWorkplace1, this.industrial);
-//				System.out.println("x: " + ct2.transform(temp).getX() + " y: " + ct2.transform(temp).getY());
-//				return temp;
-//			case 2:
-//				return findClosestCoordFromMap(vwWorkplace2, this.industrial);
-//			case 3:
-//				return findClosestCoordFromMap(vwWorkplace3, this.industrial);
-//			case 4:
-//				return findClosestCoordFromMap(vwWorkplace4, this.industrial);
-//			case 5:
-//				return findClosestCoordFromMap(vwWorkplace5, this.industrial);
-//		}
-//		return vwWorkplace1;
+		int rand = random.nextInt(4)+1;
+		switch (rand) {
+			case 1:
+				return this.scenario.getNetwork().getLinks().get(this.vwGate1LinkID).getCoord();
+			case 2:
+				return this.scenario.getNetwork().getLinks().get(this.vwGate2LinkID).getCoord();
+			case 3:
+				return this.scenario.getNetwork().getLinks().get(this.vwGate3LinkID).getCoord();
+			case 4:
+				return this.scenario.getNetwork().getLinks().get(this.vwGate4LinkID).getCoord();
+		}
+		return this.scenario.getNetwork().getLinks().get(this.vwGate1LinkID).getCoord();
 	}
 
 	private void createOneWorker(int i, Coord homeC, Coord coordWork, String mode, String fromToPrefix) {
@@ -531,17 +518,15 @@ public class VWRCreateDemand {
  
  
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
-		home.setEndTime(7*60*60);
+		home.setEndTime(6*60*60);
 		plan.addActivity(home);
  
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 		plan.addLeg(outboundTrip);
 		
-		int rand = random.nextInt(91);
+		int rand = random.nextInt(121);
 		Activity work = scenario.getPopulation().getFactory().createActivityFromCoord("work", coordWork);
-		double startTime = 7*60*60 + 30*60 + rand*60;
-		work.setStartTime(startTime);
-		work.setEndTime(startTime + 7*60*60+40*60);
+		work.setEndTime(16*60*60 + rand*60);
 		plan.addActivity(work);
 		
 		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -562,7 +547,7 @@ public class VWRCreateDemand {
  
 		
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
-		home.setEndTime(7.5*60*60);
+		home.setEndTime(7*60*60);
 		plan.addActivity(home);
  
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -590,7 +575,7 @@ public class VWRCreateDemand {
  
 		
 		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
-		home.setEndTime(9*60*60);
+		home.setEndTime(8*60*60);
 		plan.addActivity(home);
  
 		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
