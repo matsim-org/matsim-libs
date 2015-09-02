@@ -116,7 +116,7 @@ public class SocialCostControllerV2 {
 			this.travelTime = travelTime;
 			this.scc = scc;
 			this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-			this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney();
+			this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceRateCar() * cnScoringGroup.getMarginalUtilityOfMoney();
 		}
 
 		@Override

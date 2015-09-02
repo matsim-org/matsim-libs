@@ -85,7 +85,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setPerforming_utils_hr(0.0);
 		pcs.setTraveling_utils_hr(0.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.001);
+		pcs.setMonetaryDistanceRateCar(-0.001);
 
 		//link 11 distance
 		int expectedRoad = 11;
@@ -119,7 +119,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setPerforming_utils_hr(0.0);
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.0);
+		pcs.setMonetaryDistanceRateCar(-0.0);
 
 		//link 9 time
 		int expectedRoad = 9;
@@ -153,7 +153,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setPerforming_utils_hr(0.0);
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.001);
+		pcs.setMonetaryDistanceRateCar(-0.001);
 
 		//link 13 time AND distance
 		int expectedRoad = 13;
@@ -192,7 +192,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setPerforming_utils_hr(0.0);
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.001);
+		pcs.setMonetaryDistanceRateCar(-0.001);
 
 		installEmissionDisutilityCalculatorFactory();
 		installEmissionInternalizationListener();

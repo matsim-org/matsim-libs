@@ -59,7 +59,7 @@ public class AutosensingTest {
 		config.planCalcScore().addActivityParams(params);
 		
 		final double monetaryDistanceCostRateCarCONFIG = -0.21/1000.;
-		config.planCalcScore().setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCarCONFIG); // utils per meter!
+		config.planCalcScore().setMonetaryDistanceRateCar(monetaryDistanceCostRateCarCONFIG); // utils per meter!
 		
 		final double marginalUtilityOfMoneyCONFIG = 2. ;
 		config.planCalcScore().setMarginalUtilityOfMoney(marginalUtilityOfMoneyCONFIG);

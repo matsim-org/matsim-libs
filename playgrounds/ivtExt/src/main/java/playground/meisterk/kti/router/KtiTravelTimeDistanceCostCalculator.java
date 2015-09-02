@@ -46,7 +46,7 @@ public class KtiTravelTimeDistanceCostCalculator implements TravelDisutility {
 		this.travelCostFactor = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
 //		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMarginalUtlOfDistanceCar();
-		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceCostRateCar()
+		this.marginalUtlOfDistance = ktiConfigGroup.getDistanceCostCar()/1000.0 * cnScoringGroup.getMonetaryDistanceRateCar()
 		   * cnScoringGroup.getMarginalUtilityOfMoney() ;
 		log.warn("this is the exact translation but I don't know what it means maybe check.  kai, dec'10") ;
 	}

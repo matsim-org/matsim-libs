@@ -103,7 +103,7 @@ public class NetworkLegRouterTest {
 		// and now with a monetary distance rate different from zero:
 		
 		{
-			f.s.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(-1.) ;
+			f.s.getConfig().planCalcScore().setMonetaryDistanceRateCar(-1.) ;
 			// yyyyyy the above should be positive
 
 			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());

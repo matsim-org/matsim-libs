@@ -62,7 +62,7 @@ public class IncomeTravelCostCalculator implements TravelDisutility {
 		 * Distance dependent routing is only impelemted for car since pt is only pseudo transit*/
 
 //		this.distanceCostFactor = - charyparNagelScoring.getMarginalUtlOfDistanceCar();
-		this.distanceCostFactor = - charyparNagelScoring.getMonetaryDistanceCostRateCar() * charyparNagelScoring.getMarginalUtilityOfMoney() ;
+		this.distanceCostFactor = - charyparNagelScoring.getMonetaryDistanceRateCar() * charyparNagelScoring.getMarginalUtilityOfMoney() ;
 
 		//also opportunity costs of time have to be considered at this point (second summand)!
 		this.betaTravelTime = (- charyparNagelScoring.getTraveling_utils_hr() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);

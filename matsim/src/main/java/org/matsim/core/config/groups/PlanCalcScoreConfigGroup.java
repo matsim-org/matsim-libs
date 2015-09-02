@@ -84,9 +84,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 
-	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate_";
-	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
-	private static final String MONETARY_DISTANCE_COST_RATE_PT  = "monetaryDistanceCostRatePt" ;
+	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate";
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
@@ -191,8 +189,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 		else if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_COST_RATE.length()));
-			modeParams.setMonetaryDistanceCostRate(Double.parseDouble(value));
+//			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_COST_RATE.length()));
+//			modeParams.setMonetaryDistanceCostRate(Double.parseDouble(value));
+			throw new RuntimeException("Please use config v2, mode-parameters (see output of any recent run), and mode-specific monetary "
+					+ "distance rate (without `cost')") ;
+
 		}
 		else if (key.startsWith(CONSTANT)) {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
@@ -245,13 +246,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		else if ( CONSTANT_BIKE.equals(key)) {
 			this.setConstantBike(Double.parseDouble(value)) ;
-		}
-
-		// backward compatibility: "typed" monetary cost rate
-		else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
-			setMonetaryDistanceCostRateCar( Double.parseDouble(value) );
-		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
-			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		}
 
 		else if ( WAITING_PT.equals( key ) ) {
@@ -740,7 +734,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
-		private double monetaryDistanceCostRate = 0.0;
+		private double monetaryDistanceRate = 0.0;
 		private double constant = 0.0;
 
 		public ModeParams(final String mode) {
@@ -809,15 +803,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.constant = constant;
 		}
 
-		@StringGetter( "monetaryDistanceCostRate" )
-		public double getMonetaryDistanceCostRate() {
-			return this.monetaryDistanceCostRate;
+		@StringGetter( "monetaryDistanceRate" )
+		public double getMonetaryDistanceRate() {
+			return this.monetaryDistanceRate;
 		}
 
-		@StringSetter( "monetaryDistanceCostRate" )
-		public void setMonetaryDistanceCostRate(double monetaryDistanceCostRateCar) {
+		@StringSetter( "monetaryDistanceRate" )
+		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked() ;
-			this.monetaryDistanceCostRate = monetaryDistanceCostRateCar;
+			this.monetaryDistanceRate = monetaryDistanceRate;
 		}
 
 	}
@@ -861,20 +855,20 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public double getMonetaryDistanceCostRateCar() {
-		return this.getModes().get(TransportMode.car).getMonetaryDistanceCostRate();
+	public double getMonetaryDistanceRateCar() {
+		return this.getModes().get(TransportMode.car).getMonetaryDistanceRate();
 	}
 
-	public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
-		this.getModes().get(TransportMode.car).setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
+	public void setMonetaryDistanceRateCar(double monetaryDistanceRateCar) {
+		this.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 	}
 
-	public double getMonetaryDistanceCostRatePt() {
-		return this.getModes().get(TransportMode.pt).getMonetaryDistanceCostRate();
+	public double getMonetaryDistanceRatePt() {
+		return this.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 	}
 
-	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
-		this.getModes().get(TransportMode.pt).setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
+	public void setMonetaryDistanceRatePt(double monetaryDistanceRatePt) {
+		this.getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 	}
 
 	public double getConstantCar() {

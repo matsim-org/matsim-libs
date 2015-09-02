@@ -97,13 +97,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if ( config.planCalcScore().getMonetaryDistanceCostRateCar() > 0 ) {
+		if ( config.planCalcScore().getMonetaryDistanceRateCar() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate car > 0.  You probably want a value < 0 here.  " +
 					"This is a bug and may be changed eventually.  kai, jun'11") ;
 		}
-		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
+		if ( config.planCalcScore().getMonetaryDistanceRatePt() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +

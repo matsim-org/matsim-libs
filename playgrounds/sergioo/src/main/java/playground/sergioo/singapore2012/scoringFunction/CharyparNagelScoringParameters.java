@@ -81,14 +81,14 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		constantPt = config.getConstantPt() ;
 		constantOther = config.getConstantOther() ;
 
-		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
-		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceRateCar() * config.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceRatePt() * config.getMarginalUtilityOfMoney() ;
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
 		marginalUtilityOfDistanceOther_m = config.getMarginalUtlOfDistanceOther();
 
-		monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
-		monetaryDistanceCostRatePt = config.getMonetaryDistanceCostRatePt();
+		monetaryDistanceCostRateCar = config.getMonetaryDistanceRateCar() ;
+		monetaryDistanceCostRatePt = config.getMonetaryDistanceRatePt();
 		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(

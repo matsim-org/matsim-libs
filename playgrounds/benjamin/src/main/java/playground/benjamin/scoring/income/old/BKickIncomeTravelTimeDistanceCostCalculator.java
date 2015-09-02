@@ -54,7 +54,7 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelDisuti
 		this.travelCostFactor = (- charyparNagelScoring.getTraveling_utils_hr() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);
 
 //		this.marginalUtlOfDistance = charyparNagelScoring.getMarginalUtlOfDistanceCar() * 1.31;
-		this.marginalUtlOfDistance = charyparNagelScoring.getMonetaryDistanceCostRateCar() * 1.31 * charyparNagelScoring.getMarginalUtilityOfMoney() ;
+		this.marginalUtlOfDistance = charyparNagelScoring.getMonetaryDistanceRateCar() * 1.31 * charyparNagelScoring.getMarginalUtilityOfMoney() ;
 		
 		log.info("Using BKickIncomeTravelTimeDistanceCostCalculator...");
 	}

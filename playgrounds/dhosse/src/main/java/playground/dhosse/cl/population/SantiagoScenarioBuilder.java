@@ -743,84 +743,84 @@ public class SantiagoScenarioBuilder {
 		carParams.setConstant(0.0);
 		carParams.setMarginalUtilityOfDistance(0.0);
 		carParams.setMarginalUtilityOfTraveling(-1.056);
-		carParams.setMonetaryDistanceCostRate(-0.248);
+		carParams.setMonetaryDistanceRate(-0.248);
 		pcs.addModeParams(carParams);
 		
 		ModeParams busParams = new ModeParams(Constants.Modes.bus.toString());
 		busParams.setConstant(0.0);
 		busParams.setMarginalUtilityOfDistance(0.0);
 		busParams.setMarginalUtilityOfTraveling(-1.056);
-		busParams.setMonetaryDistanceCostRate(-0.0);
+		busParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(busParams);
 		
 		ModeParams metroParams = new ModeParams(Constants.Modes.metro.toString());
 		metroParams.setConstant(0.0);
 		metroParams.setMarginalUtilityOfDistance(0.0);
 		metroParams.setMarginalUtilityOfTraveling(-1.056);
-		metroParams.setMonetaryDistanceCostRate(-0.0);
+		metroParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(metroParams);
 		
 		ModeParams colectivoParams = new ModeParams(Constants.Modes.colectivo.toString());
 		colectivoParams.setConstant(0.0);
 		colectivoParams.setMarginalUtilityOfDistance(0.0);
 		colectivoParams.setMarginalUtilityOfTraveling(-1.056);
-		colectivoParams.setMonetaryDistanceCostRate(-0.0);
+		colectivoParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(colectivoParams);
 		
 		ModeParams schoolBusParams = new ModeParams(Constants.Modes.school_bus.toString());
 		schoolBusParams.setConstant(0.0);
 		schoolBusParams.setMarginalUtilityOfDistance(0.0);
 		schoolBusParams.setMarginalUtilityOfTraveling(-1.056);
-		schoolBusParams.setMonetaryDistanceCostRate(-0.0);
+		schoolBusParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(schoolBusParams);
 		
 		ModeParams taxiParams = new ModeParams(Constants.Modes.taxi.toString());
 		taxiParams.setConstant(0.0);
 		taxiParams.setMarginalUtilityOfDistance(0.0);
 		taxiParams.setMarginalUtilityOfTraveling(-1.056);
-		taxiParams.setMonetaryDistanceCostRate(-0.0);
+		taxiParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(taxiParams);
 		
 		ModeParams walkParams = new ModeParams(TransportMode.walk);
 		walkParams.setConstant(0.0);
 		walkParams.setMarginalUtilityOfDistance(0.0);
 		walkParams.setMarginalUtilityOfTraveling(-1.056);
-		walkParams.setMonetaryDistanceCostRate(-0.0);
+		walkParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(walkParams);
 		
 		ModeParams bikeParams = new ModeParams(TransportMode.bike);
 		bikeParams.setConstant(0.0);
 		bikeParams.setMarginalUtilityOfDistance(0.0);
 		bikeParams.setMarginalUtilityOfTraveling(-1.056);
-		bikeParams.setMonetaryDistanceCostRate(-0.0);
+		bikeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(bikeParams);
 		
 		ModeParams motorcycleParams = new ModeParams(Constants.Modes.motorcycle.toString());
 		motorcycleParams.setConstant(0.0);
 		motorcycleParams.setMarginalUtilityOfDistance(0.0);
 		motorcycleParams.setMarginalUtilityOfTraveling(-1.056);
-		motorcycleParams.setMonetaryDistanceCostRate(-0.0);
+		motorcycleParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(motorcycleParams);
 		
 		ModeParams trainParams = new ModeParams(Constants.Modes.train.toString());
 		trainParams.setConstant(0.0);
 		trainParams.setMarginalUtilityOfDistance(0.0);
 		trainParams.setMarginalUtilityOfTraveling(-1.056);
-		trainParams.setMonetaryDistanceCostRate(-0.0);
+		trainParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(trainParams);
 		
 		ModeParams rideParams = new ModeParams(TransportMode.ride);
 		rideParams.setConstant(0.0);
 		rideParams.setMarginalUtilityOfDistance(0.0);
 		rideParams.setMarginalUtilityOfTraveling(-1.056);
-		rideParams.setMonetaryDistanceCostRate(-0.0);
+		rideParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(rideParams);
 		
 		ModeParams otherModeParams = new ModeParams(TransportMode.other);
 		otherModeParams.setConstant(0.0);
 		otherModeParams.setMarginalUtilityOfDistance(0.0);
 		otherModeParams.setMarginalUtilityOfTraveling(-1.056);
-		otherModeParams.setMonetaryDistanceCostRate(-0.0);
+		otherModeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(otherModeParams);
 		
 	}

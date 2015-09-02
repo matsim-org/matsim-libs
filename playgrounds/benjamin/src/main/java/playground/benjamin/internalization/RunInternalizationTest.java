@@ -158,7 +158,7 @@ public class RunInternalizationTest {
 		pcs.setBrainExpBeta(1.0);
 		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(0.6);
-		pcs.setMonetaryDistanceCostRateCar(-0.0001);
+		pcs.setMonetaryDistanceRateCar(-0.0001);
 
 	// strategyConfigGroup
 		StrategyConfigGroup scg = controler.getConfig().strategy();
