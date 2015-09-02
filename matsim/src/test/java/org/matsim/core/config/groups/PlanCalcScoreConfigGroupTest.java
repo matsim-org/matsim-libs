@@ -223,7 +223,7 @@ public class PlanCalcScoreConfigGroupTest {
 
 	}
 
-	private ConfigGroup toUnderscoredModule(final PlanCalcScoreConfigGroup initialGroup) {
+	private static ConfigGroup toUnderscoredModule(final PlanCalcScoreConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
