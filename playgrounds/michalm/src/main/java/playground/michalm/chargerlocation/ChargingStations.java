@@ -31,7 +31,8 @@ public class ChargingStations
 {
     public static ChargingStation createStation(long id, double x, double y, double power)
     {
-        return new ChargingStation(Id.create(id, ChargingStation.class), new CoordImpl(x, y), power);
+        return new ChargingStation(Id.create(id, ChargingStation.class), new CoordImpl(x, y),
+                power);
     }
 
 
@@ -39,8 +40,8 @@ public class ChargingStations
     {
         List<ChargingStation> stations = new ArrayList<>();
         for (Zone z : zones) {
-            stations.add(new ChargingStation(Id.create(z.getId(), ChargingStation.class), z
-                    .getCoord(), power));
+            stations.add(new ChargingStation(Id.create(z.getId(), ChargingStation.class),
+                    z.getCoord(), power));
         }
 
         return stations;

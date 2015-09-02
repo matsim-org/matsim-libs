@@ -88,6 +88,9 @@
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{ifthen}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\myemph}[1]{\textcolor{red}{\emph{#1}}}
 
 \newcommand{\todo}[1]{\hl{\emph{TODO #1}}}
@@ -173,22 +176,105 @@ The MATSim team is currently working on a MATSim book.  The relation between the
 
 \tableofcontents
 
+\newboolean{isDeprecated}
+\setboolean{isDeprecated}{true}
+\setboolean{isDeprecated}{false}
+
+\def\supertxt{Superseded by MATSim book and/or information in javadoc\\ \vfill\newpage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\include{chapters/introduction}
-\include{chapters/overview}
-\include{chapters/terminology}
-\include{chapters/running}
-\include{chapters/buildingScenarios}
-\include{chapters/scoringFunction}
-\include{chapters/strategyModules}
-\include{chapters/otherModules}
-\include{chapters/visualization}
-\include{chapters/sysRequirements}
-\include{chapters/policyMeasures}
-% no longer include extensions into user guide, decided at devmtg2013. mr/oct13
-%\include{chapters/extensions}
+\NextFile{Introduction.html}
+\chapter{Introduction}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/introduction}
+}
+%
+\NextFile{Overview.html}
+\chapter{Overview}
+\label{sec:Overview}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/overview}
+}
+%
+\NextFile{Terminology.html}
+\chapter{Terminology}
+\label{sec:Terminology}
+\input{chapters/terminology}
+%
+\NextFile{RunningMATSim.html}
+\chapter{Running MATSim}
+\label{sec:Running}
+%% \ifthenelse{\boolean{isDeprecated}}{%
+%% \supertxt
+%% }{%
+\input{chapters/running}
+%% }
+%
+\NextFile{BuildingScenarios.html}
+\chapter{Building New Scenarios}
+\label{sec:BuildingScenarios}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/buildingScenarios}
+}
+%
+\NextFile{ScoringFunction.html}
+\chapter{The MATSim default scoring function (= utility function)}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/scoringFunction}
+}
+%
+\NextFile{StrategyModules.html}
+\chapter{Strategy Modules}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/strategyModules}
+}
+%
+\NextFile{OtherModules.html}
+\chapter{MATSim input data (``MATSim containers'')}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/otherModules}
+}
+%
+\NextFile{Visualization.html}
+\chapter{Visualization and analysis}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/visualization}
+}
+%
+\NextFile{SystemRequirements.html}
+\chapter{System Requirements and performance}
+%% \ifthenelse{\boolean{isDeprecated}}{%
+%% \supertxt
+%% }{%
+\input{chapters/sysRequirements}
+%% }
+%
+\NextFile{PolicyMeasures.html}
+\chapter{Specific applications}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/policyMeasures}
+}
+
+
+% no longer input extensions into user guide, decided at devmtg2013. mr/oct13
+%\input{chapters/extensions}
 
 %\appendix
 %\chapter*{Appendices}

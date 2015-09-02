@@ -28,7 +28,6 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,7 +43,6 @@ import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPer
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.CongestionAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
-import playground.ikaddoura.integrationCN.CNEventsReader;
 import playground.ikaddoura.noise2.events.NoiseEventsReader;
 import playground.vsp.congestion.events.CongestionEventsReader;
 

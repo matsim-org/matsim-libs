@@ -31,7 +31,8 @@ public class AwaitingPickupStorage
     private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
 
 
-    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
+    public void storeAwaitingPickup(PassengerRequest request,
+            PassengerPickupActivity pickupActivity)
     {
         awaitingPickups.put(request.getId(), pickupActivity);
     }

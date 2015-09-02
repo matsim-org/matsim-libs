@@ -26,6 +26,7 @@ import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -71,7 +72,7 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
-	public abstract void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results);
+	public abstract void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results);
 		
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();

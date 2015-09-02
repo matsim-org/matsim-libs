@@ -25,8 +25,8 @@ public class Array2DReaderTest
     private void assertIntArray(String contents, int[][] expected)
         throws IOException
     {
-        int[][] actual = (int[][])Array2DReader.getArray(createReader(contents),
-                expected[0].length, Array2DReader.INT_STRATEGY);
+        int[][] actual = (int[][])Array2DReader.getArray(createReader(contents), expected[0].length,
+                Array2DReader.INT_STRATEGY);
 
         Array2DAssert.assertEquals(expected, actual);
     }
@@ -41,11 +41,12 @@ public class Array2DReaderTest
         Array2DAssert.assertEquals(expected, actual);
     }
 
+
     private static BufferedReader createReader(String contents)
     {
         return new BufferedReader(new StringReader(contents));
     }
-    
+
 
     @Test
     public void testDoubleArray()

@@ -27,9 +27,9 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.michalm.zone.Zone;
-
 import com.vividsolutions.jts.geom.*;
+
+import playground.michalm.zone.Zone;
 
 
 public class DefaultActivityCreator

@@ -26,7 +26,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import playground.michalm.taxi.data.TaxiRequest;
 
 
 public class TaxibusRequestCreator
@@ -36,6 +35,6 @@ public class TaxibusRequestCreator
     public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
             Link toLink, double t0, double t1, double now)
     {
-        return new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
+        return new TaxibusRequest(id, passenger, fromLink, toLink, t0, now);
     }
 }

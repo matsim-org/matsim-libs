@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import playground.jjoubert.RetailerGA.MyFitnessFunction;
 import playground.jjoubert.RetailerGA.RetailerGA;
 import playground.jjoubert.Utilities.DateString;
-import playground.jjoubert.Utilities.MyPermutator;
+import playground.southafrica.utilities.MyPermutator;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 import com.vividsolutions.jts.geom.Coordinate;

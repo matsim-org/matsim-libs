@@ -60,8 +60,8 @@ public class SubPopMunichControler {
 
 		if(offline){
 
-			args = new String [] {"false","false","false","../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml"
-					,"1.0","../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/baseCase/","true","false"};
+			args = new String [] {"false","false","false","../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_usrGrp_baseCase_msa_typDurRelative.xml"
+					,"1.0","../../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/baseCase/","true","false"};
 		}
 
 		boolean internalizeEmission = Boolean.valueOf(args [0]); 
@@ -80,12 +80,12 @@ public class SubPopMunichControler {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
-
+		
 		if(offline){
-			config.network().setInputFile("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
-			config.plans().setInputFile("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz");
-			config.plans().setInputPersonAttributeFile("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_usrGrp.xml.gz");
-			config.counts().setCountsFileName("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+			config.network().setInputFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
+			config.plans().setInputFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz");
+			config.plans().setInputPersonAttributeFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz");
+			config.counts().setCountsFileName("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
 		}
 
 		final Controler controler = new Controler(config);
@@ -108,22 +108,6 @@ public class SubPopMunichControler {
 			}
 		});
 
-		// following is must since, feb15, it is not possible to add two replanning strategies together, even for different sub pop except "ChangeExpBeta"
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding("ReRoute_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
-			}
-		});
-
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		controler.getConfig().addModule(ecg);
@@ -136,12 +120,12 @@ public class SubPopMunichControler {
 		ecg.setEmissionVehicleFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 
 		if(offline){
-			ecg.setAverageColdEmissionFactorsFile("../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
-			ecg.setAverageWarmEmissionFactorsFile("../../input/matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
-			ecg.setDetailedColdEmissionFactorsFile("../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
-			ecg.setDetailedWarmEmissionFactorsFile("../../input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
-			ecg.setEmissionRoadTypeMappingFile("../../input/munich/roadTypeMapping.txt");
-			ecg.setEmissionVehicleFile("../../input/munich/emissionVehicles_1pct.xml.gz");
+			ecg.setAverageColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
+			ecg.setAverageWarmEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
+			ecg.setDetailedColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
+			ecg.setDetailedWarmEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
+			ecg.setEmissionRoadTypeMappingFile("../../../input/munich/roadTypeMapping.txt");
+			ecg.setEmissionVehicleFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
 		}
 		
 		ecg.setUsingDetailedEmissionCalculation(true);

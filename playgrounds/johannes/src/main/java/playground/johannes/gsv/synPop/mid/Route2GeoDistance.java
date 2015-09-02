@@ -18,15 +18,15 @@
  * *********************************************************************** */
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
  * @author jillenberger
  */
-public class Route2GeoDistance implements ProxyPlanTask {
+public class Route2GeoDistance implements EpisodeTask {
 
     private double min = 0.5;
 

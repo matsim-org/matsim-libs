@@ -19,9 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -31,14 +32,14 @@ import java.util.TreeMap;
  * @author johannes
  *
  */
-public class SortLegsTask implements ProxyPlanTask {
+public class SortLegsTask implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {
 		SortedMap<Integer, Segment> map = new TreeMap<Integer, Segment>();
 		
 		for(Segment leg : plan.getLegs()) {
-			Integer idx = Integer.parseInt(leg.getAttribute(MIDKeys.LEG_INDEX));
+			Integer idx = Integer.parseInt(leg.getAttribute(MiDKeys.LEG_INDEX));
 			map.put(idx, leg);
 		}
 		

@@ -22,13 +22,10 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -45,10 +42,10 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 	public static final String KEY = "speedFactor";
 	
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> modes = new HashSet<String>();
-		for(PlainPerson person : persons) {
-			Episode plan = person.getPlan();
+		for(Person person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 			for(int i = 0; i < plan.getLegs().size(); i++) {
 				modes.add(plan.getLegs().get(i).getAttribute(CommonKeys.LEG_MODE));
 			}
@@ -62,8 +59,8 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 			
 			double sumDist = 0;
 			double sumDur = 0;
-			for(PlainPerson person : persons) {
-				Episode plan = person.getPlan();
+			for(Person person : persons) {
+				Episode plan = person.getEpisodes().get(0);
 				for(Attributable leg : plan.getLegs()) {
 					if(mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					String distVal = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);

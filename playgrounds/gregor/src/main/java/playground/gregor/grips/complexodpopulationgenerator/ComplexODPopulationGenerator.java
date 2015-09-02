@@ -403,8 +403,8 @@ public class ComplexODPopulationGenerator implements ActionListener{
 		this.jMapViewer = new MyMapViewer(this);
 		this.jMapViewer.setBounds(0, 0, 1024, 800);
 		this.jMapViewer.setTileFactory(tf);
-		this.jMapViewer.setPanEnabled(true);
-		this.jMapViewer.setZoomEnabled(true);
+//		this.jMapViewer.setPanEnabled(true);
+//		this.jMapViewer.setZoomEnabled(true);
 		this.compositePanel.add(this.jMapViewer);
 	}	
 

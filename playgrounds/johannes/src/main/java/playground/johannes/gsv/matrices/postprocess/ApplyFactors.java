@@ -24,11 +24,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.data.CommonValues;
 
 /**
  * @author johannes
@@ -93,15 +93,15 @@ public class ApplyFactors {
 		 * days
 		 */
 		Map<String, Double> factors = new HashMap<>();
-		factors.put(CommonKeys.MONDAY, 1.02);
-		factors.put(CommonKeys.FRIDAY, 1.15);
-		factors.put(CommonKeys.SATURDAY, 0.95);
-		factors.put(CommonKeys.SUNDAY, 0.67);
+		factors.put(CommonValues.MONDAY, 1.02);
+		factors.put(CommonValues.FRIDAY, 1.15);
+		factors.put(CommonValues.SATURDAY, 0.95);
+		factors.put(CommonValues.SUNDAY, 0.67);
 		factors.put("dimido", 1.07);
 		factors.put("wkday", 1.076);
 
 		double wkdayf = 0;
-		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY, "dimido", "wkday"};
+		String[] days = new String[] {CommonValues.MONDAY, CommonValues.FRIDAY, CommonValues.SATURDAY, CommonValues.SUNDAY, "dimido", "wkday"};
 		for(String day : days) {
 			logger.info(String.format("Processing matrix %s...", day));
 

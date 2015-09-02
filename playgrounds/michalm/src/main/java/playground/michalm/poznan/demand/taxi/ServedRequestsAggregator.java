@@ -28,22 +28,20 @@ import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 
+import com.google.common.base.Function;
+
 import playground.michalm.demand.aggregator.*;
 import playground.michalm.poznan.zone.PoznanZones;
 import playground.michalm.util.matrices.*;
 import playground.michalm.zone.*;
-
-import com.google.common.base.Function;
 
 
 public class ServedRequestsAggregator
 {
     public static void main(String[] args)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-
-        //Map<Id, Zone> zones = PoznanZones.readTaxiZones(scenario);
-        Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones(scenario);
+        //Map<Id, Zone> zones = PoznanZones.readTaxiZones();
+        Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones();
 
         Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
         requests = PoznanServedRequests.filterNormalPeriods(requests);
@@ -84,8 +82,8 @@ public class ServedRequestsAggregator
                     @Override
                     public String apply(String key)
                     {
-                        return StringUtils.leftPad(hourlyDateDiscretizer.parseDiscretizedDate(key)
-                                .getHours() + "", 2);
+                        return StringUtils.leftPad(
+                                hourlyDateDiscretizer.parseDiscretizedDate(key).getHours() + "", 2);
                     };
                 });
 

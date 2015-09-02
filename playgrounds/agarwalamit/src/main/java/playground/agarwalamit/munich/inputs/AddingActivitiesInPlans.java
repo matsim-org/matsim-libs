@@ -38,7 +38,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -60,17 +59,7 @@ public class AddingActivitiesInPlans {
 	private SortedMap<String, Tuple<Double, Double>> actType2TypDurMinDur;
 	private Scenario scOut;
 	private PersonFilter pf = new PersonFilter();
-
-	public static void main(String[] args) {
-		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
-
-		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc);
-		newPlansInfo.run();
-		newPlansInfo.writePlans(outPlans);
-	}
+	private int skippedPersons = 0;
 
 	/**
 	 * @return activity type to typical and minimum duration respectively
@@ -78,7 +67,7 @@ public class AddingActivitiesInPlans {
 	public SortedMap<String, Tuple<Double, Double>> getActivityType2TypicalAndMinimalDuration(){
 		return actType2TypDurMinDur;
 	}
-	
+
 	public void run(){
 
 		scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -89,8 +78,10 @@ public class AddingActivitiesInPlans {
 
 			if(pf.isPersonIdFromUserGroup(p.getId(), UserGroup.URBAN)){
 
-				Person pOut = popFactory.createPerson(p.getId());
+				boolean skipPerson = false;
 
+				Person pOut = popFactory.createPerson(p.getId());
+				
 				Plan planOut = popFactory.createPlan();
 				pOut.addPlan(planOut);
 
@@ -108,14 +99,6 @@ public class AddingActivitiesInPlans {
 
 				if(firstAct == null || lastAct == null) throw new RuntimeException("First and last plan elements are not instanceof Activity. Aborting...");
 
-				if(firstAct.getEndTime() == 0.) {
-					/*
-					 * If first and last act are not same, 1800 sec will be assigned to first act during "duringConsistencyCheck".
-					 * else it will be clubbed with last act and thus, will be scored together.
-					 */
-					log.warn("First activity has zero end time.");
-				}
-
 				if(firstAct.getType().equals(lastAct.getType())){ 
 					double homeDur = firstAct.getEndTime();
 					homeDur = homeDur +  24*3600 - lastAct.getStartTime(); // here 30*00 may not be necessary, because, this step only decide about typical duration and lesser typical duration is better than very high.
@@ -124,9 +107,15 @@ public class AddingActivitiesInPlans {
 					if(homeDur == 0) throw new RuntimeException("First and last activities are same, yet total duration is 0. Aborting...");
 
 					homeTypDur = Math.max(Math.floor(homeDur/3600), 0.5) * 3600;
-
+				} else {
+					if(firstAct.getEndTime() == 0.) {
+						/*
+						 * If first and last act are not same, 1800 sec will be assigned to first act during "duringConsistencyCheck".
+						 * else it will be clubbed with last act and thus, will be scored together.
+						 */
+						log.warn("First activity has zero end time and first and last activities are different and thus scored differently. Setting a minimum duration of 1800 sec for first activity.");
+					}
 				}
-
 				for(int ii = 0; ii<pes.size();ii++) {
 					PlanElement pe = pes.get(ii);
 
@@ -147,7 +136,7 @@ public class AddingActivitiesInPlans {
 							if(isFirstAndLastActSame){ // same first and last act
 
 								actType = firstAct.getType().substring(0,4).concat(homeTypDur/3600+"H");
-								
+
 								Activity hAct = popFactory.createActivityFromCoord(actType, firstAct.getCoord());
 
 								if(ii==0) hAct.setEndTime(firstAct.getEndTime()); // first act --> only end time (no need for any time shift for first act)
@@ -171,13 +160,15 @@ public class AddingActivitiesInPlans {
 									Activity act = popFactory.createActivityFromCoord(actType, firstAct.getCoord());
 									act.setEndTime(firstAct.getEndTime()+timeShift); //time shift is required for first activity also, for e.g. activities having zero end time.
 									planOut.addActivity(act);
-
 								} else { // last
 
-									if(lastAct.getStartTime() > 24*3600) {
-										continue; // approx 22 such activities, skipping these activities.
+									if(lastAct.getStartTime() >= 24*3600) {
+										// skipping the person, one could skip only this activity (and the connecting leg) which could generate other prob like 
+										// home1 -car- home2 -pt- work will reduce to home1 -car- home2 and home1 and home2 are not wrapped.
+										skipPerson = true;
+										break;
 									}
-									
+
 									double dur = 24*3600 - lastAct.getStartTime();
 
 									Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
@@ -191,7 +182,7 @@ public class AddingActivitiesInPlans {
 									act.setStartTime(lastAct.getStartTime()+ timeShift);
 									planOut.addActivity(act);
 								}
-
+							
 							}
 						} else { // all intermediate activities
 
@@ -220,8 +211,9 @@ public class AddingActivitiesInPlans {
 						actType2TypDurMinDur.put(actType, typMinDur);
 					} 
 				}
-				popOut.addPerson(pOut);
-			
+				if(!skipPerson) popOut.addPerson(pOut);
+				else skippedPersons++;
+
 			} else if(pf.isPersonIdFromUserGroup(p.getId(), UserGroup.COMMUTER) || pf.isPersonIdFromUserGroup(p.getId(), UserGroup.REV_COMMUTER) ){
 				//removing end time from the last act
 				Person pOut = popFactory.createPerson(p.getId());
@@ -231,17 +223,17 @@ public class AddingActivitiesInPlans {
 
 				List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
 				int sizeOfPlanElements = pes.size();
-				
+
 				for (int ii=0; ii < sizeOfPlanElements-1;ii++){
 					PlanElement pe = pes.get(ii);
-					
+
 					if (pe instanceof Activity){
 						planOut.addActivity((Activity)pe);
 					} else if (pe instanceof Leg){
 						planOut.addLeg((Leg)pe);
 					}
 				}
-				
+
 				PlanElement pe = pes.get(sizeOfPlanElements-1);
 				Activity act = popFactory.createActivityFromCoord(((Activity)pe).getType(),((Activity)pe).getCoord());
 				planOut.addActivity(act);
@@ -266,8 +258,8 @@ public class AddingActivitiesInPlans {
 			timeShift = 1800;
 		} else if (duration < 0){
 			throw new RuntimeException("Duration is negative. Setting it to minimum dur of 1800");
-//			timeShift = - duration + 1800;
-//			duration = 1800;
+			//			timeShift = - duration + 1800;
+			//			duration = 1800;
 		} else dur = duration;
 
 		return new Tuple<Double, Double>(dur, timeShift);
@@ -277,8 +269,9 @@ public class AddingActivitiesInPlans {
 		return this.scOut.getPopulation();
 	}
 
-	private void writePlans( String outplans){
+	void writePlans( String outplans){
 		new PopulationWriter(scOut.getPopulation()).write(outplans);
 		log.info("File is written to "+outplans);
+		log.warn("Total number of skipped persons are "+skippedPersons+". Because last activity starts after mid night.");
 	}
 }

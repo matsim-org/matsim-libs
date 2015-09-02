@@ -18,7 +18,12 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.TObjectLongMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.map.hash.TObjectLongHashMap;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
@@ -26,6 +31,7 @@ import org.matsim.core.utils.misc.Time;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -40,7 +46,7 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 		final Map<String,Number> values = new LinkedHashMap<>();
 
 		// This is awful, but BIOGEME does not understand anything else than numbers...
-		values.put("P_ID", Long.getLong(cs.getDecisionMaker().getId().toString()));
+		values.put("P_ID", getId( cs ) );
 		values.put("P_AGE", getAge(cs.getDecisionMaker()));
 		values.put("P_GENDER", getGender(cs.getDecisionMaker()));
 		values.put("P_CARAVAIL", getCarAvailability(cs.getDecisionMaker()));
@@ -52,6 +58,26 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 		}
 
 		return values;
+	}
+
+	private final TLongObjectMap<Id<Person>> idMappings = new TLongObjectHashMap<>();
+	private long getId( final ChoiceSet<Trip> cs ) {
+		final Id<Person> id = cs.getDecisionMaker().getId();
+		final Long longId = Long.getLong( id.toString() );
+
+		if ( longId != null ) return longId;
+
+		// TODO store table number to id
+		// (could also be done offline, as String hashCode should be stable according to documentation)
+		long value = id.toString().hashCode();
+
+		while ( idMappings.containsKey( value ) && !idMappings.get( value ).equals( id ) ) {
+			log.warn( "Already a numerical ID "+value+" (for id "+idMappings.get( value )+") when adding "+id );
+			value++;
+		}
+
+		idMappings.put( value , id );
+		return value;
 	}
 
 	private int getChoice(final ChoiceSet<Trip> cs) {

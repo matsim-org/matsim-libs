@@ -22,10 +22,7 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -43,10 +40,10 @@ public class TripDayVolumeTask extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectIntHashMap<String> values = new TObjectIntHashMap<>();
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			String day = person.getAttribute(CommonKeys.DAY);
 			for(Episode plan : person.getEpisodes()) {
 				

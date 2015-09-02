@@ -1,6 +1,7 @@
 package playground.dhosse.cl.population;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class CSVToPlans {
 	private final String carAvail = "carAvail";
 	
 	private final String shapefile;
-	private final String ouputDirectory;
+	private final String outputDirectory;
 	
 	private Scenario scenario;
 	private ObjectAttributes agentAttributes;
@@ -76,7 +77,7 @@ public class CSVToPlans {
 		
 		this.config = config;
 		this.shapefile = shapefileName;
-		this.ouputDirectory = outputDirectory;
+		this.outputDirectory = outputDirectory;
 	}
 	
 	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile){
@@ -611,8 +612,9 @@ public class CSVToPlans {
 	
 	private void write(){
 		
-		new ObjectAttributesXmlWriter(agentAttributes).writeFile(this.ouputDirectory + "agentAttributes.xml");
-		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputDirectory + "plans.xml.gz");
+		createDir(new File(this.outputDirectory));
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile(this.outputDirectory + "agentAttributes.xml");
+		new PopulationWriter(this.scenario.getPopulation()).write(this.outputDirectory + "plans.xml.gz");
 		
 	}
 	
@@ -791,6 +793,10 @@ public class CSVToPlans {
 		
 		return res;
 		
+	}
+	
+	private static void createDir(File file) {
+		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
 	
 }

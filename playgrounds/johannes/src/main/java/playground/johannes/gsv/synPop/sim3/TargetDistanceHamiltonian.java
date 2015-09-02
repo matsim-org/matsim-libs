@@ -21,7 +21,8 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -43,14 +44,14 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		this.weighted = weighted;
 	}
 
-	public double evaluate(PlainPerson person) {
+	public double evaluate(Person person) {
 		double targetSum = 0;
 		double realSum = 0;
 		double errSum = 0;
 		double cnt = 0;
 		
-		for (int i = 1; i < person.getPlan().getActivities().size(); i++) {
-			PlainElement leg = (PlainElement)person.getPlan().getLegs().get(i - 1);
+		for (int i = 1; i < ((PlainPerson)person).getPlan().getActivities().size(); i++) {
+			PlainElement leg = (PlainElement)((PlainPerson)person).getPlan().getLegs().get(i - 1);
 			Double targetDistance = (Double) leg.getUserData(TARGET_DISTANCE_KEY);
 			
 			if (targetDistance == null) {
@@ -63,8 +64,8 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 			if (targetDistance != null) {
 				targetSum += targetDistance;
 
-				PlainElement prev = (PlainElement)person.getPlan().getActivities().get(i - 1);
-				PlainElement next = (PlainElement)person.getPlan().getActivities().get(i);
+				PlainElement prev = (PlainElement)((PlainPerson)person).getPlan().getActivities().get(i - 1);
+				PlainElement next = (PlainElement)((PlainPerson)person).getPlan().getActivities().get(i);
 				double dist = distance(prev, next);
 				realSum += dist;
 

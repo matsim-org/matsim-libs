@@ -33,19 +33,16 @@ import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,29 +126,29 @@ public class PopulationGenerator {
 		 * 
 		 */
 		dayProbas = new ChoiceSet<>(random);
-		dayProbas.addChoice(CommonKeys.MONDAY, 1.02);
-		dayProbas.addChoice(CommonKeys.TUESDAY, 1.04);
-		dayProbas.addChoice(CommonKeys.WEDNESDAY, 1.08);
-		dayProbas.addChoice(CommonKeys.WEDNESDAY, 1.08);
-		dayProbas.addChoice(CommonKeys.FRIDAY, 1.15);
-		dayProbas.addChoice(CommonKeys.SATURDAY, 0.95);
-		dayProbas.addChoice(CommonKeys.SUNDAY, 0.67);
+		dayProbas.addChoice(CommonValues.MONDAY, 1.02);
+		dayProbas.addChoice(CommonValues.TUESDAY, 1.04);
+		dayProbas.addChoice(CommonValues.WEDNESDAY, 1.08);
+		dayProbas.addChoice(CommonValues.WEDNESDAY, 1.08);
+		dayProbas.addChoice(CommonValues.FRIDAY, 1.15);
+		dayProbas.addChoice(CommonValues.SATURDAY, 0.95);
+		dayProbas.addChoice(CommonValues.SUNDAY, 0.67);
 		/*
 		 * 
 		 */
 		monthProbas = new ChoiceSet<>(random);
-		monthProbas.addChoice(MIDKeys.JANUARY, 0.083);
-		monthProbas.addChoice(MIDKeys.FEBRUARY, 0.094);
-		monthProbas.addChoice(MIDKeys.MARCH, 0.099);
-		monthProbas.addChoice(MIDKeys.APRIL, 0.095);
-		monthProbas.addChoice(MIDKeys.MAY, 0.091);
-		monthProbas.addChoice(MIDKeys.JUNE, 0.085);
+		monthProbas.addChoice(MiDValues.JANUARY, 0.083);
+		monthProbas.addChoice(MiDValues.FEBRUARY, 0.094);
+		monthProbas.addChoice(MiDValues.MARCH, 0.099);
+		monthProbas.addChoice(MiDValues.APRIL, 0.095);
+		monthProbas.addChoice(MiDValues.MAY, 0.091);
+		monthProbas.addChoice(MiDValues.JUNE, 0.085);
 		// july is missing in mid2008
-		monthProbas.addChoice(MIDKeys.AUGUST, 0.092);
-		monthProbas.addChoice(MIDKeys.SEPTEMBER, 0.093);
-		monthProbas.addChoice(MIDKeys.OCTOBER, 0.088);
-		monthProbas.addChoice(MIDKeys.NOVEMBER, 0.092);
-		monthProbas.addChoice(MIDKeys.DECEMBER, 0.088);
+		monthProbas.addChoice(MiDValues.AUGUST, 0.092);
+		monthProbas.addChoice(MiDValues.SEPTEMBER, 0.093);
+		monthProbas.addChoice(MiDValues.OCTOBER, 0.088);
+		monthProbas.addChoice(MiDValues.NOVEMBER, 0.092);
+		monthProbas.addChoice(MiDValues.DECEMBER, 0.088);
 		/*
 		 * 
 		 */
@@ -276,7 +273,7 @@ public class PopulationGenerator {
 		
 		PlainPerson person = new PlainPerson(id);
 		person.setAttribute(CommonKeys.DAY, dayProbas.randomWeightedChoice());
-		person.setAttribute(MIDKeys.PERSON_MONTH, monthProbas.randomWeightedChoice());
+		person.setAttribute(MiDKeys.PERSON_MONTH, monthProbas.randomWeightedChoice());
 
 		Episode plan = new PlainEpisode();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");

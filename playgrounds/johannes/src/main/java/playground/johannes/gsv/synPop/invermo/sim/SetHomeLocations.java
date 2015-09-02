@@ -27,9 +27,10 @@ import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainPerson;
@@ -56,12 +57,12 @@ public class SetHomeLocations {
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, args[0]);
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Cloning persons...");
@@ -83,11 +84,11 @@ public class SetHomeLocations {
 		/*
 		 * Assign facilities to the geocoded home locations.
 		 */
-		ProxyTaskRunner.run(new AssignHomeFacilities(dataPool), persons);
+		TaskRunner.run(new AssignHomeFacilities(dataPool), persons);
 		/*
 		 * Calculate the target population density.
 		 */
-		ProxyTaskRunner.run(new InitializeTargetDensity(dataPool), persons);
+		TaskRunner.run(new InitializeTargetDensity(dataPool), persons);
 		/*
 		 * Distribute population according to zone values.
 		 */

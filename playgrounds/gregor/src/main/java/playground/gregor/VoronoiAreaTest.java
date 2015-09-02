@@ -42,7 +42,7 @@ public class VoronoiAreaTest extends PApplet{
 	private static final long serialVersionUID = 1L;
 	private List<GraphEdge> edges;
 	private int redraws;
-	private int cnt=40;
+	private int cnt=4000;
 	private HashMap<Integer, Cell> cells;
 
 	@Override
@@ -56,14 +56,37 @@ public class VoronoiAreaTest extends PApplet{
 	}
 
 	private void buildVD() {
-
-
-		double x[] = new double[this.cnt];
-		double y[] = new double[this.cnt];
-		for (int i = 0; i < this.cnt; i++) {
-			x[i] = MatsimRandom.getRandom().nextInt(1920);
-			y[i] = MatsimRandom.getRandom().nextInt(1080);
+		double  width = 60;
+		int idx =0;
+		boolean even = false;
+		for (int yc = 0; yc < 1080; yc += width*Math.sqrt(3)/4) {
+			int xc = 0;
+			if (even) {
+				xc += width*1.5/2;
+			}
+			for (; xc < 1920; xc+=width*1.5) {
+				idx++;
+			}
+			even = !even;
 		}
+		
+		double x[] = new double[idx];
+		double y[] = new double[idx];
+		even = false;
+		idx =0;
+		
+		for (int yc = 0; yc < 1080; yc += width*Math.sqrt(3)/4) {
+			int xc = 0;
+			if (even) {
+				xc += width*1.5/2;
+			}
+			for (; xc < 1920; xc+=width*1.5) {
+				x[idx] = xc;
+				y[idx++] = yc;
+			}
+			even = !even;
+		}
+		System.out.println(idx);
 
 		Voronoi v = new Voronoi(0.0001);
 		this.edges = v.generateVoronoi(x, y, 0, 1920, 0, 1080);
@@ -88,6 +111,10 @@ public class VoronoiAreaTest extends PApplet{
 
 
 		for (GraphEdge e : this.edges) {
+			
+			double length = Math.sqrt((e.x1-e.x2)*(e.x1-e.x2)+(e.y1-e.y2)*(e.y1-e.y2));
+//			System.out.println(length);
+			
 
 			Cell c1 = this.cells.get(e.site1);
 			if (c1 == null) {
@@ -210,8 +237,8 @@ public class VoronoiAreaTest extends PApplet{
 			//			
 						stroke(255);
 						fill(255);
-						text(c.area+"", (float)c.x, (float)c.y);
-						text(c.area2+"", (float)c.x, (float)c.y+21);
+//						text(c.area+"", (float)c.x, (float)c.y);
+//						text(c.area2+"", (float)c.x, (float)c.y+21);
 						ellipse((float)c.x, (float)c.y,5,5);
 		}
 

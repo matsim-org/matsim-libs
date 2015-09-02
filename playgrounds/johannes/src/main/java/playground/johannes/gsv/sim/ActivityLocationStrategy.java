@@ -51,7 +51,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.johannes.gsv.misc.QuadTree;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.ProgressLogger;
 
 /**

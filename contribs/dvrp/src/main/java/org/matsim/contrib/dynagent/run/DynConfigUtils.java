@@ -45,9 +45,10 @@ public class DynConfigUtils
     {
         QSimConfigGroup qSimConfig = config.qsim();
         qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-        qSimConfig.setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue );
+        qSimConfig.setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
         qSimConfig.setRemoveStuckVehicles(false);
         qSimConfig.setStartTime(0);
-        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
+        qSimConfig.setSimStarttimeInterpretation(
+                QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
     }
 }

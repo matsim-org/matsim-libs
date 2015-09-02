@@ -67,6 +67,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@SuppressWarnings("static-method")
 	@Before
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();		
@@ -82,9 +83,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	public void testLoadMATSim4UrbanSimMinimalConfig(){
 
 		M4UConfigurationConverterV4 connector = null;
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 
-		String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
+		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 		log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 
@@ -132,7 +132,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 
 
 		log.info("done") ;
@@ -149,10 +149,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
 
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-
 		try{
-			String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 
@@ -177,7 +175,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 		log.info("done") ;
 	}
 
@@ -192,8 +190,6 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	@Test
 	//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testExternalMATSimConfig(){
-		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-
 		M4UConfigurationConverterV4 converter = null;
 
 		String path = utils.getOutputDirectory() + "/tmp" ;
@@ -203,7 +199,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 		// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
 		CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);
-		String externalConfigLocation = testExternalConfig.generateConfigV2();
+		String externalConfigLocation = testExternalConfig.generateMATSimConfig();
 
 		// this creates a MATSim4UrbanSim configuration
 		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
@@ -252,7 +248,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleanUpCustomTempDirectories();
+		TempDirectoryUtil.cleanUpCustomTempDirectories();
 	}
 
 	// Helper method for get the file content
@@ -284,14 +280,14 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			CreateTestExternalMATSimConfig externalTestConfig,
 			CreateTestM4UConfig testConfig, Config config) {
 
-		Assert.assertTrue(config.controler().getFirstIteration() == externalTestConfig.firstIteration.intValue());
-		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.lastIteration.intValue());
-		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.matsim4opusOutput ) ));
+		Assert.assertTrue(config.controler().getFirstIteration() == externalTestConfig.getFirstIteration() ) ;
+		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.getLastIteration() );
+		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.getMatsim4opusOutput() ) ));
 
-		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFileName ) ));
+		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.getNetworkInputFileName() ) ));
 
 		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
-			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFileName ) ));
+			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.getInputPlansFileName() ) ));
 		}
 
 		Iterator<StrategySettings> iteratorStrategyCG = config.strategy().getStrategySettings().iterator();
@@ -317,11 +313,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		}
 
 		// tnicolai: times and durations in testExternalConfig are given as String, so they are not comparable with double values
-		ActivityParams homeActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_0);
-		ActivityParams workActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_1);
-		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( externalTestConfig.activityType_0 ));
+		ActivityParams homeActivity = config.planCalcScore().getActivityParams("home");
+		ActivityParams workActivity = config.planCalcScore().getActivityParams("work");
+		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( "home" ));
 		// Assert.assertTrue(homeActivity.getTypicalDuration() == testExternalConfig.homeActivityTypicalDuration.intValue());
-		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( externalTestConfig.activityType_1 ));
+		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( "work" ));
 		// Assert.assertTrue(workActivity.getOpeningTime() == testExternalConfig.workActivityOpeningTime.intValue());
 		// Assert.assertTrue(workActivity.getLatestStartTime() == testExternalConfig.workActivityLatestStartTime.intValue());
 
@@ -374,11 +370,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue( Paths.checkPathEnding( contolerCG.getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.matsim4opusOutput ) ));
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFileName ) ));
+		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.getNetworkInputFileName() ) ));
 
 		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFileName ) ));
+			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.getInputPlansFileName() ) ));
 		}
 
 		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);

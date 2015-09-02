@@ -112,6 +112,7 @@
 		<module>matrixbasedptrouter</module>
 		<module>parking</module>
 		<module>socnetsim</module>
+		<module>socnetgen</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
 		<module>multimodal</module>
@@ -143,7 +144,12 @@
 		<repository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>

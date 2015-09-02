@@ -12,9 +12,9 @@ public class UsersOfBothServices {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats.txt");
+		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/1.250.RT_CS_1");
 
-		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSTW_Stats.txt");
+		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/1.250.RT_CS");
 
 		Set<String> bla = new HashSet<String>();
 
@@ -25,7 +25,7 @@ public class UsersOfBothServices {
 		while(s != null) {
 			String[] arr = s.split("\\s");
 			
-			bla.add((arr[0]));
+			bla.add((arr[7]));
 			
 			s = readLink1.readLine();
 		
@@ -37,8 +37,10 @@ public class UsersOfBothServices {
 		while(s != null) {
 			String[] arr = s.split("\\s");
 			
-			if (bla.contains((arr[0])))
+			if (bla.contains((arr[7]))) {
 				count++;
+				bla.remove(arr[7]);
+			}
 			s = readLink2.readLine();
 		
 			

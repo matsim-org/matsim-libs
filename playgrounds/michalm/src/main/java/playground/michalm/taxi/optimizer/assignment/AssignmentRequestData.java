@@ -34,12 +34,13 @@ class AssignmentRequestData
     final int dimension;
 
 
-    AssignmentRequestData(TaxiOptimizerConfiguration optimConfig, SortedSet<TaxiRequest> unplannedRequests)
+    AssignmentRequestData(TaxiOptimizerConfiguration optimConfig,
+            SortedSet<TaxiRequest> unplannedRequests)
     {
         dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        urgentReqCount = Requests.countRequests(unplannedRequests, new Requests.IsUrgentPredicate(
-                optimConfig.context.getTime()));
+        urgentReqCount = Requests.countRequests(unplannedRequests,
+                new Requests.IsUrgentPredicate(optimConfig.context.getTime()));
 
         requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
     }

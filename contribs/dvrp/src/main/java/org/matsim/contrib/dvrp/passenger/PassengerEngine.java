@@ -50,8 +50,9 @@ public class PassengerEngine
     protected final AwaitingPickupStorage awaitingPickupStorage;
 
 
-    public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-                           VrpOptimizer optimizer, MatsimVrpContext context)
+    public PassengerEngine(String mode, EventsManager eventsManager,
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+            MatsimVrpContext context)
     {
         this.mode = mode;
         this.eventsManager = eventsManager;
@@ -100,8 +101,8 @@ public class PassengerEngine
      * @param passenger
      * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that
      *        in MATSim leg departure times may be meaningless; the only thing that truly matters is
-     *        the activity end time. Is your code defensive against that? kai, jul'14
-     *        I (jb) only use this functionality after I explicitly set the Leg departure time (aug '15)
+     *        the activity end time. Is your code defensive against that? kai, jul'14 I (jb) only
+     *        use this functionality after I explicitly set the Leg departure time (aug '15)
      * @return
      */
     public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
@@ -183,8 +184,8 @@ public class PassengerEngine
 
     //================ PICKUP / DROPOFF
 
-    public boolean pickUpPassenger(PassengerPickupActivity pickupActivity,
-            MobsimDriverAgent driver, PassengerRequest request, double now)
+    public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+            PassengerRequest request, double now)
     {
         MobsimPassengerAgent passenger = request.getPassenger();
         Id<Link> linkId = driver.getCurrentLinkId();
@@ -207,7 +208,8 @@ public class PassengerEngine
         mobVehicle.addPassenger(passenger);
         passenger.setVehicle(mobVehicle);
 
-        eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+        eventsManager.processEvent(
+                new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
         return true;
     }
@@ -221,7 +223,8 @@ public class PassengerEngine
         mobVehicle.removePassenger(passenger);
         passenger.setVehicle(null);
 
-        eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+        eventsManager.processEvent(
+                new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);

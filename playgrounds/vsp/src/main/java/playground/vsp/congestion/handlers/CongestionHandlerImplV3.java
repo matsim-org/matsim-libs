@@ -43,7 +43,7 @@ import playground.vsp.congestion.LinkCongestionInfo;
  * @author ikaddoura
  *
  */
-public class CongestionHandlerImplV3 extends CongestionHandler implements ActivityEndEventHandler {
+public final class CongestionHandlerImplV3 extends AbstractCongestionHandler implements ActivityEndEventHandler {
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	
@@ -51,30 +51,33 @@ public class CongestionHandlerImplV3 extends CongestionHandler implements Activi
 		super(events, scenario);
 	}
 	
+	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
-		this.totalDelay = this.totalDelay + delayOnThisLink;
+		
+		// global book-keeping:
+		this.addToTotalDelay( delayOnThisLink );
 		
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
-		double totalDelayWithDelaysOnPreviousLinks = 0.;
+		double agentDelayWithDelaysOnPreviousLinks = 0.;
 		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
-			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
 			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
 		}
 		
-		if (totalDelayWithDelaysOnPreviousLinks < 0.) {
+		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
 			throw new RuntimeException("The total delay is below 0. Aborting...");
 			
-		} else if (totalDelayWithDelaysOnPreviousLinks == 0.) {
+		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
 			// The agent was leaving the link without a delay.
 			
 		} else {
 			// The agent was leaving the link with a delay.
 						
-			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(totalDelayWithDelaysOnPreviousLinks, event);
+			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), agentDelayWithDelaysOnPreviousLinks);
 			
 			if (storageDelay < 0.) {
 				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
@@ -83,13 +86,13 @@ public class CongestionHandlerImplV3 extends CongestionHandler implements Activi
 				// The delay resulting from the storage capacity is 0.
 				
 			} else if (storageDelay > 0.) {	
-				if (this.allowForStorageCapacityConstraint) {
-					if (this.calculateStorageCapacityConstraints) {
+				if (this.isAllowingForStorageCapacityConstraint()) {
+					if (this.isCalculatingStorageCapacityConstraints()) {
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
 						this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
 					} else {
-						this.delayNotInternalized_storageCapacity += storageDelay;
-						log.warn("Delay which is not internalized: " + this.delayNotInternalized_storageCapacity);
+						this.addToDelayNotInternalized_storageCapacity( storageDelay ) ;
+						log.warn("Delay which is not internalized: " + this.getDelayNotInternalized_storageCapacity());
 					}
 					
 				} else {
@@ -108,7 +111,7 @@ public class CongestionHandlerImplV3 extends CongestionHandler implements Activi
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
 //				log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
-				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
+				this.addToDelayNotInternalized_spillbackNoCausingAgent( this.agentId2storageDelay.get(event.getPersonId()) ) ;
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
 		}

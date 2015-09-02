@@ -34,7 +34,6 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -47,7 +46,7 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
  * @author amit
  */
 
-public class PricingControler {
+class PricingControler {
 	
 	private static boolean usingMunich = false;
 
@@ -128,7 +127,7 @@ public class PricingControler {
 			Logger.getLogger(PricingControler.class).info("Congestion pricing implementation does not match. No pricing implementation is introduced.");
 		}
 		
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener(controler.getScenario()));
 		
 		if(usingMunich){
 			controler.addOverridingModule(new AbstractModule() {

@@ -89,8 +89,8 @@
 		<module>duncan</module>
 		<module>dziemke</module>
 		<!--<module>fhuelsmann</module>-->
-		<!--<module>gregor</module>-->
-		<!--<module>gunnar</module>-->
+		<module>gregor</module>
+		<module>gunnar</module>
 		<!--<module>hbecker</module>-->
 		<module>ikaddoura</module>
 		<module>imob</module>
@@ -111,7 +111,6 @@
 		<module>muelleki</module>
 		<module>mzilske</module>
 		<module>naronald</module>
-		<module>ndekoker</module>
 		<module>nmviljoen</module>
 		<module>pbouman</module>
 		<module>pieter</module>
@@ -124,7 +123,7 @@
 		<module>smetzler</module>
 		<module>southAfrica</module>
 		<!--<module>staheale</module>-->
-		<!--<module>stockholm</module>-->
+		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tobiqui</module>
@@ -137,7 +136,6 @@
 		<module>vsptelematics</module>
 		<module>vsp</module>
 		<module>vspshk</module>
-		<module>qvanheerden</module>
 		<module>wbean</module>
 		<module>vbmh</module>
 	</modules>
@@ -155,7 +153,12 @@
 		<repository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>

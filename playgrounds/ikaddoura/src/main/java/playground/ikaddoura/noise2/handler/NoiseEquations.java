@@ -24,6 +24,7 @@ package playground.ikaddoura.noise2.handler;
 
 import java.util.Collection;
 
+
 /**
  * 
  * Contains general equations that are relevant to compute noise emission and immission levels, based on the German RLS-90 approach 'Lange gerade Straßen'.
@@ -42,6 +43,10 @@ public class NoiseEquations {
 				
 		// 	M ... traffic volume
 		// 	p ... share of hdv in %
+		
+		if (p > 1) {
+			throw new RuntimeException("p has to be <= 1. For an HGV share of 1%, p should be 0.01. Aborting...");
+		}
 				
 		double pInPercentagePoints = p * 100.;	
 		double mittelungspegel = 37.3 + 10* Math.log10(n * (1 + (0.082 * pInPercentagePoints)));
@@ -51,8 +56,12 @@ public class NoiseEquations {
 	
 	public static double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double p) {
 		
-		// 	basically the speed is 100 km/h
+		//  v ... speed in kilometers per hour
 		// 	p ... share of hdv, in percentage points
+		
+		if (p > 1) {
+			throw new RuntimeException("p has to be <= 1. For an HGV share of 1%, p should be 0.01. Aborting...");
+		}
 		
 		double pInPercentagePoints = p * 100.;	
 
@@ -60,8 +69,7 @@ public class NoiseEquations {
 		double lHdv = calculateLHdv(vHdv);
 
 		double d = lHdv - lCar; 
-		
-		double geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
+		double geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10( (100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
 		
 		return geschwindigkeitskorrekturDv;
 	}

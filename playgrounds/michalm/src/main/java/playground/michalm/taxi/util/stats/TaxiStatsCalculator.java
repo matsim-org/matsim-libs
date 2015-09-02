@@ -23,7 +23,7 @@ import java.util.EnumMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
@@ -97,8 +97,8 @@ public class TaxiStatsCalculator
             double withPassenger = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
             return empty / (empty + withPassenger);
         }
-        
-        
+
+
         public DescriptiveStatistics getDriveWithPassengerTimes()
         {
             return timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER);

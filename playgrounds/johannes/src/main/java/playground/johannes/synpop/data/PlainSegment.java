@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class PlainSegment extends  PlainElement implements Segment{
+public class PlainSegment extends PlainElement implements Segment {
 
     private Episode episode;
 

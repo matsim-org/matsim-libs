@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class RandomSelector implements Mutator {
 	
 	private final SingleMutator delegate;
 	
-	private final List<PlainPerson> mutation;
+	private final List<Person> mutation;
 	
 	public RandomSelector(SingleMutator delegate, Random random) {
 		this.delegate = delegate;
@@ -45,18 +45,18 @@ public class RandomSelector implements Mutator {
 	}
 	
 	@Override
-	public List<PlainPerson> select(List<PlainPerson> persons) {
+	public List<Person> select(List<Person> persons) {
 		mutation.set(0, persons.get(random.nextInt(persons.size())));
 		return mutation;
 	}
 
 	@Override
-	public boolean modify(List<PlainPerson> persons) {
+	public boolean modify(List<Person> persons) {
 		return delegate.mutate(persons.get(0));
 	}
 
 	@Override
-	public void revert(List<PlainPerson> persons) {
+	public void revert(List<Person> persons) {
 		delegate.revert(persons.get(0));
 		
 	}

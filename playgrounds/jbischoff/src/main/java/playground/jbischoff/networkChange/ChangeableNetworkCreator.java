@@ -52,7 +52,7 @@ public class ChangeableNetworkCreator {
 		prepareScen();
 		tcc =  readEvents();
 		createNetworkChangeEvents(sc.getNetwork(),tcc);
-		new NetworkChangeEventsWriter().write(CHANGEFILE, networkChangeEvents);;
+		new NetworkChangeEventsWriter().write(CHANGEFILE, networkChangeEvents);
 	}
 	
 	public void createNetworkChangeEvents(Network network, TravelTimeCalculator tcc2) {

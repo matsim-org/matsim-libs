@@ -20,7 +20,7 @@
 package playground.johannes.gsv.matrices.episodes2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 
 /**

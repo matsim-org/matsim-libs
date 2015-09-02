@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -69,8 +70,8 @@ public class RunOneTaxiExample
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
-        VrpPathCalculator calculator = new VrpPathCalculatorImpl(router, travelTime,
-                travelDisutility);
+        VrpPathCalculator calculator = new VrpPathCalculatorImpl(router, new VrpPathFactoryImpl(travelTime,
+                travelDisutility));
 
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(context, calculator);
 
@@ -80,8 +81,8 @@ public class RunOneTaxiExample
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
                 new OneTaxiRequestCreator(), optimizer, context, qSim);
 
-        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new OneTaxiActionCreator(
-                passengerEngine, qSim.getSimTimer()));
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
+                new OneTaxiActionCreator(passengerEngine, qSim.getSimTimer()));
 
         EventsManager events = qSim.getEventsManager();
 

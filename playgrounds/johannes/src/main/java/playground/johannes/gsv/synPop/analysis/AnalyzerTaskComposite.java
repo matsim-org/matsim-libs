@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -53,7 +53,7 @@ public class AnalyzerTaskComposite extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Collection<PlainPerson> person, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> person, Map<String, DescriptiveStatistics> results) {
 		for(AnalyzerTask task : tasks) {
 			logger.debug(String.format("Running task %1$s...", task.getClass().getSimpleName()));
 			task.analyze(person, results);

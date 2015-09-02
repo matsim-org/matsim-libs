@@ -1,28 +1,46 @@
 package saleem.p0;
 
-import org.matsim.core.controler.Controler;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
 
-public class P0ControlListener implements IterationStartsListener,ShutdownListener {
+public class P0ControlListener implements IterationStartsListener,IterationEndsListener, ShutdownListener {
 	public NetworkImpl network;
 	P0QueueDelayControl handler;
+	public ArrayList<Double> avgabsolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
+	public ArrayList<Double> iters = new ArrayList<Double>();//To check the convergence quality
 	public P0ControlListener(NetworkImpl network){
 		this.network = network;
 	}
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		handler = new P0QueueDelayControl(network);
+		handler = new P0QueueDelayControl(network, event.getIteration());
 	    event.getControler().getEvents().addHandler(handler);
 		
 	}
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		handler.plotStats();
+		handler.plotAbsoultePressureDifference(iters, avgabsolutepressuredifference);
 		handler.printDelayStats();
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		handler.printEvents();
+		network.setNetworkChangeEvents(P0QueueDelayControl.events);
+		avgabsolutepressuredifference.add(handler.getAvgPressDiffOverIter());
+		iters.add(Double.parseDouble(Integer.toString(event.getIteration())));
 		// TODO Auto-generated method stub
 		
 	}

@@ -82,7 +82,6 @@ class UlmResource {
 		config.network().setInputFile(wd + "/network.xml");
 		config.plans().setInputFile(wd + "/population.xml");
 		config.global().setCoordinateSystem(CRS);
-		config.scenario().setUseVehicles(true);
 		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setSnapshotPeriod(1);

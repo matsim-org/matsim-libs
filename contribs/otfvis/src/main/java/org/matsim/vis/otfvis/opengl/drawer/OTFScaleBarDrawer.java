@@ -1,17 +1,15 @@
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import java.awt.Font;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-
-import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
+import org.matsim.core.gbl.MatsimResource;
+import org.matsim.vis.otfvis.caching.SceneGraph;
+
+import java.awt.*;
 
 /**
  * OTFScaleBarDrawer draws a scale bar as an overlay.

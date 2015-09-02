@@ -28,12 +28,10 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -105,16 +103,16 @@ public class TaxiQSimProvider implements Provider<QSim> {
 		TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(), tcg.isVehicleDiversion(),
 				tcg.getPickupDuration(), tcg.getDropoffDuration());
 		
-		resetSchedules(context.getVrpData().getVehicles());
+		resetSchedules(context.getVrpData().getVehicles().values());
 		
 		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
 				.getNetwork(), travelDisutility, travelTime);
 
-		LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
+		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
 				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
 
 		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
-				routerWithCache, travelTime, travelDisutility);
+				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
 		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
 		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(
 				calculator, scheduler);
@@ -128,7 +126,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 
 	}
 	
-	private void resetSchedules(List<Vehicle> vehicles) {
+	private void resetSchedules(Iterable<Vehicle> vehicles) {
 
     	for (Vehicle v : vehicles){
     		VehicleImpl vi = (VehicleImpl) v;

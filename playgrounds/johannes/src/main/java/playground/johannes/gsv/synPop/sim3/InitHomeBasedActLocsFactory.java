@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Random;
 
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -42,7 +42,7 @@ public class InitHomeBasedActLocsFactory implements ProxyPlanTaskFactory {
 	}
 	
 	@Override
-	public ProxyPlanTask getInstance() {
+	public EpisodeTask getInstance() {
 		return new InitHomeBasedActLocations(pool, new XORShiftRandom(random.nextLong()));
 	}
 

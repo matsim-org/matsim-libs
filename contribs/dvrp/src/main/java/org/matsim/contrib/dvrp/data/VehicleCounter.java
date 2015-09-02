@@ -24,12 +24,12 @@ import java.util.*;
 
 public class VehicleCounter
 {
-    private final List<Vehicle> vehicles;
+    private final Collection<Vehicle> vehicles;
     private final Queue<Vehicle> waitingVehicles;
     private final Queue<Vehicle> activeVehicles;
 
 
-    public VehicleCounter(List<Vehicle> vehicles)
+    public VehicleCounter(Collection<Vehicle> vehicles)
     {
         this.vehicles = vehicles;
 

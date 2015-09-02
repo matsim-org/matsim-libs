@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.utils.spatialAvg.Cell;
+import playground.benjamin.utils.spatialAvg.LinkWeightUtil;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * 

@@ -21,10 +21,10 @@ package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.data.CommonValues;
 
 import java.io.*;
 import java.util.HashMap;
@@ -54,11 +54,11 @@ public class ScaleMatrices {
         dayFactors.put(Episodes2Matrix.SUMMER, 0.998);
         dayFactors.put(Episodes2Matrix.WINTER, 1.002);
 
-        dayFactors.put(CommonKeys.MONDAY, 1.02);
+        dayFactors.put(CommonValues.MONDAY, 1.02);
         dayFactors.put(Episodes2Matrix.DIMIDO, 1.07);
-        dayFactors.put(CommonKeys.FRIDAY, 1.15);
-        dayFactors.put(CommonKeys.SATURDAY, 0.95);
-        dayFactors.put(CommonKeys.SUNDAY, 0.67);
+        dayFactors.put(CommonValues.FRIDAY, 1.15);
+        dayFactors.put(CommonValues.SATURDAY, 0.95);
+        dayFactors.put(CommonValues.SUNDAY, 0.67);
 
         logger.info("Loading volumes...");
         BufferedReader reader = new BufferedReader(new FileReader(fractionsFile));
@@ -98,7 +98,10 @@ public class ScaleMatrices {
             }
         }
 
-        if(volume == 0) throw new RuntimeException("Cannot find factor for " + filename);
+        if(volume == 0) {
+            logger.warn(String.format("No factor found for %s...", filename));
+            return 1;
+        }
 
         double sum = factors.get(ALL_PATTERN);
         double upscaleFactor = sum/volume;

@@ -27,7 +27,9 @@ public class TaxiStatusToMatrix
 
     public static void main(String[] args)
     {
-        TaxiStatusToMatrix m = new TaxiStatusToMatrix("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/nov/");
+        //String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/nov/";
+        String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/taxi_berlin/2013/status/";
+        TaxiStatusToMatrix m = new TaxiStatusToMatrix(dir);
         m.read();
         m.write();
     }

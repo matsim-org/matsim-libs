@@ -26,7 +26,7 @@ import java.util.Collections;
 import org.apache.log4j.Logger;
 
 import playground.fabrice.primloc.CumulativeDistribution;
-import playground.jjoubert.Utilities.MyPermutator;
+import playground.southafrica.utilities.MyPermutator;
 
 public class RetailerGA {
 	private final int populationSize;

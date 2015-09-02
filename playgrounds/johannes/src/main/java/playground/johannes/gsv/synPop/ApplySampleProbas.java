@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
