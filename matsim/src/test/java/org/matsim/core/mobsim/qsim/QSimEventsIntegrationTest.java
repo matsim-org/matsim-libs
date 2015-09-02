@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -51,6 +52,29 @@ public class QSimEventsIntegrationTest {
 		QNetsimEngineModule.configure(qSim);
 		try {
 			qSim.run();
+		} catch (RuntimeException e) {
+			// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
+		}
+	}
+
+	@Test
+	public void controlerHandlesExceptionCorrectly() {
+		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		//		config.qsim().setUsingThreadpool(false);
+		Controler controler = new Controler(config);
+		controler.getEvents().addHandler(new LinkLeaveEventHandler() {
+			@Override
+			public void handleEvent(LinkLeaveEvent event) {
+				throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
+			}
+
+			@Override
+			public void reset(int iteration) {
+
+			}
+		});
+		try {
+			controler.run();
 		} catch (RuntimeException e) {
 			// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
 		}
