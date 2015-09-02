@@ -73,6 +73,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	private EventsManager events ;
 	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLink = new HashMap<Id<Link>, List<Id<Link>>>();
 
+	@Override
 	public void handleEvent(PersonArrivalEvent event){
 		if(event.getLegMode().equals(TransportMode.car)) {
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
@@ -83,7 +84,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
 
-		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
+		Id<Person> delayedPerson = event.getPersonId();
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
@@ -150,7 +151,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	private double processSpillbackDelays(double delayToChargeFor, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
 
 		double remainingDelay = delayToChargeFor;
-		Id<Person> affectedPerson = Id.createPersonId(event.getVehicleId().toString());
+		Id<Person> affectedPerson = event.getPersonId();
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
