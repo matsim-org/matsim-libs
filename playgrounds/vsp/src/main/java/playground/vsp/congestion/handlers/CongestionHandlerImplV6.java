@@ -97,6 +97,8 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			congestionType = "flowCapacity";
 		}
 		
+		
+		//TODO : need a method to update totalInternalizedDelay in AbstractCongestionHandler
 		CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), congestionType, causingAgent, 
 				event.getPersonId(), delay, causingLink, this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
 		this.events.processEvent(congestionEvent);
