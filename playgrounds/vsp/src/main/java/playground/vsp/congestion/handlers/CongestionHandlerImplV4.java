@@ -92,7 +92,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		if( linkInfo.getLeavingAgents().isEmpty()){
 			// identifying if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
-			Id<Link> spillBackCausingLink = getUpstreamLinkInRoute(delayedPerson);
+			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
 
 			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
 			 * first removing the link (optional operation) and then adding it to the end of the list.
@@ -110,7 +110,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
 
-			double remainingStorageDelay = allocateStorageDelayToUpstreamLinks(storageDelay, event.getLinkId(), event);
+			double remainingStorageDelay = allocateStorageDelayToDownstreamLinks(storageDelay, event.getLinkId(), event);
 			if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
 
 		} else {
@@ -120,7 +120,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		}
 	}
 
-	private double  allocateStorageDelayToUpstreamLinks(double storageDelay, Id<Link> startAllocationFromThisLink, LinkLeaveEvent event){
+	private double  allocateStorageDelayToDownstreamLinks(double storageDelay, Id<Link> startAllocationFromThisLink, LinkLeaveEvent event){
 
 		double remainingDelay = storageDelay;
 
@@ -141,7 +141,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 			if(remainingDelay==0) break;
 			else {
-				remainingDelay = allocateStorageDelayToUpstreamLinks(remainingDelay, spillBackCausingLink, event);
+				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
 			}
 		}
 
@@ -185,7 +185,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	}
 
 
-	private Id<Link> getUpstreamLinkInRoute(Id<Person> personId){
+	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;

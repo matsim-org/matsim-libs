@@ -74,7 +74,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			 * Map containing freeSpeedLeaveTime is cleared beforehand.
 			 */
 			
-			causingLink = getUpstreamLinkInRoute(event.getPersonId());
+			causingLink = getDownstreamLinkInRoute(event.getPersonId());
 			// last entered person on this causing link is causing agent.
 			List<Id<Person>> personsEnteredOnCausingLink = new ArrayList<Id<Person>>(this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().keySet());
 			causingAgent = personsEnteredOnCausingLink.get(personsEnteredOnCausingLink.size()-1); 
@@ -142,7 +142,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		
 	}
 	
-	private Id<Link> getUpstreamLinkInRoute(Id<Person> personId){
+	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
