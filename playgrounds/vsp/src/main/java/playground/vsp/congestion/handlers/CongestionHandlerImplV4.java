@@ -94,15 +94,18 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			// identifying if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
 
-			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
-			 * first removing the link (optional operation) and then adding it to the end of the list.
-			 */
 			if( this.linkId2SpillBackCausingLink.containsKey(event.getLinkId()) ) {
+				/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
+				 * first removing the link (optional operation) and then adding it to the end of the list.
+				 */
 				this.linkId2SpillBackCausingLink.get(event.getLinkId()).remove(spillBackCausingLink);
 				this.linkId2SpillBackCausingLink.get(event.getLinkId()).add(spillBackCausingLink);
 			} else {
 				this.linkId2SpillBackCausingLink.put(event.getLinkId(), new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
 			}
+			// yy Amit, what is the above handful of lines supposed to do?  Seems to me that at a diverge it may add more 
+			// than one downstream link as blocking.  It will, however, never go "forward" if the blocking link is farther way, no?  kai, sep'15
+			
 		} 
 
 		//charge for the flow delay and remaining delays are said to be storage delay
@@ -111,6 +114,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
 
 			double remainingStorageDelay = allocateStorageDelayToDownstreamLinks(storageDelay, event.getLinkId(), event);
+
 			if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
 
 		} else {
@@ -171,6 +175,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
 			this.events.processEvent(congestionEvent); // this is a work around but for this to work, eventManager of AbstractCongestionHandler should not be private. 
 			//TODO: if eventManager of AbstractCongestionHandler is not be private anymore, remove the eventsManager object from this class.
+			// yy Amit, as said in email: keep eventsManager private, but provide a getEventsManager(). kai, sep'15
 
 			remainingDelay = remainingDelay - agentDelay;
 		}
