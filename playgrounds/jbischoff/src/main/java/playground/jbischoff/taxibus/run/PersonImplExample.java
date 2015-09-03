@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.PlansCalcRouteWithTollOrNotTest;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -43,10 +45,12 @@ public class PersonImplExample {
 		Population population = scenario.getPopulation();
 		ObjectAttributes pa = scenario.getPopulation().getPersonAttributes();
 		
-		Person p =  population.getFactory().createPerson(Id.createPersonId("1"));
-		
-		pa.putAttribute("1", "license", "yes");
-		new ObjectAttributesXmlWriter(pa).writeFile("attributes.xml");
+		PersonImpl p =  (PersonImpl) population.getFactory().createPerson(Id.createPersonId("1"));
+		p.addTravelcard("bahncard");
+		p.addTravelcard("BerlinAB");
+		population.addPerson(p);
+		PopulationWriter pw = new PopulationWriter(scenario.getPopulation());
+		pw.writeFileV4("outputplans.xml");
 		
 	}
 

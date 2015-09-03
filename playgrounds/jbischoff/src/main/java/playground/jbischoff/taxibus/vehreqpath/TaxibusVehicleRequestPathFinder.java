@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;
 import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
 import playground.jbischoff.taxibus.utils.TaxibusUtils;
 
@@ -72,6 +74,8 @@ public class TaxibusVehicleRequestPathFinder
 		
 		for (TaxibusRequest request : filteredReqs){
 			if (best.requests.contains(request)) continue;
+        	if (request.getStatus() != TaxibusRequestStatus.UNPLANNED) continue;
+
 			ArrayList<VrpPathWithTravelData> tentativeNewPath = calculateVrpPaths(best,request);
 			double currentCost = TaxibusUtils.calcPathCost(tentativeNewPath);
 			if (currentCost<bestCost){
@@ -100,9 +104,12 @@ public class TaxibusVehicleRequestPathFinder
 
 
 	private ArrayList<VrpPathWithTravelData> calculateVrpPaths(TaxibusVehicleRequestPath best, TaxibusRequest request) {
-		TreeSet<TaxibusRequest> allRequests = new TreeSet<TaxibusRequest>();
+		TreeSet<TaxibusRequest> allRequests = new TreeSet<TaxibusRequest>(Requests.ABSOLUTE_COMPARATOR);
 		allRequests.addAll(best.requests);
-		allRequests.add(request);
+
+		if (!allRequests.add(request)){
+			throw new IllegalStateException();
+		}
 		ArrayList<VrpPathWithTravelData> segments = new ArrayList<>();
 		Iterator<TaxibusRequest> iterator = allRequests.iterator();
 		VrpPathWithTravelData currentSegment = calculator.calcPath(best.path.get(0).getFromLink(),iterator.next().getFromLink() , best.path.get(0).getDepartureTime()) ;

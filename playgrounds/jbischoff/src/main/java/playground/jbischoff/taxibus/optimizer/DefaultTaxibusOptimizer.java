@@ -19,7 +19,6 @@
 
 package playground.jbischoff.taxibus.optimizer;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,6 +28,8 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import playground.jbischoff.taxibus.optimizer.filter.TaxibusRequestFilter;
 import playground.jbischoff.taxibus.optimizer.filter.TaxibusVehicleFilter;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;
+import playground.jbischoff.taxibus.utils.TaxibusUtils;
 import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
 import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPaths;
 
@@ -77,6 +78,11 @@ public class DefaultTaxibusOptimizer extends AbstractTaxibusOptimizer {
 	        
 	        while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
 	            TaxibusRequest req = reqIter.next();
+	            TaxibusRequestStatus cs = req.getStatus();
+	            if (req.getStatus() != TaxibusRequestStatus.UNPLANNED ){
+	            	reqIter.remove();
+	            	continue;
+	            }
 	            Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,  req);
 	            TaxibusVehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
 	            		filteredVehs, TaxibusVehicleRequestPaths.TW_COST);
@@ -84,9 +90,9 @@ public class DefaultTaxibusOptimizer extends AbstractTaxibusOptimizer {
 	            if (best != null) {
 	                reqIter.remove();
 	              boolean possibleOtherRequest = true;
+	              Iterable<TaxibusRequest> filteredReqs = requestFilter.filterRequestsForBestRequest(unplannedRequests, best);
 	              do{
-	            	  
-	            	  Iterable<TaxibusRequest> filteredReqs = requestFilter.filterRequestsForBestRequest(unplannedRequests, best);
+
 	            	  TaxibusVehicleRequestPath nextBest = optimConfig.vrpFinder.findBestAdditionalVehicleForRequestPath(best,filteredReqs);
 	            	  if (nextBest!=null){  
 	            		  best = nextBest;
@@ -97,10 +103,10 @@ public class DefaultTaxibusOptimizer extends AbstractTaxibusOptimizer {
 	            	  }
 	              }
 	              while (possibleOtherRequest);
+//	              	TaxibusUtils.printRequestPath(best);
 	              
 	                optimConfig.scheduler.scheduleRequest(best);
-
-	            
+	                
 	                
 	            }
 	            
