@@ -77,7 +77,6 @@ public class DistrictPopulationExtractor2011 {
 	
 	public DistrictPopulationExtractor2011() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
 	}
 	
 	

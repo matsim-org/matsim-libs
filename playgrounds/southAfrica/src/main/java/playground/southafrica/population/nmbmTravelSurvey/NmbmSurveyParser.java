@@ -94,7 +94,6 @@ public class NmbmSurveyParser {
 
 	public NmbmSurveyParser() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
 		this.locationlessPersons = new HashMap<>();
 		this.locationlessType = new HashMap<String, Integer>();
 	}

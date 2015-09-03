@@ -80,53 +80,6 @@ public final class ScenarioImpl implements Scenario {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 
-	/**
-	 * Creates a vehicle container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useVehicles
-	 * config switch to true (see MATSIM-202 for an example).
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createTransitVehicleContainer(){
-		return false;
-	}
-
-	public final boolean createVehicleContainer(){
-		return false;
-	}
-
-	/**
-	 * Creates a household container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useHouseholds
-	 * config switch to true.
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createHouseholdsContainer(){
-		return false;
-	}
-
-	/**
-	 * need this in ScenarioLoader.  If you need it elsewhere, use {@link ScenarioUtils.ScenarioBuilder}.
-	 */
-	final boolean createLanesContainer() {
-		return false;
-	}
-
-	/**
-	 * Creates a transit schedule and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useTransit
-	 * config switch to true (see MATSIM-220 for an example).
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createTransitScheduleContainer() {
-		return false;
-	}
-
 	@Override
 	public final ActivityFacilities getActivityFacilities() {
 		return this.facilities;

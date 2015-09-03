@@ -62,7 +62,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -252,7 +251,6 @@ public class GfipQueuePassingControler {
 		new NetworkWriter(sc.getNetwork()).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network.xml.gz");
 
 		/* Create the vehicle types. */
-		((ScenarioImpl)sc).createVehicleContainer();
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		VehicleType A1 = vf.createVehicleType(Id.create(GfipMode.GFIP_A1.toString(), VehicleType.class));
 		A1.setDescription("Motorcycle");

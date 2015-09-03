@@ -123,8 +123,7 @@ public class HouseholdSampler {
 		LOG.info("Sampling " + String.format("%.1f%%", fraction*100) + " of households.");
 		
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
-		
+
 		/* Read just the households. */
 		String householdsFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "households.xml.gz";
 		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdsFile);		
