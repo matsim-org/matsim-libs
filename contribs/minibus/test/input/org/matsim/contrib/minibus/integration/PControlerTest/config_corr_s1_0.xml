@@ -193,10 +193,10 @@
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of car distance into money -->
-		<param name="monetaryDistanceCostRateCar" value="0.0" />
+		<param name="monetaryDistanceRateCar" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of pt distance into money -->
-		<param name="monetaryDistanceCostRatePt" value="0.0" />
+		<param name="monetaryDistanceRatePt" value="0.0" />
 
 		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
 		<param name="performing" value="6.0" />
