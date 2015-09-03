@@ -72,8 +72,8 @@ public class ProcessNoiseImmissions {
 	}
 
 	public static void main(String[] args) {
-		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/baseCase/ITERS/it.100/immissions/";
-		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/baseCase/receiverPoints/receiverPoints.csv";
+		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/immissions/";
+		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
 
 		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, 100);
 		readNoiseFile.run();

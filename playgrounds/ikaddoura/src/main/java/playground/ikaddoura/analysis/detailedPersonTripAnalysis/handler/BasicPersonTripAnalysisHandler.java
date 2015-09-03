@@ -81,6 +81,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private Map<Id<Person>,Map<Integer,Boolean>> personId2tripNumber2stuckAbort = new HashMap<>();
 	
 	private Map<Id<Person>, Double> personId2totalpayments = new HashMap <Id<Person>, Double>();
+	
+	private double totalPayments = 0.;
 
 	public BasicPersonTripAnalysisHandler(Scenario scenario) {
 		this.scenario = scenario;
@@ -106,6 +108,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	public void handleEvent(PersonMoneyEvent event) {	
 		
 		// trip
+		
+		totalPayments = totalPayments + ( -1. * event.getAmount() );
 		
 		int tripNumber = this.personId2currentTripNumber.get(event.getPersonId());
 				
@@ -411,4 +415,13 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 		return personId2tripNumber2amount;
 	}
+
+	public double getTotalPayments() {
+		return totalPayments;
+	}
+
+	public Scenario getScenario() {
+		return scenario;
+	}
+
 }

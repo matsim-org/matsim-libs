@@ -1390,22 +1390,22 @@ public class NoiseTest {
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
 		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
 		
-		System.out.println("emission: " + emission);
-		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
-		
-		if (emission >= emissionPlusOneCar) {
-			System.out.println(" :-(");
-		} else {
-			System.out.println(" :-)");
-		}
-		
-		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
-		
-		if (emission >= emissionPlusOneHGV) {
-			System.out.println(" :-(");
-		} else {
-			System.out.println(" :-)");
-		}
+//		System.out.println("emission: " + emission);
+//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
+//		
+//		if (emission >= emissionPlusOneCar) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
+//		
+//		if (emission >= emissionPlusOneHGV) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
 
 	}
 	
