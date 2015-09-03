@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
@@ -97,7 +98,7 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
 	}
 	
     public TreeSet<TaxibusRequest> getPickUpsForLink(Link link){
-    	TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>();
+    	TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
     	for (TaxibusRequest req : this.requests){
     		if (req.getFromLink().equals(link)){
     			beginningRequests.add(req);
@@ -108,15 +109,18 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
     }
     
     public TreeSet<TaxibusRequest> getDropOffsForLink(Link link){
-    	TreeSet<TaxibusRequest> endingRequests = new TreeSet<>();
+    	TreeSet<TaxibusRequest> endingRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
     	for (TaxibusRequest req : this.requests){
     		if (req.getToLink().equals(link)){
+    			
     			endingRequests.add(req);
     		}
     	}
     	
     	return endingRequests.isEmpty() ? null : endingRequests ;
     }
+    
+    
     
     
     

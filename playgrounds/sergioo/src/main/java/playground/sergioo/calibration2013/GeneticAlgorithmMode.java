@@ -72,8 +72,8 @@ public class GeneticAlgorithmMode {
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTraveling_utils_hr();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingPt_utils_hr();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceCostRateCar();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceCostRatePt();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRateCar();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRatePt();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getUtilityOfLineSwitch();
 			calculateScore(scenario);
 		}
@@ -92,8 +92,8 @@ public class GeneticAlgorithmMode {
 			scenario.getConfig().planCalcScore().setTraveling_utils_hr(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(this.parameters[k++]);
+			scenario.getConfig().planCalcScore().setMonetaryDistanceRateCar(this.parameters[k++]);
+			scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(this.parameters[k++]);
 		}
 		private void calculateScore(final Scenario scenario) {
@@ -197,7 +197,7 @@ public class GeneticAlgorithmMode {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		scenario.getConfig().planCalcScore().setConstantCar(10);
 		scenario.getConfig().planCalcScore().setMarginalUtlOfDistanceWalk(10);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(10);
+		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(10);
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario).readFile(args[3]);

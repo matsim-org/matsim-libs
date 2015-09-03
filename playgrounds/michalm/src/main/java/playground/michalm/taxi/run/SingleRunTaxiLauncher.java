@@ -19,7 +19,7 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.util.MovingAgentsRegister;
 
 
-public class SingleRunTaxiLauncher
+class SingleRunTaxiLauncher
     extends TaxiLauncher
 {
     private LegHistogram legHistogram;

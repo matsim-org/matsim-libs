@@ -172,7 +172,7 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
-				assert SelectorUtils.containsAllIds( personsStillToAllocate , r.jointPlan.getIndividualPlans().keySet() ); 
+				assert SelectorUtils.containsAllIds( personsStillToAllocate , r.jointPlan.getIndividualPlans().keySet() );
 				actuallyRemainingPersons = SelectorUtils.filter( remainingPersons , r.jointPlan );
 			}
 

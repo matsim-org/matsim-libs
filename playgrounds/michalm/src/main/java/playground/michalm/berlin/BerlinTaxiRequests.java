@@ -34,12 +34,12 @@ public class BerlinTaxiRequests
 {
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
     private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
-    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/berlin.xml.gz";
+    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/only_berlin.xml.gz";
 
 
     public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
     {
-        Scenario berlinBrBScenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE,
+        Scenario berlinBrbScenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE,
                 DIR + allPlansFile);
 
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
@@ -48,7 +48,7 @@ public class BerlinTaxiRequests
                 onlyBerlinScenario.getNetwork());
         Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
 
-        for (Person p : berlinBrBScenario.getPopulation().getPersons().values()) {
+        for (Person p : berlinBrbScenario.getPopulation().getPersons().values()) {
             Plan plan = p.getPlans().get(0);
             Activity fromActivity = (Activity)plan.getPlanElements().get(0);
             Activity toActivity = (Activity)plan.getPlanElements().get(2);

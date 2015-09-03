@@ -19,6 +19,7 @@
 
 package playground.jbischoff.taxibus.optimizer.filter;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
@@ -26,6 +27,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.util.DistanceUtils;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;
 import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
 import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
 
@@ -66,11 +68,12 @@ public class KStraightLineNearestRequestFilter
 	@Override
 	public Iterable<TaxibusRequest> filterRequestsForBestRequest(Iterable<TaxibusRequest> unplannedRequests,
 			TaxibusVehicleRequestPath best) {
+		
 		Link fromLink = best.path.get(0).getFromLink();
 		Link initialToLink = best.getInitialDestination();
         PartialSort<TaxibusRequest> nearestRequestSort = new PartialSort<TaxibusRequest>(k);
         for (TaxibusRequest req : unplannedRequests) {
-            Link toLink = req.getFromLink();
+        	Link toLink = req.getFromLink();
             double squaredBeginDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
             
             Link reqDestinationLink = req.getToLink();

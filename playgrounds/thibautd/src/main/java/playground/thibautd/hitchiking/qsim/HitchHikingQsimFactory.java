@@ -92,7 +92,7 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 					controler.getTripRouterProvider().get(),
 					queuesManager,
 					eventsManager,
-					controler.getConfig().planCalcScore().getMonetaryDistanceCostRateCar());
+					controler.getConfig().planCalcScore().getMonetaryDistanceRateCar());
 
         if (sc.getConfig().transit().isUseTransit()) {
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);

@@ -52,10 +52,10 @@ public class KtiToNormalConfigTrivial {
 		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
 		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
 		// TODO: check units (per km or per m)
-		planCalcScore.setMonetaryDistanceCostRatePt(
+		planCalcScore.setMonetaryDistanceRatePt(
 				-( ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
 				planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceCostRateCar(
+		planCalcScore.setMonetaryDistanceRateCar(
 				-( ktiConfigGroup.getDistanceCostCar() / 1000d ) /
 				planCalcScore.getMarginalUtilityOfMoney() );
 

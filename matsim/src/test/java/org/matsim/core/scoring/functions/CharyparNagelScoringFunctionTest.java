@@ -471,12 +471,12 @@ public class CharyparNagelScoringFunctionTest {
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
-		f.config.planCalcScore().setMonetaryDistanceCostRateCar(-0.00001) ;
+		f.config.planCalcScore().setMonetaryDistanceRateCar(-0.00001) ;
 
 		assertEquals(-0.25, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		f.config.planCalcScore().setMonetaryDistanceCostRateCar(-1.0) ;
+		f.config.planCalcScore().setMonetaryDistanceRateCar(-1.0) ;
 		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-12500.0, calcScore(f), EPSILON);
@@ -488,12 +488,12 @@ public class CharyparNagelScoringFunctionTest {
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
-		f.config.planCalcScore().setMonetaryDistanceCostRatePt(-0.00001) ;
+		f.config.planCalcScore().setMonetaryDistanceRatePt(-0.00001) ;
 
 		assertEquals(-0.20, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		f.config.planCalcScore().setMonetaryDistanceCostRatePt(-1.0) ;
+		f.config.planCalcScore().setMonetaryDistanceRatePt(-1.0) ;
 		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-10000.0, calcScore(f), EPSILON);
@@ -665,8 +665,8 @@ public class CharyparNagelScoringFunctionTest {
 			scoring.setTravelingBike_utils_hr(0.0);
 
 			scoring.setMarginalUtilityOfMoney(1.) ;
-			scoring.setMonetaryDistanceCostRateCar(0.0) ;
-			scoring.setMonetaryDistanceCostRatePt(0.0);
+			scoring.setMonetaryDistanceRateCar(0.0) ;
+			scoring.setMonetaryDistanceRatePt(0.0);
 
 
 			// setup activity types h and w for scoring

@@ -29,6 +29,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import com.google.common.collect.ComparisonChain;
+
 import playground.jbischoff.taxibus.scheduler.TaxibusDriveWithPassengerTask;
 import playground.jbischoff.taxibus.scheduler.TaxibusTask;
 import playground.jbischoff.taxibus.scheduler.TaxibusTask.TaxibusTaskType;
@@ -38,7 +40,7 @@ import playground.jbischoff.taxibus.scheduler.TaxibusTaskWithRequests;
  * @author  jbischoff
  * (might not be needed)
  */
-public class TaxibusRequest extends RequestImpl   implements PassengerRequest, Comparable<TaxibusRequest>
+public class TaxibusRequest extends RequestImpl   implements PassengerRequest
  {
 	
     public enum TaxibusRequestStatus
@@ -161,7 +163,8 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest, C
 		            case PERFORMED:
 		                return TaxibusRequestStatus.PERFORMED;
 		                
-		            case PLANNED://illegal
+		            case PLANNED://not illegal here
+		            	return TaxibusRequestStatus.PLANNED;
 		        }
 
 		        throw new IllegalStateException("Unreachable code");
@@ -169,11 +172,6 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest, C
 		
 	}
 
-	@Override
-	public int compareTo(TaxibusRequest o) {
-
-		return Double.valueOf(this.getT0()).compareTo(o.getT0());
-	}
 	
 	
 	

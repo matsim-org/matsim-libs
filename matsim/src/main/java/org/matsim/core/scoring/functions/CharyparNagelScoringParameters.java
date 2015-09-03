@@ -141,12 +141,12 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				double marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
 				double marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
-				double monetaryDistanceCostRate = params.getMonetaryDistanceCostRate();
+				double monetaryDistanceRate = params.getMonetaryDistanceRate();
 				double constant = params.getConstant();
 				Mode newModeParams = new Mode(
 						marginalUtilityOfTraveling_s,
 						marginalUtilityOfDistance_m,
-						monetaryDistanceCostRate,
+						monetaryDistanceRate,
 						constant);
 				modeParams.put(modeName, newModeParams);
 			}

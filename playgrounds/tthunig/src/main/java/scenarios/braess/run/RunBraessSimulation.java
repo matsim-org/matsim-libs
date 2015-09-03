@@ -199,7 +199,7 @@ public class RunBraessSimulation {
 		// use -0.000015 to approximately balance the utility of travel time and
 		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
 		// use -0.0 to use only time.)
-		config.planCalcScore().setMonetaryDistanceCostRateCar( -0.0 );
+		config.planCalcScore().setMonetaryDistanceRateCar( -0.0 );
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
@@ -329,9 +329,9 @@ public class RunBraessSimulation {
 		
 		if (SIGMA != 0.0)
 			runName += "_sigma" + SIGMA;
-		if (config.planCalcScore().getMonetaryDistanceCostRateCar() != 0.0)
+		if (config.planCalcScore().getMonetaryDistanceRateCar() != 0.0)
 			runName += "_distCost"
-					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
+					+ config.planCalcScore().getMonetaryDistanceRateCar();
 
 		if (LANE_TYPE.equals(LaneType.TRIVIAL)) {
 			runName += "_trivialLanes";

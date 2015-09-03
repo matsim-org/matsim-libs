@@ -3,7 +3,6 @@ package gunnar.ihop2.regent.demandreading;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.BIRTHYEAR_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOMEZONE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE;
-import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.SEX_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURMODE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_ATTRIBUTE;
 
@@ -27,12 +26,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import patryk.popgen2.Building;
 import patryk.utils.LinksRemover;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -117,6 +118,18 @@ public class PopulationCreator {
 
 	public void setAgentWorkXYFile(final String agentWorkXYFileName) {
 		this.agentWorkXYFileName = agentWorkXYFileName;
+	}
+
+	public void setNetworkNodeXYFile(final String networkNodeXYFile)
+			throws FileNotFoundException {
+		final PrintWriter writer = new PrintWriter(networkNodeXYFile);
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
+			writer.print(node.getCoord().getX());
+			writer.print(";");
+			writer.println(node.getCoord().getY());
+		}
+		writer.flush();
+		writer.close();
 	}
 
 	public void setZonesBoundaryShapeFileName(
@@ -208,7 +221,8 @@ public class PopulationCreator {
 		}
 	}
 
-	private Person newPerson(final String personId, final XY2Links xy2links) {
+	private Person newPerson(final String personId, final XY2Links xy2links,
+			final CoordinateTransformation coordinateTransform) {
 
 		// create a new person with an empty plan
 
@@ -226,8 +240,9 @@ public class PopulationCreator {
 		final String homeBuildingType = (String) this.scenario.getPopulation()
 				.getPersonAttributes()
 				.getAttribute(personId, HOUSINGTYPE_ATTRIBUTE);
-		final Coord homeCoord = ShapeUtils.drawPointFromGeometry(this
-				.drawGeometry(homeZone, homeBuildingType, HOME));
+		final Coord homeCoord = coordinateTransform.transform(ShapeUtils
+				.drawPointFromGeometry(this.drawGeometry(homeZone,
+						homeBuildingType, HOME)));
 		final Activity homeMorning = this.scenario.getPopulation().getFactory()
 				.createActivityFromCoord(HOME, homeCoord);
 		homeMorning.setEndTime(this.drawHomeEndTime_s());
@@ -249,8 +264,9 @@ public class PopulationCreator {
 				.getPopulation().getPersonAttributes()
 				.getAttribute(personId, WORKZONE_ATTRIBUTE));
 
-		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
-				.getPersonAttributes().getAttribute(personId, SEX_ATTRIBUTE));
+//		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
+//				.getPersonAttributes()
+//				.getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
 		((PersonImpl) person).setEmployed(workZone != null);
 		((PersonImpl) person).setAge(2015 - Integer
 				.parseInt((String) this.scenario.getPopulation()
@@ -268,8 +284,9 @@ public class PopulationCreator {
 				.getPersonAttributes()
 				.getAttribute(personId,
 						RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE);
-		final Coord workCoord = ShapeUtils.drawPointFromGeometry(this
-				.drawGeometry(workZone, workBuildingType, WORK));
+		final Coord workCoord = coordinateTransform.transform(ShapeUtils
+				.drawPointFromGeometry(this.drawGeometry(workZone,
+						workBuildingType, WORK)));
 		final Activity work = this.scenario.getPopulation().getFactory()
 				.createActivityFromCoord(WORK, workCoord);
 		work.setEndTime(this.drawWorkEndTime_s());
@@ -325,7 +342,11 @@ public class PopulationCreator {
 		linksRem.run();
 		// <<<<< TODO <<<<<
 
-		XY2Links xy2links = new XY2Links(this.scenario);
+		final XY2Links xy2links = new XY2Links(this.scenario);
+		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory
+				.getCoordinateTransformation(
+						StockholmTransformationFactory.WGS84_EPSG3857,
+						StockholmTransformationFactory.WGS84_SWEREF99);
 
 		final Map<String, Zone> id2clippedZone = this.zonalSystem
 				.getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
@@ -350,21 +371,19 @@ public class PopulationCreator {
 			final String workTourMode = (String) personAttributes.getAttribute(
 					personId, WORKTOURMODE_ATTRIBUTE);
 
-			// TODO ONLY PT WORK TRIPS !!!
-
 			if (id2clippedZone.keySet().contains(homeZone)
 					&& id2clippedZone.keySet().contains(workZone)
-					&& RegentPopulationReader.PT_ATTRIBUTEVALUE
-							.equals(workTourMode)
-			// && CAR_ATTRIBUTEVALUE.equals(workTourMode)
-			) {
+					&& (RegentPopulationReader.PT_ATTRIBUTEVALUE
+							.equals(workTourMode) || RegentPopulationReader.CAR_ATTRIBUTEVALUE
+							.equals(workTourMode))) {
 				if (processedCarDrivers % everyXthPerson == 0) {
 					System.out.print("Person " + personId + ": homeZone = "
 							+ homeZone + ", workZone = " + workZone
 							+ ", workTourMode = " + workTourMode);
 					System.out.println("; this is the " + processedCarDrivers
 							+ "th agent.");
-					final Person person = this.newPerson(personId, xy2links);
+					final Person person = this.newPerson(personId, xy2links,
+							coordinateTransform);
 					this.scenario.getPopulation().addPerson(person);
 
 				}
@@ -403,23 +422,25 @@ public class PopulationCreator {
 		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
 
 		final String buildingShapeFileName = "./data/shapes/by_full_EPSG3857_2.shp";
-		// final String buildingShapeFileName = null;
 
 		// final String populationFileName = "./150410_worktrips_small.xml";
 		// final String populationFileName =
 		// "./data/synthetic_population/150410_worktrips.xml";
 		final String populationFileName = "./data/synthetic_population/150615_trips.xml";
 
-		final String initialPlansFile = "./data/demand_output/initial_plans_v03.xml";
+		final String initialPlansFile = "./data/demand_output/initial_plans.xml";
 
 		final PopulationCreator pc = new PopulationCreator(networkFileName,
 				zonesShapeFileName, populationFileName);
 		pc.setBuildingsFileName(buildingShapeFileName);
 		pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
+
+		pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
+
 		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
-		
-		pc.setPopulationSampleFactor(1.0);
+
+		pc.setPopulationSampleFactor(0.001);
 
 		pc.run(initialPlansFile);
 

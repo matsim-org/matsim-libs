@@ -118,9 +118,12 @@ public class Transmodeler2MATSimNetwork {
 		for (TransmodelerNode transmodelerNode : nodesReader.getNodes()
 				.values()) {
 
+			// final Coord coord = new CoordImpl(
+			// 1e-6 * transmodelerNode.getLongitude(),
+			// 1e-6 * transmodelerNode.getLatitude());
 			final Coord coord = coordinateTransform.transform(new CoordImpl(
-					transmodelerNode.getLongitude(), transmodelerNode
-							.getLatitude()));
+					1e-6 * transmodelerNode.getLongitude(),
+					1e-6 * transmodelerNode.getLatitude()));
 
 			final Node matsimNode = matsimNetworkFactory.createNode(
 					Id.create(transmodelerNode.getId(), Node.class), coord);

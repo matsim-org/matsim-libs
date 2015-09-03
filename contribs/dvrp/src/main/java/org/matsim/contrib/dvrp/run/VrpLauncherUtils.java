@@ -45,7 +45,7 @@ public class VrpLauncherUtils
 {
     public static final int MAX_TIME = 36 * 60 * 60;
 
-    //only the free-flow speed should decide on the movement of vehicles
+    //to avoid congestion; only the free-flow speed should decide on the movement of vehicles
     public static final double VARIANT_NETWORK_FLOW_CAP_FACTOR = 100;
 
 

@@ -22,6 +22,7 @@ package playground.thibautd.socnetsimusages.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
@@ -84,6 +85,7 @@ public class RunMatsim2010SocialScenario {
 				new AbstractModule() {
 					@Override
 					public void install() {
+						install( new ConfigConfiguredPlanLinkIdentifierModule());
 						install(new SocnetsimDefaultAnalysisModule());
 						install(new JointActivitiesScoringModule());
 						install(new DefaultGroupStrategyRegistryModule());

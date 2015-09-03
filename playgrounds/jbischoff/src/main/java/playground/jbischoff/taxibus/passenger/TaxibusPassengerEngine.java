@@ -21,7 +21,6 @@ package playground.jbischoff.taxibus.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -55,6 +54,7 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		        Id<Link> toLinkId = passenger.getDestinationLinkId();
 
 
+		        internalInterface.registerAdditionalAgentOnLink(passenger);
 		        PassengerRequest request = advancedRequestStorage.retrieveAdvancedRequest(passenger,
 		                fromLinkId, toLinkId);
 
@@ -70,7 +70,6 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		                awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 		            }
 		        }
-		        internalInterface.registerAdditionalAgentOnLink(passenger);
 
 		        return !request.isRejected();
 		    }
@@ -81,10 +80,10 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 	public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
 			Id<Link> toLinkId, Double departureTime) {
 		    		        if (departureTime <= now ) {
-		            throw new IllegalStateException("This is not a call ahead");
+		            throw new IllegalStateException("This is not a call ahead (departure time: "+departureTime+" now: "+now);
 		        }
 
-		        PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
+		        PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime+1,
 		                now);
 		        advancedRequestStorage.storeAdvancedRequest(request);
 
