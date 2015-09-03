@@ -78,8 +78,8 @@
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
 		<param name="marginalUtlOfDistanceOther" value="0.0" />
 		<param name="marginalUtilityOfMoney" value="1" />
-		<param name="monetaryDistanceCostRateCar" value="0.0" />
-		<param name="monetaryDistanceCostRatePt" value="0.0" />
+		<param name="monetaryDistanceRateCar" value="0.0" />
+		<param name="monetaryDistanceRatePt" value="0.0" />
 		<param name="utilityOfLineSwitch" value="0.0" />
 
 		<param name="constantCar" value="0.0" />
