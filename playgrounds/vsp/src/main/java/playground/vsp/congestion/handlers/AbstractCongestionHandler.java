@@ -246,6 +246,8 @@ PersonStuckEventHandler {
 			double delayForThisPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
 			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
 
+			if(delayForThisPerson==0.) return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
+			
 			if (vehicleId.toString().equals(personId.toString())) {
 				//					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
