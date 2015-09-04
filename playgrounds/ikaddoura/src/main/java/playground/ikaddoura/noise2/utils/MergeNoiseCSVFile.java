@@ -50,13 +50,13 @@ public class MergeNoiseCSVFile {
 
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
-	private double endTime = 24. * 3600.;
+	private double endTime = 30. * 3600.;
 		
-	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/consideredAgentUnits/";
-	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/receiverPoints/receiverPoints.csv";
-		
+	String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/damages_receiverPoint/";
+	String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
+	
 	private String separator = ";";
-	private String label = "consideredAgentUnits";
+	private String label = "damages_receiverPoint";
 	
 	private String outputPath = workingDirectory;
 	

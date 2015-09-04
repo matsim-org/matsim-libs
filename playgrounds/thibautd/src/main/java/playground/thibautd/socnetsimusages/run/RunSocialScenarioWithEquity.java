@@ -30,6 +30,7 @@ import org.matsim.contrib.socnetsim.jointactivities.scoring.JointActivitiesScori
 import org.matsim.contrib.socnetsim.jointtrips.JointTripsModule;
 import org.matsim.contrib.socnetsim.run.RunUtils;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
+import org.matsim.contrib.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModule;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.contrib.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
 import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
@@ -40,6 +41,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
@@ -80,6 +83,7 @@ public class RunSocialScenarioWithEquity {
 				new AbstractModule() {
 					@Override
 					public void install() {
+						install( new ConfigConfiguredPlanLinkIdentifierModule());
 						install(new SocnetsimDefaultAnalysisModule());
 						install(new JointActivitiesScoringModule());
 						install(new DefaultGroupStrategyRegistryModule());
@@ -97,8 +101,11 @@ public class RunSocialScenarioWithEquity {
 				} );
 
 
-					controller.run();
-				}
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks(
+				scenario.getActivityFacilities(),
+				(NetworkImpl) scenario.getNetwork() );
+		controller.run();
+	}
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario(config);

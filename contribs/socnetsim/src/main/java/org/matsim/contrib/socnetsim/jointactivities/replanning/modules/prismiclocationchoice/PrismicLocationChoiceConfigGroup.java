@@ -24,14 +24,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupingUtils.GroupingParameters;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class PrismicLocationChoiceConfigGroup extends ReflectiveConfigGroup {
+public class PrismicLocationChoiceConfigGroup extends ReflectiveConfigGroup implements GroupingParameters {
 	public static final String GROUP_NAME = "prismicLocationChoice";
 
+	private int maxGroupSize = 50;
 	private double tieActivationProb = 0.5;
 	private double jointPlanBreakageProb = 0.5;
 	private Collection<String> types = Collections.singleton( "leisure" );
@@ -41,6 +43,7 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveConfigGroup {
 	private int maximumExpansionFactor = 3;
 
 	private SamplingMethod samplingMethod = SamplingMethod.random;
+
 	public static enum SamplingMethod {
 		random,
 		maximumDistanceMinimization,
@@ -54,26 +57,39 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveConfigGroup {
 		super( GROUP_NAME );
 	}
 
+	@Override
+	@StringGetter( "maxGroupSize" )
+	public double getMaxGroupSize() {
+		return maxGroupSize;
+	}
+
+	@StringSetter( "maxGroupSize" )
+	public void setMaxGroupSize(final int maxGroupSize ) {
+		this.maxGroupSize = maxGroupSize;
+	}
+
+	@Override
 	@StringGetter( "tieActivationProb" )
-	public double getTieActivationProb() {
+	public double getTieActivationProbability() {
 		return this.tieActivationProb;
 	}
 
 	@StringSetter( "tieActivationProb" )
-	public void setTieActivationProb(double tieActivationProb) {
+	public void setTieActivationProbability(double tieActivationProb) {
 		if ( tieActivationProb < 0 || tieActivationProb > 1 ) {
 			throw new IllegalArgumentException( "invalid probability "+tieActivationProb );
 		}
 		this.tieActivationProb = tieActivationProb;
 	}
 
+	@Override
 	@StringGetter( "jointPlanBreakageProb" )
-	public double getJointPlanBreakageProb() {
+	public double getJointPlanBreakingProbability() {
 		return this.jointPlanBreakageProb;
 	}
 
 	@StringSetter( "jointPlanBreakageProb" )
-	public void setJointPlanBreakageProb(double jointPlanBreakageProb) {
+	public void setJointPlanBreakingProbability(double jointPlanBreakageProb) {
 		if ( jointPlanBreakageProb < 0 || jointPlanBreakageProb > 1 ) {
 			throw new IllegalArgumentException( "invalid probability "+jointPlanBreakageProb );
 		}

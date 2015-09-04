@@ -102,6 +102,8 @@ class KNTaxiLauncher
         params.vrpOutDir = null;
         params.histogramOutDir = null;
         params.eventsOutFile = null;
+        
+        params.validate();
 
         return params;
     }

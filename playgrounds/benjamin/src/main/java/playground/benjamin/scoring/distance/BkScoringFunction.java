@@ -155,7 +155,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 //		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
 
 //		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
-		marginalUtilityOfFuel = configGroup.getMonetaryDistanceCostRateCar() * configGroup.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfFuel = configGroup.getMonetaryDistanceRateCar() * configGroup.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

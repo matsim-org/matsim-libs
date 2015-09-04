@@ -30,9 +30,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class BerlinNetworkChangeEvents
 {
-    private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
-    private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
-    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/berlin.xml.gz";
+    private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/network/";
+    private static final String BERLIN_BRB_NET_FILE = DIR + "berlin_brb.xml.gz";
+    private static final String ONLY_BERLIN_NET_FILE = DIR + "only_berlin.xml.gz";
 
 
     public static void filterEventsWithinBerlin(String allChangeEventsFile,
@@ -67,10 +67,10 @@ public class BerlinNetworkChangeEvents
 
     public static void main(String[] args)
     {
-        String[] files = { "changeevents", "changeevents_min" };
-        for (String f : files) {
-            String in = "scenarios/2014_10_basic_scenario_v4/" + f + ".xml.gz";
-            String out = "scenarios/2015_08_only_berlin_v1/" + f + ".xml.gz";
+        String[] suffixes = { "", "_min" };
+        for (String suffix : suffixes) {
+            String in = "berlin_brb_changeevents" + suffix + ".xml.gz";
+            String out = "only_berlin_changeevents" + suffix + ".xml.gz";
             filterEventsWithinBerlin(in, out);
         }
     }

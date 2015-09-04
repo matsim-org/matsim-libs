@@ -20,12 +20,12 @@
 package playground.jbischoff.taxibus.optimizer.filter;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
-import playground.michalm.taxi.data.TaxiRequest;
 
 
 public interface TaxibusRequestFilter

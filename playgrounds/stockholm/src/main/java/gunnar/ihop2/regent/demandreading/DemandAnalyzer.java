@@ -68,6 +68,8 @@ public class DemandAnalyzer {
 		System.out.println(otherzones.size() + " distinct otherzones");
 		System.out.println("worktourmodes: " + worktourmodes);
 		System.out.println("othertourmodes: " + othertourmodes);
+		System.out.println(homezones);
+
 	}
 
 	public static void main(String[] args) {

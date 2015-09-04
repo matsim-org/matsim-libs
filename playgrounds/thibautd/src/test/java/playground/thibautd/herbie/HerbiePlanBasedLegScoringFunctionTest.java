@@ -277,8 +277,8 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config.addModule( ktiConfigGroup );
 		config.planCalcScore().setMarginalUtlOfDistanceWalk( -5 );
 		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
-		config.planCalcScore().setMonetaryDistanceCostRateCar( -1 );
-		config.planCalcScore().setMonetaryDistanceCostRatePt( -2 );
+		config.planCalcScore().setMonetaryDistanceRateCar( -1 );
+		config.planCalcScore().setMonetaryDistanceRatePt( -2 );
 		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
 	}
 

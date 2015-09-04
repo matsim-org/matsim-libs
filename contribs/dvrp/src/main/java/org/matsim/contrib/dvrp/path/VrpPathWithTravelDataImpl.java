@@ -119,4 +119,15 @@ public class VrpPathWithTravelDataImpl
     {
         return Iterators.forArray(links);
     }
+
+    @Override
+	public Link[] getLinks() {
+		return links;
+	}
+
+    @Override
+	public double[] getLinkTTs() {
+		return linkTTs;
+	}
+    
 }

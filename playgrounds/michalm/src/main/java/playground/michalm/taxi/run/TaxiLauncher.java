@@ -34,7 +34,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
 
@@ -108,7 +107,7 @@ class TaxiLauncher
         TravelDisutility travelDisutility = VrpLauncherUtils
                 .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
 
-        boolean useTree = true;//TODO let's try out trees
+        boolean useTree = !true;//TODO move this switch to TaxiLauncherParams
         if (useTree) {
             routerWithCache = new DijkstraWithDijkstraTreeCache(scenario.getNetwork(),
                     travelDisutility, travelTime, timeDiscretizer);

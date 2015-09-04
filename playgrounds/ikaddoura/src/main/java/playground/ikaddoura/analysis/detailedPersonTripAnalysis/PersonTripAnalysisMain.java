@@ -51,7 +51,11 @@ import playground.vsp.congestion.events.CongestionEventsReader;
  * Provides the following analysis: 
  * 
  * TODO
- * aggregated information: total travel time, total congestion cost, total noise damages, total travel related user benefits, total toll revenues, system welfare
+ * affected congestion not equal caused congestion
+ * scale factor!!!
+ * caused noise damage cost different in the alternative computation approach
+ * 
+ * DONE:
  * 
  * trip-based information
  * person ; trip no.; leg mode ; stuckAbort (trip) ; VTTS (trip) ; departure time (trip) ; trip arrival time (trip) ; travel time (trip) ; travel distance (trip) ; toll payment (trip) ; caused noise cost (trip) ; caused congestion (trip) ; affected congestion (trip)
@@ -85,16 +89,15 @@ public class PersonTripAnalysisMain {
 			throw new RuntimeException("Aborting...");
 			
 		} else {			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_config.xml";
+			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/output_network.xml.gz";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/output_config.xml.gz";
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_plans.xml.gz";
+			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/100.events.xml.gz";
+			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/detailedAnalysis/";
+			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/output_plans.xml.gz";
 			
-			noiseEventsFile = null;
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/ITERS/it.100/100.events.xml.gz";
-
+			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/100.events.xml.gz";
+			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/100.events.xml.gz";
 		}
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
@@ -114,8 +117,7 @@ public class PersonTripAnalysisMain {
 		}
 				
 		Config config = ConfigUtils.loadConfig(configFile);	
-//		config.plans().setInputFile(populationFile);
-		config.plans().setInputFile(null);
+		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
@@ -184,25 +186,9 @@ public class PersonTripAnalysisMain {
 		// print the results
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, null, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
 				
 		log.info("Print trip information...");
 		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.walk, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.pt, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.bike, basicHandler, vttsHandler, congestionHandler, noiseHandler);
 		log.info("Print trip information... Done.");
 
 		log.info("Print person information...");
@@ -214,6 +200,8 @@ public class PersonTripAnalysisMain {
 		
 		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2amount(), 2000., 40 * 1000.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);
+		
+		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);
 	}
 }
 		

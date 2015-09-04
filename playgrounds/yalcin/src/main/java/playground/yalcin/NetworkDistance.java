@@ -121,7 +121,7 @@ public class NetworkDistance {
 		config.planCalcScore().setTraveling_utils_hr(0.0);
 
 //		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
-		config.planCalcScore().setMonetaryDistanceCostRateCar(-0.001) ;
+		config.planCalcScore().setMonetaryDistanceRateCar(-0.001) ;
 		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm

@@ -43,7 +43,7 @@ public class RunFreeSpeedSimulation {
 		config.planCalcScore().addActivityParams(sighting);
 		config.planCalcScore().setTraveling_utils_hr(0);
 		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+		config.planCalcScore().setMonetaryDistanceRateCar(0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
 		config.setParam("JDEQSim", "flowCapacityFactor", "100");
 		config.setParam("JDEQSim", "storageCapacityFactor", "100");

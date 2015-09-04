@@ -75,8 +75,8 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		config.planCalcScore().setTraveling_utils_hr(0);
 		config.planCalcScore().setTravelingPt_utils_hr(0);
 		config.planCalcScore().setTravelingWalk_utils_hr(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(10);
-		config.planCalcScore().setMonetaryDistanceCostRatePt(0);
+		config.planCalcScore().setMonetaryDistanceRateCar(10);
+		config.planCalcScore().setMonetaryDistanceRatePt(0);
 		config.planCalcScore().addActivityParams(h);
 		config.planCalcScore().addActivityParams(w);
 		config.planCalcScore().addActivityParams(transitActivityParams);
@@ -263,7 +263,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
 		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(-1.00);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(-0.001);
+		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(-0.001);
 		scenario.getConfig().planCalcScore().addActivityParams(h);
 		scenario.getConfig().planCalcScore().addActivityParams(w);
 		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));

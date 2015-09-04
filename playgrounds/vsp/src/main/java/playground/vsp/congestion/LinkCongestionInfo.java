@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura, amit
  *
  */
-public class LinkCongestionInfo {
+public final class LinkCongestionInfo {
 	
 	private Id<Link> linkId;
 	private double freeTravelTime;
@@ -159,9 +159,11 @@ public class LinkCongestionInfo {
 		return isLinkFree;
 	}
 	
+	@Deprecated
 	public List<Id<Link>> getSpillBackCausingLinks() {
 		return spillBackCausingLinks;
 	}
+	@Deprecated
 	public List<Id<Person>> getAgentsCausingFlowDelays() {
 		return agentsCausingFlowDelays;
 	}

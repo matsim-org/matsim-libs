@@ -142,10 +142,10 @@ import java.util.concurrent.ConcurrentHashMap;
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
 			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
 		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceCostRate() != 0.) {
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
 			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
 		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0.) {
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 

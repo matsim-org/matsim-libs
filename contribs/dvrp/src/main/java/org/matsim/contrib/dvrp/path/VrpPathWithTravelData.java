@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import org.matsim.api.core.v01.network.Link;
+
 public interface VrpPathWithTravelData
     extends VrpPath
 {
@@ -32,4 +34,8 @@ public interface VrpPathWithTravelData
 
 
     public double getTravelCost();
+    
+    public double[] getLinkTTs();
+    
+    public Link[] getLinks();
 }

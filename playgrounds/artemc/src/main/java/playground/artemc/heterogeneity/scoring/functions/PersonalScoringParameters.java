@@ -99,12 +99,12 @@ public class PersonalScoringParameters implements MatsimParameters {
 			double marginalUtilityOfTraveling_s = modeParams.getMarginalUtilityOfTraveling() / 3600.0;
 			worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
 			double marginalUtilityOfDistance_m = modeParams.getMarginalUtilityOfDistance();
-			double monetaryDistanceCostRate = modeParams.getMonetaryDistanceCostRate();
+			double monetaryDistanceRate = modeParams.getMonetaryDistanceRate();
 			double constant = modeParams.getConstant();
 			Mode newModeParams = new Mode(
 					marginalUtilityOfTraveling_s,
 					marginalUtilityOfDistance_m,
-					monetaryDistanceCostRate,
+					monetaryDistanceRate,
 					constant);
 			tmpModeParams.put(modeName, newModeParams);
 		}
