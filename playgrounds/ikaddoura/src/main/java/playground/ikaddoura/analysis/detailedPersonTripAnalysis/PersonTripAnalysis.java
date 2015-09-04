@@ -114,7 +114,7 @@ public class PersonTripAnalysis {
 					);
 			bw.newLine();
 			
-			for (Id<Person> id : basicHandler.getPersonId2tripNumber2legMode().keySet()) {
+			for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
 				
 				double userBenefit = Double.NEGATIVE_INFINITY;
 				if (personId2userBenefit.containsKey(id)) {
@@ -133,62 +133,62 @@ public class PersonTripAnalysis {
 				double affectedCongestion = 0.;
 				double affectedCongestionCost = 0.;
 				
-				for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
-					
-					if (basicHandler.getPersonId2tripNumber2amount().containsKey(id) && basicHandler.getPersonId2tripNumber2amount().get(id).containsKey(trip)) {
-						tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2amount().get(id).get(trip);
-					}
-					
-					if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
-						causedNoiseCost = causedNoiseCost + noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
-					}
-
-					if (noiseHandler.getPersonId2affectedNoiseCost().containsKey(id)) {
-						affectedNoiseCost = affectedNoiseCost + noiseHandler.getPersonId2affectedNoiseCost().get(id);
-					}
-
-					if (congestionHandler.getPersonId2tripNumber2causedDelay().containsKey(id) && congestionHandler.getPersonId2tripNumber2causedDelay().get(id).containsKey(trip)) {
-						causedCongestion = causedCongestion + congestionHandler.getPersonId2tripNumber2causedDelay().get(id).get(trip);
-					}
-					
-					if (congestionHandler.getPersonId2tripNumber2affectedDelay().containsKey(id) && congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).containsKey(trip)) {
-						affectedCongestion = affectedCongestion + congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).get(trip);
-
-						double vttsThisTrip = Double.NEGATIVE_INFINITY;
-						if (vttsHandler.getPersonId2TripNr2VTTSh().containsKey(id) && vttsHandler.getPersonId2TripNr2VTTSh().get(id).containsKey(trip)) {
-							vttsThisTrip = vttsHandler.getPersonId2TripNr2VTTSh().get(id).get(trip);
-						}
-						if (vttsThisTrip == Double.NEGATIVE_INFINITY) {
-							log.warn("No vtts to convert affected delays into delay costs.");
-						} else {
-							affectedCongestionCost = vttsThisTrip * (affectedCongestion / 3600.);
-						}
-					}		
-					
-					if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+				if (noiseHandler.getPersonId2affectedNoiseCost().containsKey(id)) {
+					affectedNoiseCost = affectedNoiseCost + noiseHandler.getPersonId2affectedNoiseCost().get(id);
+				}
+				
+				if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
+					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
 						
-						mode_trips++;
+						if (basicHandler.getPersonId2tripNumber2amount().containsKey(id) && basicHandler.getPersonId2tripNumber2amount().get(id).containsKey(trip)) {
+							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2amount().get(id).get(trip);
+						}
 						
-						if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-							if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-								mode_stuckAbort = "yes";
+						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
+							causedNoiseCost = causedNoiseCost + noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
+						}
+
+						if (congestionHandler.getPersonId2tripNumber2causedDelay().containsKey(id) && congestionHandler.getPersonId2tripNumber2causedDelay().get(id).containsKey(trip)) {
+							causedCongestion = causedCongestion + congestionHandler.getPersonId2tripNumber2causedDelay().get(id).get(trip);
+						}
+						
+						if (congestionHandler.getPersonId2tripNumber2affectedDelay().containsKey(id) && congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).containsKey(trip)) {
+							affectedCongestion = affectedCongestion + congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).get(trip);
+
+							double vttsThisTrip = Double.NEGATIVE_INFINITY;
+							if (vttsHandler.getPersonId2TripNr2VTTSh().containsKey(id) && vttsHandler.getPersonId2TripNr2VTTSh().get(id).containsKey(trip)) {
+								vttsThisTrip = vttsHandler.getPersonId2TripNr2VTTSh().get(id).get(trip);
 							}
-						}
+							if (vttsThisTrip == Double.NEGATIVE_INFINITY) {
+								log.warn("No vtts to convert affected delays into delay costs.");
+							} else {
+								affectedCongestionCost = affectedCongestionCost + vttsThisTrip * (congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).get(trip) / 3600.);
+							}
+						}		
 						
-						if (vttsHandler.getPersonId2TripNr2VTTSh().containsKey(id) && vttsHandler.getPersonId2TripNr2VTTSh().get(id).containsKey(trip)) {
-							mode_vtts.add(vttsHandler.getPersonId2TripNr2VTTSh().get(id).get(trip));
+						if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+							
+							mode_trips++;
+							
+							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+									mode_stuckAbort = "yes";
+								}
+							}
+							
+							if (vttsHandler.getPersonId2TripNr2VTTSh().containsKey(id) && vttsHandler.getPersonId2TripNr2VTTSh().get(id).containsKey(trip)) {
+								mode_vtts.add(vttsHandler.getPersonId2TripNr2VTTSh().get(id).get(trip));
+							}
+							
+							if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+								mode_travelTime = mode_travelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
+							}
+							
+							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+								mode_travelDistance = mode_travelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+							}			
 						}
-						
-						if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-							mode_travelTime = mode_travelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
-						}
-						
-						if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-							mode_travelDistance = mode_travelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
-						}
-								
 					}
-					
 				}
 				
 				double mode_avgVTTS = 0.;
@@ -259,7 +259,9 @@ public class PersonTripAnalysis {
 					+ "travel time (trip) [sec];"
 					+ "travel distance (trip) [m];"
 					+ "affected congestion (trip) [sec];"
-					+ "affected congestion cost (trip) [monetary units]" );
+					+ "affected congestion cost (trip) [monetary units];"
+					+ "caused congestion (trip) [sec];"
+					+ "ASSUMED caused noise cost (trip) [sec]"); // TODO make this accurate?!
 			
 			bw.newLine();
 			
@@ -319,6 +321,16 @@ public class PersonTripAnalysis {
 							}
 						}
 						
+						double causedDelay = 0.;
+						if (congestionHandler.getPersonId2tripNumber2causedDelay().containsKey(id) && congestionHandler.getPersonId2tripNumber2causedDelay().get(id).containsKey(trip)) {
+							causedDelay = congestionHandler.getPersonId2tripNumber2causedDelay().get(id).get(trip);
+						}
+						
+						double causedNoiseCost = 0.;
+						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
+							causedNoiseCost = noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
+						}
+						
 						bw.write(id + ";"
 						+ trip + ";"
 						+ transportModeThisTrip + ";"
@@ -329,7 +341,9 @@ public class PersonTripAnalysis {
 						+ travelTime + ";"
 						+ travelDistance + ";"
 						+ affectedDelay + ";"
-						+ affectedDelayCost
+						+ affectedDelayCost + ";"
+						+ causedDelay + ";"
+						+ causedNoiseCost
 						);
 						bw.newLine();						
 					}
@@ -435,6 +449,7 @@ public class PersonTripAnalysis {
 					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
 						
 						// for all modes
+						
 						allTrips++;
 						
 						if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
@@ -465,7 +480,7 @@ public class PersonTripAnalysis {
 							if (vttsThisTrip == Double.NEGATIVE_INFINITY) {
 								log.warn("No vtts to convert affected delays into delay costs.");
 							} else {
-								affectedCongestionCost = vttsThisTrip * (affectedCongestion / 3600.);
+								affectedCongestionCost = affectedCongestionCost + vttsThisTrip * (congestionHandler.getPersonId2tripNumber2affectedDelay().get(id).get(trip) / 3600.);
 							}
 							
 						}
@@ -514,29 +529,29 @@ public class PersonTripAnalysis {
 
 			bw.newLine();
 			
-			bw.write("number of " + mode + " trips;" + mode_trips);
+			bw.write("number of " + mode + " trips (sample size);" + mode_trips);
 			bw.newLine();
 			
-			bw.write("number of " + mode + " stuck and abort trips;" + mode_StuckAndAbortTrips);
+			bw.write("number of " + mode + " stuck and abort trip (sample size)s;" + mode_StuckAndAbortTrips);
 			bw.newLine();
 			
 			bw.newLine();
 						
-			bw.write(mode + " travel distance [km];" + mode_TravelDistance / 1000.);
+			bw.write(mode + " travel distance (sample size) [km];" + mode_TravelDistance / 1000.);
 			bw.newLine();
 			
 			bw.write("average " + mode + " VTTS [monetary units per hour];" + mode_avgVTTS);
 			bw.newLine();
 			
-			bw.write(mode + " travel time [hours];" + mode_TravelTime / 3600.);
+			bw.write(mode + " travel time (sample size) [hours];" + mode_TravelTime / 3600.);
 			bw.newLine();
 			
 			bw.newLine();
 									
-			bw.write("number of trips (all modes);" + allTrips);
+			bw.write("number of trips (sample size, all modes);" + allTrips);
 			bw.newLine();
 			
-			bw.write("number of stuck and abort trips (all modes);" + allStuckAndAbortTrips);
+			bw.write("number of stuck and abort trips (sample size, all modes);" + allStuckAndAbortTrips);
 			bw.newLine();
 			
 			bw.write("affected congestion [hours];" + affectedCongestion / 3600.);
@@ -550,32 +565,32 @@ public class PersonTripAnalysis {
 			
 			bw.newLine();
 			
-			bw.write("affected congestion cost [monetary units];" + affectedCongestionCost);
+			bw.write("affected congestion cost (sample size) [monetary units];" + affectedCongestionCost);
 			bw.newLine();
 			
-			bw.write("affected noise damage costs [monetary units];" + affectedNoiseCost);
+			bw.write("affected noise damage costs (sample size) [monetary units];" + affectedNoiseCost);
 			bw.newLine();
 			
-			bw.write("affected noise damage costs [monetary units] (alternative computation);" + noiseHandler.getAffectedNoiseCost());
+			bw.write("affected noise damage costs (sample size) [monetary units] (alternative computation);" + noiseHandler.getAffectedNoiseCost());
 			bw.newLine();
 			
-			bw.write("caused noise damage costs [monetary units];" + causedNoiseCost);
+			bw.write("caused noise damage costs (sample size) [monetary units];" + causedNoiseCost);
 			bw.newLine();
 			
-			bw.write("caused noise damage costs [monetary units] (alternative computation);" + noiseHandler.getCausedNoiseCost());
+			bw.write("caused noise damage costs (sample size) [monetary units] (alternative computation);" + noiseHandler.getCausedNoiseCost());
 			bw.newLine();
 			
-			bw.write("travel related user benefits (including toll payments) [monetary units];" + userBenefits);
+			bw.write("travel related user benefits (sample size) (including toll payments) [monetary units];" + userBenefits);
 			bw.newLine();
 			
-			bw.write("toll revenues [monetary units];" + tollPayments);
+			bw.write("toll revenues (sample size) [monetary units];" + tollPayments);
 			bw.newLine();
 			
-			bw.write("toll revenues [monetary units] (alternative computation);" + basicHandler.getTotalPayments());
+			bw.write("toll revenues (sample size) [monetary units] (alternative computation);" + basicHandler.getTotalPayments());
 			bw.newLine();
 			
 			double welfare = tollPayments + userBenefits - affectedNoiseCost;
-			bw.write("system welfare [monetary units];" + welfare);
+			bw.write("system welfare (sample size) [monetary units];" + welfare);
 			bw.newLine();
 			
 			log.info("Output written to " + fileName);

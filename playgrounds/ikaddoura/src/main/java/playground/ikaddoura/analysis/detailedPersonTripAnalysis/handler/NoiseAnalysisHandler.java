@@ -102,23 +102,29 @@ public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEvent
 			}
 		}
 		
-		if (personId2tripNumber2causedNoiseCost.containsKey(event.getCausingAgentId()) && personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).containsKey(tripNumber)) {
+		if (personId2tripNumber2causedNoiseCost.containsKey(event.getCausingAgentId())) {
 			
-			double causedAmountBefore = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).get(tripNumber);
-			double causedAmountUpdated = causedAmountBefore + event.getAmount();
+			if (personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).containsKey(tripNumber)) {
+				
+				double causedAmountBefore = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).get(tripNumber);
+				double causedAmountUpdated = causedAmountBefore + event.getAmount();
+				
+				Map<Integer,Double> tripNumber2causedAmount = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
+				tripNumber2causedAmount.put(tripNumber, causedAmountUpdated);
+				personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedAmount);
+				
+			} else {
+				Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
+				tripNumber2causedDelay.put(tripNumber, event.getAmount());
+				personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedDelay);
+			}
 			
-			Map<Integer,Double> tripNumber2causedAmount = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
-			tripNumber2causedAmount.put(tripNumber, causedAmountUpdated);
-			personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedAmount);
-		
 		} else {
 			
 			Map<Integer,Double> tripNumber2causedDelay = new HashMap<>();
 			tripNumber2causedDelay.put(tripNumber, event.getAmount());
 			personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedDelay);
-
-		}
-		
+		}		
 	}
 
 	@Override
@@ -149,6 +155,7 @@ public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEvent
 	}
 
 	public Map<Id<Person>,Map<Integer,Double>> getPersonId2tripNumber2causedNoiseCost() {
+		// the trip number may be wrong because of the interval based computation of noise
 		return personId2tripNumber2causedNoiseCost;
 	}
 
