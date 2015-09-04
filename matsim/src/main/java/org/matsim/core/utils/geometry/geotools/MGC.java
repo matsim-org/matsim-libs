@@ -64,6 +64,8 @@ public class MGC {
 				"EPSG:31468");
 		COORDINATE_REFERENCE_SYSTEMS.put(TransformationFactory.WGS84_UTM29N, // Coimbra, Portugal
 				"PROJCS[\"WGS_1984_UTM_Zone_29N\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0.0],UNIT[\"Meter\",1]]");
+        COORDINATE_REFERENCE_SYSTEMS.put(TransformationFactory.WGS84_UTM31N, // Barcelona, Spain
+                "PROJCS[\"WGS_1984_UTM_Zone_31N\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",3],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"Meter\",1]]");
 		COORDINATE_REFERENCE_SYSTEMS.put(TransformationFactory.CH1903_LV03_GT, "PROJCS[\"Hotine_Oblique_Mercator_Azimuth_Center\",GEOGCS[\"Bessel" +
 				"1841\",DATUM[\"D_unknown\",SPHEROID[\"bessel\",6377397.155,299.1528128]]" +
 				",PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[" +

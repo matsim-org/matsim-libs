@@ -28,13 +28,13 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
-public class ServedRequestsShpWriter
+public class PoznanServedRequestsShpWriter
 {
-    private final Iterable<ServedRequest> servedRequests;
+    private final Iterable<PoznanServedRequest> servedRequests;
     private final String coordinateSystem;
 
 
-    public ServedRequestsShpWriter(Iterable<ServedRequest> servedRequests, String coordinateSystem)
+    public PoznanServedRequestsShpWriter(Iterable<PoznanServedRequest> servedRequests, String coordinateSystem)
     {
         this.servedRequests = servedRequests;
         this.coordinateSystem = coordinateSystem;
@@ -56,7 +56,7 @@ public class ServedRequestsShpWriter
 
         List<SimpleFeature> origins = new ArrayList<>();
         List<SimpleFeature> destinations = new ArrayList<>();
-        for (ServedRequest r : servedRequests) {
+        for (PoznanServedRequest r : servedRequests) {
             String id = r.id + "";
 
             Object[] attrs = new Object[6];
@@ -78,14 +78,14 @@ public class ServedRequestsShpWriter
 
     public static void main(String[] args)
     {
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2);
+        Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(2);
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
         String shpPath = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/GIS/";
         String originsShpFile = shpPath + "origins_2014_02.shp";
         String destinationsShpFile = shpPath + "destinations_2014_02.shp";
 
-        new ServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N)
+        new PoznanServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N)
                 .write(originsShpFile, destinationsShpFile);
     }
 }

@@ -27,20 +27,19 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.michalm.demand.taxi.ServedRequest;
 
-public class ServedRequestsReader
+
+public class PoznanServedRequestsReader
 {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
     private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
             TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
-    private final List<ServedRequest> requests;
+    private final List<PoznanServedRequest> requests;
 
-    private Scanner scanner;
-
-
-    public ServedRequestsReader(List<ServedRequest> requests)
+    public PoznanServedRequestsReader(List<PoznanServedRequest> requests)
     {
         this.requests = requests;
     }
@@ -55,12 +54,12 @@ public class ServedRequestsReader
             while (scanner.hasNext()) {
                 //2014_02_000001  01-02-2014 00:00:26  01-02-2014 00:00:22  16.964106  52.401409  16.898370  52.428270  329
                 Id<ServedRequest> id = Id.create(scanner.next(), ServedRequest.class);
-                Date accepted = getNextDate();
-                Date assigned = getNextDate();
-                Coord from = getNextCoord();
-                Coord to = getNextCoord();
+                Date accepted = getNextDate(scanner);
+                Date assigned = getNextDate(scanner);
+                Coord from = getNextCoord(scanner);
+                Coord to = getNextCoord(scanner);
                 Id<String> taxiId = Id.create(scanner.next(), String.class);
-                requests.add(new ServedRequest(id, accepted, assigned, from, to, taxiId));
+                requests.add(new PoznanServedRequest(id, accepted, assigned, from, to, taxiId));
             }
         }
         catch (FileNotFoundException e) {
@@ -69,7 +68,7 @@ public class ServedRequestsReader
     }
 
 
-    private Date getNextDate()
+    private Date getNextDate(Scanner scanner)
     {
         String day = scanner.next();
         String time = scanner.next();
@@ -77,7 +76,7 @@ public class ServedRequestsReader
     }
 
 
-    private Coord getNextCoord()
+    private Coord getNextCoord(Scanner scanner)
     {
         double x = scanner.nextDouble();
         double y = scanner.nextDouble();

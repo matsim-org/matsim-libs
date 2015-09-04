@@ -22,32 +22,35 @@ package playground.michalm.poznan.demand.taxi;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class ServedRequestsBasedDemandGenerator
+public class PoznanServedRequestsBasedDemandGenerator
 {
     private final Scenario scenario;
     private final PopulationFactory pf;
 
 
-    public ServedRequestsBasedDemandGenerator(Scenario scenario)
+    public PoznanServedRequestsBasedDemandGenerator(Scenario scenario)
     {
         this.scenario = scenario;
         pf = scenario.getPopulation().getFactory();
     }
 
 
-    private int curentAgentId = 0;
+    private int currentAgentId = 0;
     private Map<Id<Person>, Integer> prebookingTimes = new HashMap<>();
 
 
-    public void generatePlansFor(Iterable<ServedRequest> requests, Date timeZero)
+    public void generatePlansFor(Iterable<PoznanServedRequest> requests, Date timeZero)
     {
-        for (ServedRequest r : requests) {
+        for (PoznanServedRequest r : requests) {
             int acceptedTime = getTime(r.accepted, timeZero);
             int assignedTime = getTime(r.assigned, timeZero);
 
@@ -56,7 +59,7 @@ public class ServedRequestsBasedDemandGenerator
             Plan plan = pf.createPlan();
 
             // act0
-            Activity startAct = pf.createActivityFromCoord("dummy", r.from);
+            Activity startAct = createActivityFromCoord("dummy", r.from);
             startAct.setEndTime(pickupTime);
             plan.addActivity(startAct);
 
@@ -64,9 +67,9 @@ public class ServedRequestsBasedDemandGenerator
             plan.addLeg(pf.createLeg(TaxiUtils.TAXI_MODE));
 
             // act1
-            plan.addActivity(pf.createActivityFromCoord("dummy", r.to));
+            plan.addActivity(createActivityFromCoord("dummy", r.to));
 
-            String strId = String.format("taxi_customer_%d", curentAgentId++);
+            String strId = String.format("taxi_customer_%d", currentAgentId++);
             Person person = pf.createPerson(Id.createPersonId(strId));
 
             person.addPlan(plan);
@@ -76,6 +79,15 @@ public class ServedRequestsBasedDemandGenerator
                 prebookingTimes.put(person.getId(), acceptedTime);
             }
         }
+    }
+    
+    
+    private Activity createActivityFromCoord(String actType, Coord coord)
+    {
+        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+        Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), coord);
+        activity.setLinkId(link.getId());
+        return activity;
     }
 
 
@@ -95,15 +107,14 @@ public class ServedRequestsBasedDemandGenerator
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
 
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(4);
-        Date zeroDate = ServedRequestsReader.parseDate("09-04-2014 00:00:00");
-        Date fromDate = ServedRequestsReader.parseDate("09-04-2014 04:00:00");
-        Iterable<ServedRequest> filteredRequests = PoznanServedRequests.filterNext24Hours(requests,
-                fromDate);
+        Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(4);
+        Date zeroDate = PoznanServedRequestsReader.parseDate("09-04-2014 00:00:00");
+        Date fromDate = PoznanServedRequestsReader.parseDate("09-04-2014 04:00:00");
+        requests = PoznanServedRequests.filterNext24Hours(requests, fromDate);
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
-        ServedRequestsBasedDemandGenerator dg = new ServedRequestsBasedDemandGenerator(scenario);
-        dg.generatePlansFor(filteredRequests, zeroDate);
+        PoznanServedRequestsBasedDemandGenerator dg = new PoznanServedRequestsBasedDemandGenerator(scenario);
+        dg.generatePlansFor(requests, zeroDate);
         dg.write("d:/PP-rad/taxi/poznan-supply/dane/zlecenia_obsluzone/plans_09_04_2014.xml");
     }
 }

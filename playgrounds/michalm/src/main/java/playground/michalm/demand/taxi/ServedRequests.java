@@ -17,13 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.poznan.demand.taxi;
+package playground.michalm.demand.taxi;
 
 import java.util.*;
 
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
@@ -43,22 +44,22 @@ public class ServedRequests
 
     public static boolean isWithinArea(ServedRequest request, PreparedPolygon preparedPolygon)
     {
-        Point from = MGC.coord2Point(request.from);
-        Point to = MGC.coord2Point(request.to);
+        Point from = MGC.coord2Point(request.getFrom());
+        Point to = MGC.coord2Point(request.getTo());
         return preparedPolygon.contains(from) && preparedPolygon.contains(to);
     }
 
 
     public static boolean isBetweenDates(ServedRequest request, Date fromDate, Date toDate)
     {
-        long assignedTime = request.assigned.getTime();
+        long assignedTime = request.getStartTime().getTime();
         return assignedTime >= fromDate.getTime() && assignedTime < toDate.getTime();
     }
 
 
     public static boolean isOnWeekDays(ServedRequest request, WeekDay... weekDays)
     {
-        WeekDay wd = WeekDay.getWeekDay(request.assigned);
+        WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
         return Arrays.asList(weekDays).contains(wd);
     }
 
@@ -95,5 +96,39 @@ public class ServedRequests
                 return ServedRequests.isOnWeekDays(request, weekDays);
             }
         };
+    }
+
+
+    public static <T extends ServedRequest> Iterable<T> filterWorkDaysPeriods(Iterable<T> requests,
+            final int zeroHour)
+    {
+        Predicate<ServedRequest> predicate = new Predicate<ServedRequest>() {
+            public boolean apply(ServedRequest request)
+            {
+                WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
+
+                switch (wd) {
+                    case MON:
+                        return request.getStartTime().getHours() >= zeroHour;
+
+                    case TUE:
+                    case WED:
+                    case THU:
+                        return true;
+
+                    case SAT:
+                    case SUN:
+                        return false;
+
+                    case FRI:
+                        return request.getStartTime().getHours() < zeroHour;
+
+                    default:
+                        throw new IllegalArgumentException();
+                }
+            }
+        };
+
+        return Iterables.filter(requests, predicate);
     }
 }

@@ -23,29 +23,28 @@ import java.text.*;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
 import org.matsim.matrices.Matrices;
 
 import com.google.common.base.Function;
 
 import playground.michalm.demand.aggregator.*;
+import playground.michalm.demand.taxi.ServedRequests;
 import playground.michalm.poznan.zone.PoznanZones;
 import playground.michalm.util.matrices.*;
 import playground.michalm.zone.*;
 
 
-public class ServedRequestsAggregator
+public class PoznanServedRequestsAggregator
 {
     public static void main(String[] args)
     {
         //Map<Id, Zone> zones = PoznanZones.readTaxiZones();
         Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones();
 
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
+        Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
         requests = PoznanServedRequests.filterNormalPeriods(requests);
-        requests = PoznanServedRequests.filterWorkDaysPeriods(requests);
+        requests = ServedRequests.filterWorkDaysPeriods(requests, PoznanServedRequests.ZERO_HOUR);
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
         //aggregateRequests
@@ -54,7 +53,7 @@ public class ServedRequestsAggregator
                 FormatBasedDateDiscretizer.YMDH);
         DemandAggregator demandAggregator = new DemandAggregator(zoneFinder, hourlyDateDiscretizer);
 
-        for (ServedRequest r : requests) {
+        for (PoznanServedRequest r : requests) {
             demandAggregator.addTrip(r.assigned, r.from, r.to);
         }
 

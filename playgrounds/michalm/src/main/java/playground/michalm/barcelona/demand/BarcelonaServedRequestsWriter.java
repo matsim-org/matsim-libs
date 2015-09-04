@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.poznan.demand.taxi;
+package playground.michalm.barcelona.demand;
 
-import java.util.Date;
-
-import org.matsim.api.core.v01.*;
+import java.io.*;
 
 
-public class ServedRequest
+public class BarcelonaServedRequestsWriter
 {
-    public final Id<ServedRequest> id;
-    public final Date accepted;
-    public final Date assigned;
-    public final Coord from;
-    public final Coord to;
-    public final Id<String> taxiId;
+    private final Iterable<BarcelonaServedRequest> requests;
 
 
-    public ServedRequest(Id<ServedRequest> id, Date accepted, Date assigned, Coord from, Coord to,
-            Id<String> taxiId)
+    public BarcelonaServedRequestsWriter(Iterable<BarcelonaServedRequest> requests)
     {
-        this.id = id;
-        this.accepted = accepted;
-        this.assigned = assigned;
-        this.from = from;
-        this.to = to;
-        this.taxiId = taxiId;
+        this.requests = requests;
+    }
+
+
+    public void writeFile(String file)
+    {
+        try (PrintWriter pw = new PrintWriter(new File(file))) {
+            pw.println("id,HOUR_start,MINUTE_start,travel time,distance");
+
+            for (BarcelonaServedRequest r : requests) {
+                pw.printf("%s,%d,%d,%d,%.1f\n", r.id, //
+                        r.startTime.getHours(), r.startTime.getMinutes(), //
+                        r.travelTime, r.distance);
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

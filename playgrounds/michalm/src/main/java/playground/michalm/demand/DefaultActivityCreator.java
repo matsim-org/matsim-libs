@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.util.random.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.*;
 
 import playground.michalm.zone.Zone;
+import playground.michalm.zone.util.RandomPointUtils;
 
 
 public class DefaultActivityCreator
@@ -65,20 +65,11 @@ public class DefaultActivityCreator
     public Activity createActivity(Zone zone, String actType)
     {
         Geometry geometry = geometryProvider.getGeometry(zone, actType);
-        Envelope envelope = geometry.getEnvelopeInternal();
-        double minX = envelope.getMinX();
-        double maxX = envelope.getMaxX();
-        double minY = envelope.getMinY();
-        double maxY = envelope.getMaxY();
-
         Point p = null;
-
         do {
-            double x = uniform.nextDouble(minX, maxX);
-            double y = uniform.nextDouble(minY, maxY);
-            p = MGC.xy2Point(x, y);
+            p = RandomPointUtils.getRandomPointInGeometry(geometry);
         }
-        while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
+        while (!pointAcceptor.acceptPoint(zone, actType, p));
 
         Coord coord = scenario.createCoord(p.getX(), p.getY());
         Link link = NetworkUtils.getNearestLink(network, coord);
