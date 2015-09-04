@@ -47,11 +47,9 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 	public CongestionHandlerImplV6(EventsManager events, Scenario scenario) {
 		super(events, scenario);
 		this.scenario = scenario;
-		this.events = events;
 	}
 
 	private Scenario scenario;
-	private EventsManager events;
 	
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
@@ -81,8 +79,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			
 			if (causingAgent==null) {
 				if(delay==1){
-					//		roundingErrors+=delay;
-					// TODO : need a method to update global roundingErrors.
+					this.addToDelayNotInternalized_roundingErrors(delay);
 					return;
 				}else {
 					throw new RuntimeException("Delay for person "+event.getPersonId()+" is "+ delay+" sec. But causing agent could not be located. This happened during event "+event.toString()+" Aborting...");
@@ -97,11 +94,10 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			congestionType = "flowCapacity";
 		}
 		
-		
-		//TODO : need a method to update totalInternalizedDelay in AbstractCongestionHandler
 		CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), congestionType, causingAgent, 
 				event.getPersonId(), delay, causingLink, this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
-		this.events.processEvent(congestionEvent);
+		this.getEventsManager().processEvent(congestionEvent);
+		this.addToTotalInternalizedDelay(delay);
 		
 	}
 	

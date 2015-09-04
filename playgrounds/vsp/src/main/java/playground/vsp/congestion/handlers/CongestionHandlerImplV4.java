@@ -66,11 +66,9 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
 		this.scenario = scenario;
-		this.events = events;
 	}
 
 	private Scenario scenario;
-	private EventsManager events ;
 	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLink = new HashMap<Id<Link>, List<Id<Link>>>();
 
 	@Override
@@ -105,6 +103,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			}
 			// yy Amit, what is the above handful of lines supposed to do?  Seems to me that at a diverge it may add more 
 			// than one downstream link as blocking.  It will, however, never go "forward" if the blocking link is farther way, no?  kai, sep'15
+			//Yes, this will store all the spillback causing downstream link. No, here not, but it go forward (farther way) in the method allocateStorageDelayToDownstreamLinks()
 			
 		} 
 
@@ -159,7 +158,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
-		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2freeSpeedLeaveTime().keySet()); 
+		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
@@ -173,9 +172,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
-			this.events.processEvent(congestionEvent); // this is a work around but for this to work, eventManager of AbstractCongestionHandler should not be private. 
-			//TODO: if eventManager of AbstractCongestionHandler is not be private anymore, remove the eventsManager object from this class.
-			// yy Amit, as said in email: keep eventsManager private, but provide a getEventsManager(). kai, sep'15
+			this.getEventsManager().processEvent(congestionEvent); 
+			this.addToTotalInternalizedDelay(agentDelay);
 
 			remainingDelay = remainingDelay - agentDelay;
 		}

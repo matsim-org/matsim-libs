@@ -387,5 +387,15 @@ PersonStuckEventHandler {
 	final void addToDelayNotInternalized_spillbackNoCausingAgent(double val) {
 		this.delayNotInternalized_spillbackNoCausingAgent += val ;
 	}
+	final void addToTotalInternalizedDelay(double val){
+		this.totalInternalizedDelay += val;
+	}
 
+	public void addToDelayNotInternalized_roundingErrors(double val) {
+		this.delayNotInternalized_roundingErrors += val;
+	}
+
+	final EventsManager getEventsManager(){
+		return this.events;
+	}
 }
