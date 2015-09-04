@@ -42,7 +42,7 @@ public class XMLReaderWriter {
 		
 	}
 	public Document modifyPopulation(Document document){//Converts Population into RT90 from SWEREF99
-		CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84_RT90);
+		//CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84_RT90);
 		Element rootElement = document.getRootElement();
 		List persons = rootElement.getChildren("person");
 		for (int i = 0; i < persons.size(); i++) {
@@ -50,10 +50,12 @@ public class XMLReaderWriter {
 			 List activs = ((Element)person).getChild("plan").getChildren("act");
 			 for(int j = 0; j < activs.size(); j++){
 				 Element act = (Element) activs.get(j);
-				 Coord coord = new CoordImpl(Double.parseDouble(act.getAttributeValue("x")), Double.parseDouble(act.getAttributeValue("y")));
-				 coord = ct.transform(coord);
-				 act.setAttribute("x", Double.toString(coord.getX()));
-				 act.setAttribute("y", Double.toString(coord.getY()));
+				 //act.removeAttribute(act.getAttribute("link"));
+				 //act.removeAttribute(act.getAttribute("end_time"));
+				 //Coord coord = new CoordImpl(Double.parseDouble(act.getAttributeValue("x")), Double.parseDouble(act.getAttributeValue("y")));
+				 //coord = ct.transform(coord);
+				 //act.setAttribute("x", Double.toString(coord.getX()));
+				 //act.setAttribute("y", Double.toString(coord.getY()));
 			 }
 		}
 		return document;
@@ -210,13 +212,14 @@ public class XMLReaderWriter {
 		
 	}
 	public Document modifyNetwork(Document document){
+		CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
 		CoordinateSystemConverter converter = new CoordinateSystemConverter();
 		Element rootElement = document.getRootElement();
 		List listElement = ((Element)(rootElement.getChildren("nodes").get(0))).getChildren("node");
 		for (int i = 0; i < listElement.size(); i++) {
 			 Element node = (Element) listElement.get(i);
 			 Coord coord = new CoordImpl(Double.parseDouble(node.getAttributeValue("x")), Double.parseDouble(node.getAttributeValue("y")));
-			 coord=converter.deg2UTM(coord);
+			 coord = ct.transform(coord);
 			 node.setAttribute("x", Double.toString(coord.getX()));
 			 node.setAttribute("y", Double.toString(coord.getY()));
 			 System.out.println("X : "+ node.getAttributeValue("x") + " Y : " + node.getAttributeValue("y"));
