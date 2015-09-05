@@ -1,4 +1,0 @@
-x	This config is for class AddParkingIdsToSmartChargingLog
-parkingTimesFileWithCorrectParkingIds	H:/data/experiments/ARTEMIS/nov2011/N-szenario11/output/parkingTimesAndLegEnergyConsumption_n.txt
-inputChargingLog	H:/data/experiments/ARTEMIS/nov2011/SR-szenario11/output/chargingLog.txt
-outputChargingLog	H:/data/experiments/ARTEMIS/nov2011/SR-szenario11/output/chargingLog_n.txt

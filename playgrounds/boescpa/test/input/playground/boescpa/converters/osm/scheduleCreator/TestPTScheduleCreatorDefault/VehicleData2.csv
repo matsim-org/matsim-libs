@@ -1,5 +1,0 @@
-vehicleType;length;width;accessTime;egressTime;doorOperation;Capacity;Capacity;pcuEquivalents;comments
-;m;m;sec/Person;sec/Person;;Seats;Standing;;[HAFAS-Descr., EN]
-R;2.1;2.2;2.3;2.4;serial;26;27;2.8;Regio
-;;;;;;;
-Here other Data may follow...

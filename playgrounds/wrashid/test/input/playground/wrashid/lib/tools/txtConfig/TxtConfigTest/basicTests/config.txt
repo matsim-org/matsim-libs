@@ -1,8 +1,0 @@
-baseFolder	H:/data/ktiRun22/output/
-eventsFile	#baseFolder#ITERS/it.50/50.events.xml.gz
-e	#d#E
-a	A
-c	#b#C
-b	#a#B
-d	#c#D
-outputDirectory	@parentDirectory@/output/
