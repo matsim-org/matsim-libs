@@ -19,34 +19,34 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author dgrether
  * 
  */
-public class DgCottbusSubPopAverageTravelTimeHandler implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class DgCottbusSubPopAverageTravelTimeHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(DgCottbusSubPopAverageTravelTimeHandler.class);
 	
-	private double travelTimeCommuter = 0.0;
-	private double travelTimeFootball = 0.0;
+	private Double travelTimeFootball = 0.0;
+	private Double travelTimeCommuter = 0.0;
 	
-	private Set<Id> footballPersonIds = new HashSet<Id>();
-	private Set<Id> commuterPersonIds = new HashSet<Id>();
+	private Map<Id<Person>, Double> departureTimeByPerson = new HashMap<>();
+	
+	private Set<Id<Person>> footballPersonIds = new HashSet<>();
+	private Set<Id<Person>> commuterPersonIds = new HashSet<>();
 	
 	
 	public DgCottbusSubPopAverageTravelTimeHandler() {}
@@ -57,69 +57,50 @@ public class DgCottbusSubPopAverageTravelTimeHandler implements LinkEnterEventHa
 	}
 	
 	public double getCommuterAvgTT() {
+		
+		
 		log.info("found " + commuterPersonIds.size() + " commuter travellers with total travel time: " + this.travelTimeCommuter);
 		return this.travelTimeCommuter / this.commuterPersonIds.size();
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.travelTimeCommuter = 0.0;
-		this.travelTimeFootball = 0.0;
+		this.departureTimeByPerson.clear();
 		this.footballPersonIds.clear();
 		this.commuterPersonIds.clear();
 	}
 
-	private boolean isFootballId(Id id){
+	private boolean isFootballId(Id<Person> id){
 		if (id.toString().contains("FB")){
 			return true;
 		}
 		return false;
 	}
-	
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (isFootballId(event.getPersonId())){
-			this.travelTimeFootball -= event.getTime();
-		}
-		else {
-			this.travelTimeCommuter -= event.getTime();
-			
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		if (isFootballId(event.getPersonId())){
-			this.travelTimeFootball += event.getTime();
-		}
-		else {
-			this.travelTimeCommuter += event.getTime();
-		}
-	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+		double personTT = event.getTime() - this.departureTimeByPerson.get(event.getPersonId());
 		if (isFootballId(event.getPersonId())){
-			this.travelTimeFootball += event.getTime();
+			this.travelTimeFootball += personTT;
 		}
 		else {
-			this.travelTimeCommuter += event.getTime();
+			this.travelTimeCommuter += personTT;
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+		this.departureTimeByPerson.put(event.getPersonId(), event.getTime());
+		
 		if (isFootballId(event.getPersonId())){
 			if (! footballPersonIds.contains(event.getPersonId())){
 				footballPersonIds.add(event.getPersonId());
 			}
-			this.travelTimeFootball -= event.getTime();
 		}
 		else {
 			if (! commuterPersonIds.contains(event.getPersonId())){
 				this.commuterPersonIds.add(event.getPersonId());
 			}
-			this.travelTimeCommuter -= event.getTime();
 		}
 	}
 
