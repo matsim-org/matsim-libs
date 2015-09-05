@@ -24,12 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.misc.Time;
 
-@Deprecated // The "Desires" matsim toplevel container was never properly finished.
-public class Desires implements MatsimToplevelContainer {
+@Deprecated 
+public class Desires  {
 	// yyyy this is an unfinished matsim toplevel container since
 	// (1) the factory method is not there
 	// (2) the public interface has not been reviewed.
@@ -48,7 +46,7 @@ public class Desires implements MatsimToplevelContainer {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	@Deprecated 
 	public Desires(final String desc) {
 		this.desc = desc;
 	}
@@ -57,7 +55,7 @@ public class Desires implements MatsimToplevelContainer {
 	// accumulate methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	@Deprecated 
 	public final boolean accumulateActivityDuration(final String act_type, final double duration) {
 		if (this.act_durs == null) { return this.putActivityDuration(act_type,duration); }
 		if (this.act_durs.get(act_type) == null)  { return this.putActivityDuration(act_type,duration); }
@@ -133,9 +131,4 @@ public class Desires implements MatsimToplevelContainer {
 		return "[desc=" + this.desc + "]" + "[nof_act_durs=" + this.act_durs.size() + "]";
 	}
 
-	@Override
-	@Deprecated // not yet implemented.  kai, apr'10
-	public MatsimFactory getFactory() {
-		throw new UnsupportedOperationException() ;
-	}
 }

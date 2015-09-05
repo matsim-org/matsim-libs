@@ -46,7 +46,7 @@ public abstract class AbstractController {
         public void run() {
             log.error("received unexpected shutdown request.");
             unexpectedShutdown.set(true);
-            log.info("sending innterrupt request to controllerThread");
+            log.info("sending interrupt request to controllerThread");
             controllerThread.interrupt();
             
             if (!dirtyShutdown) {
