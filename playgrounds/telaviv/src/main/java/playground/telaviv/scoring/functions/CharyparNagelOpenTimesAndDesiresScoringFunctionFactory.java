@@ -38,7 +38,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 
 /**
  * Generates {@link CharyparNagelOpenTimesActivityScoring}s.

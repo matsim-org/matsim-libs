@@ -50,7 +50,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.telaviv.config.XMLParameterParser;

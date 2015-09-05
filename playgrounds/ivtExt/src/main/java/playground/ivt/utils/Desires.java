@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package playground.ivt.utils;
 
 import java.util.HashMap;
 import java.util.Map;

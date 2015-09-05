@@ -29,7 +29,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**

@@ -42,7 +42,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.telaviv.config.TelAvivConfig;
