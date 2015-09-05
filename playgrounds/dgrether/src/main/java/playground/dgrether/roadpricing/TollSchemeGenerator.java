@@ -24,27 +24,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.opengis.kml._2.BoundaryType;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinearRingType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.PolygonType;
-import net.opengis.kml._2.ScreenOverlayType;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -56,9 +46,6 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
-import playground.dgrether.utils.DgNet2Shape;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -66,6 +53,19 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+
+import net.opengis.kml._2.BoundaryType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinearRingType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.PolygonType;
+import net.opengis.kml._2.ScreenOverlayType;
+import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
+import playground.dgrether.utils.DgNet2Shape;
 
 /**
  * @author dgrether
@@ -243,9 +243,8 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkImpl createTollScheme(Config config) {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadNetwork();
-		this.network = loader.getScenario().getNetwork();
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		this.network = sc.getNetwork();
 
 		NetworkImpl net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "

@@ -44,7 +44,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -130,9 +130,7 @@ public class MyControler2 {
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadNetwork();
-		Scenario scenarioData = loader.getScenario();
+		Scenario scenarioData = ScenarioUtils.loadScenario(config);
 
 		// create population
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/vancouver/facilities/shp/landuse.shp";

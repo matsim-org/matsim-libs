@@ -2,18 +2,19 @@ package playground.andreas.utils.pop;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -107,14 +108,13 @@ public class DeriveSmallScenarioFromBigOne {
 		config.setParam("plans", "inputPlansFile", setBoundingBoxOut);
 //		config.setParam("plans", "outputPlansFile", xy2linksOut);
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(config);
-		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
-		config = sl.getScenario().getConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
