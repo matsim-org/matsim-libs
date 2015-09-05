@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -675,6 +676,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			network.simEngine.getMobsim().getEventsManager().processEvent(
+					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			
+			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			network.simEngine.getMobsim().getAgentCounter().incLost();
 			network.simEngine.getMobsim().getAgentCounter().decLiving();
@@ -682,6 +686,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.clear();
 
 		for (QVehicle veh : buffer) {
+			network.simEngine.getMobsim().getEventsManager().processEvent(
+					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			
 			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			network.simEngine.getMobsim().getAgentCounter().incLost();
