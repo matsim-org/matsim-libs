@@ -241,6 +241,8 @@ PersonStuckEventHandler {
 		List<Id<Person>> reverseList = new ArrayList<Id<Person>>();
 		reverseList.addAll(linkInfo.getLeavingAgents());
 		Collections.reverse(reverseList);
+		// (yy do we really need this reverting?  I find this rather unstable: Someone overlooks something, and it ends up sorted 
+		// wrongly.  There are, as alternatives, SortedSet and SortedMap, and ascending/descending iterators.  kai, sep'15 )
 
 		for (Id<Person> personId : reverseList){
 			double delayForThisPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;

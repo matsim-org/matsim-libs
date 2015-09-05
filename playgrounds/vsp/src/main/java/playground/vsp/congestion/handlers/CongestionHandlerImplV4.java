@@ -69,7 +69,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	}
 
 	private Scenario scenario;
-	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLink = new HashMap<Id<Link>, List<Id<Link>>>();
+	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<Id<Link>, List<Id<Link>>>();
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
@@ -89,32 +89,25 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		if(delayOnTheLink==0) return;
 
 		if( linkInfo.getLeavingAgents().isEmpty()){
-			// identifying if agent is delayed due to storage capacity only i.e. if leavingAgentsList is empty, it is storage delay.
-			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
+			// (getLeavingAgents is NOT the queue, i.e. NOT all agents with delay, but only those agents where time
+			// headway approx 1/cap, i.e. "flow" queue. So we get here only if we are spillback delayed, and our own bottleneck
+			// is not active)
 
-			if( this.linkId2SpillBackCausingLink.containsKey(event.getLinkId()) ) {
-				/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
-				 * first removing the link (optional operation) and then adding it to the end of the list.
-				 */
-				this.linkId2SpillBackCausingLink.get(event.getLinkId()).remove(spillBackCausingLink);
-				this.linkId2SpillBackCausingLink.get(event.getLinkId()).add(spillBackCausingLink);
-			} else {
-				this.linkId2SpillBackCausingLink.put(event.getLinkId(), new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
-			}
-			// yy Amit, what is the above handful of lines supposed to do?  Seems to me that at a diverge it may add more 
-			// than one downstream link as blocking.  It will, however, never go "forward" if the blocking link is farther way, no?  kai, sep'15
-			//Yes, this will store all the spillback causing downstream link. No, here not, but it go forward (farther way) in the method allocateStorageDelayToDownstreamLinks()
+			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
 			
+			memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), spillBackCausingLink);
 		} 
 
-		//charge for the flow delay and remaining delays are said to be storage delay
+		// charge for the flow delay; remaining delays are said to be storage delay
 		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnTheLink);
 
 		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
 
 			double remainingStorageDelay = allocateStorageDelayToDownstreamLinks(storageDelay, event.getLinkId(), event);
 
-			if(remainingStorageDelay > 0.) throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
+			if(remainingStorageDelay > 0.) {
+				throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
+			}
 
 		} else {
 
@@ -123,28 +116,48 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		}
 	}
 
-	private double  allocateStorageDelayToDownstreamLinks(double storageDelay, Id<Link> startAllocationFromThisLink, LinkLeaveEvent event){
+
+	private void memorizeSpillBackCausingLinkForCurrentLink(Id<Link> currentLink, Id<Link> spillBackCausingLink) {
+		if( this.linkId2SpillBackCausingLinks.containsKey( currentLink ) ) {
+			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
+			 * first removing the link (optional operation) and then adding it to the end of the list.
+			 * Necessary in part because links are never removed from this data structure.
+			 */
+			this.linkId2SpillBackCausingLinks.get(currentLink).remove(spillBackCausingLink);
+			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
+		} else {
+			this.linkId2SpillBackCausingLinks.put(currentLink, new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
+		}
+	}
+
+	private double  allocateStorageDelayToDownstreamLinks(double storageDelay, Id<Link> linkId, LinkLeaveEvent event){
 
 		double remainingDelay = storageDelay;
 
-		if(! this.linkId2SpillBackCausingLink.containsKey(startAllocationFromThisLink)) {
+		// if linkId is not registered (by other vehicles) as having spill-back, we return:
+		if(! this.linkId2SpillBackCausingLinks.containsKey(linkId)) {
 			return remainingDelay;
 		}
 		
-		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLink.get(startAllocationFromThisLink));
+		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLinks.get(linkId));
 		if(spillBackCausingLinks.isEmpty()) return remainingDelay;
+
 		Collections.reverse(spillBackCausingLinks);
+		// (yy do we really need this reverting?  I find this rather unstable: Someone overlooks something, and it ends up sorted 
+		// wrongly.  There are, as alternatives, SortedSet and SortedMap, and ascending/descending iterators.  kai, sep'15)
 
+		// Go through all those outgoing links that have (ever) reported a blockage ...
 		Iterator<Id<Link>> spillBackLinkIterator = spillBackCausingLinks.iterator();
-
 		while (remainingDelay > 0. && spillBackLinkIterator.hasNext()){
 			Id<Link> spillBackCausingLink = spillBackLinkIterator.next();
 
 			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
 
-			if(remainingDelay==0) break;
-			else {
+			if(remainingDelay==0) {
+				break;
+			} else {
 				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
+				// !! this is where the recursive call is !!
 			}
 		}
 
