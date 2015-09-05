@@ -33,7 +33,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
 
@@ -155,6 +154,7 @@ public class InternalControler {
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
 				planCalcScoreConfigGroup,
+				scenario.getConfig().scenario(),
 				scenario.getNetwork(), 
 				STUCK_SCORE);
 		

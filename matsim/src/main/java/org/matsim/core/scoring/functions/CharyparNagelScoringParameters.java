@@ -28,6 +28,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
@@ -62,6 +63,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final boolean scoreActs;
 	
 	public final boolean usingOldScoringBelowZeroUtilityDuration ;
+	
+	public final int simulationPeriodInDays;
 
 	public CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
@@ -75,7 +78,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			final double marginalUtilityOfMoney,
 			final double abortedPlanScore,
 			final boolean scoreActs,
-			final boolean usingOldScoringBelowZeroUtilityDuration) {
+			final boolean usingOldScoringBelowZeroUtilityDuration,
+			final int simulationPeriodInDays) {
 		this.utilParams = utilParams;
 		this.modeParams = modeParams;
 		this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
@@ -88,10 +92,11 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		this.abortedPlanScore = abortedPlanScore;
 		this.scoreActs = scoreActs;
 		this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+		this.simulationPeriodInDays = simulationPeriodInDays;
 	}
 
-	public static CharyparNagelScoringParametersBuilder getBuilder( final PlanCalcScoreConfigGroup config ) {
-		return new CharyparNagelScoringParametersBuilder( config );
+	public static CharyparNagelScoringParametersBuilder getBuilder( final PlanCalcScoreConfigGroup config, final ScenarioConfigGroup scenarioConfig) {
+		return new CharyparNagelScoringParametersBuilder( config, scenarioConfig );
 	}
 
 	public static final class CharyparNagelScoringParametersBuilder {
@@ -108,8 +113,11 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		private double abortedPlanScore;
 		private boolean scoreActs;
 		private boolean usingOldScoringBelowZeroUtilityDuration;
+		private int simulationPeriodInDays = 1;
 
-		private CharyparNagelScoringParametersBuilder( final PlanCalcScoreConfigGroup config ) {
+		private CharyparNagelScoringParametersBuilder(final PlanCalcScoreConfigGroup config, ScenarioConfigGroup scenarioConfig) {
+			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
+			
 			this.usingOldScoringBelowZeroUtilityDuration = config.isUsingOldScoringBelowZeroUtilityDuration() ;
 
 			marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
@@ -234,7 +242,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 					marginalUtilityOfMoney,
 					abortedPlanScore,
 					scoreActs,
-					usingOldScoringBelowZeroUtilityDuration);
+					usingOldScoringBelowZeroUtilityDuration,
+					this.simulationPeriodInDays);
 		}
 	}
 }

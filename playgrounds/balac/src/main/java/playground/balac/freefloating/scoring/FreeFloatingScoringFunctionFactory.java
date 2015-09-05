@@ -23,25 +23,26 @@ public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.
 	private final Scenario scenario;
 	public FreeFloatingScoringFunctionFactory(Config config, Network network, Scenario scenario)
 	  {
-	    super(config.planCalcScore(), network);
+	    super(config.planCalcScore(), config.scenario(), network);
 	    this.scenario = scenario;
 	    this.network = network;
 	    this.config = config;
 	  }   
 
-	  public ScoringFunction createNewScoringFunction(Person person)
+	  @Override
+	public ScoringFunction createNewScoringFunction(Person person)
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
 		  scoringFunctionAccumulator.addScoringFunction(
 	      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(),
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
+				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
 	      this.config, 
 	      network));
-		  scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), null, ((ScenarioImpl) scenario).getActivityFacilities()));
+		  scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(), null, ((ScenarioImpl) scenario).getActivityFacilities()));
 
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 	   return scoringFunctionAccumulator;
 	  }
 }

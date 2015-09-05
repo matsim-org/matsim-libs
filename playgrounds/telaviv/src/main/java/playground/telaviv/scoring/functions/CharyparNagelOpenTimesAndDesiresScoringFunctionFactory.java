@@ -93,7 +93,7 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 				}
 				
 				// create CharyparNagelScoringParameters on person's typical durations
-				params = CharyparNagelScoringParameters.getBuilder(this.config).create();
+				params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenario.getConfig().scenario()).create();
 				this.paramsMap.put(person.getId(), params);
 				
 				// reset original typical durations

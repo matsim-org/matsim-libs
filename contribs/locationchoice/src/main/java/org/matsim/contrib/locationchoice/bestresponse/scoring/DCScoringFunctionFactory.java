@@ -36,7 +36,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
     public DCScoringFunctionFactory(Scenario scenario, DestinationChoiceBestResponseContext lcContext) {
-		super(scenario.getConfig().planCalcScore(), scenario.getNetwork());
+		super(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork());
 		this.scenario = scenario;
 		this.lcContext = lcContext;
 		log.info("creating DCScoringFunctionFactory");
@@ -60,8 +60,8 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create(), scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create(), scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create()));
 		return scoringFunctionAccumulator;
 	}
 }

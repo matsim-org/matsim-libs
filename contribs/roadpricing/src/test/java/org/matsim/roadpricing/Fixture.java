@@ -20,7 +20,8 @@
 
 package org.matsim.roadpricing;
 
-import junit.framework.TestCase;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -49,7 +50,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
-import java.util.List;
+import junit.framework.TestCase;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -215,7 +216,7 @@ import java.util.List;
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
+		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getConfig().scenario(), scenario.getNetwork()));
 		events.addHandler(scoring);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();

@@ -22,7 +22,7 @@ public class SpecialScoringFunctionFactory extends org.matsim.core.scoring.funct
 
 	public SpecialScoringFunctionFactory(Config config, Network network, Scenario scenario)
 	  {
-	    super(config.planCalcScore(), network);
+	    super(config.planCalcScore(), config.scenario(), network);
 	    this.network = network;
 	    this.config = config;
 	    this.scenario = scenario;
@@ -35,14 +35,14 @@ public class SpecialScoringFunctionFactory extends org.matsim.core.scoring.funct
 	    //this is the main difference, since we need a special scoring for carsharing legs
 		  scoringFunctionSum.addScoringFunction(
 	      new CarsharingWithTaxiLegScoringFunction((PlanImpl)person.getSelectedPlan(),
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
+				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
 	      this.config, 
 	      network));
 		  scoringFunctionSum.addScoringFunction(new ShoppingByCarScoringFunction(person.getSelectedPlan(), this.scenario));
 		  //the remaining scoring functions can be changed and adapted to the needs of the user
-		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), scenario));
-		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
-		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(), scenario));
+		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 	    return scoringFunctionSum;
 	  }
 }

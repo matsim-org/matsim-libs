@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -73,6 +69,9 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
@@ -279,7 +278,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
 		config.planCalcScore().setMonetaryDistanceRateCar( -1 );
 		config.planCalcScore().setMonetaryDistanceRatePt( -2 );
-		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
+		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 	}
 
 	//private void initPlans() {

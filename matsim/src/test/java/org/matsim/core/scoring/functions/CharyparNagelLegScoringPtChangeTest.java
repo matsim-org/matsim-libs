@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -120,8 +121,10 @@ public class CharyparNagelLegScoringPtChangeTest {
 		conf.setTravelingPt_utils_hr( random.nextDouble() * 1000 );
 		conf.setUtilityOfLineSwitch( random.nextDouble() * 1000 );
 
+		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
 		return new CharyparNagelLegScoring(
-				CharyparNagelScoringParameters.getBuilder(conf).create(),
+				CharyparNagelScoringParameters.getBuilder(conf, scenarioConfig).create(),
 				network);
 	}
 
