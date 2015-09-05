@@ -51,9 +51,9 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -94,8 +94,12 @@ public class DgFigure9ScenarioGenerator {
 	private int cycle = 120;
 	
 	public ScenarioImpl loadScenario(){
-		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals_coordinated.xml");
-		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
+		
+		Config config = ConfigUtils.loadConfig(baseDir + "config_signals_coordinated.xml");
+		MatsimRandom.reset(config.global().getRandomSeed());
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(sc);
+		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);

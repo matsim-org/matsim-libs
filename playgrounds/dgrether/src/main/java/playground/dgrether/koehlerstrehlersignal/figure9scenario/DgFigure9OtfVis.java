@@ -24,16 +24,19 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.dgrether.DgOTFVis;
 
 
@@ -45,15 +48,19 @@ public class DgFigure9OtfVis {
 //		String conf = DgKoehlerStrehler2010Runner.signalsConfigSol800;
 //		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario2/config_signals_coordinated.xml";
 		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
-		Scenario scenario = loader.loadScenario();
+		
+		Config config = ConfigUtils.loadConfig(conf);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 
 		

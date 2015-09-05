@@ -30,10 +30,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PopulationCut {
@@ -41,7 +42,11 @@ public class PopulationCut {
 	//////////////////////////////////////////////////////////////////////
 
 	private static void reduceScenario(String[] args) {
-		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).loadScenario();
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		Coord min = new CoordImpl(args[1],args[2]);
 		Coord max = new CoordImpl(args[3],args[4]);
 

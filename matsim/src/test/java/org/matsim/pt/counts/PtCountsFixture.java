@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
@@ -71,7 +73,10 @@ public abstract class PtCountsFixture {
 	public void setUp() {
 		String configFile = "test/input/org/matsim/pt/counts/config.xml";
 
-		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
+		Config config = ConfigUtils.loadConfig(configFile);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		this.scenario = ScenarioUtils.createScenario(config);
+		
 		config = scenario.getConfig();
 
 		new MatsimCountsReader(this.counts).readFile(config.findParam(MODULE_NAME, countFileParamName));
