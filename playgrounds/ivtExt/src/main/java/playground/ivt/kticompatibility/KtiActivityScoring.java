@@ -290,10 +290,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 	protected double getPerformanceScore(final String actType, final double duration) {
 		final PersonImpl person = (PersonImpl) plan.getPerson();
-		final Desires desires = person.getDesires();
 		final double typicalDuration =
-			desires != null ?
-				desires.getActivityDuration(actType) :
 				params.utilParams.get( actType ).getTypicalDuration();
 
 		// initialize zero utility durations here for better code readability, because we only need them here

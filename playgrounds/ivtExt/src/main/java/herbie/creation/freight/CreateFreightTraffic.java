@@ -253,8 +253,9 @@ public class CreateFreightTraffic {
 		Person p = new PersonImpl(Id.create(this.freightOffset + index, Person.class));
 		((PersonImpl)p).setEmployed(true);
 		((PersonImpl)p).setCarAvail("always");
-		((PersonImpl)p).createDesires("freight");
-		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
+		//((PersonImpl)p).createDesires("freight");
+		//((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
+		if ( true ) throw new RuntimeException( "desires are gone" );
 		Zone originZone = this.zones.get(this.zoneIds[originIndex]);
 		Zone destinationZone = this.zones.get(this.zoneIds[destinationIndex]);
 		p.addPlan(this.createSingleFreightPlan(originZone, destinationZone));

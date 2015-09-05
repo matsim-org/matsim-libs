@@ -45,12 +45,12 @@ public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesAc
 
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
-	private final Desires desires;
+	//private final Desires desires;
 	private final Id personId;
 	
 	public DesiresAndOpenTimesActivityScoring(Plan plan, final CharyparNagelScoringParameters params, final Scenario scenario) {
 		super(params, ((ScenarioImpl)scenario).getActivityFacilities());
-		this.desires = ((PersonImpl) plan.getPerson()).getDesires();
+		//this.desires = ((PersonImpl) plan.getPerson()).getDesires();
 		this.params = params;
 		this.scenario = scenario;
 		this.personId = plan.getPerson().getId();
