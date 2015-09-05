@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.thibautd.utils.MyConfigUtils;
-
 /**
  * Uses the trivial meaning of KTI params (NOT the one resulting from the code),
  * with the idea that the strange things in the code may have been introduced by refactorings
@@ -36,34 +27,34 @@ import playground.thibautd.utils.MyConfigUtils;
  */
 public class KtiToNormalConfigTrivial {
 	public static void main(final String[] args) {
-		final String inputConfigFile = args[ 0 ];
-		final String outputConfigFile = args[ 1 ];
-
-		final Config inputConfig = ConfigUtils.createConfig();
-		final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		inputConfig.addModule( ktiConfigGroup );
-		ConfigUtils.loadConfig( inputConfig , inputConfigFile );
-
-		final Config outputConfig = new Config();
-		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
-		outputConfig.addModule( planCalcScore );
-		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
-		planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
-		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
-		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
-		// TODO: check units (per km or per m)
-		planCalcScore.setMonetaryDistanceRatePt(
-				-( ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
-				planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceRateCar(
-				-( ktiConfigGroup.getDistanceCostCar() / 1000d ) /
-				planCalcScore.getMarginalUtilityOfMoney() );
-
-		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
-		outputConfig.addModule( ktiLikeConfigGroup );
-		ktiLikeConfigGroup.setTravelCardRatio( ktiConfigGroup.getDistanceCostPtUnknownTravelCard() / ktiConfigGroup.getDistanceCostPtNoTravelCard() );
-
-		new ConfigWriter( outputConfig ).write( outputConfigFile );
+//		final String inputConfigFile = args[ 0 ];
+//		final String outputConfigFile = args[ 1 ];
+//
+//		final Config inputConfig = ConfigUtils.createConfig();
+//		final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+//		inputConfig.addModule( ktiConfigGroup );
+//		ConfigUtils.loadConfig( inputConfig , inputConfigFile );
+//
+//		final Config outputConfig = new Config();
+//		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
+//		outputConfig.addModule( planCalcScore );
+//		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
+//		planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
+//		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
+//		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
+//		// TODO: check units (per km or per m)
+//		planCalcScore.setMonetaryDistanceRatePt(
+//				-( ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
+//				planCalcScore.getMarginalUtilityOfMoney() );
+//		planCalcScore.setMonetaryDistanceRateCar(
+//				-( ktiConfigGroup.getDistanceCostCar() / 1000d ) /
+//				planCalcScore.getMarginalUtilityOfMoney() );
+//
+//		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
+//		outputConfig.addModule( ktiLikeConfigGroup );
+//		ktiLikeConfigGroup.setTravelCardRatio( ktiConfigGroup.getDistanceCostPtUnknownTravelCard() / ktiConfigGroup.getDistanceCostPtNoTravelCard() );
+//
+//		new ConfigWriter( outputConfig ).write( outputConfigFile );
 	}
 }
 

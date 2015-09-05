@@ -56,12 +56,13 @@ public final class ZurichScenarioUtils {
 							person.getId().toString(),
 							"desires" );
 				if ( desires != null ) {
-					((PersonImpl) person).createDesires( desires.getDesc() );
-					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
-						((PersonImpl) person).getDesires().putActivityDuration(
-							entry.getKey(),
-							entry.getValue() );
-					}
+					throw new UnsupportedOperationException();
+					//((PersonImpl) person).createDesires( desires.getDesc() );
+					//for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+					//	((PersonImpl) person).getDesires().putActivityDuration(
+					//		entry.getKey(),
+					//		entry.getValue() );
+					//}
 				}
 
 				// travel card
