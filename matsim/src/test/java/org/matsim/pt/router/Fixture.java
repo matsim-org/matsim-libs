@@ -33,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -95,7 +94,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		this.config.transit().setUseTransit(true);
 		
 		ScenarioBuilder scBuilder = new ScenarioBuilder(config) ;
-		scBuilder.createTransitSchedule() ;
 		this.scenario = (ScenarioImpl) scBuilder.createScenario() ;
 
 		this.network = this.scenario.getNetwork();

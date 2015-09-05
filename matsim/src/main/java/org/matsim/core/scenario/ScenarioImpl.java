@@ -73,76 +73,11 @@ public final class ScenarioImpl implements Scenario {
 		this.network = NetworkImpl.createNetwork();
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
 		this.facilities = new ActivityFacilitiesImpl();
-		if (this.config.households().getInputFile()!=null ){
-			this.createHouseholdsContainer();
-		}
-		if ( this.config.network().getLaneDefinitionsFile()!=null || this.config.qsim().isUseLanes()) {
-			createLanesContainer();
-		}
-		if ( this.config.transit().getTransitScheduleFile() != null || this.config.transit().isUseTransit() ) {
-
-			this.createTransitScheduleContainer() ;
-			this.createTransitVehicleContainer() ;
-
-			this.config.setLocked( true );
-//			// (set the config locked so that we do not get inconsistent behavior from setting the file name to null afterwards --???)
-		}
-	}
-
-	/**
-	 * Creates a vehicle container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useVehicles
-	 * config switch to true (see MATSIM-202 for an example).
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createTransitVehicleContainer(){
-		if ( this.transitVehicles != null ) return false;
-		this.transitVehicles = VehicleUtils.createVehiclesContainer();
-		return true;
-	}
-	public final boolean createVehicleContainer(){
-		if ( this.vehicles != null ) return false;
-		this.vehicles = VehicleUtils.createVehiclesContainer();
-		return true;
-	}
-
-	/**
-	 * Creates a household container and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useHouseholds
-	 * config switch to true.
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createHouseholdsContainer(){
-		if ( this.households != null ) return false;
 		this.households = new HouseholdsImpl();
-		return true;
-	}
-
-	/**
-	 * need this in ScenarioLoader.  If you need it elsewhere, use {@link ScenarioUtils.ScenarioBuilder}.
-	 */
-	final boolean createLanesContainer() {
-		if ( this.lanes != null ) return false ;
 		this.lanes = new LaneDefinitions20Impl();
-		return true ;
-	}
-
-	/**
-	 * Creates a transit schedule and stores it, if it does not exist.
-	 * This is necessary only in very special use cases, when one needs
-	 * to create such a container <b>without</b> setting the useTransit
-	 * config switch to true (see MATSIM-220 for an example).
-	 *
-	 * @return true if a new container was initialized, false otherwise
-	 */
-	public final boolean createTransitScheduleContainer() {
-		if ( this.transitSchedule != null ) return false;
+		this.vehicles = VehicleUtils.createVehiclesContainer();
+		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		return true;
 	}
 
 	@Override
@@ -194,63 +129,21 @@ public final class ScenarioImpl implements Scenario {
 
 	@Override
 	public final Households getHouseholds() {
-		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
-		if ( this.households == null ) {
-			if ( this.config.households().getInputFile()!=null ) {
-				this.createHouseholdsContainer();
-			}
-			else {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
-				// throw new IllegalStateException(
-				log.info(
-						"no households, and households not activated from config. You must first call the create method of ScenarioImpl." );
-			}
-		}
-
 		return this.households;
 	}
 
 	@Override
 	public LaneDefinitions20 getLanes() {
-		if (this.lanes == null) {
-			throw new RuntimeException("Lanes not activated.");
-		}
 		return this.lanes;
 	}
 
 	@Override
 	public final Vehicles getTransitVehicles() {
-		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
-		if ( this.transitVehicles == null ) {
-//			if ( this.config.transit().isUseTransit() ) {
-//				this.createTransitVehicleContainer();
-//			}
-//			else {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
-				 throw new IllegalStateException(
-//				log.info(
-						"no transit vehicles container" );
-//			}
-		}
-
 		return this.transitVehicles;
 	}
 
 	@Override
 	final public Vehicles getVehicles() {
-		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
-		if ( this.vehicles == null ) {
-				// throw new IllegalStateException(
-				log.info(
-						"no vehicles container, and vehicles not activated from config. You must first call the create method of ScenarioImpl." );
-		}
-
 		return this.vehicles;
 	}
 
@@ -258,23 +151,6 @@ public final class ScenarioImpl implements Scenario {
 
 	@Override
 	public final TransitSchedule getTransitSchedule() {
-		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
-		if ( this.transitSchedule == null ) {
-			if ( this.config.transit().isUseTransit() ) {
-				this.createTransitScheduleContainer() ;
-				// (silently creating the container if it is requested and transit is switched on, since this is probably ok.
-				// This has been the behavior for many years, and many tests depend on it. kai, jul'15) 
-				
-				// locking the config so at least nobody can switch of isUseTransit after this:
-				this.config.setLocked(true);
-			}
-			else {
-//								 throw new IllegalStateException(
-				log.info(
-						"transit schedule is null" );
-			}
-		}
-
 		return this.transitSchedule;
 	}
 

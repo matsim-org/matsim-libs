@@ -46,7 +46,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -184,7 +183,6 @@ public class EquilNetworkControler {
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(equilNetwork);
 		
 		//vehicle types
-		((ScenarioImpl)sc).createVehicleContainer();
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
 		sc.getConfig().plansCalcRoute().setNetworkModes(Arrays.asList(mainModes));
 		sc.getConfig().qsim().setMainModes(Arrays.asList(mainModes));

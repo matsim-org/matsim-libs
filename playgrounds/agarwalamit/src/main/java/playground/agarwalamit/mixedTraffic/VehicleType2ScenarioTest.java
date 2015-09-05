@@ -54,7 +54,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -75,7 +74,6 @@ public class VehicleType2ScenarioTest {
 		
 		if(! useModifiedMobsimFactory){
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			((ScenarioImpl) scenario).createVehicleContainer();
 		}
 	}
 

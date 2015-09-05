@@ -51,7 +51,6 @@ public class ComprehensivePopulationReader {
 	 */
 	public ComprehensivePopulationReader() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
 	}
 	
 	public void parse(String inputfolder){

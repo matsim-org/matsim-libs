@@ -41,7 +41,6 @@ public class ScenarioLoaderImplTest {
 		{
 			//			Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
 			ScenarioBuilder builder = new ScenarioBuilder( this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml") ) ;
-			builder.createTransitSchedule() ;
 			// facilities is there by default????
 			Scenario scenario = builder.createScenario() ;
 			Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());

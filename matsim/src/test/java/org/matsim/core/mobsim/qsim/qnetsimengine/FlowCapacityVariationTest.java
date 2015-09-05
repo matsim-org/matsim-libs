@@ -54,7 +54,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -177,7 +176,6 @@ public class FlowCapacityVariationTest {
 		private void createPopulation(){
 
 			// Vehicles info			
-			((ScenarioImpl)scenario).createVehicleContainer();
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));

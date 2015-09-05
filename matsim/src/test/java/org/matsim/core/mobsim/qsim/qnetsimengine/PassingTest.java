@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -132,7 +131,6 @@ public class PassingTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		((ScenarioImpl)net.scenario).createVehicleContainer();
 		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
 
 		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();

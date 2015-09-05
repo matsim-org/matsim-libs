@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -191,7 +190,6 @@ public class DeparturesOnSameLinkSameTimeTest {
 		private void createPopulation(){
 
 			// Vehicles info			
-			((ScenarioImpl)scenario).createVehicleContainer();
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
 			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
 

@@ -233,7 +233,6 @@ public class ScenarioLoaderImpl {
 	private void loadHouseholds() {
 		final String householdsFile = this.config.households().getInputFile();
 		if ( (this.config.households() != null) && (householdsFile != null) ) {
-			this.scenario.createHouseholdsContainer() ;
 			log.info("loading households from " + householdsFile);
 			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
 			log.info("households loaded.");
@@ -242,11 +241,6 @@ public class ScenarioLoaderImpl {
 			log.info("no households file set in config, not loading households");
 		}
 		if ((this.config.households() != null) && (this.config.households().getInputHouseholdAttributesFile() != null)) {
-
-			this.scenario.createHouseholdsContainer() ;
-			// (there was a test that implied that loading hh attributes without ever loading hhs themselves would be a valid operation. 
-			// The hh container was originally instantiated by the useHouseholds switch, but that is gone now. kai, jul'15)
-			
 			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
 			log.info("loading household attributes from " + householdAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes()).parse(householdAttributesFileName);
@@ -259,20 +253,17 @@ public class ScenarioLoaderImpl {
 	private void loadTransit() throws UncheckedIOException {
 		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
 		if ( transitScheduleFile != null ) {
-			this.scenario.createTransitScheduleContainer() ;
 			new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
 		}
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
-			this.scenario.createTransitScheduleContainer() ;
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).parse(transitLinesAttributesFileName);
 		}
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
-			this.scenario.createTransitScheduleContainer() ;
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).parse(transitStopsAttributesFileName);
@@ -282,8 +273,7 @@ public class ScenarioLoaderImpl {
 	private void loadTransitVehicles() throws UncheckedIOException {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
-			log.info("loading transit vehicles from " + vehiclesFile );
-			this.scenario.createTransitVehicleContainer() ;
+			log.info("loading transit vehicles from " + vehiclesFile);
 			new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
 		}
 		else {
@@ -294,7 +284,6 @@ public class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			this.scenario.createVehicleContainer() ;
 			new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
 		} 
 		else {
@@ -315,7 +304,6 @@ public class ScenarioLoaderImpl {
 						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
-			this.scenario.createLanesContainer() ;
 			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
 			reader.readFile(filename);
 		}
