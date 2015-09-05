@@ -87,8 +87,7 @@ public class ODDemandGenerator
                 // leg
                 Leg leg = pf.createLeg(mode);
                 if (addEmptyRoute) {
-                    Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
-                    leg.setRoute(r);
+                    leg.setRoute(new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
                 }
                 leg.setDepartureTime(startAct.getEndTime());
 

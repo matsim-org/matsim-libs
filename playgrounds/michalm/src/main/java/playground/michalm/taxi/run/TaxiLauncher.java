@@ -93,6 +93,7 @@ class TaxiLauncher
                 params.algorithmConfig.ttimeSource, params.algorithmConfig.tdisSource);
 
         if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            //works for TimeVariantLinks
             travelTime = new FreeSpeedTravelTime();
         }
         else {// TravelTimeSource.EVENTS

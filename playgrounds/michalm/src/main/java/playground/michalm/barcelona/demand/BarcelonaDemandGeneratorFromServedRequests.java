@@ -21,42 +21,30 @@ package playground.michalm.barcelona.demand;
 
 import java.util.Date;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.random.*;
-import org.matsim.core.network.*;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.common.collect.Iterables;
 
-import playground.michalm.demand.taxi.ServedRequests;
+import playground.michalm.demand.taxi.*;
 
 
-public class BarcelonaServedRequestsBasedDemandGenerator
+public class BarcelonaDemandGeneratorFromServedRequests
+    extends AbstractDemandGeneratorFromServedRequests
 {
-    private final Scenario scenario;
-    private final NetworkImpl network;
-    private final PopulationFactory pf;
-
     private final static UniformRandom uniform = RandomUtils.getGlobalUniform();
 
 
-    public BarcelonaServedRequestsBasedDemandGenerator(Scenario scenario)
+    public BarcelonaDemandGeneratorFromServedRequests(Scenario scenario)
     {
-        this.scenario = scenario;
-        pf = scenario.getPopulation().getFactory();
-        network = (NetworkImpl)scenario.getNetwork();
+        super(scenario);
     }
 
 
-    private int currentAgentId = 0;
-
-
-    public void generatePlansFor(Iterable<BarcelonaServedRequest> requests,
+    public void generateDemand(Iterable<BarcelonaServedRequest> requests,
             double selectionProbability)
     {
         for (BarcelonaServedRequest r : requests) {
@@ -69,35 +57,8 @@ public class BarcelonaServedRequestsBasedDemandGenerator
                 continue;
             }
 
-            int pickupTime = calcStartTime(r);
-            Plan plan = pf.createPlan();
-
-            // act0
-            Activity startAct = createActivityFromCoord("orig", r.from);
-            startAct.setEndTime(pickupTime);
-            plan.addActivity(startAct);
-
-            // leg
-            plan.addLeg(pf.createLeg(TaxiUtils.TAXI_MODE));
-
-            // act1
-            plan.addActivity(createActivityFromCoord("dest", r.to));
-
-            String strId = String.format("taxi_customer_%d", currentAgentId++);
-            Person person = pf.createPerson(Id.createPersonId(strId));
-
-            person.addPlan(plan);
-            scenario.getPopulation().addPerson(person);
+            generatePassenger(r, calcStartTime(r));
         }
-    }
-
-
-    private Activity createActivityFromCoord(String actType, Coord coord)
-    {
-        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-        Link link = network.getNearestLinkExactly(coord);
-        activity.setLinkId(link.getId());
-        return activity;
     }
 
 
@@ -112,12 +73,6 @@ public class BarcelonaServedRequestsBasedDemandGenerator
         }
 
         return h * 3600 + m * 60 + uniform.nextInt(0, 59);
-    }
-
-
-    public void write(String plansFile)
-    {
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile);
     }
 
 
@@ -140,10 +95,10 @@ public class BarcelonaServedRequestsBasedDemandGenerator
             Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
             new MatsimNetworkReader(scenario).readFile(networkFile);
 
-            BarcelonaServedRequestsBasedDemandGenerator dg = new BarcelonaServedRequestsBasedDemandGenerator(
+            BarcelonaDemandGeneratorFromServedRequests dg = new BarcelonaDemandGeneratorFromServedRequests(
                     scenario);
             double scale = i / 10.;
-            dg.generatePlansFor(requests, scale);
+            dg.generateDemand(requests, scale);
             dg.write(dir + "plans5to4_" + scale + ".xml.gz");
         }
 
