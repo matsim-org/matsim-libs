@@ -39,17 +39,18 @@ import org.matsim.population.Desires;
  */
 public class PersonImpl implements Person {
 
+	private final static String SEX_ATTRIBUTE="sex";
+	private final static String HAS_LICENSE= "hasLicense";
+	private static final String CAR_AVAIL = "carAvail";
+	private static final String EMPLOYED = "employed";
+	private static final String AGE = "age";
+	private static final String TRAVELCARDS = "travelcards";
+
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
 	protected List<Plan> plans = new ArrayList<Plan>(6);
 	protected Id<Person> id;
-	private String sex;
-	private int age = Integer.MIN_VALUE;
-	private String hasLicense;
-	private String carAvail;
-	private Boolean isEmployed = false;
 
-	private TreeSet<String> travelcards = null;
 	protected Desires desires = null;
 
 	private Plan selectedPlan = null;
@@ -126,60 +127,57 @@ public class PersonImpl implements Person {
 
 	@Deprecated // use PersonAttributes
 	public final String getSex() {
-		return this.sex;
+		return (String) getCustomAttributes().get(SEX_ATTRIBUTE);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final int getAge() {
-		return this.age;
+		return (Integer) getCustomAttributes().get(AGE);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final String getLicense() {
-		return this.hasLicense;
+		return (String) getCustomAttributes().get(HAS_LICENSE);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final boolean hasLicense() {
-		return ("yes".equals(this.hasLicense)) || ("true".equals(this.hasLicense));
+		return ("yes".equals(this.getLicense())) || ("true".equals(this.getLicense()));
 	}
 
 	@Deprecated // use PersonAttributes
 	public final String getCarAvail() {
-		return this.carAvail;
+		return (String) getCustomAttributes().get(CAR_AVAIL);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final Boolean isEmployed() {
-		return this.isEmployed;
+		return (Boolean) getCustomAttributes().get(EMPLOYED);
 	}
 
 	@Deprecated // use PersonAttributes
 	public void setAge(final int age) {
-		if ((age < 0) && (age != Integer.MIN_VALUE)) {
-			throw new NumberFormatException("A person's age has to be an integer >= 0.");
-		}
-		this.age = age;
+		getCustomAttributes().put(AGE, age);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final void setSex(final String sex) {
-		this.sex = (sex == null) ? null : sex.intern();
+		getCustomAttributes().put(SEX_ATTRIBUTE, sex);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final void setLicence(final String licence) {
-		this.hasLicense = (licence == null) ? null : licence.intern();
+		getCustomAttributes().put(HAS_LICENSE, licence);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final void setCarAvail(final String carAvail) {
-		this.carAvail = (carAvail == null) ? null : carAvail.intern();
+		getCustomAttributes().put(CAR_AVAIL, carAvail);
 	}
 
 	@Deprecated // use PersonAttributes
 	public final void setEmployed(final Boolean employed) {
-		this.isEmployed = employed;
+		getCustomAttributes().put(EMPLOYED, employed);
 	}
 
 	@Deprecated // use PersonAttributes
@@ -193,20 +191,20 @@ public class PersonImpl implements Person {
 
 	@Deprecated // use PersonAttributes
 	public final void addTravelcard(final String type) {
-		if (this.travelcards == null) {
-			this.travelcards = new TreeSet<String>();
+		if (this.getTravelcards() == null) {
+			getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());
 		}
-		if (this.travelcards.contains(type)) {
+		if (this.getTravelcards().contains(type)) {
 			log.info(this + "[type=" + type + " already exists]");
 		} else {
-			this.travelcards.add(type.intern());
+			this.getTravelcards().add(type.intern());
 		}
 	}
 
 
 	@Deprecated // use PersonAttributes
 	public final TreeSet<String> getTravelcards() {
-		return this.travelcards;
+		return (TreeSet<String>) getCustomAttributes().get(TRAVELCARDS);
 	}
 
 
@@ -222,14 +220,8 @@ public class PersonImpl implements Person {
 	public final String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("[id=").append(this.getId()).append("]");
-		b.append("[sex=").append(this.getSex()).append("]");
-		b.append("[age=").append(this.getAge()).append("]");
-		b.append("[license=").append(this.getLicense()).append("]");
-		b.append("[car_avail=").append(this.getCarAvail()).append("]");
-		b.append("[employed=").append((isEmployed() == null ? "null" : (isEmployed ? "yes" : "no"))).append("]");
-		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
 		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
-	  return b.toString();
+		return b.toString();
 	}
 
 	@Override
