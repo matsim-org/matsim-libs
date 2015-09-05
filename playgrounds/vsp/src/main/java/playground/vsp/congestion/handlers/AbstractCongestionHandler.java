@@ -129,6 +129,10 @@ PersonStuckEventHandler {
 		this.totalInternalizedDelay = 0.0;
 		this.delayNotInternalized_roundingErrors = 0.0;
 		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
+		
+		//--
+		this.personId2legNr.clear();
+		this.personId2linkNr.clear();
 	}
 
 	@Override
