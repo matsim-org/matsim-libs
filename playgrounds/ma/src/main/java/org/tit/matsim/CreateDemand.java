@@ -99,7 +99,7 @@ public class CreateDemand {
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
-				((PersonImpl)person).createDesires("desired activity durations");
+				//((PersonImpl)person).createDesires("desired activity durations");
 				/*
 				 * Create a day plan and add it to the person
 				 */
@@ -193,7 +193,7 @@ public class CreateDemand {
 					
 					Double duration = Double.parseDouble(parts[index_activityDuration]);		
 					// store the desired duration in the persons knowledge
-					((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
+					//((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
 					plan.addActivity(activity);
 				}
 				previousPerson = personId;
@@ -269,7 +269,9 @@ public class CreateDemand {
 				}
 				else {
 					Person pusPerson = plan.getPerson();
-					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					if ( true ) throw new RuntimeException( "desires do not exist anymore. please use a Map" );
+					//double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					double activityDuration = 0;
 					
 					time += activityDuration + this.randomizeTimes();
 					String dur = String.valueOf((int)(activityDuration / 3600.0));

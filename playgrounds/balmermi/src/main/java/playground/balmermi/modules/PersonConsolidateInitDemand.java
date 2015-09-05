@@ -35,7 +35,7 @@
 //import org.matsim.core.facilities.ActivityOptionImpl;
 //import org.matsim.core.population.PlanImpl;
 //import org.matsim.core.utils.misc.Time;
-//import org.matsim.population.Desires;
+//import playground.ivt.utils.Desires;
 //import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 //import org.matsim.population.algorithms.PlanAlgorithm;
 //
