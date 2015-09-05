@@ -1,10 +1,15 @@
 package playground.wrashid.PHEV.co2emissions;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class SimpleEvaluator {
 
@@ -13,11 +18,13 @@ public class SimpleEvaluator {
 		args=new String[1];
 		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		Network network = scenario.getNetwork();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		AllLinkHandler allLinkHandler = new AllLinkHandler(180.0,network); // co2 emissions in gram per km 
 		// get for one link statistics of CO2, for the specified interval
