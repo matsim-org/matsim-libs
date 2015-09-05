@@ -141,13 +141,8 @@ public class ScenarioLoaderImpl {
 
 	/**
 	 * Loads the network into the scenario of this class
-	 *
-	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
-	 * 				If you want only a network, use the MatsimNetworkReader directly.
-	 *
 	 */
-	@Deprecated
-	public void loadNetwork() {
+	private void loadNetwork() {
 		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();

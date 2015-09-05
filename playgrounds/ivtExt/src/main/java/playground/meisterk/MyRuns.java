@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,7 +50,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -205,8 +204,7 @@ public class MyRuns {
 		reader.readFile(args[0]);
 		MatsimRandom.reset(config.global().getRandomSeed());
 
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
@@ -444,10 +442,7 @@ public class MyRuns {
 	}
 
 	public static void setPlansToSameDepTime(Config config) {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadScenario();
-
-		Scenario scenario = loader.getScenario();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 
 		PersonSetFirstActEndTime psfaet = new PersonSetFirstActEndTime(24.0 * 3600);
