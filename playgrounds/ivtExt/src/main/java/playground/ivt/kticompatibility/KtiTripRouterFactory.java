@@ -26,39 +26,38 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 
-import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 
 /**
  * @author thibautd
  */
 public class KtiTripRouterFactory implements TripRouterFactory {
-	final KtiPtRoutingModuleInfo ptInfo;
 	private TripRouterFactory delegate;
 	private Scenario scenario;
 
 	public KtiTripRouterFactory(final Scenario scenario) {
-		this.ptInfo = new KtiPtRoutingModuleInfo(
-				(KtiPtConfigGroup) scenario.getConfig().getModule( KtiPtConfigGroup.GROUP_NAME ),
-				scenario.getNetwork() );
-		this.delegate =
-				DefaultTripRouterFactoryImpl
-						.createRichTripRouterFactoryImpl(scenario);
-		this.scenario = scenario;
+		//this.ptInfo = new KtiPtRoutingModuleInfo(
+		//		(KtiPtConfigGroup) scenario.getConfig().getModule( KtiPtConfigGroup.GROUP_NAME ),
+		//		scenario.getNetwork() );
+		//this.delegate =
+		//		DefaultTripRouterFactoryImpl
+		//				.createRichTripRouterFactoryImpl(scenario);
+		//this.scenario = scenario;
 	}
 
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+		throw new UnsupportedOperationException( "too old to be safe.");
 
-		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
+//		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
+//
+//		router.setRoutingModule(
+//				TransportMode.pt,
+//				new KtiPtRoutingModule(
+//					scenario.getConfig().plansCalcRoute(),
+//					ptInfo,
+//					scenario.getNetwork()) );
 
-		router.setRoutingModule(
-				TransportMode.pt,
-				new KtiPtRoutingModule(
-					scenario.getConfig().plansCalcRoute(),
-					ptInfo,
-					scenario.getNetwork()) );
-
-		return router;
+//		return router;
 	}
 
 }
