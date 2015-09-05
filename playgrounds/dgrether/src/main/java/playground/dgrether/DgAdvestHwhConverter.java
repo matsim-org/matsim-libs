@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -58,15 +56,14 @@ public class DgAdvestHwhConverter {
   private boolean dohwh = true;
   
   public DgAdvestHwhConverter(){
-    Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(net);
     sc.getConfig().plans().setInputFile(plansIn);
     
-    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
-    loader.loadScenario();
+    ScenarioUtils.loadScenario(sc);
     
-    Scenario newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    Scenario nonWorkScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario nonWorkScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
     Population newPop = newScenario.getPopulation();
     Population nonWorkPop = nonWorkScenario.getPopulation();
     Person newPerson = null;

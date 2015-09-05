@@ -97,11 +97,7 @@ public class ScenarioLoaderImpl {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 	}
 
-	/**
-	 * yy Does it make sense to leave this constructor public?  kai, mar'11
-	 */
-	@Deprecated // please use the static calls in ScenarioUtils instead
-	public ScenarioLoaderImpl(Scenario scenario) {
+	private ScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig();
 	}

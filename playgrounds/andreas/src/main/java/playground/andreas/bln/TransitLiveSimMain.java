@@ -15,7 +15,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -34,8 +33,7 @@ public class TransitLiveSimMain {
 		config.addCoreModules();
 		new ConfigReader(config).readFile(configFilename);
 		config.transit().setUseTransit(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).readFile(inputDir + "transitSchedule.xml");
 		new VehicleReaderV1(scenario.getTransitVehicles()).parse(inputDir + "vehicles.xml");

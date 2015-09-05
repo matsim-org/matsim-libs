@@ -24,6 +24,7 @@
 package playground.vsp.parkAndRide.prepare;
 
 import java.io.IOException;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -115,7 +116,6 @@ public class PRPrepareRunner {
 		config.transit().setTransitScheduleFile(scheduleFile);
 		config.transit().setVehiclesFile(vehiclesFile);
 		config.network().setInputFile(networkFile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
-		scenarioLoader.loadScenario();		
+		ScenarioUtils.loadScenario(scenario);
 	}
 }
