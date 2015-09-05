@@ -47,7 +47,7 @@
 //import org.matsim.core.utils.geometry.CoordImpl;
 //import org.matsim.core.utils.geometry.CoordUtils;
 //import org.matsim.core.utils.misc.Counter;
-//import playground.ivt.utils.Desires;
+//import org.matsim.population.Desires;
 //
 ///*
 // * Relocate Activities that should be performed in Facilities within the

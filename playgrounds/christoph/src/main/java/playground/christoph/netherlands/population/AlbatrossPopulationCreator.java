@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 
 import playground.christoph.netherlands.zones.GetZoneConnectors;
 

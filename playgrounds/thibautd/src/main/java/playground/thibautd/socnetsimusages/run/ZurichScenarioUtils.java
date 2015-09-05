@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.thibautd.utils.DesiresConverter;
 
@@ -56,13 +56,12 @@ public final class ZurichScenarioUtils {
 							person.getId().toString(),
 							"desires" );
 				if ( desires != null ) {
-					throw new UnsupportedOperationException();
-					//((PersonImpl) person).createDesires( desires.getDesc() );
-					//for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
-					//	((PersonImpl) person).getDesires().putActivityDuration(
-					//		entry.getKey(),
-					//		entry.getValue() );
-					//}
+					((PersonImpl) person).createDesires( desires.getDesc() );
+					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+						((PersonImpl) person).getDesires().putActivityDuration(
+							entry.getKey(),
+							entry.getValue() );
+					}
 				}
 
 				// travel card

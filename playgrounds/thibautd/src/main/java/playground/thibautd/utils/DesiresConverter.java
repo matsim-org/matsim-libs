@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.utils.misc.Time;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**

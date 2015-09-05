@@ -10,7 +10,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 
 public class ScalingThePopulation {
 

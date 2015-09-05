@@ -33,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.Desires;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -158,30 +159,29 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final void assignDesires(final Plan p) {
-		throw new UnsupportedOperationException( "desires are gone" );
-		//Desires d = ((PersonImpl) p.getPerson()).createDesires(null);
-		//double othr_dur = 0.0;
-		//Activity prevAct = null;
-		//boolean prevIsFirst = true;
-		//for (PlanElement pe : p.getPlanElements()) {
-		//	// handle all activities except the first and the last one
-		//	if (pe instanceof Activity) {
-		//		if (!prevIsFirst) {
-		//			if (prevAct.getMaximumDuration() <= 0.0) {
-		//				log.fatal("pid="+p.getPerson().getId()+": That must not happen!");
-		//			}
-		//			d.accumulateActivityDuration(prevAct.getType(), prevAct.getMaximumDuration());
-		//			othr_dur += prevAct.getMaximumDuration();
-		//		}
-		//		prevIsFirst = (prevAct == null);
-		//		prevAct = (Activity) pe;
-		//	}
-		//}
-		//double home_dur = Time.MIDNIGHT - othr_dur;
-		//if (home_dur <= 0.0) {
-		//	throw new RuntimeException("pid="+p.getPerson().getId()+": That must not happen!");
-		//}
-		//d.accumulateActivityDuration(((ActivityImpl)p.getPlanElements().get(0)).getType(),home_dur);
+		Desires d = ((PersonImpl) p.getPerson()).createDesires(null);
+		double othr_dur = 0.0;
+		Activity prevAct = null;
+		boolean prevIsFirst = true;
+		for (PlanElement pe : p.getPlanElements()) {
+			// handle all activities except the first and the last one
+			if (pe instanceof Activity) {
+				if (!prevIsFirst) {
+					if (prevAct.getMaximumDuration() <= 0.0) {
+						log.fatal("pid="+p.getPerson().getId()+": That must not happen!");
+					}
+					d.accumulateActivityDuration(prevAct.getType(), prevAct.getMaximumDuration());
+					othr_dur += prevAct.getMaximumDuration();
+				}
+				prevIsFirst = (prevAct == null);
+				prevAct = (Activity) pe;
+			}
+		}
+		double home_dur = Time.MIDNIGHT - othr_dur;
+		if (home_dur <= 0.0) {
+			throw new RuntimeException("pid="+p.getPerson().getId()+": That must not happen!");
+		}
+		d.accumulateActivityDuration(((ActivityImpl)p.getPlanElements().get(0)).getType(),home_dur);
 	}
 
 	//////////////////////////////////////////////////////////////////////

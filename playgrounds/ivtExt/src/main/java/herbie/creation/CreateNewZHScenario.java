@@ -254,9 +254,8 @@ public class CreateNewZHScenario {
 						
 						// activity is not first or last activity
 						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
-							//double duration = ((PersonImpl)p).getDesires().getActivityDuration(act.getType());
-							//act.setEndTime(act.getStartTime() + duration);
-							throw new RuntimeException( "desires do not exist anymore");
+							double duration = ((PersonImpl)p).getDesires().getActivityDuration(act.getType());
+							act.setEndTime(act.getStartTime() + duration);
 						}
 						else if (cnt == 0) {
 							act.setStartTime(0.0);
@@ -289,9 +288,8 @@ public class CreateNewZHScenario {
 							duration = Double.parseDouble(act.getType().substring(1)) * 3600.0;
 						}
 						act.setType(v2Type);
-						//((PersonImpl)p).createDesires(v2Type);
-						//((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
-						throw new RuntimeException( "desires do not exist anymore" );
+						((PersonImpl)p).createDesires(v2Type);
+						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
 					}
 					//reset route
 					if (pe instanceof Leg) {

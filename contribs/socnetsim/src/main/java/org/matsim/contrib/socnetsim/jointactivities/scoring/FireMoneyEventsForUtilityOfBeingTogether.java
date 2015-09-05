@@ -34,6 +34,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.population.Desires;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
@@ -130,6 +131,11 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final Scenario scenario,
 			final PersonImpl person,
 			final String type ) {
+		final Desires desires = person.getDesires();
+		if ( desires != null ) {
+			return desires.getActivityDuration( type );
+		}
+
 		final Double typicalDuration =
 					(Double) scenario.getPopulation().getPersonAttributes().getAttribute(
 						person.getId().toString(),

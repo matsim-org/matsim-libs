@@ -55,6 +55,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -180,7 +181,14 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					PersonImpl person = (PersonImpl)p;
-                    prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
+					Desires desires = person.getDesires();					
+					if (desires != null) {
+						// hä? in the desires, only the typical duration can be specified. need to get the rest from the config anyway, or from where else?
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), desires.getActivityDuration(activityParams.getActivityType()));
+					} else {				
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
+						
+					}
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(), activityParams.getMinimalDuration());

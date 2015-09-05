@@ -28,7 +28,7 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 
 /**
  * Same as CharyparNagelOpenTimesActivityScoring, but retrieves desired activity

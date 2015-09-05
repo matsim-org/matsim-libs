@@ -66,7 +66,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	
 	public final int simulationPeriodInDays;
 
-	private CharyparNagelScoringParameters(
+	public CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
 			final Map<String, Mode> modeParams,
 			final double marginalUtilityOfWaiting_s,

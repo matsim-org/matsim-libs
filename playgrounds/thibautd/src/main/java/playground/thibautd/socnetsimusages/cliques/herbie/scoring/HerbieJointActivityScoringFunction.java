@@ -248,8 +248,7 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = 0;// ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(actType);
-		if ( true ) throw new UnsupportedOperationException();
+		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;

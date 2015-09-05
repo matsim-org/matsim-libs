@@ -19,48 +19,57 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.thibautd.utils.MyConfigUtils;
+
 /**
  * @author thibautd
  */
 public class KtiToSimiliKtiConfig {
 	public static void main(final String[] args) {
-//		final String inputConfigFile = args[ 0 ];
-//		final String outputConfigFile = args[ 1 ];
-//
-//		final Config inputConfig = ConfigUtils.createConfig();
-//		final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-//		inputConfig.addModule( ktiConfigGroup );
-//		ConfigUtils.loadConfig( inputConfig , inputConfigFile );
-//
-//		final Config outputConfig = new Config();
-//		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
-//		outputConfig.addModule( planCalcScore );
-//		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
-//		// XXX KTI defines a constant for car in the config group,
-//		// BUT IT IS NOT USED IN THE SCORING FUNCTION!!!!!!!
-//		//planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
-//		planCalcScore.setConstantCar( 0 );
-//		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
-//		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
-//		planCalcScore.setMonetaryDistanceRatePt(
-//				// yes, that's really it. In KTI, the (monetary) cost of distance
-//				// is *multiplied* by the marginal utility of distance.
-//				// This makes it completely meaningless, but we need to reproduce it
-//				// if we want to use the "calibrated" parameters.
-//				// In particular, as the MonetaryDistanceCostRateCar is null
-//				// in the calibrated config, this makes the "fuel cost"
-//				// parameter unused...
-//				(planCalcScore.getMonetaryDistanceRatePt() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
-//				planCalcScore.getMarginalUtilityOfMoney() );
-//		planCalcScore.setMonetaryDistanceRateCar(
-//				(planCalcScore.getMonetaryDistanceRateCar() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
-//				planCalcScore.getMarginalUtilityOfMoney() );
-//
-//		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
-//		outputConfig.addModule( ktiLikeConfigGroup );
-//		ktiLikeConfigGroup.setTravelCardRatio( ktiConfigGroup.getDistanceCostPtUnknownTravelCard() / ktiConfigGroup.getDistanceCostPtNoTravelCard() );
-//
-//		new ConfigWriter( outputConfig ).write( outputConfigFile );
+		final String inputConfigFile = args[ 0 ];
+		final String outputConfigFile = args[ 1 ];
+
+		final Config inputConfig = ConfigUtils.createConfig();
+		final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+		inputConfig.addModule( ktiConfigGroup );
+		ConfigUtils.loadConfig( inputConfig , inputConfigFile );
+
+		final Config outputConfig = new Config();
+		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
+		outputConfig.addModule( planCalcScore );
+		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
+		// XXX KTI defines a constant for car in the config group,
+		// BUT IT IS NOT USED IN THE SCORING FUNCTION!!!!!!!
+		//planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
+		planCalcScore.setConstantCar( 0 );
+		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
+		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
+		planCalcScore.setMonetaryDistanceRatePt(
+				// yes, that's really it. In KTI, the (monetary) cost of distance
+				// is *multiplied* by the marginal utility of distance.
+				// This makes it completely meaningless, but we need to reproduce it
+				// if we want to use the "calibrated" parameters.
+				// In particular, as the MonetaryDistanceCostRateCar is null
+				// in the calibrated config, this makes the "fuel cost"
+				// parameter unused...
+				(planCalcScore.getMonetaryDistanceRatePt() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
+				planCalcScore.getMarginalUtilityOfMoney() );
+		planCalcScore.setMonetaryDistanceRateCar(
+				(planCalcScore.getMonetaryDistanceRateCar() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
+				planCalcScore.getMarginalUtilityOfMoney() );
+
+		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
+		outputConfig.addModule( ktiLikeConfigGroup );
+		ktiLikeConfigGroup.setTravelCardRatio( ktiConfigGroup.getDistanceCostPtUnknownTravelCard() / ktiConfigGroup.getDistanceCostPtNoTravelCard() );
+
+		new ConfigWriter( outputConfig ).write( outputConfigFile );
 	}
 }
 

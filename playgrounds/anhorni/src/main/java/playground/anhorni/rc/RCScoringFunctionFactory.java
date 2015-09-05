@@ -31,7 +31,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;;
 
 public class RCScoringFunctionFactory implements ScoringFunctionFactory {

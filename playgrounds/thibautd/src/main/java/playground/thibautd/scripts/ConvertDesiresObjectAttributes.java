@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import playground.ivt.utils.Desires;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;

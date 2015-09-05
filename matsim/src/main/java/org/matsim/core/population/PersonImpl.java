@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
-
+import org.matsim.population.Desires;
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -50,6 +50,7 @@ public class PersonImpl implements Person {
 	private Boolean isEmployed = false;
 
 	private TreeSet<String> travelcards = null;
+	protected Desires desires = null;
 
 	private Plan selectedPlan = null;
 
@@ -182,6 +183,15 @@ public class PersonImpl implements Person {
 	}
 
 	@Deprecated // use PersonAttributes
+	public final Desires createDesires(final String desc) {
+		if (this.desires == null) {
+			this.desires = new Desires(desc);
+		}
+		return this.desires;
+	}
+
+
+	@Deprecated // use PersonAttributes
 	public final void addTravelcard(final String type) {
 		if (this.travelcards == null) {
 			this.travelcards = new TreeSet<String>();
@@ -198,6 +208,15 @@ public class PersonImpl implements Person {
 	public final TreeSet<String> getTravelcards() {
 		return this.travelcards;
 	}
+
+
+	@Deprecated // use PersonAttributes
+	public final Desires getDesires() {
+		return this.desires;
+	}
+
+
+
 
 	@Override
 	public final String toString() {

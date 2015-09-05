@@ -88,6 +88,7 @@ class CreateDemand {
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
+				((PersonImpl)person).createDesires("desired activity durations");
 				/*
 				 * Create a day plan and add it to the person
 				 */
@@ -183,6 +184,8 @@ class CreateDemand {
 						populationFactory.createActivityFromCoord(activityType, coordDestination);
 					
 					Double duration = Double.parseDouble(parts[index_activityDuration]);		
+					// store the desired duration in the persons knowledge
+					((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
 					plan.addActivity(activity);
 				}
 				previousPerson = personId;
@@ -259,7 +262,7 @@ class CreateDemand {
 				}
 				else {
 					Person pusPerson = plan.getPerson();
-					double activityDuration = 8 * 3600;
+					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
 					
 					time += activityDuration + this.randomizeTimes();
 					String dur = String.valueOf((int)(activityDuration / 3600.0));
