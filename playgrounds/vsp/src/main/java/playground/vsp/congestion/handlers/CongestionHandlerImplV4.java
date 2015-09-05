@@ -70,6 +70,12 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 	private Scenario scenario;
 	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<Id<Link>, List<Id<Link>>>();
+	
+	/**
+	 * This list is used to store entering agents, (1) which can not be cleared in personId2EnteringAgents map because 
+	 * linkEnterTime is required later (2) and these agents should not be charged since they already left the link. 
+	 */
+	private Map<Id<Link>,List<Id<Person>>> linkId2ExcludeEnteringAgentsList = new HashMap<Id<Link>, List<Id<Person>>>();
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
@@ -84,6 +90,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		Id<Person> delayedPerson = event.getPersonId();
 
+		storeExcludedEnteringAgents(event);
+		
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
@@ -110,12 +118,9 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			}
 
 		} else {
-
 			this.addToDelayNotInternalized_storageCapacity(storageDelay);
-
 		}
 	}
-
 
 	private void memorizeSpillBackCausingLinkForCurrentLink(Id<Link> currentLink, Id<Link> spillBackCausingLink) {
 		if( this.linkId2SpillBackCausingLinks.containsKey( currentLink ) ) {
@@ -172,7 +177,14 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
 		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
+		
+		personsEnteredOnSpillBackCausingLink.removeAll(this.linkId2ExcludeEnteringAgentsList.get(spillbackCausingLink)); 
+		// these agents shoudld not be charged because they have already left the link.
+		// TODO : need to find a better way to do this.
+		
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
+//		cant use leavingAgents list for the order of entering agents since it is modified in updateFlowQueue(...) before calculateCongestion(...).
+//		thus, must use LinkedHashMap for perosnId2LinkEnterTime.
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
 		double marginalDelaysPerLeavingVehicle = spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec();
@@ -199,7 +211,21 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		return remainingDelay;
 	}
-
+	
+	/**
+	 * @param event
+	 * As stated above, these stored agents are not guilty (they have already left the link). 
+	 * Directly, can not remove from the PersonId2EnterTime map because linkEnterTime is required later.
+	 */
+	private void storeExcludedEnteringAgents(LinkLeaveEvent event){
+		if(this.linkId2ExcludeEnteringAgentsList.containsKey(event.getLinkId())){
+			List<Id<Person>> excludedEnteringAgents = this.linkId2ExcludeEnteringAgentsList.get(event.getLinkId());
+			excludedEnteringAgents.add(event.getPersonId());
+		} else {
+			List<Id<Person>> excludedEnteringAgents = new ArrayList<Id<Person>>(Arrays.asList(event.getPersonId()));
+			this.linkId2ExcludeEnteringAgentsList.put(event.getLinkId(), excludedEnteringAgents);
+		}
+	}
 
 	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
