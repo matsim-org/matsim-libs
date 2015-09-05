@@ -19,32 +19,41 @@
 
 package playground.michalm.chargerlocation;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
-
-import playground.michalm.zone.Zone;
+import org.matsim.api.core.v01.*;
 
 
-public class ChargingStations
+public class ChargerLocation
+    implements BasicLocation<ChargerLocation>
 {
-    public static ChargingStation createStation(long id, double x, double y, double power)
+    private final Id<ChargerLocation> id;
+    private final Coord coord;
+    private final double power;
+
+
+    public ChargerLocation(Id<ChargerLocation> id, Coord coord, double power)
     {
-        return new ChargingStation(Id.create(id, ChargingStation.class), new CoordImpl(x, y),
-                power);
+        this.id = id;
+        this.coord = coord;
+        this.power = power;
     }
 
 
-    public static List<ChargingStation> createStationsInZones(Iterable<Zone> zones, double power)
+    @Override
+    public Id<ChargerLocation> getId()
     {
-        List<ChargingStation> stations = new ArrayList<>();
-        for (Zone z : zones) {
-            stations.add(new ChargingStation(Id.create(z.getId(), ChargingStation.class),
-                    z.getCoord(), power));
-        }
-
-        return stations;
+        return id;
     }
 
+
+    @Override
+    public Coord getCoord()
+    {
+        return coord;
+    }
+
+
+    public double getPower()
+    {
+        return power;
+    }
 }
