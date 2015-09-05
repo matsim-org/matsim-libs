@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Link2WaitEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -73,6 +74,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
+		this.getEvents().processEvent(new Link2WaitEvent(now, this.getId(), this.getDestinationLinkId(), this.vehicle.getId()));
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
