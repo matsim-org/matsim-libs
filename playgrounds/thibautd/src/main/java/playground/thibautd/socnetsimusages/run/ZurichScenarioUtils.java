@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.thibautd.utils.DesiresConverter;
 

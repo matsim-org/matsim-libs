@@ -45,6 +45,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.balac.freefloating.scoring.FreeFloatingParkingScoringFunctionFactory;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
@@ -117,7 +118,7 @@ public class SetupParkingForZHScenario {
 	}
 	
 	public static void appendScoringFactory(ParkingModuleWithFFCarSharingZH parkingModule){
-		parkingModule.getControler().setScoringFunctionFactory(new ParkingScoringFunctionFactory (parkingModule.getControler().getScoringFunctionFactory(),parkingModule.getParkingScoreManager()));
+		parkingModule.getControler().setScoringFunctionFactory(new FreeFloatingParkingScoringFunctionFactory (parkingModule.getControler() ,parkingModule.getParkingScoreManager()));
 	}
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {

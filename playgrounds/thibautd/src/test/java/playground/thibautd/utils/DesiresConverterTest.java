@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.matsim.population.Desires;
+import playground.ivt.utils.Desires;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

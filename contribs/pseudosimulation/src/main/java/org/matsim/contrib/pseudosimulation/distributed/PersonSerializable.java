@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
 
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
@@ -37,7 +36,6 @@ public class PersonSerializable implements Serializable {
     private String carAvail;
     PlanSerializable selectedPlan = null;
     private TreeSet<String> travelcards = null;
-    protected Desires desires = null;
 
     private Boolean isEmployed;
 
