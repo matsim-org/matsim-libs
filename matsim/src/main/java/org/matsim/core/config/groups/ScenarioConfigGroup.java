@@ -98,19 +98,11 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	
 	
 
-//	public boolean isUseLanes() {
-//		return this.useLanes;
-//	}
-
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	void setUseLanes(@SuppressWarnings("unused") final boolean useLanes) {
 		throw new RuntimeException( getMessage( USE_LANES ) ) ;
 	}
-
-//	public boolean isUseHouseholds() {
-//		return this.useHouseholds;
-//	}
 
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
@@ -124,23 +116,12 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
 	}
 	
-//	@SuppressWarnings("static-method")
-//	@Deprecated // since jul'15
-//	public Boolean getUseVehicles() {
-//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
-//	}
-	
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	public void setUseTransit(@SuppressWarnings("unused") final Boolean b) {
 		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
 
-//	@SuppressWarnings("static-method")
-//	@Deprecated // since jul'15
-//	public Boolean getUseTransit() {
-//		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
-//	}
 	
 	private static String getMessage( String module ) {
 		return "The " + module + " switch is no longer operational.  The file is loaded if the file name"
