@@ -91,7 +91,7 @@ public class KNAnalysisEventsHandlerTest {
 		this.network.addNode(fromNode);
 		Node toNode = this.network.getFactory().createNode(Id.create("789012", Node.class), new CoordImpl(200.0, 200.0));
 		this.network.addNode(toNode);
-		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode.getId(), toNode.getId());
+		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode, toNode);
 		link.setLength(Math.sqrt(20000.0));
 		link.setFreespeed(13.333);
 		link.setCapacity(2000);

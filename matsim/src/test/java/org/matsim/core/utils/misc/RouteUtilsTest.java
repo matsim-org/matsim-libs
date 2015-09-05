@@ -340,12 +340,12 @@ public class RouteUtilsTest {
 			this.network.addNode(nf.createNode(this.nodeIds[4], this.scenario.createCoord(400, 0)));
 			this.network.addNode(nf.createNode(this.nodeIds[5], this.scenario.createCoord(500, 0)));
 			this.network.addNode(nf.createNode(this.nodeIds[6], this.scenario.createCoord(600, 0)));
-			this.network.addLink(nf.createLink(this.linkIds[0], this.nodeIds[0], this.nodeIds[1]));
-			this.network.addLink(nf.createLink(this.linkIds[1], this.nodeIds[1], this.nodeIds[2]));
-			this.network.addLink(nf.createLink(this.linkIds[2], this.nodeIds[2], this.nodeIds[3]));
-			this.network.addLink(nf.createLink(this.linkIds[3], this.nodeIds[3], this.nodeIds[4]));
-			this.network.addLink(nf.createLink(this.linkIds[4], this.nodeIds[4], this.nodeIds[5]));
-			this.network.addLink(nf.createLink(this.linkIds[5], this.nodeIds[5], this.nodeIds[6]));
+			this.network.addLink(nf.createLink(this.linkIds[0], this.network.getNodes().get(this.nodeIds[0]), this.network.getNodes().get(this.nodeIds[1])));
+			this.network.addLink(nf.createLink(this.linkIds[1], this.network.getNodes().get(this.nodeIds[1]), this.network.getNodes().get(this.nodeIds[2])));
+			this.network.addLink(nf.createLink(this.linkIds[2], this.network.getNodes().get(this.nodeIds[2]), this.network.getNodes().get(this.nodeIds[3])));
+			this.network.addLink(nf.createLink(this.linkIds[3], this.network.getNodes().get(this.nodeIds[3]), this.network.getNodes().get(this.nodeIds[4])));
+			this.network.addLink(nf.createLink(this.linkIds[4], this.network.getNodes().get(this.nodeIds[4]), this.network.getNodes().get(this.nodeIds[5])));
+			this.network.addLink(nf.createLink(this.linkIds[5], this.network.getNodes().get(this.nodeIds[5]), this.network.getNodes().get(this.nodeIds[6])));
 		}
 	}
 

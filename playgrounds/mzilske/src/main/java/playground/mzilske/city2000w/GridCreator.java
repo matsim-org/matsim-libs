@@ -39,11 +39,11 @@ public class GridCreator {
 				Node node = network.getFactory().createNode(makeId(i, j, Node.class), makeCoord(i, j));
 				network.addNode(node);
 				if (i != 0) {
-					Link iLink = network.getFactory().createLink(makeLinkId(i, j), makeId(i-1, j, Node.class), makeId(i, j, Node.class));
+					Link iLink = network.getFactory().createLink(makeLinkId(i, j), network.getNodes().get(makeId(i-1, j, Node.class)), network.getNodes().get(makeId(i, j, Node.class)));
 					iLink.setLength(1000);
 					iLink.setFreespeed(100);
 					iLink.setCapacity(1000);
-					Link iLinkR = network.getFactory().createLink(Id.create("i("+i+","+j+")"+"R", Link.class), makeId(i, j, Node.class),makeId(i-1, j, Node.class));
+					Link iLinkR = network.getFactory().createLink(Id.create("i("+i+","+j+")"+"R", Link.class), network.getNodes().get(makeId(i, j, Node.class)), network.getNodes().get(makeId(i-1, j, Node.class)));
 					iLinkR.setLength(1000);
 					iLinkR.setFreespeed(100);
 					iLinkR.setCapacity(1000);
@@ -51,11 +51,11 @@ public class GridCreator {
 					network.addLink(iLinkR);
 				}
 				if (j != 0) {
-					Link jLink = network.getFactory().createLink(Id.create("j("+i+","+j+")", Link.class), makeId(i, j-1, Node.class), makeId(i, j, Node.class));
+					Link jLink = network.getFactory().createLink(Id.create("j("+i+","+j+")", Link.class), network.getNodes().get(makeId(i, j-1, Node.class)), network.getNodes().get(makeId(i, j, Node.class)));
 					jLink.setLength(1000);
 					jLink.setFreespeed(100);
 					jLink.setCapacity(1000);
-					Link jLinkR = network.getFactory().createLink(Id.create("j("+i+","+j+")"+"R", Link.class), makeId(i, j, Node.class), makeId(i, j-1, Node.class));
+					Link jLinkR = network.getFactory().createLink(Id.create("j("+i+","+j+")"+"R", Link.class), network.getNodes().get(makeId(i, j, Node.class)), network.getNodes().get(makeId(i, j-1, Node.class)));
 					jLinkR.setLength(1000);
 					jLinkR.setFreespeed(100);
 					jLinkR.setCapacity(1000);

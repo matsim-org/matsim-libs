@@ -59,20 +59,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
 	}
 
-	@Override
-	@Deprecated
-	public Link createLink(final Id<Link> id, final Id<Node> fromNodeId, final Id<Node> toNodeId) {
-		Node fromNode = this.network.getNodes().get(fromNodeId) ;
-		if ( fromNode==null ) {
-			log.error("could not find fromNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
-		}
-		Node toNode = this.network.getNodes().get(toNodeId) ;
-		if ( toNode==null ) {
-			log.error("could not find toNodeId in network; this will probably fail downstream; have you added the node to the network?") ;
-		}
-		return createLink(id, fromNode, toNode);
-	}
-
 	public Link createLink(final Id<Link> id, final Node from, final Node to,
 			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {

@@ -19,6 +19,8 @@
 
 package playground.andreas.demo;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -43,21 +45,33 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.andreas.bvgAna.mrieser.analysis.RouteTimeDiagram;
 import playground.andreas.bvgAna.mrieser.analysis.TransitRouteAccessEgressAnalysis;
 import playground.andreas.bvgAna.mrieser.analysis.VehicleTracker;
-
-import java.util.ArrayList;
 
 public class AccessEgressDemoSimple {
 
@@ -85,32 +99,34 @@ public class AccessEgressDemoSimple {
 		Network network = this.scenario.getNetwork();
 		((NetworkImpl) network).setCapacityPeriod(3600.0);
 		
-		network.addNode(network.getFactory().createNode(Id.create("01", Node.class), this.scenario.createCoord(-500, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("10", Node.class), this.scenario.createCoord(0, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("11", Node.class), this.scenario.createCoord(500, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("12", Node.class), this.scenario.createCoord(1000, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("13", Node.class), this.scenario.createCoord(1500, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("14", Node.class), this.scenario.createCoord(2000, 0)));
+		Node n01, n10, n11, n12, n13, n14;
+		network.addNode(n01 = network.getFactory().createNode(Id.create("01", Node.class), this.scenario.createCoord(-500, 0)));
+		network.addNode(n10 = network.getFactory().createNode(Id.create("10", Node.class), this.scenario.createCoord(0, 0)));
+		network.addNode(n11 = network.getFactory().createNode(Id.create("11", Node.class), this.scenario.createCoord(500, 0)));
+		network.addNode(n12 = network.getFactory().createNode(Id.create("12", Node.class), this.scenario.createCoord(1000, 0)));
+		network.addNode(n13 = network.getFactory().createNode(Id.create("13", Node.class), this.scenario.createCoord(1500, 0)));
+		network.addNode(n14 = network.getFactory().createNode(Id.create("14", Node.class), this.scenario.createCoord(2000, 0)));
 		
-		network.addNode(network.getFactory().createNode(Id.create("02", Node.class), this.scenario.createCoord(-500, -500)));
-		network.addNode(network.getFactory().createNode(Id.create("20", Node.class), this.scenario.createCoord(0, -500)));
-		network.addNode(network.getFactory().createNode(Id.create("21", Node.class), this.scenario.createCoord(500, -500)));
-		network.addNode(network.getFactory().createNode(Id.create("22", Node.class), this.scenario.createCoord(1000, -500)));
-		network.addNode(network.getFactory().createNode(Id.create("23", Node.class), this.scenario.createCoord(1500, -500)));
-		network.addNode(network.getFactory().createNode(Id.create("24", Node.class), this.scenario.createCoord(2000, -500)));
+		Node n02, n20, n21, n22, n23, n24;
+		network.addNode(n02 = network.getFactory().createNode(Id.create("02", Node.class), this.scenario.createCoord(-500, -500)));
+		network.addNode(n20 = network.getFactory().createNode(Id.create("20", Node.class), this.scenario.createCoord(0, -500)));
+		network.addNode(n21 = network.getFactory().createNode(Id.create("21", Node.class), this.scenario.createCoord(500, -500)));
+		network.addNode(n22 = network.getFactory().createNode(Id.create("22", Node.class), this.scenario.createCoord(1000, -500)));
+		network.addNode(n23 = network.getFactory().createNode(Id.create("23", Node.class), this.scenario.createCoord(1500, -500)));
+		network.addNode(n24 = network.getFactory().createNode(Id.create("24", Node.class), this.scenario.createCoord(2000, -500)));
 		
 		Link l;
-		l = network.getFactory().createLink(Id.create("0110", Link.class), Id.create("01", Node.class), Id.create("10", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("1011", Link.class), Id.create("10", Node.class), Id.create("11", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("1112", Link.class), Id.create("11", Node.class), Id.create("12", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("1213", Link.class), Id.create("12", Node.class), Id.create("13", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("1314", Link.class), Id.create("13", Node.class), Id.create("14", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("0110", Link.class), n01, n10); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1011", Link.class), n10, n11); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1112", Link.class), n11, n12); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1213", Link.class), n12, n13); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1314", Link.class), n13, n14); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
 		
-		l = network.getFactory().createLink(Id.create("0220", Link.class), Id.create("02", Node.class), Id.create("20", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("2021", Link.class), Id.create("20", Node.class), Id.create("21", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("2122", Link.class), Id.create("21", Node.class), Id.create("22", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("2223", Link.class), Id.create("22", Node.class), Id.create("23", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(Id.create("2324", Link.class), Id.create("23", Node.class), Id.create("24", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("0220", Link.class), n02, n20); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2021", Link.class), n20, n21); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2122", Link.class), n21, n22); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2223", Link.class), n22, n23); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2324", Link.class), n23, n24); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
 		
 	}
 
