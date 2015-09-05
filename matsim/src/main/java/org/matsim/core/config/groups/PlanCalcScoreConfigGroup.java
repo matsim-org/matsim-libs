@@ -58,29 +58,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String PERFORMING = "performing";
 
 	private static final String TRAVELING = "traveling_";
-	private static final String TRAVELING_CAR = "traveling";
-	private static final String TRAVELING_PT = "travelingPt";
-	private static final String TRAVELING_BIKE = "travelingBike";
-	private static final String TRAVELING_WALK = "travelingWalk";
-	private static final String TRAVELING_OTHER = "travelingOther";
 	private static final String WAITING  = "waiting";
 	private static final String WAITING_PT  = "waitingPt";
 
 	private static final String CONSTANT = "constant_";
-	private static final String CONSTANT_CAR = "constantCar" ;
-	private static final String CONSTANT_BIKE = "constantBike" ;
-	private static final String CONSTANT_WALK = "constantWalk" ;
-	private static final String CONSTANT_OTHER = "constantOther" ;
-	private static final String CONSTANT_PT = "constantPt" ;
 
 	private static final String WRITE_EXPERIENCED_PLANS = "writeExperiencedPlans";
 
-	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
-
-	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance_";
-	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
-	private static final String MARGINAL_UTL_OF_DISTANCE_OTHER = "marginalUtlOfDistanceOther";
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 
@@ -88,8 +73,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate";
 
 	private static final String MONETARY_DISTANCE_RATE_ = "monetaryDistanceRate_" ;
-	private static final Object MONETARY_DISTANCE_RATE_CAR = "monetaryDistanceRateCar";
-	private static final Object MONETARY_DISTANCE_RATE_PT = "monetaryDistanceRatePt";
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
@@ -202,65 +185,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_RATE_.length()));
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		}
-		else if ( MONETARY_DISTANCE_RATE_CAR.equals(key) ){
-			ModeParams modeParams = getOrCreateModeParams( TransportMode.car ) ;
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
-		}
-		else if ( MONETARY_DISTANCE_RATE_PT.equals(key) ){
-			ModeParams modeParams = getOrCreateModeParams( TransportMode.pt ) ;
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
-		}
 		else if (key.startsWith(CONSTANT)) {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
 			modeParams.setConstant(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" traveling
-		else if (TRAVELING_CAR.equals(key)) {
-			setTraveling_utils_hr(Double.parseDouble(value));
-		}
-		else if (TRAVELING_PT.equals(key)) {
-			setTravelingPt_utils_hr(Double.parseDouble(value));
-		}
-		else if (TRAVELING_WALK.equals(key)) {
-			setTravelingWalk_utils_hr(Double.parseDouble(value));
-		}
-		else if (TRAVELING_OTHER.equals(key)) {
-			setTravelingOther_utils_hr(Double.parseDouble(value));
-		}
-		else if (TRAVELING_BIKE.equals(key)) {
-			setTravelingBike_utils_hr(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" util of distance
-		else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
-			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
-		}
-		else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
-			setMarginalUtlOfDistancePt(Double.parseDouble(value));
-		}
-		else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
-			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
-		}
-		else if (MARGINAL_UTL_OF_DISTANCE_OTHER.equals(key)){
-			setMarginalUtlOfDistanceOther(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" constants
-		else if ( CONSTANT_CAR.equals(key)) {
-			this.setConstantCar(Double.parseDouble(value)) ;
-		}
-		else if ( CONSTANT_WALK.equals(key)) {
-			this.setConstantWalk(Double.parseDouble(value)) ;
-		}
-		else if ( CONSTANT_OTHER.equals(key)) {
-			this.setConstantOther(Double.parseDouble(value)) ;
-		}
-		else if ( CONSTANT_PT.equals(key)) {
-			this.setConstantPt(Double.parseDouble(value)) ;
-		}
-		else if ( CONSTANT_BIKE.equals(key)) {
-			this.setConstantBike(Double.parseDouble(value)) ;
 		}
 
 		else if ( WAITING_PT.equals( key ) ) {
