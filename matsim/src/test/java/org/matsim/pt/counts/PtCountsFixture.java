@@ -73,7 +73,7 @@ public abstract class PtCountsFixture {
 	public void setUp() {
 		String configFile = "test/input/org/matsim/pt/counts/config.xml";
 
-		Config config = ConfigUtils.loadConfig(configFile);
+		this.config = ConfigUtils.loadConfig(configFile);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		this.scenario = ScenarioUtils.createScenario(config);
 		
