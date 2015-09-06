@@ -1,9 +1,11 @@
 /* *********************************************************************** *
+
  * project: org.matsim.*
+ * LegRouterWrapper.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,9 +18,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.router;
 
-package org.matsim.core.router.old;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.router.old.LegRouter;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
+import java.util.Arrays;
+import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,15 +45,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-/**
- * Calculates a route along links in a network, but doesn't really use that route, but
- * only the travel time of it for teleportation purposes.
- * Typically, this class is used with a free-flow travel speed router and some
- * speedfactor > 1.0 (often 2.0), so "estimate" travel times with a non-car mode.
- *
- * @author mrieser
- */
-final class PseudoTransitLegRouter implements LegRouter {
+public final class PseudoTransitRoutingModule implements RoutingModule {
+
+	private final String mode;
+	private final PopulationFactory populationFactory;
 
 	private final Network network;
 	private final ModeRouteFactory routeFactory;
@@ -50,15 +56,124 @@ final class PseudoTransitLegRouter implements LegRouter {
 	private final double speedFactor;
 	private final double beelineDistanceFactor;
 
-	 PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final ModeRouteFactory routeFactory) {
+	public PseudoTransitRoutingModule(
+			final String mode,
+			final PopulationFactory populationFactory,
+            final Network network,
+			final LeastCostPathCalculator routeAlgo,
+			final double speedFactor,
+			double beelineDistanceFactor,
+			final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;
 		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.routeFactory = routeFactory;
+		this.mode = mode;
+		this.populationFactory = populationFactory;
 	}
 
 	@Override
+	public List<? extends PlanElement> calcRoute(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final double departureTime,
+			final Person person) {
+		Leg newLeg = populationFactory.createLeg( mode );
+		newLeg.setDepartureTime( departureTime );
+
+		double travTime = routeLeg(
+				person,
+				newLeg,
+				new FacilityWrapper( fromFacility ),
+				new FacilityWrapper( toFacility ),
+				departureTime);
+
+		// otherwise, information may be lost
+		newLeg.setTravelTime( travTime );
+
+		return Arrays.asList( newLeg );
+	}
+
+	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	@Override
+	public String toString() {
+		return "[LegRouterWrapper: mode="+mode+"]";
+	}
+
+	private static class FacilityWrapper implements Activity {
+		private final Facility wrapped;
+
+		public FacilityWrapper(final Facility toWrap) {
+			this.wrapped = toWrap;
+		}
+
+		@Override
+		public double getEndTime() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setEndTime(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public String getType() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setType(String type) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public Coord getCoord() {
+			return wrapped.getCoord();
+		}
+
+		@Override
+		public double getStartTime() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setStartTime(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public double getMaximumDuration() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setMaximumDuration(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public Id<Link> getLinkId() {
+			return wrapped.getLinkId();
+		}
+
+		@Override
+		public Id<ActivityFacility> getFacilityId() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public String toString() {
+			return "[FacilityWrapper: wrapped="+wrapped+"]";
+		}
+	}
+
+
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		int travTime = 0;
 		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());

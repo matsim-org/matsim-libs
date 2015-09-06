@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.NetworkRoutingModule;
+import org.matsim.core.router.PseudoTransitRoutingModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -44,9 +45,14 @@ public final class DefaultRoutingModules {
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
 			ModeRoutingParams params ) {
-		LegRouter toWrap = new PseudoTransitLegRouter( net, routeAlgo, params.getTeleportedModeFreespeedFactor(), params.getBeelineDistanceFactor(), 
+		return new PseudoTransitRoutingModule(
+				mode,
+				popFac,
+				net,
+				routeAlgo,
+				params.getTeleportedModeFreespeedFactor(),
+				params.getBeelineDistanceFactor(),
 				((PopulationFactoryImpl) popFac).getModeRouteFactory() ) ;
-		return new LegRouterWrapper( mode, popFac, toWrap ) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
