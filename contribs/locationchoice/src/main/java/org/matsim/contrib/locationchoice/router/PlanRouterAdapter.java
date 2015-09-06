@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.old;
+package org.matsim.contrib.locationchoice.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;

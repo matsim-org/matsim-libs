@@ -32,7 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
