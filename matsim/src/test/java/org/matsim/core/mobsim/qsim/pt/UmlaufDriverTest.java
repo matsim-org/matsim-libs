@@ -603,6 +603,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
+
+		@Override
+		public String getMode() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 
 }
