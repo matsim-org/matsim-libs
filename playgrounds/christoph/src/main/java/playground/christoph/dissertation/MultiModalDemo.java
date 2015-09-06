@@ -61,7 +61,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -892,7 +891,7 @@ public class MultiModalDemo {
 				
 				LeastCostPathCalculator leastCostPathCalculator = new MultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTime);
-				((IntermodalLeastCostPathCalculator) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
+				((Dijkstra) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
 				
 				leastCostPathCalculators.put(mode, leastCostPathCalculator);
 			}
