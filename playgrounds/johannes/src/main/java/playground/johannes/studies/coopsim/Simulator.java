@@ -41,7 +41,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.NetworkLegRouter;
+import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;

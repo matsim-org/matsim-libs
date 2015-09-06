@@ -7,7 +7,6 @@ import matsimConnector.utility.Constants;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;

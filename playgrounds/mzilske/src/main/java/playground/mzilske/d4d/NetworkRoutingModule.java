@@ -1,7 +1,5 @@
 package playground.mzilske.d4d;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -13,12 +11,12 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+
+import java.util.List;
 
 public class NetworkRoutingModule implements RoutingModule {
 	
