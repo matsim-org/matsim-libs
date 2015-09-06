@@ -271,21 +271,21 @@ public class PopulationCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person, ParsedPerson emme2Person) {
-		person.setAge(emme2Person.AGE);
+	private void setBasicParameters(Person person, ParsedPerson emme2Person) {
+		PersonImpl.setAge(person, emme2Person.AGE);
 
-		if (emme2Person.GENDER == 1) person.setSex("m");
-		else person.setSex("f");
+		if (emme2Person.GENDER == 1) PersonImpl.setSex(person, "m");
+		else PersonImpl.setSex(person, "f");
 
 		if (emme2Person.LICENSE == 1) {
-			person.setLicence("yes");
-			if (emme2Person.NUMVEH == 0) person.setCarAvail("never");
-			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) person.setCarAvail("always");
-			else person.setCarAvail("sometimes");
+			PersonImpl.setLicence(person, "yes");
+			if (emme2Person.NUMVEH == 0) PersonImpl.setCarAvail(person, "never");
+			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) PersonImpl.setCarAvail(person, "always");
+			else PersonImpl.setCarAvail(person, "sometimes");
 		}
 		else {
-			person.setLicence("no");
-			person.setCarAvail("sometimes");
+			PersonImpl.setLicence(person, "no");
+			PersonImpl.setCarAvail(person, "sometimes");
 		}
 	}
 

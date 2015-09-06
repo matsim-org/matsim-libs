@@ -188,9 +188,9 @@ public class PopulationBuilder2011 {
 					/* Set the hard coded attributes. This will, however, be 
 					 * duplicated in the person attributes to be more 
 					 * consistent with the direction of future MATSim work. */
-					((PersonImpl)person).setAge(age);
-					((PersonImpl)person).setSex(Gender2011.getMatsimGender(Gender2011.getGender(gender)));
-					((PersonImpl)person).setEmployed(employment == 1 ? true : false);
+					PersonImpl.setAge(person, age);
+					PersonImpl.setSex(person, Gender2011.getMatsimGender(Gender2011.getGender(gender)));
+					PersonImpl.setEmployed(person, employment == 1 ? true : false);
 					
 					/* Set person attributes. */
 					personAttributes.putAttribute(person.getId().toString(), "population", PopulationGroup2011.getType(population).toString());

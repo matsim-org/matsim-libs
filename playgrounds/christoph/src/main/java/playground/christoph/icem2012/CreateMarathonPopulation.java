@@ -767,12 +767,12 @@ public class CreateMarathonPopulation {
 		
 		for (int personCount = 0; personCount < runners; personCount++) {
 			
-			PersonImpl person = (PersonImpl) populationFactory.createPerson(Id.create("runner_" + personCount, Person.class));
+			Person person = populationFactory.createPerson(Id.create("runner_" + personCount, Person.class));
 
 			// set random age and gender
-			person.setAge((int)(18 + Math.round(random.nextDouble() * 47)));	// 18 .. 65 years old
-			if (random.nextDouble() > 0.5) person.setSex("m");
-			else person.setSex("f");
+			PersonImpl.setAge(person, (int) (18 + Math.round(random.nextDouble() * 47)));	// 18 .. 65 years old
+			if (random.nextDouble() > 0.5) PersonImpl.setSex(person, "m");
+			else PersonImpl.setSex(person, "f");
 			
 			Plan plan = populationFactory.createPlan();
 			person.addPlan(plan);

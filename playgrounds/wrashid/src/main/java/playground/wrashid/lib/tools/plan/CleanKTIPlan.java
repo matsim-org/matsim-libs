@@ -1,7 +1,5 @@
 package playground.wrashid.lib.tools.plan;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -9,9 +7,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-
-import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
-import playground.wrashid.lib.tools.kml.Color;
 
 public class CleanKTIPlan {
 
@@ -29,7 +24,7 @@ public class CleanKTIPlan {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			
 			PersonImpl p=(PersonImpl) person;
-			p.removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(p);
 			
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof ActivityImpl) {

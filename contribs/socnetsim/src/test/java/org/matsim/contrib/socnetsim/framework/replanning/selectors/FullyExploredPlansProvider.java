@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -324,7 +323,7 @@ public class FullyExploredPlansProvider {
 
 			for ( Person p : info.getFirst().getPersons() ) {
 				scenario.getPopulation().addPerson( p );
-				((PersonImpl) p).setSelectedPlan( null );
+				p.setSelectedPlan(null);
 			}
 
 			if ( info.getSecond() != null ) {
@@ -332,7 +331,7 @@ public class FullyExploredPlansProvider {
 				assert plans.size() == info.getFirst().getPersons().size();
 				for ( Plan p : plans ) {
 					assert p.getPerson().getSelectedPlan() == null;
-					((PersonImpl) p.getPerson()).setSelectedPlan( p );
+					p.getPerson().setSelectedPlan(p);
 				}
 			}
 			else {
@@ -343,7 +342,7 @@ public class FullyExploredPlansProvider {
 					final Plan dummyPlan = scenario.getPopulation().getFactory().createPlan();
 					dummyPlan.setScore( null );
 					p.addPlan( dummyPlan );
-					((PersonImpl) p).setSelectedPlan( dummyPlan );
+					p.setSelectedPlan(dummyPlan);
 				}
 			}
 

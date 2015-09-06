@@ -22,6 +22,7 @@ package playground.christoph.evacuation.mobsim.decisiondata;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -96,22 +97,22 @@ public class DecisionDataGrabber {
 			int oldestMaleAge = 0;
 			int oldestFemaleAge = 0;
 			for (Id personId : household.getMemberIds()) {
-				PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get(personId);
-				if (person.getAge() < 18) {
+				Person person = scenario.getPopulation().getPersons().get(personId);
+				if (PersonImpl.getAge(person) < 18) {
 					hasChildren = true;
 				} else {
-					if (person.getSex().equals("f")) {
-						if (person.getAge() > oldestFemaleAge) {
-							oldestFemaleAge = person.getAge();
+					if (PersonImpl.getSex(person).equals("f")) {
+						if (PersonImpl.getAge(person) > oldestFemaleAge) {
+							oldestFemaleAge = PersonImpl.getAge(person);
 							oldestFemaleId = person.getId();
 						}
-					} else if (person.getSex().equals("m")) {
-						if (person.getAge() > oldestMaleAge) {
-							oldestMaleAge = person.getAge();
+					} else if (PersonImpl.getSex(person).equals("m")) {
+						if (PersonImpl.getAge(person) > oldestMaleAge) {
+							oldestMaleAge = PersonImpl.getAge(person);
 							oldestMaleId = person.getId();
 						}
 					} else {
-						throw new RuntimeException("Unknown gender type was found: " + person.getSex());
+						throw new RuntimeException("Unknown gender type was found: " + PersonImpl.getSex(person));
 					}
 				}
 			}

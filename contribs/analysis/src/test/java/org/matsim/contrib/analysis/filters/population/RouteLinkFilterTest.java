@@ -28,8 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
-import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -70,13 +68,13 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		Population population = scenario.getPopulation();
 
-		PersonImpl person;
+		Person person;
 		PlanImpl plan;
 		LegImpl leg;
 		NetworkRoute route;
 
-		person = new PersonImpl(Id.create("1", Person.class));
-		plan = person.createAndAddPlan(true);
+		person = PersonImpl.createPerson(Id.create("1", Person.class));
+		plan = PersonImpl.createAndAddPlan(person, true);
 		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
@@ -86,8 +84,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
-		person = new PersonImpl(Id.create("2", Person.class));
-		plan = person.createAndAddPlan(true);
+		person = PersonImpl.createPerson(Id.create("2", Person.class));
+		plan = PersonImpl.createAndAddPlan(person, true);
 		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
@@ -97,8 +95,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
-		person = new PersonImpl(Id.create("3", Person.class));
-		plan = person.createAndAddPlan(true);
+		person = PersonImpl.createPerson(Id.create("3", Person.class));
+		plan = PersonImpl.createAndAddPlan(person, true);
 		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);

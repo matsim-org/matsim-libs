@@ -78,9 +78,9 @@ public class WalkSpeedComparatorTest {
 	
 	private Person createPerson(PopulationFactory factory, Id<Person> id, int age, String sex) {
 		
-		PersonImpl person = (PersonImpl) factory.createPerson(id);
-		person.setAge(age);
-		person.setSex(sex);
+		Person person = factory.createPerson(id);
+		PersonImpl.setAge(person, age);
+		PersonImpl.setSex(person, sex);
 		
 		return person;
 	}

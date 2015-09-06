@@ -55,9 +55,9 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class)); // person 1 travels link1 + link2
-		PersonImpl person2 = new PersonImpl(Id.create(2, Person.class)); // person 2 travels link1 + link2
-		PersonImpl person3 = new PersonImpl(Id.create(3, Person.class)); // person 3 travels link1 + link3
+		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class)); // person 1 travels link1 + link2
+		Person person2 = PersonImpl.createPerson(Id.create(2, Person.class)); // person 2 travels link1 + link2
+		Person person3 = PersonImpl.createPerson(Id.create(3, Person.class)); // person 3 travels link1 + link3
 		
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = Time.parseTime("07:00:10");

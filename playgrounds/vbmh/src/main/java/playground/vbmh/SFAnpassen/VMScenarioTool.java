@@ -101,9 +101,9 @@ public class VMScenarioTool {
 		Map<Id<Person>, ? extends Person> personMap = scenario.getPopulation().getPersons();
 		LinkedList <Id<Person>> personsNotUsed = new LinkedList <Id<Person>>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {
-			PersonImpl pa = (PersonImpl) p;
-			System.out.println(pa.getCarAvail());
-			if(pa.getCarAvail()!="never" && zufall.nextDouble()<wkeit && i<anzahl_agents){
+			Person pa = p;
+			System.out.println(PersonImpl.getCarAvail(pa));
+			if(PersonImpl.getCarAvail(pa)!="never" && zufall.nextDouble()<wkeit && i<anzahl_agents){
 				//population.addPerson(pa);
 				
 				System.out.println("Autofahrer hinzugefuegt");

@@ -257,22 +257,22 @@ public class WalkTravelTime implements TravelTime {
 		scatterFactor = scatterSpeed / weidmannReferenceWalkSpeed;
 		
 		if (person instanceof PersonImpl) {
-			PersonImpl p = (PersonImpl) person;
+			Person p = person;
 			
 			// get gender factor
-			if (p.getSex() == null) {
+			if (PersonImpl.getSex(p) == null) {
 				if (genderWarnCount.get() < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
-			} else if (p.getSex().equals("m")) genderFactor = maleScaleFactor;
-			else if (p.getSex().equals("f")) genderFactor = femaleScaleFactor;
+			} else if (PersonImpl.getSex(p).equals("m")) genderFactor = maleScaleFactor;
+			else if (PersonImpl.getSex(p).equals("f")) genderFactor = femaleScaleFactor;
 			else {
 				if (genderWarnCount.get() < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
 			}
 			
-			Integer age = p.getAge();
+			Integer age = PersonImpl.getAge(p);
 			
 			if (age == null) {
 				if (ageWarnCount.get() < 10) {
@@ -290,7 +290,7 @@ public class WalkTravelTime implements TravelTime {
 				}
 				ageFactor = ageFactors[100];
 			} else {
-				ageFactor = ageFactors[p.getAge()];
+				ageFactor = ageFactors[PersonImpl.getAge(p)];
 			}
 		}
 		

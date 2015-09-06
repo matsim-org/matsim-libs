@@ -90,7 +90,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 			double distance = DistanceCalculations.getLegDistance(route, network);
 		
 			double distanceCost = 0.0;
-			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
+			TreeSet<String> travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
 			if (travelCards == null) {
 				distanceCost = this.ktiConfigGroup.getDistanceCostPtNoTravelCard();
 			}

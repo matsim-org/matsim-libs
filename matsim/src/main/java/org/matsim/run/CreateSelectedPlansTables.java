@@ -183,13 +183,13 @@ public class CreateSelectedPlansTables {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");
-				final PersonImpl person=(PersonImpl) this.plans0.getPersons().get(person_id);
-				out.write(person.getSex()+"\t");
-				out.write(person.getAge()+"\t");
-				out.write(person.getLicense()+"\t");
-				out.write(person.getCarAvail()+"\t");
-				if (person.isEmployed() != null)
-					out.write((person.isEmployed() ? "yes" : "no"));
+				final Person person= this.plans0.getPersons().get(person_id);
+				out.write(PersonImpl.getSex(person)+"\t");
+				out.write(PersonImpl.getAge(person)+"\t");
+				out.write(PersonImpl.getLicense(person)+"\t");
+				out.write(PersonImpl.getCarAvail(person)+"\t");
+				if (PersonImpl.isEmployed(person) != null)
+					out.write((PersonImpl.isEmployed(person) ? "yes" : "no"));
 				out.write("\t");
 
 				Plan selectedPlan = person.getSelectedPlan();

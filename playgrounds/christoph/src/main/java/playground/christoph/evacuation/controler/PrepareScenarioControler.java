@@ -110,7 +110,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Remove all un-selected plans from agents' memories
 		 */
 		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 		
 		/*

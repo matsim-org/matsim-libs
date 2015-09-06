@@ -516,9 +516,9 @@ public class MultiModalDemo {
 				for (String legMode : CollectionUtils.stringToArray(legModes)) {					
 					Plan plan = createPlan(scenario, departureTime, legMode);
 					person.addPlan(plan);
-					if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
+					if (legMode.equals(initialLegMode)) person.setSelectedPlan(plan);
 				}
-				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan((person)));				
+				if (initialLegMode.equals(randomMode)) person.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan((person)));
 			} else {
 				if (initialLegMode.equals(randomMode)) {
 					String[] modes = CollectionUtils.stringToArray(legModes);
@@ -537,9 +537,9 @@ public class MultiModalDemo {
 		
 		Person person = populationFactory.createPerson(id);
 		
-		((PersonImpl) person).setSex(sex);
-		((PersonImpl) person).setAge(age);
-		((PersonImpl) person).setCarAvail("always");
+		PersonImpl.setSex(person, sex);
+		PersonImpl.setAge(person, age);
+		PersonImpl.setCarAvail(person, "always");
 		
 		return person;
 	}
@@ -577,8 +577,8 @@ public class MultiModalDemo {
 		
 		int i = 0;
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			ages[i] = ((PersonImpl) person).getAge();
-			if(((PersonImpl) person).getSex().equals("m")) males++;
+			ages[i] = PersonImpl.getAge(person);
+			if(PersonImpl.getSex(person).equals("m")) males++;
 			else females++;
 			
 			Leg leg = (Leg) new BestPlanSelector<Plan, Person>().selectPlan((person)).getPlanElements().get(1);
@@ -832,9 +832,9 @@ public class MultiModalDemo {
 					
 					writer.write(person.getId().toString());
 					writer.write("\t");
-					writer.write(String.valueOf(((PersonImpl) person).getAge()));
+					writer.write(String.valueOf(PersonImpl.getAge(person)));
 					writer.write("\t");
-					writer.write(((PersonImpl) person).getSex());
+					writer.write(PersonImpl.getSex(person));
 					writer.write("\t");
 					writer.write(mode);
 					writer.write("\t");

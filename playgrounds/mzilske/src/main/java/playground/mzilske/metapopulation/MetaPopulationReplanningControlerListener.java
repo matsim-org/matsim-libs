@@ -61,7 +61,7 @@ class MetaPopulationReplanningControlerListener implements ReplanningListener {
             @Override
             public void run(HasPlansAndId<MetaPopulationPlan, Person> metaPopulation) {
                 MetaPopulationPlan selectedPlan = metaPopulation.getSelectedPlan();
-                Person person = new PersonImpl(Id.create("wurst", Person.class));
+                Person person = PersonImpl.createPerson(Id.create("wurst", Person.class));
                 PlanImpl p0 = new PlanImpl();
                 p0.setScore(0.0);
                 person.addPlan(p0);

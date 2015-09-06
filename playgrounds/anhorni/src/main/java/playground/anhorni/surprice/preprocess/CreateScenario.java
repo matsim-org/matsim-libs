@@ -194,7 +194,7 @@ public class CreateScenario {
 			else {
 				personWeeksThurgau = this.chooseWeek(nonworkersNormalized);
 			}
-			PersonImpl person = (PersonImpl)p;			
+			Person person = p;
 			this.createPlansForPerson(person, personWeeksThurgau, secLocationAssigner);
 		}				
 	}
@@ -252,13 +252,13 @@ public class CreateScenario {
 		return personWeeks;
 	}
 
-	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau, PersonSetSecondaryLocation secLocationAssigner) {	
+	private void createPlansForPerson(Person person, PersonWeeks personWeeksThurgau, PersonSetSecondaryLocation secLocationAssigner) {
 		// only one week to begin with
 		int week = 0;		
 		for (int dow = 0; dow < 7; dow++) {
 			person.getPlans().clear();
 			Plan plan = personWeeksThurgau.getDay(dow, week);
-			PersonImpl thurgauPerson = (PersonImpl)personWeeksThurgau.getPerson();
+			Person thurgauPerson = (Person)personWeeksThurgau.getPerson();
 						
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
@@ -382,7 +382,7 @@ public class CreateScenario {
 				person.getPlans().clear();
 				Plan plan = this.personWeeksMZ.get(person.getId()).getDay(dow, 0);
 				person.addPlan(plan);
-				((PersonImpl)person).setSelectedPlan(plan);				
+				person.setSelectedPlan(plan);
 			}
 			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
 			

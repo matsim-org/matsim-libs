@@ -43,18 +43,18 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Plan plan;
-		person.createAndAddPlan(false);
-		plan = person.createAndAddPlan(false);
+		PersonImpl.createAndAddPlan(person, false);
+		plan = PersonImpl.createAndAddPlan(person, false);
 		plan.setScore(10.0);
-		plan = person.createAndAddPlan(false);
+		plan = PersonImpl.createAndAddPlan(person, false);
 		plan.setScore(-50.0);
-		plan = person.createAndAddPlan(false);
+		plan = PersonImpl.createAndAddPlan(person, false);
 		plan.setScore(40.0);
-		plan = person.createAndAddPlan(false);
+		plan = PersonImpl.createAndAddPlan(person, false);
 		plan.setScore(30.0);
-		plan = person.createAndAddPlan(false);
+		plan = PersonImpl.createAndAddPlan(person, false);
 		plan.setScore(-20.0);
 
 		GenericPlanSelector<Plan, Person> selector = new BestPlanSelector<Plan, Person>();

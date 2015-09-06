@@ -337,7 +337,7 @@ public class Plansgenerator {
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
 
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home

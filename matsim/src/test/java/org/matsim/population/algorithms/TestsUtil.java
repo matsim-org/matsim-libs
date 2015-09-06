@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -38,7 +38,7 @@ import org.matsim.facilities.ActivityFacility;
 @Ignore
 public class TestsUtil {
 
-	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, PersonImpl person, String mode, String facString) {
+	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
@@ -54,7 +54,7 @@ public class TestsUtil {
 		return plan;
 	}
 
-	static PlanImpl createPlanFromLinks(NetworkImpl layer, PersonImpl person, String mode, String linkString) {
+	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {

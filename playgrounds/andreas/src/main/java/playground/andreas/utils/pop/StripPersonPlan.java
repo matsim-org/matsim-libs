@@ -57,11 +57,11 @@ public class StripPersonPlan extends NewPopulation {
 		this.personshandled++;
 
 		person.setId(Id.create("p" + personshandled, Person.class));
-		person.setAge(Integer.MIN_VALUE);
-		person.setCarAvail(null);
-		person.setEmployed((Boolean) null);
-		person.setLicence(null);
-		person.setSex(null);
+		PersonImpl.setAge(person, Integer.MIN_VALUE);
+		PersonImpl.setCarAvail(person, null);
+		PersonImpl.setEmployed(person, (Boolean) null);
+		PersonImpl.setLicence(person, null);
+		PersonImpl.setSex(person, null);
 		
 		for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
 			if (pE instanceof ActivityImpl) {

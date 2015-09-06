@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -68,7 +67,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Coord home_coord = null;
 		Coord work_coord = null;
@@ -92,17 +91,17 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		model.setHHDimension(p.getHousehold().getPersonCount());
 		model.setHHKids(p.getHousehold().getKidCount());
 		model.setIncome(p.getHousehold().getMunicipality().getIncome()/1000.0);
-		model.setLicenseOwnership(person.hasLicense());
+		model.setLicenseOwnership(PersonImpl.hasLicense(person));
 		model.setNationality(p.isSwiss());
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 
 		int mobtype = model.calcMobilityTools();
-		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
-		person.setCarAvail(null);
-		if ((0 == mobtype) || (mobtype == 3)) { person.setCarAvail(NEVER); }
-		if ((1 == mobtype) || (mobtype == 4)) { person.setCarAvail(SOMETIMES); }
-		if ((2 == mobtype) || (mobtype == 5)) { person.setCarAvail(ALWAYS); }
+		if ((3 <= mobtype) && (mobtype <= 5)) { PersonImpl.addTravelcard(person, UNKNOWN); }
+		PersonImpl.setCarAvail(person, null);
+		if ((0 == mobtype) || (mobtype == 3)) { PersonImpl.setCarAvail(person, NEVER); }
+		if ((1 == mobtype) || (mobtype == 4)) { PersonImpl.setCarAvail(person, SOMETIMES); }
+		if ((2 == mobtype) || (mobtype == 5)) { PersonImpl.setCarAvail(person, ALWAYS); }
 	}
 
 	public void run(Plan plan) {

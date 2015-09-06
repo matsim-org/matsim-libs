@@ -33,7 +33,7 @@ public class PersonDataCS {
 		for(Person p: scenario.getPopulation().getPersons().values()){
 			boolean rb = false;
 			boolean ff = false;
-			PersonImpl pImpl = (PersonImpl) p;
+			Person pImpl = p;
 			Plan plan = p.getSelectedPlan();
 			
 			for (PlanElement pe: plan.getPlanElements()) {
@@ -42,18 +42,18 @@ public class PersonDataCS {
 					
 					if (((Leg) pe).getMode().equals("cs_fix_gas") && !rb) {
 						outLinkrb.write(p.getId().toString() + " ");
-						outLinkrb.write(Integer.toString(pImpl.getAge()) + " ");
-						outLinkrb.write(pImpl.getSex() + " ");
-						outLinkrb.write(pImpl.getCarAvail());
+						outLinkrb.write(Integer.toString(PersonImpl.getAge(pImpl)) + " ");
+						outLinkrb.write(PersonImpl.getSex(pImpl) + " ");
+						outLinkrb.write(PersonImpl.getCarAvail(pImpl));
 						outLinkrb.newLine();
 						rb = true;
 						
 					}
 					else if (((Leg) pe).getMode().equals("cs_flex_gas") && !ff) {
 						outLinkff.write(p.getId().toString() + " ");
-						outLinkff.write(Integer.toString(pImpl.getAge()) + " ");
-						outLinkff.write(pImpl.getSex() + " ");
-						outLinkff.write(pImpl.getCarAvail());
+						outLinkff.write(Integer.toString(PersonImpl.getAge(pImpl)) + " ");
+						outLinkff.write(PersonImpl.getSex(pImpl) + " ");
+						outLinkff.write(PersonImpl.getCarAvail(pImpl));
 						outLinkff.newLine();
 						ff = true;
 					}

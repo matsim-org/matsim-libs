@@ -155,7 +155,7 @@ public class CreateDemand {
 		Person person = scenario.getPopulation().getFactory()
 				.createPerson(Id.createPersonId(toFromPrefix + i));
 
-		((PersonImpl)person).setEmployed(true);
+		PersonImpl.setEmployed(person, true);
 		
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 

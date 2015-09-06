@@ -54,7 +54,7 @@ public class AgeWorkChecker {
 			
 			@Override
 			public void run(Person person) {
-				int age = ((PersonImpl) person).getAge();
+				int age = PersonImpl.getAge(person);
 				if(age < 12 && hasWork(person)){
 //					log.error("Person " + person.getId() + ": age " + age);
 					workingKidCounter.incCounter();

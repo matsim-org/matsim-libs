@@ -146,13 +146,13 @@ public class MicroCensus2010 {
 			weight_sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		for (Person pp : pop.getPersons().values()) {
-			PersonImpl p = (PersonImpl) pp;
-			int age = p.getAge();
-			String sex = p.getSex();
-			String lic = p.getLicense();
-			boolean has_work = p.isEmployed();
+			Person p = pp;
+			int age = PersonImpl.getAge(p);
+			String sex = PersonImpl.getSex(p);
+			String lic = PersonImpl.getLicense(p);
+			boolean has_work = PersonImpl.isEmployed(p);
 			boolean has_educ = false;
-			if (p.getAge() < 16) { has_educ = true; }
+			if (PersonImpl.getAge(p) < 16) { has_educ = true; }
 //			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 //				if (pe instanceof Activity) {
 //					Activity a = (Activity) pe;

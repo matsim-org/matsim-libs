@@ -118,7 +118,7 @@ public class AAMLegScoringFunction extends org.matsim.core.scoring.functions.Cha
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet<String> travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
 		if (travelCards == null || travelCards.contains("ch-HT-mobility"))
 			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
 		else if (travelCards.contains("unknown"))

@@ -39,7 +39,7 @@ public class YoungPeopleIdentifier extends DuringLegAgentSelector {
 				for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if (((PersonImpl) ((HasPerson)agent).getPerson()).getAge() == 18) {
+				if (PersonImpl.getAge(((HasPerson) agent).getPerson()) == 18) {
 					System.out.println("found agent");
 					set.add(agent);
 				}

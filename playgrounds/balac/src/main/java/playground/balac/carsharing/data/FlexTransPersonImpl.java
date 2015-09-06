@@ -3,6 +3,8 @@ package playground.balac.carsharing.data;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -18,14 +20,16 @@ public class FlexTransPersonImpl extends PersonImpl
   private CH1903LV03toWGS84 coordTranformer = new CH1903LV03toWGS84();
   private Coord homeSwissCoord;
 
-  public FlexTransPersonImpl(PersonImpl p)
+  public FlexTransPersonImpl(Person p)
   {
     super(p.getId());
-    setAge(p.getAge());
-    setCarAvail(p.getCarAvail());
-    setLicence(p.getLicense());
-    setSex(p.getSex());
-    this.plans = p.getPlans();
+    setAge(this, PersonImpl.getAge(p));
+    setCarAvail(this, PersonImpl.getCarAvail(p));
+    setLicence(this, PersonImpl.getLicense(p));
+    setSex(this, PersonImpl.getSex(p));
+    for (Plan plan : p.getPlans()) {
+        addPlan(plan);
+    }
 
     setSelectedPlan(p.getSelectedPlan());
     setHomeCoord();

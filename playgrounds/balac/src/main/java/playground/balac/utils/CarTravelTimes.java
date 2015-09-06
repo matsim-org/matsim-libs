@@ -130,7 +130,7 @@ public class CarTravelTimes {
 			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
-			PersonImpl person = new PersonImpl(Id.create(arr[0], Person.class));
+			Person person = PersonImpl.createPerson(Id.create(arr[0], Person.class));
 			
 			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
 			ActivityImpl act = new ActivityImpl("home", lStart.getId());

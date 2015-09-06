@@ -39,7 +39,7 @@ public class MembershipAssigner
   private QuadTree<Person> personsQuadTree;
   private int counter;
   private SupplySideModel membershipModel;
-  private ArrayList<PersonImpl> personsWithLicense = new ArrayList<PersonImpl>();
+  private ArrayList<Person> personsWithLicense = new ArrayList<Person>();
   //private String stationfilePath = "C:/Users/balacm/Desktop/Stations_GreaterZurich_2x.txt";
   //private String newfilePath = "C:/Users/balacm/Documents/MobilityData/Stations_GreaterZurich.txt";
 
@@ -62,7 +62,7 @@ public class MembershipAssigner
 	  init(model);
   }
 
-  private double computeAccessCSWork(PersonImpl pi)
+  private double computeAccessCSWork(Person pi)
   {
     Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
     Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
@@ -91,7 +91,7 @@ public class MembershipAssigner
     return access;
   }
 
-  private double computeAccessCSHome(PersonImpl pi)
+  private double computeAccessCSHome(Person pi)
   {
     Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
     Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
@@ -190,18 +190,18 @@ public class MembershipAssigner
   {
     for (Person person : this.scenario.getPopulation().getPersons().values())
     {
-      PersonImpl pi = (PersonImpl)person;
+      Person pi = person;
       if (person.getPlans().size() > 1) {
         log.error("More than one plan for person: " + pi.getId());
       }
-      if (pi.getLicense().equalsIgnoreCase("yes")) {
-        PersonImpl personWithLicense = new PersonImpl(pi.getId());
-        personWithLicense.setAge(pi.getAge());
+      if (PersonImpl.getLicense(pi).equalsIgnoreCase("yes")) {
+        Person personWithLicense = PersonImpl.createPerson(pi.getId());
+        PersonImpl.setAge(personWithLicense, PersonImpl.getAge(pi));
         personWithLicense.addPlan(pi.getSelectedPlan());
-        personWithLicense.setCarAvail(pi.getCarAvail());
-        personWithLicense.setEmployed(pi.isEmployed());
-        personWithLicense.setSex(pi.getSex());
-        personWithLicense.setLicence(pi.getLicense());
+        PersonImpl.setCarAvail(personWithLicense, PersonImpl.getCarAvail(pi));
+        PersonImpl.setEmployed(personWithLicense, PersonImpl.isEmployed(pi));
+        PersonImpl.setSex(personWithLicense, PersonImpl.getSex(pi));
+        PersonImpl.setLicence(personWithLicense, PersonImpl.getLicense(pi));
         this.personsWithLicense.add(personWithLicense);
       }
     }
@@ -212,7 +212,7 @@ public class MembershipAssigner
   private void modifyPlans() {
 	  MatsimRandom.reset(46442);
 
-    for (PersonImpl person : this.personsWithLicense)
+    for (Person person : this.personsWithLicense)
     {
       if (person.getPlans().size() > 1) {
         log.error("More than one plan for person: " + person.getId());
@@ -224,24 +224,24 @@ public class MembershipAssigner
     MatsimRandom.reset(r.nextLong());
   }
 
-  private void assignCarSharingMembership(PersonImpl pi)
+  private void assignCarSharingMembership(Person pi)
   {
     FlexTransPersonImpl ftPerson = new FlexTransPersonImpl(pi);
     addFTAttributes(ftPerson);
     int choice = this.membershipModel.calcMembership(ftPerson);
     if (choice == 0)
     {
-      pi.addTravelcard("ch-HT-mobility");
-      ((PersonImpl)this.scenario.getPopulation().getPersons().get(pi.getId())).addTravelcard("ch-HT-mobility");
+      PersonImpl.addTravelcard(pi, "ch-HT-mobility");
+      PersonImpl.addTravelcard(this.scenario.getPopulation().getPersons().get(pi.getId()), "ch-HT-mobility");
       this.counter += 1;
     }
     else
     {
-      pi.addTravelcard("unknown");
+      PersonImpl.addTravelcard(pi, "unknown");
     }
 
-    if (pi.getTravelcards().contains("ch-HT-mobility"))
-      ftPerson.addTravelcard("Mobility");
+    if (PersonImpl.getTravelcards(pi).contains("ch-HT-mobility"))
+      PersonImpl.addTravelcard(ftPerson, "Mobility");
   }
 
   private void addFTAttributes(FlexTransPersonImpl ftPerson)

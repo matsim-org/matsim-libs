@@ -90,7 +90,7 @@ public class PlansFilterByLegMode {
 						hasOtherLegMode = true;
 					}
 				}
-				if (this.legModeIsCar && never.equals(((PersonImpl) person).getCarAvail())) {
+				if (this.legModeIsCar && never.equals(PersonImpl.getCarAvail(person))) {
 					// person cannot drive car if she has no car. this means, the person was given a lift by someone else
 					// --> do not include this person, as we're only interested in the driver
 					if ( cnt < 1 ) {

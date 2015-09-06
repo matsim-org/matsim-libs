@@ -97,15 +97,15 @@ public class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMats
 		String ageString = atts.getValue("age");
 		int age = Integer.MIN_VALUE;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson.setAge(age);
-		this.currperson.setSex(atts.getValue("sex"));
-		this.currperson.setLicence(atts.getValue("license"));
-		this.currperson.setCarAvail(atts.getValue("car_avail"));
+		PersonImpl.setAge(this.currperson, age);
+		PersonImpl.setSex(this.currperson, atts.getValue("sex"));
+		PersonImpl.setLicence(this.currperson, atts.getValue("license"));
+		PersonImpl.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonImpl.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed("yes".equals(employed));
+			PersonImpl.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 }

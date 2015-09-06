@@ -159,7 +159,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 	}
 
 	protected double getAge(Person p) {
-		return ((PersonImpl) p).getAge();
+		return PersonImpl.getAge(p);
 	}
 
 
@@ -172,14 +172,14 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 //	}
 
 	private double getHasLicense(Person p) {
-		if (((PersonImpl) p).getLicense().equals("yes")) {
+		if (PersonImpl.getLicense(p).equals("yes")) {
 			return 1;
 		}
 		// else...
 		return 0;
 	}
 	private double getTravelcards(Person p) {
-		if (((PersonImpl) p).getTravelcards().equals("yes")) {
+		if (PersonImpl.getTravelcards(p).equals("yes")) {
 			return 1;
 		}
 		// else...
@@ -187,11 +187,11 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 	}
 
 	private double getCarAlternativeAvail(Person p) {
-		if (((PersonImpl) p).getCarAvail().equals("always")) {
+		if (PersonImpl.getCarAvail(p).equals("always")) {
 			return 1;
 		}
 
-		if (((PersonImpl) p).getLicense().equals("yes")){
+		if (PersonImpl.getLicense(p).equals("yes")){
 			double r1 = MatsimRandom.getRandom().nextDouble();
 			if (r1 < 0.34 ) {
 				return 0;
@@ -204,7 +204,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 	}
 
 	private double getCarAvailPerson(Person p) {
-		if (((PersonImpl) p).getCarAvail().equals("always")) {
+		if (PersonImpl.getCarAvail(p).equals("always")) {
 			return 1;
 		}
 		// else...
@@ -228,7 +228,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 		return dist / 1000;
 	}
 
-	public String detectTourMainActivity1 (PersonImpl person){
+	public String detectTourMainActivity1 (Person person){
 
 		String main_type = "o";
 		Plan plan = person.getSelectedPlan();

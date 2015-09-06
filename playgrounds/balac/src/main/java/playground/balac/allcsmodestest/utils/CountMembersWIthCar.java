@@ -22,8 +22,8 @@ public class CountMembersWIthCar {
 		int count = 0;
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)person).getTravelcards() != null && ((PersonImpl)person).getTravelcards().contains("ch-HT-mobility")) 	
-				if (!((PersonImpl)person).getCarAvail().equals("never")) {
+			if (PersonImpl.getTravelcards(person) != null && PersonImpl.getTravelcards(person).contains("ch-HT-mobility"))
+				if (!PersonImpl.getCarAvail(person).equals("never")) {
 					
 					count++;
 				}

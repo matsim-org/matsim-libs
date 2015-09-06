@@ -43,14 +43,14 @@ public class PersonImplPops extends PersonImpl {
 		super(id);
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
 	}
-	public PersonImplPops(PersonImpl person, Id<Population> populationId) {
+	public PersonImplPops(Person person, Id<Population> populationId) {
 		super(person.getId());
-		setAge(person.getAge());
-		setCarAvail(person.getCarAvail());
-		setEmployed(person.isEmployed());
-		setLicence(person.getLicense());
+		setAge(this, PersonImpl.getAge(person));
+		setCarAvail(this, PersonImpl.getCarAvail(person));
+		setEmployed(this, PersonImpl.isEmployed(person));
+		setLicence(this, PersonImpl.getLicense(person));
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
-		setSex(person.getSex());
+		setSex(this, PersonImpl.getSex(person));
 		for(Plan plan:person.getPlans())
 			addPlan(plan);
 		setSelectedPlan(person.getSelectedPlan());

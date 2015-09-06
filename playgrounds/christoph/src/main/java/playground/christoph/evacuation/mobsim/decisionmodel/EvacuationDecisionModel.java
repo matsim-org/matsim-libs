@@ -141,9 +141,9 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		int later = 0;
 		int never = 0;
 		for (Id<Person> personId : household.getMemberIds()) {
-			PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get(personId);
-			int age = person.getAge();
-			boolean drivingLicense = person.hasLicense();
+			Person person = scenario.getPopulation().getPersons().get(personId);
+			int age = PersonImpl.getAge(person);
+			boolean drivingLicense = PersonImpl.hasLicense(person);
 			
 			EvacuationDecision evacuationDecision = runSurveyBasedPersonModel(age, drivingLicense, hasChildren, isJoined);
 			if (evacuationDecision == EvacuationDecision.IMMEDIATELY) immediately++;

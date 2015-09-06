@@ -41,7 +41,7 @@ public class ScoreStatistics {
 				
 				
 				
-				if (bla.getAttribute(p.getId().toString(), "subpopulation") == null && ((PersonImpl)p).isEmployed()) {
+				if (bla.getAttribute(p.getId().toString(), "subpopulation") == null && PersonImpl.isEmployed(p)) {
 					
 					//boolean grocery = false;
 					for (PlanElement pe: p.getSelectedPlan().getPlanElements()) {

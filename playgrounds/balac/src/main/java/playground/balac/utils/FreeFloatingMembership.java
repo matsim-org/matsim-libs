@@ -43,9 +43,9 @@ public class FreeFloatingMembership {
 		
 		while (number < goal) {
 			
-			PersonImpl p = (PersonImpl) arr[r.nextInt(size)];
+			Person p = (Person) arr[r.nextInt(size)];
 			
-			if (p.hasLicense()) {
+			if (PersonImpl.hasLicense(p)) {
 				x++;
 				if (bla.getAttribute(p.getId().toString(), "CS_CARD") == null) {
 					

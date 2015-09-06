@@ -18,12 +18,10 @@
  * *********************************************************************** */
 package playground.wrashid.lib.tools.plan;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class KeepOnlySelectedPlans {
 
@@ -45,7 +43,7 @@ public class KeepOnlySelectedPlans {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) person;
-			p.removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(p);
 		}
 
 		GeneralLib.writePopulation(scenario.getPopulation(), scenario.getNetwork(), outputPlansFile);

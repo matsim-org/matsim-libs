@@ -54,7 +54,7 @@ public class PlansDumping {
 		plans.addAlgorithm(new PersonAlgorithm() {
 			@Override
 			public void run(Person person) {
-				((PersonImpl) person).removeUnselectedPlans();
+				PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 				Plan plan = person.getSelectedPlan();
 				for (PlanElement planElement : plan.getPlanElements()) {
 					if (planElement instanceof Leg) {

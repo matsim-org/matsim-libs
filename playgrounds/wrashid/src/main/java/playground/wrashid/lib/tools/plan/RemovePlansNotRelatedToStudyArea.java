@@ -7,13 +7,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -39,7 +37,7 @@ public class RemovePlansNotRelatedToStudyArea {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
 			PersonImpl p = (PersonImpl) person;
-			p.removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(p);
 
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof ActivityImpl) {

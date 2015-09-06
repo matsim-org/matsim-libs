@@ -60,9 +60,9 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = s.getPopulation();
-		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
+		Person person = PersonImpl.createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
+		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
 		plan.createAndAddActivity("act1", new CoordImpl(100.0, 100.0));
 		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act2", new CoordImpl(200.0, 200.0));

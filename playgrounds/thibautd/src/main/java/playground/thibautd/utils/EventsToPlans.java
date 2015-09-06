@@ -81,7 +81,7 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 								new MapUtils.Factory<Plan>() {
 									@Override
 									public Plan create() {
-										return new PlanImpl( new PersonImpl( agentId ) );
+										return new PlanImpl(PersonImpl.createPerson(agentId));
 									}
 								});
 						plan.addActivity( activity );
@@ -101,7 +101,7 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 								new MapUtils.Factory<Plan>() {
 									@Override
 									public Plan create() {
-										return new PlanImpl( new PersonImpl( agentId ) );
+										return new PlanImpl(PersonImpl.createPerson(agentId));
 									}
 								});
 							plan.addLeg( leg );

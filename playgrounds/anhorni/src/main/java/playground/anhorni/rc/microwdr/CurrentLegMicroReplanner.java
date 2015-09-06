@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -99,12 +98,12 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		
 		if (random.nextFloat() > 0.3) return false;  // only 30% replanners
 		
-		PersonImpl p = (PersonImpl)person;
+		Person p = person;
 		int legnr = plan.getPlanElements().indexOf(leg);
 				
 	//	logger.warn(legnr);
 		
-		if (p.getAge() == legnr) {
+		if (PersonImpl.getAge(p) == legnr) {
 	//		logger.error("agent already replanned");
 	//		return false; // agent has been replanned already
 		} else {

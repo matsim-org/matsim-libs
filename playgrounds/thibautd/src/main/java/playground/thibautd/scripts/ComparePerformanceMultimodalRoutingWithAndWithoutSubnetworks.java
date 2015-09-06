@@ -58,7 +58,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-		final Person person = new PersonImpl( null );
+		final Person person = PersonImpl.createPerson(null);
 
 		final Timer timer = new Timer();
 		timer.startTimer();

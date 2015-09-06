@@ -296,10 +296,10 @@ public class Census2001SampleParser {
 			String modeToMain = sa[8];
 			Double income = Double.parseDouble(sa[9]);
 			
-			PersonImpl person = (PersonImpl) pf.createPerson(pid);
-			person.setAge(age);
-			person.setSex(gender);
-			person.setEmployed(employment);
+			Person person = pf.createPerson(pid);
+			PersonImpl.setAge(person, age);
+			PersonImpl.setSex(person, gender);
+			PersonImpl.setEmployed(person, employment);
 			personAttributes.putAttribute(pid.toString(), "quarterType", quarterType);
 			personAttributes.putAttribute(pid.toString(), "relationship", relationship);
 			personAttributes.putAttribute(pid.toString(), "race", race);

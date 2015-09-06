@@ -31,18 +31,18 @@ public class TWUsersWithCar {
 		int countYoung = 0;
 		
 		for (Person person: scenario.getPopulation().getPersons().values()) {
-			if (((PersonImpl)person).getAge() >= 18) {
-			if (!((PersonImpl)person).getCarAvail().equals("never")  && ((PersonImpl)person).hasLicense())
+			if (PersonImpl.getAge(person) >= 18) {
+			if (!PersonImpl.getCarAvail(person).equals("never")  && PersonImpl.hasLicense(person))
 				countCar++;
 			
-			if (((PersonImpl)person).hasLicense())
+			if (PersonImpl.hasLicense(person))
 				countLicence++;
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
 				 if (pe instanceof Leg) {
 					
 					if (((Leg) pe).getMode().equals("twowaycarsharing")) {
 						
-						if (!((PersonImpl)person).getCarAvail().equals("never")) {
+						if (!PersonImpl.getCarAvail(person).equals("never")) {
 							
 							hasCar.add(person.getId());
 						}				

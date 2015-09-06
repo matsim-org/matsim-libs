@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -74,9 +73,9 @@ public class AssignTypePopulation {
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())
 			if(isRelatedWithLine(person, line))
-				population.addPerson(new PersonImplPops((PersonImpl)person, Id.create(line.getId(), Population.class)));
+				population.addPerson(new PersonImplPops(person, Id.create(line.getId(), Population.class)));
 			else
-				population.addPerson(new PersonImplPops((PersonImpl)person, PersonImplPops.DEFAULT_POP_ID));
+				population.addPerson(new PersonImplPops(person, PersonImplPops.DEFAULT_POP_ID));
 		return population;
 	}
 	private static boolean isRelatedWithLine(Person person, TransitLine line) {

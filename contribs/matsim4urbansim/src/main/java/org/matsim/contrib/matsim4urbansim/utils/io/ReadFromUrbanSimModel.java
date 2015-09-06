@@ -326,7 +326,7 @@ public class ReadFromUrbanSimModel {
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
 				
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -345,14 +345,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonImpl.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexZoneID_WORK ].equals("-1") )
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonImpl.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonImpl.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workZoneId = Id.create( parts[ indexZoneID_WORK ], ActivityFacility.class );
 					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
 					currentZoneLocations.setWorkZoneIDAndZoneCoordinate(workZoneId, jobLocation);
@@ -444,7 +444,7 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );
@@ -460,14 +460,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonImpl.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexParcelID_WORK ].equals("-1") )
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonImpl.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonImpl.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workParcelId = Id.create( parts[ indexParcelID_WORK ], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
@@ -615,7 +615,7 @@ public class ReadFromUrbanSimModel {
 	 * @param rld TODO
 	 */
 	private void mergePopulation(final Population oldPop,
-			final Population newPop, PersonImpl newPerson,
+			final Population newPop, Person newPerson,
 			Population backupPop, final Network network, 
 			PopulationCounter cnt, boolean isParcel, 
 			ZoneLocations currentZoneLocations, RandomLocationDistributor rld) {
@@ -632,7 +632,7 @@ public class ReadFromUrbanSimModel {
 				backupPop.addPerson( newPerson );
 				cnt.newPersonCnt++;
 				break;
-			} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed. Accept new person:
+			} else if ( PersonImpl.isEmployed(oldPerson) != PersonImpl.isEmployed(newPerson) ) { // employment status changed. Accept new person:
 				newPop.addPerson(newPerson);
 				cnt.employmentChangedCnt++;
 				break;
@@ -682,7 +682,7 @@ public class ReadFromUrbanSimModel {
 			}
 
 			// check if new person works
-			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter. fix this when other activities are considered
+			if ( !PersonImpl.isEmployed(newPerson) ) { // person does not move; doesn't matter. fix this when other activities are considered
 				newPop.addPerson(newPerson);
 				cnt.unemployedCnt++;
 				break ;

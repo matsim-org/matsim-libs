@@ -3,6 +3,7 @@ package playground.balac.aam.replanning;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
@@ -23,11 +24,11 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
 		ArrayList<String> modes = new ArrayList<String>();
-		PersonImpl p = (PersonImpl) plan.getPerson();
+		Person p = plan.getPerson();
 		modes.add("bike");
 		modes.add("walk");
 		modes.add("pt");
-		if (p.getLicense().equals( "yes" ) && !p.getCarAvail().equals( "never" )) 
+		if (PersonImpl.getLicense(p).equals( "yes" ) && !PersonImpl.getCarAvail(p).equals( "never" ))
 			modes.add("car");
 		
 	//	 if (p.getTravelcards() != null && Boolean.parseBoolean(config.getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))

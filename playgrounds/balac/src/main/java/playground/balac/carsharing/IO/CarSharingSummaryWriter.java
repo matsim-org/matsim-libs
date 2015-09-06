@@ -48,13 +48,13 @@ public class CarSharingSummaryWriter
     }
   }
 
-  public void write(PersonImpl person, LinkImpl startLink, CarSharingStation fromStation, CarSharingStation toStation, LinkImpl endLink, double departureTime, double arrivalTime, ActivityImpl actBefore, ActivityImpl actAfter)
+  public void write(Person person, LinkImpl startLink, CarSharingStation fromStation, CarSharingStation toStation, LinkImpl endLink, double departureTime, double arrivalTime, ActivityImpl actBefore, ActivityImpl actAfter)
   {
     try
     {
       this.out.write(person.getId() + "\t");
-      this.out.write(person.getLicense() + "\t");
-      this.out.write(person.getCarAvail() + "\t");
+      this.out.write(PersonImpl.getLicense(person) + "\t");
+      this.out.write(PersonImpl.getCarAvail(person) + "\t");
       this.out.write(startLink.getCoord().getX() + "\t");
       this.out.write(startLink.getCoord().getY() + "\t");
       this.out.write(fromStation.getCoord().getX() + "\t");

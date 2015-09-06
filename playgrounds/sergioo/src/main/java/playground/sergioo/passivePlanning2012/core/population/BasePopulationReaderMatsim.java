@@ -33,12 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -168,15 +163,15 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
 		this.currperson = new BasePersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
-		this.currperson.setCarAvail(atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonImpl.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonImpl.setAge(this.currperson, age);
+		PersonImpl.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonImpl.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonImpl.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed(VALUE_YES.equals(employed));
+			PersonImpl.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 

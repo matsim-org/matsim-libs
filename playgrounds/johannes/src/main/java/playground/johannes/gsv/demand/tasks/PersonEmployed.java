@@ -62,7 +62,7 @@ public class PersonEmployed implements PopulationTask {
 			double p = zone.getAttribute();
 			
 			if(random.nextDouble() < p)
-				((PersonImpl)person).setEmployed(true);
+				PersonImpl.setEmployed(person, true);
 		}
 	}
 

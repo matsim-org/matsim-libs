@@ -23,14 +23,14 @@ public class KeepOnlySelectedPlan {
 
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			
-			PersonImpl p1 = (PersonImpl) scenario2.getPopulation().getFactory().createPerson(p.getId());
+			Person p1 = scenario2.getPopulation().getFactory().createPerson(p.getId());
 			p1.addPlan(p.getSelectedPlan());
 			p1.setSelectedPlan(p.getSelectedPlan());
 			
-			p1.setAge(((PersonImpl)p).getAge());
-			p1.setCarAvail(((PersonImpl)p).getCarAvail());
-			p1.setSex(((PersonImpl)p).getSex());
-			p1.setLicence(((PersonImpl)p).getLicense());
+			PersonImpl.setAge(p1, PersonImpl.getAge(p));
+			PersonImpl.setCarAvail(p1, PersonImpl.getCarAvail(p));
+			PersonImpl.setSex(p1, PersonImpl.getSex(p));
+			PersonImpl.setLicence(p1, PersonImpl.getLicense(p));
 			scenario2.getPopulation().addPerson(p1);
 		}
 		

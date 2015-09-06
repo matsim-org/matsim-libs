@@ -37,7 +37,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -149,8 +148,8 @@ public class WalkBikeRouting {
 				
 				Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 				
-				((PersonImpl) person).setAge(Integer.parseInt(arr[12]));
-				((PersonImpl) person).setSex(arr[11]);
+				PersonImpl.setAge(person, Integer.parseInt(arr[12]));
+				PersonImpl.setSex(person, arr[11]);
 				
 				
 				double m = TimeConversion.convertTimeToDouble(arr[10]);

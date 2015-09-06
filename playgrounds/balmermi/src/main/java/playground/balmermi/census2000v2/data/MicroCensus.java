@@ -144,10 +144,10 @@ public class MicroCensus {
 			weight_sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		for (Person pp : pop.getPersons().values()) {
-			PersonImpl p = (PersonImpl) pp;
-			int age = p.getAge();
-			String sex = p.getSex();
-			String lic = p.getLicense();
+			Person p = pp;
+			int age = PersonImpl.getAge(p);
+			String sex = PersonImpl.getSex(p);
+			String lic = PersonImpl.getLicense(p);
 			boolean has_work = false;
 			boolean has_educ = false;
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {

@@ -29,7 +29,7 @@ public class RemoveUnselectedPlans extends AbstractPersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		if (person instanceof PersonImpl) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 	}
 

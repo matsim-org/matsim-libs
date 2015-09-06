@@ -215,7 +215,7 @@ public class OptimalWalkPlanFinderTest {
 
 	private static class Fixture {
 		protected Config config = null;
-		private PersonImpl person = null;
+		private Person person = null;
 		private PlanImpl plan = null;
 		private Scenario scenario;
 		private NetworkImpl network;
@@ -270,8 +270,8 @@ public class OptimalWalkPlanFinderTest {
 
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
 
-			this.person = new PersonImpl(Id.create("1", Person.class));
-			this.plan = this.person.createAndAddPlan(true);
+			this.person = PersonImpl.createPerson(Id.create("1", Person.class));
+			this.plan = PersonImpl.createAndAddPlan(this.person, true);
 
 			CoordImpl homeLocation = new CoordImpl(0.0,1.0);
 			CoordImpl workLocation = new CoordImpl(1153.8461538461538,1.0);

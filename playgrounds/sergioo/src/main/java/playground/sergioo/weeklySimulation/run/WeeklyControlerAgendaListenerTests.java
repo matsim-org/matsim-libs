@@ -36,7 +36,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -153,11 +152,11 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 			String[] types = fixedTypes?new String[]{"home", "work"}:controler.getConfig().findParam("locationchoice", "flexible_types").split(", ");
 			TripRouter tripRouter = controler.getTripRouterProvider().get();
 			for(Person person: controler.getScenario().getPopulation().getPersons().values())
-				toBeAdded.add(AgendaBasePersonImpl.createAgendaBasePerson(fixedTypes, types, (PersonImpl) person, tripRouter, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
+				toBeAdded.add(AgendaBasePersonImpl.createAgendaBasePerson(fixedTypes, types, person, tripRouter, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
 		}
 		else
 			for(Person person: controler.getScenario().getPopulation().getPersons().values())
-				toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson((PersonImpl) person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));	
+				toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson(person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
 		for(Person person:toBeAdded) {
             controler.getScenario().getPopulation().getPersons().remove(person.getId());
             controler.getScenario().getPopulation().addPerson(person);

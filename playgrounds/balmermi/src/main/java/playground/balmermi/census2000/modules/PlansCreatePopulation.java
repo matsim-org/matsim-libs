@@ -66,12 +66,12 @@ public class PlansCreatePopulation {
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
 			playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(pid);
-			PersonImpl person = new PersonImpl(Id.create(pid.toString(), Person.class));
-			person.setSex(p.getSex());
-			person.setAge(p.getAge());
-			person.setLicence(p.getLicense());
-			person.setCarAvail(p.getCarAvail());
-			person.setCarAvail(p.getEmployed());
+			Person person = PersonImpl.createPerson(Id.create(pid.toString(), Person.class));
+			PersonImpl.setSex(person, p.getSex());
+			PersonImpl.setAge(person, p.getAge());
+			PersonImpl.setLicence(person, p.getLicense());
+			PersonImpl.setCarAvail(person, p.getCarAvail());
+			PersonImpl.setCarAvail(person, p.getEmployed());
 			try {
 				plans.addPerson(person);
 			} catch (Exception e) {

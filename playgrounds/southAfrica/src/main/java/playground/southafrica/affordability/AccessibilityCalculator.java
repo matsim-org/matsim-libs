@@ -42,8 +42,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -62,7 +60,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
-import playground.southafrica.population.utilities.PopulationUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -425,7 +422,7 @@ public class AccessibilityCalculator {
 		try{
 			for(Person person : this.sc.getPopulation().getPersons().values()){
 				/* Calculate the individual's accessibility score. */
-				double accessibility = calculateAccessibility((PersonImpl)person);
+				double accessibility = calculateAccessibility(person);
 				
 				/* Add the individual's score to that of the household. */
 				Id<Household> householdId = Id.create(person.getCustomAttributes().get("householdId").toString(), Household.class);
@@ -503,7 +500,7 @@ public class AccessibilityCalculator {
 	 * @param person
 	 * @return
 	 */
-	public double calculateAccessibility(PersonImpl person){
+	public double calculateAccessibility(Person person){
 	
 		double mobility = getMobilityScore(person);
 		double transportOptions = getTransportOptionsScore(person);
@@ -514,7 +511,7 @@ public class AccessibilityCalculator {
 	}
 	
 	
-	private double getMobilityScore(PersonImpl person){
+	private double getMobilityScore(Person person){
 		int accessibilityClass = getAccessibilityClass(person);
 		
 		/*TODO Remove after validation */
@@ -1050,7 +1047,7 @@ public class AccessibilityCalculator {
 
 	
 	
-	private int getAccessibilityClass(PersonImpl person){
+	private int getAccessibilityClass(Person person){
 	
 		/* If the person has a custom attribute for school with value "School" or
 		 * "PreSchool", s/he is school-going. 
@@ -1060,12 +1057,12 @@ public class AccessibilityCalculator {
 //		boolean attendSchool = ((String)person.getCustomAttributes().get("school")).contains("School")  ||
 //				person.getAge() < 16 ? true : false;
 		boolean attendSchool = activityChainContainsEducation(person.getSelectedPlan())  ||
-				(person.getAge() >= 6 && person.getAge() < 16) ? true : false;
+				(PersonImpl.getAge(person) >= 6 && PersonImpl.getAge(person) < 16) ? true : false;
 		if(attendSchool){
 			return 1;
 		}
 		
-		boolean isWorking = person.isEmployed() || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
+		boolean isWorking = PersonImpl.isEmployed(person) || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
 		boolean isAccompanyingScholar = activityChainContainsDroppingScholar(person.getSelectedPlan());
 		
 		if(isWorking){

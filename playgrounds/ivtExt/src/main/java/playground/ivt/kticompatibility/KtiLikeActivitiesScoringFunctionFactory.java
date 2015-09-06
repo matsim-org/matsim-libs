@@ -93,7 +93,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
-		final Collection<String> travelCards = ((PersonImpl) person).getTravelcards();
+		final Collection<String> travelCards = PersonImpl.getTravelcards(person);
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
 				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :

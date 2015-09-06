@@ -73,8 +73,8 @@ public class CreatePopulation {
 		ActivityFacility workFacility;
 		
 		for (int i = 0; i<nPersons; i++) {
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
-			p.setEmployed(true);
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			PersonImpl.setEmployed(p, true);
 			
 			if (i % 3 == 0) {
 				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(0, ActivityFacility.class));
@@ -94,7 +94,7 @@ public class CreatePopulation {
 		this.scenario.getPopulation().getPersons().clear();
 	}
 		
-	private void generateWorkPlan(PersonImpl p, ActivityFacility homeFacility, ActivityFacility workFacility, double timeOffset) {	
+	private void generateWorkPlan(Person p, ActivityFacility homeFacility, ActivityFacility workFacility, double timeOffset) {
 		
 		double time = 0.0 + timeOffset;
 		PlanImpl plan = new PlanImpl();

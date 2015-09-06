@@ -79,8 +79,8 @@ public class ChangeSingleLegModeTest {
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 
 		module.prepareReplanning(null);
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		person.setCarAvail("never");
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PersonImpl.setCarAvail(person, "never");
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);

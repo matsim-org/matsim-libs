@@ -250,9 +250,9 @@ public class CreateFreightTraffic {
 	}
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
-		Person p = new PersonImpl(Id.create(this.freightOffset + index, Person.class));
-		((PersonImpl)p).setEmployed(true);
-		((PersonImpl)p).setCarAvail("always");
+		Person p = PersonImpl.createPerson(Id.create(this.freightOffset + index, Person.class));
+		PersonImpl.setEmployed(p, true);
+		PersonImpl.setCarAvail(p, "always");
 		((PersonImpl)p).createDesires("freight");
 		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
 		Zone originZone = this.zones.get(this.zoneIds[originIndex]);

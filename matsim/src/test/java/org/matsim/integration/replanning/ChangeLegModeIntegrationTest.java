@@ -80,9 +80,9 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
+		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);

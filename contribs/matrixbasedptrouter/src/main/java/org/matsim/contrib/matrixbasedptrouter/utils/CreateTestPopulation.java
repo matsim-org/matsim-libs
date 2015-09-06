@@ -42,7 +42,7 @@ public final class CreateTestPopulation {
 		//create persons and add them to the population
 		for(int i=0;i<nPersons;i++){
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
-			((PersonImpl)person).setAge(30);
+			PersonImpl.setAge(person, 30);
 			Plan plan = population.getFactory().createPlan();
 			
 			//create home activities at (0,100) and work activities at (200,100), all modes are by car
@@ -86,7 +86,7 @@ public final class CreateTestPopulation {
 		//create persons and add them to the population
 		for(int i=0;i<nPersons;i++){
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
-			((PersonImpl)person).setAge(30);
+			PersonImpl.setAge(person, 30);
 			Plan plan = population.getFactory().createPlan();
 			
 			//create home activities at homeCoord and work activities at workCoord, all modes are by car			

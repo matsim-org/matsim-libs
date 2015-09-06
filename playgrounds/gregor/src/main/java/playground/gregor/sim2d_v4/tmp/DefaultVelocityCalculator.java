@@ -126,23 +126,23 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 		scatterFactor = this.referenceWalkSpeed / scatterSpeed;
 		
 		if (person instanceof PersonImpl) {
-			PersonImpl p = (PersonImpl) person;
+			Person p = person;
 			
 			// get gender factor
-			if (p.getSex() == null) {
+			if (PersonImpl.getSex(p) == null) {
 				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
-			} else if (p.getSex().equalsIgnoreCase("m")) genderFactor = this.maleScaleFactor;
-			else if (p.getSex().equalsIgnoreCase("f")) genderFactor = this.femaleScaleFactor;
+			} else if (PersonImpl.getSex(p).equalsIgnoreCase("m")) genderFactor = this.maleScaleFactor;
+			else if (PersonImpl.getSex(p).equalsIgnoreCase("f")) genderFactor = this.femaleScaleFactor;
 			else {
 				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined correct - expected 'm' or 'f' but found " +
-							p.getSex() + ". Ignoring gender dependent walk speed factor.");
+							PersonImpl.getSex(p) + ". Ignoring gender dependent walk speed factor.");
 				}
 			}
 			
-			int age = p.getAge();
+			int age = PersonImpl.getAge(p);
 			
 			// by default, age is set to Integer.MIN_VALUE in PersonImpl  
 			if (age == Integer.MIN_VALUE) {
@@ -161,7 +161,7 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 				}
 				ageFactor = this.ageFactors[100];
 			} else {
-				ageFactor = this.ageFactors[p.getAge()];
+				ageFactor = this.ageFactors[PersonImpl.getAge(p)];
 			}
 		}
 		

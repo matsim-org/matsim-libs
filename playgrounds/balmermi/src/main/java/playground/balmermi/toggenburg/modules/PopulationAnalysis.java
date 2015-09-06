@@ -46,7 +46,7 @@ public class PopulationAnalysis {
 		int count = 0;
 		for (int i=0; i<stats.length; i++) { stats[i] = 0; }
 		for (Person pp : population.getPersons().values()) {
-			PersonImpl p = (PersonImpl) pp;
+			Person p = pp;
 			boolean analyse = true;
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -70,16 +70,16 @@ public class PopulationAnalysis {
 				}
 			}
 			if (analyse) {
-				int age = p.getAge();
+				int age = PersonImpl.getAge(p);
 				if (age > 99) { stats[100]++; } else { stats[age]++; }
-				if (p.getSex().equals("m")) { stats[101]++; } else { stats[102]++; }
-				if (p.hasLicense()) { stats[103]++; } else { stats[104]++; }
-				if (p.getCarAvail().startsWith("a")) { stats[105]++; }
-				else if (p.getCarAvail().startsWith("s")) { stats[106]++; }
+				if (PersonImpl.getSex(p).equals("m")) { stats[101]++; } else { stats[102]++; }
+				if (PersonImpl.hasLicense(p)) { stats[103]++; } else { stats[104]++; }
+				if (PersonImpl.getCarAvail(p).startsWith("a")) { stats[105]++; }
+				else if (PersonImpl.getCarAvail(p).startsWith("s")) { stats[106]++; }
 				else { stats[107]++; }
-				if (p.isEmployed()) { stats[108]++; } else { stats[109]++; }
-				if (p.getTravelcards() == null) { stats[111]++; }
-				else if (p.getTravelcards().isEmpty()) { stats[111]++; }
+				if (PersonImpl.isEmployed(p)) { stats[108]++; } else { stats[109]++; }
+				if (PersonImpl.getTravelcards(p) == null) { stats[111]++; }
+				else if (PersonImpl.getTravelcards(p).isEmpty()) { stats[111]++; }
 				else { stats[110]++; }
 				count++;
 			}

@@ -73,7 +73,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 		int currentId = 0;
 		for (int j=0; j < nMembers; j++) {
 			final Id<Person> id = Id.create( currentId++ , Person.class );
-			final PersonImpl person = new PersonImpl( id );
+			final Person person = PersonImpl.createPerson(id);
 
 			final Plan plan = new PlanImpl( person );
 			fillPlan( plan , random );

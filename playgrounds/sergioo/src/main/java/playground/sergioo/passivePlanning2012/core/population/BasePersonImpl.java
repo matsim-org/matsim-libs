@@ -22,25 +22,25 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	}
 
 	//Static methods
-	public static BasePersonImpl getBasePerson(boolean fixedTypes, String[] types, PersonImpl person, TripRouter tripRouter, ActivityFacilities facilities) {
+	public static BasePersonImpl getBasePerson(boolean fixedTypes, String[] types, Person person, TripRouter tripRouter, ActivityFacilities facilities) {
 		BasePersonImpl newPerson = new BasePersonImpl(person.getId());
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
+		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
+		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
+		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
+		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		newPerson.addPlan(plan);
 		BasePlanImpl.createBasePlan(fixedTypes, types, newPerson, plan, tripRouter, facilities);
 		return newPerson;
 	}
-	public static BasePersonImpl convertToBasePerson(PersonImpl person) {
+	public static BasePersonImpl convertToBasePerson(Person person) {
 		BasePersonImpl newPerson = new BasePersonImpl(person.getId());
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
+		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
+		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
+		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
+		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
 		for(Plan plan:person.getPlans())
 			if(!plan.isSelected())
 				newPerson.addPlan(plan);

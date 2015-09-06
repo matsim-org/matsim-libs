@@ -112,15 +112,15 @@ public class AlbatrossPopulationCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person, AlbatrossPerson albatrossPerson) {
+	private void setBasicParameters(Person person, AlbatrossPerson albatrossPerson) {
 		
-		if (albatrossPerson.GEND == 0) person.setSex("m");
-		else person.setSex("f");
+		if (albatrossPerson.GEND == 0) PersonImpl.setSex(person, "m");
+		else PersonImpl.setSex(person, "f");
 
-		if (albatrossPerson.WSTAT == 0) person.setEmployed(false);
-		else person.setEmployed(true);
+		if (albatrossPerson.WSTAT == 0) PersonImpl.setEmployed(person, false);
+		else PersonImpl.setEmployed(person, true);
 		
-		person.setAge(calcAge(albatrossPerson));
+		PersonImpl.setAge(person, calcAge(albatrossPerson));
 	}
 	
 	/*

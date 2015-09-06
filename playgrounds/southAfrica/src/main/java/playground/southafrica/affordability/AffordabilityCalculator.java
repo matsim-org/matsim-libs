@@ -257,9 +257,9 @@ public class AffordabilityCalculator {
 		
 		/* Calculate the number fo adults and children. */
 		for(Id id: household.getMemberIds()){
-			PersonImpl person = (PersonImpl) this.sc.getPopulation().getPersons().get(id);
+			Person person = this.sc.getPopulation().getPersons().get(id);
 			if(person != null){
-				if(person.getAge() <= 18){
+				if(PersonImpl.getAge(person) <= 18){
 					numberOfChildren++;
 				} else{
 					numberOfAdults++;

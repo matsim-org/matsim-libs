@@ -83,7 +83,7 @@ public class CreatePTLegs {
 		
 		// keep only one plan per person
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 		
 		// create pt routes

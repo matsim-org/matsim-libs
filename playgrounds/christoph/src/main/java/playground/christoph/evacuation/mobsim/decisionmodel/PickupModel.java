@@ -83,12 +83,12 @@ public class PickupModel implements PersonDecisionModel {
 	
 	@Override
 	public void runModel(Person person) {
-		PersonImpl p = (PersonImpl) person;
+		Person p = person;
 		PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(person.getId());
 		
-		int age = p.getAge();
-		String sex = p.getSex();
-		boolean drivingLicense = p.hasLicense();
+		int age = PersonImpl.getAge(p);
+		String sex = PersonImpl.getSex(p);
+		boolean drivingLicense = PersonImpl.hasLicense(p);
 		boolean hasChildren = pdd.hasChildren();
 		
 		PickupDecision pickupDecision = runModel(age, drivingLicense, sex, hasChildren);

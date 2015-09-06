@@ -47,7 +47,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -236,7 +235,7 @@ public class AccessEgressDemoSimple {
 		TransitLine tLine = schedule.getTransitLines().get(Id.create("line A", TransitLine.class));
 		TransitRoute tRoute = tLine.getRoutes().get(Id.create("A", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopTrain; j++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create("A - " + j, Person.class));
+			Person person = pb.createPerson(Id.create("A - " + j, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalTrain);
@@ -256,7 +255,7 @@ public class AccessEgressDemoSimple {
 		tLine = schedule.getTransitLines().get(Id.create("line B", TransitLine.class));
 		tRoute = tLine.getRoutes().get(Id.create("B", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopBus; j++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create("B - " + j, Person.class));
+			Person person = pb.createPerson(Id.create("B - " + j, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalBus);

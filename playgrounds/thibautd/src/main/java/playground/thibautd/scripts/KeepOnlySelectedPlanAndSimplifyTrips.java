@@ -75,7 +75,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 			@Override
 			public void run(final Person person) {
 				if ( atts.getAttribute( person.getId().toString() , "subpopulation" ) != null ) return;
-				((PersonImpl) person).removeUnselectedPlans();
+				PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 				trips2legs.run( person.getSelectedPlan() );
 
 				for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {

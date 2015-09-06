@@ -9,10 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -79,7 +76,7 @@ public class RouterManager {
 						Activity prev = (Activity) plan.getPlanElements().get(i-1);
 						Activity next = (Activity) plan.getPlanElements().get(i+1);
 						Path path = null;
-						if(((PersonImpl)plan.getPerson()).getCarAvail().equals("never")) {
+						if(PersonImpl.getCarAvail(plan.getPerson()).equals("never")) {
 							costs[CAR_POSITION] = Double.POSITIVE_INFINITY;
 							distances[CAR_POSITION] = Double.POSITIVE_INFINITY;
 						}

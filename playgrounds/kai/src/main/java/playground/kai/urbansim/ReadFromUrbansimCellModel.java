@@ -151,7 +151,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				// generate persons only after it's clear that they have a home location:
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {
 					Id<Person> personId = Id.create( personCnt, Person.class ) ;
-					PersonImpl person = new PersonImpl( personId ) ;
+					Person person = PersonImpl.createPerson(personId);
 					personCnt++ ;
 					if ( personCnt > 10 ) {
 						log.error( "hack" ) ;
@@ -160,13 +160,13 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 					population.addPerson(person) ;
 
-					PlanImpl plan = person.createAndAddPlan(true);
+					PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
 					Utils.makeHomePlan(plan, homeCoord) ;
 
 					if ( ii<nWorkers ) {
-						person.setEmployed(Boolean.TRUE);
+						PersonImpl.setEmployed(person, Boolean.TRUE);
 					} else {
-						person.setEmployed(Boolean.FALSE);
+						PersonImpl.setEmployed(person, Boolean.FALSE);
 					}
 				}
 				line = reader.readLine(); // next line

@@ -66,9 +66,9 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		boolean hasLicense = model.calcLicenseOwnership();
-		if (hasLicense) { ((PersonImpl) person).setLicence(YES); } else { ((PersonImpl) person).setLicence(NO); }
+		if (hasLicense) { PersonImpl.setLicence(person, YES); } else { PersonImpl.setLicence(person, NO); }
 		if ((p.getAge() < 18) && (hasLicense)) {
-			((PersonImpl) person).setLicence(NO);
+			PersonImpl.setLicence(person, NO);
 		}
 	}
 

@@ -77,7 +77,7 @@ import org.xml.sax.Attributes;
 	private final Network network;
 	private final ActivityFacilities facilities;
 
-	/*package*/ PersonImpl currperson = null;
+	/*package*/ Person currperson = null;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
@@ -181,21 +181,21 @@ import org.xml.sax.Attributes;
 		String ageString = atts.getValue("age");
 		int age = Integer.MIN_VALUE;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(Id.create(atts.getValue("id"), Person.class));
-		this.currperson.setSex(atts.getValue("sex"));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue("license"));
-		this.currperson.setCarAvail(atts.getValue("car_avail"));
+		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
+		PersonImpl.setSex(this.currperson, atts.getValue("sex"));
+		PersonImpl.setAge(this.currperson, age);
+		PersonImpl.setLicence(this.currperson, atts.getValue("license"));
+		PersonImpl.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonImpl.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed("yes".equals(employed));
+			PersonImpl.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 
 	private void startTravelcard(final Attributes atts) {
-		this.currperson.addTravelcard(atts.getValue(ATTR_TYPE));
+		PersonImpl.addTravelcard(this.currperson, atts.getValue(ATTR_TYPE));
 	}
 
 	private void startActivityFacility(final Attributes atts) {
@@ -248,7 +248,7 @@ import org.xml.sax.Attributes;
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonImpl.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {

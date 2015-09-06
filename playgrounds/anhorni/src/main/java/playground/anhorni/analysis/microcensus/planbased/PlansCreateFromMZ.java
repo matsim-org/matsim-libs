@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -923,7 +922,7 @@ public class PlansCreateFromMZ {
 			if (has_changed) { cnt_p++; }
 			p.getPlans().clear();
 			p.addPlan(plan2);
-			((PersonImpl) p).setSelectedPlan(plan2);
+			p.setSelectedPlan(plan2);
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {

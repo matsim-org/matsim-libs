@@ -12,15 +12,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
 
 public class PopulationWriteTable {
 	
@@ -63,11 +60,11 @@ public class PopulationWriteTable {
 			out.write("\n");
 			out.flush();
 			for (Person pp : population.getPersons().values()) {
-				PersonImpl p = (PersonImpl) pp;
+				Person p = pp;
 				out.write(p.getId().toString()+"\t");
-				if (p.hasLicense()) { out.write("yes\t"); } else { out.write("no\t"); }
-				out.write(p.getCarAvail()+"\t");
-				if (p.getTravelcards() != null) { out.write("yes"); } else { out.write("no"); }
+				if (PersonImpl.hasLicense(p)) { out.write("yes\t"); } else { out.write("no\t"); }
+				out.write(PersonImpl.getCarAvail(p)+"\t");
+				if (PersonImpl.getTravelcards(p) != null) { out.write("yes"); } else { out.write("no"); }
 
 				Map<String,Id> facs = new TreeMap<String, Id>();
 				for (String type : actOptTypes) { facs.put(type,null); }

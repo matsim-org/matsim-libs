@@ -39,7 +39,7 @@ public class PersonAgeTask extends TrajectoryAnalyzerTask {
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		for(Trajectory t : trajectories) {
-			stats.addValue(((PersonImpl) t.getPerson()).getAge());
+			stats.addValue(PersonImpl.getAge(t.getPerson()));
 		}
 		
 		results.put("person_age", stats);

@@ -219,7 +219,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		PersonImpl matsimPerson = new PersonImpl(Id.create(record.id, Person.class));
+		Person matsimPerson = PersonImpl.createPerson(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;
@@ -231,19 +231,19 @@ public class GraphBuilder {
 		if(age < 0)
 			errLogger.logNoAge(record.isEgo);
 		else
-			matsimPerson.setAge(age);
+			PersonImpl.setAge(matsimPerson, age);
 		
 		String sex = sqlData.getSex(record);
 		if(sex != null)
-			matsimPerson.setSex(sex);
+			PersonImpl.setSex(matsimPerson, sex);
 		else
 			errLogger.logNoSex(record.isEgo);
 		
 		if(record.isEgo)
-			matsimPerson.setLicence(sqlData.getLicense(record));
+			PersonImpl.setLicence(matsimPerson, sqlData.getLicense(record));
 		
 		if(record.isEgo)
-			matsimPerson.setCarAvail(sqlData.getCarAvail(record));
+			PersonImpl.setCarAvail(matsimPerson, sqlData.getCarAvail(record));
 		
 		person.setCitizenship(sqlData.getCitizenship(record));
 		person.setEducation(sqlData.getEducation(record));

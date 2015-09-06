@@ -162,7 +162,7 @@ public class MembershipAssigner {
 		int count = 0;
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getLicense().equals("yes")) {
+			if (PersonImpl.getLicense(p).equals("yes")) {
 				
 				int x = calcMembership(p);
 				if (x == 0) {
@@ -210,8 +210,8 @@ public class MembershipAssigner {
 	protected final double calcNoUtil(Person pi) {
 	  double util = 0.0D;
 	  util += 5.23D * 0.924;
-	  if (((((PersonImpl)pi).getAge() <= 30 ? 1 : 0) & (((PersonImpl)pi).getAge() >= 18 ? 1 : 0)) != 0) util += 0.791D;
-	  if (((PersonImpl)pi).getAge() >= 60) util += 0.43D;
+	  if (((PersonImpl.getAge(pi) <= 30 ? 1 : 0) & (PersonImpl.getAge(pi) >= 18 ? 1 : 0)) != 0) util += 0.791D;
+	  if (PersonImpl.getAge(pi) >= 60) util += 0.43D;
 
 	  return util;
 	}
@@ -223,10 +223,10 @@ public class MembershipAssigner {
 	  util += 0.0563D * this.accessWork.get(pi.getId());
 	  util += 0.0D;
 
-	  if (((((PersonImpl)pi).getAge() <= 45 ? 1 : 0) & (((PersonImpl)pi).getAge() >= 31 ? 1 : 0)) != 0) util += 0.436D;
-	  if (((PersonImpl)pi).getCarAvail().equals( "never")) util += 1.14D;
-	  if (((PersonImpl)pi).getCarAvail().equals( "sometimes")) util += 2.56D;
-	  if (((PersonImpl)pi).getSex().equals( "m")) util += 0.197D;
+	  if (((PersonImpl.getAge(pi) <= 45 ? 1 : 0) & (PersonImpl.getAge(pi) >= 31 ? 1 : 0)) != 0) util += 0.436D;
+	  if (PersonImpl.getCarAvail(pi).equals( "never")) util += 1.14D;
+	  if (PersonImpl.getCarAvail(pi).equals( "sometimes")) util += 2.56D;
+	  if (PersonImpl.getSex(pi).equals( "m")) util += 0.197D;
 
 	  return util;
 	}

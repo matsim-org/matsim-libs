@@ -275,8 +275,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void createPassiveAgents() {
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
-			PersonImpl person = new PersonImpl (new IdImpl(i));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(new IdImpl(i));
+			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
 
 			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
 			home.setEndTime(6 * 3600);

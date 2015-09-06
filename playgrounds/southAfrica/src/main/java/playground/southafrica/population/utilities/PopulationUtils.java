@@ -255,7 +255,7 @@ public class PopulationUtils {
 		Counter counter = new Counter(" employed persons # ");
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			Person person = sc.getPopulation().getPersons().get(id);
-			if(((PersonImpl)person).isEmployed()){
+			if(PersonImpl.isEmployed(person)){
 				counter.incCounter();
 			}
 		}

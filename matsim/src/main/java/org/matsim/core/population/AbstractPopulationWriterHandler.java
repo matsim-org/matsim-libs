@@ -44,8 +44,8 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 		if (person instanceof PersonImpl) {
 			PersonImpl p = (PersonImpl)person;
 			// travelcards
-			if (p.getTravelcards() != null) {
-				for (String t : p.getTravelcards()) {
+			if (PersonImpl.getTravelcards(p) != null) {
+				for (String t : PersonImpl.getTravelcards(p)) {
 					this.startTravelCard(t, writer);
 					this.endTravelCard(writer);
 				}

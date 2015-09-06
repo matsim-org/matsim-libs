@@ -108,7 +108,7 @@ public class GenerateRandomHouseholdScenario {
 				final Link leisureLink = randomLinks.nextLink();
 
 				final Person driver = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
-				((PersonImpl) driver).setCarAvail( "always" );
+				PersonImpl.setCarAvail(driver, "always");
 				createPlan( random , popFactory , driver , homeLink , workLink , leisureLink , workThenLeisure );
 				members.add( driver.getId() );
 				population.addPerson( driver );
@@ -116,7 +116,7 @@ public class GenerateRandomHouseholdScenario {
 				if ( doublePlans ) {
 					// generate twice the "same" plan, once with car, once without
 					final Person passenger = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
-					((PersonImpl) passenger).setCarAvail( "never" );
+					PersonImpl.setCarAvail(passenger, "never");
 					createPlan( random , popFactory , passenger , homeLink , workLink , leisureLink , workThenLeisure );
 					members.add( passenger.getId() );
 					population.addPerson( passenger );

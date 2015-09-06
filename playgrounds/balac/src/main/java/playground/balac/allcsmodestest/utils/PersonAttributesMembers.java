@@ -24,7 +24,7 @@ public class PersonAttributesMembers {
 		
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getTravelcards() != null && ((PersonImpl)p).getTravelcards().contains("ffProgram")) {
+			if (PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ffProgram")) {
 				
 				members.putAttribute(p.getId().toString(), "CS_CARD" , "freefloating");
 			}

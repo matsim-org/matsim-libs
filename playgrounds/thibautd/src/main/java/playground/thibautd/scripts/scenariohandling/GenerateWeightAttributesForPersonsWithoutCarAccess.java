@@ -47,8 +47,8 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 			new PersonAlgorithm() {
 				@Override
 				public void run(final Person person) {
-					final String carAvail = ((PersonImpl) person).getCarAvail();
-					final String license = ((PersonImpl) person).getLicense();
+					final String carAvail = PersonImpl.getCarAvail(person);
+					final String license = PersonImpl.getLicense(person);
 					final boolean isCarAvail =
 						!"no".equals( license ) &&
 						!"never".equals( carAvail );

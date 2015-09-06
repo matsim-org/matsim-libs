@@ -13,7 +13,7 @@ class PlansAddCarAvailability {
 				+ " algorithm...");
 
         for (Id<Person> personId : plans.getPersons().keySet()) {
-            PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+            Person person = plans.getPersons().get(personId);
 
             for (int i = person.getPlans().size() - 1; i >= 0; i--) {
                 Plan plan = person.getPlans().get(i);
@@ -27,9 +27,9 @@ class PlansAddCarAvailability {
 
                 }
                 if (carAvail)
-                    person.setCarAvail("always");
+                    PersonImpl.setCarAvail(person, "always");
                 else
-                    person.setCarAvail("never");
+                    PersonImpl.setCarAvail(person, "never");
             }
 
         }

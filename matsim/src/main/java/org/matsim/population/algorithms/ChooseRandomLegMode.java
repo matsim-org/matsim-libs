@@ -69,7 +69,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		if (tour.size() > 1) {
 			boolean forbidCar = false;
 			if (!this.ignoreCarAvailability) {
-				String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
+				String carAvail = PersonImpl.getCarAvail(plan.getPerson());
 				if ("never".equals(carAvail)) {
 					forbidCar = true;
 				}

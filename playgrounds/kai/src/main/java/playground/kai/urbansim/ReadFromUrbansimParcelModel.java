@@ -159,7 +159,7 @@ public class ReadFromUrbansimParcelModel {
 				String[] parts = line.split("[\t\n]+");
 
 				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;
@@ -178,14 +178,14 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 				}
 
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonImpl.createAndAddPlan(newPerson, true);
 				Utils.makeHomePlan(plan, homeCoord) ;
 
 				int idx = idxFromKey.get("parcel_id_work") ;
 				if ( parts[idx].equals("-1") ) {
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonImpl.setEmployed(newPerson, Boolean.FALSE);
 				} else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonImpl.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workParcelId = Id.create( parts[idx], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
@@ -212,7 +212,7 @@ public class ReadFromUrbansimParcelModel {
 						backupPop.addPerson( newPerson) ;
 						notFoundCnt++ ;
 						break ;
-					} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
+					} else if ( PersonImpl.isEmployed(oldPerson) != PersonImpl.isEmployed(newPerson) ) { // employment status changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
@@ -224,7 +224,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if new person works
-					if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
+					if ( !PersonImpl.isEmployed(newPerson) ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
 						newPop.addPerson(newPerson) ;
 						break ;
 					}

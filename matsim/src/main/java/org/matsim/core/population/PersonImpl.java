@@ -58,8 +58,12 @@ public class PersonImpl implements Person {
 	private Customizable customizableDelegate;
 
 	@Deprecated // please try to use the factory: pop.getFactory().create...
-	public PersonImpl(final Id<Person> id) {
+	protected PersonImpl(final Id<Person> id) {
 		this.id = id;
+	}
+
+	public static Person createPerson(final Id<Person> id) {
+		return new PersonImpl(id);
 	}
 
 	@Override
@@ -76,11 +80,11 @@ public class PersonImpl implements Person {
 	}
 
 	@Deprecated // use methods of interface Person
-	public PlanImpl createAndAddPlan(final boolean selected) {
-		PlanImpl p = new PlanImpl(this);
-		this.addPlan(p);
+	public static PlanImpl createAndAddPlan(Person person, final boolean selected) {
+		PlanImpl p = new PlanImpl(person);
+		person.addPlan(p);
 		if (selected) {
-			this.setSelectedPlan(p);
+			person.setSelectedPlan(p);
 		}
 		return p;
 	}
@@ -93,8 +97,8 @@ public class PersonImpl implements Person {
 		this.selectedPlan = selectedPlan;
 	}
 
-	public void removeUnselectedPlans() {
-		for (Iterator<Plan> iter = this.getPlans().iterator(); iter.hasNext(); ) {
+	public static void removeUnselectedPlans(Person person) {
+		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
 			if (!plan.isSelected()) {
 				iter.remove();
@@ -126,58 +130,58 @@ public class PersonImpl implements Person {
 	}
 
 	@Deprecated // use PersonAttributes
-	public final String getSex() {
-		return (String) getCustomAttributes().get(SEX_ATTRIBUTE);
+	public static String getSex(Person person) {
+		return (String) person.getCustomAttributes().get(SEX_ATTRIBUTE);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final Integer getAge() {
-		return (Integer) getCustomAttributes().get(AGE);
+	public static Integer getAge(Person person) {
+		return (Integer) person.getCustomAttributes().get(AGE);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final String getLicense() {
-		return (String) getCustomAttributes().get(HAS_LICENSE);
+	public static String getLicense(Person person) {
+		return (String) person.getCustomAttributes().get(HAS_LICENSE);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final boolean hasLicense() {
-		return ("yes".equals(this.getLicense())) || ("true".equals(this.getLicense()));
+	public static boolean hasLicense(Person person) {
+		return ("yes".equals(PersonImpl.getLicense(person))) || ("true".equals(PersonImpl.getLicense(person)));
 	}
 
 	@Deprecated // use PersonAttributes
-	public final String getCarAvail() {
-		return (String) getCustomAttributes().get(CAR_AVAIL);
+	public static String getCarAvail(Person person) {
+		return (String) person.getCustomAttributes().get(CAR_AVAIL);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final Boolean isEmployed() {
-		return (Boolean) getCustomAttributes().get(EMPLOYED);
+	public static Boolean isEmployed(Person person) {
+		return (Boolean) person.getCustomAttributes().get(EMPLOYED);
 	}
 
 	@Deprecated // use PersonAttributes
-	public void setAge(final Integer age) {
-		getCustomAttributes().put(AGE, age);
+	public static void setAge(Person person, final Integer age) {
+		person.getCustomAttributes().put(AGE, age);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final void setSex(final String sex) {
-		getCustomAttributes().put(SEX_ATTRIBUTE, sex);
+	public static void setSex(Person person, final String sex) {
+		person.getCustomAttributes().put(SEX_ATTRIBUTE, sex);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final void setLicence(final String licence) {
-		getCustomAttributes().put(HAS_LICENSE, licence);
+	public static void setLicence(Person person, final String licence) {
+		person.getCustomAttributes().put(HAS_LICENSE, licence);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final void setCarAvail(final String carAvail) {
-		getCustomAttributes().put(CAR_AVAIL, carAvail);
+	public static void setCarAvail(Person person, final String carAvail) {
+		person.getCustomAttributes().put(CAR_AVAIL, carAvail);
 	}
 
 	@Deprecated // use PersonAttributes
-	public final void setEmployed(final Boolean employed) {
-		getCustomAttributes().put(EMPLOYED, employed);
+	public static void setEmployed(Person person, final Boolean employed) {
+		person.getCustomAttributes().put(EMPLOYED, employed);
 	}
 
 	@Deprecated // use PersonAttributes
@@ -190,21 +194,21 @@ public class PersonImpl implements Person {
 
 
 	@Deprecated // use PersonAttributes
-	public final void addTravelcard(final String type) {
-		if (this.getTravelcards() == null) {
-			getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());
+	public static void addTravelcard(Person person, final String type) {
+		if (PersonImpl.getTravelcards(person) == null) {
+			person.getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());
 		}
-		if (this.getTravelcards().contains(type)) {
-			log.info(this + "[type=" + type + " already exists]");
+		if (PersonImpl.getTravelcards(person).contains(type)) {
+			log.info(person + "[type=" + type + " already exists]");
 		} else {
-			this.getTravelcards().add(type.intern());
+			PersonImpl.getTravelcards(person).add(type.intern());
 		}
 	}
 
 
 	@Deprecated // use PersonAttributes
-	public final TreeSet<String> getTravelcards() {
-		return (TreeSet<String>) getCustomAttributes().get(TRAVELCARDS);
+	public static TreeSet<String> getTravelcards(Person person) {
+		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
 	}
 
 

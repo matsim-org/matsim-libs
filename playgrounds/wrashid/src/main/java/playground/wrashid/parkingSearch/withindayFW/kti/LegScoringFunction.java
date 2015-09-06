@@ -27,10 +27,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
@@ -174,7 +171,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		double score = 0.0;
 
 		double distanceCost = 0.0;
-		TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
+		TreeSet<String> travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
 		if (travelCards == null) {
 			distanceCost = this.ktiConfigGroup.getDistanceCostPtNoTravelCard();
 		} else if (travelCards.contains("unknown")) {

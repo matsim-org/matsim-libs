@@ -82,7 +82,7 @@ public class PersonSubtourHandler {
 				// Getting the main mode at the sub-tour level
 				String mode =((LegImpl)plan.getPlanElements().get(subtour.get(k)-1)).getMode();
 				int license = 0;
-				if (((PersonImpl) plan.getPerson()).hasLicense()){license =1;}
+				if (PersonImpl.hasLicense(plan.getPerson())){license =1;}
 				int modechoice = 0;
 				if (mode == TransportMode.car) {modechoice=0;}
 				else if (mode == TransportMode.pt) {modechoice=1;}

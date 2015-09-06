@@ -152,7 +152,7 @@ public class PseudoGravityModel {
 
 		// for every worker, add it to the pseudoCell
 		for ( Person pp : population.getPersons().values() ) {
-			if ( ((PersonImpl) pp).isEmployed() ) {
+			if ( PersonImpl.isEmployed(pp) ) {
 				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;

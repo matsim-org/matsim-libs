@@ -80,10 +80,10 @@ public class IpfWriter2011 {
 					bw.write(personId.toString().split("_")[1]);
 					bw.write("\t");
 					/* Age. */
-					bw.write(String.valueOf(((PersonImpl) population.getPersons().get(personId)).getAge()));
+					bw.write(String.valueOf(PersonImpl.getAge(population.getPersons().get(personId))));
 					bw.write("\t");
 					/* Gender. */
-					int gender = ((PersonImpl) population.getPersons().get(personId)).getSex().equalsIgnoreCase("m") ? 1 : 2;
+					int gender = PersonImpl.getSex(population.getPersons().get(personId)).equalsIgnoreCase("m") ? 1 : 2;
 					bw.write(String.valueOf(gender));
 					bw.write("\t");
 					/* Relation/role in household. */
@@ -91,7 +91,7 @@ public class IpfWriter2011 {
 					bw.write(String.valueOf(Relationship2011.getCode(relationship)));
 					bw.write("\t");
 					/* Employment status */
-					int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
+					int employed = PersonImpl.isEmployed(population.getPersons().get(personId)) ? 1 : 0;
 					bw.write(String.valueOf(employed));
 					bw.write("\t");
 					/* Level of school currently attending. */

@@ -122,11 +122,11 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 			@Override
 			public void run(final Person person) {
 				final Household hh = person2hh.get( person.getId() );
-				if ( "always".equals( ((PersonImpl) person).getCarAvail() ) ) {
+				if ( "always".equals( PersonImpl.getCarAvail(person) ) ) {
 					((HouseholdImpl) hh).getVehicleIds().add( Id.create(person.getId().toString(), Vehicle.class) );
 				}
 
-				if ( "sometimes".equals( ((PersonImpl) person).getCarAvail() ) ) {
+				if ( "sometimes".equals( PersonImpl.getCarAvail(person) ) ) {
 					hhsWithSometimes.add( hh.getId() );
 				}
 			}

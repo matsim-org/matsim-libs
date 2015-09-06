@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,7 +36,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 		List<Trip> t = TripStructureUtils.getTrips(plan, stageActivityTypes);
 		
 		int cnt = t.size();
-		PersonImpl p = (PersonImpl) plan.getPerson();
+		Person p = plan.getPerson();
 		if (cnt == 0) {
 			return;
 		}
@@ -45,7 +46,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 			if (l.getMode() == "car" || l.getMode() == "bike")
 				return;
 		
-		if (p.hasLicense() && p.getTravelcards() != null && p.getTravelcards().contains("ch-HT-mobility"))
+		if (PersonImpl.hasLicense(p) && PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ch-HT-mobility"))
 			setRandomTripMode(t.get(rndIdx), plan);
 	}
 

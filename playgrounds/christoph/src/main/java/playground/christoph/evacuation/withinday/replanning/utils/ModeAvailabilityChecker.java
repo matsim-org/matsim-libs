@@ -93,8 +93,8 @@ public class ModeAvailabilityChecker {
 	 * @return
 	 */
 	public boolean hasDrivingLicense(Id personId) {
-		PersonImpl p = (PersonImpl) this.scenario.getPopulation().getPersons().get(personId);
-		return p.hasLicense();
+		Person p = this.scenario.getPopulation().getPersons().get(personId);
+		return PersonImpl.hasLicense(p);
 	}
 	
 	/**

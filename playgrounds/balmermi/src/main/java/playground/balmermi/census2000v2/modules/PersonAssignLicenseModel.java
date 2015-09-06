@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -112,10 +111,10 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		Household hh = (Household)atts.get(CAtts.HH_W);
 
 		// age
-		model.setAge(((PersonImpl) person).getAge());
+		model.setAge(PersonImpl.getAge(person));
 
 		// sex
-		if (((PersonImpl) person).getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
+		if (PersonImpl.getSex(person).equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
 
 		// nat
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
@@ -131,11 +130,11 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		
 		// calc and assign license ownership
 		boolean hasLicense = false;
-		if (((PersonImpl) person).getAge() >= 18) {
+		if (PersonImpl.getAge(person) >= 18) {
 			hasLicense = model.calcLicenseOwnership();
 			if (!hasLicense && (MatsimRandom.getRandom().nextDouble() < 0.4)) { hasLicense = true; }
 		}
-		if (hasLicense) { ((PersonImpl) person).setLicence(YES); } else { ((PersonImpl) person).setLicence(NO); }
+		if (hasLicense) { PersonImpl.setLicence(person, YES); } else { PersonImpl.setLicence(person, NO); }
 	}
 
 	public void run(Plan plan) {

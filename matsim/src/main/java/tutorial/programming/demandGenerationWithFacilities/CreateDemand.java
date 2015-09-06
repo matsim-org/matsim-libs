@@ -209,7 +209,7 @@ class CreateDemand {
 		 * Adapt the activity locations and the activity end times. 
 		 */
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {			
-			if (((PersonImpl)person).isEmployed()) {
+			if (PersonImpl.isEmployed(person)) {
 				Collections.shuffle(this.pusWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusWorkers.get(0));
 				Plan plan = this.adaptAndCopyPlan(person, pusPerson.getSelectedPlan(), true);	

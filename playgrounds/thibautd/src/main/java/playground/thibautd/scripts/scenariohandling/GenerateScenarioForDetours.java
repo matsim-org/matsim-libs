@@ -198,7 +198,7 @@ public class GenerateScenarioForDetours {
 						final Person driver =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) driver).setCarAvail( "always" );
+						PersonImpl.setCarAvail(driver, "always");
 						driver.addPlan(
 								createPlan(
 									random,
@@ -213,7 +213,7 @@ public class GenerateScenarioForDetours {
 						final Person passenger =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) passenger).setCarAvail( "never" );
+						PersonImpl.setCarAvail(passenger, "never");
 						passenger.addPlan(
 								createPlan(
 									random,

@@ -69,9 +69,9 @@ public class PersonGender implements PopulationTask {
 			double p = zone.getAttribute();
 			
 			if(random.nextDouble() < p) {
-				((PersonImpl)person).setSex(PersonAttributes.FEMALE);
+				PersonImpl.setSex(person, PersonAttributes.FEMALE);
 			} else {
-				((PersonImpl)person).setSex(PersonAttributes.MALE);
+				PersonImpl.setSex(person, PersonAttributes.MALE);
 			}
 		}
 

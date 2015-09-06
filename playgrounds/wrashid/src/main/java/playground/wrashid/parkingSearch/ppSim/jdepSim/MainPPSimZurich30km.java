@@ -458,12 +458,12 @@ public class MainPPSimZurich30km {
 
 		for (int i = 0; i < populationExpansionFactor; i++) {
 			for (Person origPerson : originalAgents) {
-				PersonImpl originPersonImpl = (PersonImpl) origPerson;
+				Person originPerson = origPerson;
 
-				PersonImpl newPerson = (PersonImpl) factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
-				newPerson.setAge(((PersonImpl) origPerson).getAge());
-				newPerson.setSex(((PersonImpl) origPerson).getSex());
-				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
+				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
+				PersonImpl.setAge(newPerson, PersonImpl.getAge(origPerson));
+				PersonImpl.setSex(newPerson, PersonImpl.getSex(origPerson));
+				newPerson.addPlan(originPerson.createCopyOfSelectedPlanAndMakeSelected());
 
 				scenario.getPopulation().addPerson(newPerson);
 			}

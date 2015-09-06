@@ -148,10 +148,10 @@ public class RunAnalyses {
 		@Override
 		public void run(Person person) {
 			try {
-				PersonImpl p = (PersonImpl) person;
-				this.writer.write(person.getId() + "\t" + p.getAge() + "\t");
-				this.writer.write(p.getSex() + "\t" + p.getLicense() + "\t");
-				this.writer.write(p.getCarAvail() + "\t" + p.isEmployed() + "\n");
+				Person p = person;
+				this.writer.write(person.getId() + "\t" + PersonImpl.getAge(p) + "\t");
+				this.writer.write(PersonImpl.getSex(p) + "\t" + PersonImpl.getLicense(p) + "\t");
+				this.writer.write(PersonImpl.getCarAvail(p) + "\t" + PersonImpl.isEmployed(p) + "\n");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

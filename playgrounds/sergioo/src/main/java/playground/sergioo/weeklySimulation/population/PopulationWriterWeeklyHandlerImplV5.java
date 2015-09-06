@@ -123,30 +123,30 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 		out.write(p.getId().toString());
 		out.write("\"");
 		if (p instanceof PersonImpl){
-			PersonImpl person = (PersonImpl)p;
-			if (person.getSex() != null) {
+			Person person = p;
+			if (PersonImpl.getSex(person) != null) {
 				out.write(" sex=\"");
-				out.write(person.getSex());
+				out.write(PersonImpl.getSex(person));
 				out.write("\"");
 			}
-			if (person.getAge() != Integer.MIN_VALUE) {
+			if (PersonImpl.getAge(person) != Integer.MIN_VALUE) {
 				out.write(" age=\"");
-				out.write(Integer.toString(person.getAge()));
+				out.write(Integer.toString(PersonImpl.getAge(person)));
 				out.write("\"");
 			}
-			if (person.getLicense() != null) {
+			if (PersonImpl.getLicense(person) != null) {
 				out.write(" license=\"");
-				out.write(person.getLicense());
+				out.write(PersonImpl.getLicense(person));
 				out.write("\"");
 			}
-			if (person.getCarAvail() != null) {
+			if (PersonImpl.getCarAvail(person) != null) {
 				out.write(" car_avail=\"");
-				out.write(person.getCarAvail());
+				out.write(PersonImpl.getCarAvail(person));
 				out.write("\"");
 			}
-			if (person.isEmployed() != null) {
+			if (PersonImpl.isEmployed(person) != null) {
 				out.write(" employed=\"");
-				out.write((person.isEmployed() ? "yes" : "no"));
+				out.write((PersonImpl.isEmployed(person) ? "yes" : "no"));
 				out.write("\"");
 			}
 		}

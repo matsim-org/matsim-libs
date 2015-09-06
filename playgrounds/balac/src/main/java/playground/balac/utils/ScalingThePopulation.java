@@ -34,12 +34,12 @@ public class ScalingThePopulation {
 			
 				PersonImpl originalPerson = (PersonImpl)((Person)arr[i]);
 				
-				p.setAge(originalPerson.getAge());
-				p.setCarAvail(originalPerson.getCarAvail());
-				p.setLicence(originalPerson.getLicense());
-				p.setSex(originalPerson.getSex());
-				p.setEmployed(originalPerson.isEmployed());
-				p.addTravelcard("unknown");
+				PersonImpl.setAge(p, PersonImpl.getAge(originalPerson));
+				PersonImpl.setCarAvail(p, PersonImpl.getCarAvail(originalPerson));
+				PersonImpl.setLicence(p, PersonImpl.getLicense(originalPerson));
+				PersonImpl.setSex(p, PersonImpl.getSex(originalPerson));
+				PersonImpl.setEmployed(p, PersonImpl.isEmployed(originalPerson));
+				PersonImpl.addTravelcard(p, "unknown");
 				Desires d = originalPerson.getDesires();
 				p.createDesires(d.getDesc());
 				p.getDesires().setDesc(d.getDesc());

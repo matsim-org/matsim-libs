@@ -184,10 +184,10 @@ public class PrepareInitialRoutesTest {
 	 */
 	private Person createPerson(Scenario scenario, String id) {
 		
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
-		person.setAge(20);
-		person.setSex("m");
+		PersonImpl.setAge(person, 20);
+		PersonImpl.setSex(person, "m");
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);

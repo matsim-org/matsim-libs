@@ -86,11 +86,11 @@ class CreatePopulation {
 				 * Create a person and add it to the population
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
-				((PersonImpl)person).setAge(Integer.parseInt(parts[index_age]));
+				PersonImpl.setAge(person, Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;
 				if (parts[index_workLocation].equals("-1")) employed = false; 
-				((PersonImpl)person).setEmployed(employed);
+				PersonImpl.setEmployed(person, employed);
 				population.addPerson(person);
 
 				/* 

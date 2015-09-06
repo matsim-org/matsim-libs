@@ -32,10 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -108,29 +105,29 @@ import org.matsim.core.utils.misc.Time;
 				out.write(person.getPopulationId().toString());
 				out.write("\"");
 			}
-			if (person.getSex() != null) {
+			if (PersonImpl.getSex(person) != null) {
 				out.write(" sex=\"");
-				out.write(person.getSex());
+				out.write(PersonImpl.getSex(person));
 				out.write("\"");
 			}
-			if (person.getAge() != Integer.MIN_VALUE) {
+			if (PersonImpl.getAge(person) != Integer.MIN_VALUE) {
 				out.write(" age=\"");
-				out.write(Integer.toString(person.getAge()));
+				out.write(Integer.toString(PersonImpl.getAge(person)));
 				out.write("\"");
 			}
-			if (person.getLicense() != null) {
+			if (PersonImpl.getLicense(person) != null) {
 				out.write(" license=\"");
-				out.write(person.getLicense());
+				out.write(PersonImpl.getLicense(person));
 				out.write("\"");
 			}
-			if (person.getCarAvail() != null) {
+			if (PersonImpl.getCarAvail(person) != null) {
 				out.write(" car_avail=\"");
-				out.write(person.getCarAvail());
+				out.write(PersonImpl.getCarAvail(person));
 				out.write("\"");
 			}
-			if (person.isEmployed() != null) {
+			if (PersonImpl.isEmployed(person) != null) {
 				out.write(" employed=\"");
-				out.write((person.isEmployed() ? "yes" : "no"));
+				out.write((PersonImpl.isEmployed(person) ? "yes" : "no"));
 				out.write("\"");
 			}
 		}

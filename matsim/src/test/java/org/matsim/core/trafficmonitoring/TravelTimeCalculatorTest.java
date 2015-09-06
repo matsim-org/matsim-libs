@@ -268,7 +268,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
+		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
 
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600 + 10;
@@ -538,9 +538,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 5*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
-		PersonImpl person2 = new PersonImpl(Id.create(2, Person.class));
-		PersonImpl person3 = new PersonImpl(Id.create(3, Person.class));
+		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person2 = PersonImpl.createPerson(Id.create(2, Person.class));
+		Person person3 = PersonImpl.createPerson(Id.create(3, Person.class));
 
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600;

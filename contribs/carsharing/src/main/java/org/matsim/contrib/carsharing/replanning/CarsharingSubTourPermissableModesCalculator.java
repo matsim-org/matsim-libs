@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
@@ -34,18 +35,18 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
-		final PersonImpl person;
+		final Person person;
 		List<String> l; 
 		try {
-			person = (PersonImpl) plan.getPerson();
+			person = plan.getPerson();
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException( "I need a PersonImpl to get car availability" );
 		}
 
 		final boolean carAvail =
-			!"no".equals( person.getLicense() ) &&
-			!"never".equals( person.getCarAvail() );
+			!"no".equals( PersonImpl.getLicense(person) ) &&
+			!"never".equals( PersonImpl.getCarAvail(person) );
 		if (carAvail)			 
 			  l = new ArrayList<String>( this.availableModes );
 		  else

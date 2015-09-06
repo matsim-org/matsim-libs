@@ -57,7 +57,7 @@ public class SimplePopulationGenerator {
 
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
+			Person person = pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 
 			//System.out.println("Agent: "+i+" from "+populationSize);
@@ -88,12 +88,12 @@ public class SimplePopulationGenerator {
 			//Add person attributes
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				person.setCarAvail("never");
+				PersonImpl.setCarAvail(person, "never");
 			}
 			else{
-				person.setCarAvail("always");
+				PersonImpl.setCarAvail(person, "always");
 			}
-			person.setEmployed(true);
+			PersonImpl.setEmployed(person, true);
 			simplePopulationGenerator.createIncome(person);
 
 			//Add home location to the plan
@@ -120,7 +120,7 @@ public class SimplePopulationGenerator {
 		simplePopulationGenerator.writeIncomes(outputPath);
 	}
 	
-	private void createIncome(PersonImpl person){
+	private void createIncome(Person person){
 //		Double mean=Math.log(19600.0);
 //		Double std=0.78;
 		//Values from working population of Sioux Falls Scenario

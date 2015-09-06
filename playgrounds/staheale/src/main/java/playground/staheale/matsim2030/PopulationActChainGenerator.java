@@ -179,9 +179,9 @@ public class PopulationActChainGenerator {
 				idCount += 1;
 
 				// check if gender information is consistent, otherwise set it to csv info
-				if (mz_person.getSex().equals(sex) != true) {
+				if (PersonImpl.getSex(mz_person).equals(sex) != true) {
 					log.warn("gender information for person " +re10record+ " is not consistent");
-					person.setSex(sex);
+					PersonImpl.setSex(person, sex);
 				}
 
 				// create home activity as first activity if necessary
@@ -207,7 +207,7 @@ public class PopulationActChainGenerator {
 						firstLegMode = firstLeg.getMode();
 					}
 					else {
-						if (mz_person.hasLicense()) {
+						if (PersonImpl.hasLicense(mz_person)) {
 								firstLegMode = "car";
 						}
 						else {
@@ -266,7 +266,7 @@ public class PopulationActChainGenerator {
 					if (pe instanceof Leg) {
 						LegImpl l = (LegImpl) pe;
 						if (l.getMode().equals("other") || l.getMode().equals("abroad_teleport") || l.getMode().equals("pseudoetappe")) {
-							if (person.getLicense().equals("yes")) {
+							if (PersonImpl.getLicense(person).equals("yes")) {
 								l.setMode("car");
 								//log.info("leg mode of person with recId " +recId+ " is changed to car");
 
@@ -282,7 +282,7 @@ public class PopulationActChainGenerator {
 
 				//////////////////////////////////////////////////////////////////////
 				// check if license holder is over 18
-				if (person.hasLicense() && person.getAge() < 18) {
+				if (PersonImpl.hasLicense(person) && PersonImpl.getAge(person) < 18) {
 					log.warn("person " +person.getId()+ " has a license, but is under 18");
 				}
 

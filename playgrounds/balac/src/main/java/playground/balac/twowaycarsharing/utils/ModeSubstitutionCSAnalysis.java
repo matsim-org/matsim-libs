@@ -58,7 +58,7 @@ public class ModeSubstitutionCSAnalysis {
 						hadow = true;
 						
 						s = findMode(person.getId(), j, scenario);
-						if (!(((PersonImpl)person).getCarAvail()).equals("never"))
+						if (!(PersonImpl.getCarAvail(person)).equals("never"))
 							hasCar.add(person.getId());
 						
 						if (s.getMode().equals("car")) {

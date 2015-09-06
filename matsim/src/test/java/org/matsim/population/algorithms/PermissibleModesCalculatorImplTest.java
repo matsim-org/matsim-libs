@@ -65,7 +65,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNothing() {
 		String name = "no information";
-		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
+		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
@@ -73,27 +73,27 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoLicense() {
 		String name = "no License";
-		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
+		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
-		person.setLicence( "no" );
+		PersonImpl.setLicence(person, "no");
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
 	@Before
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
-		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
+		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
-		person.setCarAvail( "never" );
+		PersonImpl.setCarAvail(person, "never");
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
 	@Before
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
-		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
+		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
-		person.setCarAvail( "sometimes" );
+		PersonImpl.setCarAvail(person, "sometimes");
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
 

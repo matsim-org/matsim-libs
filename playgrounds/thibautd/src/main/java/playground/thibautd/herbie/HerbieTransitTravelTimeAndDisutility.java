@@ -135,7 +135,7 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 	}
 	
 	public void setPerson(final Person person) {
-		TreeSet<String> travelCards = ((PersonImpl) person).getTravelcards();
+		TreeSet<String> travelCards = PersonImpl.getTravelcards(person);
 		if (travelCards == null) {
 			distanceCost = herbieConfig.getDistanceCostPtNoTravelCard();
 		}

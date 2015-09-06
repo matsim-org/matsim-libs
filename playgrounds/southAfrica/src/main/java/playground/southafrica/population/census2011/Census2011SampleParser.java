@@ -290,10 +290,10 @@ public class Census2011SampleParser {
 
 			Income2011 pIncome = Income2011.parseIncome2011FromString(sa[6]);
 			
-			PersonImpl person = (PersonImpl) pf.createPerson(personId);
-			person.setAge(age);
-			person.setSex(Gender2011.getMatsimGender(gender));
-			person.setEmployed(isEmployed);
+			Person person = pf.createPerson(personId);
+			PersonImpl.setAge(person, age);
+			PersonImpl.setSex(person, Gender2011.getMatsimGender(gender));
+			PersonImpl.setEmployed(person, isEmployed);
 			personAttributes.putAttribute(personId.toString(), "relationship", relationship.toString());
 			personAttributes.putAttribute(personId.toString(), "race", populationGroup.toString());
 			personAttributes.putAttribute(personId.toString(), "school", school.toString());

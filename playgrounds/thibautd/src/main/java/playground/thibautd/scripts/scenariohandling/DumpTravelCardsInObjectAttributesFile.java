@@ -53,7 +53,7 @@ public class DumpTravelCardsInObjectAttributesFile {
 		final ObjectAttributes attributes = new ObjectAttributes();
 
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Set<String> cards = ((PersonImpl) person).getTravelcards();
+			final Set<String> cards = PersonImpl.getTravelcards(person);
 			attributes.putAttribute( person.getId().toString() , "hasTravelcard" , !(cards == null || cards.isEmpty()) );
 		}
 

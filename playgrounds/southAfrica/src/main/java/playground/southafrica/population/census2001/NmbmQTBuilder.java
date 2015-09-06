@@ -209,10 +209,10 @@ public class NmbmQTBuilder {
 		for(Id<Household> householdId : inputHouseholds.getHouseholds().keySet()){
 			Household household = inputHouseholds.getHouseholds().get(householdId);
 			for(Id<Person> personId : inputHouseholds.getHouseholds().get(householdId).getMemberIds()){
-				PersonImpl person = (PersonImpl) inputPopulation.getPersons().get(personId);
+				Person person = inputPopulation.getPersons().get(personId);
 				if(person != null){
 					int householdSize = household.getMemberIds().size();
-					int age = person.getAge();
+					int age = PersonImpl.getAge(person);
 					Income surveyIncome = household.getIncome();
 					if(surveyIncome != null){
 						/* Check for working kids. */
@@ -224,7 +224,7 @@ public class NmbmQTBuilder {
 									SouthAfricaInflationCorrector.convert(surveyIncome.getIncome(), travelActivityYear, populationYear), 
 									surveyIncome.getIncomePeriod());
 							
-							Id<QuadTree> qtId = getQtId(person.isEmployed(), householdSize, age, currentIncome);
+							Id<QuadTree> qtId = getQtId(PersonImpl.isEmployed(person), householdSize, age, currentIncome);
 							/* Check that there is a viable QuadTree definition */
 							if(qtId != null){
 								/* Create the QuadTree if it doesn't exist yet */
@@ -327,7 +327,7 @@ public class NmbmQTBuilder {
 				Point altHomePoint = getRandomInteriorPoint(this.zones.get(Id.create(sa[12], MyZone.class)));
 				Coord homeCoord = new CoordImpl(altHomePoint.getX(), altHomePoint.getY());
 				
-				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
+				Person p = sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
 				
 				
 				
@@ -366,13 +366,13 @@ public class NmbmQTBuilder {
 				/* Link individual to its household. */
 				p.getCustomAttributes().put("householdId", hhId.toString());
 				/* Set the person's age. */
-				p.setAge(Integer.parseInt(sa[7]));
+				PersonImpl.setAge(p, Integer.parseInt(sa[7]));
 				/* Set the person's gender. */
-				p.setSex(sa[8].equalsIgnoreCase("1") ? "m" : "f");
+				PersonImpl.setSex(p, sa[8].equalsIgnoreCase("1") ? "m" : "f");
 				/* Set the person's race. */
 				p.getCustomAttributes().put("race", Race.getDescription(Race.getRace(Integer.parseInt(sa[4]))));
 				/* Set person's employment status. */
-				p.setEmployed(Integer.parseInt(sa[10]) == 1 ? true : false);
+				PersonImpl.setEmployed(p, Integer.parseInt(sa[10]) == 1 ? true : false);
 				/* Set person's schooling status. */
 				p.getCustomAttributes().put("school", Schooling.getDescription(Schooling.getSchool(Integer.parseInt(sa[11]))));
 				
@@ -381,7 +381,7 @@ public class NmbmQTBuilder {
 								
 				/*===== Now pick a plan for the person =====*/
 				/* Get the QT id */
-				Id qtId = getQtId(p.isEmployed(), Integer.parseInt(sa[2]), p.getAge(), hh.getIncome());
+				Id qtId = getQtId(PersonImpl.isEmployed(p), Integer.parseInt(sa[2]), PersonImpl.getAge(p), hh.getIncome());
 				Id tryNewId = searchForQtId(qtId);
 				if(tryNewId == null){
 					if(!noQtMap.containsKey(qtId)){

@@ -81,7 +81,7 @@ public class PlanGenerator {
 			Id<ActivityFacility> homeFacilityId = Id.create(workers.getString("homeFacility"), ActivityFacility.class);
 			Id<ActivityFacility> workFacilityId = Id.create(workers.getString("workFacility"), ActivityFacility.class);
 
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(personId, Person.class));
+			Person person = pf.createPerson(Id.create(personId, Person.class));
 			Plan plan = pf.createPlan();
 
 			String mode = "";
@@ -90,14 +90,14 @@ public class PlanGenerator {
 			String hh_id = parts[0];
 			
 			if(carTracker.get(hh_id)>0){
-				person.setCarAvail("always");
+				PersonImpl.setCarAvail(person, "always");
 				carTracker.put(hh_id, carTracker.get(hh_id)-1);
 				mode = "car";
 				dba.executeStatement(String.format("UPDATE %s SET car = 1 WHERE synth_person_id = '%s';",
 						"u_artemc.sf_home_work", personId));
 			}
 			else{
-				person.setCarAvail("never");
+				PersonImpl.setCarAvail(person, "never");
 				mode = "pt";
 				dba.executeStatement(String.format("UPDATE %s SET car = 0 WHERE synth_person_id = '%s';",
 						"u_artemc.sf_home_work", personId));
@@ -106,9 +106,9 @@ public class PlanGenerator {
 	
 
 
-			person.setAge(ageMap.get(personId));
-			person.setSex(sexMap.get(personId));
-			person.setEmployed(true);
+			PersonImpl.setAge(person, ageMap.get(personId));
+			PersonImpl.setSex(person, sexMap.get(personId));
+			PersonImpl.setEmployed(person, true);
 
 			//Add home location to the plan
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
@@ -141,7 +141,7 @@ public class PlanGenerator {
 			Id<ActivityFacility> homeFacilityId = Id.create(housewives.getString("homeFacility"), ActivityFacility.class);
 			Id<ActivityFacility> secondaryFacilityId = Id.create(housewives.getString("secondaryFacility"), ActivityFacility.class);
 
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(personId, Person.class));
+			Person person = pf.createPerson(Id.create(personId, Person.class));
 			Plan plan = pf.createPlan();
 
 			String mode="";
@@ -150,22 +150,22 @@ public class PlanGenerator {
 			String hh_id = parts[0];
 			
 			if(carTracker.get(hh_id)>0){
-				person.setCarAvail("always");
+				PersonImpl.setCarAvail(person, "always");
 				carTracker.put(hh_id, carTracker.get(hh_id)-1);
 				mode = "car";
 				dba.executeStatement(String.format("UPDATE %s SET car = 1 WHERE synth_person_id = '%s';",
 						"u_artemc.sf_home_secondary", personId));
 			}
 			else{
-				person.setCarAvail("never");
+				PersonImpl.setCarAvail(person, "never");
 				mode = "pt";
 				dba.executeStatement(String.format("UPDATE %s SET car = 0 WHERE synth_person_id = '%s';",
 						"u_artemc.sf_home_secondary", personId));
 			}
 
-			person.setAge(ageMap.get(personId));
-			person.setSex(sexMap.get(personId));
-			person.setEmployed(false);
+			PersonImpl.setAge(person, ageMap.get(personId));
+			PersonImpl.setSex(person, sexMap.get(personId));
+			PersonImpl.setEmployed(person, false);
 
 			//Add home location to the plan
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());

@@ -267,8 +267,8 @@ public class PopulationCreator {
 //		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
 //				.getPersonAttributes()
 //				.getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
-		((PersonImpl) person).setEmployed(workZone != null);
-		((PersonImpl) person).setAge(2015 - Integer
+		PersonImpl.setEmployed(person, workZone != null);
+		PersonImpl.setAge(person, 2015 - Integer
 				.parseInt((String) this.scenario.getPopulation()
 						.getPersonAttributes()
 						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE)));

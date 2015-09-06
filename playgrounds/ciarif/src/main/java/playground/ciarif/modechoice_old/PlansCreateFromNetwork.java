@@ -110,12 +110,12 @@ public class PlansCreateFromNetwork {
 					else if (rd2 < 0.4) { car_avail = "always"; }
 				}
 			}
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
-			p.setSex(sex);
-			p.setAge(age);
-			p.setLicence(license);
-			p.setCarAvail(car_avail);
-			p.setEmployed(employed);
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			PersonImpl.setSex(p, sex);
+			PersonImpl.setAge(p, age);
+			PersonImpl.setLicence(p, license);
+			PersonImpl.setCarAvail(p, car_avail);
+			PersonImpl.setEmployed(p, employed);
 			plans.addPerson(p);
 		}
 		System.out.println("    done.");

@@ -672,7 +672,7 @@ public class GeneratePopulation {
 				String caseid = row[CASEID];
 				String pid = row[PID];
 				Id id = createPersonId(caseid, pid);
-				PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(id);
+				Person person = scenario.getPopulation().getFactory().createPerson(id);
 				String palter = row[PALTER];
 				if (palter.equals("997")) {
 					// Verweigert
@@ -681,13 +681,13 @@ public class GeneratePopulation {
 				} else if (palter.equals("999")) {
 					// Keine Angabe
 				} else {
-					person.setAge(Integer.parseInt(palter));
+					PersonImpl.setAge(person, Integer.parseInt(palter));
 				}
 				String psex = row[PSEX];
 				if (psex.equals("1")) {
-					person.setSex("m");
+					PersonImpl.setSex(person, "m");
 				} else if (psex.equals("2")) {
-					person.setSex("f");
+					PersonImpl.setSex(person, "f");
 				} else {
 					// unknown
 				}
@@ -745,10 +745,10 @@ public class GeneratePopulation {
 	}
 
 	private Person copyPersonWithNewLocationsInSameCell(Coord homeCoord, Person person, String cloneId) {
-		PersonImpl oldPerson = (PersonImpl) person;
-		PersonImpl newPerson = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(person.getId().toString() + "#" + cloneId, Person.class));
-		newPerson.setAge(oldPerson.getAge());
-		newPerson.setSex(oldPerson.getSex());
+		Person oldPerson = person;
+		Person newPerson = scenario.getPopulation().getFactory().createPerson(Id.create(person.getId().toString() + "#" + cloneId, Person.class));
+		PersonImpl.setAge(newPerson, PersonImpl.getAge(oldPerson));
+		PersonImpl.setSex(newPerson, PersonImpl.getSex(oldPerson));
 		for(Plan oldPlan : oldPerson.getPlans()) {
 			Plan newPlan = scenario.getPopulation().getFactory().createPlan();
 			for (PlanElement planElement : oldPlan.getPlanElements()) {

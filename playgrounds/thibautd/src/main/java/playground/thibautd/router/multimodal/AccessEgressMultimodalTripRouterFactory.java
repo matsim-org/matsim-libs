@@ -108,7 +108,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 										scenario.getConfig().planCalcScore());
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
-						private final Person dummy = new PersonImpl( Id.create( "dummy" , Person.class ) );
+						private final Person dummy = PersonImpl.createPerson(Id.create("dummy", Person.class));
 						@Override
 						public double getLinkTravelDisutility(
 								final Link link,

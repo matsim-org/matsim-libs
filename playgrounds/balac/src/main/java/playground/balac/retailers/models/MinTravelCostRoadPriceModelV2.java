@@ -20,7 +20,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -52,7 +51,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
       for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-      PersonImpl pi = (PersonImpl)p;
+      Person pi = p;
       this.persons.put(pi.getId(), pi);
     }
   }

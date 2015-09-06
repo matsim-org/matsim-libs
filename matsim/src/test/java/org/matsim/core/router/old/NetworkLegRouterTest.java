@@ -57,7 +57,7 @@ public class NetworkLegRouterTest {
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
@@ -74,7 +74,7 @@ public class NetworkLegRouterTest {
 	public void testRouteLegWithDistance() {
 		Fixture f = new Fixture();
 
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));

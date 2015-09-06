@@ -64,14 +64,14 @@ public class IpfWriter {
 					bw.write("\t");
 					bw.write(personId.toString().split("_")[1]);
 					bw.write("\t");
-					bw.write(String.valueOf(((PersonImpl) population.getPersons().get(personId)).getAge()));
+					bw.write(String.valueOf(PersonImpl.getAge(population.getPersons().get(personId))));
 					bw.write("\t");
-					int gender = ((PersonImpl) population.getPersons().get(personId)).getSex().equalsIgnoreCase("m") ? 1 : 2;
+					int gender = PersonImpl.getSex(population.getPersons().get(personId)).equalsIgnoreCase("m") ? 1 : 2;
 					bw.write(String.valueOf(gender));
 					bw.write("\t");
 					bw.write(String.valueOf(getRelationshipCode((String) personAttributes.getAttribute(personId.toString(), "relationship"))));
 					bw.write("\t");
-					int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
+					int employed = PersonImpl.isEmployed(population.getPersons().get(personId)) ? 1 : 0;
 					bw.write(String.valueOf(employed));
 					bw.write("\t");
 					bw.write(String.valueOf(Schooling.getCode((String) personAttributes.getAttribute(personId.toString(), "school"))));

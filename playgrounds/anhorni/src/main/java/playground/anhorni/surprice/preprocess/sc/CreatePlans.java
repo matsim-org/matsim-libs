@@ -59,9 +59,9 @@ public class CreatePlans {
 	public void run(String outPath) {
 		int nbrPersons = 500;
 		for (int i = 0; i < nbrPersons; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
+			PersonImpl person = PersonImpl.createPerson(Id.create(i, Person.class));
 			this.scenario.getPopulation().addPerson(person);
-			person.createAndAddPlan(true);
+			PersonImpl.createAndAddPlan(person, true);
 			Plan plan = person.getSelectedPlan();
 			
 			int offset = 1; //rnd.nextInt(600);

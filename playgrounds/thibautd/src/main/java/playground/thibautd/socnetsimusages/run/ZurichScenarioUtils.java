@@ -70,7 +70,7 @@ public final class ZurichScenarioUtils {
 							person.getId().toString(),
 							"hasTravelcard" );
 				if ( hasCard != null && hasCard ) {
-					((PersonImpl) person).addTravelcard( UNKOWN_TRAVEL_CARD );
+					PersonImpl.addTravelcard(person, UNKOWN_TRAVEL_CARD);
 				}
 			}
 		}

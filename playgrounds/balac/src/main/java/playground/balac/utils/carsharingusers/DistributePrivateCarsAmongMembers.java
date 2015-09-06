@@ -30,9 +30,9 @@ public class DistributePrivateCarsAmongMembers {
 			
 			if (rand.nextDouble() < x)
 			
-				((PersonImpl)p).setCarAvail("always");
+				PersonImpl.setCarAvail(p, "always");
 			else
-				((PersonImpl)p).setCarAvail("never");
+				PersonImpl.setCarAvail(p, "never");
 
 		}
 		

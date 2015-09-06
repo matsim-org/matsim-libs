@@ -85,7 +85,7 @@ public class WeeklyPlans {
 
 	private static void addCopiedDay(Plan plan, List<PlanElement> dailyPlanElements,
 			int dayPos, ActivityFacilities activityFacilities) {
-		boolean carAvailable = !((PersonImpl)plan.getPerson()).getCarAvail().equals("never") && ((PersonImpl)plan.getPerson()).hasLicense(); 
+		boolean carAvailable = !PersonImpl.getCarAvail(plan.getPerson()).equals("never") && PersonImpl.hasLicense(plan.getPerson());
 		for(PlanElement planElement:dailyPlanElements) {
 			PlanElement planElementCopy;
 			if(planElement instanceof Activity) {
@@ -114,7 +114,7 @@ public class WeeklyPlans {
 				homeFacilityId = ((Activity)planElement).getFacilityId();
 				homeCoord = ((Activity)planElement).getCoord();
 			}
-		boolean carAvailable = !((PersonImpl)plan.getPerson()).getCarAvail().equals("never") && ((PersonImpl)plan.getPerson()).hasLicense(); 
+		boolean carAvailable = !PersonImpl.getCarAvail(plan.getPerson()).equals("never") && PersonImpl.hasLicense(plan.getPerson());
 		double totalDurations = 9*3600;
 		try {
 			totalDurations = new NormalDistributionImpl(9*3600, 2*3600).inverseCumulativeProbability(Math.random());

@@ -29,7 +29,7 @@ public class DesiresToPersonAttributes {
 				members.putAttribute(p.getId().toString(), s , ((PersonImpl)p).getDesires().getActivityDurations().get(s));
 			}
 			
-			if (((PersonImpl)p).getTravelcards() != null && ((PersonImpl)p).getTravelcards().contains("ffProgram")) {
+			if (PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ffProgram")) {
 				
 				members.putAttribute(p.getId().toString(), "FF_CARD" , "true");
 			}
@@ -37,7 +37,7 @@ public class DesiresToPersonAttributes {
 				members.putAttribute(p.getId().toString(), "FF_CARD" , "false");
 
 			
-			if (((PersonImpl)p).getTravelcards() != null && ((PersonImpl)p).getTravelcards().contains("ch-HT-mobility")) {
+			if (PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ch-HT-mobility")) {
 				
 				members.putAttribute(p.getId().toString(), "RT_CARD" , "true");
 			}

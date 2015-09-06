@@ -87,7 +87,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private Plan createSamplePlan() {
-		PlanImpl plan = new PlanImpl(new PersonImpl(Id.create(1, Person.class)));
+		PlanImpl plan = new PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
 		
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		plan.createAndAddLeg(TransportMode.car);

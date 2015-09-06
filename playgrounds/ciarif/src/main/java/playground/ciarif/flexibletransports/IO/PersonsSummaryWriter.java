@@ -3,8 +3,9 @@ package playground.ciarif.flexibletransports.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 
 public class PersonsSummaryWriter
@@ -42,15 +43,15 @@ public class PersonsSummaryWriter
     }
   }
 
-  public void write(PersonImpl person)
+  public void write(Person person)
   {
     try
     {
       this.out.write(person.getId() + "\t");
-      this.out.write(person.getAge() + "\t");
-      this.out.write(person.getSex() + "\t");
-      this.out.write(person.getLicense() + "\t");
-      this.out.write(person.getCarAvail() + "\n");
+      this.out.write(PersonImpl.getAge(person) + "\t");
+      this.out.write(PersonImpl.getSex(person) + "\t");
+      this.out.write(PersonImpl.getLicense(person) + "\t");
+      this.out.write(PersonImpl.getCarAvail(person) + "\n");
       this.out.flush();
     }
     catch (IOException e) {

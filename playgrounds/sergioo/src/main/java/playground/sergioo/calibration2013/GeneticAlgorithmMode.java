@@ -99,8 +99,8 @@ public class GeneticAlgorithmMode {
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				PersonImpl copyPerson = new PersonImpl(person.getId());
-				copyPerson.setCarAvail(((PersonImpl)person).getCarAvail());
+				Person copyPerson = PersonImpl.createPerson(person.getId());
+				PersonImpl.setCarAvail(copyPerson, PersonImpl.getCarAvail(person));
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);

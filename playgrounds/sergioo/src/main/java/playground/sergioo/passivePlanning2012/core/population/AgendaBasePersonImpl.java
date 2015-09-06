@@ -29,28 +29,28 @@ public class AgendaBasePersonImpl extends BasePersonImpl implements	AgendaBasePe
 		this.agendaDecisionMaker = agendaDecisionMaker;
 	}
 
-	public static AgendaBasePersonImpl convertToAgendaBasePerson(PersonImpl person, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
+	public static AgendaBasePersonImpl convertToAgendaBasePerson(Person person, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
 		AgendaDecisionMaker agendaDecisionMaker = new AgendaDecisionMaker(facilities, getCarAvailability(mainModes, person), modes, createAgenda(person), simulationEndTime);
 		setInitialKnownPlaces(agendaDecisionMaker, person);
 		AgendaBasePersonImpl newPerson = new AgendaBasePersonImpl(person.getId(), agendaDecisionMaker);
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
+		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
+		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
+		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
+		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
 		BasePlanImpl.convertToBasePlan(newPerson, person.getSelectedPlan());
 		return newPerson;
 	}
 	
-	public static AgendaBasePersonImpl createAgendaBasePerson(boolean fixedTypes, String[] types, PersonImpl person, TripRouter tripRouter, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
+	public static AgendaBasePersonImpl createAgendaBasePerson(boolean fixedTypes, String[] types, Person person, TripRouter tripRouter, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
 		AgendaDecisionMaker agendaDecisionMaker = new AgendaDecisionMaker(facilities, getCarAvailability(mainModes, person), modes, createAgenda(person), simulationEndTime);
 		setInitialKnownPlaces(agendaDecisionMaker, person);
 		AgendaBasePersonImpl newPerson = new AgendaBasePersonImpl(person.getId(), agendaDecisionMaker);
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
+		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
+		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
+		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
+		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
 		newPerson.addPlan(person.getSelectedPlan());
 		BasePlanImpl.createBasePlan(fixedTypes, types, newPerson, person.getSelectedPlan(), tripRouter, facilities);
 		return newPerson;

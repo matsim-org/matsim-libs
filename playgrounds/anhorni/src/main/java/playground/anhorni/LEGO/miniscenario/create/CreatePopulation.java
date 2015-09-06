@@ -71,9 +71,9 @@ public class CreatePopulation {
 			}
 						
 			for (int j = 0; j < personsPerLocation; j++) {
-				PersonImpl p = new PersonImpl(Id.create(personCnt + offset, Person.class));
+				PersonImpl p = PersonImpl.createPerson(Id.create(personCnt + offset, Person.class));
 				personCnt++;
-				p.createAndAddPlan(true);
+				PersonImpl.createAndAddPlan(p, true);
 				ActivityImpl act = new ActivityImpl("home", facility.getCoord());
 				act.setFacilityId(facility.getId());
 				act.setEndTime(11.0 * 3600.0);

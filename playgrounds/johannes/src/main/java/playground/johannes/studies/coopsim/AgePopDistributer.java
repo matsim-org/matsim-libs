@@ -25,6 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import org.apache.commons.math.stat.StatUtils;
 
+import org.matsim.core.population.PersonImpl;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
@@ -68,7 +69,7 @@ public class AgePopDistributer {
 		
 		for(SocialVertex v : graph.getVertices()) {
 			double personAge = A * accessVals.get(v) + b;
-			v.getPerson().getPerson().setAge((int) personAge);
+			PersonImpl.setAge(v.getPerson().getPerson(), (int) personAge);
 		}
 		
 		SocialSparseGraphMLWriter writer = new SocialSparseGraphMLWriter();

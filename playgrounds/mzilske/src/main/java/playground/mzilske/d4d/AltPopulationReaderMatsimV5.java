@@ -137,21 +137,21 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 
 	private Person parsePerson(XMLStreamReader xmlr) throws XMLStreamException {
 		String id = xmlr.getAttributeValue(""	, "id");
-		PersonImpl person = new PersonImpl(Id.create(id, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(id, Person.class));
 		String sex = xmlr.getAttributeValue(""	, "sex");
-		if (sex!=null) person.setSex(sex);
+		if (sex!=null) PersonImpl.setSex(person, sex);
 		String age = xmlr.getAttributeValue(""	, "age");
-		if (age!=null) person.setAge(Integer.parseInt(age)); 
+		if (age!=null) PersonImpl.setAge(person, Integer.parseInt(age));
 		String license = xmlr.getAttributeValue(""	, "license");
-		if (license!=null) person.setLicence(license);
+		if (license!=null) PersonImpl.setLicence(person, license);
 		String car = xmlr.getAttributeValue(""	, "car_avail");
-		if (car!=null) person.setCarAvail(car);
+		if (car!=null) PersonImpl.setCarAvail(person, car);
 		String employed = xmlr.getAttributeValue(""	, "employed");
 		if (employed!=null) {
 			if (employed.equals("yes")) {
-				person.setEmployed(true);
+				PersonImpl.setEmployed(person, true);
 			} else if (employed.equals("no")) {
-				person.setEmployed(false);
+				PersonImpl.setEmployed(person, false);
 			}
 		}
 		while (xmlr.hasNext()) {
@@ -161,7 +161,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 				if ("travelcard".compareTo(name ) == 0) {
 					String tc = xmlr.getAttributeValue("", "type");
 					if (tc!=null) {
-						person.addTravelcard(tc);
+						PersonImpl.addTravelcard(person, tc);
 					}
 				} else if ("plan".compareTo(name ) == 0) {
 					Plan plan = parsePlan(xmlr);

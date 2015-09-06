@@ -137,7 +137,7 @@ public class CreateDilutedHouseholdCut {
 
 		log.info("  removing not selected plans...");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 		log.info("  done.");
 		

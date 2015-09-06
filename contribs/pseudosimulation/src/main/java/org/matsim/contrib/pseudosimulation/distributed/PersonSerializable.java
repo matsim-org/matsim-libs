@@ -17,11 +17,11 @@ public class PersonSerializable implements Serializable {
 
     public PersonSerializable(Person p) {
         this.id = p.getId().toString();
-        PersonImpl person = (PersonImpl) p;
-        this.sex = person.getSex();
-        this.age = person.getAge();
-        this.hasLicense = person.getLicense();
-        this.carAvail = person.getCarAvail();
+        Person person = p;
+        this.sex = PersonImpl.getSex(person);
+        this.age = PersonImpl.getAge(person);
+        this.hasLicense = PersonImpl.getLicense(person);
+        this.carAvail = PersonImpl.getCarAvail(person);
         for (Plan plan : person.getPlans()) {
             PlanSerializable planSerializable = new PlanSerializable(plan);
             plans.add(planSerializable);
@@ -42,13 +42,13 @@ public class PersonSerializable implements Serializable {
     private Boolean isEmployed;
 
     public Person getPerson() {
-        PersonImpl person = new PersonImpl(Id.createPersonId(id));
-        person.setAge(age);
-        person.setCarAvail(carAvail);
+        Person person = PersonImpl.createPerson(Id.createPersonId(id));
+        PersonImpl.setAge(person, age);
+        PersonImpl.setCarAvail(person, carAvail);
 
-        person.setEmployed(isEmployed);
-        person.setLicence(hasLicense);
-        person.setSex(sex);
+        PersonImpl.setEmployed(person, isEmployed);
+        PersonImpl.setLicence(person, hasLicense);
+        PersonImpl.setSex(person, sex);
         for (PlanSerializable planSer : plans) {
             Plan plan = planSer.getPlan(person);
             person.addPlan(plan);

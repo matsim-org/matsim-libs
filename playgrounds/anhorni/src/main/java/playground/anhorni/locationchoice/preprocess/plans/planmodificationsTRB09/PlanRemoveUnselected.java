@@ -71,7 +71,7 @@ public class PlanRemoveUnselected {
 		Counter counter = new Counter(" person # ");
 		for (Person person : this.plans.getPersons().values()) {
 			counter.incCounter();
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 		log.info("runModifications done.");
 

@@ -95,7 +95,7 @@ public class CreateVehiclesForHouseholds {
 		int alwaysCarAvailable = 0;
 		for (Id id : household.getMemberIds()) {
 			Person person = scenario.getPopulation().getPersons().get(id);
-			String carAvailability = ((PersonImpl) person).getCarAvail();
+			String carAvailability = PersonImpl.getCarAvail(person);
 			if (carAvailability != null && carAvailability.equals("always")) alwaysCarAvailable++;
 		}
 		for (int i = numVehicles + 1; i <= alwaysCarAvailable; i++) {

@@ -97,8 +97,8 @@ public class GenerateHomeWorkPlansForJointTrips {
 			final boolean isDriver = i % 2 == 0;
 			final String mode = isDriver ? TransportMode.car : TransportMode.pt;
 
-			PersonImpl person = new PersonImpl( ids.next() );
-			if (!isDriver) person.setCarAvail( "never" );
+			Person person = PersonImpl.createPerson(ids.next());
+			if (!isDriver) PersonImpl.setCarAvail(person, "never");
 			persons.add( person );
 
 			assert person.getPlans().size() == 0;

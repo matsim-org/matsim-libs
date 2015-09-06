@@ -22,11 +22,11 @@ class PlansExtractSingleMode {
 		int countCarPlans = 0;
 		while (pid_it.hasNext()) {
 			Id<Person> personId = pid_it.next();
-			PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 			for (int i = person.getPlans().size() - 1; i >= 0; i--) {
 				boolean carDriver = false;
-				if(person.getCarAvail().equals("always")||person.getCarAvail().equals("sometimes"))
+				if(PersonImpl.getCarAvail(person).equals("always")|| PersonImpl.getCarAvail(person).equals("sometimes"))
 					carDriver=true;
 //				Plan plan = person.getPlans().get(i);
 //				boolean transitUser = false;

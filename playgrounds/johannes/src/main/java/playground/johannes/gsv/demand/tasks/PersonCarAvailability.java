@@ -50,10 +50,10 @@ public class PersonCarAvailability implements PopulationTask {
 	@Override
 	public void apply(Population pop) {
 		for(Person person : pop.getPersons().values()) {
-			double p = fractions.get(((PersonImpl)person).getAge());
+			double p = fractions.get(PersonImpl.getAge(person));
 			
 			if(random.nextDouble() < p)
-				((PersonImpl)person).setCarAvail("always");
+				PersonImpl.setCarAvail(person, "always");
 		}
 
 	}

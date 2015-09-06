@@ -63,16 +63,16 @@ public class ParkingBetas  extends AbstractParkingBetas{
 		Parser parser = null;
 		if (!parkingWalkBetaCache.containsKey(personId)) {
 			Parser pTmp = new Parser(parkingWalkBeta);
-			PersonImpl persImpl = (PersonImpl) person;
+			Person persImpl = person;
 
 			int isMale = 1;
-			if (persImpl.getSex() != null) {
-				isMale = !persImpl.getSex().contains("f") ? 1 : 0;
+			if (PersonImpl.getSex(persImpl) != null) {
+				isMale = !PersonImpl.getSex(persImpl).contains("f") ? 1 : 0;
 			}
 
 			pTmp.setVariable("isMale", isMale);
 
-			int age = persImpl.getAge();
+			int age = PersonImpl.getAge(persImpl);
 
 			pTmp.setVariable("ageInYears", age);
 			parkingWalkBetaCache.put(personId, pTmp);

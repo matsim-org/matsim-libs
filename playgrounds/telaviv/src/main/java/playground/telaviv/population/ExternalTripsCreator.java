@@ -182,11 +182,11 @@ public class ExternalTripsCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person) {
-		person.setAge(100);
-		person.setSex("m");
-		person.setLicence("yes");
-		person.setCarAvail("always");		
+	private void setBasicParameters(Person person) {
+		PersonImpl.setAge(person, 100);
+		PersonImpl.setSex(person, "m");
+		PersonImpl.setLicence(person, "yes");
+		PersonImpl.setCarAvail(person, "always");
 	}
 	
 	/*

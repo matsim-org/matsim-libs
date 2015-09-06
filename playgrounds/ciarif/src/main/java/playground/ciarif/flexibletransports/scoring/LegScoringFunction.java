@@ -152,7 +152,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
 		if (travelCards == null)
 			distanceCost = this.ftConfigGroup.getDistanceCostPtNoTravelCard();
 		else if (travelCards.contains("unknown"))

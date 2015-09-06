@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -55,7 +54,7 @@ public class Population2SocialGraph {
 		SocialSparseGraph graph = builder.createGraph();
 		for(Person person : populatio.getPersons().values()) {
 			Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			SocialPerson sPerson = new SocialPerson((PersonImpl) person);
+			SocialPerson sPerson = new SocialPerson(person);
 			builder.addVertex(graph, sPerson, geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY())));
 		}
 		

@@ -67,11 +67,11 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 				
 				// copy attributes if possible
 				if (person instanceof PersonImpl && experiencedPerson instanceof PersonImpl) {
-					((PersonImpl) experiencedPerson).setAge(((PersonImpl) person).getAge());
-					((PersonImpl) experiencedPerson).setCarAvail(((PersonImpl) person).getCarAvail());
-					((PersonImpl) experiencedPerson).setEmployed(((PersonImpl) person).isEmployed());
-					((PersonImpl) experiencedPerson).setLicence(((PersonImpl) person).getLicense());
-					((PersonImpl) experiencedPerson).setSex(((PersonImpl) person).getSex());
+					PersonImpl.setAge(experiencedPerson, PersonImpl.getAge(person));
+					PersonImpl.setCarAvail(experiencedPerson, PersonImpl.getCarAvail(person));
+					PersonImpl.setEmployed(experiencedPerson, PersonImpl.isEmployed(person));
+					PersonImpl.setLicence(experiencedPerson, PersonImpl.getLicense(person));
+					PersonImpl.setSex(experiencedPerson, PersonImpl.getSex(person));
 				}
 				
 				experiencedPopulation.addPerson(experiencedPerson);

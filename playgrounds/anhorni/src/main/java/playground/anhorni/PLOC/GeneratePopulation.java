@@ -32,7 +32,7 @@ public class GeneratePopulation {
 	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  Population staticPopulation) {
 		
 		for (int i = 0; i < populationSize; i++) {
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
 
 			// assign home town
 			int townId = 0;

@@ -85,7 +85,7 @@ public class PrepareBackgroundPopulation {
 		
 		// remove unselected plans from population
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
 		}
 		
 		// remove persons which have a "one activity only" plan selected

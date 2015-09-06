@@ -57,7 +57,7 @@ final private int numMembers = 20850;
 		
 		for (Person p: scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getSex().equals("m")) 
+			if (PersonImpl.getSex(p).equals("m"))
 				men.put(p.getId(), p);
 			else
 				women.put(p.getId(), p);
@@ -156,23 +156,23 @@ final private int numMembers = 20850;
 				
 				switch(index) {
 				
-					case 0: if (18 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 24) {
+					case 0: if (18 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 24) {
 					
 								addedMembers.put(p.getId(), p);
 								notFound = false;
 							}
-					case 1: if (25 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 44) {
+					case 1: if (25 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 44) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
 				
-					case 2: if (45 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 64) {
+					case 2: if (45 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 64) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
-					case 3: if (55 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 64) {
+					case 3: if (55 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 64) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;

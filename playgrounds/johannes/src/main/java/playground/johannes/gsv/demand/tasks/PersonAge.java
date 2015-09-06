@@ -77,7 +77,7 @@ public class PersonAge implements PopulationTask {
 			
 			int age = lower + offset;
 			
-			((PersonImpl)person).setAge(age);
+			PersonImpl.setAge(person, age);
 		}
 
 	}

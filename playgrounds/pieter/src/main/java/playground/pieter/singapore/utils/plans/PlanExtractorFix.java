@@ -59,9 +59,9 @@ class PlanExtractorFix {
 			while (pid_it.hasNext()) {
 				
 				Id<Person> personId = pid_it.next();
-				PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+				Person person = plans.getPersons().get(personId);
 
-				String assignedMode = person.getCarAvail().equals("always")?"car":"pt";
+				String assignedMode = PersonImpl.getCarAvail(person).equals("always")?"car":"pt";
 				if(assignedMode.equals("car"))
 					carCount++;
 				ResultSet rs = dba

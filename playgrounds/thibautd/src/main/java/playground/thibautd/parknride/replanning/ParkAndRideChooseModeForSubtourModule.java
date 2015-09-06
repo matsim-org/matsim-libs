@@ -98,7 +98,7 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 			Person person = plan.getPerson();
 			if (CHECK_CAR_AVAIL &&
 					person instanceof PersonImpl &&
-					"never".equals( ((PersonImpl) person).getCarAvail() )) {
+					"never".equals( PersonImpl.getCarAvail(person) )) {
 				available.remove( TransportMode.car );
 				available.remove( ParkAndRideConstants.PARK_N_RIDE_LINK_MODE );
 			}

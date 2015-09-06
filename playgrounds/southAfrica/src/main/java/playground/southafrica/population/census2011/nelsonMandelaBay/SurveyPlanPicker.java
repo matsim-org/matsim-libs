@@ -156,8 +156,8 @@ public class SurveyPlanPicker {
 			Coord home = getQtPlanHomeCoordinate(plan);
 			
 			/* Get the person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertNmbm2004Employment( ((PersonImpl)person).isEmployed() ).toString();
-			String b = SaDemographicsAge.getAgeClass(((PersonImpl)person).getAge()).toString();
+			String a = SaDemographicsEmployment.convertNmbm2004Employment( PersonImpl.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass(PersonImpl.getAge(person)).toString();
 			Id<Household> hhid = Id.create((String) surveyPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId"), Household.class);
 			Household household = surveyPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
@@ -204,8 +204,8 @@ public class SurveyPlanPicker {
 			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
 			
 			/* Get person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertCensus2011Employment( ((PersonImpl)person).isEmployed() ).toString();
-			String b = SaDemographicsAge.getAgeClass( ((PersonImpl)person).getAge() ).toString();
+			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonImpl.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass( PersonImpl.getAge(person) ).toString();
 			Household household = censusPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
 			String d = SaDemographicsIncome.convertCensus2011Income( Income2011.getIncomeEnum(household.getIncome()) ).toString();

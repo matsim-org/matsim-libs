@@ -30,8 +30,8 @@ public class CarsharingRentalTimes {
 		double time = 0.0;
 		int members = 0;
 		for (Person p: scenario.getPopulation().getPersons().values()) {
-			PersonImpl per = (PersonImpl)p;
-			if (per.getTravelcards() !=null && per.getTravelcards().contains("ch-HT-mobility"))
+			Person per = p;
+			if (PersonImpl.getTravelcards(per) !=null && PersonImpl.getTravelcards(per).contains("ch-HT-mobility"))
 				members++;
 			if (per.getId().toString().equals("6551679"))
 				System.out.println();

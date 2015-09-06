@@ -31,10 +31,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 
@@ -91,7 +89,7 @@ public class WithindayListener implements StartupListener, IterationStartsListen
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Population pop = event.getControler().getScenario().getPopulation();
 		for (Person p : pop.getPersons().values()) {
-			((PersonImpl)p).setAge(100);
+			PersonImpl.setAge(p, 100);
 		}	
 	}
 }

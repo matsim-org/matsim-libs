@@ -283,7 +283,7 @@ public class InsertionRemovalIterativeActionTest {
 
 		for (int i=0; i < N_COUPLES; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
-			Person person = new PersonImpl( driverId );
+			Person person = PersonImpl.createPerson(driverId);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
@@ -295,7 +295,7 @@ public class InsertionRemovalIterativeActionTest {
 			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
-			person = new PersonImpl( passengerId );
+			person = PersonImpl.createPerson(passengerId);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
@@ -326,7 +326,7 @@ public class InsertionRemovalIterativeActionTest {
 
 		for (int i=0; i < N_COUPLES; i++) {
 			Id driverId1 = Id.create( "driver"+i , Person.class );
-			Person person = new PersonImpl( driverId1 );
+			Person person = PersonImpl.createPerson(driverId1);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId1 , plan );
 			ActivityImpl act = plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) );
@@ -337,7 +337,7 @@ public class InsertionRemovalIterativeActionTest {
 			act.setCoord( coord2 );
 
 			Id passengerId1 = Id.create( "passenger"+i , Person.class );
-			person = new PersonImpl( passengerId1 );
+			person = PersonImpl.createPerson(passengerId1);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId1 , plan );
 			act = plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) );
