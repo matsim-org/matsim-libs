@@ -19,7 +19,6 @@
 
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
 
-import org.matsim.api.core.v01.Coord;
 
 import playground.wrashid.lib.obj.Coord;
 
