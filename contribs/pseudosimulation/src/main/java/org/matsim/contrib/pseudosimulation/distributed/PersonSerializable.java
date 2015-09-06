@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
+import org.matsim.core.population.PersonUtils;
 
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);

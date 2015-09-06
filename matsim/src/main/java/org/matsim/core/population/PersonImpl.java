@@ -20,20 +20,17 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
-import org.matsim.population.Desires;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -43,7 +40,6 @@ public class PersonImpl implements Person {
 	protected Id<Person> id;
 
 	private TreeSet<String> travelcards = null;
-	protected Desires desires = null;
 
 	private Plan selectedPlan = null;
 
@@ -101,23 +97,6 @@ public class PersonImpl implements Person {
 	public void setId(final Id<Person> id) {
 		this.id = id;
 	}
-
-	@Deprecated // use PersonAttributes
-	public final Desires createDesires(final String desc) {
-		if (this.desires == null) {
-			this.desires = new Desires(desc);
-		}
-		return this.desires;
-	}
-
-
-	@Deprecated // use PersonAttributes
-	public final Desires getDesires() {
-		return this.desires;
-	}
-
-
-
 
 	@Override
 	public final String toString() {

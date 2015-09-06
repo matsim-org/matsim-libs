@@ -84,7 +84,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	private double calcScore(final Fixture f) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
 		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(PersonImpl.createPerson(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {

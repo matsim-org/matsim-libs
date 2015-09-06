@@ -187,8 +187,8 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		PersonUtils.setAge(p2, 20);
 		PersonUtils.setSex(p2, "m");
 		
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(1.0, 0.0));
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		link.setLength(1.0);
 		scenario.getNetwork().addNode(node1);

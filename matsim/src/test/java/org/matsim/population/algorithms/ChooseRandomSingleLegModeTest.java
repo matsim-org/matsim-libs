@@ -46,7 +46,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testRandomChoice() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(new PersonImpl(Id.create(1, Person.class)));
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -107,7 +107,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testHandlePlan_OnlySingleLegChanged() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(new PersonImpl(Id.create(1, Person.class)));
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		LegImpl leg1 = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));

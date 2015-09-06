@@ -80,7 +80,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		ActivityImpl act = plan.createAndAddActivity("home", new Coord(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);

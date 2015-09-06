@@ -42,8 +42,8 @@ public class TripPlanMutateTimeAllocationTest {
 	@Test
 	public void testRun() {
 		// setup population with one person
-		PersonImpl person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);

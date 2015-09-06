@@ -247,11 +247,11 @@ public class CreateFreightTraffic {
 		Person p = PersonImpl.createPerson(Id.create(this.freightOffset + index, Person.class));
 		PersonUtils.setEmployed(p, true);
 		PersonUtils.setCarAvail(p, "always");
-		((PersonImpl)p).createDesires("freight");
-		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
-		Person p = new PersonImpl(Id.create(this.freightOffset + index, Person.class));
-		((PersonImpl)p).setEmployed(true);
-		((PersonImpl)p).setCarAvail("always");
+//		((PersonImpl)p).createDesires("freight");
+//		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
+//		Person p = new PersonImpl(Id.create(this.freightOffset + index, Person.class));
+//		((PersonImpl)p).setEmployed(true);
+//		((PersonImpl)p).setCarAvail("always");
 		//((PersonImpl)p).createDesires("freight");
 		//((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
 		if ( true ) throw new RuntimeException( "Desires are gone. This can be done another way" );
