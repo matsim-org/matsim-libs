@@ -291,7 +291,7 @@ PersonStuckEventHandler {
 		//			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents').");
 		//		}
 
-		linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
+//		linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 
 		linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());

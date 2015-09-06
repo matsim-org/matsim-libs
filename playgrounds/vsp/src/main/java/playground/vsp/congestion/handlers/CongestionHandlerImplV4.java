@@ -25,10 +25,14 @@ package playground.vsp.congestion.handlers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -70,7 +74,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 	private Scenario scenario;
 	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<Id<Link>, List<Id<Link>>>();
-	
+
 	/**
 	 * This list is used to store entering agents, (1) which can not be cleared in personId2EnteringAgents map because 
 	 * linkEnterTime is required later (2) and these agents should not be charged since they already left the link. 
@@ -81,6 +85,10 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	public void handleEvent(PersonArrivalEvent event){
 		if(event.getLegMode().equals(TransportMode.car)) {
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
+
+			for (Id<Link>linkId : this.linkId2ExcludeEnteringAgentsList.keySet()){ // This is necessary so that an agent once charged can be charged again if causing storageDelay.
+				this.linkId2ExcludeEnteringAgentsList.get(linkId).remove(event.getPersonId());
+			}
 		}
 	}
 
@@ -91,10 +99,12 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		Id<Person> delayedPerson = event.getPersonId();
 
 		storeExcludedEnteringAgents(event);
-		
+
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
+
+		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event);
 
 		if( linkInfo.getLeavingAgents().isEmpty()){
 			// (getLeavingAgents is NOT the queue, i.e. NOT all agents with delay, but only those agents where time
@@ -102,7 +112,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			// is not active)
 
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
-			
+
 			memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), spillBackCausingLink);
 		} 
 
@@ -132,6 +142,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
 		} else {
 			this.linkId2SpillBackCausingLinks.put(currentLink, new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
+
 		}
 	}
 
@@ -143,7 +154,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		if(! this.linkId2SpillBackCausingLinks.containsKey(linkId)) {
 			return remainingDelay;
 		}
-		
+
 		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLinks.get(linkId));
 		if(spillBackCausingLinks.isEmpty()) return remainingDelay;
 
@@ -177,14 +188,14 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
 		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
-		
+
 		personsEnteredOnSpillBackCausingLink.removeAll(this.linkId2ExcludeEnteringAgentsList.get(spillbackCausingLink)); 
 		// these agents shoudld not be charged because they have already left the link.
 		// TODO : need to find a better way to do this.
-		
+
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
-//		cant use leavingAgents list for the order of entering agents since it is modified in updateFlowQueue(...) before calculateCongestion(...).
-//		thus, must use LinkedHashMap for perosnId2LinkEnterTime.
+		//		cant use leavingAgents list for the order of entering agents since it is modified in updateFlowQueue(...) before calculateCongestion(...).
+		//		thus, must use LinkedHashMap for perosnId2LinkEnterTime.
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
 		double marginalDelaysPerLeavingVehicle = spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec();
@@ -211,10 +222,84 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		return remainingDelay;
 	}
-	
+
 	/**
 	 * @param event
-	 * As stated above, these stored agents are not guilty (they have already left the link). 
+	 * <p> This is a very special case (possible only at intersections), where agent is first delayed due to flow Capacity and then delayed due to storage capacity.
+	 * For this, the time gap (tau) between freeSpeedLinkLeave time of two consecutive vehicles and leavingAgents list are checked. 
+	 * Thus, 
+	 * <p> <code> if( leavingAgents.isEmpty() ) { return }
+	 * <p> else {checkForTimeGap} </code>
+	 * <p> 
+	 * <p> See{@link CombinedFlowAndStorageDelayTest.class}
+	 */
+	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event){
+
+
+		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
+		double remainingDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+
+		if(linkInfo.getLeavingAgents().isEmpty()){
+
+			double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+			double marginalFlowDelay = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+			double timeGap = 0;
+
+			// this is sorted based on higher to lower values.
+			Map<Id<Person>,Double> personId2FreeSpeedTime = sortByValues(linkInfo.getPersonId2freeSpeedLeaveTime());
+			boolean startComparingTimeGap = false;
+			for(Id<Person> personId : personId2FreeSpeedTime.keySet()){
+
+				if(startComparingTimeGap){
+
+					double freeSpeedTimeOfAgent = personId2FreeSpeedTime.get(personId);
+					timeGap = freeSpeedLeaveTimeOfNowAgent - freeSpeedTimeOfAgent;
+
+					if(timeGap < marginalFlowDelay) {
+						double agentDelay = Math.min(marginalFlowDelay, remainingDelay);
+
+						CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", personId, event.getPersonId(), agentDelay, event.getLinkId(),
+								linkInfo.getPersonId2linkEnterTime().get(event.getPersonId()) );
+						this.getEventsManager().processEvent(congestionEvent); 
+						this.addToTotalInternalizedDelay(agentDelay);
+
+						remainingDelay = remainingDelay - agentDelay;
+						// this person should be charged here.
+					} else {
+						break;
+					}
+				}
+				if( personId.equals(event.getPersonId()) ) startComparingTimeGap = true;
+			}
+		}
+		return remainingDelay;
+	}
+
+
+	private Map<Id<Person>,Double> sortByValues (Map<Id<Person>,Double> map) { 
+
+		List<Entry<Id<Person>,Double>> list = new LinkedList<Entry<Id<Person>,Double>>(map.entrySet());
+		Comparator<Entry<Id<Person>,Double>> sortByValueComparator = new Comparator<Entry<Id<Person>,Double>> () {
+			@Override
+			public int compare(Entry<Id<Person>, Double> left,
+					Entry<Id<Person>, Double> right) {
+				return -( left.getValue().compareTo(right.getValue()) );
+			}
+		};
+
+		Collections.sort(list, sortByValueComparator);
+
+		Map<Id<Person>,Double> sortedHashMap = new LinkedHashMap<Id<Person>, Double>();
+		for (Iterator<Entry<Id<Person>,Double>> it = list.iterator(); it.hasNext();) {
+			Entry<Id<Person>,Double> entry = (Entry<Id<Person>,Double>) it.next();
+			sortedHashMap.put(entry.getKey(), entry.getValue());
+		} 
+		return sortedHashMap;
+	}
+
+	/**
+	 * @param event
+	 * <p> As stated above, these stored agents are not guilty (they have already left the link). 
 	 * Directly, can not remove from the PersonId2EnterTime map because linkEnterTime is required later.
 	 */
 	private void storeExcludedEnteringAgents(LinkLeaveEvent event){
