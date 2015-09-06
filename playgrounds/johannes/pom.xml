@@ -59,11 +59,6 @@
 			<artifactId>socnetgen</artifactId>
 			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>ivtExt</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<profiles>
