@@ -35,23 +35,23 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
-	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_DRIVER = "driver";
 
-	private final Id<Person> personId;
+	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 //	private final String networkMode;
 
-	public Wait2LinkEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) { //String networkMode
+	public Wait2LinkEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId) { //String networkMode
 		super(time);
-		this.personId = agentId;
+		this.driverId = driverId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 //		this.networkMode = networkMode;
 	}
 	
 	public Id<Person> getPersonId() {
-		return this.personId;
+		return this.driverId;
 	}	
 	
 	public Id<Link> getLinkId() {
@@ -74,7 +74,7 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
 		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
 		if (this.vehicleId != null) {
 			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
