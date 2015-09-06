@@ -40,13 +40,13 @@ public class ScalingThePopulation {
 				p.setSex(originalPerson.getSex());
 				p.setEmployed(originalPerson.isEmployed());
 				p.addTravelcard("unknown");
-				Desires d = originalPerson.getDesires();
-				p.createDesires(d.getDesc());
-				p.getDesires().setDesc(d.getDesc());
-				for (String type : d.getActivityDurations().keySet()) {
-					
-					p.getDesires().putActivityDuration(type, d.getActivityDuration(type));
-				}
+				//Desires d = originalPerson.getDesires();
+				//p.createDesires(d.getDesc());
+				//p.getDesires().setDesc(d.getDesc());
+				//for (String type : d.getActivityDurations().keySet()) {
+				//
+				//	p.getDesires().putActivityDuration(type, d.getActivityDuration(type));
+				//}
 				
 				scenario.getPopulation().addPerson(p);
 			}			

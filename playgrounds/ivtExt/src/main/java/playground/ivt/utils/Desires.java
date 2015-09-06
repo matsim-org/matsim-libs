@@ -71,7 +71,7 @@ public class Desires  {
 
 	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final boolean putActivityDuration(final String act_type, final double duration) {
-		if (duration <= 0.0) { log.fatal("duration=" + duration + " not allowed!"); return false; }
+		if (duration <= 0.0) { playground.johannes.coopsim.mental.ActivityDesires.log.fatal("duration=" + duration + " not allowed!"); return false; }
 		if (this.act_durs == null) { this.act_durs = new HashMap<String, Double>(); }
 		this.act_durs.put(act_type,duration);
 		return true;

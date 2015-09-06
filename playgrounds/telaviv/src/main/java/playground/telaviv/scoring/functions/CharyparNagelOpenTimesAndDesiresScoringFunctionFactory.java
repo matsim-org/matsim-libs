@@ -75,41 +75,41 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		
-		CharyparNagelScoringParameters params = this.paramsMap.get(person.getId());
-		/*
-		 * We get the typical durations from the persons' desires. Instead, we
-		 * could also store them in the PersonAttributes and get them from there.
-		 */		
-		if (params == null) {
-			// ensure that only one thread at a time can adapt the config parameters
-			synchronized (this) {
-				Desires desires = ((PersonImpl) person).getDesires();
-				
-				// replace typical durations in config - quite an ugly hack...
-				for (ActivityParams activityParams : config.getActivityParams()) {
-					double typicalDuration = desires.getActivityDuration(activityParams.getActivityType());
-					if (typicalDuration != Time.UNDEFINED_TIME) activityParams.setTypicalDuration(typicalDuration);
-				}
-				
-				// create CharyparNagelScoringParameters on person's typical durations
-				params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenario.getConfig().scenario()).create();
-				this.paramsMap.put(person.getId(), params);
-				
-				// reset original typical durations
-				for (ActivityParams activityParams : config.getActivityParams()) {
-					activityParams.setTypicalDuration(this.originalTypicalDurations.get(activityParams.getActivityType()));
-				}
-			}
-		}
-		
-		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		throw new UnsupportedOperationException( "desires do not exist anymore. Please find another way to do this" );
+		//CharyparNagelScoringParameters params = this.paramsMap.get(person.getId());
+		///*
+		// * We get the typical durations from the persons' desires. Instead, we
+		// * could also store them in the PersonAttributes and get them from there.
+		// */
+		//if (params == null) {
+		//	// ensure that only one thread at a time can adapt the config parameters
+		//	synchronized (this) {
+		//		Desires desires = ((PersonImpl) person).getDesires();
+		//
+		//		// replace typical durations in config - quite an ugly hack...
+		//		for (ActivityParams activityParams : config.getActivityParams()) {
+		//			double typicalDuration = desires.getActivityDuration(activityParams.getActivityType());
+		//			if (typicalDuration != Time.UNDEFINED_TIME) activityParams.setTypicalDuration(typicalDuration);
+		//		}
+		//
+		//		// create CharyparNagelScoringParameters on person's typical durations
+		//		params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenario.getConfig().scenario()).create();
+		//		this.paramsMap.put(person.getId(), params);
+		//
+		//		// reset original typical durations
+		//		for (ActivityParams activityParams : config.getActivityParams()) {
+		//			activityParams.setTypicalDuration(this.originalTypicalDurations.get(activityParams.getActivityType()));
+		//		}
+		//	}
+		//}
+		//
+		//SumScoringFunction sumScoringFunction = new SumScoringFunction();
+		//sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
+		//sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		//sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		//sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-		return sumScoringFunction;
+		//return sumScoringFunction;
 	}
 	
 }

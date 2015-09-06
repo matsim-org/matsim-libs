@@ -51,18 +51,18 @@ public final class ZurichScenarioUtils {
 
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {
 				// put desires (if any) in persons for backward compatibility
-				final Desires desires = (Desires)
-					scenario.getPopulation().getPersonAttributes().getAttribute(
-							person.getId().toString(),
-							"desires" );
-				if ( desires != null ) {
-					((PersonImpl) person).createDesires( desires.getDesc() );
-					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
-						((PersonImpl) person).getDesires().putActivityDuration(
-							entry.getKey(),
-							entry.getValue() );
-					}
-				}
+				//final Desires desires = (Desires)
+				//	scenario.getPopulation().getPersonAttributes().getAttribute(
+				//			person.getId().toString(),
+				//			"desires" );
+				//if ( desires != null ) {
+				//	((PersonImpl) person).createDesires( desires.getDesc() );
+				//	for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+				//		((PersonImpl) person).getDesires().putActivityDuration(
+				//			entry.getKey(),
+				//			entry.getValue() );
+				//	}
+				//}
 
 				// travel card
 				final Boolean hasCard = (Boolean)

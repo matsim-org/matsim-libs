@@ -26,13 +26,6 @@ public class PersonRetailersImpl extends PersonImpl
     this.plans = p.getPlans();
     addPlan(p.getSelectedPlan());
     setSelectedPlan(p.getSelectedPlan());
-    this.desires = new MyDesires(p.getDesires());
-    createDesires(p.getDesires().toString());
-    
-    for (String actType:p.getDesires().getActivityDurations().keySet()) {
-    	Double actDur = p.getDesires().getActivityDuration(actType);
-    	this.desires.putActivityDuration(actType, actDur);
-    }
   }
    
 
@@ -43,9 +36,5 @@ public class PersonRetailersImpl extends PersonImpl
 
   public double getGlobalShopsUtility() {
     return this.globalShopsUtility;
-  }
-
-  public void modifyDesires(String actType, Double durs) {
-    desires.putActivityDuration(actType, durs);
   }
 }

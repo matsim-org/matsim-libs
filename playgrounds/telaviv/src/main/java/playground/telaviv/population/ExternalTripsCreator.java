@@ -206,7 +206,7 @@ public class ExternalTripsCreator {
 		Plan plan = populationFactory.createPlan();
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
-		Desires desires = person.createDesires("");
+		//Desires desires = person.createDesires("");
 		
 		LegImpl leg;
 		ActivityImpl activity;
@@ -253,7 +253,8 @@ public class ExternalTripsCreator {
 		/*
 		 * Finally add a tta desire that has a duration of 86400 - all other activities.
 		 */
-		desires.accumulateActivityDuration("tta", 86400);
+		//desires.accumulateActivityDuration("tta", 86400);
+		throw new RuntimeException( "desires do not exist anymore. Please do it another way or contact the core team." );
 	}
 	
 	/*

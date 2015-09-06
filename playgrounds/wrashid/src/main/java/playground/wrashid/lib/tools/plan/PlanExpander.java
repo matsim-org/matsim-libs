@@ -49,7 +49,7 @@ public class PlanExpander {
 		for (int i = 0; i < populationExpansionFactor; i++) {
 			for (Person origPerson : originalAgents) {
 				PersonImpl originPersonImpl=(PersonImpl) origPerson;
-				Desires originDesires = originPersonImpl.getDesires();
+				//Desires originDesires = originPersonImpl.getDesires();
 				
 				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
 				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());

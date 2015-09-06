@@ -301,12 +301,13 @@ public class PopulationCreator {
 	 */
 	private boolean createAndAddInitialPlan(PersonImpl person, ParsedPerson emme2Person, Scenario scenario,
 			Map<Integer, List<ActivityFacility>> facilitiesToZoneMap, Map<Integer, Emme2Zone> zonalAttributes) {
+		if ( true ) throw new RuntimeException( "desires do not exist anymore. Please find a way to do another way or contact the core team." );
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		Plan plan = populationFactory.createPlan();
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
-		Desires desires = person.createDesires("");
+		//Desires desires = person.createDesires("");
 
 		LegImpl leg;
 		ActivityImpl activity;
@@ -397,7 +398,7 @@ public class PopulationCreator {
 
 		// If we have no activity chains we have nothing left to do.
 		if (!hasPrimaryActivity && !hasSecondaryActivity) {
-			desires.accumulateActivityDuration("home", 86400);
+			//desires.accumulateActivityDuration("home", 86400);
 			return true;
 		}
 
@@ -440,7 +441,7 @@ public class PopulationCreator {
 				 * 0.0 seconds, which results in crashes in the scoring function (typical duration is 0.0
 				 * which leads to a divide by zero problem). 
 				 */
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = primaryPreFacility;
@@ -473,7 +474,7 @@ public class PopulationCreator {
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_1_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_1_MAIN);
-			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+			//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousFacility = primaryFacility;
@@ -507,7 +508,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_AFT);
 				activity.setEndTime(time + emme2Person.DUR_1_AFT);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = primaryPostFacility;
@@ -577,7 +578,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_BEF);
 				activity.setEndTime(time + emme2Person.DUR_2_BEF);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = secondaryPreFacility;
@@ -610,7 +611,7 @@ public class PopulationCreator {
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_2_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_2_MAIN);
-			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+			//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousFacility = secondaryFacility;
@@ -643,7 +644,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_AFT);
 				activity.setEndTime(time + emme2Person.DUR_2_AFT);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = secondaryPostFacility;
@@ -673,14 +674,14 @@ public class PopulationCreator {
 		 * Finally add a home desire that has a duration of 86400 - all other activities.
 		 */
 		double otherDurations = 0.0;
-		for (double duration : desires.getActivityDurations().values()) {
-			otherDurations = otherDurations + duration;
-		}
-		if (otherDurations < 86400) {
-			// make desired home duration not longer than 12 hours
-			double homeDuration = Math.min(12*3600, 86400 - otherDurations);
-			desires.accumulateActivityDuration("home", homeDuration);
-		}
+		//for (double duration : desires.getActivityDurations().values()) {
+		//	otherDurations = otherDurations + duration;
+		//}
+		//if (otherDurations < 86400) {
+		//	// make desired home duration not longer than 12 hours
+		//	double homeDuration = Math.min(12*3600, 86400 - otherDurations);
+		//	desires.accumulateActivityDuration("home", homeDuration);
+		//}
 		
 		// no errors have been found, so return true
 		return true;

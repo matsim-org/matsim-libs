@@ -202,17 +202,6 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 //
 //	}
 
-	private void setDesiresIfApplicable() {
-		for (Person p:getScenario().getPopulation().getPersons().values()){
-			PersonImpl person=(PersonImpl) p;
-			Desires desires = person.getDesires();
-			if (desires!=null){
-				// setting typical parking duration
-				// if missing, this causes score to become Infinity (e.g. kti scenario)
-				desires.putActivityDuration("parking", 180);
-			}
-		}
-	}
 
 	protected void startUpBegin() {
 		
