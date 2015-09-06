@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.NetworkRoutingModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -55,8 +56,12 @@ public final class DefaultRoutingModules {
 	}
 
 	public static RoutingModule createNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		LegRouter toWrap = new NetworkLegRouter(net, routeAlgo, ((PopulationFactoryImpl) popFact).getModeRouteFactory() ) ;
-		return new LegRouterWrapper( mode, popFact, toWrap ) ;
+		return new NetworkRoutingModule(
+				mode,
+				popFact,
+				net,
+				routeAlgo,
+				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
 	}
 
 }
