@@ -156,7 +156,7 @@ public class PersonImpl implements Person {
 	}
 
 	@Deprecated // use PersonAttributes
-	public void setAge(final int age) {
+	public void setAge(final Integer age) {
 		getCustomAttributes().put(AGE, age);
 	}
 
