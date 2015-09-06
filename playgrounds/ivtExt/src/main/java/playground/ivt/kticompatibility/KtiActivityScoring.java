@@ -38,7 +38,6 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.OpeningTime.DayType;
-import playground.ivt.utils.Desires;
 
 /**
  * Due to the abusive use of extension, the meisterk's KTI activity scoring
