@@ -119,7 +119,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		else {
-			delegate.addParam( key , value );
+			try {
+				delegate.addParam(key, value);
+			}
+			catch ( IllegalArgumentException e ) {
+				throw new IllegalArgumentException(
+						"Got an exception adding parameters "+key+". "+
+								"Did you use an old config (with underscores)? "+
+								"If so, you can convert it using org.matsim.run.ConvertOldPlanCalcScoreConfigGroup oldCOnfig newConfig");
+			}
 		}
 	}
 
