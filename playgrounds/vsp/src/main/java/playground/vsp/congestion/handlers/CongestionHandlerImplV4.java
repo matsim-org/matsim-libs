@@ -279,7 +279,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	 * @param map
 	 * @return a map sorted by its value in the reverse order (Descending order).
 	 */
-	private Map<Id<Person>,Double> sortByValues (Map<Id<Person>,Double> map) { 
+	private static Map<Id<Person>,Double> sortByValues (Map<Id<Person>,Double> map) { 
 
 		List<Entry<Id<Person>,Double>> list = new LinkedList<Entry<Id<Person>,Double>>(map.entrySet());
 		Comparator<Entry<Id<Person>,Double>> sortByValueComparator = new Comparator<Entry<Id<Person>,Double>> () {
