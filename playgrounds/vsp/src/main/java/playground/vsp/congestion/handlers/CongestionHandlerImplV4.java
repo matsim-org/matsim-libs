@@ -257,15 +257,15 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 					if(timeGap < marginalFlowDelay) {
 						double agentDelay = Math.min(marginalFlowDelay, remainingDelay);
-
+						// this person should be charged here.
 						CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", personId, event.getPersonId(), agentDelay, event.getLinkId(),
 								linkInfo.getPersonId2linkEnterTime().get(event.getPersonId()) );
 						this.getEventsManager().processEvent(congestionEvent); 
 						this.addToTotalInternalizedDelay(agentDelay);
 
 						remainingDelay = remainingDelay - agentDelay;
-						// this person should be charged here.
 					} else {
+						// since timeGap is higher than marginalFlowDelay, no need for further look up.
 						break;
 					}
 				}
@@ -276,6 +276,10 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	}
 
 
+	/**
+	 * @param map
+	 * @return a map sorted by its value in the reverse order (Descending order).
+	 */
 	private Map<Id<Person>,Double> sortByValues (Map<Id<Person>,Double> map) { 
 
 		List<Entry<Id<Person>,Double>> list = new LinkedList<Entry<Id<Person>,Double>>(map.entrySet());
