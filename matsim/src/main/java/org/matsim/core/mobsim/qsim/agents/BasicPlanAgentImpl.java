@@ -74,7 +74,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.getEvents().processEvent(new Link2WaitEvent(now, this.getId(), this.getDestinationLinkId(), this.vehicle.getId()));
+		this.getEvents().processEvent(new Link2WaitEvent(now, this.getId(), this.getDestinationLinkId(), this.vehicle.getId(), getCurrentLeg().getMode()));
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
