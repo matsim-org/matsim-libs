@@ -27,10 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.WrappedBinaryMinHeap;
-import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -80,7 +77,7 @@ import java.util.Set;
  * @author lnicolas
  * @author mrieser
  */
-public class Dijkstra implements IntermodalLeastCostPathCalculator {
+public class Dijkstra implements LeastCostPathCalculator {
 
 	private final static Logger log = Logger.getLogger(Dijkstra.class);
 
@@ -182,7 +179,10 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		}
 	}
 
-	@Override
+	/**
+	 * @deprecated Use a filtered network instead which only contains the links you want.
+	 */
+	@Deprecated
 	public void setModeRestriction(final Set<String> modeRestriction) {
 		if (modeRestriction == null) {
 			this.modeRestriction = null;

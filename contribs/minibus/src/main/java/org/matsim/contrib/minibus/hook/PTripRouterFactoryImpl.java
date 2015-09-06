@@ -33,11 +33,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
@@ -127,16 +123,17 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 			// of multimodality unecessary from a behavioral point of view.
 			// However, checking the mode restriction for each link is expensive,
 			// so it is not worth doing it if it is not necessary. (td, oct. 2012)
-			if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-				((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
+			if (routeAlgo instanceof Dijkstra) {
+				((Dijkstra) routeAlgo).setModeRestriction(
 					Collections.singleton( TransportMode.car ));
-				((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
+				((Dijkstra) routeAlgoPtFreeFlow).setModeRestriction(
 					Collections.singleton( TransportMode.car ));
 			}
 			else {
 				// this is impossible to reach when using the algorithms of org.matsim.*
 				// (all implement IntermodalLeastCostPathCalculator)
 				log.warn( "network is multimodal but least cost path algorithm is not an instance of IntermodalLeastCostPathCalculator!" );
+				throw new RuntimeException();
 			}
 		}
 

@@ -58,7 +58,6 @@ public class PopulationFactoryImplTest {
 
         Id<Link> linkId = Id.create(1, Link.class);
 		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
 	}
 
 	@Test
@@ -70,7 +69,6 @@ public class PopulationFactoryImplTest {
 
 		Id<Link> linkId = Id.create(1, Link.class);
 		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
-		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
 	}
 
 }
