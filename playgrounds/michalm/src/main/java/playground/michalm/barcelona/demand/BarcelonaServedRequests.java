@@ -37,7 +37,7 @@ public class BarcelonaServedRequests
     public static List<BarcelonaServedRequest> readRequests()
     {
         List<BarcelonaServedRequest> requests = new ArrayList<>();
-        String file = "d:/PP-rad/Barcelona/served_requests/tripsBCN.csv";
+        String file = "d:/PP-rad/Barcelona/data/served_requests/tripsBCN.csv";
         new BarcelonaServedRequestsReader(requests).readFile(file);
         return requests;
     }

@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.sergioo.visualizer2D2012.LayersPanel;
@@ -85,7 +84,7 @@ public class WeeklyPlanPainter extends Painter {
 			width = 0.5;
 			height = (endTime-startTime)/3600;
 		}
-		Coord ldCorner = new CoordImpl(x, y);
+		Coord ldCorner = new Coord(x, y);
 		if(planElement instanceof Activity) {
 			Color color = TYPE_ACTIVITY_COLORS.get(((Activity)planElement).getType());
 			if(color==null)
@@ -94,12 +93,12 @@ public class WeeklyPlanPainter extends Painter {
 				if(isHorizontal) {
 					double widthO = 24-ldCorner.getX();
 					paintRectangle(g2, layersPanel, ldCorner, widthO, height, color);
-					paintRectangle(g2, layersPanel, new CoordImpl(0, y+1), width-widthO, height, color);
+					paintRectangle(g2, layersPanel, new Coord((double) 0, y + 1), width-widthO, height, color);
 				}
 				else {
 					double heightO = ldCorner.getY()-24;
-					paintRectangle(g2, layersPanel, new CoordImpl(x, 24), width, height-heightO, color);
-					paintRectangle(g2, layersPanel, new CoordImpl(x+1, ldCorner.getY()-24), width, heightO, color);
+					paintRectangle(g2, layersPanel, new Coord(x, (double) 24), width, height-heightO, color);
+					paintRectangle(g2, layersPanel, new Coord(x + 1, ldCorner.getY() - 24), width, heightO, color);
 				}
 			else
 				paintRectangle(g2, layersPanel, ldCorner, width, height, color);
@@ -110,12 +109,12 @@ public class WeeklyPlanPainter extends Painter {
 				if(isHorizontal) {
 					double widthO = 24-ldCorner.getX();
 					paintRectangleBorder(g2, layersPanel, ldCorner, widthO, height, color);
-					paintRectangleBorder(g2, layersPanel, new CoordImpl(0, y+1), width-widthO, height, color);
+					paintRectangleBorder(g2, layersPanel, new Coord((double) 0, y + 1), width-widthO, height, color);
 				}
 				else {
 					double heightO = 24-ldCorner.getY();
-					paintRectangleBorder(g2, layersPanel, new CoordImpl(x, 24), width, heightO, color);
-					paintRectangleBorder(g2, layersPanel, new CoordImpl(x+1, ldCorner.getY()-24), width, height-heightO, color);
+					paintRectangleBorder(g2, layersPanel, new Coord(x, (double) 24), width, heightO, color);
+					paintRectangleBorder(g2, layersPanel, new Coord(x + 1, ldCorner.getY() - 24), width, height-heightO, color);
 				}
 			else
 				paintRectangleBorder(g2, layersPanel, ldCorner, width, height, color);

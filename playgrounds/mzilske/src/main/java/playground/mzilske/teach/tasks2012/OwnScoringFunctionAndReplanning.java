@@ -107,7 +107,7 @@ public class OwnScoringFunctionAndReplanning {
 		private CharyparNagelScoringFunctionFactory delegate;
 		
 		public MyScoringFunctionFactory(Config config, Network network) {
-			this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), network);
+			this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), network);
 		}
 
 		@Override

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -25,7 +26,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class VisumFile2MatsimNetwork {
 	
@@ -175,7 +175,7 @@ public class VisumFile2MatsimNetwork {
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
 			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
-			node.setCoord(new CoordImpl(Double.parseDouble(parts[columnsIndices[1]]),Double.parseDouble(parts[columnsIndices[2]])));
+			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			network.addNode(node);
 			line=reader.readLine();
 		}
@@ -191,7 +191,7 @@ public class VisumFile2MatsimNetwork {
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
 			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
-			node.setCoord(new CoordImpl(Double.parseDouble(parts[columnsIndices[1]]),Double.parseDouble(parts[columnsIndices[2]])));
+			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			Id<Node> repeated = null;
 			for(Id<Node> idB:nodesRep.keySet())
 				if(network.getNodes().get(idB).getCoord().equals(node.getCoord()))

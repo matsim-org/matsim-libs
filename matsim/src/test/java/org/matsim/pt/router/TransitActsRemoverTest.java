@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 
 public class TransitActsRemoverTest extends TestCase {
@@ -37,7 +36,7 @@ public class TransitActsRemoverTest extends TestCase {
 	
 	public void testNormalTransitPlan() {
 		PlanImpl plan = new PlanImpl();
-		Coord dummyCoord = new CoordImpl(0, 0);
+		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(new ActivityImpl("h", dummyCoord));
 
 		plan.addLeg(new LegImpl(TransportMode.transit_walk));
@@ -92,7 +91,7 @@ public class TransitActsRemoverTest extends TestCase {
 	
 	public void testPlanWithoutLegs() {
 		PlanImpl plan = new PlanImpl();
-		Coord dummyCoord = new CoordImpl(0, 0);
+		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(new ActivityImpl("h", dummyCoord));
 		new TransitActsRemover().run(plan);
 		assertEquals(1, plan.getPlanElements().size());
@@ -101,7 +100,7 @@ public class TransitActsRemoverTest extends TestCase {
 
 	public void testWalkOnlyPlan() {
 		PlanImpl plan = new PlanImpl();
-		Coord dummyCoord = new CoordImpl(0, 0);
+		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(new ActivityImpl("h", dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.transit_walk));
 		plan.addActivity(new ActivityImpl("w", dummyCoord));
@@ -112,7 +111,7 @@ public class TransitActsRemoverTest extends TestCase {
 	
 	public void testNoTransitActPlan() {
 		PlanImpl plan = new PlanImpl();
-		Coord dummyCoord = new CoordImpl(0, 0);
+		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(new ActivityImpl("h", dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.car));
 		plan.addActivity(new ActivityImpl("w", dummyCoord));

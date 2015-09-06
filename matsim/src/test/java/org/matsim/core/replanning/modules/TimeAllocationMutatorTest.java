@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +32,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
@@ -81,10 +81,10 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		// setup network
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
@@ -160,10 +160,10 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		// setup network
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);

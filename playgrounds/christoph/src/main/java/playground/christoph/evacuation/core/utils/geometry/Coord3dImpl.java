@@ -20,7 +20,6 @@
 
 package playground.christoph.evacuation.core.utils.geometry;
 
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 

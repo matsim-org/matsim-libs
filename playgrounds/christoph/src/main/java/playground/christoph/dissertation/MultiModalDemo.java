@@ -22,6 +22,7 @@ package playground.christoph.dissertation;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,7 +61,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -254,13 +254,13 @@ public class MultiModalDemo {
 
 	private static void createNetwork(Scenario scenario) {
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
-		
-		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(0.0, 0.0));
-		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(100.0, 0.0));
-		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(100.0, 1000.0));
-		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(2100.0, 1000.0));
-		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(2100.0, 0.0));
-		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(2200.0, 0.0));
+
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), new Coord(100.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord(100.0, 1000.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord(2100.0, 1000.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord(2100.0, 0.0));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), new Coord(2200.0, 0.0));
 		
 		scenario.getNetwork().addNode(n1);
 		scenario.getNetwork().addNode(n2);
@@ -607,9 +607,9 @@ public class MultiModalDemo {
 		createNetwork(sc);
 		
 		NetworkFactory networkFactory = sc.getNetwork().getFactory();
-		
-		Node dummyNode1 = networkFactory.createNode(Id.create("dummyNode1", Node.class), sc.createCoord(0.0, 0.0));
-		Node dummyNode2 = networkFactory.createNode(Id.create("dummyNode2", Node.class), sc.createCoord(100.0, 0.0));
+
+		Node dummyNode1 = networkFactory.createNode(Id.create("dummyNode1", Node.class), new Coord(0.0, 0.0));
+		Node dummyNode2 = networkFactory.createNode(Id.create("dummyNode2", Node.class), new Coord(100.0, 0.0));
 		
 		Link dummyLink = networkFactory.createLink(Id.create("dummyLink", Link.class), dummyNode1, dummyNode2);
 		dummyLink.setLength(1000.0);
@@ -891,7 +891,7 @@ public class MultiModalDemo {
 				
 				LeastCostPathCalculator leastCostPathCalculator = new MultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTime);
-				((IntermodalLeastCostPathCalculator) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
+				((Dijkstra) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
 				
 				leastCostPathCalculators.put(mode, leastCostPathCalculator);
 			}

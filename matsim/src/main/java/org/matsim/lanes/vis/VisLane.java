@@ -22,7 +22,6 @@ package org.matsim.lanes.vis;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.awt.geom.Point2D;
@@ -51,7 +50,7 @@ public class VisLane implements Serializable {
 	private List<String> toLinkIds;
 	private transient List<VisLinkWLanes> toLinksData = null;
 	private double euklideanDistance;
-	private CoordImpl startCoord;
+	private Coord startCoord;
 	private Coord endCoord; 
 	private Map<Integer, Tuple<Coord, Coord>> drivingLaneMap = null;
 	
@@ -140,8 +139,8 @@ public class VisLane implements Serializable {
 	}
 	
 	private void calcCoords(){
-		this.startCoord = new CoordImpl(startPoint.x, startPoint.y);
-		this.endCoord = new CoordImpl(endPoint.x, endPoint.y);
+		this.startCoord = new Coord(startPoint.x, startPoint.y);
+		this.endCoord = new Coord(endPoint.x, endPoint.y);
 		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
 	}
 
@@ -149,7 +148,7 @@ public class VisLane implements Serializable {
 		if (this.drivingLaneMap == null){
 			this.drivingLaneMap = new HashMap<Integer, Tuple<Coord, Coord>>();
 		}
-		Tuple<Coord, Coord> tuple = new Tuple<Coord, Coord>(new CoordImpl(drivingLaneStart.x, drivingLaneStart.y), new CoordImpl(drivingLaneEnd.x, drivingLaneEnd.y));
+		Tuple<Coord, Coord> tuple = new Tuple<Coord, Coord>(new Coord(drivingLaneStart.x, drivingLaneStart.y), new Coord(drivingLaneEnd.x, drivingLaneEnd.y));
 		this.drivingLaneMap.put(laneNumber, tuple);
 	}
 	

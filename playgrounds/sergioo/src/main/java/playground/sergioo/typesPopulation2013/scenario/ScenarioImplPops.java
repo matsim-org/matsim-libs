@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.sergioo.typesPopulation2013.scenario;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -61,11 +60,6 @@ public class ScenarioImplPops implements Scenario {
 	@Override
 	public Config getConfig() {
 		return delegate.getConfig();
-	}
-
-	@Override
-	public Coord createCoord(double x, double y) {
-		return delegate.createCoord(x, y);
 	}
 
 	@Override

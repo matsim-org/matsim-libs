@@ -10,12 +10,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +42,6 @@ import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -90,7 +90,7 @@ public class UCSBptNetworkParser {
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			if (!node.getId().toString().startsWith("pn-")) {
 				TransitStopFacility transitStopFacility =
-						transitSchedule.getFactory().createTransitStopFacility(Id.create("stop-"+node.getId().toString(), TransitStopFacility.class), new CoordImpl(node.getCoord()), false);
+						transitSchedule.getFactory().createTransitStopFacility(Id.create("stop-"+node.getId().toString(), TransitStopFacility.class), new Coord(node.getCoord().getX(), node.getCoord().getY()), false);
 				transitSchedule.addStopFacility(transitStopFacility);
 				transitStopFacility.setName((String)nodeObjectAttributes.getAttribute(node.getId().toString(),DESC_NAME));
 
@@ -325,7 +325,7 @@ public class UCSBptNetworkParser {
 				Coordinate c = new Coordinate((f.getBounds().getMinX() + f.getBounds().getMaxX())/2.0, (f.getBounds().getMinY() + f.getBounds().getMaxY())/2.0);
 				
 				// add node
-				Node n = network.getFactory().createNode(nodeId,new CoordImpl(c.x,c.y));
+				Node n = network.getFactory().createNode(nodeId, new Coord(c.x, c.y));
 				network.addNode(n);
 
 				// add node attributes
@@ -354,7 +354,7 @@ public class UCSBptNetworkParser {
 					network.addLink(link);
 				}
 				else { // a new line: insert a pseudo link for the stop facility
-					Node pseudoNode = network.getFactory().createNode(Id.create("pn-"+nodeId.toString(), Node.class),new CoordImpl(c.x,c.y));
+					Node pseudoNode = network.getFactory().createNode(Id.create("pn-"+nodeId.toString(), Node.class), new Coord(c.x, c.y));
 					network.addNode(pseudoNode);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),ILIN_NAME,ilinId);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,-1); // -100 feet

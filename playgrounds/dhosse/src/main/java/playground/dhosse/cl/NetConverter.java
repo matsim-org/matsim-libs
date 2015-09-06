@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.type.FeatureTypeFactoryImpl;
-import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,9 +32,6 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

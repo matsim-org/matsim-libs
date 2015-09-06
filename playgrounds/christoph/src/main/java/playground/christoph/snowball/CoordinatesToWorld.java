@@ -37,6 +37,7 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -181,7 +182,7 @@ public class CoordinatesToWorld {
 			} catch (NumberFormatException nfe) {
 				continue;
 			}
-			Node node = factory.createNode(Id.create(line.Alter_MergeParameter, Node.class), scenario.createCoord(x, y));
+			Node node = factory.createNode(Id.create(line.Alter_MergeParameter, Node.class), new Coord(x, y));
 			network.addNode(node);
 		}
 		

@@ -49,7 +49,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	}
 
 	private static final Logger log = Logger.getLogger(TransitAgentImpl.class);
-	
+
 	@Override
 	public final  boolean getExitAtStop(final TransitStopFacility stop) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) basicAgentDelegate.getCurrentLeg().getRoute();
@@ -68,7 +68,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 
 	@SuppressWarnings("static-method")
 	private final boolean containsId(List<TransitRouteStop> stopsToCome,
-                       Id<TransitStopFacility> egressStopId) {
+			Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
@@ -127,6 +127,11 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	@Override
 	public Id<Person> getId() {
 		return basicAgentDelegate.getId() ;
+	}
+
+	@Override
+	public String getMode() {
+		return basicAgentDelegate.getMode() ;
 	}
 
 }

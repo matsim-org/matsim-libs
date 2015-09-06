@@ -70,7 +70,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -161,8 +160,15 @@ public class MainWorkplaceCapacities {
 	private static ActivityFacilities buildings;
 	//private static Coord downLeft = new CoordImpl(103.83355, 1.2814);
 	//private static Coord upRight = new CoordImpl(103.8513, 1.2985);
-	private static Coord downLeft = new CoordImpl(-Double.MAX_VALUE, -Double.MAX_VALUE);
-	private static Coord upRight = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+	private static Coord downLeft;
+
+	static {
+		final double x = -Double.MAX_VALUE;
+		final double y = -Double.MAX_VALUE;
+		downLeft = new Coord(x, y);
+	}
+
+	private static Coord upRight = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
 	private static HashMap<String, Double> workerAreas = new HashMap<String, Double>();
 	//Main
 	/**
@@ -203,7 +209,7 @@ public class MainWorkplaceCapacities {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		ResultSet stopsResult = dataBaseAux.executeQuery("SELECT * FROM stops");
 		while(stopsResult.next())
-			stopsBase.put(stopsResult.getString(1), new CoordImpl(stopsResult.getDouble(3), stopsResult.getDouble(2)));
+			stopsBase.put(stopsResult.getString(1), new Coord(stopsResult.getDouble(3), stopsResult.getDouble(2)));
 		stopsResult.close();
 		dataBaseAux.close();
 		System.out.println("Stops done!");
@@ -557,7 +563,7 @@ public class MainWorkplaceCapacities {
 			while(mPAreasR.next()) {
 				ResultSet mPAreasR2 = dataBaseAuxiliar.executeQuery("SELECT ZoneID,`Pu/Pr` FROM DCM_mplan_zones_modeshares WHERE objectID="+mPAreasR.getInt(1));
 				mPAreasR2.next();
-				dataMPAreas.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), new MPAreaData(Id.create(mPAreasR.getString(1), ActivityFacility.class), coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), Id.create(mPAreasR2.getInt(1), ActivityFacility.class), mPAreasR2.getDouble(2)));
+				dataMPAreas.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), new MPAreaData(Id.create(mPAreasR.getString(1), ActivityFacility.class), coordinateTransformation.transform(new Coord(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), Id.create(mPAreasR2.getInt(1), ActivityFacility.class), mPAreasR2.getDouble(2)));
 			}
 			mPAreasR.close();
 			dataBaseAuxiliar.close();
@@ -989,7 +995,7 @@ public class MainWorkplaceCapacities {
 			System.out.println("Matrix written!");
 		}
 		Matrix3DImpl matrix = (Matrix3DImpl)capacities;
-		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new CoordImpl(0,0));
+		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord((double) 0, (double) 0));
 		for(int o=0; o<matrix.getDimension(1); o++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(o).getPoints())
@@ -1068,7 +1074,7 @@ public class MainWorkplaceCapacities {
 			modeShareZone.difference += getMaxCapacity(mPArea)-capacity;
 		}
 		System.out.println("Zones done!");
-		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new CoordImpl(0,0));
+		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord((double) 0, (double) 0));
 		for(int c=0; c<matrixCapacities[0].length; c++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(c).getPoints())
@@ -1126,7 +1132,7 @@ public class MainWorkplaceCapacities {
 			Id<ActivityFacility> id = Id.create((int)(buildingsR.getFloat(5)), ActivityFacility.class);
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
-			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new Coord(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			building.setLinkId(((NetworkImpl)network).getNearestLinkExactly(building.getCoord()).getId());
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double proportion = buildingsR.getDouble(4);

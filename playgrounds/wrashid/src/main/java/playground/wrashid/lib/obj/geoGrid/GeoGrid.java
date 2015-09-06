@@ -2,12 +2,10 @@ package playground.wrashid.lib.obj.geoGrid;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class GeoGrid {
@@ -96,7 +94,7 @@ public class GeoGrid {
 		// TODO: make this more efficient (don't iterate throug all fields!!!!
 		for (int i = - degree ; i < degree ; i++) {
 			for (int j = -degree; j < degree; j++) {
-				String tmpCoordKey = getGridKeyFromCoordinate(new CoordImpl(coord.getX() + i * sideLengthInMeters, coord.getY()
+				String tmpCoordKey = getGridKeyFromCoordinate(new Coord(coord.getX() + i * sideLengthInMeters, coord.getY()
 						+ j * sideLengthInMeters));
 				if (valuesInGrid.containsKey(tmpCoordKey)) {
 					someValueFound = true;

@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -32,7 +33,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -55,8 +55,8 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 	public WalkSpeedComparator() {
 				
 		NetworkFactory factory = new NetworkFactoryImpl(NetworkImpl.createNetwork());
-		Node startNode = factory.createNode(Id.create("startNode", Node.class), new CoordImpl(0.0, 0.0));
-		Node endNode = factory.createNode(Id.create("endNode", Node.class), new CoordImpl(1.0, 0.0));
+		Node startNode = factory.createNode(Id.create("startNode", Node.class), new Coord(0.0, 0.0));
+		Node endNode = factory.createNode(Id.create("endNode", Node.class), new Coord(1.0, 0.0));
 		link = factory.createLink(Id.create("link", Link.class), startNode, endNode);
 		link.setLength(1.0);
 		

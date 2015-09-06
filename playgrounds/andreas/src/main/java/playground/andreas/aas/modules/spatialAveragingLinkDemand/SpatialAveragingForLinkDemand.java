@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
@@ -220,7 +219,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 	private Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);
 		double yCentroid = findBinCenterY(yIndex);
-		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
+		Coord cellCentroid = new Coord(xCentroid, yCentroid);
 		return cellCentroid;
 	}
 

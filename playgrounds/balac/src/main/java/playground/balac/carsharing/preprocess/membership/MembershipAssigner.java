@@ -19,7 +19,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -65,7 +64,7 @@ public class MembershipAssigner
   private double computeAccessCSWork(PersonImpl pi)
   {
     Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
-    Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+    Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
     double access = 0.0D;
     
     
@@ -94,7 +93,7 @@ public class MembershipAssigner
   private double computeAccessCSHome(PersonImpl pi)
   {
     Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
-    Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+    Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
     double access = 0.0D;
     for (PlanElement pe : pi.getSelectedPlan().getPlanElements())
     {
@@ -252,7 +251,7 @@ public class MembershipAssigner
 
   private double computeDensityHome(FlexTransPersonImpl pi)
   {
-    Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+    Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
 
     for (PlanElement pe : pi.getSelectedPlan().getPlanElements())
     {

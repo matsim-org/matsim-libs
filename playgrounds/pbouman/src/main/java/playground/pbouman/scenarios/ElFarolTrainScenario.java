@@ -130,15 +130,15 @@ public class ElFarolTrainScenario
 		NetworkFactory nw = net.getFactory();
 		
 		Node a, b, c, u, v, w;
-		
+
 		Node [] nodes = new Node [] {
-				a = nw.createNode(Id.create("a", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 - ySpan)),
-				b = nw.createNode(Id.create("b", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 + ySpan)),
-				c = nw.createNode(Id.create("c", Node.class), scen.createCoord(boxSize/2, boxSize / 2)),
+				a = nw.createNode(Id.create("a", Node.class), new Coord(boxSize / 2, boxSize / 2 - ySpan)),
+				b = nw.createNode(Id.create("b", Node.class), new Coord(boxSize / 2, boxSize / 2 + ySpan)),
+				c = nw.createNode(Id.create("c", Node.class), new Coord(boxSize / 2, boxSize / 2)),
 		
-				u = nw.createNode(Id.create("u", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
-				v = nw.createNode(Id.create("v", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
-				w = nw.createNode(Id.create("w", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2)),
+				u = nw.createNode(Id.create("u", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
+				v = nw.createNode(Id.create("v", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
+				w = nw.createNode(Id.create("w", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2)),
 		};
 		
 		for (Node n : nodes)
@@ -281,14 +281,14 @@ public class ElFarolTrainScenario
 			
 			Person p = popFac.createPerson(Id.create("Agent"+t, Person.class));
 			Plan plan = popFac.createPlan();
-			
-			ActivityImpl homeAct = (ActivityImpl) popFac.createActivityFromCoord("home", scen.createCoord(ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
+
+			ActivityImpl homeAct = (ActivityImpl) popFac.createActivityFromCoord("home", new Coord(ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
 			homeAct.setEndTime(workP[index].getOpeningTime() - longDist/speed - headWay);
 			plan.addActivity(homeAct);
 			plan.addLeg(popFac.createLeg(mode));
-			
+
 			ActivityImpl workAct = (ActivityImpl) popFac.createActivityFromCoord("work"+index,
-					scen.createCoord(longDist + boxSize + ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
+					new Coord(longDist + boxSize + ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
 			workAct.setEndTime(workP[index].getEarliestEndTime());
 			plan.addActivity(workAct);
 			plan.addLeg(popFac.createLeg(mode));

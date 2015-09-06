@@ -213,12 +213,12 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			}
 			this.curract = new ActivityImpl(atts.getValue(ATTR_ACT_TYPE), coord, linkId);
 			this.currplan.addActivity(curract);
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			this.curract = new ActivityImpl(atts.getValue(ATTR_ACT_TYPE), coord);
 			this.currplan.addActivity(curract);
 		} else {

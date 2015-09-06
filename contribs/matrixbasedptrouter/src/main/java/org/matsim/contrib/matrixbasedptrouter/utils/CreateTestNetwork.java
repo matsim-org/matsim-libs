@@ -26,7 +26,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -76,15 +74,15 @@ public final class CreateTestNetwork {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), scenario.createCoord(0, 100));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), scenario.createCoord(0, 200));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), scenario.createCoord(0, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), scenario.createCoord(100, 100));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), scenario.createCoord(100, 200));
-		Node node6 = network.createAndAddNode(Id.create(6, Node.class), scenario.createCoord(100, 0));
-		Node node7 = network.createAndAddNode(Id.create(7, Node.class), scenario.createCoord(200, 100));
-		Node node8 = network.createAndAddNode(Id.create(8, Node.class), scenario.createCoord(200, 200));
-		Node node9 = network.createAndAddNode(Id.create(9, Node.class), scenario.createCoord(200, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 100));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 0, (double) 200));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 100, (double) 100));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 100, (double) 200));
+		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 100, (double) 0));
+		Node node7 = network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 200, (double) 100));
+		Node node8 = network.createAndAddNode(Id.create(8, Node.class), new Coord((double) 200, (double) 200));
+		Node node9 = network.createAndAddNode(Id.create(9, Node.class), new Coord((double) 200, (double) 0));
 
 		// add links (bi-directional)
 		network.createAndAddLink(Id.create( 1, Link.class), node1, node2, 100, freespeed, capacity, numLanes);
@@ -196,10 +194,12 @@ public final class CreateTestNetwork {
 		 */   
 
 		List<Coord> facilityList = new ArrayList<Coord>();
-		facilityList.add(new CoordImpl(10, -40));  // 50m to pt station 1
-		facilityList.add(new CoordImpl(10, 240));  // 50m to pt station 2
-		facilityList.add(new CoordImpl(190, 240)); // 50m to pt station 3
-		facilityList.add(new CoordImpl(190, -40)); // 50m to pt station 4
+		final double y1 = -40;
+		facilityList.add(new Coord((double) 10, y1));  // 50m to pt station 1
+		facilityList.add(new Coord((double) 10, (double) 240));  // 50m to pt station 2
+		facilityList.add(new Coord((double) 190, (double) 240)); // 50m to pt station 3
+		final double y = -40;
+		facilityList.add(new Coord((double) 190, y)); // 50m to pt station 4
 		return facilityList;
 	}
 
@@ -226,10 +226,10 @@ public final class CreateTestNetwork {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), scenario.createCoord(50, 100));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), scenario.createCoord(50, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), scenario.createCoord(100, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 100));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 50, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 100, (double) 0));
 
 		// add links
 		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);

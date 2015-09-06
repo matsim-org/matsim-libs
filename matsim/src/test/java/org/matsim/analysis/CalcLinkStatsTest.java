@@ -24,6 +24,7 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -50,10 +51,10 @@ public class CalcLinkStatsTest {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		
-		Node node1 = nf.createNode(Id.create("1", Node.class), s.createCoord(0, 0));
-		Node node2 = nf.createNode(Id.create("2", Node.class), s.createCoord(1000, 0));
-		Node node3 = nf.createNode(Id.create("3", Node.class), s.createCoord(2000, 0));
+
+		Node node1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -124,10 +125,10 @@ public class CalcLinkStatsTest {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = s.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		
-		Node node1 = nf.createNode(Id.create("1", Node.class), s.createCoord(0, 0));
-		Node node2 = nf.createNode(Id.create("2", Node.class), s.createCoord(1000, 0));
-		Node node3 = nf.createNode(Id.create("3", Node.class), s.createCoord(2000, 0));
+
+		Node node1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);

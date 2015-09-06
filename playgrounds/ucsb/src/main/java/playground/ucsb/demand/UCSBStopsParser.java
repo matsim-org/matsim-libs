@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -55,7 +54,13 @@ public class UCSBStopsParser {
 	private final static Logger log = Logger.getLogger(UCSBStopsParser.class);
 
 	private final Random r = MatsimRandom.getRandom();
-	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
+	private final Coord DEFAULT_COORD;
+
+	{
+		final double x = -1.0;
+		final double y = -1.0;
+		DEFAULT_COORD = new Coord(x, y);
+	}
 
 	private static final String HID = "HID";
 	private static final String PID = "PID";

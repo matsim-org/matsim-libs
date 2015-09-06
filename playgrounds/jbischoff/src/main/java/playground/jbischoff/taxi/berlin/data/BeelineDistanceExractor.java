@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.util.DistanceUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -97,9 +96,9 @@ public class BeelineDistanceExractor
     public double calcDistance(Id<Zone> zoneID, Id<Zone> secondZoneId)
     {
         Point p = this.zones.get(zoneID).getMultiPolygon().getCentroid();
-        Coord z1 = new CoordImpl(p.getX(),p.getY());
+        Coord z1 = new Coord(p.getX(), p.getY());
         Point p2 = this.zones.get(secondZoneId).getMultiPolygon().getCentroid();
-        Coord z2 = new CoordImpl(p2.getX(),p2.getY());
+        Coord z2 = new Coord(p2.getX(), p2.getY());
         double dist = DistanceUtils.calculateDistance(z1,z2) / 1000;
         return dist;
     }

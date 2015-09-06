@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -167,11 +166,11 @@ import org.xml.sax.Attributes;
 			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-				coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
+				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-			coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
+			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");

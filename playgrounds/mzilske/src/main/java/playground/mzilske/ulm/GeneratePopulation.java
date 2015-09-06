@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -63,7 +62,7 @@ class GeneratePopulation {
 	private Coord randomCoord() {
 		int nFac = (int) (transitSchedule.getFacilities().size() * Math.random());
 		Coord coord = facs.get(nFac).getCoord();
-		return new CoordImpl(coord.getX() + Math.random()*1000, coord.getY() + Math.random()*1000);
+		return new Coord(coord.getX() + Math.random() * 1000, coord.getY() + Math.random() * 1000);
 	}
 
 	private List<Leg> createLeg() {

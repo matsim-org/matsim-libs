@@ -21,10 +21,10 @@ package playground.wrashid.parkingSearch.planLevel.linkFacilityMapping;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -60,7 +60,7 @@ public class LinkParkingFacilityAssociation extends LinkFacilityAssociation {
 			
 			
 			// DEBUG INFO: display parking facilities
-			if (GeneralLib.getDistance(new CoordImpl(4528426.090831845,5822407.437950259), network.getLinks().get(facilityLink).getCoord())<5000){
+			if (GeneralLib.getDistance(new Coord(4528426.090831845, 5822407.437950259), network.getLinks().get(facilityLink).getCoord())<5000){
 				ParkingRoot.getMapDebugTrace().addPointCoordinate(network.getLinks().get(facilityLink).getCoord(), facilityLink.toString(), Color.GREEN);
 			}
 		}

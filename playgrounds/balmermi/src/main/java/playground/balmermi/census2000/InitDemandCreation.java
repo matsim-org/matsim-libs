@@ -21,17 +21,18 @@
 package playground.balmermi.census2000;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
@@ -67,15 +68,14 @@ public class InitDemandCreation {
 
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		ScenarioImpl scenario = (ScenarioImpl) sl.getScenario();
-		Config config = scenario.getConfig();
-		World world = new World();
-
-		System.out.println("  reading facilities xml file... ");
-		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		System.out.println("  done.");
+		World world = new World();
+		
 
 		System.out.println("  reading matrices xml file... ");
 		Matrices matrices = new Matrices();

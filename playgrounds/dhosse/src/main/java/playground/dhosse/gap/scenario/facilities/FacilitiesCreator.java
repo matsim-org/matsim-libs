@@ -10,7 +10,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -144,8 +143,8 @@ public class FacilitiesCreator {
 			while((line = reader.readLine()) != null){
 				
 				String[] parts = line.split(",");
-				
-				Coord coord = Global.ct.transform(new CoordImpl(Double.parseDouble(parts[idxX]), Double.parseDouble(parts[idxY])));
+
+				Coord coord = Global.ct.transform(new Coord(Double.parseDouble(parts[idxX]), Double.parseDouble(parts[idxY])));
 				
 				ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(Global.ActType.work.name() + "_" + counter, ActivityFacility.class), coord);
 				ActivityOption work = scenario.getActivityFacilities().getFactory().createActivityOption(Global.ActType.work.name());

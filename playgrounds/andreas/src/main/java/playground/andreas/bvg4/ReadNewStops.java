@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -65,8 +65,8 @@ public class ReadNewStops implements TabularFileHandler {
 				double yCoord = Double.valueOf(row[2].trim());
 				Id<Link> linkId = Id.create(row[3].trim(), Link.class);
 				String stopName = row[4].trim();
-				
-				TransitStopFacility stop = fac.createTransitStopFacility(stopId, new CoordImpl(xCoord, yCoord), false);
+
+				TransitStopFacility stop = fac.createTransitStopFacility(stopId, new Coord(xCoord, yCoord), false);
 				stop.setLinkId(linkId);
 				stop.setName(stopName);
 

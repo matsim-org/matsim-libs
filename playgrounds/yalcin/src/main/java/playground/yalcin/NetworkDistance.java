@@ -41,7 +41,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -155,8 +154,8 @@ public class NetworkDistance {
 				 * parts[8]: ToX
 				 * parts[9]: ToY
 				 */
-				Coord fromCoord = new CoordImpl(parts[4], parts[5]);
-				Coord toCoord = new CoordImpl(parts[8], parts[9]);
+				Coord fromCoord = new Coord(Double.parseDouble(parts[4]), Double.parseDouble(parts[5]));
+				Coord toCoord = new Coord(Double.parseDouble(parts[8]), Double.parseDouble(parts[9]));
 				Node fromNode = network.getNearestNode(fromCoord);
 				Node toNode = network.getNearestNode(toCoord);
 

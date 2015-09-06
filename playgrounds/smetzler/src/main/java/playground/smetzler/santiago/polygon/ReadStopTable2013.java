@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -80,10 +79,10 @@ public class ReadStopTable2013 implements TabularFileHandler {
 				String crossingStreetA = row[5];
 				String crossingStreetB = row[6];
 				String stopArea = row[7];
-				
-				Coord coordCartesian = new CoordImpl(row[8], row[9]);
-				
-				Coord coordLatLong = new CoordImpl(row[10], row[11]);
+
+				Coord coordCartesian = new Coord(Double.parseDouble(row[8]), Double.parseDouble(row[9]));
+
+				Coord coordLatLong = new Coord(Double.parseDouble(row[10]), Double.parseDouble(row[11]));
 				
 				String censal1992 = row[12];
 				String comunas = row[13];

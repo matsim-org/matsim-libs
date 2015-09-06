@@ -17,7 +17,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -75,7 +74,7 @@ public class GtiActivityRelocator {
 		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "population_Gti.xml.gz");
 		
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(gar.cpr.getScenario().getHouseholds().getHouseholdAttributes());
-		oaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		oaw.putAttributeConverter(Coord.class, new CoordConverter());
 		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "householdAttributes_Gti.xml.gz");
 		
 		Header.printFooter();
@@ -159,7 +158,7 @@ public class GtiActivityRelocator {
 					os instanceof String){
 				/* Get the point and its associated coordinates. */
 				Point ps = (Point)geo;
-				Coord c = new CoordImpl(ps.getX(), ps.getY());
+				Coord c = new Coord(ps.getX(), ps.getY());
 				Coord cc = ct.transform(c);
 				
 				/* Establish a facility for the point. */

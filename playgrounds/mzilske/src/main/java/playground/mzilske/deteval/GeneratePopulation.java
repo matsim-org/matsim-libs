@@ -777,14 +777,14 @@ public class GeneratePopulation {
 
 	private Coord createRandomCoord(Integer integer) {
 		Point point = getRandomPointInFeature(rnd, verkehrszellen.get(integer));
-		return scenario.createCoord(point.getX(), point.getY());
+		return new Coord(point.getX(), point.getY());
 	}
 
 	private Coord createCentroidCoordIfAvailable(Integer integer) {
 		SimpleFeature verkehrszelle = verkehrszellen.get(integer);
 		if (verkehrszelle != null) {
 			Point point = ((Geometry) verkehrszelle.getDefaultGeometry()).getCentroid();
-			return scenario.createCoord(point.getX(), point.getY());
+			return new Coord(point.getX(), point.getY());
 		} else {
 			return null;
 		}

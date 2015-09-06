@@ -50,11 +50,6 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 					this.endTravelCard(writer);
 				}
 			}
-			// desires
-			if (p.getDesires() != null) {
-				log.error("Desires are no longer supported and will not be written to file!");
-			}
-
 		}
 		// plans
 		for (Plan plan : person.getPlans()) {

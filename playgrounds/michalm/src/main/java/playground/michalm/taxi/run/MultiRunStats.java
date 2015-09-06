@@ -52,7 +52,7 @@ public class MultiRunStats
                         + "%.0f\t"//
                         + "%.0f\t"//
                         + "%.2f\t"//
-                        + "%.1f\n"//
+                        + "%.1f\t"//
                         + "%.1f\n", //
                 cfg, //
                 data.getRequests().size(), //

@@ -29,7 +29,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -72,7 +71,7 @@ public class ApproximatelyCoordianteTransformation {
 		lat /= distSum;
 		lon /= distSum;
 
-		return new CoordImpl(lat,lon);
+		return new Coord(lat, lon);
 	}
 
 
@@ -118,12 +117,12 @@ public class ApproximatelyCoordianteTransformation {
 			String [] tokLine = StringUtils.explode(line, '\t',4);
 			double lon = Double.parseDouble(tokLine[0]);
 			double lat = Double.parseDouble(tokLine[1]);
-			Coord wgs84 = new CoordImpl(lon,lat);
+			Coord wgs84 = new Coord(lon, lat);
 
 			double x = Double.parseDouble(tokLine[2]);
 			double y = Double.parseDouble(tokLine[3]);
 			e.expandToInclude(x, y);
-			Coord noIdea = new CoordImpl(x,y);
+			Coord noIdea = new Coord(x, y);
 			Tuple<Coord,Coord> tuple = new Tuple<Coord, Coord>(wgs84, noIdea);
 			ret.add(tuple);
 			line = infile.readLine();
@@ -136,8 +135,10 @@ public class ApproximatelyCoordianteTransformation {
 
 		String f = "/home/laemmel/arbeit/svn/shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
 		ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
-		Coord sleepyHollowWgs84 = new CoordImpl(-4.632836,53.309088);
-		Coord sleepyHollowNoIdea = new CoordImpl(-1005.17457059858,745.710112755592);
+		final double x1 = -4.632836;
+		Coord sleepyHollowWgs84 = new Coord(x1, 53.309088);
+		final double x = -1005.17457059858;
+		Coord sleepyHollowNoIdea = new Coord(x, 745.710112755592);
 		Coord test = transform.getTransformed(sleepyHollowNoIdea);
 		System.out.println("lat deviation:" + (sleepyHollowWgs84.getX() - test.getX()) + " long deviation:" + (sleepyHollowWgs84.getY() - test.getY()));
 

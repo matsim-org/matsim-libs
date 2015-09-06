@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -82,9 +82,9 @@ public class ChangeLegModeTest {
 		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		person.setCarAvail("never");
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);
-		plan.createAndAddActivity("work", new CoordImpl(0, 0));
+		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();
 		for (String mode : modes) {
@@ -103,9 +103,9 @@ public class ChangeLegModeTest {
 		module.prepareReplanning(null);
 
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
-		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("work", new CoordImpl(0, 0));
+		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();
 		for (String mode : possibleModes) {

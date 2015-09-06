@@ -235,8 +235,8 @@ public class BuildingsZHCreator {
 		for (Entry<Id<ActivityFacility>, BuildingData> entry :data.entrySet()) {
 			Id<ActivityFacility> id = entry.getKey();
 			BuildingData building = entry.getValue();
-			
-			Coord coord = scenario.createCoord(building.x, building.y);
+
+			Coord coord = new Coord(building.x, building.y);
 			ActivityFacility facility = factory.createActivityFacility(id, coord);
 			facilities.addActivityFacility(facility);
 

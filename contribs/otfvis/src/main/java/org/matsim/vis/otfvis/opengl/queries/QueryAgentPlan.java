@@ -50,7 +50,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -199,7 +198,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					if (coord == null) {
 						Link link = net.getLinks().get(act.getLinkId());
 						AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
-						coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
+						coord = new Coord(pi.getEasting(), pi.getNorthing());
 					}
 					addCoord(coord, actColor);
 				} else if (planElement instanceof Leg) {

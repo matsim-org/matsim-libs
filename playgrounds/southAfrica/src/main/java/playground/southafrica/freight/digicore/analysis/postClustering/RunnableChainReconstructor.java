@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -98,7 +98,7 @@ public class RunnableChainReconstructor implements Runnable {
 									 * all the points in the original cluster/hull. */
 									da.setFacilityId(thisFacilityId);
 									if(!g.getCentroid().isEmpty()){
-										da.setCoord(new CoordImpl(g.getCentroid().getX(), g.getCentroid().getY()));
+										da.setCoord(new Coord(g.getCentroid().getX(), g.getCentroid().getY()));
 									} else{
 										log.warn("The geometry is empty and has no centroid. Activity location not changed.");
 									}

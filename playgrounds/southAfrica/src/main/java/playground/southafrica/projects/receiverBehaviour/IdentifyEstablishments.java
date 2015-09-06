@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -47,9 +46,12 @@ public class IdentifyEstablishments {
 
 		/* Set up the three shopping area locations. */
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
-		Coord waterkloof = ct.transform(new CoordImpl(28.240537, -25.774736));
-		Coord menlo = ct.transform(new CoordImpl(28.257851, -25.770383));
-		Coord watermeyer = ct.transform(new CoordImpl(28.294479, -25.744117));
+		final double y2 = -25.774736;
+		Coord waterkloof = ct.transform(new Coord(28.240537, y2));
+		final double y1 = -25.770383;
+		Coord menlo = ct.transform(new Coord(28.257851, y1));
+		final double y = -25.744117;
+		Coord watermeyer = ct.transform(new Coord(28.294479, y));
 		
 		/* Check all network vertices, and count how many are within 1km */
 		LOG.info("Checking node distances...");

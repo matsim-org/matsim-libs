@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -132,17 +132,17 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		Network n = sc.getNetwork();
 		NetworkFactory nf = n.getFactory();
 		// Nodes
-		Node n1 = nf.createNode(Id.create("1", Node.class), new CoordImpl(0.0, 5.0));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0.0, 5.0));
 		n.addNode(n1);
-		Node n2 = nf.createNode(Id.create("2", Node.class), new CoordImpl(11.0, 5.0));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new Coord(11.0, 5.0));
 		n.addNode(n2);
-		Node n3 = nf.createNode(Id.create("3", Node.class), new CoordImpl(6.0, 2.0));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new Coord(6.0, 2.0));
 		n.addNode(n3);
-		Node n4 = nf.createNode(Id.create("4", Node.class), new CoordImpl(6.0, 8.0));
+		Node n4 = nf.createNode(Id.create("4", Node.class), new Coord(6.0, 8.0));
 		n.addNode(n4);
-		Node n5 = nf.createNode(Id.create("5", Node.class), new CoordImpl(6.0, 13.0));
+		Node n5 = nf.createNode(Id.create("5", Node.class), new Coord(6.0, 13.0));
 		n.addNode(n5);
-		Node n6 = nf.createNode(Id.create("6", Node.class), new CoordImpl(8.0, 13.0));
+		Node n6 = nf.createNode(Id.create("6", Node.class), new Coord(8.0, 13.0));
 		n.addNode(n6);
 
 		Link l12 = nf.createLink(Id.create("12", Link.class), n1, n2);

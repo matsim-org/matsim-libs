@@ -43,7 +43,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -155,11 +154,11 @@ public class MyZoneToZoneRouter {
 						 */
 						
 						Point fp = zones.get(row).getCentroid();
-						Coord fc = new CoordImpl(fp.getX(), fp.getY());
+						Coord fc = new Coord(fp.getX(), fp.getY());
 						Node fn = ni.getNearestNode(fc);
 						
 						Point tp = zones.get(col).getCentroid();
-						Coord tc = new CoordImpl(tp.getX(), tp.getY());
+						Coord tc = new Coord(tp.getX(), tp.getY());
 						Node tn = ni.getNearestNode(tc); 
 						
 						Path p = router.calcLeastCostPath(fn, tn, 25200, null, null); /* Use 07:00:00 */

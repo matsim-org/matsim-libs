@@ -40,10 +40,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -62,7 +59,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
-import playground.southafrica.population.utilities.PopulationUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -360,7 +356,7 @@ public class AccessibilityCalculator {
 				if(route.getTransportMode().equalsIgnoreCase("bus")){
 					for(TransitRouteStop trs : route.getStops()){
 						Coord busStop = trs.getStopFacility().getCoord();
-						Coord albersBusStop = new CoordImpl(busStop.getX(), busStop.getY());
+						Coord albersBusStop = new Coord(busStop.getX(), busStop.getY());
 						busStops.put(
 								albersBusStop.getX(), 
 								albersBusStop.getY(), 
@@ -372,8 +368,8 @@ public class AccessibilityCalculator {
 						NodeImpl toNode = (NodeImpl) transitNetwork.getLinks().get(linkId).getToNode();
 						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
 							/* Only consider intersections. */
-							CoordImpl albersIntersection = new CoordImpl(toNode.getCoord().getX(), toNode.getCoord().getY());
-							CoordImpl closestTaxiStop = (CoordImpl) taxiStops.get(albersIntersection.getX(), albersIntersection.getY());
+							Coord albersIntersection = new Coord(toNode.getCoord().getX(), toNode.getCoord().getY());
+							Coord closestTaxiStop = taxiStops.get(albersIntersection.getX(), albersIntersection.getY());
 							if(closestTaxiStop == null){
 								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
 							} else{
@@ -388,7 +384,7 @@ public class AccessibilityCalculator {
 				} else if(route.getTransportMode().equalsIgnoreCase("rail")){
 					for(TransitRouteStop trs : route.getStops()){
 						Coord railStop = trs.getStopFacility().getCoord();
-						Coord albersRailStop = new CoordImpl(railStop.getX(), railStop.getY());
+						Coord albersRailStop = new Coord(railStop.getX(), railStop.getY());
 						railStops.put(
 								albersRailStop.getX(), 
 								albersRailStop.getY(), 
@@ -888,7 +884,7 @@ public class AccessibilityCalculator {
 		Double time = 0.0;
 		String educationType = null;
 		
-		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Coord coord = null;
 		double maxDistance = Double.NEGATIVE_INFINITY;
 		
@@ -897,7 +893,7 @@ public class AccessibilityCalculator {
 				ActivityImpl act = (ActivityImpl) pe;
 				if(act.getType().contains("e")){
 					Coord thisCoord = act.getCoord();
-					double distance = homeCoord.calcDistance(thisCoord);
+					double distance = CoordUtils.calcDistance(homeCoord, thisCoord);
 					if(distance > maxDistance){
 						maxDistance = distance;
 						coord = act.getCoord();

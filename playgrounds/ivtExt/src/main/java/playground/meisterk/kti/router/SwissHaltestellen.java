@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -56,7 +55,7 @@ public class SwissHaltestellen {
 		while ((line = reader.readLine()) != null) {
 			String[] parts = StringUtils.explode(line, '\t');
 			if (parts.length == 7) {
-				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+				Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 				SwissHaltestelle swissStop = new SwissHaltestelle(parts[0], coord);
 				this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
 				this.haltestellenMap.put(swissStop.getId(), swissStop);
@@ -93,7 +92,7 @@ public class SwissHaltestellen {
 	 * cdobler, may'12
 	 */
 	public void addHaltestelle(String id, double x, double y) {
-		CoordImpl coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		SwissHaltestelle swissStop = new SwissHaltestelle(id, coord);
 		this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
 		this.haltestellenMap.put(swissStop.getId(), swissStop);

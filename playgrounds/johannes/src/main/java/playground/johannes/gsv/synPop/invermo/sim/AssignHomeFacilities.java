@@ -22,7 +22,6 @@ package playground.johannes.gsv.synPop.invermo.sim;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
@@ -69,7 +68,7 @@ public class AssignHomeFacilities implements PersonTask {
 			e.printStackTrace();
 		}
 
-		return new CoordImpl(points[0], points[1]);
+		return new Coord(points[0], points[1]);
 	}
 
 	@Override

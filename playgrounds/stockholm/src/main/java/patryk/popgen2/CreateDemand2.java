@@ -23,7 +23,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.population.algorithms.XY2Links;
@@ -281,7 +280,7 @@ public class CreateDemand2 {
 							.getEnvelopeInternal().getMinY());
 			p = MGC.xy2Point(x, y);
 		} while (!geom.contains(p));
-		Coord coord = new CoordImpl(p.getX(), p.getY());
+		Coord coord = new Coord(p.getX(), p.getY());
 		return coord;
 	}
 

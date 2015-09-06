@@ -41,7 +41,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Calculate the number of trips for all inbound and all outbound trips of a given region
@@ -219,8 +218,8 @@ public class CalculateModeShareForRegion {
 //		Coord targetCoord = new CoordImpl(4603511.0, 5807250.0); // SXF
 //		Coord minSourceCoord = new CoordImpl(4586900.000, 5824500.000);
 //		Coord maxSourceCoord = new CoordImpl(4588800.000, 5826300.000);
-		Coord minSourceCoord = new CoordImpl(4586000.000, 5824700.000); // TXL bounding box
-		Coord maxSourceCoord = new CoordImpl(4588900.000, 5825900.000); // TXL bounding box
+		Coord minSourceCoord = new Coord(4586000.000, 5824700.000); // TXL bounding box
+		Coord maxSourceCoord = new Coord(4588900.000, 5825900.000); // TXL bounding box
 				
 		// Move all acts from area to the given coordinates
 		CalculateModeShareForRegion.filterPersonActs(networkFile, inPlansFile, outputDir + statsFile, minSourceCoord, maxSourceCoord);		

@@ -19,7 +19,6 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Coord;
@@ -30,7 +29,6 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;

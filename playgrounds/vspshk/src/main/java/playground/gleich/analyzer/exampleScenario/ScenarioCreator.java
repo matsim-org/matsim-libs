@@ -16,7 +16,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCreator {
 	
@@ -50,8 +49,8 @@ public class ScenarioCreator {
 						int nPersons = 1 + nPersonsBase/((xFrom+yFrom)*(xTo+yTo)); //minimum 1
 						nPersonsTotal += nPersons;
 
-						Coord fromCoord = new CoordImpl(xFrom*1000, yFrom*1000);
-						Coord toCoord = new CoordImpl(xTo*1000, yTo*1000);//arrivalCoordinates in Act2Mode appear to be different
+						Coord fromCoord = new Coord((double) (xFrom * 1000), (double) (yFrom * 1000));
+						Coord toCoord = new Coord((double) (xTo * 1000), (double) (yTo * 1000));//arrivalCoordinates in Act2Mode appear to be different
 						System.out.println(nPersons+"pt Agents from " + xFrom + yFrom + " (" + fromCoord.toString() + ") to "+xTo+yTo+" ("+toCoord.toString());
 						createPersons(rnd, pop, nPersons, fromCoord, toCoord, 5, 12, "pt", xFrom, yFrom, xTo, yTo);//i,j,k,l for Agent Ids which include node numbers where work and home places are located
 						createPersons(rnd, pop, nPersons, fromCoord, toCoord, 7, 9, "pt", xFrom, yFrom, xTo, yTo);

@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -102,7 +101,7 @@ public class ComplexNetworkReducer {
 			Iterator<NmvNode> it = graph.getVertices().iterator();
 			while(it.hasNext()){
 				NmvNode node = it.next();
-				Coord c = new CoordImpl(node.X, node.Y);
+				Coord c = new Coord(node.X, node.Y);
 				Coord wgs84 = ct.transform(c);
 				int inDegree = graph.getInEdges(node).size();
 				int outDegree = graph.getOutEdges(node).size();

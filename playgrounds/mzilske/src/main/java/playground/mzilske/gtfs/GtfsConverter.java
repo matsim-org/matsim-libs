@@ -23,7 +23,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -491,7 +490,7 @@ public class GtfsConverter {
 		int stopLatitudeIndex = stopsSource.getContentIndex("stop_lat");
 		int stopLongitudeIndex = stopsSource.getContentIndex("stop_lon");
 		for(String[] entries: stopsSource.getContent()){
-			TransitStopFacility t = this.ts.getFactory().createTransitStopFacility(Id.create(entries[stopIdIndex], TransitStopFacility.class), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
+			TransitStopFacility t = this.ts.getFactory().createTransitStopFacility(Id.create(entries[stopIdIndex], TransitStopFacility.class), transform.transform(new Coord(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
 			t.setName(entries[stopNameIndex]);
 			ts.addStopFacility(t);
 		}		
@@ -696,7 +695,7 @@ public class GtfsConverter {
 		Id<Node> dummyId = Id.create("dN_" + toNodeId, Node.class);
 		if(!(network.getNodes().containsKey(dummyId))){
 			NodeImpl n = new NodeImpl(dummyId);
-			n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+1,nodes.get(toNodeId).getCoord().getY()+1));
+			n.setCoord(new Coord(nodes.get(toNodeId).getCoord().getX() + 1, nodes.get(toNodeId).getCoord().getY() + 1));
 			network.addNode(n);
 			double length = 50;
 			Link link = network.getFactory().createLink(Id.create("dL1_" + toNodeId, Link.class), n, nodes.get(toNodeId));
@@ -848,17 +847,17 @@ public class GtfsConverter {
 				for(String[] shapeCoord: shapes){
 					double dist = Double.parseDouble(shapeCoord[0].trim());
 					if((shapeDistStart <= dist) && (shapeDistEnd >= dist)){
-						coord.add(transform.transform(new CoordImpl(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2]))));
+						coord.add(transform.transform(new Coord(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2]))));
 					}
 				}
 			}else{
-				Coord fromCoord = new CoordImpl(params[1], params[2]);
-				Coord toCoord = new CoordImpl(params[3], params[4]);
+				Coord fromCoord = new Coord(Double.parseDouble(params[1]), Double.parseDouble(params[2]));
+				Coord toCoord = new Coord(Double.parseDouble(params[3]), Double.parseDouble(params[4]));
 				String shapeId = this.shapeIdToTripIdAssignments.get(tripId);
 				List<String[]> shapes = this.shapes.get(Id.create(shapeId, Shape.class));
 				boolean add = false;
 				for(String[] shapeCoord: shapes){
-					Coord c = transform.transform(new CoordImpl(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2])));
+					Coord c = transform.transform(new Coord(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2])));
 					if(CoordUtils.calcDistance(c, fromCoord) <= this.toleranceInM){
 						add = true;						 
 					}else if(CoordUtils.calcDistance(c, toCoord) <= this.toleranceInM){

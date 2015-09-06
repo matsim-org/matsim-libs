@@ -25,6 +25,7 @@ package org.matsim.core.mobsim.qsim;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -222,12 +223,12 @@ public class FlowStorageSpillbackTest {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
-		
-		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), scenario.createCoord(0., 0.));
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(100., 0.));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(200., 0.));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(300., 0.));
-		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(400., 0.));
+
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), new Coord(0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(100., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(200., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(300., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(400., 0.));
 		
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);

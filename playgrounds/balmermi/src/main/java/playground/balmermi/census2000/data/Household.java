@@ -23,7 +23,7 @@ package playground.balmermi.census2000.data;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class Household implements Comparable<Household>  {
 
@@ -33,7 +33,7 @@ public class Household implements Comparable<Household>  {
 
 	private final Municipality municipality;
 	public Integer hh_id;
-	public CoordImpl coord;
+	public Coord coord;
 	public int hh_cat;
 	public HashSet<MyPerson> persons = new HashSet<MyPerson>();
 	
@@ -70,7 +70,7 @@ public class Household implements Comparable<Household>  {
 		return this.hh_id;
 	}
 	
-	public final CoordImpl getCoord() {
+	public final Coord getCoord() {
 		return this.coord;
 	}
 	

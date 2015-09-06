@@ -23,6 +23,7 @@ package playground.gregor.scenariogen.casimpleexp;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CAExperimentsGridlock {
 	private static String inputDir = "/Users/laemmel/devel/casimgridlock/input";
@@ -172,20 +172,16 @@ public class CAExperimentsGridlock {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(
-				-40, 0));
-		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(
-				-10, 0));
-		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(-5,
-				0));
-		Node n2b = fac.createNode(Id.create("n2b", Node.class), new CoordImpl(
-				0, 20));
-		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(5,
-				0));
-		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(
-				10 + 5 + 5, 0));
-		Node n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(
-				40 + 5 + 5, 0));
+		final double x2 = -40;
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new Coord(x2, (double) 0));
+		final double x1 = -10;
+		Node n1 = fac.createNode(Id.create("n1", Node.class), new Coord(x1, (double) 0));
+		final double x = -5;
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new Coord(x, (double) 0));
+		Node n2b = fac.createNode(Id.create("n2b", Node.class), new Coord((double) 0, (double) 20));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new Coord((double) 5, (double) 0));
+		Node n4 = fac.createNode(Id.create("n4", Node.class), new Coord((double) (10 + 5 + 5), (double) 0));
+		Node n5 = fac.createNode(Id.create("n5", Node.class), new Coord((double) (40 + 5 + 5), (double) 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);

@@ -263,7 +263,7 @@ public class CreateMarathonPopulation {
 	
 	private void createShiftedNode(Scenario scenario, String nodeId, double dx, double dy) {
 		Node node = scenario.getNetwork().getNodes().get(Id.create(nodeId, Node.class));
-		Coord coord = scenario.createCoord(node.getCoord().getX() + dx, node.getCoord().getY() + dy);
+		Coord coord = new Coord(node.getCoord().getX() + dx, node.getCoord().getY() + dy);
 		Id<Node> id = Id.create(nodeId + "_shifted", Node.class);
 		Node shiftedNode = scenario.getNetwork().getFactory().createNode(id, coord);
 		scenario.getNetwork().addNode(shiftedNode);
@@ -803,8 +803,8 @@ public class CreateMarathonPopulation {
 			}
 			
 //			System.out.println(person.getId().toString() + "\t" + x + "\t" + y);
-			
-			Coord coord = scenario.createCoord(x, y);
+
+			Coord coord = new Coord(x, y);
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("preRun", startLinkId);
 			activity.setFacilityId(Id.create("preRunFacility", ActivityFacility.class));
 			activity.setEndTime(9*3600);

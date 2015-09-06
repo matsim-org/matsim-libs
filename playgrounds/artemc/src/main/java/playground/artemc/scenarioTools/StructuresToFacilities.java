@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -14,7 +15,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.*;
 import org.opengis.feature.Property;
@@ -165,8 +165,8 @@ public class StructuresToFacilities {
 
 			
 			System.out.println(nodeZoneId);
-			if(nodeZoneId>0){	
-				facilities.createAndAddFacility(facilityID, new CoordImpl(x,y));
+			if(nodeZoneId>0){
+				facilities.createAndAddFacility(facilityID, new Coord(x, y));
 				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityID);
 				facility.setLinkId(NetworkUtils.getNearestLink(network, facility.getCoord()).getId());
 				ArrayList<ActivityOptionImpl> activities = getActivity(structure, capacity);		

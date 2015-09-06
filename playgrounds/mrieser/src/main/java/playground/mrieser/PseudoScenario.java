@@ -19,7 +19,6 @@
 
 package playground.mrieser;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -60,11 +59,6 @@ public class PseudoScenario implements Scenario {
 	@Override
 	public ActivityFacilities getActivityFacilities() {
 		return null;
-	}
-
-	@Override
-	public Coord createCoord(final double x, final double y) {
-		return this.scenario.createCoord(x, y);
 	}
 
 	@Override

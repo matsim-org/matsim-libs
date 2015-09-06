@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -72,9 +71,9 @@ public class ActivitiesFileGenerator extends MatsimXmlWriter{
 				EndLat = rs.getDouble(7);
 				EndLon = rs.getDouble(8);
 //				TripID = rs.getInt(9);			
-			
-				Coord coordStart =new CoordImpl(StartLon, StartLat);
-				Coord coordEnd =new CoordImpl(EndLon, EndLat);
+
+				Coord coordStart = new Coord(StartLon, StartLat);
+				Coord coordEnd = new Coord(EndLon, EndLat);
 				Coord UTMStart = ct.transform(coordStart);
 				Coord UTMEnd = ct.transform(coordEnd);
 				StartLon=UTMStart.getX();

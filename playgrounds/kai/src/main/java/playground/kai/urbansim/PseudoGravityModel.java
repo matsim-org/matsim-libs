@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -68,8 +67,8 @@ public class PseudoGravityModel {
 	private ActivityFacilitiesImpl facilities ;
 	private Map<Id<Job>,Id<Location>> locationFromJob ;
 
-	private Coord minCoord = new CoordImpl( Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY ) ;
-	private Coord maxCoord = new CoordImpl( Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY ) ;
+	private Coord minCoord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+	private Coord maxCoord = new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 
 	static final int ll = 33 ;
 	static final int llll = ll*ll ;

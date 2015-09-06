@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
@@ -69,15 +68,15 @@ public class ZHFacilitiesReader {
 				String retailerID =  entries[1].trim();
 				int size_descr = Integer.parseInt(entries[2].trim());
 				double xCH = Double.parseDouble(entries[4].trim());
-				double yCH = Double.parseDouble(entries[5].trim());		
-				Coord exactPosition = new CoordImpl(xCH, yCH);
+				double yCH = Double.parseDouble(entries[5].trim());
+				Coord exactPosition = new Coord(xCH, yCH);
 				
 				String name = entries[6].trim();
-				
+
 				facilities.add(new ZHFacility(
 									Id.create(shopID, ActivityFacility.class),
 									name,
-									new CoordImpl(0.0, 0.0),
+						new Coord(0.0, 0.0),
 									exactPosition, 
 									Id.create("0", Link.class),
 									Id.create(retailerID, Person.class),

@@ -28,7 +28,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class SpatialGrid {
@@ -61,8 +60,7 @@ public class SpatialGrid {
 
 		for(int i=0; i<numberOfCellsX; i++){
 			for(int j=0; j<numberOfCellsY; j++){
-				Coord cellCentroid = new CoordImpl(gridMinX + (i+0.5)*cellWidth,
-													gridMinY + (j+0.5)*cellHeight);
+				Coord cellCentroid = new Coord(gridMinX + (i + 0.5) * cellWidth, gridMinY + (j + 0.5) * cellHeight);
 				grid[i][j]= new Cell(i,j,cellCentroid);
 			}
 		}

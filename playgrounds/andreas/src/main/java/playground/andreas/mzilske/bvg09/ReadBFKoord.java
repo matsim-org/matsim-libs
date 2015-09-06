@@ -6,7 +6,6 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -56,7 +55,7 @@ public class ReadBFKoord implements TabularFileHandler{
 			}
 			log.info("Ignoring: " + tempBuffer);
 		} else {
-			this.stopCoords.put(Id.create(row[0], TransitStopFacility.class), new CoordImpl(row[1], row[2]));
+			this.stopCoords.put(Id.create(row[0], TransitStopFacility.class), new Coord(Double.parseDouble(row[1]), Double.parseDouble(row[2])));
 			StringBuffer sB = new StringBuffer();
 			for (int i = 3; i < row.length; i++) {
 				sB.append(row[i]);

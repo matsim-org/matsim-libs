@@ -21,6 +21,7 @@
 package playground.jjoubert.Utilities.matsim2urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +42,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -255,7 +255,7 @@ public class WalkDistanceEstimator {
 		log.info("Calculating sub-place distances.");
 		NetworkImpl ni = (NetworkImpl) sPt.getNetwork();
 		for(MyZone sp : spList){
-			CoordImpl centroid = new CoordImpl(sp.getCentroid().getX(), sp.getCentroid().getY());
+			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
 			Node closest = ni.getNearestNode(centroid);
 			Double d = CoordUtils.calcDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			

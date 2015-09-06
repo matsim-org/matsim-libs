@@ -48,6 +48,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -443,11 +444,12 @@ public class CreateAutomatedFDTest {
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), scenario.createCoord(-50, 0));
-		Node node1 = network.createAndAddNode(Id.createNodeId(0), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.createNodeId(1), scenario.createCoord(1000, 0));
-		Node node3 = network.createAndAddNode(Id.createNodeId(2), scenario.createCoord(500, 866.0));
-		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), scenario.createCoord(1050,0));
+		double x = -50;
+		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), new Coord(x, (double) 0));
+		Node node1 = network.createAndAddNode(Id.createNodeId(0), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 1000, (double) 0));
+		Node node3 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 500, 866.0));
+		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
 		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, 60, 27000, 1);
 		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, 60, 2700, 1);

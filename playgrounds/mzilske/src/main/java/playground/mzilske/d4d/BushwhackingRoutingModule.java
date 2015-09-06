@@ -22,7 +22,6 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.Facility;

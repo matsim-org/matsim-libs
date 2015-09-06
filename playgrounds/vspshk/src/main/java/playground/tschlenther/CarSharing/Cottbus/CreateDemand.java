@@ -5,12 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+	import java.util.Map;
 import java.util.Random;
 
-import org.geotools.io.TableWriter;
-import org.matsim.api.core.v01.Coord;
+	import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -19,12 +17,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
+	import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
+	import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -260,7 +256,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			      y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 			      p = MGC.xy2Point(x, y);
 			   } while (!g.contains(p));
-			   Coord coord = new CoordImpl(p.getX(), p.getY());
+			Coord coord = new Coord(p.getX(), p.getY());
 			   return coord;
 		}
 		
@@ -390,7 +386,7 @@ import com.vividsolutions.jts.io.WKTReader;
 		try{
 		Double x = Double.parseDouble(row[2]);
 		Double y = Double.parseDouble(row[1]);
-		Coord coords = new CoordImpl(x,y);
+			Coord coords = new Coord(x, y);
 		this.facilityMap.put(row[0],ct.transform(coords));
 		}
 		catch (NumberFormatException e){

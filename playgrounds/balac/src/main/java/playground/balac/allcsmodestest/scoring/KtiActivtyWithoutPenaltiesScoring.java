@@ -19,21 +19,12 @@
  * *********************************************************************** */
 package playground.balac.allcsmodestest.scoring;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -44,7 +35,8 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTime.DayType;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.population.Desires;
+
+import java.util.*;
 
 /**
  * Due to the abusive use of extension, the meisterk's KTI activity scoring
@@ -341,11 +333,7 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 	}
 
 	protected double getPerformanceScore(String actType, double duration) {
-		final PersonImpl person = (PersonImpl) plan.getPerson();
-		final Desires desires = person.getDesires();
 		final double typicalDuration =
-			desires != null ?
-				desires.getActivityDuration(actType) :
 				params.utilParams.get( actType ).getTypicalDuration();
 
 		// initialize zero utility durations here for better code readability, because we only need them here

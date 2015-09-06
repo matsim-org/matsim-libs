@@ -19,21 +19,22 @@
 
 package org.matsim.core.router.old;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import junit.framework.Assert;
 
 /**
  * @author mrieser
@@ -44,10 +45,12 @@ public class TeleportationLegRouterTest {
 	public void testRouteLeg() {
 		ModeRouteFactory routeFactory = new ModeRouteFactory();
 		routeFactory.setRouteFactory(TransportMode.walk, new GenericRouteFactory());
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.walk);
-		Activity fromAct = new ActivityImpl("h", new CoordImpl(0, 0));
-		Activity toAct = new ActivityImpl("h", new CoordImpl(1000, 0));
+		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
+		Activity toAct = new ActivityImpl("h", new Coord((double) 1000, (double) 0));
 
 		TeleportationLegRouter router = new TeleportationLegRouter(routeFactory, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
@@ -60,14 +63,13 @@ public class TeleportationLegRouterTest {
 		Assert.assertEquals(50.0, tt, 10e-7);
 		Assert.assertEquals(50.0, leg.getTravelTime(), 10e-7);
 		Assert.assertEquals(50.0, leg.getRoute().getTravelTime(), 10e-7);
-		
-		Activity otherToAct = new ActivityImpl("h", new CoordImpl(1000, 1000));
+
+		Activity otherToAct = new ActivityImpl("h", new Coord((double) 1000, (double) 1000));
 		double manhattanBeelineDistanceFactor = Math.sqrt(2.0);
 		router = new TeleportationLegRouter(routeFactory, 10.0, manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);
 		Assert.assertEquals(200.0, tt, 10e-7);
 		Assert.assertEquals(200.0, leg.getTravelTime(), 10e-7);
 		Assert.assertEquals(200.0, leg.getRoute().getTravelTime(), 10e-7);
-		
 	}
 }

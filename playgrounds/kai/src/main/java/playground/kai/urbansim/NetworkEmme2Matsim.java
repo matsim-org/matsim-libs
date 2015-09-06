@@ -20,6 +20,7 @@
 package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -90,8 +91,8 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						Node node = network.getFactory().createNode( Id.create(idStr, Node.class), 
-								sc.createCoord(Double.parseDouble(xxStr),Double.parseDouble(yyStr)) ) ;
+						Node node = network.getFactory().createNode( Id.create(idStr, Node.class),
+								new Coord(Double.parseDouble(xxStr), Double.parseDouble(yyStr))) ;
 						network.addNode( node ) ;
 					} else {
 						Node fromNode = network.getNodes().get(Id.create(parts[1], Node.class) ) ;

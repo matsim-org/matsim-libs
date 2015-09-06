@@ -21,7 +21,6 @@ package playground.andreas.utils.pt.transitSchedule2Tikz;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -61,7 +60,7 @@ public class TikzNode {
 	 * @return 
 	 */
 	public void offset(Double xOffset, Double yOffset, Double scale) {
-		this.coord = new CoordImpl((this.coord.getX() + xOffset)* scale, (this.coord.getY() + yOffset) * scale);
+		this.coord = new Coord((this.coord.getX() + xOffset) * scale, (this.coord.getY() + yOffset) * scale);
 	}
 }
 

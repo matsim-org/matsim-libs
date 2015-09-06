@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -180,7 +179,7 @@ public class MyMultiFeatureReader {
 			Geometry geo = (Geometry) feature.getDefaultGeometry();
 			if(geo instanceof Point){
 				Point ps = (Point)geo;
-				list.add(new CoordImpl(ps.getX(), ps.getY()));
+				list.add(new Coord(ps.getX(), ps.getY()));
 			} else{
 				throw new RuntimeException("The shapefile does not contain Point(s)!");
 			}

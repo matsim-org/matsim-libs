@@ -36,7 +36,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -82,13 +82,13 @@ public class SingleActLocationMutator extends LocationMutator {
 			travelDistancePre = RouteUtils.calcDistance((NetworkRoute) legPre.getRoute(), this.scenario.getNetwork());
 		}
 		else {
-			travelDistancePre = ((CoordImpl)actPre.getCoord()).calcDistance(actToMove.getCoord());
+			travelDistancePre = CoordUtils.calcDistance(actPre.getCoord(), actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
 			travelDistancePost = RouteUtils.calcDistance((NetworkRoute) legPost.getRoute(), this.scenario.getNetwork());
 		}
 		else {
-			travelDistancePost = ((CoordImpl)actToMove.getCoord()).calcDistance(actPost.getCoord());
+			travelDistancePost = CoordUtils.calcDistance(actToMove.getCoord(), actPost.getCoord());
 		}
 		double radius =  0.5 * (travelDistancePre + travelDistancePost);
 

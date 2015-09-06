@@ -24,12 +24,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.population.Desires;
 
 /**
  * Same as CharyparNagelOpenTimesActivityScoring, but retrieves desired activity
@@ -45,12 +43,10 @@ public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesAc
 
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
-	private final Desires desires;
 	private final Id personId;
 	
 	public DesiresAndOpenTimesActivityScoring(Plan plan, final CharyparNagelScoringParameters params, final Scenario scenario) {
 		super(params, ((ScenarioImpl)scenario).getActivityFacilities());
-		this.desires = ((PersonImpl) plan.getPerson()).getDesires();
 		this.params = params;
 		this.scenario = scenario;
 		this.personId = plan.getPerson().getId();

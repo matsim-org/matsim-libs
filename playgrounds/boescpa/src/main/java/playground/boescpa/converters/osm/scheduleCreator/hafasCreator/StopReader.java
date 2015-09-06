@@ -24,7 +24,6 @@ package playground.boescpa.converters.osm.scheduleCreator.hafasCreator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
@@ -74,7 +73,7 @@ public class StopReader implements TransitStopCreator {
 				Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 				double xCoord = Double.parseDouble(newLine.substring(8, 18));
 				double yCoord = Double.parseDouble(newLine.substring(19, 29));
-				Coord coord = new CoordImpl(xCoord, yCoord);
+				Coord coord = new Coord(xCoord, yCoord);
 				if (this.transformation != null) {
 					coord = this.transformation.transform(coord);
 				}

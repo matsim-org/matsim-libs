@@ -31,8 +31,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -49,9 +53,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
 /**
@@ -90,7 +91,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		final CharyparNagelScoringParameters params = createParams( person , config , personAttributes );
+		final CharyparNagelScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
@@ -163,13 +164,14 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 	private CharyparNagelScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
+			final ScenarioConfigGroup scenarioConfig,
 			final ObjectAttributes personAttributes) {
 		if ( individualParameters.containsKey( person.getId() ) ) {
 			return individualParameters.get( person.getId() );
 		}
 
 		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config );
+				CharyparNagelScoringParameters.getBuilder( config, scenarioConfig );
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans

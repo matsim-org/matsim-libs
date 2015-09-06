@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -133,8 +132,8 @@ public class CALink implements NetsimLink {
 			// add half of the cell length. position is mid point of cell!
 			double x = fromCoord.getX() + (i - 0.5) * dx;
 			double y = fromCoord.getY() + (i - 0.5) * dy;
-			
-			this.cells[i] = new CACell(i, new CoordImpl(x, y), cellLength);
+
+			this.cells[i] = new CACell(i, new Coord(x, y), cellLength);
 		}
 		this.firstCell = this.cells[0];
 		this.lastCell = this.cells[numberOfCells - 1];

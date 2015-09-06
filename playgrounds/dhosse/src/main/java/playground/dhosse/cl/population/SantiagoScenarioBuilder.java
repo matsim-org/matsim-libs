@@ -62,7 +62,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -228,8 +227,12 @@ public class SantiagoScenarioBuilder {
 		
 //		top=-33.0144 left=-71.3607 bottom=-33.8875 right=-70.4169
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", Constants.toCRS);
-		Coord leftBottom = ct.transform(new CoordImpl(-71.3607 ,-33.8875));
-		Coord rightTop = ct.transform(new CoordImpl(-70.4169, -33.0144));
+		final double x1 = -71.3607;
+		final double y1 = -33.8875;
+		Coord leftBottom = ct.transform(new Coord(x1, y1));
+		final double x = -70.4169;
+		final double y = -33.0144;
+		Coord rightTop = ct.transform(new Coord(x, y));
 		double minX = leftBottom.getX();
 		double maxX = rightTop.getX();
 		double minY = leftBottom.getY();
@@ -338,8 +341,12 @@ public class SantiagoScenarioBuilder {
 	private static Population getRest(Population allPersons, Population population1, Population population2){
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
-		Coord leftBottom = ct.transform(new CoordImpl(-71.3607, -33.8875));
-		Coord rightTop = ct.transform(new CoordImpl(-70.4169, -33.0144));
+		final double x1 = -71.3607;
+		final double y1 = -33.8875;
+		Coord leftBottom = ct.transform(new Coord(x1, y1));
+		final double x = -70.4169;
+		final double y = -33.0144;
+		Coord rightTop = ct.transform(new Coord(x, y));
 		double minX = leftBottom.getX();
 		double maxX = rightTop.getX();
 		double minY = leftBottom.getY();

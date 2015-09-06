@@ -63,12 +63,6 @@ public class PlansCalcRouteConfigGroupTest {
 	@Test
 	public void testDefaultsAreCleared() {
 		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
-		
-		Assert.assertEquals(
-				"unexpected number of default modes in "+group.getModeRoutingParams(),
-				4,
-				group.getModeRoutingParams().size() );
-
 		group.setTeleportedModeSpeed( "skateboard" , 20 / 3.6 );
 		group.setTeleportedModeSpeed( "longboard" , 20 / 3.6 );
 		Assert.assertEquals(

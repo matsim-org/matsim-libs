@@ -21,6 +21,7 @@ package playground.michalm.barcelona.supply;
 
 import java.text.ParseException;
 
+import org.apache.commons.math3.util.MathArrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.VehicleGenerator;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
@@ -41,12 +42,13 @@ public class BarcelonaTaxiGenerator
                 7398, 5541, 6209, 6425, 6496, 5682, 5064, 5505, 6785, 5122, 3948, 3770, 2790,
                 2463 };
         double vehsToReqsRatio = 0.2;
+        double[] vehsPerHour = MathArrays.scale(vehsToReqsRatio, reqsPerHour);
 
         double minWorkTime = 4.0 * 3600;
         double maxWorkTime = 12.0 * 3600;
 
-        String dir = "d:/PP-rad/Barcelona/";
-        String networkFile = dir + "barcelona_network.xml";
+        String dir = "d:/PP-rad/Barcelona/data/";
+        String networkFile = dir + "network/barcelona_network.xml";
         String taxisFile = dir + "taxis5to5_" + vehsToReqsRatio + ".xml";
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -54,7 +56,7 @@ public class BarcelonaTaxiGenerator
 
         BarcelonaTaxiCreator btc = new BarcelonaTaxiCreator(scenario);
         VehicleGenerator vg = new VehicleGenerator(minWorkTime, maxWorkTime, btc);
-        vg.generateVehicles(reqsPerHour, BarcelonaServedRequests.ZERO_HOUR * 3600, 3600);
+        vg.generateVehicles(vehsPerHour, BarcelonaServedRequests.ZERO_HOUR * 3600, 3600);
         new VehicleWriter(vg.getVehicles()).write(taxisFile);
     }
 }

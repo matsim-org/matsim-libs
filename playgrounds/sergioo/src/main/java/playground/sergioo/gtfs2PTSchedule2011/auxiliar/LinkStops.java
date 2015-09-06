@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -82,7 +82,7 @@ public class LinkStops {
 			log.warn("Bad position of stop "+stops.get(i).getName()+" according to the link " + link.getId());
 			return null;
 		}
-		Node toNode = network.getFactory().createNode(Id.createNodeId(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i),new CoordImpl(nearestPoint.getX(), nearestPoint.getY()));
+		Node toNode = network.getFactory().createNode(Id.createNodeId(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i), new Coord(nearestPoint.getX(), nearestPoint.getY()));
 		if(network.getNodes().get(Id.createNodeId(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i))==null)
 			network.addNode(toNode);
 		double length = -1;

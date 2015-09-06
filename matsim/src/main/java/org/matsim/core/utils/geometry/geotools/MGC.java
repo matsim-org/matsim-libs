@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -110,7 +109,7 @@ public class MGC {
 	 * @return Geotools coordinate
 	 */
 	public static Coord coordinate2Coord(final Coordinate coord) {
-		return new CoordImpl(coord.x, coord.y);
+		return new Coord(coord.x, coord.y);
 	}
 
 	/**
@@ -136,7 +135,7 @@ public class MGC {
 	 * @return MATSim coordinate
 	 */
 	public static Coord point2Coord(final Point point) {
-		return new CoordImpl(point.getX(), point.getY());
+		return new Coord(point.getX(), point.getY());
 	}
 
 	/**

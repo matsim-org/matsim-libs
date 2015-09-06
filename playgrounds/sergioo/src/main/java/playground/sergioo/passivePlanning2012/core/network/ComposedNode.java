@@ -18,7 +18,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
 public class ComposedNode implements Node {
@@ -35,7 +34,7 @@ public class ComposedNode implements Node {
 
 	public ComposedNode(Node node) {
 		id = Id.create(node.getId().toString()+SEPARATOR, Node.class);
-		coord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
+		coord = new Coord(node.getCoord().getX(), node.getCoord().getY());
 		inLinks = new HashMap<Id<Link>, Link>();
 		outLinks = new HashMap<Id<Link>, Link>();
 		nodes = new HashSet<Node>();
@@ -109,7 +108,7 @@ public class ComposedNode implements Node {
 			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
 		id = Id.create(idText, Node.class);
-		coord = new CoordImpl(0, 0);
+		coord = new Coord((double) 0, (double) 0);
 		for(Node node:nodes)
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
 		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());

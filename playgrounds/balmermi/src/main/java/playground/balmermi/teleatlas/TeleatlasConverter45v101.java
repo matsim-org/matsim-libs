@@ -468,7 +468,7 @@ public class TeleatlasConverter45v101 {
 	}
 
 	private Coord convertCoordinate(Coordinate c) {
-		return this.coordTransform.transform(this.scenario.createCoord(c.x, c.y));
+		return this.coordTransform.transform(new Coord(c.x, c.y));
 	}
 
 	public static void main(String[] args) throws IOException, RuntimeException {

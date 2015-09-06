@@ -1,10 +1,5 @@
 package playground.singapore.travelsummary.travelcomponents;
 
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 

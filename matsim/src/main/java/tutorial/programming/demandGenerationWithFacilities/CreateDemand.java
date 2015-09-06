@@ -88,7 +88,6 @@ class CreateDemand {
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
-				((PersonImpl)person).createDesires("desired activity durations");
 				/*
 				 * Create a day plan and add it to the person
 				 */
@@ -145,8 +144,7 @@ class CreateDemand {
 				 * Otherwise add a leg and an activity (destination activity)
 				 */
 				if (!personId.equals(previousPerson)) {
-					Coord coordOrigin = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordOrigin]), 
-							Double.parseDouble(parts[index_yCoordOrigin]));
+					Coord coordOrigin = new Coord(Double.parseDouble(parts[index_xCoordOrigin]), Double.parseDouble(parts[index_yCoordOrigin]));
 					
 					Activity activity = 
 						populationFactory.createActivityFromCoord("home", coordOrigin);
@@ -174,8 +172,7 @@ class CreateDemand {
 					/*
 					 * Add activity given its type.
 					 */
-					Coord coordDestination = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordDestination]), 
-							Double.parseDouble(parts[index_yCoordDestination]));
+					Coord coordDestination = new Coord(Double.parseDouble(parts[index_xCoordDestination]), Double.parseDouble(parts[index_yCoordDestination]));
 										
 					String activityType = parts[index_activityType].trim();
 					if (activityType.startsWith("w")) worker = true;
@@ -184,8 +181,6 @@ class CreateDemand {
 						populationFactory.createActivityFromCoord(activityType, coordDestination);
 					
 					Double duration = Double.parseDouble(parts[index_activityDuration]);		
-					// store the desired duration in the persons knowledge
-					((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
 					plan.addActivity(activity);
 				}
 				previousPerson = personId;
@@ -262,7 +257,7 @@ class CreateDemand {
 				}
 				else {
 					Person pusPerson = plan.getPerson();
-					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					double activityDuration = 8 * 3600;
 					
 					time += activityDuration + this.randomizeTimes();
 					String dur = String.valueOf((int)(activityDuration / 3600.0));

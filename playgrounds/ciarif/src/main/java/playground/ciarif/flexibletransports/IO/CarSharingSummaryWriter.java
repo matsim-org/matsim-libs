@@ -3,9 +3,8 @@ package playground.ciarif.flexibletransports.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;

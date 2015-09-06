@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,7 +59,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -78,12 +78,12 @@ public class CharyparNagelScoringFunctionTest {
 	private static final double EPSILON =1e-9;
 
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final Person person) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
 		return charyparNagelScoringFunctionFactory.createNewScoringFunction(person);
 	}
 
 	private double calcScore(final Fixture f) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
 		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(new PersonImpl(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
@@ -681,16 +681,16 @@ public class CharyparNagelScoringFunctionTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(    0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(  500.0, 0.0));
-			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new CoordImpl( 5500.0, 0.0));
-			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new CoordImpl( 6000.0, 0.0));
-			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(11000.0, 0.0));
-			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(11500.0, 0.0));
-			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(16500.0, 0.0));
-			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new CoordImpl(17000.0, 0.0));
-			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new CoordImpl(22000.0, 0.0));
-			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new CoordImpl(22500.0, 0.0));
+			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(500.0, 0.0));
+			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(5500.0, 0.0));
+			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(6000.0, 0.0));
+			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new Coord(11000.0, 0.0));
+			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new Coord(11500.0, 0.0));
+			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new Coord(16500.0, 0.0));
+			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new Coord(17000.0, 0.0));
+			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new Coord(22000.0, 0.0));
+			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new Coord(22500.0, 0.0));
 
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 500, 25, 3600, 1);
 			Link link2 = this.network.createAndAddLink(Id.create("2", Link.class), node2, node3, 25000, 50, 3600, 1);

@@ -27,12 +27,12 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
@@ -84,9 +84,9 @@ public class ClusteredChainGeneratorTest{
 		Assert.assertTrue("Facility 3 not in map.", afs.getFacilities().containsKey(Id.create("f3", Facility.class)));
 		
 		/* Check facility coordinates. */
-		Assert.assertEquals("Wrong centroid for f1", new CoordImpl(0.5, 5.5), afs.getFacilities().get(Id.create("f1", Facility.class)).getCoord());
-		Assert.assertEquals("Wrong centroid for f2", new CoordImpl((3.0 + 4.0 + 5.0)/3.0, (1.0 + 3.0 + 3.0)/3.0), afs.getFacilities().get(Id.create("f2", Facility.class)).getCoord());
-		Assert.assertEquals("Wrong centroid for f3", new CoordImpl(5.0, 6.0), afs.getFacilities().get(Id.create("f3", Facility.class)).getCoord());
+		Assert.assertEquals("Wrong centroid for f1", new Coord(0.5, 5.5), afs.getFacilities().get(Id.create("f1", Facility.class)).getCoord());
+		Assert.assertEquals("Wrong centroid for f2", new Coord((3.0 + 4.0 + 5.0) / 3.0, (1.0 + 3.0 + 3.0) / 3.0), afs.getFacilities().get(Id.create("f2", Facility.class)).getCoord());
+		Assert.assertEquals("Wrong centroid for f3", new Coord(5.0, 6.0), afs.getFacilities().get(Id.create("f3", Facility.class)).getCoord());
 		
 		File facilityAttributeFile = new File(utils.getClassInputDirectory() + "facilityAttributes.xml");
 		Assert.assertTrue("Facility attributes file does not exist.", facilityAttributeFile.exists());
@@ -203,17 +203,28 @@ public class ClusteredChainGeneratorTest{
 	 */
 	private void setupClusters(){
 		/* Set up basic activities. */
-		DigicoreActivity a1 = new DigicoreActivity("t1", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a1.setCoord(new CoordImpl(0, 6));
-		DigicoreActivity a2 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a2.setCoord(new CoordImpl(1, 6));
-		DigicoreActivity a3 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a3.setCoord(new CoordImpl(0, 5));
-		DigicoreActivity a4 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a4.setCoord(new CoordImpl(1, 5));
-		DigicoreActivity a5 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a5.setCoord(new CoordImpl(3, 3));
-		DigicoreActivity a6 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a6.setCoord(new CoordImpl(5, 3));
-		DigicoreActivity a7 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a7.setCoord(new CoordImpl(4, 1));
-		DigicoreActivity a8 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a8.setCoord(new CoordImpl(4, 2));
-		DigicoreActivity a9 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a9.setCoord(new CoordImpl(0, 2));
-		DigicoreActivity a10 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a10.setCoord(new CoordImpl(2, 4));
-		DigicoreActivity a11 = new DigicoreActivity("t1", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); a11.setCoord(new CoordImpl(5, 6));
+		DigicoreActivity a1 = new DigicoreActivity("t1", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a1.setCoord(new Coord((double) 0, (double) 6));
+		DigicoreActivity a2 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a2.setCoord(new Coord((double) 1, (double) 6));
+		DigicoreActivity a3 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a3.setCoord(new Coord((double) 0, (double) 5));
+		DigicoreActivity a4 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a4.setCoord(new Coord((double) 1, (double) 5));
+		DigicoreActivity a5 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a5.setCoord(new Coord((double) 3, (double) 3));
+		DigicoreActivity a6 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a6.setCoord(new Coord((double) 5, (double) 3));
+		DigicoreActivity a7 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a7.setCoord(new Coord((double) 4, (double) 1));
+		DigicoreActivity a8 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a8.setCoord(new Coord((double) 4, (double) 2));
+		DigicoreActivity a9 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a9.setCoord(new Coord((double) 0, (double) 2));
+		DigicoreActivity a10 = new DigicoreActivity("t2", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a10.setCoord(new Coord((double) 2, (double) 4));
+		DigicoreActivity a11 = new DigicoreActivity("t1", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a11.setCoord(new Coord((double) 5, (double) 6));
 		
 		/* Set up facilities */
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
@@ -228,7 +239,7 @@ public class ClusteredChainGeneratorTest{
 		ca1[3] = new Coordinate(a4.getCoord().getX(), a4.getCoord().getY());
 		ca1[4] = ca1[0];
 		Polygon p1 = gf.createPolygon(ca1);
-		ActivityFacility f1 = ff.createActivityFacility(Id.create("f1", ActivityFacility.class), new CoordImpl(p1.getCentroid().getX(), p1.getCentroid().getY()));
+		ActivityFacility f1 = ff.createActivityFacility(Id.create("f1", ActivityFacility.class), new Coord(p1.getCentroid().getX(), p1.getCentroid().getY()));
 		facilities.addActivityFacility(f1);
 		attributes.putAttribute(f1.getId().toString(), "concaveHull", p1);
 		
@@ -238,14 +249,14 @@ public class ClusteredChainGeneratorTest{
 		ca2[2] = new Coordinate(a7.getCoord().getX(), a7.getCoord().getY());
 		ca2[3] = ca2[0];
 		Polygon p2 = gf.createPolygon(ca2);
-		ActivityFacility f2 = ff.createActivityFacility(Id.create("f2", ActivityFacility.class), new CoordImpl(p2.getCentroid().getX(), p2.getCentroid().getY()));
+		ActivityFacility f2 = ff.createActivityFacility(Id.create("f2", ActivityFacility.class), new Coord(p2.getCentroid().getX(), p2.getCentroid().getY()));
 		facilities.addActivityFacility(f2);
 		attributes.putAttribute(f2.getId().toString(), "concaveHull", p2);
 		
 		Coordinate[] ca3 = new Coordinate[1];
 		ca3[0] = new Coordinate(a11.getCoord().getX(), a11.getCoord().getY());
 		Point p3 = gf.createPoint(ca3[0]);
-		ActivityFacility f3 = ff.createActivityFacility(Id.create("f3", ActivityFacility.class), new CoordImpl(p3.getCentroid().getX(), p3.getCentroid().getY()));
+		ActivityFacility f3 = ff.createActivityFacility(Id.create("f3", ActivityFacility.class), new Coord(p3.getCentroid().getX(), p3.getCentroid().getY()));
 		facilities.addActivityFacility(f3);
 		attributes.putAttribute(f3.getId().toString(), "concaveHull", p3);
 		

@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -30,7 +30,7 @@ public class HaltestellenFilterForSpecificNetwork {
 	}
 	
 	
-	public static boolean isWithinBoundy(CalcBoundingBox bbox, CoordImpl coord){
+	public static boolean isWithinBoundy(CalcBoundingBox bbox, Coord coord){
 		if (bbox.getMinX()<coord.getX() && bbox.getMaxX()>coord.getX()){
 			if (bbox.getMinY()<coord.getY() && bbox.getMaxY()>coord.getY()){
 				return true;
@@ -45,7 +45,7 @@ public class HaltestellenFilterForSpecificNetwork {
 		while ((line = reader.readLine()) != null) {
 			String[] parts = StringUtils.explode(line, '\t');
 			if (parts.length == 7) {
-				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+				Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 				
 				if (isWithinBoundy(bbox,coord)){
 					System.out.println(line);

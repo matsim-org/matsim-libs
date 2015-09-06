@@ -83,7 +83,7 @@ public class Tutorial {
 					.getCoordinateTransformation(TransformationFactory.WGS84,
 							TransformationFactory.CH1903_LV03);
 			// home activity
-			Coord homeCoordinates = sc.createCoord(8.55744100 , 47.3548407 );
+			Coord homeCoordinates = new Coord(8.55744100, 47.3548407);
 			Activity activity1 = populationFactory.createActivityFromCoord(
 					"h6", ct.transform(homeCoordinates));
 			activity1.setEndTime(21600);
@@ -94,7 +94,7 @@ public class Tutorial {
 			// work activity
 			Activity activity2 =
 					  populationFactory.createActivityFromCoord(
-					    "w10",ct.transform(sc.createCoord(8.51774679 , 47.3893719))
+					    "w10",ct.transform(new Coord(8.51774679, 47.3893719))
 					  );
 			activity2.setEndTime(57600);
 			plan.addActivity(activity2);

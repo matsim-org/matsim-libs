@@ -1,5 +1,6 @@
 package playground.dhosse.frequencyBasedPt.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -7,7 +8,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateTestNetwork {
 	
@@ -25,14 +25,14 @@ public class CreateTestNetwork {
 		//	|													|
 		//	|													|
 		// (6)-------------------------------------------------(7)
-		
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0,150));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(150,150));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(300,150));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(450,150));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(600,150));
-		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(0,0));
-		Node node7 = network.createAndAddNode(Id.create(7, Node.class), new CoordImpl(600,0));
+
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 150));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 150, (double) 150));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 300, (double) 150));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 450, (double) 150));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 600, (double) 150));
+		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 0, (double) 0));
+		Node node7 = network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 600, (double) 0));
 		
 		network.createAndAddLink(Id.create( 1, Link.class), node1, node2, 150., speed50, 1800., 1.);
 		network.createAndAddLink(Id.create( 2, Link.class), node2, node1, 150., speed50, 1800., 1.);

@@ -12,7 +12,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 public class PointShapeFileWriter {
 	// Other objects

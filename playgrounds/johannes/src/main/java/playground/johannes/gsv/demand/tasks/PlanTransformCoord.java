@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -69,8 +68,8 @@ public class PlanTransformCoord implements PopulationTask {
 					} catch (TransformException e) {
 						e.printStackTrace();
 					}
-					
-					((ActivityImpl)act).setCoord(new CoordImpl(points[0], points[1]));
+
+					((ActivityImpl)act).setCoord(new Coord(points[0], points[1]));
 				}
 			}
 		}

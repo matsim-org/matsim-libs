@@ -24,9 +24,9 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -52,8 +52,8 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testInitializationStops() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new CoordImpl(5, 11), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new CoordImpl(18, 7), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 5, (double) 11), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 18, (double) 7), false);
 		Link link1 = new FakeLink(Id.create(3, Link.class));
 		Link link2 = new FakeLink(Id.create(4, Link.class));
 		stop1.setLinkId(link1.getId());

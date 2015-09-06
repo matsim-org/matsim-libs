@@ -47,12 +47,10 @@ public class BerlinZoneUtils
     public static final Id<Link> TO_SXF_LINK_ID = Id.create(-35829, Link.class);
 
     //Coord objects are mutable, thus private; use createXXXCoord methods instead 
-    private static final Coord FROM_TXL_COORD = new CoordImpl(4588010.58447, 5825269.27936);
-    private static final Coord TO_TXL_COORD = new CoordImpl(4588009.07923, 5825207.56463);
-    private static final Coord TXL_CENTROID = new CoordImpl(
-            (FROM_TXL_COORD.getX() + TO_TXL_COORD.getX()) / 2, //
-            (FROM_TXL_COORD.getY() + TO_TXL_COORD.getY()) / 2);
-    private static final Coord SXF_CENTROID = new CoordImpl(4603210.22153, 5807381.44468);
+    private static final Coord FROM_TXL_COORD = new Coord(4588010.58447, 5825269.27936);
+    private static final Coord TO_TXL_COORD = new Coord(4588009.07923, 5825207.56463);
+    private static final Coord TXL_CENTROID = new Coord((FROM_TXL_COORD.getX() + TO_TXL_COORD.getX()) / 2, (FROM_TXL_COORD.getY() + TO_TXL_COORD.getY()) / 2);
+    private static final Coord SXF_CENTROID = new Coord(4603210.22153, 5807381.44468);
 
 
     public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile)
@@ -93,24 +91,24 @@ public class BerlinZoneUtils
 
     public static Coord createFromTxlCoord()
     {
-        return new CoordImpl(FROM_TXL_COORD);
+        return new Coord(FROM_TXL_COORD.getX(), FROM_TXL_COORD.getY());
     }
 
 
     public static Coord createToTxlCoord()
     {
-        return new CoordImpl(TO_TXL_COORD);
+        return new Coord(TO_TXL_COORD.getX(), TO_TXL_COORD.getY());
     }
 
 
     public static Coord createTxlCentroid()
     {
-        return new CoordImpl(TXL_CENTROID);
+        return new Coord(TXL_CENTROID.getX(), TXL_CENTROID.getY());
     }
 
 
     public static Coord createSxfCentroid()
     {
-        return new CoordImpl(SXF_CENTROID);
+        return new Coord(SXF_CENTROID.getX(), SXF_CENTROID.getY());
     }
 }

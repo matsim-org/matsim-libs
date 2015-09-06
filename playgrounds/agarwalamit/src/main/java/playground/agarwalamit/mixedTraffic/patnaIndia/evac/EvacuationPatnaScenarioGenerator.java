@@ -39,7 +39,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;

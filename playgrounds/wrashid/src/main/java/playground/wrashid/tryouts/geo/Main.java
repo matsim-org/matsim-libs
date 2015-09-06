@@ -19,7 +19,7 @@
 
 package playground.wrashid.tryouts.geo;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -36,7 +36,7 @@ public class Main {
 
 		// WKTParser parser = new WKTParser( new Geome DefaultGeographicCRS.WGS84 );
 		// Point point = (Point) parser.parse("POINT( 48.44 -123.37)");
-		Point p = MGC.coord2Point(new CoordImpl(744120.000135, 234919.999845));
+		Point p = MGC.coord2Point(new Coord(744120.000135, 234919.999845));
 
 		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(file)) {
 			Geometry sourceGeometry = (Geometry) feature.getDefaultGeometry();

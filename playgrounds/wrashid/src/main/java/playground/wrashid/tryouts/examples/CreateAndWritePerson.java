@@ -29,7 +29,7 @@ public class CreateAndWritePerson {
 		Id<Node> nodeId2= Id.create("nodeId2", Node.class);
 		Id<Link> linkId= Id.create("linkId", Link.class);
 		Id<Person> personId = Id.create("personId", Person.class);
-		Coord coord= sc.createCoord(1.0, 1.0);
+		Coord coord= new Coord(1.0, 1.0);
 
 		Node node1= sc.getNetwork().getFactory().createNode(nodeId1,coord);
 		Node node2= sc.getNetwork().getFactory().createNode(nodeId2,coord);

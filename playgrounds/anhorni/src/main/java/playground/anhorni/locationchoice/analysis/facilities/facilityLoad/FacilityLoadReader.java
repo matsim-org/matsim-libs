@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 
@@ -52,7 +52,7 @@ public class FacilityLoadReader {
 				Id<ActivityFacility> facilityId = Id.create(entries[0].trim(), ActivityFacility.class);
 				double x = Double.parseDouble(entries[1].trim());
 				double y = Double.parseDouble(entries[2].trim());
-				CoordImpl coord = new CoordImpl(x,y);
+				Coord coord = new Coord(x, y);
 				
 				double load = Double.parseDouble(entries[4].trim());
 				String facilityType = entries[7].trim();

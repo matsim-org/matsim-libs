@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +41,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
@@ -141,14 +141,10 @@ public class RingRoadBiMultiLane {
 				
 				NetworkFactory fac = net.getFactory();
 				double l = s.sideLength;
-				Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(
-						0, 0));
-				Node n1 = fac.createNode(Id.createNodeId("1"), new CoordImpl(
-						l, 0));
-				Node n2 = fac.createNode(Id.createNodeId("2"), new CoordImpl(
-						l, l));
-				Node n3 = fac.createNode(Id.createNodeId("3"), new CoordImpl(
-						0, l));
+				Node n0 = fac.createNode(Id.createNodeId("0"), new Coord((double) 0, (double) 0));
+				Node n1 = fac.createNode(Id.createNodeId("1"), new Coord(l, (double) 0));
+				Node n2 = fac.createNode(Id.createNodeId("2"), new Coord(l, l));
+				Node n3 = fac.createNode(Id.createNodeId("3"), new Coord((double) 0, l));
 				net.addNode(n3);
 				net.addNode(n2);
 				net.addNode(n1);

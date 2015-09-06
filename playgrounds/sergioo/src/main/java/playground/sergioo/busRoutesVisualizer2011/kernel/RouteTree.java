@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
@@ -81,7 +80,7 @@ public class RouteTree {
 		return null;
 	}
 	public Node getNearestNode(double x, double y) {
-		Coord point = new CoordImpl(x, y);
+		Coord point = new Coord(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
 		for(Link link:network.getLinks().values()) {

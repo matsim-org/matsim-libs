@@ -41,7 +41,6 @@ import net.opengis.kml._2.TimeStampType;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
@@ -166,7 +165,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			return;
 		}
 
-		Coord coord = this.coordTransform.transform(new CoordImpl(position.getEasting(), position.getNorthing()));
+		Coord coord = this.coordTransform.transform(new Coord(position.getEasting(), position.getNorthing()));
 		PointType point = kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
 		this.timeGeometry.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));

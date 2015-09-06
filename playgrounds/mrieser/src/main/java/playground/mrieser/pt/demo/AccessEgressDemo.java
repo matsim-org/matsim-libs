@@ -20,6 +20,7 @@
 
 package playground.mrieser.pt.demo;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -80,7 +81,7 @@ public class AccessEgressDemo {
 //		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord((double) (i * 500), (double) 0));
 			network.addNode(nodes[i]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
@@ -99,7 +100,7 @@ public class AccessEgressDemo {
 		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((double) ((i + 1) * 500), (double) 0), stopsBlockLane);
 			stops[i].setLinkId(Id.create(i, Link.class));
 			schedule.addStopFacility(stops[i]);
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);

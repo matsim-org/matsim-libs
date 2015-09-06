@@ -125,8 +125,8 @@ public class LinkQuadTreeTest {
 
 	private Link createLink(Scenario s, double fromX, double fromY, double toX, double toY) {
 		NetworkFactory nf = s.getNetwork().getFactory();
-		Coord fc = s.createCoord(fromX, fromY);
-		Coord tc = s.createCoord(toX, toY);
+		Coord fc = new Coord(fromX, fromY);
+		Coord tc = new Coord(toX, toY);
 		return nf.createLink(
 				Id.create(fc.toString() + "-" + tc.toString(), Link.class), 
 				nf.createNode(Id.create(fc.toString(), Node.class), fc), 

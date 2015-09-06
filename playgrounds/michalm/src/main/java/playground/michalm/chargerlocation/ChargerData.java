@@ -24,28 +24,28 @@ import java.util.*;
 
 public class ChargerData
 {
-    public final List<ChargingStation> stations;
+    public final List<ChargerLocation> locations;
     public final double totalPower;
     public final double powerToEnergy;
 
 
-    public ChargerData(List<ChargingStation> stations, double powerToEnergy)
+    public ChargerData(List<ChargerLocation> locations, double powerToEnergy)
     {
-        this.stations = stations;
+        this.locations = locations;
         this.powerToEnergy = powerToEnergy;
 
         double powerSum = 0;
-        for (ChargingStation s : stations) {
-            powerSum += s.getPower();
+        for (ChargerLocation l : locations) {
+            powerSum += l.getPower();
         }
 
         totalPower = powerSum;
 
-        Collections.sort(stations, new Comparator<ChargingStation>() {
+        Collections.sort(locations, new Comparator<ChargerLocation>() {
             @Override
-            public int compare(ChargingStation o1, ChargingStation o2)
+            public int compare(ChargerLocation l1, ChargerLocation l2)
             {
-                return o1.getId().compareTo(o2.getId());
+                return l1.getId().compareTo(l2.getId());
             }
         });
     }

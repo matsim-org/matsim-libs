@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.vehicles.Vehicle;
 
@@ -423,14 +422,14 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		public Fixture() {
 			this.network = NetworkImpl.createNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(1000,    0));
-			Node node2 = this.network.createAndAddNode(Id.create(2, Node.class), new CoordImpl( 500,    0));
-			Node node3 = this.network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(   0,    0));
-			Node node4 = this.network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(1000, 2000));
-			Node node5 = this.network.createAndAddNode(Id.create(5, Node.class), new CoordImpl( 500, 2000));
-			Node node6 = this.network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(   0, 2000));
-			Node node7 = this.network.createAndAddNode(Id.create(7, Node.class), new CoordImpl( 500,  500));
-			Node node8 = this.network.createAndAddNode(Id.create(8, Node.class), new CoordImpl( 500, 1500));
+			Node node1 = this.network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
+			Node node2 = this.network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 500, (double) 0));
+			Node node3 = this.network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+			Node node4 = this.network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 1000, (double) 2000));
+			Node node5 = this.network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 500, (double) 2000));
+			Node node6 = this.network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 0, (double) 2000));
+			Node node7 = this.network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 500, (double) 500));
+			Node node8 = this.network.createAndAddNode(Id.create(8, Node.class), new Coord((double) 500, (double) 1500));
 			this.network.createAndAddLink(Id.create(1, Link.class), node1, node7, 1000.0, 10.0, 2000.0, 1);
 			this.network.createAndAddLink(Id.create(2, Link.class), node2, node7, 1000.0, 10.0, 2000.0, 1);
 			this.network.createAndAddLink(Id.create(3, Link.class), node3, node7, 1000.0, 10.0, 2000.0, 1);

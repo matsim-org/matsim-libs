@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -28,7 +29,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -77,7 +77,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
         LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
         double centerX = 683217.0; 
         double centerY = 247300.0;
-        CoordImpl coord = new CoordImpl(centerX, centerY);
+		Coord coord = new Coord(centerX, centerY);
       
         boolean shopgroceryInside = false;
      

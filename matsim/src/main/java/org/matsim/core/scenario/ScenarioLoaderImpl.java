@@ -24,8 +24,6 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
@@ -76,59 +74,27 @@ public class ScenarioLoaderImpl {
 		scenarioLoader.loadScenario();
 	}
 
-	/**
-	 * @deprecated  This used to be a constructor with a global side effect, which is absolutely evil.
-	 *				Please just load the Scenario with ScenarioUtils.loadScenario instead.
-	 */
-	@Deprecated
-	public static ScenarioLoaderImpl createScenarioLoaderImplAndResetRandomSeed(String configFilename) {
-		Config config = ConfigUtils.loadConfig(configFilename);
-		MatsimRandom.reset(config.global().getRandomSeed());
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		return new ScenarioLoaderImpl(scenario);
-	}
-
 	private final Config config;
 
 	private final ScenarioImpl scenario;
 
-	/**
-	 * yy Does it make sense to leave this constructor public?  kai, mar'11
-	 */
-	@Deprecated // please use the static calls in ScenarioUtils instead
-	public ScenarioLoaderImpl(Config config) {
+	private ScenarioLoaderImpl(Config config) {
 		this.config = config;
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 	}
 
-	/**
-	 * yy Does it make sense to leave this constructor public?  kai, mar'11
-	 */
-	@Deprecated // please use the static calls in ScenarioUtils instead
-	public ScenarioLoaderImpl(Scenario scenario) {
+	private ScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig();
-	}
-
-
-	/**
-	 * @deprecated  Please use the static calls in ScenarioUtils instead.
-	 *
-	 */
-	@Deprecated
-	public Scenario getScenario() {
-		return this.scenario;
 	}
 
 	/**
 	 * Loads all mandatory Scenario elements and
 	 * if activated in config's scenario module/group
 	 * optional elements.
-	 * @deprecated  Please use the static calls in ScenarioUtils instead.
 	 * @return the Scenario
 	 */
-	@Deprecated
-	public Scenario loadScenario() {
+	private Scenario loadScenario() {
 		String currentDir = new File("tmp").getAbsolutePath();
 		currentDir = currentDir.substring(0, currentDir.length() - 3);
 		log.info("loading scenario from base directory: " + currentDir);
@@ -149,13 +115,8 @@ public class ScenarioLoaderImpl {
 
 	/**
 	 * Loads the network into the scenario of this class
-	 *
-	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
-	 * 				If you want only a network, use the MatsimNetworkReader directly.
-	 *
 	 */
-	@Deprecated
-	public void loadNetwork() {
+	private void loadNetwork() {
 		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
@@ -175,13 +136,7 @@ public class ScenarioLoaderImpl {
 		}
 	}
 
-	/**
-	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
-	 * 				If you want only Facilities, use the MatsimFacilitiesReader directly.
-	 *
-	 */
-	@Deprecated
-	public void loadActivityFacilities() {
+	private void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
@@ -201,13 +156,7 @@ public class ScenarioLoaderImpl {
 		}
 	}
 
-	/**
-	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
-	 * 				If you want only a Population, use the MatsimPopulationReader directly.
-	 *
-	 */
-	@Deprecated
-	public void loadPopulation() {
+	private void loadPopulation() {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);

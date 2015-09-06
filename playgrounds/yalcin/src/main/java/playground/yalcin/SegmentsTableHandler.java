@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -45,8 +45,8 @@ public class SegmentsTableHandler implements TabularFileHandler {
 	private final BufferedWriter writer;
 
 	// some variables to maintain state
-	private CoordImpl startCoord = null;
-	private CoordImpl endCoord = null;
+	private Coord startCoord = null;
+	private Coord endCoord = null;
 	private String personId = null;
 	private String tripId = null;
 	private String startDate = null;
@@ -106,7 +106,7 @@ public class SegmentsTableHandler implements TabularFileHandler {
 			this.tripId = row[1];
 			this.startDate = row[6];
 			this.startTime = row[7];
-			this.startCoord = new CoordImpl(Double.parseDouble(row[3])/1000.0, Double.parseDouble(row[4])/1000.0);
+			this.startCoord = new Coord(Double.parseDouble(row[3]) / 1000.0, Double.parseDouble(row[4]) / 1000.0);
 			this.cntSegments = 0;
 			this.cntPuTSegments = 0;
 			this.cntRailSegments = 0;
@@ -115,7 +115,7 @@ public class SegmentsTableHandler implements TabularFileHandler {
 
 		this.endDate = row[11];
 		this.endTime = row[12];
-		this.endCoord = new CoordImpl(Double.parseDouble(row[8])/1000.0, Double.parseDouble(row[9])/1000.0);
+		this.endCoord = new Coord(Double.parseDouble(row[8]) / 1000.0, Double.parseDouble(row[9]) / 1000.0);
 		this.cntSegments++;
 		if (Double.parseDouble(row[18]) >= 0.5) {
 			this.cntPuTSegments++;

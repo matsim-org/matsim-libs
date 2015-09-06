@@ -20,6 +20,7 @@
 
 package playground.christoph.router;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -42,9 +43,9 @@ public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 		
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("p1", Person.class));
 		scenario.getPopulation().addPerson(person);
-		
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), scenario.createCoord(0.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), scenario.createCoord(1.0, 0.0));
+
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(1.0, 0.0));
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);

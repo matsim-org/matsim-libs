@@ -36,7 +36,6 @@ import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -331,7 +330,7 @@ public class Fcd {
 	public static Link getNearestLinkWithRightDirection(NetworkImpl net, Coord coord, double direction) {
 		Link link = NetworkUtils.getNearestLink(net, coord);
 		double directionGiven_rad = direction * 2 * Math.PI / 360.0;
-		Coord vectorGiven = new CoordImpl(Math.cos(directionGiven_rad), Math.sin(directionGiven_rad));
+		Coord vectorGiven = new Coord(Math.cos(directionGiven_rad), Math.sin(directionGiven_rad));
 		// could be done without converting to a vector
 		
 		if(angleIsWithinEpsilon(getVector(link), vectorGiven)){
@@ -372,8 +371,8 @@ public class Fcd {
 	
 	private static Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
-		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
-		return new CoordImpl(x, y);
+		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
+		return new Coord(x, y);
 	}
 
 }

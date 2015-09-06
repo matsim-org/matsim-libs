@@ -17,7 +17,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
@@ -102,15 +101,15 @@ public class PopulationGenerator {
 			System.out.println("Home: "+homePoint.getX()+","+homePoint.getY()+"   Work: "+workPoint.getX()+","+workPoint.getY());
 					
 			Plan plan = populationFactory.createPlan();
-			Link link = NetworkUtils.getNearestLink(net, new CoordImpl(homePoint.getX(), homePoint.getY()));
+			Link link = NetworkUtils.getNearestLink(net, new Coord(homePoint.getX(), homePoint.getY()));
 			Activity activity = populationFactory.createActivityFromLinkId("home", link.getId());
 			activity.setEndTime(3600.0*8);
 			plan.addActivity(activity);
 			Leg leg = populationFactory.createLeg("car");
 			
 			plan.addLeg(leg);
-			
-			link = NetworkUtils.getNearestLink(net, new CoordImpl(workPoint.getX(), workPoint.getY()));
+
+			link = NetworkUtils.getNearestLink(net, new Coord(workPoint.getX(), workPoint.getY()));
 			activity = populationFactory.createActivityFromLinkId("work", link.getId());
 			activity.setStartTime(3600.0*9);
 			activity.setEndTime(3600.0*18);
@@ -185,9 +184,9 @@ public class PopulationGenerator {
 				
 		System.out.println("Min: "+xMin+","+yMin);
 		System.out.println("Max: "+xMax+","+yMax);
-		
-		dimensions[0] = new CoordImpl(xMin-1000, yMin-1000);
-		dimensions[1] = new CoordImpl(xMax+1000, yMax+1000);
+
+		dimensions[0] = new Coord(xMin - 1000, yMin - 1000);
+		dimensions[1] = new Coord(xMax + 1000, yMax + 1000);
 		
 		return dimensions;
 	}

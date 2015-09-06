@@ -46,7 +46,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CASimFZJ {
 
@@ -213,7 +212,7 @@ public class CASimFZJ {
 		while (ry > 50) {
 			ry = MatsimRandom.getRandom().nextGaussian() * 10;
 		}
-		return new CoordImpl(c0.getX() + rx, c0.getY() + ry);
+		return new Coord(c0.getX() + rx, c0.getY() + ry);
 	}
 
 	private static double getGausianEndTime(double sigma, double range) {

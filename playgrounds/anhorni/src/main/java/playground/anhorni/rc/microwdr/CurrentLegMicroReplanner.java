@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;

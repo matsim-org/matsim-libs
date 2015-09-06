@@ -280,19 +280,19 @@ public class EditRoutesTest extends MatsimTestCase {
 		/*
 		 * create Nodes
 		 */
-		coord = scenario.createCoord(0, 0);
+		coord = new Coord((double) 0, (double) 0);
 		node1 = networkFactory.createNode(Id.create("n1", Node.class), coord);
 		network.addNode(node1);
-		
-		coord = scenario.createCoord(1, 0);
+
+		coord = new Coord((double) 1, (double) 0);
 		node2 = networkFactory.createNode(Id.create("n2", Node.class), coord);
 		network.addNode(node2);
 
-		coord = scenario.createCoord(1, 1);
+		coord = new Coord((double) 1, (double) 1);
 		node3 = networkFactory.createNode(Id.create("n3", Node.class), coord);
 		network.addNode(node3);
 
-		coord = scenario.createCoord(0, 1);
+		coord = new Coord((double) 0, (double) 1);
 		node4 = networkFactory.createNode(Id.create("n4", Node.class), coord);
 		network.addNode(node4);
 

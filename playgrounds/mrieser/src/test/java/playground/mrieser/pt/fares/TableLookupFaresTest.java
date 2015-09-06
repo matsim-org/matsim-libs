@@ -23,9 +23,9 @@ package playground.mrieser.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -35,9 +35,9 @@ public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_SameFromAsTo() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(1100, 1200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 2100, (double) 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 1100, (double) 1200));
 
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();
 		fares.put(new Tuple<ActivityFacilityImpl, ActivityFacilityImpl>(stop1, stop2), 2.0);
@@ -50,9 +50,9 @@ public class TableLookupFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_BasicQueries() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(1100, 1200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 2100, (double) 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 1100, (double) 1200));
 
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();
 		fares.put(new Tuple<ActivityFacilityImpl, ActivityFacilityImpl>(stop1, stop2), 2.0);
@@ -66,9 +66,9 @@ public class TableLookupFaresTest extends MatsimTestCase {
 	public void testGetSingleTripCost_ReverseQueries() {
 		// not clear if this is a feature or a bug...
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(1100, 1200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 2100, (double) 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 1100, (double) 1200));
 
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();
 		fares.put(new Tuple<ActivityFacilityImpl, ActivityFacilityImpl>(stop1, stop2), 2.0);

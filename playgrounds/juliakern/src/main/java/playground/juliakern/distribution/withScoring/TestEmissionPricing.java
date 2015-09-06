@@ -38,7 +38,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -259,15 +258,15 @@ public class TestEmissionPricing {
 	private static void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(1.0, 10000.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(2500.0, 10000.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord(4500.0, 10000.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord(17500.0, 10000.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), scenario.createCoord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), scenario.createCoord(19999.0, 1500.0));
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), scenario.createCoord(1.0, 1500.0));
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), scenario.createCoord(12500.0,  12499.0));
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), scenario.createCoord(12500.0, 7500.0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(1.0, 10000.0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(2500.0, 10000.0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(4500.0, 10000.0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(17500.0, 10000.0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(19999.0, 10000.0));
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(19999.0, 1500.0));
+		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(1.0, 1500.0));
+		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(12500.0, 12499.0));
+		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(12500.0, 7500.0));
 
 
 		network.createAndAddLink(Id.create("12", Link.class), node1, node2, 1000, 60.00, 3600, 1, null, "22");
@@ -292,8 +291,8 @@ public class TestEmissionPricing {
 				double yCoord = 7188. + (j-1)*625;
 				
 				// add a link for each person
-				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), scenario.createCoord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), scenario.createCoord(xCoord, yCoord+10.));
+				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
+				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 10.));
 				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
 
 			}
@@ -313,12 +312,12 @@ public class TestEmissionPricing {
 				double xCoord = 6563. + (i+1)*625;
 				double yCoord = 7188. + (j-1)*625;
 				Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
-				
-				Coord coord = new CoordImpl(xCoord, yCoord);
+
+				Coord coord = new Coord(xCoord, yCoord);
 				Activity home = pFactory.createActivityFromCoord("home", coord );
 				home.setEndTime(1.0);
 				Leg leg = pFactory.createLeg(TransportMode.walk);
-				Coord coord2 = new CoordImpl(xCoord, yCoord+10.);
+				Coord coord2 = new Coord(xCoord, yCoord + 10.);
 				Activity home2 = pFactory.createActivityFromCoord("home", coord2);
 
 				plan.addActivity(home);

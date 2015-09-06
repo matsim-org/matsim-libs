@@ -3,19 +3,15 @@ package saleem.stockholmscenario.stockholmptdata;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 

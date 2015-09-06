@@ -22,13 +22,13 @@ package org.matsim.core.network.algorithms;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -40,11 +40,11 @@ public class CalcBoundingBoxTest {
 		Network net = NetworkUtils.createNetwork();
 		NetworkFactory nf = net.getFactory();
 
-		Node n0 = nf.createNode(Id.create(0, Node.class), new CoordImpl(100, 500));
-		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(300, 400));
-		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(200, 700));
-		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(600, 200));
-		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(400, 300));
+		Node n0 = nf.createNode(Id.create(0, Node.class), new Coord((double) 100, (double) 500));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new Coord((double) 300, (double) 400));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new Coord((double) 200, (double) 700));
+		Node n3 = nf.createNode(Id.create(3, Node.class), new Coord((double) 600, (double) 200));
+		Node n4 = nf.createNode(Id.create(4, Node.class), new Coord((double) 400, (double) 300));
 
 		net.addNode(n0);
 		net.addNode(n1);
@@ -76,11 +76,21 @@ public class CalcBoundingBoxTest {
 		Network net = NetworkUtils.createNetwork();
 		NetworkFactory nf = net.getFactory();
 
-		Node n0 = nf.createNode(Id.create(0, Node.class), new CoordImpl(-100, -500));
-		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(-300, -400));
-		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(-200, -700));
-		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(-600, -200));
-		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(-400, -300));
+		final double x4 = -100;
+		final double y4 = -500;
+		Node n0 = nf.createNode(Id.create(0, Node.class), new Coord(x4, y4));
+		final double x3 = -300;
+		final double y3 = -400;
+		Node n1 = nf.createNode(Id.create(1, Node.class), new Coord(x3, y3));
+		final double x2 = -200;
+		final double y2 = -700;
+		Node n2 = nf.createNode(Id.create(2, Node.class), new Coord(x2, y2));
+		final double x1 = -600;
+		final double y1 = -200;
+		Node n3 = nf.createNode(Id.create(3, Node.class), new Coord(x1, y1));
+		final double x = -400;
+		final double y = -300;
+		Node n4 = nf.createNode(Id.create(4, Node.class), new Coord(x, y));
 
 		net.addNode(n0);
 		net.addNode(n1);

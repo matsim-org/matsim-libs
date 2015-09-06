@@ -23,6 +23,7 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -43,10 +44,12 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;
+	private final ScenarioConfigGroup scenarioConfig;
 	private CharyparNagelScoringParameters params = null;
 
-	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
+	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ScenarioConfigGroup scenarioConfig, Network network) {
 		this.config = config;
+		this.scenarioConfig = scenarioConfig;
 		this.network = network;
 	}
 
@@ -76,7 +79,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 			 * values in them due to using the same config. Still much better from a memory performance
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
-			this.params = CharyparNagelScoringParameters.getBuilder(this.config).create();
+			this.params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenarioConfig).create();
 		}
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();

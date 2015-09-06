@@ -36,7 +36,6 @@ public class DefaultActivityCreator
     implements ActivityCreator
 {
     protected final UniformRandom uniform = RandomUtils.getGlobalUniform();
-    protected final Scenario scenario;
     protected final Network network;
     protected final PopulationFactory pf;
 
@@ -53,7 +52,6 @@ public class DefaultActivityCreator
     public DefaultActivityCreator(Scenario scenario, GeometryProvider geometryProvider,
             PointAcceptor pointAcceptor)
     {
-        this.scenario = scenario;
         this.network = scenario.getNetwork();
         this.pf = scenario.getPopulation().getFactory();
         this.geometryProvider = geometryProvider;
@@ -71,7 +69,7 @@ public class DefaultActivityCreator
         }
         while (!pointAcceptor.acceptPoint(zone, actType, p));
 
-        Coord coord = scenario.createCoord(p.getX(), p.getY());
+        Coord coord = new Coord(p.getX(), p.getY());
         Link link = NetworkUtils.getNearestLink(network, coord);
 
         ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);

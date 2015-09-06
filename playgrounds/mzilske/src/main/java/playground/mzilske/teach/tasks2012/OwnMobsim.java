@@ -1,6 +1,7 @@
 package playground.mzilske.teach.tasks2012;
 
 import com.google.inject.Provider;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -15,7 +16,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
@@ -41,8 +41,7 @@ public class OwnMobsim {
 			Node end = scenario.getNetwork().getNodes().get(Id.create("14", Node.class));
 			for (double i=0; i<1000; i++) {
 				writer.beginSnapshot(i);
-				CoordImpl pos = new CoordImpl(start.getCoord().getX() + ( (end.getCoord().getX() - start.getCoord().getX()) / 1000.0) * i,  
-						start.getCoord().getY() + ( (end.getCoord().getY() - start.getCoord().getY()) / 1000.0)* i);
+				Coord pos = new Coord(start.getCoord().getX() + ((end.getCoord().getX() - start.getCoord().getX()) / 1000.0) * i, start.getCoord().getY() + ((end.getCoord().getY() - start.getCoord().getY()) / 1000.0) * i);
 				AgentSnapshotInfo agentSnapshotInfo = agentSnapshotInfoFactory.createAgentSnapshotInfo(Id.create("1", Person.class), pos.getX(), pos.getY(), 0.0, 0.0);
 				System.out.println(pos);
 				agentSnapshotInfo.setAgentState(AgentState.PERSON_DRIVING_CAR);

@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.regex.*;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -95,8 +94,8 @@ public class Geocoder {
 			statusCode = Integer.parseInt (m.group(1));
 			String lat = m.group(2);
 			String lon = m.group(3);
-			if (statusCode == 200) { 
-				location = new CoordImpl (Double.parseDouble(lon), Double.parseDouble(lat));
+			if (statusCode == 200) {
+				location = new Coord(Double.parseDouble(lon), Double.parseDouble(lat));
 				break;
 			}
 		}

@@ -17,7 +17,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -166,7 +165,7 @@ public class PopulationBuilder2011 {
 						/* Give it a home coordinate. Currently this does not 
 						 * take facilities and their building types into account. */
 						Point homePoint = thisZone.sampleRandomInteriorPoint();
-						Coord homeCoord = new CoordImpl(homePoint.getX(), homePoint.getY());
+						Coord homeCoord = new Coord(homePoint.getX(), homePoint.getY());
 						householdAttributes.putAttribute(household.getId().toString(), "homeCoord", homeCoord);
 						
 						/* Add the household attributes. */
@@ -237,7 +236,7 @@ public class PopulationBuilder2011 {
 		HouseholdsWriterV10 hw = new HouseholdsWriterV10(households);
 		hw.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "households.xml.gz");
 		ObjectAttributesXmlWriter householdsAttributeWriter = new ObjectAttributesXmlWriter(householdAttributes);
-		householdsAttributeWriter.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		householdsAttributeWriter.putAttributeConverter(Coord.class, new CoordConverter());
 		householdsAttributeWriter.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz");
 		
 		/* Try and conserve memory. Don't know if it does, though. */

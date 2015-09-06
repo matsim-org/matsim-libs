@@ -12,7 +12,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -150,10 +150,10 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	private final Map<String, Map<Id<Link>, Double[]>> knownTravelTimes = new HashMap<String, Map<Id<Link>, Double[]>>();
 	private final SimplerNetworkTravelDisutility simpleTravelDisutility =  new SimplerNetworkTravelDisutility();
 	private final SimplerNetworkTravelTime simpleTravelTime =  new SimplerNetworkTravelTime();
-	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
+	private final Dijkstra leastCostPathCalculator;
 	
 	//Constructors
-	public SocialDecisionMaker2(ScenarioSimplerNetwork scenario, Household household, IntermodalLeastCostPathCalculator leastCostPathCalculator) {
+	public SocialDecisionMaker2(ScenarioSimplerNetwork scenario, Household household, Dijkstra leastCostPathCalculator) {
 		this.scenario = scenario;
 		if(household!=null)
 			this.household = household;

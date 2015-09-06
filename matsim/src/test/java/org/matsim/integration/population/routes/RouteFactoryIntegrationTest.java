@@ -20,8 +20,15 @@
 
 package org.matsim.integration.population.routes;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -30,11 +37,8 @@ import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.Collection;
 
 /**
  * @author mrieser
@@ -81,8 +85,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/variant1");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler2 = new Controler(scenario);
         controler2.getConfig().controler().setCreateGraphs(false);

@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -106,7 +105,7 @@ public class MyTollSchemeGenerator {
 	"8.468355740492342,47.39746691123316,0 8.470883682949605,47.39656743520219,0 8.471627920840675,47.39394790751316,0 8.466070295798161,47.39433939496237,0 8.468607322537721,47.39135729003962,0 " +
 	"8.467614108595754,47.39018181322238,0 8.464771613486562,47.39097562237137,0 8.44864283511221,47.37986637690101,0 ";
 
-	private static final Coord centerCoord = new CoordImpl(0, 0);
+	private static final Coord centerCoord = new Coord((double) 0, (double) 0);
 	//6 o'clock
 	private static final double START = 21600;
 	//9 o'clock
@@ -254,7 +253,7 @@ public class MyTollSchemeGenerator {
 			singleCoords = s.split(",");
 			x = Double.parseDouble(singleCoords[0]);
 			y = Double.parseDouble(singleCoords[1]);
-			c = new CoordImpl(x, y);
+			c = new Coord(x, y);
 //			log.debug("read coordinate with x: " + x + " y: " + y);
 			coord = transform.transform(c);
 //			log.debug("transformed coordinate with x: " + coord.getX() + " y: "

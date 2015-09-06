@@ -110,8 +110,8 @@ class CreateGridNetworkScenario {
 		// creates nodes
 		for(int row = 1; row < (rows + 1); row++){
 			for(int column = 1; column < (columns + 1); column++){
-				n = nf.createNode(Id.create(String.valueOf(column) + "." + String.valueOf(row), Node.class), 
-						scenario.createCoord(column * distanceFromNodeToNode, row * distanceFromNodeToNode));
+				n = nf.createNode(Id.create(String.valueOf(column) + "." + String.valueOf(row), Node.class),
+						new Coord(column * distanceFromNodeToNode, row * distanceFromNodeToNode));
 				network.addNode(n);
 			}
 		}

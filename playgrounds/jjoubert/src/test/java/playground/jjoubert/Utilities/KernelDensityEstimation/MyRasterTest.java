@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -327,25 +326,25 @@ public class MyRasterTest{
 
 	private static List<Coord> buildTestPoints() {
 		List<Coord> l = new ArrayList<Coord>(9);
-		Coord p1 = new CoordImpl(0.5, 0.5); // a
+		Coord p1 = new Coord(0.5, 0.5); // a
 		l.add(p1);
-		Coord p2 = new CoordImpl(1.2, 1.2); // b
+		Coord p2 = new Coord(1.2, 1.2); // b
 		l.add(p2);
-		Coord p3 = new CoordImpl(4.2, 1.8); // c
+		Coord p3 = new Coord(4.2, 1.8); // c
 		l.add(p3);
-		Coord p4 = new CoordImpl(2.5, 2.5); // d
+		Coord p4 = new Coord(2.5, 2.5); // d
 		l.add(p4);
-		Coord p5 = new CoordImpl(2.3, 2.8); // e
+		Coord p5 = new Coord(2.3, 2.8); // e
 		l.add(p5);
-		Coord p6 = new CoordImpl(2.7, 2.8); // f
-		l.add(p6);		
-		Coord p7 = new CoordImpl(1.8, 3.2); // g
+		Coord p6 = new Coord(2.7, 2.8); // f
+		l.add(p6);
+		Coord p7 = new Coord(1.8, 3.2); // g
 		l.add(p7);
-		Coord p8 = new CoordImpl(1.2, 3.8); // h
+		Coord p8 = new Coord(1.2, 3.8); // h
 		l.add(p8);
-		Coord p9 = new CoordImpl(5.5, 2.5); // i
+		Coord p9 = new Coord(5.5, 2.5); // i
 		l.add(p9);
-		Coord p10 = new CoordImpl(3.5, 4.5); // j
+		Coord p10 = new Coord(3.5, 4.5); // j
 		l.add(p10);
 	
 		return l;

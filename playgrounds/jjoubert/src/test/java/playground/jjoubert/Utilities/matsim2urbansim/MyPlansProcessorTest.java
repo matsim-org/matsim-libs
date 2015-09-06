@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -46,7 +47,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MyPlansProcessorTest extends MatsimTestCase{
@@ -103,10 +103,10 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Network n = scenario.getNetwork();
 		NetworkFactory nf = n.getFactory();
 
-		Node n1 = nf.createNode(Id.create("1", Node.class), new CoordImpl(2,3));
-		Node n2 = nf.createNode(Id.create("2", Node.class), new CoordImpl(8,3));
-		Node n3 = nf.createNode(Id.create("3", Node.class), new CoordImpl(7,7));
-		Node n4 = nf.createNode(Id.create("4", Node.class), new CoordImpl(3,7));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 2, (double) 3));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 8, (double) 3));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 7, (double) 7));
+		Node n4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 3, (double) 7));
 
 		n.addNode(n1); n.addNode(n2); n.addNode(n3); n.addNode(n4);
 
@@ -139,7 +139,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Person p1 = pf.createPerson(Id.create("0", Person.class));
 		Plan plan = pf.createPlan();
 		// Home.
-		Activity a1 = new ActivityImpl("home", new CoordImpl(1.0, 1.0)); a1.setEndTime(6*3600);
+		Activity a1 = new ActivityImpl("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		Leg l1 = new LegImpl(TransportMode.car);
@@ -154,7 +154,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		plan.addLeg(l1);
 		// TODO Try dijkstra here.
 		// Work.
-		Activity a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0));
+		Activity a2 = new ActivityImpl("work", new Coord(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -165,7 +165,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		l2.setTravelTime(10.0*60.0);
 		plan.addLeg(l2);
 		// Home.
-		Activity a3 = new ActivityImpl("home", new CoordImpl(1.0, 1.0));
+		Activity a3 = new ActivityImpl("home", new Coord(1.0, 1.0));
 		a3.setStartTime(17*3600);
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------
@@ -178,7 +178,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Person p2 = pf.createPerson(Id.create("1", Person.class));
 		plan = pf.createPlan();
 		// Home.
-		a1 = new ActivityImpl("home", new CoordImpl(1.0, 1.0)); a1.setEndTime(6*3600);
+		a1 = new ActivityImpl("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		l1 = new LegImpl(TransportMode.car);
@@ -193,7 +193,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		plan.addLeg(l1);
 		// TODO Try dijkstra here.
 		// Work.
-		a2 = new ActivityImpl("work", new CoordImpl(9.0, 9.0));
+		a2 = new ActivityImpl("work", new Coord(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -204,7 +204,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		l2.setTravelTime(20.0*60.0);
 		plan.addLeg(l2);
 		// Home.
-		a3 = new ActivityImpl("home", new CoordImpl(1.0, 1.0));
+		a3 = new ActivityImpl("home", new Coord(1.0, 1.0));
 		a3.setStartTime(17*3600);
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------

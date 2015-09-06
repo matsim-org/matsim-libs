@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.satellic;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,12 +30,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.dgrether.DgPaths;
 
-import java.util.Random;
+import playground.dgrether.DgPaths;
 
 
 public class DgSatellicPopulationPostprocessing {
@@ -49,11 +48,10 @@ public class DgSatellicPopulationPostprocessing {
   
   public void doPostprocessing(){
     //load base scenario data
-    Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(NETWORK);
     sc.getConfig().plans().setInputFile(POPIN);
-    ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
-    loader.loadScenario();
+    ScenarioUtils.loadScenario(sc);
     NetworkImpl network = (NetworkImpl) sc.getNetwork();
     Population pop = sc.getPopulation();
     Random random = MatsimRandom.getLocalInstance();

@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -280,7 +280,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			else {
 				to_fac = this.getPrimActFacility(to_facs,WORK);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCoord();
+			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<work_list.size(); i++) {
 				ActivityImpl a = work_list.get(i);
 				a.setCoord(coord);
@@ -302,7 +302,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			else {
 				to_fac = this.getPrimActFacility(to_facs,EDUCATION);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCoord();
+			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<educ_list.size(); i++) {
 				ActivityImpl a = educ_list.get(i);
 				a.setCoord(coord);

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -100,10 +101,11 @@ public class CreateInputs {
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("1:00:00"));
-		Node node1 = network.createAndAddNode(Id.createNodeId("1"), scenario.createCoord(-100.0,0.0));
-		Node node2 = network.createAndAddNode(Id.createNodeId("2"), scenario.createCoord( 0.0,  0.0));
-		Node node3 = network.createAndAddNode(Id.createNodeId("3"), scenario.createCoord( 0.0,1000.0));
-		Node node4 = network.createAndAddNode(Id.createNodeId("4"), scenario.createCoord( 100.0,1000.0));
+		double x = -100.0;
+		Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord(x, 0.0));
+		Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
+		Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord(0.0, 1000.0));
+		Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(100.0, 1000.0));
 
 		Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","walk"));
 

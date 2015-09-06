@@ -8,6 +8,7 @@ import matsimConnector.utility.Constants;
 import matsimConnector.utility.Distances;
 import matsimConnector.utility.MathUtility;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -15,7 +16,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import pedCA.context.Context;
 import pedCA.environment.markers.Destination;
@@ -37,12 +37,15 @@ public class NetworkGenerator {
 	protected static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("n0",Node.class), new CoordImpl(-20.,DOOR_WIDTH/2));
-		Node n1 = fac.createNode(Id.create("n1",Node.class), new CoordImpl(-10.,DOOR_WIDTH/2));
-		Node n2 = fac.createNode(Id.create("n2",Node.class), new CoordImpl(-0.2,DOOR_WIDTH/2));
-		Node n5 = fac.createNode(Id.create("n5",Node.class), new CoordImpl(CA_LENGTH+0.,DOOR_WIDTH/2));
-		Node n6 = fac.createNode(Id.create("n6",Node.class), new CoordImpl(CA_LENGTH+10.,DOOR_WIDTH/2));
-		Node n7 = fac.createNode(Id.create("n7",Node.class), new CoordImpl(CA_LENGTH+20.,DOOR_WIDTH/2));
+		final double x2 = -20.;
+		Node n0 = fac.createNode(Id.create("n0",Node.class), new Coord(x2, DOOR_WIDTH / 2));
+		final double x1 = -10.;
+		Node n1 = fac.createNode(Id.create("n1",Node.class), new Coord(x1, DOOR_WIDTH / 2));
+		final double x = -0.2;
+		Node n2 = fac.createNode(Id.create("n2",Node.class), new Coord(x, DOOR_WIDTH / 2));
+		Node n5 = fac.createNode(Id.create("n5",Node.class), new Coord(CA_LENGTH + 0., DOOR_WIDTH / 2));
+		Node n6 = fac.createNode(Id.create("n6",Node.class), new Coord(CA_LENGTH + 10., DOOR_WIDTH / 2));
+		Node n7 = fac.createNode(Id.create("n7",Node.class), new Coord(CA_LENGTH + 20., DOOR_WIDTH / 2));
 		
 		net.addNode(n0);
 		net.addNode(n1);
@@ -146,7 +149,7 @@ public class NetworkGenerator {
 					double y = destinationCA.getCoordinates().getY();
 					Coordinates coord = new Coordinates(x-(LINK_LENGTH*i)-0.2,y);
 					MathUtility.rotate(coord, destinationCA.getRotation(), destinationCA.getCoordinates());
-					nodes.add(fac.createNode(Id.create("n"+nodeCount,Node.class), new CoordImpl(coord.getX(),coord.getY())));
+					nodes.add(fac.createNode(Id.create("n"+nodeCount,Node.class), new Coord(coord.getX(), coord.getY())));
 					net.addNode(nodes.get(nodes.size()-1));
 					nodeCount++;
 				}			
@@ -202,26 +205,26 @@ public class NetworkGenerator {
 		}
 		if (south.size()>0){
 			Coordinates centroid = Distances.centroid(south);
-			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX(),centroid.getY()-LINK_LENGTH));
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new Coord(centroid.getX(), centroid.getY() - LINK_LENGTH));
 			net.addNode(orDestNode);
 			connect(orDestNode, south, net, fac,'s');
 		
 		}
 		if (north.size()>0){
 			Coordinates centroid = Distances.centroid(north);
-			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX(),centroid.getY()+LINK_LENGTH));
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new Coord(centroid.getX(), centroid.getY() + LINK_LENGTH));
 			net.addNode(orDestNode);
 			connect(orDestNode, north, net, fac,'n');
 		}
 		if (west.size()>0){
 			Coordinates centroid = Distances.centroid(west);
-			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX()-LINK_LENGTH,centroid.getY()));
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new Coord(centroid.getX() - LINK_LENGTH, centroid.getY()));
 			net.addNode(orDestNode);
 			connect(orDestNode, west, net, fac, 'w');
 		}
 		if (east.size()>0){
 			Coordinates centroid = Distances.centroid(east);
-			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX()+LINK_LENGTH,centroid.getY()));
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new Coord(centroid.getX() + LINK_LENGTH, centroid.getY()));
 			net.addNode(orDestNode);
 			connect(orDestNode, east, net, fac, 'e');
 		}
@@ -239,7 +242,7 @@ public class NetworkGenerator {
 			net.addLink(linkOut);
 			net.addLink(linkIn);
 		}
-		Node firstNode = fac.createNode(Id.create("n_"+direction,Node.class), new CoordImpl(orDestNode.getCoord().getX(),orDestNode.getCoord().getY()+LINK_LENGTH));
+		Node firstNode = fac.createNode(Id.create("n_"+direction,Node.class), new Coord(orDestNode.getCoord().getX(), orDestNode.getCoord().getY() + LINK_LENGTH));
 		Link linkOut = fac.createLink(Id.create("l"+net.getLinks().size(),Link.class), orDestNode, firstNode);
 		Link linkIn = fac.createLink(Id.create("l"+(net.getLinks().size()+1),Link.class), firstNode, orDestNode);
 		net.addNode(firstNode);

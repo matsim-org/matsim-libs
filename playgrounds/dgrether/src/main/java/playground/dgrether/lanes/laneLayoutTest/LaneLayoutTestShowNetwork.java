@@ -27,7 +27,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -40,9 +39,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  */
 public class LaneLayoutTestShowNetwork {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
@@ -51,11 +47,10 @@ public class LaneLayoutTestShowNetwork {
 		ConfigUtils.addOrGetModule(sc.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
 		sc.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(sc);
 		EventsManager events = EventsUtils.createEventsManager();
 
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(sc, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);
 		otfVisQSim.run();

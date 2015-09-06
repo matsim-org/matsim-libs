@@ -210,9 +210,8 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			return this.delegate.getActivityFacilities();
 		}
 
-		@Override
 		public Coord createCoord(double x, double y) {
-			return this.delegate.createCoord(x, y);
+			return new Coord(x, y);
 		}
 
 		@Override

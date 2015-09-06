@@ -191,7 +191,7 @@ public class MATSimScenarioCreator {
 		}
 		locX /= this.nn.size();
 		locY /= this.nn.size();
-		Node centerN = fac.createNode(Id.createNodeId(this.frId),nsc.createCoord(locX, locY));
+		Node centerN = fac.createNode(Id.createNodeId(this.frId), new Coord(locX, locY));
 		impl.addNode(centerN);
 		
 		
@@ -281,7 +281,7 @@ public class MATSimScenarioCreator {
 		NetworkFactoryImpl fac = impl.getFactory();
 		for (Transition t : geo.transitions){
 			if (!t.room2Id.equals("-1")){
-				Coord c = this.sc.createCoord((t.v1.px+t.v2.px)/2, (t.v1.py+t.v2.py)/2);
+				Coord c = new Coord((t.v1.px + t.v2.px) / 2, (t.v1.py + t.v2.py) / 2);
 				Node n = impl.getNearestNode(c);
 				double dist = CoordUtils.calcDistance(c, n.getCoord());
 				if (dist > EPSILON) {

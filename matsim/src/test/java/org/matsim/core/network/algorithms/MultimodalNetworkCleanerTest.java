@@ -26,6 +26,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -130,8 +131,8 @@ public class MultimodalNetworkCleanerTest {
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 0, (double) 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addNode(node11);
 		network.addLink(network.getFactory().createLink(f.linkIds[10], node1, node10));
@@ -226,8 +227,8 @@ public class MultimodalNetworkCleanerTest {
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
 		Node node2 = network.getNodes().get(f.nodeIds[2]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 0, (double) 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addNode(node11);
 		network.addLink(network.getFactory().createLink(f.linkIds[10], node1, node10));
@@ -282,8 +283,8 @@ public class MultimodalNetworkCleanerTest {
 		Network network = f.scenario.getNetwork();
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 0, (double) 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addNode(node11);
 		network.addLink(network.getFactory().createLink(f.linkIds[10], node10, node1));
@@ -333,7 +334,7 @@ public class MultimodalNetworkCleanerTest {
 	public void testRemoveNodesWithoutLinks() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		network.addNode(network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(300, 300)));
+		network.addNode(network.getFactory().createNode(f.nodeIds[10], new Coord((double) 300, (double) 300)));
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 7, network.getNodes().size());
@@ -356,8 +357,8 @@ public class MultimodalNetworkCleanerTest {
 		Node node1 = network.getNodes().get(f.nodeIds[1]);
 		Node node2 = network.getNodes().get(f.nodeIds[2]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(0, 200));
-		Node node11 = network.getFactory().createNode(f.nodeIds[11], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 0, (double) 200));
+		Node node11 = network.getFactory().createNode(f.nodeIds[11], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addNode(node11);
 		network.addLink(network.getFactory().createLink(f.linkIds[10], node10, node1));
@@ -436,7 +437,7 @@ public class MultimodalNetworkCleanerTest {
 
 		Node node2 = network.getNodes().get(f.nodeIds[2]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addLink(network.getFactory().createLink(f.linkIds[18], node2, node10));
 		network.addLink(network.getFactory().createLink(f.linkIds[19], node3, node10));
@@ -470,7 +471,7 @@ public class MultimodalNetworkCleanerTest {
 
 		Node node2 = network.getNodes().get(f.nodeIds[2]);
 		Node node3 = network.getNodes().get(f.nodeIds[3]);
-		Node node10 = network.getFactory().createNode(f.nodeIds[10], f.scenario.createCoord(200, 200));
+		Node node10 = network.getFactory().createNode(f.nodeIds[10], new Coord((double) 200, (double) 200));
 		network.addNode(node10);
 		network.addLink(network.getFactory().createLink(f.linkIds[18], node10, node2));
 		network.addLink(network.getFactory().createLink(f.linkIds[19], node10, node3));
@@ -549,8 +550,8 @@ public class MultimodalNetworkCleanerTest {
 		Id<Node> id2 = Id.create(2, Node.class);
 		Id<Link> linkId1 = Id.create(1, Link.class);
 
-		Node node1 = factory.createNode(id1, scenario.createCoord(  0, 100));
-		Node node2 = factory.createNode(id2, scenario.createCoord(100, 100));
+		Node node1 = factory.createNode(id1, new Coord((double) 0, (double) 100));
+		Node node2 = factory.createNode(id2, new Coord((double) 100, (double) 100));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addLink(factory.createLink(linkId1, node1, node2));
@@ -582,7 +583,7 @@ public class MultimodalNetworkCleanerTest {
 		NetworkFactory nf = network.getFactory();
 		Node node4 = network.getNodes().get(f.nodeIds[4]);
 		Node node5 = network.getNodes().get(f.nodeIds[5]);
-		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
+		Node node7 = nf.createNode(f.nodeIds[7], new Coord((double) 600, (double) 100));
 		network.addNode(node7);
 		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
 		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
@@ -602,7 +603,7 @@ public class MultimodalNetworkCleanerTest {
 		NetworkFactory nf = network.getFactory();
 		Node node4 = network.getNodes().get(f.nodeIds[4]);
 		Node node5 = network.getNodes().get(f.nodeIds[5]);
-		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
+		Node node7 = nf.createNode(f.nodeIds[7], new Coord((double) 600, (double) 100));
 		network.addNode(node7);
 		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
 		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
@@ -622,7 +623,7 @@ public class MultimodalNetworkCleanerTest {
 		NetworkFactory nf = network.getFactory();
 		Node node4 = network.getNodes().get(f.nodeIds[4]);
 		Node node5 = network.getNodes().get(f.nodeIds[5]);
-		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
+		Node node7 = nf.createNode(f.nodeIds[7], new Coord((double) 600, (double) 100));
 		network.addNode(node7);
 		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
 		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
@@ -643,7 +644,7 @@ public class MultimodalNetworkCleanerTest {
 		NetworkFactory nf = network.getFactory();
 		Node node4 = network.getNodes().get(f.nodeIds[4]);
 		Node node5 = network.getNodes().get(f.nodeIds[5]);
-		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
+		Node node7 = nf.createNode(f.nodeIds[7], new Coord((double) 600, (double) 100));
 		network.addNode(node7);
 		network.addLink(nf.createLink(f.linkIds[10], node4, node7));
 		network.addLink(nf.createLink(f.linkIds[11], node7, node5));
@@ -662,16 +663,16 @@ public class MultimodalNetworkCleanerTest {
 		MultimodalFixture2 f = new MultimodalFixture2();
 		Network network = f.scenario.getNetwork();
 		NetworkFactory nf = network.getFactory();
-		Node node7 = nf.createNode(f.nodeIds[7], f.scenario.createCoord(600, 100));
-		Node node8 = nf.createNode(f.nodeIds[8], f.scenario.createCoord(600, 000));
+		Node node7 = nf.createNode(f.nodeIds[7], new Coord((double) 600, (double) 100));
+		Node node8 = nf.createNode(f.nodeIds[8], new Coord((double) 600, (double) 000));
 		network.addNode(node7);
 		network.addNode(node8);
 		network.addLink(nf.createLink(f.linkIds[10], node7, node8));
 		network.addLink(nf.createLink(f.linkIds[11], node8, node7));
 		network.getLinks().get(f.linkIds[10]).setAllowedModes(f.modesW);
 		network.getLinks().get(f.linkIds[11]).setAllowedModes(f.modesW);
-		Node node9 = nf.createNode(f.nodeIds[9], f.scenario.createCoord(700, 100));
-		Node node10 = nf.createNode(f.nodeIds[10], f.scenario.createCoord(700, 000));
+		Node node9 = nf.createNode(f.nodeIds[9], new Coord((double) 700, (double) 100));
+		Node node10 = nf.createNode(f.nodeIds[10], new Coord((double) 700, (double) 000));
 		network.addNode(node9);
 		network.addNode(node10);
 		network.addLink(nf.createLink(f.linkIds[12], node9, node10));
@@ -729,12 +730,12 @@ public class MultimodalNetworkCleanerTest {
 
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			Node node1 = factory.createNode(this.nodeIds[1], this.scenario.createCoord(  0, 100));
-			Node node2 = factory.createNode(this.nodeIds[2], this.scenario.createCoord(100, 100));
-			Node node3 = factory.createNode(this.nodeIds[3], this.scenario.createCoord(200, 100));
-			Node node4 = factory.createNode(this.nodeIds[4], this.scenario.createCoord(  0, 100));
-			Node node5 = factory.createNode(this.nodeIds[5], this.scenario.createCoord(100,   0));
-			Node node6 = factory.createNode(this.nodeIds[6], this.scenario.createCoord(200,   0));
+			Node node1 = factory.createNode(this.nodeIds[1], new Coord((double) 0, (double) 100));
+			Node node2 = factory.createNode(this.nodeIds[2], new Coord((double) 100, (double) 100));
+			Node node3 = factory.createNode(this.nodeIds[3], new Coord((double) 200, (double) 100));
+			Node node4 = factory.createNode(this.nodeIds[4], new Coord((double) 0, (double) 100));
+			Node node5 = factory.createNode(this.nodeIds[5], new Coord((double) 100, (double) 0));
+			Node node6 = factory.createNode(this.nodeIds[6], new Coord((double) 200, (double) 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
@@ -796,9 +797,12 @@ public class MultimodalNetworkCleanerTest {
 			NetworkFactory factory = network.getFactory();
 			Node node4 = network.getNodes().get(this.nodeIds[4]);
 			Node node6 = network.getNodes().get(this.nodeIds[6]);
-			Node node7 = factory.createNode(this.nodeIds[7], this.scenario.createCoord(  0, -100));
-			Node node8 = factory.createNode(this.nodeIds[8], this.scenario.createCoord(100, -100));
-			Node node9 = factory.createNode(this.nodeIds[9], this.scenario.createCoord(200, -100));
+			double y2 = -100;
+			Node node7 = factory.createNode(this.nodeIds[7], new Coord((double) 0, y2));
+			double y1 = -100;
+			Node node8 = factory.createNode(this.nodeIds[8], new Coord((double) 100, y1));
+			double y = -100;
+			Node node9 = factory.createNode(this.nodeIds[9], new Coord((double) 200, y));
 			network.addNode(node7);
 			network.addNode(node8);
 			network.addNode(node9);
@@ -855,12 +859,12 @@ public class MultimodalNetworkCleanerTest {
 
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			Node node1 = factory.createNode(this.nodeIds[1], this.scenario.createCoord(  0, 100));
-			Node node2 = factory.createNode(this.nodeIds[2], this.scenario.createCoord(100, 100));
-			Node node3 = factory.createNode(this.nodeIds[3], this.scenario.createCoord(  0,   0));
-			Node node4 = factory.createNode(this.nodeIds[4], this.scenario.createCoord(400, 100));
-			Node node5 = factory.createNode(this.nodeIds[5], this.scenario.createCoord(400,   0));
-			Node node6 = factory.createNode(this.nodeIds[6], this.scenario.createCoord(300,   0));
+			Node node1 = factory.createNode(this.nodeIds[1], new Coord((double) 0, (double) 100));
+			Node node2 = factory.createNode(this.nodeIds[2], new Coord((double) 100, (double) 100));
+			Node node3 = factory.createNode(this.nodeIds[3], new Coord((double) 0, (double) 0));
+			Node node4 = factory.createNode(this.nodeIds[4], new Coord((double) 400, (double) 100));
+			Node node5 = factory.createNode(this.nodeIds[5], new Coord((double) 400, (double) 0));
+			Node node6 = factory.createNode(this.nodeIds[6], new Coord((double) 300, (double) 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);

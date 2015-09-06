@@ -23,7 +23,7 @@ public class AAMScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 	public AAMScoringFunctionFactory(Config config, Network network, Scenario scenario)
 	  {
-	    super(config.planCalcScore(), network);
+	    super(config.planCalcScore(), config.scenario(), network);
 	    this.network = network;
 	    this.config = config;
 	    this.scenario = scenario;
@@ -36,14 +36,14 @@ public class AAMScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		  scoringFunctionSum.addScoringFunction(
 	      new AAMLegScoringFunction((PlanImpl)person.getSelectedPlan(),
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
+				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
 	      this.config, 
 	      network));
-		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),  scenario));
+		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),  scenario));
 	    //scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 
-		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
-		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 	    return scoringFunctionSum;
 	  }
 }

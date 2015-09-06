@@ -31,7 +31,7 @@ public class BarcelonaZones
 {
     public static MultiPolygon readAgglomerationArea()
     {
-        String agglomerationShpFile = "d:/PP-rad/Barcelona/GIS/BCN_polygon_UMT31N.shp";
+        String agglomerationShpFile = "d:/PP-rad/Barcelona/data/GIS/BCN_polygon_UMT31N.shp";
 
         Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
         if (features.size() != 1) {

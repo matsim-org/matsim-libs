@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -81,7 +80,7 @@ public class Shp2Facilities {
 			}
 			final Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			Point center = polygon.getCentroid();
-			Coord coord = new CoordImpl ( center.getX() , center.getY() ) ;
+			Coord coord = new Coord(center.getX(), center.getY());
 			
 			Id<ActivityFacility> id = Id.create( cnt , ActivityFacility.class) ;
 			cnt++ ;

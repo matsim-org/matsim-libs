@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
@@ -228,7 +227,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			// get node attributes
 			// Coordinate c = f.getBounds().centre();
 			BoundingBox bb = f.getBounds();
-			Coord c = new CoordImpl((bb.getMinX() + bb.getMaxX()) / 2.0, (bb.getMinY() + bb.getMaxY()) / 2.0);
+			Coord c = new Coord((bb.getMinX() + bb.getMaxX()) / 2.0, (bb.getMinY() + bb.getMaxY()) / 2.0);
 
 			Object id = f.getAttribute(NODE_ID_NAME);
 			int feattyp = Integer.parseInt(f.getAttribute(NODE_FEATTYP_NAME).toString());
