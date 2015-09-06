@@ -264,10 +264,14 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config = ConfigUtils.createConfig();
 		ktiConfigGroup = new HerbieConfigGroup();
 		config.addModule( ktiConfigGroup );
-		config.planCalcScore().setMarginalUtlOfDistanceWalk( -5 );
-		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
-		config.planCalcScore().setMonetaryDistanceRateCar( -1 );
-		config.planCalcScore().setMonetaryDistanceRatePt( -2 );
+		final double marginalUtlOfDistanceWalk = -5;
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(marginalUtlOfDistanceWalk);
+		double marginalUtlOfDistanceOther = -9;
+		config.planCalcScore().getModes().get(TransportMode.other).setMarginalUtilityOfDistance(marginalUtlOfDistanceOther);
+		double monetaryDistanceRateCar = -1;
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+		double monetaryDistanceRatePt = -2;
+		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 	}
 

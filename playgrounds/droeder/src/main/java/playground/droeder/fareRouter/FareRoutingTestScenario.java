@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -65,10 +66,10 @@ class FareRoutingTestScenario {
 		scenario.getConfig().transit().setUseTransit(true);
 		// take into account only in-veh-time and money 
 		scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(0.);
-		scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(0.00000000001);
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(0.00000000001);
 		scenario.getConfig().planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(0.);
 		// and that 1:1
-		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(3600.);
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3600.);
 		scenario.getConfig().planCalcScore().setMarginalUtilityOfMoney(1.);
 		
 		

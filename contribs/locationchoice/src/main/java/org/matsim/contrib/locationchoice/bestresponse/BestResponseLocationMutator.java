@@ -291,7 +291,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
 		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
-		double betaTime = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr();
+		double betaTime = this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
 			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;

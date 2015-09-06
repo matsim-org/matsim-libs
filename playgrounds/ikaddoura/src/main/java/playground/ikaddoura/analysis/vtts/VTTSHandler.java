@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -210,19 +211,19 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		double tripDelayDisutilityOneSec = 0.;
 		
 		if (this.personId2currentTripMode.get(personId).equals("car")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 			
 		} else if (this.personId2currentTripMode.get(personId).equals("walk")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() * (-1);
 
 		} else if (this.personId2currentTripMode.get(personId).equals("pt")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() * (-1);
 
 		} else if (this.personId2currentTripMode.get(personId).equals("bike")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingBike_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() * (-1);
 			
 		} else {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingOther_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.other).getMarginalUtilityOfTraveling() * (-1);
 		}
 		
 		// Translate the disutility into monetary units.

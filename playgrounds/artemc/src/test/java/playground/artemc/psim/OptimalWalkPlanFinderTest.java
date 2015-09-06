@@ -247,13 +247,14 @@ public class OptimalWalkPlanFinderTest {
 			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 			scoring.setBrainExpBeta(1.0);
 
-			scoring.setConstantWalk(0.0);
+			scoring.getModes().get(TransportMode.walk).setConstant(0.0);
 
 			scoring.setEarlyDeparture_utils_hr(-3.0);
 			scoring.setLateArrival_utils_hr(-3.0);
 			scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
 			scoring.setPerforming_utils_hr(1.0);
-			scoring.setTravelingWalk_utils_hr(-1.0);
+			final double travelingWalk = -1.0;
+			scoring.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
 			scoring.setMarginalUtilityOfMoney(1.);
 

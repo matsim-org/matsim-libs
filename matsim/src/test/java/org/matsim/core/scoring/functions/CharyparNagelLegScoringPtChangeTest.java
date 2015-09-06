@@ -117,8 +117,8 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		final PlanCalcScoreConfigGroup conf = new PlanCalcScoreConfigGroup();
 		conf.setMarginalUtlOfWaitingPt_utils_hr( random.nextDouble() * 1000 );
-		conf.setMonetaryDistanceRatePt( random.nextDouble() * 1000 );
-		conf.setTravelingPt_utils_hr( random.nextDouble() * 1000 );
+		conf.getModes().get(TransportMode.pt).setMonetaryDistanceRate(random.nextDouble() * 1000);
+		conf.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(random.nextDouble() * 1000);
 		conf.setUtilityOfLineSwitch( random.nextDouble() * 1000 );
 
 		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();

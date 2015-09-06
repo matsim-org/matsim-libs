@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
@@ -198,7 +199,8 @@ public class RunBraessSimulation {
 		// use -0.000015 to approximately balance the utility of travel time and
 		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
 		// use -0.0 to use only time.)
-		config.planCalcScore().setMonetaryDistanceRateCar( -0.0 );
+		double monetaryDistanceRateCar = -0.0;
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
@@ -329,9 +331,9 @@ public class RunBraessSimulation {
 		
 		if (SIGMA != 0.0)
 			runName += "_sigma" + SIGMA;
-		if (config.planCalcScore().getMonetaryDistanceRateCar() != 0.0)
+		if (config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() != 0.0)
 			runName += "_distCost"
-					+ config.planCalcScore().getMonetaryDistanceRateCar();
+					+ config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate();
 
 		if (LANE_TYPE.equals(LaneType.TRIVIAL)) {
 			runName += "_trivialLanes";

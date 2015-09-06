@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -70,24 +71,24 @@ public class PlanCalcScoreConfigGroupTest {
 				inputConfigGroup.getBrainExpBeta() );
 		Assert.assertEquals(
 				"wrong constantBike "+msg,
-				initialGroup.getConstantBike(),
-				inputConfigGroup.getConstantBike() );
+				initialGroup.getModes().get(TransportMode.bike).getConstant(),
+				inputConfigGroup.getModes().get(TransportMode.bike).getConstant());
 		Assert.assertEquals(
 				"wrong constantCar "+msg,
-				initialGroup.getConstantCar(),
-				inputConfigGroup.getConstantCar() );
+				initialGroup.getModes().get(TransportMode.car).getConstant(),
+				inputConfigGroup.getModes().get(TransportMode.car).getConstant());
 		Assert.assertEquals(
 				"wrong constantOther "+msg,
-				initialGroup.getConstantOther(),
-				inputConfigGroup.getConstantOther() );
+				initialGroup.getModes().get(TransportMode.other).getConstant(),
+				inputConfigGroup.getModes().get(TransportMode.other).getConstant());
 		Assert.assertEquals(
 				"wrong constantPt "+msg,
-				initialGroup.getConstantPt(),
-				inputConfigGroup.getConstantPt() );
+				initialGroup.getModes().get(TransportMode.pt).getConstant(),
+				inputConfigGroup.getModes().get(TransportMode.pt).getConstant());
 		Assert.assertEquals(
 				"wrong constantWalk "+msg,
-				initialGroup.getConstantWalk(),
-				inputConfigGroup.getConstantWalk() );
+				initialGroup.getModes().get(TransportMode.walk).getConstant(),
+				inputConfigGroup.getModes().get(TransportMode.walk).getConstant());
 		Assert.assertEquals(
 				"wrong lateArrival_utils_hr "+msg,
 				initialGroup.getLateArrival_utils_hr(),
@@ -106,12 +107,12 @@ public class PlanCalcScoreConfigGroupTest {
 				inputConfigGroup.getMarginalUtilityOfMoney() );
 		Assert.assertEquals(
 				"wrong marginalUtlOfDistanceOther "+msg,
-				initialGroup.getMarginalUtlOfDistanceOther(),
-				inputConfigGroup.getMarginalUtlOfDistanceOther() );
+				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance(),
+				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfDistance());
 		Assert.assertEquals(
 				"wrong marginalUtlOfDistanceWalk "+msg,
-				initialGroup.getMarginalUtlOfDistanceWalk(),
-				inputConfigGroup.getMarginalUtlOfDistanceWalk() );
+				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(),
+				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance());
 		Assert.assertEquals(
 				"wrong marginalUtlOfWaiting_utils_hr "+msg,
 				initialGroup.getMarginalUtlOfWaiting_utils_hr(),
@@ -122,12 +123,12 @@ public class PlanCalcScoreConfigGroupTest {
 				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr() );
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRateCar "+msg,
-				initialGroup.getMonetaryDistanceRateCar(),
-				inputConfigGroup.getMonetaryDistanceRateCar() );
+				initialGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate(),
+				inputConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate());
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRatePt "+msg,
-				initialGroup.getMonetaryDistanceRatePt(),
-				inputConfigGroup.getMonetaryDistanceRatePt() );
+				initialGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate(),
+				inputConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate());
 		Assert.assertEquals(
 				"wrong pathSizeLogitBeta "+msg,
 				initialGroup.getPathSizeLogitBeta(),
@@ -138,24 +139,24 @@ public class PlanCalcScoreConfigGroupTest {
 				inputConfigGroup.getPerforming_utils_hr() );
 		Assert.assertEquals(
 				"wrong traveling_utils_hr "+msg,
-				initialGroup.getTraveling_utils_hr(),
-				inputConfigGroup.getTraveling_utils_hr() );
+				initialGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
 		Assert.assertEquals(
 				"wrong travelingBike_utils_hr "+msg,
-				initialGroup.getTravelingBike_utils_hr(),
-				inputConfigGroup.getTravelingBike_utils_hr() );
+				initialGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling());
 		Assert.assertEquals(
 				"wrong travelingOther_utils_hr "+msg,
-				initialGroup.getTravelingOther_utils_hr(),
-				inputConfigGroup.getTravelingOther_utils_hr() );
+				initialGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling());
 		Assert.assertEquals(
 				"wrong travelingPt_utils_hr "+msg,
-				initialGroup.getTravelingPt_utils_hr(),
-				inputConfigGroup.getTravelingPt_utils_hr() );
+				initialGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling());
 		Assert.assertEquals(
 				"wrong travelingWalk_utils_hr "+msg,
-				initialGroup.getTravelingWalk_utils_hr(),
-				inputConfigGroup.getTravelingWalk_utils_hr() );
+				initialGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling(),
+				inputConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling());
 		Assert.assertEquals(
 				"wrong utilityOfLineSwitch "+msg,
 				initialGroup.getUtilityOfLineSwitch(),
@@ -263,28 +264,28 @@ public class PlanCalcScoreConfigGroupTest {
 		final PlanCalcScoreConfigGroup group = new PlanCalcScoreConfigGroup();
 
 		group.setBrainExpBeta( 124);
-		group.setConstantBike( 98 );
-		group.setConstantCar( 345 );
-		group.setConstantOther( 345 );
-		group.setConstantPt( 983 );
-		group.setConstantWalk( 89 );
+		group.getModes().get(TransportMode.bike).setConstant((double) 98);
+		group.getModes().get(TransportMode.car).setConstant((double) 345);
+		group.getModes().get(TransportMode.other).setConstant((double) 345);
+		group.getModes().get(TransportMode.pt).setConstant((double) 983);
+		group.getModes().get(TransportMode.walk).setConstant((double) 89);
 		group.setLateArrival_utils_hr( 345 );
 		group.setEarlyDeparture_utils_hr( 5 );
 		group.setLearningRate( 98 );
 		group.setMarginalUtilityOfMoney( 9 );
-		group.setMarginalUtlOfDistanceOther( 23 );
-		group.setMarginalUtlOfDistanceWalk( 8675 );
+		group.getModes().get(TransportMode.other).setMarginalUtilityOfDistance((double) 23);
+		group.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 8675);
 		group.setMarginalUtlOfWaiting_utils_hr( 65798 );
 		group.setMarginalUtlOfWaitingPt_utils_hr( 9867 );
-		group.setMonetaryDistanceRateCar( 240358 );
-		group.setMonetaryDistanceRatePt( 9835 );
+		group.getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 240358);
+		group.getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 9835);
 		group.setPathSizeLogitBeta( 8 );
 		group.setPerforming_utils_hr( 678 );
-		group.setTraveling_utils_hr( 246 );
-		group.setTravelingBike_utils_hr( 968 );
-		group.setTravelingOther_utils_hr(206 );
-		group.setTravelingPt_utils_hr( 957 );
-		group.setTravelingWalk_utils_hr( 983455 );
+		group.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 246);
+		group.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling((double) 968);
+		group.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling((double) 206);
+		group.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 957);
+		group.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 983455);
 		group.setUtilityOfLineSwitch( 396 );
 
 		final Random random = new Random( 925 );

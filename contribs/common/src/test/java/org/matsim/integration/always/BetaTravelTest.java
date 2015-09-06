@@ -20,10 +20,10 @@
 
 package org.matsim.integration.always;
 
-import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -318,7 +318,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
             // do some test to ensure the scenario is correct
-            double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
+			double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
             if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
                 throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
             }
@@ -361,7 +361,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
+				double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 *

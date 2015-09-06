@@ -111,8 +111,9 @@ public class ConfigCreator {
 		pcs.setMarginalUtilityOfMoney(1);
 		pcs.setPathSizeLogitBeta(1);
 		pcs.setUsingOldScoringBelowZeroUtilityDuration(false);
-		
-		pcs.setTraveling_utils_hr(-6.0);
+
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setPerforming_utils_hr(6.0);
 		
 	}

@@ -103,13 +103,13 @@ public class RouterManager {
 							double endDistance = CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-1).getCoord(), next.getCoord());
 							distances[PT_POSITION] += startDistance;
 							distances[PT_POSITION] += endDistance;
-							costs[PT_POSITION] += startDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);
-							costs[PT_POSITION] += endDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);	
+							costs[PT_POSITION] += startDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
+							costs[PT_POSITION] += endDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
 						}
 						else
 							distances[PT_POSITION] = Double.POSITIVE_INFINITY;
 						distances[WALK_POSITION] = CoordUtils.calcDistance(prev.getCoord(), next.getCoord());
-						costs[WALK_POSITION] = distances[WALK_POSITION]/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);
+						costs[WALK_POSITION] = distances[WALK_POSITION]/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
 						int bestPosition = getBestPosition(costs);
 						for(int p = 0; p<NUM_MODES; p++)
 							if(costs[p]<costs[bestPosition])

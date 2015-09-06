@@ -48,7 +48,7 @@ public class PricingHandler implements PersonDepartureEventHandler {
 	public PricingHandler(EventsManager eventsManager, ScenarioImpl scenario, double toll) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.toll = toll;
 		log.info("VTTS_car: " + vtts_car);
 	}

@@ -211,36 +211,44 @@ public class CharyparNagelScoringFunctionTest {
 	@Test
 	public void testTravelingAndConstantCar() {
 		Fixture f = new Fixture();
-		f.config.planCalcScore().setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		assertEquals(-3.0, calcScore(f), EPSILON);
-		f.config.planCalcScore().setConstantCar(-6.0) ;
+		double constantCar = -6.0;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setConstant(constantCar);
 		assertEquals(-9.0, calcScore(f), EPSILON);
 	}
 
 	@Test
 	public void testTravelingPtAndConstantPt() {
 		Fixture f = new Fixture();
-		f.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
+		final double travelingPt = -9.0;
+		f.config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		assertEquals(-2.25, calcScore(f), EPSILON);
-		f.config.planCalcScore().setConstantPt(-3.0) ;
+		double constantPt = -3.0;
+		f.config.planCalcScore().getModes().get(TransportMode.pt).setConstant(constantPt);
 		assertEquals(-5.25, calcScore(f), EPSILON);
 	}
 
 	@Test
 	public void testTravelingWalkAndConstantWalk() {
 		Fixture f = new Fixture();
-		f.config.planCalcScore().setTravelingWalk_utils_hr(-18.0);
+		final double travelingWalk = -18.0;
+		f.config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 		assertEquals(-9.0, calcScore(f), EPSILON ) ;
-		f.config.planCalcScore().setConstantWalk(-1.0);
+		double constantWalk = -1.0;
+		f.config.planCalcScore().getModes().get(TransportMode.walk).setConstant(constantWalk);
 		assertEquals(-10.0, calcScore(f), EPSILON);
 	}
 
 	@Test
 	public void testTravelingBikeAndConstantBike(){
 		Fixture f = new Fixture();
-		f.config.planCalcScore().setTravelingBike_utils_hr(-6.0);
+		final double travelingBike = -6.0;
+		f.config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
 		assertEquals(-1.5, calcScore(f), EPSILON ) ;
-		f.config.planCalcScore().setConstantBike(-2.0);
+		double constantBike = -2.0;
+		f.config.planCalcScore().getModes().get(TransportMode.bike).setConstant(constantBike);
 		assertEquals(-3.5, calcScore(f), EPSILON);
 	}
 
@@ -436,7 +444,8 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 		// test 1 where late arrival has the biggest impact
 		f.config.planCalcScore().setLateArrival_utils_hr(-18.0);
-		f.config.planCalcScore().setTraveling_utils_hr(-6.0);
+		final double traveling1 = -6.0;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling1);
 
 		ScoringFunction testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
@@ -452,7 +461,8 @@ public class CharyparNagelScoringFunctionTest {
 
 		// test 2 where traveling has the biggest impact
 		f.config.planCalcScore().setLateArrival_utils_hr(-3.0);
-		f.config.planCalcScore().setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 
 		testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
@@ -472,12 +482,14 @@ public class CharyparNagelScoringFunctionTest {
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
-		f.config.planCalcScore().setMonetaryDistanceRateCar(-0.00001) ;
+		double monetaryDistanceRateCar1 = -0.00001;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar1);
 
 		assertEquals(-0.25, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		f.config.planCalcScore().setMonetaryDistanceRateCar(-1.0) ;
+		double monetaryDistanceRateCar = -1.0;
+		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-12500.0, calcScore(f), EPSILON);
@@ -489,12 +501,14 @@ public class CharyparNagelScoringFunctionTest {
 		// test 1 where marginalUtitityOfMoney is fixed to 1.0
 		f.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 		//		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
-		f.config.planCalcScore().setMonetaryDistanceRatePt(-0.00001) ;
+		double monetaryDistanceRatePt1 = -0.00001;
+		f.config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt1);
 
 		assertEquals(-0.20, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		f.config.planCalcScore().setMonetaryDistanceRatePt(-1.0) ;
+		double monetaryDistanceRatePt = -1.0;
+		f.config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
 		assertEquals(-10000.0, calcScore(f), EPSILON);
@@ -651,23 +665,23 @@ public class CharyparNagelScoringFunctionTest {
 			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 			scoring.setBrainExpBeta(2.0);
 
-			scoring.setConstantCar(0.0);
-			scoring.setConstantPt(0.0);
-			scoring.setConstantWalk(0.0);
-			scoring.setConstantBike(0.0);
+			scoring.getModes().get(TransportMode.car).setConstant(0.0);
+			scoring.getModes().get(TransportMode.pt).setConstant(0.0);
+			scoring.getModes().get(TransportMode.walk).setConstant(0.0);
+			scoring.getModes().get(TransportMode.bike).setConstant(0.0);
 
 			scoring.setEarlyDeparture_utils_hr(0.0);
 			scoring.setLateArrival_utils_hr(0.0);
 			scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
 			scoring.setPerforming_utils_hr(0.0);
-			scoring.setTraveling_utils_hr(0.0);
-			scoring.setTravelingPt_utils_hr(0.0);
-			scoring.setTravelingWalk_utils_hr(0.0);
-			scoring.setTravelingBike_utils_hr(0.0);
+			scoring.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
+			scoring.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(0.0);
+			scoring.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
+			scoring.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(0.0);
 
 			scoring.setMarginalUtilityOfMoney(1.) ;
-			scoring.setMonetaryDistanceRateCar(0.0) ;
-			scoring.setMonetaryDistanceRatePt(0.0);
+			scoring.getModes().get(TransportMode.car).setMonetaryDistanceRate(0.0);
+			scoring.getModes().get(TransportMode.pt).setMonetaryDistanceRate(0.0);
 
 
 			// setup activity types h and w for scoring

@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -283,7 +284,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		// with delay --> 70.570685898554200
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
@@ -352,7 +353,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		
 		// home duration morning: 28800.
 		// home duration evening with delay: (24 * 3600.) - 57705.
