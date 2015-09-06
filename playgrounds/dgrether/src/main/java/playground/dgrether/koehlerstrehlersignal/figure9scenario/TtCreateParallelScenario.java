@@ -20,6 +20,7 @@
 package playground.dgrether.koehlerstrehlersignal.figure9scenario;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -603,14 +604,14 @@ public class TtCreateParallelScenario {
 		
 		((NetworkImpl) net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
-		net.addNode(fac.createNode(idN1, sc.createCoord(-500, 0)));
-		net.addNode(fac.createNode(idN2, sc.createCoord(-300, 0)));
-		net.addNode(fac.createNode(idN3, sc.createCoord(-100, 100)));
-		net.addNode(fac.createNode(idN4, sc.createCoord(-100, -100)));
-		net.addNode(fac.createNode(idN5, sc.createCoord(100, 100)));
-		net.addNode(fac.createNode(idN6, sc.createCoord(100, -100)));
-		net.addNode(fac.createNode(idN7, sc.createCoord(300, 0)));
-		net.addNode(fac.createNode(idN8, sc.createCoord(500, 0)));
+		net.addNode(fac.createNode(idN1, new Coord(-500, 0)));
+		net.addNode(fac.createNode(idN2, new Coord(-300, 0)));
+		net.addNode(fac.createNode(idN3, new Coord(-100, 100)));
+		net.addNode(fac.createNode(idN4, new Coord(-100, -100)));
+		net.addNode(fac.createNode(idN5, new Coord(100, 100)));
+		net.addNode(fac.createNode(idN6, new Coord(100, -100)));
+		net.addNode(fac.createNode(idN7, new Coord(300, 0)));
+		net.addNode(fac.createNode(idN8, new Coord(500, 0)));
 		
 		this.createAndAddLinks(idL12, idL21, idN1, idN2, net);
 		this.createAndAddLinks(idL23, idL32, idN2, idN3, net);
