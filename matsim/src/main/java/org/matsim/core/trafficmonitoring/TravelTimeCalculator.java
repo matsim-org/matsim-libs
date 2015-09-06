@@ -208,7 +208,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		/* if filtering transport modes is enabled and the vehicles
 		 * starts a leg on a non analyzed transport mode, add the vehicle 
 		 * to the filtered vehicles set. */
-		if (filterAnalyzedModes && !analyzedModes.contains(event.getLegMode())) { 
+		if (filterAnalyzedModes && !analyzedModes.contains(event.getNetworkMode())) { 
 			this.vehiclesToFilter.add(event.getVehicleId());
 		}
 	}

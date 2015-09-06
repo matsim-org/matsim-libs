@@ -34,18 +34,20 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
+	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
 	public static final String ATTRIBUTE_PERSON = "person";
 
 	private final Id<Person> personId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
+//	private final String networkMode;
 
-	public Wait2LinkEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
+	public Wait2LinkEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) { //String networkMode
 		super(time);
 		this.personId = agentId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
+//		this.networkMode = networkMode;
 	}
 	
 	public Id<Person> getPersonId() {
@@ -64,7 +66,8 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 		return EVENT_TYPE;
 	}
 	
-	public String getLegMode() {
+	public String getNetworkMode() {
+//		return networkMode;
 		return null;
 	}
 	
@@ -76,6 +79,9 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 		if (this.vehicleId != null) {
 			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		}
+//		if (this.networkMode != null) {
+//			attr.put(ATTRIBUTE_NETWORKMODE, networkMode);
+//		}
 		return attr;
 	}
 }
