@@ -228,10 +228,9 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	 * <p> This is a very special case (possible only at intersections), where agent is first delayed due to flow Capacity and then delayed due to storage capacity.
 	 * For this, the time gap (tau) between freeSpeedLinkLeave time of two consecutive vehicles and leavingAgents list are checked. 
 	 * Thus, 
-	 * <p> <code> if( leavingAgents.isEmpty() ) { return }
-	 * <p> else {checkForTimeGap} </code>
+	 * <p> <code> if( leavingAgents.isEmpty() ) { checkForTimeGap} </code>
 	 * <p> 
-	 * <p> See{@link CombinedFlowAndStorageDelayTest.class}
+	 * <p> A test is available, see {@link CombinedFlowAndStorageDelayTest.class}.
 	 */
 	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event){
 
