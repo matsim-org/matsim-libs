@@ -57,7 +57,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String EARLY_DEPARTURE = "earlyDeparture";
 	private static final String PERFORMING = "performing";
 
-	private static final String TRAVELING = "traveling_";
 	private static final String WAITING  = "waiting";
 	private static final String WAITING_PT  = "waitingPt";
 
@@ -65,27 +64,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String WRITE_EXPERIENCED_PLANS = "writeExperiencedPlans";
 
-	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance_";
-
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 
 	@Deprecated
 	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate";
 
-	private static final String MONETARY_DISTANCE_RATE_ = "monetaryDistanceRate_" ;
-
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
-
-	private static final String ACTIVITY_TYPE = "activityType_";
-	private static final String ACTIVITY_PRIORITY = "activityPriority_";
-	private static final String ACTIVITY_TYPICAL_DURATION = "activityTypicalDuration_";
-	private static final String ACTIVITY_MINIMAL_DURATION = "activityMinimalDuration_";
-	private static final String ACTIVITY_OPENING_TIME = "activityOpeningTime_";
-	private static final String ACTIVITY_LATEST_START_TIME = "activityLatestStartTime_";
-	private static final String ACTIVITY_EARLIEST_END_TIME = "activityEarliestEndTime_";
-	private static final String ACTIVITY_CLOSING_TIME = "activityClosingTime_";
-	
-	private static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll_" ;
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
@@ -128,62 +112,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		// backward compatibility: underscored
-		if (key.startsWith(ACTIVITY_TYPE)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
-			
-			actParams.setActivityType(value);
-			this.removeParameterSet( actParams );
-			addActivityParams( actParams );
-		}
-		else if (key.startsWith(ACTIVITY_PRIORITY)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_PRIORITY.length()), true);
-			actParams.setPriority(Double.parseDouble(value));
-		}
-		else if (key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), true);
-			actParams.setTypicalDuration(Time.parseTime(value));
-		}
-		else if (key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), true);
-			actParams.setMinimalDuration(Time.parseTime(value));
-		}
-		else if (key.startsWith(ACTIVITY_OPENING_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), true);
-			actParams.setOpeningTime(Time.parseTime(value));
-		}
-		else if (key.startsWith(ACTIVITY_LATEST_START_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), true);
-			actParams.setLatestStartTime(Time.parseTime(value));
-		}
-		else if (key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), true);
-			actParams.setEarliestEndTime(Time.parseTime(value));
-		}
-		else if (key.startsWith(ACTIVITY_CLOSING_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
-			actParams.setClosingTime(Time.parseTime(value));
-		}
-		else if (key.startsWith(SCORING_THIS_ACTIVITY_AT_ALL)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(SCORING_THIS_ACTIVITY_AT_ALL.length()), true);
-			actParams.setScoringThisActivityAtAll( Boolean.parseBoolean(value) );
-		}
-		else if (key.startsWith(TRAVELING)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(TRAVELING.length()));
-			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		}
-		else if (key.startsWith(MARGINAL_UTL_OF_DISTANCE)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MARGINAL_UTL_OF_DISTANCE.length()));
-			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
-		}
-		else if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
+        if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 					+ "mode-parameters (see output of any recent run), and mode-specific monetary "
 					+ "distance rate.") ;
-		}
-		else if (key.startsWith(MONETARY_DISTANCE_RATE_)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_RATE_.length()));
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		}
 		else if (key.startsWith(CONSTANT)) {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
@@ -244,18 +176,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		map.put(WRITE_EXPERIENCED_PLANS, "write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
 
 		return map;
-	}
-
-	private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
-		ActivityParams actType = this.activityTypesByNumber.get(number);
-		if ((actType == null) && createIfMissing) {
-			// not sure what this means, but I found it so...
-			// TD, sep'14
-			actType = new ActivityParams(number);
-			this.activityTypesByNumber.put(number, actType);
-			addParameterSet( actType );
-		}
-		return actType;
 	}
 
 	public Collection<String> getActivityTypes() {
@@ -393,21 +313,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
 		this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(marginalUtlOfDistanceWalk);
 	}
-
-	/**
-	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
-	 */
-	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
-		this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(marginalUtlOfDistancePt);
-	}
-
-	/**
-	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
-	 */
-		private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
-		this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(marginalUtlOfDistanceCar);
-	}
-
 
 	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
 		this.waitingPt = val ;
