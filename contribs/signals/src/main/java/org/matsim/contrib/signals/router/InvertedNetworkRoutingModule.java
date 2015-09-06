@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.router;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
@@ -36,11 +34,14 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 import java.util.*;
 
@@ -54,8 +55,10 @@ import java.util.*;
  * @author dgrether
  * 
  */
-public class InvertedNetworkLegRouter implements LegRouter {
+public class InvertedNetworkRoutingModule implements RoutingModule {
 
+	private final String mode;
+	private final PopulationFactory populationFactory;
 	private LeastCostPathCalculator leastCostPathCalculator = null;
 
 	private Network invertedNetwork = null;
@@ -64,9 +67,14 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 	private Network network = null;
 
-	InvertedNetworkLegRouter(Scenario sc,
+	InvertedNetworkRoutingModule(
+			final String mode,
+			final PopulationFactory populationFactory,
+			Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory,
 			TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime l2ltravelTimes) {
+		this.mode = mode;
+		this.populationFactory = populationFactory;
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
 				.getModeRouteFactory();
@@ -90,11 +98,9 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 	public static RoutingModule createInvertedNetworkRouter( String mode, PopulationFactory popFact,  Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime travelTimes  ) {
-		LegRouter toWrap = new InvertedNetworkLegRouter(sc, leastCostPathCalcFactory, travelCostCalculatorFactory, travelTimes) ;
-		return new LegRouterWrapper( mode, popFact, toWrap ) ;
+		return new InvertedNetworkRoutingModule( mode, popFact, sc, leastCostPathCalcFactory, travelCostCalculatorFactory, travelTimes) ;
 	}
 
-	@Override
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct,
 			double departureTime) {
 		double travelTime = 0.0;
@@ -151,4 +157,98 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		return route;
 	}
 
+	@Override
+	public List<? extends PlanElement> calcRoute(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final double departureTime,
+			final Person person) {
+		Leg newLeg = populationFactory.createLeg( mode );
+		newLeg.setDepartureTime( departureTime );
+
+		double travTime = routeLeg(
+				person,
+				newLeg,
+				new FacilityWrapper( fromFacility ),
+				new FacilityWrapper( toFacility ),
+				departureTime);
+
+		// otherwise, information may be lost
+		newLeg.setTravelTime( travTime );
+
+		return Arrays.asList( newLeg );
+	}
+
+	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	private static class FacilityWrapper implements Activity {
+		private final Facility wrapped;
+
+		public FacilityWrapper(final Facility toWrap) {
+			this.wrapped = toWrap;
+		}
+
+		@Override
+		public double getEndTime() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setEndTime(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public String getType() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setType(String type) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public Coord getCoord() {
+			return wrapped.getCoord();
+		}
+
+		@Override
+		public double getStartTime() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setStartTime(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public double getMaximumDuration() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public void setMaximumDuration(double seconds) {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public Id<Link> getLinkId() {
+			return wrapped.getLinkId();
+		}
+
+		@Override
+		public Id<ActivityFacility> getFacilityId() {
+			throw new UnsupportedOperationException( "only facility fields access are supported" );
+		}
+
+		@Override
+		public String toString() {
+			return "[FacilityWrapper: wrapped="+wrapped+"]";
+		}
+	}
 }
