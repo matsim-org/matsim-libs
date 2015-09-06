@@ -24,6 +24,7 @@ import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.LegScoringFunction;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -298,6 +299,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	@Test
+	@Ignore
 	public void testLegScores() {
 		Random random = new Random( 42 );
 		double amplitude = 100;
@@ -345,6 +347,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPlanScores() {
 		HerbiePlanBasedScoringFunctionFactory planBasedScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(
