@@ -23,11 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
-import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.thibautd.utils.DesiresConverter;
-
-import java.util.Map;
 
 /**
  * @author thibautd
@@ -45,7 +41,6 @@ public final class ZurichScenarioUtils {
 			final ObjectAttributesXmlReader reader =
 				new ObjectAttributesXmlReader(
 						scenario.getPopulation().getPersonAttributes());
-			reader.putAttributeConverter( Desires.class , new DesiresConverter() );
 			reader.parse(
 				config.plans().getInputPersonAttributeFile() );
 

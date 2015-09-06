@@ -20,25 +20,18 @@
 
 package playground.telaviv.scoring.functions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.misc.Time;
-import playground.ivt.utils.Desires;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates {@link CharyparNagelOpenTimesActivityScoring}s.

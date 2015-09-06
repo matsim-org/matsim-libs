@@ -20,10 +20,6 @@
 
 package playground.telaviv.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,10 +38,12 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
-import playground.ivt.utils.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.telaviv.config.TelAvivConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class ExternalTripsCreator {
 

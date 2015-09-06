@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -62,16 +55,13 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.OpeningTimeImpl;
-import playground.ivt.utils.Desires;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+
+import java.util.*;
 
 /**
  * @author thibautd
