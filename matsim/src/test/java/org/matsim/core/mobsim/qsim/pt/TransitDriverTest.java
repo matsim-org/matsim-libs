@@ -645,6 +645,12 @@ public class TransitDriverTest {
 		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
+
+		@Override
+		public String getMode() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 
 }

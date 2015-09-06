@@ -102,17 +102,6 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
     public Double getExpectedTravelDistance();
 
     /**
-     * Convenience method for Leg.getMode(), in an attempt to get rid of getCurrentLeg().  If the agent is not on a leg,
-     * the behavior of this method is undefined (so don't rely on it).
-     * <p/>
-     * Comments:<ul>
-     * <li>Should be renamed to getLegMode(), in my opinion, as the mode of an agent can be anything else. mrieser/jan'12
-     * <li>I don't mind, but my current eclipse can't do the refactoring (https://bugs.eclipse.org/bugs/show_bug.cgi?id=293861). kai, jan'13
-     * </ul>
-     */
-    public String getMode();
-
-    /**
      * Design thoughts:<ul>
      * <li>There needs to be some method that tells the agent that a teleportation has happened, similar to "moveOverNode".
      * Could be separated out to a "teleportation" agent, but can as well leave it here. Also used by transit and by

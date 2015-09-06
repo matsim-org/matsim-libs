@@ -231,4 +231,9 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		return this.basicPlanAgentDelegate.getPlannedVehicleId() ;
 	}
 
+	@Override
+	public String getMode() {
+		return this.basicPlanAgentDelegate.getMode() ;
+	}
+
 }
