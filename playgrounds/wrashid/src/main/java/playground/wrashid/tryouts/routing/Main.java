@@ -93,8 +93,9 @@ public class Main {
 		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 
 		for (int i = 0; i < 1000; i++) {
-			double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,
-					7.0 * 3600);
+			//double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,
+			//		7.0 * 3600);
+			throw new UnsupportedOperationException( "if you need this, please use a RoutingModule instead" );
 		}
 	}
 
