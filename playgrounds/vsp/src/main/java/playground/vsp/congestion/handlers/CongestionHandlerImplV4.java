@@ -39,7 +39,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +49,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.vehicles.Vehicle;
 
+import playground.vsp.congestion.CombinedFlowAndStorageDelayTest;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -65,7 +69,8 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler{
+public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler,
+Wait2LinkEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
@@ -79,24 +84,30 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	 * This list is used to store entering agents, (1) which can not be cleared in personId2EnteringAgents map because 
 	 * linkEnterTime is required later (2) and these agents should not be charged since they already left the link. 
 	 */
-	private Map<Id<Link>,List<Id<Person>>> linkId2ExcludeEnteringAgentsList = new HashMap<Id<Link>, List<Id<Person>>>();
+	private Map<Id<Link>,List<Id<Person>>> linkId2ExcludeEnteringAgentsList = new HashMap<>();
+	private Map<Id<Vehicle>,Id<Person>> vehicleId2personId = new HashMap<>() ;
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
 		if(event.getLegMode().equals(TransportMode.car)) {
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
 
-			for (Id<Link>linkId : this.linkId2ExcludeEnteringAgentsList.keySet()){ // This is necessary so that an agent once charged can be charged again if causing storageDelay.
+			for (Id<Link>linkId : this.linkId2ExcludeEnteringAgentsList.keySet()){
+				// This is necessary so that an agent once charged can be charged again if causing storageDelay.
 				this.linkId2ExcludeEnteringAgentsList.get(linkId).remove(event.getPersonId());
 			}
 		}
+	}
+	
+	@Override
+	public void handleEvent( Wait2LinkEvent event ) {
+		// map to be able to get driver from vehicle:
+		this.vehicleId2personId.put( event.getVehicleId(), event.getPersonId() ) ;
 	}
 
 
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
-
-		Id<Person> delayedPerson = event.getPersonId();
 
 		storeExcludedEnteringAgents(event);
 
@@ -111,7 +122,8 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 			// headway approx 1/cap, i.e. "flow" queue. So we get here only if we are spillback delayed, and our own bottleneck
 			// is not active)
 
-			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(delayedPerson);
+			Id<Person> driverId = this.vehicleId2personId.get( event.getVehicleId() ) ;
+			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(driverId);
 
 			memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), spillBackCausingLink);
 		} 
@@ -230,7 +242,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 	 * Thus, 
 	 * <p> <code> if( leavingAgents.isEmpty() ) { checkForTimeGap} </code>
 	 * <p> 
-	 * <p> A test is available, see {@link CombinedFlowAndStorageDelayTest.class}.
+	 * <p> A test is available, see {@link CombinedFlowAndStorageDelayTest}.
 	 */
 	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event){
 
@@ -294,7 +306,7 @@ public final class CongestionHandlerImplV4  extends AbstractCongestionHandler im
 
 		Map<Id<Person>,Double> sortedHashMap = new LinkedHashMap<Id<Person>, Double>();
 		for (Iterator<Entry<Id<Person>,Double>> it = list.iterator(); it.hasNext();) {
-			Entry<Id<Person>,Double> entry = (Entry<Id<Person>,Double>) it.next();
+			Entry<Id<Person>,Double> entry = it.next();
 			sortedHashMap.put(entry.getKey(), entry.getValue());
 		} 
 		return sortedHashMap;
