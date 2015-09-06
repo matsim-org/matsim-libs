@@ -29,35 +29,35 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Link2WaitEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
  * 
  * @author dgrether
  */
-public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, Wait2LinkEventHandler {
+public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Link2WaitEventHandler, VehicleAbortEventHandler, Wait2LinkEventHandler {
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
 	private static final double binSizeSeconds = 5.0 * 60.0;
 	private static final double vehicleSize = 7.5;
 	
-	private Map<Id<Person>, Double> firstTimeSeenMap = new HashMap<>();
-	private Map<Id<Person>, LinkLeaveEvent> lastTimeSeenMap = new HashMap<>();
-	private Map<Id<Person>, LinkEnterEvent> enterEventByPersonIdMap = new HashMap<>();
+	private Map<Id<Vehicle>, Double> firstTimeSeenMap = new HashMap<>();
+	private Map<Id<Vehicle>, LinkLeaveEvent> lastTimeSeenMap = new HashMap<>();
+	private Map<Id<Vehicle>, LinkEnterEvent> enterEventByVehIdMap = new HashMap<>();
 	private Network network;
 	private double networkLengthKm;
 	private Data data;
@@ -81,16 +81,16 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		boolean personIdAlreadySeen = this.firstTimeSeenMap.containsKey(event.getPersonId());
+		boolean vehIdAlreadySeen = this.firstTimeSeenMap.containsKey(event.getVehicleId());
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			if (! personIdAlreadySeen) {
-				this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
+			if (! vehIdAlreadySeen) {
+				this.firstTimeSeenMap.put(event.getVehicleId(), event.getTime());
 			}
-			this.enterEventByPersonIdMap.put(event.getPersonId(), event);
+			this.enterEventByVehIdMap.put(event.getVehicleId(), event);
 		}
 		else {
-			if (personIdAlreadySeen){
-				this.handleLeaveNetworkOrArrival(event.getPersonId());
+			if (vehIdAlreadySeen){
+				this.handleLeaveNetworkOrArrival(event.getVehicleId());
 			}
 		}
 	}
@@ -98,7 +98,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	@Override
 	public void handleEvent(Wait2LinkEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())){
-			this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
+			this.firstTimeSeenMap.put(event.getVehicleId(), event.getTime());
 		}
 	}
 
@@ -106,10 +106,10 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	public void handleEvent(LinkLeaveEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
 		if (link != null) {
-			this.lastTimeSeenMap.put(event.getPersonId(), event);
+			this.lastTimeSeenMap.put(event.getVehicleId(), event);
 			int slot = this.getBinIndex(event.getTime());
 			this.data.incrementFlow(slot, link);
-			LinkEnterEvent enterEvent = this.enterEventByPersonIdMap.get(event.getPersonId());
+			LinkEnterEvent enterEvent = this.enterEventByVehIdMap.get(event.getVehicleId());
 			if (enterEvent != null) {
 				double tt = (event.getTime() - enterEvent.getTime());
 				this.data.addTravelTimeSeconds(slot, link, tt);
@@ -118,20 +118,20 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	}
 	
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		log.warn("got AgentStuckEvent, the code might not be correct if removeStuckVehicles config switch is set to true");
+	public void handleEvent(VehicleAbortEvent event) {
+		log.warn("got VehicleAbortEvent, the code might not be correct if removeStuckVehicles config switch is set to true");
 	}
 	
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.handleLeaveNetworkOrArrival(event.getPersonId());
+	public void handleEvent(Link2WaitEvent event) {
+		this.handleLeaveNetworkOrArrival(event.getVehicleId());
 	}
 
 	
-	private void handleLeaveNetworkOrArrival(Id<Person> personId) {
-		Double firstEvent = this.firstTimeSeenMap.remove(personId);
-		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
-		this.enterEventByPersonIdMap.remove(personId);
+	private void handleLeaveNetworkOrArrival(Id<Vehicle> vehId) {
+		Double firstEvent = this.firstTimeSeenMap.remove(vehId);
+		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(vehId);
+		this.enterEventByVehIdMap.remove(vehId);
 		
 		if (firstEvent != null && lastEvent != null){
 			int index = getBinIndex(firstEvent);
@@ -140,7 +140,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 			this.data.incrementArrivals(index);
 		}
 //		else {
-//			log.warn("No first or last event found for person id: " + personId);
+//			log.warn("No first or last event found for vehicle id: " + vehId);
 //		}
 	}
 
