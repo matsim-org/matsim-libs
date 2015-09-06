@@ -156,7 +156,7 @@ public class ResultsPostProcessor
                     lineId.append('\t').append(e.id);
                     lineN.append('\t').append(s.n);
                     lineM.append('\t').append(s.m);
-                    lineRatio.append('\t').append(ratio);
+                    lineRatio.append('\t').append(String.format("%.2f", ratio));
                 }
             }
 
@@ -254,8 +254,8 @@ public class ResultsPostProcessor
                 "0.6", //
                 "0.7", //
                 "0.8", //
-                "0.9", //
-                "1.0"//
+                "0.9" //
+                //"1.0"//
         ).process(dir, subDirPrefix, "stats");
     }
 
@@ -263,7 +263,7 @@ public class ResultsPostProcessor
     public static void main(String[] args)
     {
         //processMielec();
-        processBerlin();
-        //processBarcelona();
+        //processBerlin();
+        processBarcelona();
     }
 }
