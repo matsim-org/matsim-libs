@@ -17,8 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.old;
+package org.matsim.core.router;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,12 +35,10 @@ import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import junit.framework.Assert;
-
 /**
  * @author mrieser
  */
-public class TeleportationLegRouterTest {
+public class TeleportationRoutingModuleTest {
 
 	@Test
 	public void testRouteLeg() {
@@ -52,13 +51,23 @@ public class TeleportationLegRouterTest {
 		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
 		Activity toAct = new ActivityImpl("h", new Coord((double) 1000, (double) 0));
 
-		TeleportationLegRouter router = new TeleportationLegRouter(routeFactory, 10.0, 1.0);
+		TeleportationRoutingModule router =
+				new TeleportationRoutingModule(
+						"mode",
+						scenario.getPopulation().getFactory(),
+						routeFactory, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(100.0, tt, 10e-7);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 10e-7);
 		Assert.assertEquals(100.0, leg.getRoute().getTravelTime(), 10e-7);
 
-		router = new TeleportationLegRouter(routeFactory, 20.0, 1.0);
+        router =
+				new TeleportationRoutingModule(
+						"mode",
+						scenario.getPopulation().getFactory(),
+						routeFactory,
+						20.0,
+						1.0);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(50.0, tt, 10e-7);
 		Assert.assertEquals(50.0, leg.getTravelTime(), 10e-7);
@@ -66,7 +75,13 @@ public class TeleportationLegRouterTest {
 
 		Activity otherToAct = new ActivityImpl("h", new Coord((double) 1000, (double) 1000));
 		double manhattanBeelineDistanceFactor = Math.sqrt(2.0);
-		router = new TeleportationLegRouter(routeFactory, 10.0, manhattanBeelineDistanceFactor);
+		router =
+                new TeleportationRoutingModule(
+						"mode",
+						scenario.getPopulation().getFactory(),
+						routeFactory,
+						10.0,
+						manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);
 		Assert.assertEquals(200.0, tt, 10e-7);
 		Assert.assertEquals(200.0, leg.getTravelTime(), 10e-7);
