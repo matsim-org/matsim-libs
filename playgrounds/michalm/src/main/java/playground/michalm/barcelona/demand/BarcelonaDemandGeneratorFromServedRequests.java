@@ -78,8 +78,8 @@ public class BarcelonaDemandGeneratorFromServedRequests
 
     public static void main(String[] args)
     {
-        String dir = "d:/PP-rad/Barcelona/";
-        String networkFile = dir + "barcelona_network.xml";
+        String dir = "d:/PP-rad/Barcelona/data/";
+        String networkFile = dir + "network/barcelona_network.xml";
 
         Iterable<BarcelonaServedRequest> requests = BarcelonaServedRequests.readRequests();
         System.out.println("#All: " + Iterables.size(requests));
@@ -99,9 +99,9 @@ public class BarcelonaDemandGeneratorFromServedRequests
                     scenario);
             double scale = i / 10.;
             dg.generateDemand(requests, scale);
-            dg.write(dir + "plans5to4_" + scale + ".xml.gz");
+            dg.write(dir + "plans/plans5to4_" + scale + ".xml.gz");
         }
 
-        //new BarcelonaServedRequestsWriter(requests).writeFile("d:/PP-rad/Barcelona/served_requests/tripsInAgglomeration_since_Mar_2011_only_weekdays.csv");
+        //new BarcelonaServedRequestsWriter(requests).writeFile("d:/PP-rad/Barcelona/data/served_requests/tripsInAgglomeration_since_Mar_2011_only_weekdays.csv");
     }
 }

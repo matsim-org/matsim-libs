@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,25 +19,32 @@
 
 package playground.michalm.barcelona;
 
-import java.util.Collection;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import com.google.common.collect.Sets;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
+import playground.andreas.utils.net.NetworkSimplifier;
 
-
-public class BarcelonaZones
+public class SimplifyBarcelonaNetwork
 {
-    public static MultiPolygon readAgglomerationArea()
+    public static void main(String[] args)
     {
-        String agglomerationShpFile = "d:/PP-rad/Barcelona/data/GIS/BCN_polygon_UMT31N.shp";
+        String dir = "d:/PP-rad/Barcelona/data/network/";
+        String networkFile = dir + "barcelona_network.xml";
+        String simplifiedNetworkFile = dir + "barcelona_simplified_network.xml";
 
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
-        if (features.size() != 1) {
-            throw new RuntimeException();
-        }
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario).readFile(networkFile);
 
-        return (MultiPolygon)features.iterator().next().getDefaultGeometry();
+        NetworkSimplifier simplifier = new NetworkSimplifier();
+        simplifier.setNodesToMerge(Sets.newHashSet(4, 5));
+        simplifier.run(scenario.getNetwork());
+        simplifier.run(scenario.getNetwork());//2nd run
+
+        new NetworkWriter(scenario.getNetwork()).write(simplifiedNetworkFile);
     }
 }

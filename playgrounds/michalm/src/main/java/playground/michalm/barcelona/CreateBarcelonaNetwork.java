@@ -2,7 +2,7 @@ package playground.michalm.barcelona;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.config.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -14,11 +14,11 @@ public class CreateBarcelonaNetwork
 {
     public static void main(String[] args)
     {
-        String osmFile = "d:/PP-rad/Barcelona/barcelona_osm.xml";
-        String networkFile = "d:/PP-rad/Barcelona/barcelona_network.xml";
+        String dir = "d:/PP-rad/Barcelona/data/network/";
+        String osmFile = dir + "barcelona_osm.xml";
+        String networkFile = dir + "barcelona_network.xml";
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Network network = scenario.getNetwork();
 
         CoordinateTransformation coordTrans = TransformationFactory.getCoordinateTransformation(
@@ -35,7 +35,6 @@ public class CreateBarcelonaNetwork
         onr.setHighwayDefaults(5, "tertiary_link", 1, 30. / 3.6, 1., 800);
         onr.setHighwayDefaults(6, "residential", 1, 30. / 3.6, 1., 700);
         onr.setHighwayDefaults(6, "living_street", 1, 30. / 3.6, 1., 400);
-        
         onr.parse(osmFile);
 
         new NetworkCleaner().run(network);

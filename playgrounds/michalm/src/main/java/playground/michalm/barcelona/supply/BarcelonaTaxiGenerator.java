@@ -47,8 +47,8 @@ public class BarcelonaTaxiGenerator
         double minWorkTime = 4.0 * 3600;
         double maxWorkTime = 12.0 * 3600;
 
-        String dir = "d:/PP-rad/Barcelona/";
-        String networkFile = dir + "barcelona_network.xml";
+        String dir = "d:/PP-rad/Barcelona/data/";
+        String networkFile = dir + "network/barcelona_network.xml";
         String taxisFile = dir + "taxis5to5_" + vehsToReqsRatio + ".xml";
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
