@@ -23,9 +23,11 @@ package org.matsim.core.replanning;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -33,7 +35,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ReRoutingTest extends MatsimTestCase {
 
@@ -42,6 +47,15 @@ public class ReRoutingTest extends MatsimTestCase {
 	
 	private Scenario loadScenario() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walk = config.plansCalcRoute().getModeRoutingParams().get("walk");
+		PlansCalcRouteConfigGroup.ModeRoutingParams pt = config.plansCalcRoute().getModeRoutingParams().get("pt");
+		PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
+		pars.setMode("wurst");
+		pars.setTeleportedModeSpeed(300000.0);
+		config.plansCalcRoute().addModeRoutingParams(pars);
+		config.plansCalcRoute().addModeRoutingParams(walk);
+		config.plansCalcRoute().addModeRoutingParams(pt);
+		config.plansCalcRoute().setNetworkModes(Arrays.asList("car", "ride"));
 		config.qsim().setTimeStepSize(10.0);
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
@@ -55,6 +69,12 @@ public class ReRoutingTest extends MatsimTestCase {
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+		modes.add("ride");
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			link.setAllowedModes(modes);
+		}
 		return scenario;
 	}
 	
