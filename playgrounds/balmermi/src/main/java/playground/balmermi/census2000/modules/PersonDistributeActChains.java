@@ -30,6 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -200,7 +201,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		PlanImpl plan =  ((PersonImpl) p).createAndAddPlan(true);
+		PlanImpl plan =  PersonUtils.createAndAddPlan(p, true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -253,8 +254,8 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 
 	@Override
 	public void run(Person person) {
-		int age = ((PersonImpl) person).getAge();
-		boolean employed = ((PersonImpl) person).isEmployed();
+		int age = PersonUtils.getAge(person);
+		boolean employed = PersonUtils.isEmployed(person);
 		int row = -1;
 		if (age < 6) { row = 0; }
 		else if (age < 8) { row = 2; }

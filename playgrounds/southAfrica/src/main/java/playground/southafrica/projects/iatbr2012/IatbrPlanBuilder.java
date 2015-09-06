@@ -38,7 +38,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -235,7 +234,7 @@ public class IatbrPlanBuilder {
 		Iterator<Id<Person>> iterator = population.getPersons().keySet().iterator();
 		while(iterator.hasNext()){
 			Id<Person> id = iterator.next();
-			PersonImpl person = (PersonImpl) population.getPersons().get(id);
+			Person person = population.getPersons().get(id);
 			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
 			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
 			if(firstActivity.getType().startsWith("h") && lastActivity.getType().startsWith("h")){

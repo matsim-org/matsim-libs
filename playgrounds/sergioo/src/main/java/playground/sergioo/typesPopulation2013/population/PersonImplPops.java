@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
+
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -43,14 +45,14 @@ public class PersonImplPops extends PersonImpl {
 		super(id);
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
 	}
-	public PersonImplPops(PersonImpl person, Id<Population> populationId) {
+	public PersonImplPops(Person person, Id<Population> populationId) {
 		super(person.getId());
-		setAge(person.getAge());
-		setCarAvail(person.getCarAvail());
-		setEmployed(person.isEmployed());
-		setLicence(person.getLicense());
+		PersonUtils.setAge(this, PersonUtils.getAge(person));
+		PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(person));
+		PersonUtils.setEmployed(this, PersonUtils.isEmployed(person));
+		PersonUtils.setLicence(this, PersonUtils.getLicense(person));
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
-		setSex(person.getSex());
+		PersonUtils.setSex(this, PersonUtils.getSex(person));
 		for(Plan plan:person.getPlans())
 			addPlan(plan);
 		setSelectedPlan(person.getSelectedPlan());

@@ -32,7 +32,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.router.old.TeleportationLegRouter;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import junit.framework.Assert;
 
@@ -45,9 +46,7 @@ public class TeleportationLegRouterTest {
 	public void testRouteLeg() {
 		ModeRouteFactory routeFactory = new ModeRouteFactory();
 		routeFactory.setRouteFactory(TransportMode.walk, new GenericRouteFactory());
-		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.walk);
 		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
 		Activity toAct = new ActivityImpl("h", new Coord((double) 1000, (double) 0));

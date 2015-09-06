@@ -35,10 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -186,9 +183,9 @@ public class ConvertThurgau2Plans {
 //			if (!houseHoldIncomeString.equals("")) {
 //				householdIncome = Integer.parseInt(houseHoldIncomeString);
 //			}			
-			PersonImpl person = new PersonImpl(id);
-			person.setAge(age);
-			person.setSex(gender);
+			Person person = PersonImpl.createPerson(id);
+			PersonUtils.setAge(person, age);
+			PersonUtils.setSex(person, gender);
 			population.addPerson(person);
 		}
 	}
@@ -217,8 +214,8 @@ public class ConvertThurgau2Plans {
 	
 	private Plan addPlan(Id pid, int dow) {
 		// creating/getting plan	
-		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
-		person.createAndAddPlan(true);
+		Person person = this.scenario.getPopulation().getPersons().get(pid);
+		PersonUtils.createAndAddPlan(person, true);
 		Plan plan = person.getSelectedPlan();
 						
 		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000
@@ -226,7 +223,7 @@ public class ConvertThurgau2Plans {
 	}
 	
 	private void addTripsAndActs(Id pid, String[] entrs) {
-		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
+		Person person = this.scenario.getPopulation().getPersons().get(pid);
 		Plan plan = person.getSelectedPlan();
 		
 		// departure time (min => sec.)

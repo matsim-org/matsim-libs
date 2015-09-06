@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.households.Household;
@@ -93,8 +93,8 @@ public class ModeAvailabilityChecker {
 	 * @return
 	 */
 	public boolean hasDrivingLicense(Id personId) {
-		PersonImpl p = (PersonImpl) this.scenario.getPopulation().getPersons().get(personId);
-		return p.hasLicense();
+		Person p = this.scenario.getPopulation().getPersons().get(personId);
+		return PersonUtils.hasLicense(p);
 	}
 	
 	/**

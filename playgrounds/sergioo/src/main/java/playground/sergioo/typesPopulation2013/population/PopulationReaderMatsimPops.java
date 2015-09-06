@@ -32,13 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -178,15 +172,15 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			age = Integer.parseInt(ageString);
 		String popId = atts.getValue(ATTR_PERSON_POP_ID);
 		this.currperson = new PersonImplPops(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class), popId==null?PersonImplPops.DEFAULT_POP_ID:Id.create(popId, Population.class));
-		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
-		this.currperson.setCarAvail(atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed(VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 
@@ -204,7 +198,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);
 		if (scoreString != null) {

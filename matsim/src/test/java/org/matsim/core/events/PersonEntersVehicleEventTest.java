@@ -36,7 +36,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 public class PersonEntersVehicleEventTest extends MatsimTestCase {
 
 	public void testReadWriteXml() {
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehType", VehicleType.class));
 		Vehicle vehicle = new VehicleImpl(Id.create(80, Vehicle.class), vehicleType);
 		PersonEntersVehicleEvent event = new PersonEntersVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());

@@ -19,10 +19,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -85,7 +82,7 @@ public class WeeklyPlans {
 
 	private static void addCopiedDay(Plan plan, List<PlanElement> dailyPlanElements,
 			int dayPos, ActivityFacilities activityFacilities) {
-		boolean carAvailable = !((PersonImpl)plan.getPerson()).getCarAvail().equals("never") && ((PersonImpl)plan.getPerson()).hasLicense(); 
+		boolean carAvailable = !PersonUtils.getCarAvail(plan.getPerson()).equals("never") && PersonUtils.hasLicense(plan.getPerson());
 		for(PlanElement planElement:dailyPlanElements) {
 			PlanElement planElementCopy;
 			if(planElement instanceof Activity) {
@@ -114,7 +111,7 @@ public class WeeklyPlans {
 				homeFacilityId = ((Activity)planElement).getFacilityId();
 				homeCoord = ((Activity)planElement).getCoord();
 			}
-		boolean carAvailable = !((PersonImpl)plan.getPerson()).getCarAvail().equals("never") && ((PersonImpl)plan.getPerson()).hasLicense(); 
+		boolean carAvailable = !PersonUtils.getCarAvail(plan.getPerson()).equals("never") && PersonUtils.hasLicense(plan.getPerson());
 		double totalDurations = 9*3600;
 		try {
 			totalDurations = new NormalDistributionImpl(9*3600, 2*3600).inverseCumulativeProbability(Math.random());

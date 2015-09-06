@@ -51,7 +51,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -767,12 +767,12 @@ public class CreateMarathonPopulation {
 		
 		for (int personCount = 0; personCount < runners; personCount++) {
 			
-			PersonImpl person = (PersonImpl) populationFactory.createPerson(Id.create("runner_" + personCount, Person.class));
+			Person person = populationFactory.createPerson(Id.create("runner_" + personCount, Person.class));
 
 			// set random age and gender
-			person.setAge((int)(18 + Math.round(random.nextDouble() * 47)));	// 18 .. 65 years old
-			if (random.nextDouble() > 0.5) person.setSex("m");
-			else person.setSex("f");
+			PersonUtils.setAge(person, (int) (18 + Math.round(random.nextDouble() * 47)));	// 18 .. 65 years old
+			if (random.nextDouble() > 0.5) PersonUtils.setSex(person, "m");
+			else PersonUtils.setSex(person, "f");
 			
 			Plan plan = populationFactory.createPlan();
 			person.addPlan(plan);

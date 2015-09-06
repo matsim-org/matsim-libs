@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 public class FlexTransPersonImpl extends PersonImpl
@@ -17,14 +18,16 @@ public class FlexTransPersonImpl extends PersonImpl
   private CH1903LV03toWGS84 coordTranformer = new CH1903LV03toWGS84();
   private Coord homeSwissCoord;
 
-  public FlexTransPersonImpl(PersonImpl p)
+  public FlexTransPersonImpl(Person p)
   {
     super(p.getId());
-    setAge(p.getAge());
-    setCarAvail(p.getCarAvail());
-    setLicence(p.getLicense());
-    setSex(p.getSex());
-    this.plans = p.getPlans();
+    PersonUtils.setAge(this, PersonUtils.getAge(p));
+    PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(p));
+    PersonUtils.setLicence(this, PersonUtils.getLicense(p));
+    PersonUtils.setSex(this, PersonUtils.getSex(p));
+    for (Plan plan : p.getPlans()) {
+        addPlan(plan);
+    }
 
     setSelectedPlan(p.getSelectedPlan());
     setHomeCoord();

@@ -30,6 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.misc.Time;
@@ -96,8 +97,8 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			PersonImpl person = new PersonImpl(Id.create("1", Person.class));
-			plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create("1", Person.class));
+			plan = PersonUtils.createAndAddPlan(person, true);
 			act1 = plan.createAndAddActivity("h", link1.getId());
 			act1.setEndTime(4*3600);
 			plan.createAndAddLeg(TransportMode.car);
@@ -175,8 +176,8 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			PersonImpl person = new PersonImpl(Id.create("1", Person.class));
-			plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create("1", Person.class));
+			plan = PersonUtils.createAndAddPlan(person, true);
 			act1 = plan.createAndAddActivity("h", link1.getId());
 			act1.setEndTime(4*3600);
 			plan.createAndAddLeg(TransportMode.car);

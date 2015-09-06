@@ -39,7 +39,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -305,7 +304,7 @@ public class Simulator {
 		reader.readFile(file);
 		Population pop = scenario.getPopulation();
 		for(SocialVertex v : graph.getVertices()) {
-			PersonImpl person = v.getPerson().getPerson();
+			Person person = v.getPerson().getPerson();
 			Plan plan  = pop.getPersons().get(person.getId()).getSelectedPlan();
 
 			person.getPlans().clear();

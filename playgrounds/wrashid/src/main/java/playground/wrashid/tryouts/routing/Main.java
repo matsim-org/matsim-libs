@@ -83,7 +83,7 @@ public class Main {
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, freespeed, freespeed);
 
 		
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = new ActivityImpl("h", fromCoord);

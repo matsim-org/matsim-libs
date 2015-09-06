@@ -39,7 +39,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -199,10 +198,10 @@ public class FRAdaptZHScenario {
 //	}
 	
 	private void removeBoderCrossers() {
-		List<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
+		List<Person> personsWithoutCB = new Vector<Person>();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
 			if (Integer.parseInt(p.getId().toString()) < 1000000000) {
-				personsWithoutCB.add((PersonImpl)p);
+				personsWithoutCB.add(p);
 			}
 		}
 		this.scenario.getPopulation().getPersons().clear();

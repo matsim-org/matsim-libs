@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class PlansCreateFromNetwork {
 
@@ -110,12 +111,12 @@ public class PlansCreateFromNetwork {
 					else if (rd2 < 0.4) { car_avail = "always"; }
 				}
 			}
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
-			p.setSex(sex);
-			p.setAge(age);
-			p.setLicence(license);
-			p.setCarAvail(car_avail);
-			p.setEmployed(employed);
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			PersonUtils.setSex(p, sex);
+			PersonUtils.setAge(p, age);
+			PersonUtils.setLicence(p, license);
+			PersonUtils.setCarAvail(p, car_avail);
+			PersonUtils.setEmployed(p, employed);
 			plans.addPerson(p);
 		}
 		System.out.println("    done.");

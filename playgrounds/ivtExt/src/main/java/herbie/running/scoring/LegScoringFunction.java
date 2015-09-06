@@ -25,15 +25,23 @@ import herbie.running.pt.DistanceCalculations;
 
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 
 /**
@@ -96,7 +104,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			double distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
 			
 			double distanceCost = 0.0;
-			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
+			TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 			if (travelCards == null) {
 				distanceCost = this.ktiConfigGroup.getDistanceCostPtNoTravelCard();
 			} else if (travelCards.contains("unknown")) {

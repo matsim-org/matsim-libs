@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
@@ -108,7 +108,7 @@ public class GenerateRandomHouseholdScenario {
 				final Link leisureLink = randomLinks.nextLink();
 
 				final Person driver = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
-				((PersonImpl) driver).setCarAvail( "always" );
+				PersonUtils.setCarAvail(driver, "always");
 				createPlan( random , popFactory , driver , homeLink , workLink , leisureLink , workThenLeisure );
 				members.add( driver.getId() );
 				population.addPerson( driver );
@@ -116,7 +116,7 @@ public class GenerateRandomHouseholdScenario {
 				if ( doublePlans ) {
 					// generate twice the "same" plan, once with car, once without
 					final Person passenger = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
-					((PersonImpl) passenger).setCarAvail( "never" );
+					PersonUtils.setCarAvail(passenger, "never");
 					createPlan( random , popFactory , passenger , homeLink , workLink , leisureLink , workThenLeisure );
 					members.add( passenger.getId() );
 					population.addPerson( passenger );

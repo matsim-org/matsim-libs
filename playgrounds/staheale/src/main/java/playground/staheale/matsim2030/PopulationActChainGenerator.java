@@ -20,11 +20,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -179,9 +175,9 @@ public class PopulationActChainGenerator {
 				idCount += 1;
 
 				// check if gender information is consistent, otherwise set it to csv info
-				if (mz_person.getSex().equals(sex) != true) {
+				if (PersonUtils.getSex(mz_person).equals(sex) != true) {
 					log.warn("gender information for person " +re10record+ " is not consistent");
-					person.setSex(sex);
+					PersonUtils.setSex(person, sex);
 				}
 
 				// create home activity as first activity if necessary
@@ -207,7 +203,7 @@ public class PopulationActChainGenerator {
 						firstLegMode = firstLeg.getMode();
 					}
 					else {
-						if (mz_person.hasLicense()) {
+						if (PersonUtils.hasLicense(mz_person)) {
 								firstLegMode = "car";
 						}
 						else {
@@ -266,7 +262,7 @@ public class PopulationActChainGenerator {
 					if (pe instanceof Leg) {
 						LegImpl l = (LegImpl) pe;
 						if (l.getMode().equals("other") || l.getMode().equals("abroad_teleport") || l.getMode().equals("pseudoetappe")) {
-							if (person.getLicense().equals("yes")) {
+							if (PersonUtils.getLicense(person).equals("yes")) {
 								l.setMode("car");
 								//log.info("leg mode of person with recId " +recId+ " is changed to car");
 
@@ -282,7 +278,7 @@ public class PopulationActChainGenerator {
 
 				//////////////////////////////////////////////////////////////////////
 				// check if license holder is over 18
-				if (person.hasLicense() && person.getAge() < 18) {
+				if (PersonUtils.hasLicense(person) && PersonUtils.getAge(person) < 18) {
 					log.warn("person " +person.getId()+ " has a license, but is under 18");
 				}
 

@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -94,7 +93,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 				new FastDijkstraFactory(),
 				event.getControler().getScenario().getConfig().transit().isUseTransit() ? transitRouterFactory : null);*/
 		for(Person person: persons.values())
-			toBeAdded.add(BasePersonImpl.convertToBasePerson((PersonImpl) person));
+			toBeAdded.add(BasePersonImpl.convertToBasePerson(person));
 			//toBeAdded.add(BasePersonImpl.getBasePerson(fixedTypes, types, (PersonImpl)person, tripRouterFactory.createTripRouter(), ((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities()));
 		for(Person person:toBeAdded) {
             event.getControler().getScenario().getPopulation().getPersons().remove(person.getId());

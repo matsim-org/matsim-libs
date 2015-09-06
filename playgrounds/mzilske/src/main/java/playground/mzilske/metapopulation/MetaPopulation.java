@@ -96,7 +96,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
         if (deltaAgents > 0) {
             for (int i=0; i<deltaAgents; i++) {
                 Person templatePerson = templatePopulation.get(random.nextInt(templatePopulation.size()));
-                Person person = new PersonImpl(Id.create(id.toString() + "_" + nextId++, Person.class));
+                Person person = PersonImpl.createPerson(Id.create(id.toString() + "_" + nextId++, Person.class));
                 for (Plan templatePlan : templatePerson.getPlans()) {
                     PlanImpl plan = new PlanImpl();
                     plan.copyFrom(templatePlan);

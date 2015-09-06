@@ -129,7 +129,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population population = PopulationUtils.createPopulation(scenario.getConfig());
 		for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
-			PersonImpl person = new PersonImpl(entry.getKey());
+			Person person = PersonImpl.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
 			person.addPlan(plan);

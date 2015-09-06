@@ -97,7 +97,7 @@ public class JointTripRouterFactoryTest {
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
-		PersonImpl pers = new PersonImpl( driverId );
+		Person pers = PersonImpl.createPerson(driverId);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -116,7 +116,7 @@ public class JointTripRouterFactoryTest {
 		dLeg.setRoute( dRoute );
 
 		// passenger
-		pers = new PersonImpl( passengerId );
+		pers = PersonImpl.createPerson(passengerId);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );

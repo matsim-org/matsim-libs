@@ -198,7 +198,7 @@ public class BlockingStopDemo {
 
 		// bus-passengers line 1
 		for (int i = 1; i < nOfStops; i++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(-i), Person.class));
+			Person person = pb.createPerson(Id.create(Integer.toString(-i), Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(i, Link.class));
 			act1.setEndTime(startTime + i*60);
@@ -216,7 +216,7 @@ public class BlockingStopDemo {
 
 		// bus-passengers line 2
 		for (int i = 1; i < nOfStops; i++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(-i-nOfStops), Person.class));
+			Person person = pb.createPerson(Id.create(Integer.toString(-i-nOfStops), Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(nOfLinks+i, Link.class));
 			act1.setEndTime(startTime + i*60);
@@ -244,7 +244,7 @@ public class BlockingStopDemo {
 		carRoute1.setLinkIds(Id.create(0, Link.class), linkIds1, Id.create(nOfLinks-1, Link.class));
 		carRoute2.setLinkIds(Id.create(nOfLinks, Link.class), linkIds2, Id.create(2*nOfLinks-1, Link.class));
 		for (int i = 0; i < nOfCars; i++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(i), Person.class));
+			Person person = pb.createPerson(Id.create(Integer.toString(i), Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1a = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(0, Link.class));
 			act1a.setEndTime(startTime + i*carsHeading);
@@ -259,7 +259,7 @@ public class BlockingStopDemo {
 			plan.addLeg(leg1);
 			plan.addActivity(act1b);
 
-			PersonImpl person2 = (PersonImpl) pb.createPerson(Id.create(Integer.toString(i+nOfCars), Person.class));
+			Person person2 = pb.createPerson(Id.create(Integer.toString(i+nOfCars), Person.class));
 			PlanImpl plan2 = (PlanImpl) pb.createPlan();
 			ActivityImpl act2a = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(nOfLinks, Link.class));
 			act2a.setEndTime(startTime + i*carsHeading);

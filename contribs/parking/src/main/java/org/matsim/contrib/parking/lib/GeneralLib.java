@@ -758,13 +758,13 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		PersonImpl newPerson = new PersonImpl(person.getId());
+		Person newPerson = PersonImpl.createPerson(person.getId());
 		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		newPerson.removeUnselectedPlans();
+		PersonUtils.removeUnselectedPlans(newPerson);
 		return newPerson;
 	}
 

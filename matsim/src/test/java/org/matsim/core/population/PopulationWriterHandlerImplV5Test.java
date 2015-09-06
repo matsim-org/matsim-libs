@@ -80,7 +80,7 @@ public class PopulationWriterHandlerImplV5Test {
 		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
+		Person person = pb.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
@@ -125,7 +125,7 @@ public class PopulationWriterHandlerImplV5Test {
 		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
+		Person person = pb.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));

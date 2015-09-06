@@ -170,7 +170,7 @@ import junit.framework.TestCase;
 		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2.getId(), NetworkUtils.getLinkIds(""), link3.getId()), population);
 	}
 
-	private static void addPersonToPopulation(final PersonImpl person, final Population population) {
+	private static void addPersonToPopulation(final Person person, final Population population) {
 		population.addPerson(person);
 	}
 
@@ -185,8 +185,8 @@ import junit.framework.TestCase;
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(Id.create("1", Link.class)), network.getLinks().get(Id.create("7", Link.class)), network.getLinks().get(Id.create("13", Link.class))), population);
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
-		PersonImpl person = new PersonImpl(Id.create(personId, Person.class));
+	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
+		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
@@ -198,8 +198,8 @@ import junit.framework.TestCase;
 		return person;
 	}
 
-	private static PersonImpl createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		PersonImpl person = new PersonImpl(Id.create(personId, Person.class));
+	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
+		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		ActivityImpl act = plan.createAndAddActivity("h", homeLink.getId());

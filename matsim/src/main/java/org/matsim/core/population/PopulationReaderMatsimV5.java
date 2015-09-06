@@ -90,7 +90,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final Scenario scenario;
 	private final Population plans;
 
-	private PersonImpl currperson = null;
+	private Person currperson = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
 	private LegImpl currleg = null;
@@ -160,16 +160,16 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
-		this.currperson.setCarAvail(atts.getValue(ATTR_PERSON_CARAVAIL));
+		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed(VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 
@@ -187,7 +187,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);
 		if (scoreString != null) {

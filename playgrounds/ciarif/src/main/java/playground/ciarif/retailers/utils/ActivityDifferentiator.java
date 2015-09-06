@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -201,7 +200,7 @@ public class ActivityDifferentiator {
 			int count = 0;
 			int divisor = 1;
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				PersonImpl pi = (PersonImpl)person;
+				Person pi = person;
 				// intitially only one plan is available
 				if (pi.getPlans().size() > 1) {
 					log.error("More than one plan for person: " + pi.getId());
@@ -262,7 +261,7 @@ public class ActivityDifferentiator {
 			log.info("Share:\t"+ (100.0* assignedNumberOf_GroceryActs / this.numberOfShopActs));
 		}
 
-		private void modifyDesires(ActivityImpl act, PersonImpl pi) {
+		private void modifyDesires(ActivityImpl act, Person pi) {
 			ModifyDesires desiresModificator = new ModifyDesires (act, pi);
 			desiresModificator.run();
 		}

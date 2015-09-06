@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
-	private PersonImpl person = null;
+	private Person person = null;
 	private PlanImpl plan = null;
 	private ActivityFacilities facilities = null;
 
@@ -58,7 +58,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
-		this.person = new PersonImpl(Id.create(1, Person.class));
+		this.person = PersonImpl.createPerson(Id.create(1, Person.class));
 		this.plan = new PlanImpl();
 		this.person.addPlan(this.plan);
 

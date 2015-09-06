@@ -334,7 +334,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = new PersonImpl(Id.create(1, Person.class));
+		person1 = PersonImpl.createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
