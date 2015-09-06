@@ -2,6 +2,7 @@ package playground.ciarif.flexibletransports.data;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class FlexTransPersonImpl extends PersonImpl {
 	
@@ -11,10 +12,10 @@ public class FlexTransPersonImpl extends PersonImpl {
 	
 	public FlexTransPersonImpl (Person p) {
 		super(p.getId());
-		PersonImpl.setAge(this, PersonImpl.getAge(p));
-		PersonImpl.setCarAvail(this, PersonImpl.getCarAvail(p));
-		PersonImpl.setLicence(this, PersonImpl.getLicense(p));
-		PersonImpl.setSex(this, PersonImpl.getSex(p));
+		PersonUtils.setAge(this, PersonUtils.getAge(p));
+		PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(p));
+		PersonUtils.setLicence(this, PersonUtils.getLicense(p));
+		PersonUtils.setSex(this, PersonUtils.getSex(p));
 		this.plans = p.getPlans();
 	    addPlan(p.getSelectedPlan());
 	    setSelectedPlan(p.getSelectedPlan());		

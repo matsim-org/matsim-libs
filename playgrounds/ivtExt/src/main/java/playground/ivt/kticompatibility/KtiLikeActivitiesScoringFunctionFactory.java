@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -93,7 +93,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
-		final Collection<String> travelCards = PersonImpl.getTravelcards(person);
+		final Collection<String> travelCards = PersonUtils.getTravelcards(person);
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
 				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :

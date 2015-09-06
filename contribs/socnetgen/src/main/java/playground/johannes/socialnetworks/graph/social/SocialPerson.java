@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.graph.social;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * @author illenberger
@@ -58,7 +58,7 @@ public class SocialPerson {
 	}
 	
 	public int getAge() {
-		return PersonImpl.getAge(person);
+		return PersonUtils.getAge(person);
 	}
 	
 	public String getCitizenship() {

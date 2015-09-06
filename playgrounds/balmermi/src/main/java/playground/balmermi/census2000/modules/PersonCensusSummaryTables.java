@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -97,12 +97,12 @@ public class PersonCensusSummaryTables extends AbstractPersonAlgorithm implement
 			out.write(hh.getId() + "\t");
 			out.write(hh.getCoord().getX() + "\t");
 			out.write(hh.getCoord().getY() + "\t");
-			out.write(PersonImpl.getAge(person) + "\t");
-			out.write(PersonImpl.getSex(person) + "\t");
+			out.write(PersonUtils.getAge(person) + "\t");
+			out.write(PersonUtils.getSex(person) + "\t");
 			out.write(p.isSwiss() + "\t");
-			out.write(PersonImpl.isEmployed(person) + "\t");
-			out.write(PersonImpl.getCarAvail(person) + "\t");
-			out.write(PersonImpl.getLicense(person) + "\t");
+			out.write(PersonUtils.isEmployed(person) + "\t");
+			out.write(PersonUtils.getCarAvail(person) + "\t");
+			out.write(PersonUtils.getLicense(person) + "\t");
 			out.write(hh.getCategory() + "\t");
 			out.write(hh.getPersonCount() + "\t");
 			out.write(hh.getKidCount() + "\t");

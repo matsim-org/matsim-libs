@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -62,9 +62,9 @@ public class PopulationWriteTable {
 			for (Person pp : population.getPersons().values()) {
 				Person p = pp;
 				out.write(p.getId().toString()+"\t");
-				if (PersonImpl.hasLicense(p)) { out.write("yes\t"); } else { out.write("no\t"); }
-				out.write(PersonImpl.getCarAvail(p)+"\t");
-				if (PersonImpl.getTravelcards(p) != null) { out.write("yes"); } else { out.write("no"); }
+				if (PersonUtils.hasLicense(p)) { out.write("yes\t"); } else { out.write("no\t"); }
+				out.write(PersonUtils.getCarAvail(p)+"\t");
+				if (PersonUtils.getTravelcards(p) != null) { out.write("yes"); } else { out.write("no"); }
 
 				Map<String,Id> facs = new TreeMap<String, Id>();
 				for (String type : actOptTypes) { facs.put(type,null); }

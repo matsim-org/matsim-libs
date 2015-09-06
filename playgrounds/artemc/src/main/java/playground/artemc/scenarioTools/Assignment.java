@@ -316,13 +316,13 @@ public class Assignment {
 			
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				PersonImpl.setCarAvail(person, "never");
+				PersonUtils.setCarAvail(person, "never");
 			}
 			else{
-				PersonImpl.setCarAvail(person, "always");
+				PersonUtils.setCarAvail(person, "always");
 			}
 			
-			PersonImpl.setEmployed(person, true);
+			PersonUtils.setEmployed(person, true);
 		//	person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan

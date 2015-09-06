@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -217,7 +217,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		double score = 0.0;
 
 		double distanceCost = 0.0;
-		TreeSet<String> travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
+		TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 		if (travelCards == null) {
 			distanceCost = this.ktiConfigGroup.getDistanceCostPtNoTravelCard();
 		} else if (travelCards.contains("unknown")) {

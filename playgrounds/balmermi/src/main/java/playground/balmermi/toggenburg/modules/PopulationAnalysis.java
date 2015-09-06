@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 
 public class PopulationAnalysis {
@@ -70,16 +70,16 @@ public class PopulationAnalysis {
 				}
 			}
 			if (analyse) {
-				int age = PersonImpl.getAge(p);
+				int age = PersonUtils.getAge(p);
 				if (age > 99) { stats[100]++; } else { stats[age]++; }
-				if (PersonImpl.getSex(p).equals("m")) { stats[101]++; } else { stats[102]++; }
-				if (PersonImpl.hasLicense(p)) { stats[103]++; } else { stats[104]++; }
-				if (PersonImpl.getCarAvail(p).startsWith("a")) { stats[105]++; }
-				else if (PersonImpl.getCarAvail(p).startsWith("s")) { stats[106]++; }
+				if (PersonUtils.getSex(p).equals("m")) { stats[101]++; } else { stats[102]++; }
+				if (PersonUtils.hasLicense(p)) { stats[103]++; } else { stats[104]++; }
+				if (PersonUtils.getCarAvail(p).startsWith("a")) { stats[105]++; }
+				else if (PersonUtils.getCarAvail(p).startsWith("s")) { stats[106]++; }
 				else { stats[107]++; }
-				if (PersonImpl.isEmployed(p)) { stats[108]++; } else { stats[109]++; }
-				if (PersonImpl.getTravelcards(p) == null) { stats[111]++; }
-				else if (PersonImpl.getTravelcards(p).isEmpty()) { stats[111]++; }
+				if (PersonUtils.isEmployed(p)) { stats[108]++; } else { stats[109]++; }
+				if (PersonUtils.getTravelcards(p) == null) { stats[111]++; }
+				else if (PersonUtils.getTravelcards(p).isEmpty()) { stats[111]++; }
 				else { stats[110]++; }
 				count++;
 			}

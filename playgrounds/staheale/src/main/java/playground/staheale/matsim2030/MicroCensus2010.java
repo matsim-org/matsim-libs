@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.Tuple;
 
 public class MicroCensus2010 {
@@ -147,12 +147,12 @@ public class MicroCensus2010 {
 		}
 		for (Person pp : pop.getPersons().values()) {
 			Person p = pp;
-			int age = PersonImpl.getAge(p);
-			String sex = PersonImpl.getSex(p);
-			String lic = PersonImpl.getLicense(p);
-			boolean has_work = PersonImpl.isEmployed(p);
+			int age = PersonUtils.getAge(p);
+			String sex = PersonUtils.getSex(p);
+			String lic = PersonUtils.getLicense(p);
+			boolean has_work = PersonUtils.isEmployed(p);
 			boolean has_educ = false;
-			if (PersonImpl.getAge(p) < 16) { has_educ = true; }
+			if (PersonUtils.getAge(p) < 16) { has_educ = true; }
 //			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 //				if (pe instanceof Activity) {
 //					Activity a = (Activity) pe;

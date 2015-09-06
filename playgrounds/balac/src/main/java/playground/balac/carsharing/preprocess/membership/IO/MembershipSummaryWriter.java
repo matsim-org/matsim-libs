@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.balac.carsharing.data.FlexTransPersonImpl;
 
 
@@ -52,13 +52,13 @@ public class MembershipSummaryWriter
     try
     {
       this.out.write(person.getId() + "\t");
-      this.out.write(PersonImpl.getLicense(person) + "\t");
-      this.out.write(PersonImpl.getCarAvail(person) + "\t");
-      this.out.write(PersonImpl.getAge(person) + "\t");
+      this.out.write(PersonUtils.getLicense(person) + "\t");
+      this.out.write(PersonUtils.getCarAvail(person) + "\t");
+      this.out.write(PersonUtils.getAge(person) + "\t");
       this.out.write(person.getAccessHome() + "\t");
       this.out.write(person.getAccessWork() + "\t");
       this.out.write(person.getDensityHome() + "\t");
-      this.out.write(PersonImpl.getTravelcards(person) + "\t");
+      this.out.write(PersonUtils.getTravelcards(person) + "\t");
       this.out.write(person.getHomeCoord().getX() + "\t");
       this.out.write(person.getHomeCoord().getY() + "\t");
       this.out.write(person.getHomeSwissCoord().getX() + "\t");

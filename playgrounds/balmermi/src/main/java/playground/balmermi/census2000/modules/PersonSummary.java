@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -95,55 +95,55 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	@Override
 	public void run(Person pp) {
 		Person person = pp;
-		if (PersonImpl.getAge(person) > 99) {
+		if (PersonUtils.getAge(person) > 99) {
 			return;
 		}
 
 		person_cnt++;
 
-		if (PersonImpl.getAge(person) != Integer.MIN_VALUE) {
-			this.ages[PersonImpl.getAge(person)]++;
+		if (PersonUtils.getAge(person) != Integer.MIN_VALUE) {
+			this.ages[PersonUtils.getAge(person)]++;
 		}
 
-		if (PersonImpl.getAge(person) < 5) {
+		if (PersonUtils.getAge(person) < 5) {
 			age_groups[0]++;
-			if (PersonImpl.getLicense(person).equals(YES)) { this.license_groups[0]++; }
-			if (PersonImpl.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[0][0]++; }
-			else if (PersonImpl.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[0][1]++; }
+			if (PersonUtils.getLicense(person).equals(YES)) { this.license_groups[0]++; }
+			if (PersonUtils.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[0][0]++; }
+			else if (PersonUtils.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[0][1]++; }
 			else { this.caravail_groups[0][2]++; }
-			if (PersonImpl.isEmployed(person)) { this.employed_groups[0]++; }
+			if (PersonUtils.isEmployed(person)) { this.employed_groups[0]++; }
 		}
-		else if (PersonImpl.getAge(person) < 7) {
+		else if (PersonUtils.getAge(person) < 7) {
 			age_groups[1]++;
-			if (PersonImpl.getLicense(person).equals(YES)) { this.license_groups[1]++; }
-			if (PersonImpl.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[1][0]++; }
-			else if (PersonImpl.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[1][1]++; }
+			if (PersonUtils.getLicense(person).equals(YES)) { this.license_groups[1]++; }
+			if (PersonUtils.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[1][0]++; }
+			else if (PersonUtils.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[1][1]++; }
 			else { this.caravail_groups[1][2]++; }
-			if (PersonImpl.isEmployed(person)) { this.employed_groups[1]++; }
+			if (PersonUtils.isEmployed(person)) { this.employed_groups[1]++; }
 		}
-		else if (PersonImpl.getAge(person) < 66) {
+		else if (PersonUtils.getAge(person) < 66) {
 			age_groups[2]++;
-			if (PersonImpl.getLicense(person).equals(YES)) { this.license_groups[2]++; }
-			if (PersonImpl.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[2][0]++; }
-			else if (PersonImpl.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[2][1]++; }
+			if (PersonUtils.getLicense(person).equals(YES)) { this.license_groups[2]++; }
+			if (PersonUtils.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[2][0]++; }
+			else if (PersonUtils.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[2][1]++; }
 			else { this.caravail_groups[2][2]++; }
-			if (PersonImpl.isEmployed(person)) { this.employed_groups[2]++; }
+			if (PersonUtils.isEmployed(person)) { this.employed_groups[2]++; }
 		}
-		else if (PersonImpl.getAge(person) < 1000) {
+		else if (PersonUtils.getAge(person) < 1000) {
 			age_groups[3]++;
-			if (PersonImpl.getLicense(person).equals(YES)) { this.license_groups[3]++; }
-			if (PersonImpl.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[3][0]++; }
-			else if (PersonImpl.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[3][1]++; }
+			if (PersonUtils.getLicense(person).equals(YES)) { this.license_groups[3]++; }
+			if (PersonUtils.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[3][0]++; }
+			else if (PersonUtils.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[3][1]++; }
 			else { this.caravail_groups[3][2]++; }
-			if (PersonImpl.isEmployed(person)) { this.employed_groups[3]++; }
+			if (PersonUtils.isEmployed(person)) { this.employed_groups[3]++; }
 		}
 		else {
 			age_groups[4]++;
-			if (PersonImpl.getLicense(person).equals(YES)) { this.license_groups[4]++; }
-			if (PersonImpl.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[4][0]++; }
-			else if (PersonImpl.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[4][1]++; }
+			if (PersonUtils.getLicense(person).equals(YES)) { this.license_groups[4]++; }
+			if (PersonUtils.getCarAvail(person).equals(ALWAYS)) { this.caravail_groups[4][0]++; }
+			else if (PersonUtils.getCarAvail(person).equals(SOMETIMES)) { this.caravail_groups[4][1]++; }
 			else { this.caravail_groups[4][2]++; }
-			if (PersonImpl.isEmployed(person)) { this.employed_groups[4]++; }
+			if (PersonUtils.isEmployed(person)) { this.employed_groups[4]++; }
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {

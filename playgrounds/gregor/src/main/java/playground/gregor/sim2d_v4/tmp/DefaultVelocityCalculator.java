@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * Data to calculate a person's velocity on a link is taken from:
@@ -129,20 +130,20 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 			Person p = person;
 			
 			// get gender factor
-			if (PersonImpl.getSex(p) == null) {
+			if (PersonUtils.getSex(p) == null) {
 				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
-			} else if (PersonImpl.getSex(p).equalsIgnoreCase("m")) genderFactor = this.maleScaleFactor;
-			else if (PersonImpl.getSex(p).equalsIgnoreCase("f")) genderFactor = this.femaleScaleFactor;
+			} else if (PersonUtils.getSex(p).equalsIgnoreCase("m")) genderFactor = this.maleScaleFactor;
+			else if (PersonUtils.getSex(p).equalsIgnoreCase("f")) genderFactor = this.femaleScaleFactor;
 			else {
 				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined correct - expected 'm' or 'f' but found " +
-							PersonImpl.getSex(p) + ". Ignoring gender dependent walk speed factor.");
+							PersonUtils.getSex(p) + ". Ignoring gender dependent walk speed factor.");
 				}
 			}
 			
-			int age = PersonImpl.getAge(p);
+			int age = PersonUtils.getAge(p);
 			
 			// by default, age is set to Integer.MIN_VALUE in PersonImpl  
 			if (age == Integer.MIN_VALUE) {
@@ -161,7 +162,7 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 				}
 				ageFactor = this.ageFactors[100];
 			} else {
-				ageFactor = this.ageFactors[PersonImpl.getAge(p)];
+				ageFactor = this.ageFactors[PersonUtils.getAge(p)];
 			}
 		}
 		

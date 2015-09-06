@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -257,12 +257,12 @@ public class NmbmSurveyParser {
 						
 						/* Create new person. */
 						person = population.getFactory().createPerson(personId);
-						PersonImpl.setSex(person, gender);
+						PersonUtils.setSex(person, gender);
 						if(age > 0){
-							PersonImpl.setAge(person, age);
+							PersonUtils.setAge(person, age);
 						}
-						PersonImpl.setEmployed(person, isEmployed);
-						PersonImpl.setCarAvail(person, hasCar);
+						PersonUtils.setEmployed(person, isEmployed);
+						PersonUtils.setCarAvail(person, hasCar);
 						plan = (PlanImpl) population.getFactory().createPlan();
 						
 						/* Add the first activity. */

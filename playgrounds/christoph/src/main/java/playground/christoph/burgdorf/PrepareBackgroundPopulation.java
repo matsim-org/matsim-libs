@@ -36,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -85,7 +86,7 @@ public class PrepareBackgroundPopulation {
 		
 		// remove unselected plans from population
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 		
 		// remove persons which have a "one activity only" plan selected

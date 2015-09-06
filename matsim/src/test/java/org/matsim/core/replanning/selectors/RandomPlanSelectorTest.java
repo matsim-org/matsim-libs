@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -46,12 +47,12 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testRandom() {
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false);
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(10.0);
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false);
 		plan3.setScore(-50.0);
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false);
 		plan4.setScore(0.0);
 
 		RandomPlanSelector<Plan, Person> selector = new RandomPlanSelector<Plan, Person>();

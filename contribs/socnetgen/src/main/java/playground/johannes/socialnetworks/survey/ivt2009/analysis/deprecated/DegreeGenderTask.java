@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -64,9 +64,9 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 					Set<SocialVertex> male = new HashSet<SocialVertex>();
 					Set<SocialVertex> female = new HashSet<SocialVertex>();
 					for (SocialVertex vertex : parition) {
-						if ("m".equalsIgnoreCase(PersonImpl.getSex(vertex.getPerson().getPerson())))
+						if ("m".equalsIgnoreCase(PersonUtils.getSex(vertex.getPerson().getPerson())))
 							male.add(vertex);
-						else if ("f".equalsIgnoreCase(PersonImpl.getSex(vertex.getPerson().getPerson())))
+						else if ("f".equalsIgnoreCase(PersonUtils.getSex(vertex.getPerson().getPerson())))
 							female.add(vertex);
 					}
 					

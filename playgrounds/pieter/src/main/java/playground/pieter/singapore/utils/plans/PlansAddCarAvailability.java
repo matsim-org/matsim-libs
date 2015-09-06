@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 class PlansAddCarAvailability {
 	public void run(Population plans) {
@@ -27,9 +27,9 @@ class PlansAddCarAvailability {
 
                 }
                 if (carAvail)
-                    PersonImpl.setCarAvail(person, "always");
+                    PersonUtils.setCarAvail(person, "always");
                 else
-                    PersonImpl.setCarAvail(person, "never");
+                    PersonUtils.setCarAvail(person, "never");
             }
 
         }

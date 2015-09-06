@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -80,7 +81,7 @@ public class ChangeSingleLegModeTest {
 
 		module.prepareReplanning(null);
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PersonImpl.setCarAvail(person, "never");
+		PersonUtils.setCarAvail(person, "never");
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);

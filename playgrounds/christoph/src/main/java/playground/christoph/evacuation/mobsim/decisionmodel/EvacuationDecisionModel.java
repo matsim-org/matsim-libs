@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
@@ -142,8 +142,8 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		int never = 0;
 		for (Id<Person> personId : household.getMemberIds()) {
 			Person person = scenario.getPopulation().getPersons().get(personId);
-			int age = PersonImpl.getAge(person);
-			boolean drivingLicense = PersonImpl.hasLicense(person);
+			int age = PersonUtils.getAge(person);
+			boolean drivingLicense = PersonUtils.hasLicense(person);
 			
 			EvacuationDecision evacuationDecision = runSurveyBasedPersonModel(age, drivingLicense, hasChildren, isJoined);
 			if (evacuationDecision == EvacuationDecision.IMMEDIATELY) immediately++;

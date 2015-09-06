@@ -327,8 +327,8 @@ public class PopulationGenerator {
 			
 			
 			//Add person attributes
-			PersonImpl.setCarAvail(person, "always");
-			PersonImpl.setEmployed(person, true);
+			PersonUtils.setCarAvail(person, "always");
+			PersonUtils.setEmployed(person, true);
 			person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan

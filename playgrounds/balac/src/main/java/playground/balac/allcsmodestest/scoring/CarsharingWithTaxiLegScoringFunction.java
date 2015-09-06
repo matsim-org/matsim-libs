@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -323,7 +323,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet<String> travelCards = PersonImpl.getTravelcards(this.plan.getPerson());
+		TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 		
 		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;

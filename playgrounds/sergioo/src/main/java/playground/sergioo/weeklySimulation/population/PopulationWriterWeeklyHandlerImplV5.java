@@ -33,11 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -124,29 +120,29 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 		out.write("\"");
 		if (p instanceof PersonImpl){
 			Person person = p;
-			if (PersonImpl.getSex(person) != null) {
+			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");
-				out.write(PersonImpl.getSex(person));
+				out.write(PersonUtils.getSex(person));
 				out.write("\"");
 			}
-			if (PersonImpl.getAge(person) != Integer.MIN_VALUE) {
+			if (PersonUtils.getAge(person) != Integer.MIN_VALUE) {
 				out.write(" age=\"");
-				out.write(Integer.toString(PersonImpl.getAge(person)));
+				out.write(Integer.toString(PersonUtils.getAge(person)));
 				out.write("\"");
 			}
-			if (PersonImpl.getLicense(person) != null) {
+			if (PersonUtils.getLicense(person) != null) {
 				out.write(" license=\"");
-				out.write(PersonImpl.getLicense(person));
+				out.write(PersonUtils.getLicense(person));
 				out.write("\"");
 			}
-			if (PersonImpl.getCarAvail(person) != null) {
+			if (PersonUtils.getCarAvail(person) != null) {
 				out.write(" car_avail=\"");
-				out.write(PersonImpl.getCarAvail(person));
+				out.write(PersonUtils.getCarAvail(person));
 				out.write("\"");
 			}
-			if (PersonImpl.isEmployed(person) != null) {
+			if (PersonUtils.isEmployed(person) != null) {
 				out.write(" employed=\"");
-				out.write((PersonImpl.isEmployed(person) ? "yes" : "no"));
+				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
 				out.write("\"");
 			}
 		}

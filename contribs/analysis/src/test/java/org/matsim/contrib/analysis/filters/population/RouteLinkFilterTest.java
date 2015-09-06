@@ -31,10 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,7 +71,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		NetworkRoute route;
 
 		person = PersonImpl.createPerson(Id.create("1", Person.class));
-		plan = PersonImpl.createAndAddPlan(person, true);
+		plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
@@ -85,7 +82,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		population.addPerson(person);
 
 		person = PersonImpl.createPerson(Id.create("2", Person.class));
-		plan = PersonImpl.createAndAddPlan(person, true);
+		plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
@@ -96,7 +93,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		population.addPerson(person);
 
 		person = PersonImpl.createPerson(Id.create("3", Person.class));
-		plan = PersonImpl.createAndAddPlan(person, true);
+		plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);

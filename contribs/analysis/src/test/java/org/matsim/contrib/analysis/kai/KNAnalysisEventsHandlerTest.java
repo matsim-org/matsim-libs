@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -74,7 +75,7 @@ public class KNAnalysisEventsHandlerTest {
 		this.population = scenario.getPopulation();
 		Person person = PersonImpl.createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("act1", new CoordImpl(100.0, 100.0));
 		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act2", new CoordImpl(200.0, 200.0));

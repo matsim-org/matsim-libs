@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -291,9 +291,9 @@ public class Census2011SampleParser {
 			Income2011 pIncome = Income2011.parseIncome2011FromString(sa[6]);
 			
 			Person person = pf.createPerson(personId);
-			PersonImpl.setAge(person, age);
-			PersonImpl.setSex(person, Gender2011.getMatsimGender(gender));
-			PersonImpl.setEmployed(person, isEmployed);
+			PersonUtils.setAge(person, age);
+			PersonUtils.setSex(person, Gender2011.getMatsimGender(gender));
+			PersonUtils.setEmployed(person, isEmployed);
 			personAttributes.putAttribute(personId.toString(), "relationship", relationship.toString());
 			personAttributes.putAttribute(personId.toString(), "race", populationGroup.toString());
 			personAttributes.putAttribute(personId.toString(), "school", school.toString());

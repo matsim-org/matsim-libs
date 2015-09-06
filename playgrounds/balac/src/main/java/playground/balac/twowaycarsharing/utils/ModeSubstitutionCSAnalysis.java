@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -58,7 +58,7 @@ public class ModeSubstitutionCSAnalysis {
 						hadow = true;
 						
 						s = findMode(person.getId(), j, scenario);
-						if (!(PersonImpl.getCarAvail(person)).equals("never"))
+						if (!(PersonUtils.getCarAvail(person)).equals("never"))
 							hasCar.add(person.getId());
 						
 						if (s.getMode().equals("car")) {

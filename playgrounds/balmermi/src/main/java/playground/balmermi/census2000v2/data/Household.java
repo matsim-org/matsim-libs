@@ -26,7 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.balmermi.census2000.data.Municipality;
@@ -121,13 +121,13 @@ public class Household {
 	
 	public final Map<Id<Person>,Person> getKidsW() {
 		Map<Id<Person>,Person> map = new HashMap<>();
-		for (Person p : this.persons_w.values()) { if (PersonImpl.getAge(p) < 15) { map.put(p.getId(),p); } }
+		for (Person p : this.persons_w.values()) { if (PersonUtils.getAge(p) < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 	
 	public final Map<Id<Person>,Person> getKidsZ() {
 		Map<Id<Person>,Person> map = new HashMap<Id<Person>, Person>();
-		for (Person p : this.persons_z.values()) { if (PersonImpl.getAge(p) < 15) { map.put(p.getId(),p); } }
+		for (Person p : this.persons_z.values()) { if (PersonUtils.getAge(p) < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 

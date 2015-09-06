@@ -88,12 +88,12 @@ public class SimplePopulationGenerator {
 			//Add person attributes
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				PersonImpl.setCarAvail(person, "never");
+				PersonUtils.setCarAvail(person, "never");
 			}
 			else{
-				PersonImpl.setCarAvail(person, "always");
+				PersonUtils.setCarAvail(person, "always");
 			}
-			PersonImpl.setEmployed(person, true);
+			PersonUtils.setEmployed(person, true);
 			simplePopulationGenerator.createIncome(person);
 
 			//Add home location to the plan

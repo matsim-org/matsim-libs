@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
@@ -24,11 +25,11 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	//Static methods
 	public static BasePersonImpl getBasePerson(boolean fixedTypes, String[] types, Person person, TripRouter tripRouter, ActivityFacilities facilities) {
 		BasePersonImpl newPerson = new BasePersonImpl(person.getId());
-		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
-		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
-		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
-		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
-		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
+		PersonUtils.setAge(newPerson, PersonUtils.getAge(person));
+		PersonUtils.setCarAvail(newPerson, PersonUtils.getCarAvail(person));
+		PersonUtils.setEmployed(newPerson, PersonUtils.isEmployed(person));
+		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
+		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		newPerson.addPlan(plan);
 		BasePlanImpl.createBasePlan(fixedTypes, types, newPerson, plan, tripRouter, facilities);
@@ -36,11 +37,11 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	}
 	public static BasePersonImpl convertToBasePerson(Person person) {
 		BasePersonImpl newPerson = new BasePersonImpl(person.getId());
-		PersonImpl.setAge(newPerson, PersonImpl.getAge(person));
-		PersonImpl.setCarAvail(newPerson, PersonImpl.getCarAvail(person));
-		PersonImpl.setEmployed(newPerson, PersonImpl.isEmployed(person));
-		PersonImpl.setLicence(newPerson, PersonImpl.getLicense(person));
-		PersonImpl.setSex(newPerson, PersonImpl.getSex(person));
+		PersonUtils.setAge(newPerson, PersonUtils.getAge(person));
+		PersonUtils.setCarAvail(newPerson, PersonUtils.getCarAvail(person));
+		PersonUtils.setEmployed(newPerson, PersonUtils.isEmployed(person));
+		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
+		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
 		for(Plan plan:person.getPlans())
 			if(!plan.isSelected())
 				newPerson.addPlan(plan);

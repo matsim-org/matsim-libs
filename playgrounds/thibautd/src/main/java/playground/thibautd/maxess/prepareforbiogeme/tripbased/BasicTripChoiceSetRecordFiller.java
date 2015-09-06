@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.misc.Time;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
@@ -90,11 +90,11 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 	}
 
 	private int getAge(final Person decisionMaker) {
-		return PersonImpl.getAge(decisionMaker);
+		return PersonUtils.getAge(decisionMaker);
 	}
 
 	private short getGender(final Person decisionMaker) {
-		final String sex = PersonImpl.getSex(decisionMaker).toLowerCase().trim();
+		final String sex = PersonUtils.getSex(decisionMaker).toLowerCase().trim();
 
 		switch ( sex ) {
 			case "f":
@@ -107,7 +107,7 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 	}
 
 	private short getCarAvailability(final Person decisionMaker) {
-		final String avail = PersonImpl.getCarAvail(decisionMaker).toLowerCase().trim();
+		final String avail = PersonUtils.getCarAvail(decisionMaker).toLowerCase().trim();
 
 		switch ( avail ) {
 			case "sometimes":

@@ -182,20 +182,20 @@ import org.xml.sax.Attributes;
 		int age = Integer.MIN_VALUE;
 		if (ageString != null) age = Integer.parseInt(ageString);
 		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
-		PersonImpl.setSex(this.currperson, atts.getValue("sex"));
-		PersonImpl.setAge(this.currperson, age);
-		PersonImpl.setLicence(this.currperson, atts.getValue("license"));
-		PersonImpl.setCarAvail(this.currperson, atts.getValue("car_avail"));
+		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			PersonImpl.setEmployed(this.currperson, null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			PersonImpl.setEmployed(this.currperson, "yes".equals(employed));
+			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 
 	private void startTravelcard(final Attributes atts) {
-		PersonImpl.addTravelcard(this.currperson, atts.getValue(ATTR_TYPE));
+		PersonUtils.addTravelcard(this.currperson, atts.getValue(ATTR_TYPE));
 	}
 
 	private void startActivityFacility(final Attributes atts) {
@@ -248,7 +248,7 @@ import org.xml.sax.Attributes;
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = PersonImpl.createAndAddPlan(this.currperson, selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {

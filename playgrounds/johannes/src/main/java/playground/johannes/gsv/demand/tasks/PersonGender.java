@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 
 import com.vividsolutions.jts.geom.Point;
 
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PersonAttributes;
 import playground.johannes.gsv.demand.PopulationTask;
@@ -69,9 +69,9 @@ public class PersonGender implements PopulationTask {
 			double p = zone.getAttribute();
 			
 			if(random.nextDouble() < p) {
-				PersonImpl.setSex(person, PersonAttributes.FEMALE);
+				PersonUtils.setSex(person, PersonAttributes.FEMALE);
 			} else {
-				PersonImpl.setSex(person, PersonAttributes.MALE);
+				PersonUtils.setSex(person, PersonAttributes.MALE);
 			}
 		}
 

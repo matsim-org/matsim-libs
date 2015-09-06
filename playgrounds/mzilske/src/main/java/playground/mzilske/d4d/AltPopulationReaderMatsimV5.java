@@ -42,11 +42,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -139,19 +135,19 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 		String id = xmlr.getAttributeValue(""	, "id");
 		Person person = PersonImpl.createPerson(Id.create(id, Person.class));
 		String sex = xmlr.getAttributeValue(""	, "sex");
-		if (sex!=null) PersonImpl.setSex(person, sex);
+		if (sex!=null) PersonUtils.setSex(person, sex);
 		String age = xmlr.getAttributeValue(""	, "age");
-		if (age!=null) PersonImpl.setAge(person, Integer.parseInt(age));
+		if (age!=null) PersonUtils.setAge(person, Integer.parseInt(age));
 		String license = xmlr.getAttributeValue(""	, "license");
-		if (license!=null) PersonImpl.setLicence(person, license);
+		if (license!=null) PersonUtils.setLicence(person, license);
 		String car = xmlr.getAttributeValue(""	, "car_avail");
-		if (car!=null) PersonImpl.setCarAvail(person, car);
+		if (car!=null) PersonUtils.setCarAvail(person, car);
 		String employed = xmlr.getAttributeValue(""	, "employed");
 		if (employed!=null) {
 			if (employed.equals("yes")) {
-				PersonImpl.setEmployed(person, true);
+				PersonUtils.setEmployed(person, true);
 			} else if (employed.equals("no")) {
-				PersonImpl.setEmployed(person, false);
+				PersonUtils.setEmployed(person, false);
 			}
 		}
 		while (xmlr.hasNext()) {
@@ -161,7 +157,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 				if ("travelcard".compareTo(name ) == 0) {
 					String tc = xmlr.getAttributeValue("", "type");
 					if (tc!=null) {
-						PersonImpl.addTravelcard(person, tc);
+						PersonUtils.addTravelcard(person, tc);
 					}
 				} else if ("plan".compareTo(name ) == 0) {
 					Plan plan = parsePlan(xmlr);

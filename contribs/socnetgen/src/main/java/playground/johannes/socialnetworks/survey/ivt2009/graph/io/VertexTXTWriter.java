@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Set;
 
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
@@ -47,7 +47,7 @@ public class VertexTXTWriter {
 		
 		for(SocialVertex vertex : vertices) {
 			String id = vertex.getPerson().getId().toString();
-			String gender = PersonImpl.getSex(vertex.getPerson().getPerson());
+			String gender = PersonUtils.getSex(vertex.getPerson().getPerson());
 			int k = vertex.getNeighbours().size();
 			
 			if(gender != null) {

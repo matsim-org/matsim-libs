@@ -28,7 +28,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -89,7 +89,7 @@ public class WithindayListener implements StartupListener, IterationStartsListen
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Population pop = event.getControler().getScenario().getPopulation();
 		for (Person p : pop.getPersons().values()) {
-			PersonImpl.setAge(p, 100);
+			PersonUtils.setAge(p, 100);
 		}	
 	}
 }

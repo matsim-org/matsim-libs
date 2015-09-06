@@ -118,7 +118,7 @@ public class QSimTest {
 
 		// add a single person with leg from link1 to link3
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -156,7 +156,7 @@ public class QSimTest {
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -195,7 +195,7 @@ public class QSimTest {
 
 		// add a single person with leg from link1 to link3
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg("other");
@@ -241,7 +241,7 @@ public class QSimTest {
 
 		// add a single person with leg from link1 to link3
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(0);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -285,7 +285,7 @@ public class QSimTest {
 
 		// add a single person with leg from link1 to link1
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -351,7 +351,7 @@ public class QSimTest {
 
 		// add a single person with leg from link1 to loop-link
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -417,7 +417,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("home", f.link1.getId());
 		f.plans.addPerson(person);
 
@@ -444,7 +444,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		f.plans.addPerson(person);
@@ -472,7 +472,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.walk);
@@ -508,7 +508,7 @@ public class QSimTest {
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
@@ -564,7 +564,7 @@ public class QSimTest {
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 3; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
@@ -617,7 +617,7 @@ public class QSimTest {
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -662,7 +662,7 @@ public class QSimTest {
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -675,7 +675,7 @@ public class QSimTest {
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -715,7 +715,7 @@ public class QSimTest {
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture();
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -769,7 +769,7 @@ public class QSimTest {
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -785,7 +785,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		Person personWhoBringsTheCar = PersonImpl.createPerson(Id.create(2, Person.class));
-		PlanImpl planWhichBringsTheCar = PersonImpl.createAndAddPlan(personWhoBringsTheCar, true);
+		PlanImpl planWhichBringsTheCar = PersonUtils.createAndAddPlan(personWhoBringsTheCar, true);
 		ActivityImpl aa1 = planWhichBringsTheCar.createAndAddActivity("h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
 		LegImpl ll1 = planWhichBringsTheCar.createAndAddLeg(TransportMode.car);
@@ -857,7 +857,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -907,7 +907,7 @@ public class QSimTest {
 	public void testAssignedVehicles() {
 		Fixture f = new Fixture();
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -963,7 +963,7 @@ public class QSimTest {
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -1019,7 +1019,7 @@ public class QSimTest {
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -1174,7 +1174,7 @@ public class QSimTest {
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
-		PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);

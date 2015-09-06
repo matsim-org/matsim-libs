@@ -20,7 +20,7 @@
 package playground.johannes.socialnetworks.graph.social.generators;
 
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
@@ -42,10 +42,10 @@ public class ErgmGender extends ErgmTerm {
 		int gender_i = 0;
 		int gender_j = 0;
 		
-		if(Gender.MALE.equalsIgnoreCase(PersonImpl.getSex(((SocialVertex) y.getVertex(i)).getPerson().getPerson())))
+		if(Gender.MALE.equalsIgnoreCase(PersonUtils.getSex(((SocialVertex) y.getVertex(i)).getPerson().getPerson())))
 			gender_i = 1;
 		
-		if(Gender.MALE.equalsIgnoreCase(PersonImpl.getSex(((SocialVertex) y.getVertex(j)).getPerson().getPerson())))
+		if(Gender.MALE.equalsIgnoreCase(PersonUtils.getSex(((SocialVertex) y.getVertex(j)).getPerson().getPerson())))
 			gender_j = 1;
 		
 		return Math.exp(- getTheta() * Math.abs(gender_i - gender_j));

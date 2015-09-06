@@ -38,6 +38,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -114,13 +115,13 @@ public class AlbatrossPopulationCreator {
 	 */
 	private void setBasicParameters(Person person, AlbatrossPerson albatrossPerson) {
 		
-		if (albatrossPerson.GEND == 0) PersonImpl.setSex(person, "m");
-		else PersonImpl.setSex(person, "f");
+		if (albatrossPerson.GEND == 0) PersonUtils.setSex(person, "m");
+		else PersonUtils.setSex(person, "f");
 
-		if (albatrossPerson.WSTAT == 0) PersonImpl.setEmployed(person, false);
-		else PersonImpl.setEmployed(person, true);
+		if (albatrossPerson.WSTAT == 0) PersonUtils.setEmployed(person, false);
+		else PersonUtils.setEmployed(person, true);
 		
-		PersonImpl.setAge(person, calcAge(albatrossPerson));
+		PersonUtils.setAge(person, calcAge(albatrossPerson));
 	}
 	
 	/*

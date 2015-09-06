@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class PlansAnalyse {
 
@@ -90,14 +90,14 @@ public class PlansAnalyse {
 		for (Person pp : plans.getPersons().values()) {
 			Person p = pp;
 			// license
-			if (PersonImpl.hasLicense(p)) { lic_cnt[0]++; } else { lic_cnt[1]++; }
+			if (PersonUtils.hasLicense(p)) { lic_cnt[0]++; } else { lic_cnt[1]++; }
 			// mob tools
 			int idx = -1;
-			if (PersonImpl.getTravelcards(p) == null) { idx = 0; } else { idx = 3; }
-			if (PersonImpl.getCarAvail(p) == null) { ; }
-			else if (PersonImpl.getCarAvail(p).equals(NEVER)) { idx += 0; }
-			else if (PersonImpl.getCarAvail(p).equals(SOMETIMES)) { idx += 1; }
-			else if (PersonImpl.getCarAvail(p).equals(ALWAYS)) { idx += 2; }
+			if (PersonUtils.getTravelcards(p) == null) { idx = 0; } else { idx = 3; }
+			if (PersonUtils.getCarAvail(p) == null) { ; }
+			else if (PersonUtils.getCarAvail(p).equals(NEVER)) { idx += 0; }
+			else if (PersonUtils.getCarAvail(p).equals(SOMETIMES)) { idx += 1; }
+			else if (PersonUtils.getCarAvail(p).equals(ALWAYS)) { idx += 2; }
 			else { throw new RuntimeException("pid="+p.getId()+": Haeh?"); }
 			mt_cnt[idx]++;
 			// act types

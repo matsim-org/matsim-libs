@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -49,7 +49,7 @@ public class Gender extends AbstractLinguisticAttribute {
 
 	@Override
 	protected String attribute(SocialVertex v) {
-		String gender = PersonImpl.getSex(v.getPerson().getPerson());
+		String gender = PersonUtils.getSex(v.getPerson().getPerson());
 		if (MALE.equalsIgnoreCase(gender))
 			return MALE;
 		else if (FEMALE.equalsIgnoreCase(gender))
@@ -66,8 +66,8 @@ public class Gender extends AbstractLinguisticAttribute {
 			TDoubleArrayList values2 = new TDoubleArrayList(2 * edges.size());
 
 			for (SocialEdge edge : edges) {
-				String g1 = PersonImpl.getSex(edge.getVertices().getFirst().getPerson().getPerson());
-				String g2 = PersonImpl.getSex(edge.getVertices().getSecond().getPerson().getPerson());
+				String g1 = PersonUtils.getSex(edge.getVertices().getFirst().getPerson().getPerson());
+				String g2 = PersonUtils.getSex(edge.getVertices().getSecond().getPerson().getPerson());
 
 				if (g1 != null && g2 != null) {
 					int val1 = 0;

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 
 class PlansExtractSingleMode {
@@ -26,7 +26,7 @@ class PlansExtractSingleMode {
 
 			for (int i = person.getPlans().size() - 1; i >= 0; i--) {
 				boolean carDriver = false;
-				if(PersonImpl.getCarAvail(person).equals("always")|| PersonImpl.getCarAvail(person).equals("sometimes"))
+				if(PersonUtils.getCarAvail(person).equals("always")|| PersonUtils.getCarAvail(person).equals("sometimes"))
 					carDriver=true;
 //				Plan plan = person.getPlans().get(i);
 //				boolean transitUser = false;

@@ -26,11 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -73,7 +69,7 @@ public class CreatePopulation {
 			for (int j = 0; j < personsPerLocation; j++) {
 				PersonImpl p = PersonImpl.createPerson(Id.create(personCnt + offset, Person.class));
 				personCnt++;
-				PersonImpl.createAndAddPlan(p, true);
+				PersonUtils.createAndAddPlan(p, true);
 				ActivityImpl act = new ActivityImpl("home", facility.getCoord());
 				act.setFacilityId(facility.getId());
 				act.setEndTime(11.0 * 3600.0);

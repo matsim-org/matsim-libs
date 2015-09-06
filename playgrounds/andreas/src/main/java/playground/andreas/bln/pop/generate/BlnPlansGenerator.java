@@ -15,10 +15,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -101,36 +98,36 @@ public class BlnPlansGenerator {
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth
-			PersonImpl.setAge(person, 98 - Integer.parseInt(data[2]));
+			PersonUtils.setAge(person, 98 - Integer.parseInt(data[2]));
 
 			// 1 = no, 2 occasionally, 3 yes
 			// TODO [an] any string can be written to file, but PersonReader expects
 			// "a value from the list always never sometimes"
 			if (data[19].equalsIgnoreCase("1")){
-				PersonImpl.setCarAvail(person, "never");
+				PersonUtils.setCarAvail(person, "never");
 			} else {
-				PersonImpl.setCarAvail(person, "always");
+				PersonUtils.setCarAvail(person, "always");
 			}
 
 			// filter unemployed persons and data without entry
 			if (Integer.parseInt(data[12]) != 6 && Integer.parseInt(data[12]) != 0){
-				PersonImpl.setEmployed(person, Boolean.TRUE);
+				PersonUtils.setEmployed(person, Boolean.TRUE);
 			}
 
 			// person.setHousehold(hh)(Id.create(data[1]));
 
 			if(Integer.parseInt(data[18]) == 2){
-				PersonImpl.setLicence(person, "yes");
+				PersonUtils.setLicence(person, "yes");
 			} else if(Integer.parseInt(data[18]) == 1){
-				PersonImpl.setLicence(person, "no");
+				PersonUtils.setLicence(person, "no");
 			} // else don't know
 
 			// TODO [an] same as setCarAvail. Any string can be written to file, but PersonReader expects
 			// "a value from the list "f m "."
 			if (Integer.parseInt(data[3]) == 2 ) {
-				PersonImpl.setSex(person, "f");
+				PersonUtils.setSex(person, "f");
 			} else if (Integer.parseInt(data[3]) == 1){
-				PersonImpl.setSex(person, "m");
+				PersonUtils.setSex(person, "m");
 			}
 
 		}
@@ -291,7 +288,7 @@ public class BlnPlansGenerator {
 			Plan curPlan;
 
 			if(curPerson.getSelectedPlan() == null){
-				curPlan = PersonImpl.createAndAddPlan(curPerson, true);
+				curPlan = PersonUtils.createAndAddPlan(curPerson, true);
 			} else {
 				curPlan = curPerson.getSelectedPlan();
 			}

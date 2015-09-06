@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -152,7 +152,7 @@ public class PseudoGravityModel {
 
 		// for every worker, add it to the pseudoCell
 		for ( Person pp : population.getPersons().values() ) {
-			if ( PersonImpl.isEmployed(pp) ) {
+			if ( PersonUtils.isEmployed(pp) ) {
 				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;

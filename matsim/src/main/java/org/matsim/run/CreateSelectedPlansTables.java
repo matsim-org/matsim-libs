@@ -37,10 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -184,12 +181,12 @@ public class CreateSelectedPlansTables {
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");
 				final Person person= this.plans0.getPersons().get(person_id);
-				out.write(PersonImpl.getSex(person)+"\t");
-				out.write(PersonImpl.getAge(person)+"\t");
-				out.write(PersonImpl.getLicense(person)+"\t");
-				out.write(PersonImpl.getCarAvail(person)+"\t");
-				if (PersonImpl.isEmployed(person) != null)
-					out.write((PersonImpl.isEmployed(person) ? "yes" : "no"));
+				out.write(PersonUtils.getSex(person)+"\t");
+				out.write(PersonUtils.getAge(person)+"\t");
+				out.write(PersonUtils.getLicense(person)+"\t");
+				out.write(PersonUtils.getCarAvail(person)+"\t");
+				if (PersonUtils.isEmployed(person) != null)
+					out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
 				out.write("\t");
 
 				Plan selectedPlan = person.getSelectedPlan();

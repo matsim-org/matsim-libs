@@ -37,6 +37,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
@@ -110,7 +111,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Remove all un-selected plans from agents' memories
 		 */
 		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
-			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 		
 		/*

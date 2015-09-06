@@ -36,10 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -201,15 +198,15 @@ public class PlansCreateFromMZ {
 				if (person == null) {
 					person = PersonImpl.createPerson(pid);
 					plans.addPerson(person);
-					PersonImpl.setAge(person, age);
-					PersonImpl.setLicence(person, licence);
-					PersonImpl.setSex(person, gender);
+					PersonUtils.setAge(person, age);
+					PersonUtils.setLicence(person, licence);
+					PersonUtils.setSex(person, gender);
 				}
 
 				// creating/getting plan
 				Plan plan = person.getSelectedPlan();
 				if (plan == null) {
-					PersonImpl.createAndAddPlan(person, true);
+					PersonUtils.createAndAddPlan(person, true);
 					plan = person.getSelectedPlan();
 					plan.setScore(weight); // used plans score as a storage for the person weight of the MZ2005
 				}

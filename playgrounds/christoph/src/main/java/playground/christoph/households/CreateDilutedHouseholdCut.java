@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -137,7 +138,7 @@ public class CreateDilutedHouseholdCut {
 
 		log.info("  removing not selected plans...");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			PersonImpl.removeUnselectedPlans(((PersonImpl) person));
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 		log.info("  done.");
 		

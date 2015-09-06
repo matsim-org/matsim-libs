@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Degree;
@@ -60,11 +60,11 @@ public class DegreeGenderTask extends ModuleAnalyzerTask<Degree> {
 			SocialVertex v = (SocialVertex) it.key();
 			double k = it.value();
 
-			if (PersonImpl.getSex(v.getPerson().getPerson()) != null) {
-				if (PersonImpl.getSex(v.getPerson().getPerson()).equalsIgnoreCase("m")) {
+			if (PersonUtils.getSex(v.getPerson().getPerson()) != null) {
+				if (PersonUtils.getSex(v.getPerson().getPerson()).equalsIgnoreCase("m")) {
 					sumMale += k;
 					cntMale++;
-				} else if (PersonImpl.getSex(v.getPerson().getPerson()).equalsIgnoreCase("f")) {
+				} else if (PersonUtils.getSex(v.getPerson().getPerson()).equalsIgnoreCase("f")) {
 					sumFemale += k;
 					cntFemale++;
 				}

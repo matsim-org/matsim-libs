@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.Desires;
 
 public class PersonSerializable implements Serializable {
@@ -18,10 +19,10 @@ public class PersonSerializable implements Serializable {
     public PersonSerializable(Person p) {
         this.id = p.getId().toString();
         Person person = p;
-        this.sex = PersonImpl.getSex(person);
-        this.age = PersonImpl.getAge(person);
-        this.hasLicense = PersonImpl.getLicense(person);
-        this.carAvail = PersonImpl.getCarAvail(person);
+        this.sex = PersonUtils.getSex(person);
+        this.age = PersonUtils.getAge(person);
+        this.hasLicense = PersonUtils.getLicense(person);
+        this.carAvail = PersonUtils.getCarAvail(person);
         for (Plan plan : person.getPlans()) {
             PlanSerializable planSerializable = new PlanSerializable(plan);
             plans.add(planSerializable);
@@ -43,12 +44,12 @@ public class PersonSerializable implements Serializable {
 
     public Person getPerson() {
         Person person = PersonImpl.createPerson(Id.createPersonId(id));
-        PersonImpl.setAge(person, age);
-        PersonImpl.setCarAvail(person, carAvail);
+        PersonUtils.setAge(person, age);
+        PersonUtils.setCarAvail(person, carAvail);
 
-        PersonImpl.setEmployed(person, isEmployed);
-        PersonImpl.setLicence(person, hasLicense);
-        PersonImpl.setSex(person, sex);
+        PersonUtils.setEmployed(person, isEmployed);
+        PersonUtils.setLicence(person, hasLicense);
+        PersonUtils.setSex(person, sex);
         for (PlanSerializable planSer : plans) {
             Plan plan = planSer.getPlan(person);
             person.addPlan(plan);

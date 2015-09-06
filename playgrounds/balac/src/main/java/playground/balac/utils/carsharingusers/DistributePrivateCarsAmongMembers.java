@@ -6,10 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,9 +27,9 @@ public class DistributePrivateCarsAmongMembers {
 			
 			if (rand.nextDouble() < x)
 			
-				PersonImpl.setCarAvail(p, "always");
+				PersonUtils.setCarAvail(p, "always");
 			else
-				PersonImpl.setCarAvail(p, "never");
+				PersonUtils.setCarAvail(p, "never");
 
 		}
 		

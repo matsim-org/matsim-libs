@@ -50,6 +50,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -276,7 +277,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
 			Person person = PersonImpl.createPerson(new IdImpl(i));
-			PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
 			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
 			home.setEndTime(6 * 3600);

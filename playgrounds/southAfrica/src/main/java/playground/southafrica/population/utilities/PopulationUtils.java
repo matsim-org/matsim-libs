@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -255,7 +255,7 @@ public class PopulationUtils {
 		Counter counter = new Counter(" employed persons # ");
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			Person person = sc.getPopulation().getPersons().get(id);
-			if(PersonImpl.isEmployed(person)){
+			if(PersonUtils.isEmployed(person)){
 				counter.incCounter();
 			}
 		}

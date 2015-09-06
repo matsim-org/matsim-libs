@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -31,7 +31,7 @@ public class CarsharingRentalTimes {
 		int members = 0;
 		for (Person p: scenario.getPopulation().getPersons().values()) {
 			Person per = p;
-			if (PersonImpl.getTravelcards(per) !=null && PersonImpl.getTravelcards(per).contains("ch-HT-mobility"))
+			if (PersonUtils.getTravelcards(per) !=null && PersonUtils.getTravelcards(per).contains("ch-HT-mobility"))
 				members++;
 			if (per.getId().toString().equals("6551679"))
 				System.out.println();

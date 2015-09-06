@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -209,7 +210,7 @@ class CreateDemand {
 		 * Adapt the activity locations and the activity end times. 
 		 */
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {			
-			if (PersonImpl.isEmployed(person)) {
+			if (PersonUtils.isEmployed(person)) {
 				Collections.shuffle(this.pusWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusWorkers.get(0));
 				Plan plan = this.adaptAndCopyPlan(person, pusPerson.getSelectedPlan(), true);	

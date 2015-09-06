@@ -53,11 +53,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -149,9 +145,9 @@ public class RunAnalyses {
 		public void run(Person person) {
 			try {
 				Person p = person;
-				this.writer.write(person.getId() + "\t" + PersonImpl.getAge(p) + "\t");
-				this.writer.write(PersonImpl.getSex(p) + "\t" + PersonImpl.getLicense(p) + "\t");
-				this.writer.write(PersonImpl.getCarAvail(p) + "\t" + PersonImpl.isEmployed(p) + "\n");
+				this.writer.write(person.getId() + "\t" + PersonUtils.getAge(p) + "\t");
+				this.writer.write(PersonUtils.getSex(p) + "\t" + PersonUtils.getLicense(p) + "\t");
+				this.writer.write(PersonUtils.getCarAvail(p) + "\t" + PersonUtils.isEmployed(p) + "\n");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

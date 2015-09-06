@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -145,14 +145,14 @@ public class MembershipAssigner {
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + pi.getId());
 			}
-			if (PersonImpl.getLicense(pi).equalsIgnoreCase("yes")) {this.assignCarSharingMembership(pi);}
+			if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {this.assignCarSharingMembership(pi);}
 			else {
-				PersonImpl.addTravelcard(pi, "unknown");}
+				PersonUtils.addTravelcard(pi, "unknown");}
 			PlanImpl selectedPlan = (PlanImpl)pi.getSelectedPlan();
 			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
 				final LegImpl leg = (LegImpl)actslegs.get(j);
-				if (leg.getMode().startsWith("ride")& PersonImpl.getTravelcards(pi).equals("ch-HT-mobility")) {
+				if (leg.getMode().startsWith("ride")& PersonUtils.getTravelcards(pi).equals("ch-HT-mobility")) {
 					leg.setMode("carsharing");
 				}
 			}
@@ -167,12 +167,12 @@ public class MembershipAssigner {
 		this.addFTAttributes(ftPerson);
 		int choice = new MembershipModel(this.scenario).calcMembership(ftPerson);
 		if (choice == 0) {
-			PersonImpl.addTravelcard(pi, "ch-HT-mobility");
+			PersonUtils.addTravelcard(pi, "ch-HT-mobility");
 		}
 		else {
-			PersonImpl.addTravelcard(pi, "unknown");
+			PersonUtils.addTravelcard(pi, "unknown");
 		}
-		log.info("travelcards = " + PersonImpl.getTravelcards(pi));
+		log.info("travelcards = " + PersonUtils.getTravelcards(pi));
 	}
 
 

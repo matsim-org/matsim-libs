@@ -50,6 +50,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -572,7 +573,7 @@ public class CharyparNagelScoringFunctionTest {
 
 		// score the same plan twice
 		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person1, true);
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = plan1.createAndAddActivity("home", (Id<Link>)null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
@@ -703,7 +704,7 @@ public class CharyparNagelScoringFunctionTest {
 			Link link9 = this.network.createAndAddLink(Id.create("9", Link.class), node9, node10, 500, 25, 3600, 1);
 
 			this.person = PersonImpl.createPerson(Id.create("1", Person.class));
-			this.plan = PersonImpl.createAndAddPlan(this.person, true);
+			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			ActivityImpl firstActivity = this.plan.createAndAddActivity("h", link1.getId());
 			firstActivity.setEndTime(firstLegStartTime);

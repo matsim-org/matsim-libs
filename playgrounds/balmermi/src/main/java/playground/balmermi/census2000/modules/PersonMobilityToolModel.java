@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -91,17 +91,17 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		model.setHHDimension(p.getHousehold().getPersonCount());
 		model.setHHKids(p.getHousehold().getKidCount());
 		model.setIncome(p.getHousehold().getMunicipality().getIncome()/1000.0);
-		model.setLicenseOwnership(PersonImpl.hasLicense(person));
+		model.setLicenseOwnership(PersonUtils.hasLicense(person));
 		model.setNationality(p.isSwiss());
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 
 		int mobtype = model.calcMobilityTools();
-		if ((3 <= mobtype) && (mobtype <= 5)) { PersonImpl.addTravelcard(person, UNKNOWN); }
-		PersonImpl.setCarAvail(person, null);
-		if ((0 == mobtype) || (mobtype == 3)) { PersonImpl.setCarAvail(person, NEVER); }
-		if ((1 == mobtype) || (mobtype == 4)) { PersonImpl.setCarAvail(person, SOMETIMES); }
-		if ((2 == mobtype) || (mobtype == 5)) { PersonImpl.setCarAvail(person, ALWAYS); }
+		if ((3 <= mobtype) && (mobtype <= 5)) { PersonUtils.addTravelcard(person, UNKNOWN); }
+		PersonUtils.setCarAvail(person, null);
+		if ((0 == mobtype) || (mobtype == 3)) { PersonUtils.setCarAvail(person, NEVER); }
+		if ((1 == mobtype) || (mobtype == 4)) { PersonUtils.setCarAvail(person, SOMETIMES); }
+		if ((2 == mobtype) || (mobtype == 5)) { PersonUtils.setCarAvail(person, ALWAYS); }
 	}
 
 	public void run(Plan plan) {

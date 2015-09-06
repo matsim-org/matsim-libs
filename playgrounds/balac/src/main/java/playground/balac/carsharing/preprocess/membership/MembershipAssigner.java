@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -194,14 +195,14 @@ public class MembershipAssigner
       if (person.getPlans().size() > 1) {
         log.error("More than one plan for person: " + pi.getId());
       }
-      if (PersonImpl.getLicense(pi).equalsIgnoreCase("yes")) {
+      if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {
         Person personWithLicense = PersonImpl.createPerson(pi.getId());
-        PersonImpl.setAge(personWithLicense, PersonImpl.getAge(pi));
+        PersonUtils.setAge(personWithLicense, PersonUtils.getAge(pi));
         personWithLicense.addPlan(pi.getSelectedPlan());
-        PersonImpl.setCarAvail(personWithLicense, PersonImpl.getCarAvail(pi));
-        PersonImpl.setEmployed(personWithLicense, PersonImpl.isEmployed(pi));
-        PersonImpl.setSex(personWithLicense, PersonImpl.getSex(pi));
-        PersonImpl.setLicence(personWithLicense, PersonImpl.getLicense(pi));
+        PersonUtils.setCarAvail(personWithLicense, PersonUtils.getCarAvail(pi));
+        PersonUtils.setEmployed(personWithLicense, PersonUtils.isEmployed(pi));
+        PersonUtils.setSex(personWithLicense, PersonUtils.getSex(pi));
+        PersonUtils.setLicence(personWithLicense, PersonUtils.getLicense(pi));
         this.personsWithLicense.add(personWithLicense);
       }
     }
@@ -231,17 +232,17 @@ public class MembershipAssigner
     int choice = this.membershipModel.calcMembership(ftPerson);
     if (choice == 0)
     {
-      PersonImpl.addTravelcard(pi, "ch-HT-mobility");
-      PersonImpl.addTravelcard(this.scenario.getPopulation().getPersons().get(pi.getId()), "ch-HT-mobility");
+      PersonUtils.addTravelcard(pi, "ch-HT-mobility");
+      PersonUtils.addTravelcard(this.scenario.getPopulation().getPersons().get(pi.getId()), "ch-HT-mobility");
       this.counter += 1;
     }
     else
     {
-      PersonImpl.addTravelcard(pi, "unknown");
+      PersonUtils.addTravelcard(pi, "unknown");
     }
 
-    if (PersonImpl.getTravelcards(pi).contains("ch-HT-mobility"))
-      PersonImpl.addTravelcard(ftPerson, "Mobility");
+    if (PersonUtils.getTravelcards(pi).contains("ch-HT-mobility"))
+      PersonUtils.addTravelcard(ftPerson, "Mobility");
   }
 
   private void addFTAttributes(FlexTransPersonImpl ftPerson)

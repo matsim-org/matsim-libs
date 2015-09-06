@@ -747,7 +747,7 @@ public class GeneralLib {
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		PersonImpl.removeUnselectedPlans(newPerson);
+		PersonUtils.removeUnselectedPlans(newPerson);
 		return newPerson;
 	}
 

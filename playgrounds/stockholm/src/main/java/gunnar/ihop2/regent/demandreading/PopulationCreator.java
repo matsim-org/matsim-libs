@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
@@ -267,8 +267,8 @@ public class PopulationCreator {
 //		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
 //				.getPersonAttributes()
 //				.getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
-		PersonImpl.setEmployed(person, workZone != null);
-		PersonImpl.setAge(person, 2015 - Integer
+		PersonUtils.setEmployed(person, workZone != null);
+		PersonUtils.setAge(person, 2015 - Integer
 				.parseInt((String) this.scenario.getPopulation()
 						.getPersonAttributes()
 						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE)));

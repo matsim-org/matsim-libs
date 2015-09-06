@@ -35,10 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -156,8 +153,8 @@ public class SurveyPlanPicker {
 			Coord home = getQtPlanHomeCoordinate(plan);
 			
 			/* Get the person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertNmbm2004Employment( PersonImpl.isEmployed(person) ).toString();
-			String b = SaDemographicsAge.getAgeClass(PersonImpl.getAge(person)).toString();
+			String a = SaDemographicsEmployment.convertNmbm2004Employment( PersonUtils.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass(PersonUtils.getAge(person)).toString();
 			Id<Household> hhid = Id.create((String) surveyPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId"), Household.class);
 			Household household = surveyPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
@@ -204,8 +201,8 @@ public class SurveyPlanPicker {
 			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
 			
 			/* Get person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonImpl.isEmployed(person) ).toString();
-			String b = SaDemographicsAge.getAgeClass( PersonImpl.getAge(person) ).toString();
+			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonUtils.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass( PersonUtils.getAge(person) ).toString();
 			Household household = censusPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
 			String d = SaDemographicsIncome.convertCensus2011Income( Income2011.getIncomeEnum(household.getIncome()) ).toString();

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class PersonsSummaryWriter
 {
@@ -48,10 +48,10 @@ public class PersonsSummaryWriter
     try
     {
       this.out.write(person.getId() + "\t");
-      this.out.write(PersonImpl.getAge(person) + "\t");
-      this.out.write(PersonImpl.getSex(person) + "\t");
-      this.out.write(PersonImpl.getLicense(person) + "\t");
-      this.out.write(PersonImpl.getCarAvail(person) + "\n");
+      this.out.write(PersonUtils.getAge(person) + "\t");
+      this.out.write(PersonUtils.getSex(person) + "\t");
+      this.out.write(PersonUtils.getLicense(person) + "\t");
+      this.out.write(PersonUtils.getCarAvail(person) + "\n");
       this.out.flush();
     }
     catch (IOException e) {

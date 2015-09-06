@@ -45,12 +45,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -251,8 +246,8 @@ public class CreateFreightTraffic {
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
 		Person p = PersonImpl.createPerson(Id.create(this.freightOffset + index, Person.class));
-		PersonImpl.setEmployed(p, true);
-		PersonImpl.setCarAvail(p, "always");
+		PersonUtils.setEmployed(p, true);
+		PersonUtils.setCarAvail(p, "always");
 		((PersonImpl)p).createDesires("freight");
 		((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
 		Zone originZone = this.zones.get(this.zoneIds[originIndex]);

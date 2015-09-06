@@ -41,10 +41,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -290,7 +287,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
 			Person person = PersonImpl.createPerson(Id.create(i + (int) departureTime, Person.class));
-			PlanImpl plan1 = PersonImpl.createAndAddPlan(person, true);
+			PlanImpl plan1 = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
 			a1.setEndTime(departureTime);
 			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);

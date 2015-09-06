@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -135,7 +135,7 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 	}
 	
 	public void setPerson(final Person person) {
-		TreeSet<String> travelCards = PersonImpl.getTravelcards(person);
+		TreeSet<String> travelCards = PersonUtils.getTravelcards(person);
 		if (travelCards == null) {
 			distanceCost = herbieConfig.getDistanceCostPtNoTravelCard();
 		}

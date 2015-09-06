@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class KeepOnlySelectedPlans {
 
@@ -43,7 +44,7 @@ public class KeepOnlySelectedPlans {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) person;
-			PersonImpl.removeUnselectedPlans(p);
+			PersonUtils.removeUnselectedPlans(p);
 		}
 
 		GeneralLib.writePopulation(scenario.getPopulation(), scenario.getNetwork(), outputPlansFile);

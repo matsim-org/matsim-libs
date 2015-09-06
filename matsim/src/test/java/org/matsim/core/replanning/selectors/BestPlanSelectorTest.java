@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * Test for {@link BestPlanSelector}.
@@ -45,16 +46,16 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	public void testBestPlan() {
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Plan plan;
-		PersonImpl.createAndAddPlan(person, false);
-		plan = PersonImpl.createAndAddPlan(person, false);
+		PersonUtils.createAndAddPlan(person, false);
+		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(10.0);
-		plan = PersonImpl.createAndAddPlan(person, false);
+		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(-50.0);
-		plan = PersonImpl.createAndAddPlan(person, false);
+		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(40.0);
-		plan = PersonImpl.createAndAddPlan(person, false);
+		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(30.0);
-		plan = PersonImpl.createAndAddPlan(person, false);
+		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(-20.0);
 
 		GenericPlanSelector<Plan, Person> selector = new BestPlanSelector<Plan, Person>();

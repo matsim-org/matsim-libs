@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -49,7 +49,7 @@ public class GenderNumeric extends AbstractVertexProperty {
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>(vertices.size());
 		
 		for(Vertex vertex : vertices) {
-			String gender = PersonImpl.getSex(((SocialVertex) vertex).getPerson().getPerson());
+			String gender = PersonUtils.getSex(((SocialVertex) vertex).getPerson().getPerson());
 			
 			if(Gender.FEMALE.equalsIgnoreCase(gender))
 				values.put(vertex, 1.0);

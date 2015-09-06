@@ -26,11 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -54,7 +50,7 @@ public class PlansDumping {
 		plans.addAlgorithm(new PersonAlgorithm() {
 			@Override
 			public void run(Person person) {
-				PersonImpl.removeUnselectedPlans(((PersonImpl) person));
+				PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 				Plan plan = person.getSelectedPlan();
 				for (PlanElement planElement : plan.getPlanElements()) {
 					if (planElement instanceof Leg) {

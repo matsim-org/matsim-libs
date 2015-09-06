@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.Tuple;
 
 public class MicroCensus {
@@ -145,9 +145,9 @@ public class MicroCensus {
 		}
 		for (Person pp : pop.getPersons().values()) {
 			Person p = pp;
-			int age = PersonImpl.getAge(p);
-			String sex = PersonImpl.getSex(p);
-			String lic = PersonImpl.getLicense(p);
+			int age = PersonUtils.getAge(p);
+			String sex = PersonUtils.getSex(p);
+			String lic = PersonUtils.getLicense(p);
 			boolean has_work = false;
 			boolean has_educ = false;
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {

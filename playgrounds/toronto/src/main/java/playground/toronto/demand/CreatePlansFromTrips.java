@@ -675,7 +675,7 @@ public class CreatePlansFromTrips {
 			
 			if (!skipPerson) {
 				Person q = P;
-				PersonImpl.setEmployed(q, isEmployed);
+				PersonUtils.setEmployed(q, isEmployed);
 				P.addPlan(p);
 				completedPlans++;
 				int pct = completedPlans * 100 / (scenario.getPopulation().getPersons().size() - chainsWithNoZones.size() - unusableTripChains.size());

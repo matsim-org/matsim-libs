@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -59,8 +60,8 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		linkSlopes.put(link.getId(), slope);
 
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("p1", Person.class));
-		PersonImpl.setAge(person, 20);
-		PersonImpl.setSex(person, "m");
+		PersonUtils.setAge(person, 20);
+		PersonUtils.setSex(person, "m");
 		
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
@@ -86,7 +87,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		assertEquals(calculatedTravelTime - 0.09368418280727171, 0.0);
 		
 		// increase age
-		PersonImpl.setAge(person, 80);
+		PersonUtils.setAge(person, 80);
 		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
@@ -96,7 +97,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		assertEquals(calculatedTravelTime - 0.2206463555843433, 0.0);
 
 		// change gender
-		PersonImpl.setSex(person, "f");
+		PersonUtils.setSex(person, "f");
 		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
@@ -152,11 +153,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 	private void printInfo(Person p, double expected, double calculated, double slope) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Age: ");
-		sb.append(PersonImpl.getAge(p));
+		sb.append(PersonUtils.getAge(p));
 		sb.append("; ");
 
 		sb.append("Sex: ");
-		sb.append(PersonImpl.getSex(p));
+		sb.append(PersonUtils.getSex(p));
 		sb.append("; ");
 		
 		sb.append("Link Steepness: ");
@@ -179,12 +180,12 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		Person p1 = PersonImpl.createPerson(Id.create("1", Person.class));
-		PersonImpl.setAge(p1, 90);
-		PersonImpl.setSex(p1, "f");
+		PersonUtils.setAge(p1, 90);
+		PersonUtils.setSex(p1, "f");
 
 		Person p2 = PersonImpl.createPerson(Id.create("2", Person.class));
-		PersonImpl.setAge(p2, 20);
-		PersonImpl.setSex(p2, "m");
+		PersonUtils.setAge(p2, 20);
+		PersonUtils.setSex(p2, "m");
 		
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));
 		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));

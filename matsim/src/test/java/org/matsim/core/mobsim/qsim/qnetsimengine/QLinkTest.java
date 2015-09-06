@@ -313,7 +313,7 @@ public class QLinkTest extends MatsimTestCase {
 
 	private static Person createPerson(Id<Person> personId, ScenarioImpl scenario, Link link1, Link link2) {
 		Person p = PersonImpl.createPerson(personId);
-		PlanImpl plan = PersonImpl.createAndAddPlan(p, true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
 		plan.createAndAddActivity("h", link1.getId());
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link1.getId(), link2.getId());

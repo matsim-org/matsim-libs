@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -53,7 +53,7 @@ public class DumpTravelCardsInObjectAttributesFile {
 		final ObjectAttributes attributes = new ObjectAttributes();
 
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Set<String> cards = PersonImpl.getTravelcards(person);
+			final Set<String> cards = PersonUtils.getTravelcards(person);
 			attributes.putAttribute( person.getId().toString() , "hasTravelcard" , !(cards == null || cards.isEmpty()) );
 		}
 

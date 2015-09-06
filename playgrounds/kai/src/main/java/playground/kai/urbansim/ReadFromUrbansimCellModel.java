@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -160,13 +161,13 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 					population.addPerson(person) ;
 
-					PlanImpl plan = PersonImpl.createAndAddPlan(person, true);
+					PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 					Utils.makeHomePlan(plan, homeCoord) ;
 
 					if ( ii<nWorkers ) {
-						PersonImpl.setEmployed(person, Boolean.TRUE);
+						PersonUtils.setEmployed(person, Boolean.TRUE);
 					} else {
-						PersonImpl.setEmployed(person, Boolean.FALSE);
+						PersonUtils.setEmployed(person, Boolean.FALSE);
 					}
 				}
 				line = reader.readLine(); // next line

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class PlansCreateFromNetwork {
 
@@ -111,11 +112,11 @@ public class PlansCreateFromNetwork {
 				}
 			}
 			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
-			PersonImpl.setSex(p, sex);
-			PersonImpl.setAge(p, age);
-			PersonImpl.setLicence(p, license);
-			PersonImpl.setCarAvail(p, car_avail);
-			PersonImpl.setEmployed(p, employed);
+			PersonUtils.setSex(p, sex);
+			PersonUtils.setAge(p, age);
+			PersonUtils.setLicence(p, license);
+			PersonUtils.setCarAvail(p, car_avail);
+			PersonUtils.setEmployed(p, employed);
 			plans.addPerson(p);
 		}
 		System.out.println("    done.");

@@ -12,6 +12,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -37,7 +38,7 @@ public class RemovePlansNotRelatedToStudyArea {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
 			PersonImpl p = (PersonImpl) person;
-			PersonImpl.removeUnselectedPlans(p);
+			PersonUtils.removeUnselectedPlans(p);
 
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof ActivityImpl) {

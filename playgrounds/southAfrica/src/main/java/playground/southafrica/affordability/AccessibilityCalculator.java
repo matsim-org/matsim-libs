@@ -30,7 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -1057,12 +1057,12 @@ public class AccessibilityCalculator {
 //		boolean attendSchool = ((String)person.getCustomAttributes().get("school")).contains("School")  ||
 //				person.getAge() < 16 ? true : false;
 		boolean attendSchool = activityChainContainsEducation(person.getSelectedPlan())  ||
-				(PersonImpl.getAge(person) >= 6 && PersonImpl.getAge(person) < 16) ? true : false;
+				(PersonUtils.getAge(person) >= 6 && PersonUtils.getAge(person) < 16) ? true : false;
 		if(attendSchool){
 			return 1;
 		}
 		
-		boolean isWorking = PersonImpl.isEmployed(person) || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
+		boolean isWorking = PersonUtils.isEmployed(person) || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
 		boolean isAccompanyingScholar = activityChainContainsDroppingScholar(person.getSelectedPlan());
 		
 		if(isWorking){

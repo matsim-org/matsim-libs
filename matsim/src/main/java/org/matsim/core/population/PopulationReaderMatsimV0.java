@@ -145,7 +145,7 @@ import org.xml.sax.Attributes;
 		else {
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.currplan = PersonImpl.createAndAddPlan(this.currperson, selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");

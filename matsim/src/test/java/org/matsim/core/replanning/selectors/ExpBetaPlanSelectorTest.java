@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -62,15 +63,15 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		this.config.planCalcScore().setBrainExpBeta(2.0);
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false); // weight: 0.0003.35462627902512
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false); // weight: 0.0003.35462627902512
 		plan1.setScore(96.0);
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false); // weight: 0.0024787521766663594
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false); // weight: 0.0024787521766663594
 		plan2.setScore(97.0);
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false); // weight: 0.018315638888734186
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false); // weight: 0.018315638888734186
 		plan3.setScore(98.0);
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false); // weight: 0.1353352832366127
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false); // weight: 0.1353352832366127
 		plan4.setScore(99.0);
-		PlanImpl plan5 = PersonImpl.createAndAddPlan(person, false);// weight: 1
+		PlanImpl plan5 = PersonUtils.createAndAddPlan(person, false);// weight: 1
 		plan5.setScore(100.0);
 		
 		ExpBetaPlanSelector<Plan, Person> selector = new ExpBetaPlanSelector<Plan, Person>(this.config.planCalcScore());
@@ -115,19 +116,19 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		plan1.setScore(96.0);
 		// weight: 0.04978706836786395
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(97.0);
 		// weight: 0.1353352832366127
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false);
 		plan3.setScore(98.0);
 		// weight: 0.3678794411714423
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false);
 		plan4.setScore(99.0);
 		// weight: 1
-		PlanImpl plan5 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan5 = PersonUtils.createAndAddPlan(person, false);
 		plan5.setScore(100.0);
 
 		
@@ -175,13 +176,13 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		
 		this.config.planCalcScore().setBrainExpBeta(2.0);
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		plan1.setScore(180.0);
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(180.1);
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false);
 		plan3.setScore(180.5);
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false);
 		plan4.setScore(169.9);
 
 		ExpBetaPlanSelector testee = new ExpBetaPlanSelector(this.config.planCalcScore());

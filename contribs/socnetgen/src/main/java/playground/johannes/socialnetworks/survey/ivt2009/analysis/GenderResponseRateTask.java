@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.snowball.SampledVertex;
@@ -49,7 +49,7 @@ public class GenderResponseRateTask extends AnalyzerTask {
 		int females_egos = 0;
 
 		for (SocialVertex v : graph.getVertices()) {
-			String sex = PersonImpl.getSex(v.getPerson().getPerson());
+			String sex = PersonUtils.getSex(v.getPerson().getPerson());
 			if (sex != null) {
 				if (sex.equals("m")) {
 					males++;

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.AbstractPlanSelectorTest;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
@@ -65,15 +66,15 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		// TODO [AH] Update to newest formula
 		// weight = Math.exp(this.beta * 5 * (plan.getScore() / maxScore));
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false); // weight: 14764.781
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false); // weight: 14764.781
 		plan1.setScore(96.0);
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false); // weight: 16317.607
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false); // weight: 16317.607
 		plan2.setScore(97.0);
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false); // weight: 18033.744
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false); // weight: 18033.744
 		plan3.setScore(98.0);
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false); // weight: 19930.370
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false); // weight: 19930.370
 		plan4.setScore(99.0);
-		PlanImpl plan5 = PersonImpl.createAndAddPlan(person, false);// weight: 22026.465
+		PlanImpl plan5 = PersonUtils.createAndAddPlan(person, false);// weight: 22026.465
 		plan5.setScore(100.0);
 
 		ExpBetaPlanForRemovalSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());
@@ -119,19 +120,19 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		// TODO [AH] update to newest formula
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 121.5104175
-		PlanImpl plan1 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		plan1.setScore(96.0);
 		// weight: 127.74038984602878
-		PlanImpl plan2 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(97.0);
 		// weight: 134.289779684935
-		PlanImpl plan3 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan3 = PersonUtils.createAndAddPlan(person, false);
 		plan3.setScore(98.0);
 		// weight: 141.1749639214768
-		PlanImpl plan4 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan4 = PersonUtils.createAndAddPlan(person, false);
 		plan4.setScore(99.0);
 		// weight: 148.41315910257657
-		PlanImpl plan5 = PersonImpl.createAndAddPlan(person, false);
+		PlanImpl plan5 = PersonUtils.createAndAddPlan(person, false);
 		plan5.setScore(100.0);
 
 		ExpBetaPlanForRemovalSelector selector = new ExpBetaPlanForRemovalSelector(this.config.planCalcScore());

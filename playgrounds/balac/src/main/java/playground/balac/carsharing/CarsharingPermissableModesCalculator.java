@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 public class CarsharingPermissableModesCalculator implements PermissibleModesCalculator{
@@ -21,7 +21,7 @@ public class CarsharingPermissableModesCalculator implements PermissibleModesCal
 		modes.add("bike");
 		modes.add("walk");
 		modes.add("pt");
-		if (PersonImpl.getLicense(p).equals( "yes" ) && !PersonImpl.getCarAvail(p).equals( "never" ))
+		if (PersonUtils.getLicense(p).equals( "yes" ) && !PersonUtils.getCarAvail(p).equals( "never" ))
 			modes.add("car");
 		//if (p.getTravelcards() != null)
 		//	if (p.getLicense() == "yes" && p.getTravelcards().contains("ch-HT-mobility"))

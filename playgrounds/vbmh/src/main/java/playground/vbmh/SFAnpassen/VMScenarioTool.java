@@ -18,6 +18,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -102,8 +103,8 @@ public class VMScenarioTool {
 		LinkedList <Id<Person>> personsNotUsed = new LinkedList <Id<Person>>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Person pa = p;
-			System.out.println(PersonImpl.getCarAvail(pa));
-			if(PersonImpl.getCarAvail(pa)!="never" && zufall.nextDouble()<wkeit && i<anzahl_agents){
+			System.out.println(PersonUtils.getCarAvail(pa));
+			if(PersonUtils.getCarAvail(pa)!="never" && zufall.nextDouble()<wkeit && i<anzahl_agents){
 				//population.addPerson(pa);
 				
 				System.out.println("Autofahrer hinzugefuegt");

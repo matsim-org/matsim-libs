@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
@@ -23,10 +24,10 @@ public class FlexTransPersonImpl extends PersonImpl
   public FlexTransPersonImpl(Person p)
   {
     super(p.getId());
-    setAge(this, PersonImpl.getAge(p));
-    setCarAvail(this, PersonImpl.getCarAvail(p));
-    setLicence(this, PersonImpl.getLicense(p));
-    setSex(this, PersonImpl.getSex(p));
+    PersonUtils.setAge(this, PersonUtils.getAge(p));
+    PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(p));
+    PersonUtils.setLicence(this, PersonUtils.getLicense(p));
+    PersonUtils.setSex(this, PersonUtils.getSex(p));
     for (Plan plan : p.getPlans()) {
         addPlan(plan);
     }

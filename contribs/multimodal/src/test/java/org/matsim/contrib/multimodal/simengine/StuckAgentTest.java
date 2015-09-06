@@ -39,7 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
@@ -173,8 +173,8 @@ public class StuckAgentTest {
 	private Person createPerson(Scenario scenario, String id, String mode, Route route, double departureTime) {
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
-		PersonImpl.setAge(person, 20);
-		PersonImpl.setSex(person, "m");
+		PersonUtils.setAge(person, 20);
+		PersonUtils.setSex(person, "m");
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);

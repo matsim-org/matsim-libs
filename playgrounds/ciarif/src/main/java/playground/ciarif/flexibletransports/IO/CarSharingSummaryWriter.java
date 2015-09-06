@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.ciarif.flexibletransports.router.CarSharingStation;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFtInfo;
 
@@ -54,8 +54,8 @@ public class CarSharingSummaryWriter
     try
     {
       this.out.write(person.getId() + "\t");
-      this.out.write(PersonImpl.getLicense(person) + "\t");
-      this.out.write(PersonImpl.getCarAvail(person) + "\t");
+      this.out.write(PersonUtils.getLicense(person) + "\t");
+      this.out.write(PersonUtils.getCarAvail(person) + "\t");
       this.out.write(startLink.getCoord().getX() + "\t");
       this.out.write(startLink.getCoord().getY() + "\t");
       this.out.write(fromStation.getCoord().getX() + "\t");

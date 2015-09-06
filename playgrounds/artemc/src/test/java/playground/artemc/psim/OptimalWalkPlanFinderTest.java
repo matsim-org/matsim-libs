@@ -13,10 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -271,7 +268,7 @@ public class OptimalWalkPlanFinderTest {
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
 
 			this.person = PersonImpl.createPerson(Id.create("1", Person.class));
-			this.plan = PersonImpl.createAndAddPlan(this.person, true);
+			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			CoordImpl homeLocation = new CoordImpl(0.0,1.0);
 			CoordImpl workLocation = new CoordImpl(1153.8461538461538,1.0);

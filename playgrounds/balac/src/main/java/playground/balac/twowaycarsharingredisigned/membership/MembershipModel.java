@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import playground.balac.carsharing.data.FlexTransPersonImpl;
 
 public class MembershipModel {
@@ -51,8 +51,8 @@ private final double[] calcLogitProbability(double[] utils)
 protected final double calcNoUtil(FlexTransPersonImpl pi) {
   double util = 0.0D;
   util += 5.23D * 0.979;
-  if (((PersonImpl.getAge(pi) <= 30 ? 1 : 0) & (PersonImpl.getAge(pi) >= 18 ? 1 : 0)) != 0) util += 0.791D;
-  if (PersonImpl.getAge(pi) >= 60) util += 0.43D;
+  if (((PersonUtils.getAge(pi) <= 30 ? 1 : 0) & (PersonUtils.getAge(pi) >= 18 ? 1 : 0)) != 0) util += 0.791D;
+  if (PersonUtils.getAge(pi) >= 60) util += 0.43D;
 
   return util;
 }
@@ -64,10 +64,10 @@ protected final double calcYesUtil(FlexTransPersonImpl pi)
   util += 0.0563D * pi.getAccessWork();
   util += 0.0D * pi.getDensityHome();
 
-  if (((PersonImpl.getAge(pi) <= 45 ? 1 : 0) & (PersonImpl.getAge(pi) >= 31 ? 1 : 0)) != 0) util += 0.436D;
-  if (PersonImpl.getCarAvail(pi).equals( "never")) util += 1.14D;
-  if (PersonImpl.getCarAvail(pi).equals( "sometimes")) util += 2.56D;
-  if (PersonImpl.getSex(pi).equals( "m")) util += 0.197D;
+  if (((PersonUtils.getAge(pi) <= 45 ? 1 : 0) & (PersonUtils.getAge(pi) >= 31 ? 1 : 0)) != 0) util += 0.436D;
+  if (PersonUtils.getCarAvail(pi).equals( "never")) util += 1.14D;
+  if (PersonUtils.getCarAvail(pi).equals( "sometimes")) util += 2.56D;
+  if (PersonUtils.getSex(pi).equals( "m")) util += 0.197D;
 
   return util;
 }

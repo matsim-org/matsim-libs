@@ -5,6 +5,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -29,7 +30,7 @@ public class DesiresToPersonAttributes {
 				members.putAttribute(p.getId().toString(), s , ((PersonImpl)p).getDesires().getActivityDurations().get(s));
 			}
 			
-			if (PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ffProgram")) {
+			if (PersonUtils.getTravelcards(p) != null && PersonUtils.getTravelcards(p).contains("ffProgram")) {
 				
 				members.putAttribute(p.getId().toString(), "FF_CARD" , "true");
 			}
@@ -37,7 +38,7 @@ public class DesiresToPersonAttributes {
 				members.putAttribute(p.getId().toString(), "FF_CARD" , "false");
 
 			
-			if (PersonImpl.getTravelcards(p) != null && PersonImpl.getTravelcards(p).contains("ch-HT-mobility")) {
+			if (PersonUtils.getTravelcards(p) != null && PersonUtils.getTravelcards(p).contains("ch-HT-mobility")) {
 				
 				members.putAttribute(p.getId().toString(), "RT_CARD" , "true");
 			}

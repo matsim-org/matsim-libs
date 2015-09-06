@@ -30,10 +30,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.TripRouter;
@@ -272,20 +269,20 @@ public class PopulationCreator {
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
 	private void setBasicParameters(Person person, ParsedPerson emme2Person) {
-		PersonImpl.setAge(person, emme2Person.AGE);
+		PersonUtils.setAge(person, emme2Person.AGE);
 
-		if (emme2Person.GENDER == 1) PersonImpl.setSex(person, "m");
-		else PersonImpl.setSex(person, "f");
+		if (emme2Person.GENDER == 1) PersonUtils.setSex(person, "m");
+		else PersonUtils.setSex(person, "f");
 
 		if (emme2Person.LICENSE == 1) {
-			PersonImpl.setLicence(person, "yes");
-			if (emme2Person.NUMVEH == 0) PersonImpl.setCarAvail(person, "never");
-			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) PersonImpl.setCarAvail(person, "always");
-			else PersonImpl.setCarAvail(person, "sometimes");
+			PersonUtils.setLicence(person, "yes");
+			if (emme2Person.NUMVEH == 0) PersonUtils.setCarAvail(person, "never");
+			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) PersonUtils.setCarAvail(person, "always");
+			else PersonUtils.setCarAvail(person, "sometimes");
 		}
 		else {
-			PersonImpl.setLicence(person, "no");
-			PersonImpl.setCarAvail(person, "sometimes");
+			PersonUtils.setLicence(person, "no");
+			PersonUtils.setCarAvail(person, "sometimes");
 		}
 	}
 

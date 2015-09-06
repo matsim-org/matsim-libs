@@ -165,15 +165,15 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
 		this.currperson = new BasePersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		PersonImpl.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
-		PersonImpl.setAge(this.currperson, age);
-		PersonImpl.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
-		PersonImpl.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			PersonImpl.setEmployed(this.currperson, null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			PersonImpl.setEmployed(this.currperson, VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 

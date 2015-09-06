@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -47,8 +47,8 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 			new PersonAlgorithm() {
 				@Override
 				public void run(final Person person) {
-					final String carAvail = PersonImpl.getCarAvail(person);
-					final String license = PersonImpl.getLicense(person);
+					final String carAvail = PersonUtils.getCarAvail(person);
+					final String license = PersonUtils.getLicense(person);
 					final boolean isCarAvail =
 						!"no".equals( license ) &&
 						!"never".equals( carAvail );

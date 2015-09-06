@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
@@ -212,22 +213,22 @@ public class StrategyManagerTest {
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
 		person = PersonImpl.createPerson(Id.create(1, Person.class));
-		plans[0] = PersonImpl.createAndAddPlan(person, false);
-		plans[1] = PersonImpl.createAndAddPlan(person, false);
+		plans[0] = PersonUtils.createAndAddPlan(person, false);
+		plans[1] = PersonUtils.createAndAddPlan(person, false);
 		plans[1].setScore(Double.valueOf(0.0));
-		plans[2] = PersonImpl.createAndAddPlan(person, false);
-		plans[3] = PersonImpl.createAndAddPlan(person, false);
+		plans[2] = PersonUtils.createAndAddPlan(person, false);
+		plans[3] = PersonUtils.createAndAddPlan(person, false);
 		plans[3].setScore(Double.valueOf(-50.0));
-		plans[4] = PersonImpl.createAndAddPlan(person, false);
+		plans[4] = PersonUtils.createAndAddPlan(person, false);
 		plans[4].setScore(Double.valueOf(50.0));
-		plans[5] = PersonImpl.createAndAddPlan(person, false);
+		plans[5] = PersonUtils.createAndAddPlan(person, false);
 		plans[5].setScore(Double.valueOf(50.0));
-		plans[6] = PersonImpl.createAndAddPlan(person, false);
+		plans[6] = PersonUtils.createAndAddPlan(person, false);
 		plans[6].setScore(Double.valueOf(60.0));
-		plans[7] = PersonImpl.createAndAddPlan(person, false);
-		plans[8] = PersonImpl.createAndAddPlan(person, false);
+		plans[7] = PersonUtils.createAndAddPlan(person, false);
+		plans[8] = PersonUtils.createAndAddPlan(person, false);
 		plans[8].setScore(Double.valueOf(-10.0));
-		plans[9] = PersonImpl.createAndAddPlan(person, false);
+		plans[9] = PersonUtils.createAndAddPlan(person, false);
 		population.addPerson(person);
 
 		StrategyManager manager = new StrategyManager();
@@ -264,7 +265,7 @@ public class StrategyManagerTest {
 		Person p = PersonImpl.createPerson(Id.create(1, Person.class));
 		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
-			plans[i] = PersonImpl.createAndAddPlan(p, false);
+			plans[i] = PersonUtils.createAndAddPlan(p, false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
 		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();

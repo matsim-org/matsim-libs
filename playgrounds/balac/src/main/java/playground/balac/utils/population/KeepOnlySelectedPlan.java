@@ -3,10 +3,7 @@ package playground.balac.utils.population;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -27,10 +24,10 @@ public class KeepOnlySelectedPlan {
 			p1.addPlan(p.getSelectedPlan());
 			p1.setSelectedPlan(p.getSelectedPlan());
 			
-			PersonImpl.setAge(p1, PersonImpl.getAge(p));
-			PersonImpl.setCarAvail(p1, PersonImpl.getCarAvail(p));
-			PersonImpl.setSex(p1, PersonImpl.getSex(p));
-			PersonImpl.setLicence(p1, PersonImpl.getLicense(p));
+			PersonUtils.setAge(p1, PersonUtils.getAge(p));
+			PersonUtils.setCarAvail(p1, PersonUtils.getCarAvail(p));
+			PersonUtils.setSex(p1, PersonUtils.getSex(p));
+			PersonUtils.setLicence(p1, PersonUtils.getLicense(p));
 			scenario2.getPopulation().addPerson(p1);
 		}
 		

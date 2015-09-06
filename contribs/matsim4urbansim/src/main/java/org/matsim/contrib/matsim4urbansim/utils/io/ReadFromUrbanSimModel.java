@@ -32,6 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -345,14 +346,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = PersonImpl.createAndAddPlan(newPerson, true);
+				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexZoneID_WORK ].equals("-1") )
-					PersonImpl.setEmployed(newPerson, Boolean.FALSE);
+					PersonUtils.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					PersonImpl.setEmployed(newPerson, Boolean.TRUE);
+					PersonUtils.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workZoneId = Id.create( parts[ indexZoneID_WORK ], ActivityFacility.class );
 					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
 					currentZoneLocations.setWorkZoneIDAndZoneCoordinate(workZoneId, jobLocation);
@@ -460,14 +461,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = PersonImpl.createAndAddPlan(newPerson, true);
+				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexParcelID_WORK ].equals("-1") )
-					PersonImpl.setEmployed(newPerson, Boolean.FALSE);
+					PersonUtils.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					PersonImpl.setEmployed(newPerson, Boolean.TRUE);
+					PersonUtils.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workParcelId = Id.create( parts[ indexParcelID_WORK ], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
@@ -632,7 +633,7 @@ public class ReadFromUrbanSimModel {
 				backupPop.addPerson( newPerson );
 				cnt.newPersonCnt++;
 				break;
-			} else if ( PersonImpl.isEmployed(oldPerson) != PersonImpl.isEmployed(newPerson) ) { // employment status changed. Accept new person:
+			} else if ( PersonUtils.isEmployed(oldPerson) != PersonUtils.isEmployed(newPerson) ) { // employment status changed. Accept new person:
 				newPop.addPerson(newPerson);
 				cnt.employmentChangedCnt++;
 				break;
@@ -682,7 +683,7 @@ public class ReadFromUrbanSimModel {
 			}
 
 			// check if new person works
-			if ( !PersonImpl.isEmployed(newPerson) ) { // person does not move; doesn't matter. fix this when other activities are considered
+			if ( !PersonUtils.isEmployed(newPerson) ) { // person does not move; doesn't matter. fix this when other activities are considered
 				newPop.addPerson(newPerson);
 				cnt.unemployedCnt++;
 				break ;

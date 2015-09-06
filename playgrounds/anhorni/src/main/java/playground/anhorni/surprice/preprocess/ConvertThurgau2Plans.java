@@ -35,10 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -187,8 +184,8 @@ public class ConvertThurgau2Plans {
 //				householdIncome = Integer.parseInt(houseHoldIncomeString);
 //			}			
 			Person person = PersonImpl.createPerson(id);
-			PersonImpl.setAge(person, age);
-			PersonImpl.setSex(person, gender);
+			PersonUtils.setAge(person, age);
+			PersonUtils.setSex(person, gender);
 			population.addPerson(person);
 		}
 	}
@@ -218,7 +215,7 @@ public class ConvertThurgau2Plans {
 	private Plan addPlan(Id pid, int dow) {
 		// creating/getting plan	
 		Person person = this.scenario.getPopulation().getPersons().get(pid);
-		PersonImpl.createAndAddPlan(person, true);
+		PersonUtils.createAndAddPlan(person, true);
 		Plan plan = person.getSelectedPlan();
 						
 		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000

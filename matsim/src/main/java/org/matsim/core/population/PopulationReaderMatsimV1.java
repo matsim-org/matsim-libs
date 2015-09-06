@@ -143,15 +143,15 @@ import org.xml.sax.Attributes;
 
 	private void startPerson(final Attributes atts) {
 		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
-		PersonImpl.setSex(this.currperson, atts.getValue("sex"));
-		PersonImpl.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
-		PersonImpl.setLicence(this.currperson, atts.getValue("license"));
-		PersonImpl.setCarAvail(this.currperson, atts.getValue("car_avail"));
+		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
+		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
+		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			PersonImpl.setEmployed(this.currperson, null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			PersonImpl.setEmployed(this.currperson, "yes".equals(employed));
+			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 
@@ -168,7 +168,7 @@ import org.xml.sax.Attributes;
 			throw new NumberFormatException(
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.currplan = PersonImpl.createAndAddPlan(this.currperson, selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");

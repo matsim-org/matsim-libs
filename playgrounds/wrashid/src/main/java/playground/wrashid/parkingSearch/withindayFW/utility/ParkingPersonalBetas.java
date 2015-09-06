@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class ParkingPersonalBetas {
 
@@ -66,8 +66,8 @@ public class ParkingPersonalBetas {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		
 		int isMale=1;
-		if (PersonImpl.getSex(person)!=null){
-			isMale=!PersonImpl.getSex(person).contains("f")?1:0;
+		if (PersonUtils.getSex(person)!=null){
+			isMale=!PersonUtils.getSex(person).contains("f")?1:0;
 		}
 		//return -1.0*-0.135 * (-0.1) / -0.056 * -0.135 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.1012*isMale));
 		return -0.135 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.102*isMale))*externalSearchFactor;
@@ -77,10 +77,10 @@ public class ParkingPersonalBetas {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		
 		int isMale=1;
-		if (PersonImpl.getSex(person)!=null){
-			isMale=!PersonImpl.getSex(person).contains("f")?1:0;
+		if (PersonUtils.getSex(person)!=null){
+			isMale=!PersonUtils.getSex(person).contains("f")?1:0;
 		}
-		int age= PersonImpl.getAge(person);
+		int age= PersonUtils.getAge(person);
 		//return -1.0*-0.108 * (-0.1) / -0.056 * -0.108*60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
 		return -0.108 *60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236)*externalWalkFactor;
 	}

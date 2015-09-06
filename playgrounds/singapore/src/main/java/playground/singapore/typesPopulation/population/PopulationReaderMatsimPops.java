@@ -172,15 +172,15 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			age = Integer.parseInt(ageString);
 		String popId = atts.getValue(ATTR_PERSON_POP_ID);
 		this.currperson = new PersonImplPops(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class), popId==null?PersonImplPops.DEFAULT_POP_ID:Id.create(popId, Population.class));
-		PersonImpl.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
-		PersonImpl.setAge(this.currperson, age);
-		PersonImpl.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
-		PersonImpl.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			PersonImpl.setEmployed(this.currperson, null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			PersonImpl.setEmployed(this.currperson, VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 
@@ -198,7 +198,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = PersonImpl.createAndAddPlan(this.currperson, selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);
 		if (scoreString != null) {

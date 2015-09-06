@@ -4,10 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
@@ -34,12 +31,12 @@ public class ScalingThePopulation {
 			
 				PersonImpl originalPerson = (PersonImpl)((Person)arr[i]);
 				
-				PersonImpl.setAge(p, PersonImpl.getAge(originalPerson));
-				PersonImpl.setCarAvail(p, PersonImpl.getCarAvail(originalPerson));
-				PersonImpl.setLicence(p, PersonImpl.getLicense(originalPerson));
-				PersonImpl.setSex(p, PersonImpl.getSex(originalPerson));
-				PersonImpl.setEmployed(p, PersonImpl.isEmployed(originalPerson));
-				PersonImpl.addTravelcard(p, "unknown");
+				PersonUtils.setAge(p, PersonUtils.getAge(originalPerson));
+				PersonUtils.setCarAvail(p, PersonUtils.getCarAvail(originalPerson));
+				PersonUtils.setLicence(p, PersonUtils.getLicense(originalPerson));
+				PersonUtils.setSex(p, PersonUtils.getSex(originalPerson));
+				PersonUtils.setEmployed(p, PersonUtils.isEmployed(originalPerson));
+				PersonUtils.addTravelcard(p, "unknown");
 				Desires d = originalPerson.getDesires();
 				p.createDesires(d.getDesc());
 				p.getDesires().setDesc(d.getDesc());

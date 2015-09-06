@@ -8,10 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -57,7 +54,7 @@ final private int numMembers = 20850;
 		
 		for (Person p: scenario.getPopulation().getPersons().values()) {
 			
-			if (PersonImpl.getSex(p).equals("m"))
+			if (PersonUtils.getSex(p).equals("m"))
 				men.put(p.getId(), p);
 			else
 				women.put(p.getId(), p);
@@ -156,23 +153,23 @@ final private int numMembers = 20850;
 				
 				switch(index) {
 				
-					case 0: if (18 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 24) {
+					case 0: if (18 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 24) {
 					
 								addedMembers.put(p.getId(), p);
 								notFound = false;
 							}
-					case 1: if (25 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 44) {
+					case 1: if (25 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 44) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
 				
-					case 2: if (45 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 64) {
+					case 2: if (45 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 64) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
-					case 3: if (55 <= PersonImpl.getAge(p) && PersonImpl.getAge(p) <= 64) {
+					case 3: if (55 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 64) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;

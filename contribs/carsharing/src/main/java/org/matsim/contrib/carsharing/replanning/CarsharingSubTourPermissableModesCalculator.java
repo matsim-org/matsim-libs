@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 public class CarsharingSubTourPermissableModesCalculator implements PermissibleModesCalculator{
@@ -45,8 +45,8 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 		}
 
 		final boolean carAvail =
-			!"no".equals( PersonImpl.getLicense(person) ) &&
-			!"never".equals( PersonImpl.getCarAvail(person) );
+			!"no".equals( PersonUtils.getLicense(person) ) &&
+			!"never".equals( PersonUtils.getCarAvail(person) );
 		if (carAvail)			 
 			  l = new ArrayList<String>( this.availableModes );
 		  else

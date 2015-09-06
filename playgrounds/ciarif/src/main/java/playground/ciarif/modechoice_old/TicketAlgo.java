@@ -24,7 +24,7 @@ package playground.ciarif.modechoice_old;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class TicketAlgo extends AbstractPersonAlgorithm {
@@ -46,64 +46,64 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 	public void run(Person pp) {
 		Person person = pp;
 		double rd3 = MatsimRandom.getRandom().nextDouble();
-		if (PersonImpl.isEmployed(person) == null) {
+		if (PersonUtils.isEmployed(person) == null) {
 			; // what happens if it is "null"?
-		} else if (!PersonImpl.isEmployed(person)) {
-			if (PersonImpl.getCarAvail(person) == "always") {
+		} else if (!PersonUtils.isEmployed(person)) {
+			if (PersonUtils.getCarAvail(person) == "always") {
 				if (rd3 < 0.1) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 			}
-			else if (PersonImpl.getCarAvail(person) == "sometimes") {
+			else if (PersonUtils.getCarAvail(person) == "sometimes") {
 				if (rd3 < 0.6) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 				else if (rd3 < 0.7) {
-					PersonImpl.addTravelcard(person, "GA");
+					PersonUtils.addTravelcard(person, "GA");
 				}
 				else {
 					; // no travel card will be assigned
 				}
 			}
-			else if (PersonImpl.getCarAvail(person) == "never") {
+			else if (PersonUtils.getCarAvail(person) == "never") {
 				if (rd3 < 0.2) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 				else if (rd3 < 0.5) {
-					PersonImpl.addTravelcard(person, "GA");
+					PersonUtils.addTravelcard(person, "GA");
 				}
 				else {
 					; // no travel card will be assigned
 				}
 			}
 			else {
-				throw new RuntimeException("do not know car avail = " + PersonImpl.getCarAvail(person));
+				throw new RuntimeException("do not know car avail = " + PersonUtils.getCarAvail(person));
 			}
 		}
-		else if (PersonImpl.isEmployed(person)) {
-			if (PersonImpl.getCarAvail(person) == "always") {
+		else if (PersonUtils.isEmployed(person)) {
+			if (PersonUtils.getCarAvail(person) == "always") {
 				if (rd3 < 0.1) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 			}
-			else if (PersonImpl.getCarAvail(person) == "sometimes") {
+			else if (PersonUtils.getCarAvail(person) == "sometimes") {
 				if (rd3 < 0.7) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 				else {
-					PersonImpl.addTravelcard(person, "GA");
+					PersonUtils.addTravelcard(person, "GA");
 				}
 			}
-			else if (PersonImpl.getCarAvail(person) == "never") {
+			else if (PersonUtils.getCarAvail(person) == "never") {
 				if (rd3 < 0.5) {
-					PersonImpl.addTravelcard(person, "HT");
+					PersonUtils.addTravelcard(person, "HT");
 				}
 				else {
-					PersonImpl.addTravelcard(person, "GA");
+					PersonUtils.addTravelcard(person, "GA");
 				}
 			}
 			else {
-				throw new RuntimeException("do not know car avail = " + PersonImpl.getCarAvail(person));
+				throw new RuntimeException("do not know car avail = " + PersonUtils.getCarAvail(person));
 			}
 		}
 	}
