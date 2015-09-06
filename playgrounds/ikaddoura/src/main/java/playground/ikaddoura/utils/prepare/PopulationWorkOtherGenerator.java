@@ -176,7 +176,7 @@ public class PopulationWorkOtherGenerator {
 		
 		double area = maxXCoord - minXCoord;
 		double randomXCoord = calculateRandomlyDistributedValue((area/2.0), (area/2.0));
-		Coord zoneCoord = this.scenario.createCoord(randomXCoord, 0);
+		Coord zoneCoord = new Coord(randomXCoord, (double) 0);
 		return zoneCoord;
 	}
 	

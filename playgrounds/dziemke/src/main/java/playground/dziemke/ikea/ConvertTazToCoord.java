@@ -1,6 +1,5 @@
 package playground.dziemke.ikea;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -43,9 +41,7 @@ BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile)
 		String parts[] = line.split(",");
 
 // read Coordinates
-		Coord CoordReadFromFile = new CoordImpl(
-				Double.parseDouble(parts[index_x]),
-				Double.parseDouble(parts[index_y]));
+		Coord CoordReadFromFile = new Coord(Double.parseDouble(parts[index_x]), Double.parseDouble(parts[index_y]));
 	// Transform Coordinates
 		CoordReadFromFile=ct.transform(CoordReadFromFile);
 	// declare TazID as key for HashMap

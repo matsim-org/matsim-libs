@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +43,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -248,9 +248,9 @@ public class QLinkTest extends MatsimTestCase {
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, (EventsUtils.createEventsManager()));
@@ -400,9 +400,9 @@ public class QLinkTest extends MatsimTestCase {
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1001, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1001, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 10 * 7.5, 7.5, 3600.0, 1.0);
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node2, node2, 2 * 7.5, 7.5, 3600.0, 1.0);
@@ -466,9 +466,9 @@ public class QLinkTest extends MatsimTestCase {
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
-			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1001, 0));
+			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1001, (double) 0));
 			this.link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			sim = (QSim) QSimUtils.createDefaultQSim(scenario, (EventsUtils.createEventsManager()));

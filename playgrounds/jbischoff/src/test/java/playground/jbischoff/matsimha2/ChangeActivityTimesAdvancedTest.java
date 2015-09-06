@@ -60,7 +60,7 @@ public class ChangeActivityTimesAdvancedTest {
 
 	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
-	Coord homeCoordinates = sc.createCoord(13.077, 52.357);
+		Coord homeCoordinates = new Coord(13.077, 52.357);
 	Activity activity1 = populationFactory.createActivityFromCoord("home", ct.transform(homeCoordinates));
 	activity1.setEndTime(8*3600);
 	testplan.addActivity(activity1);
@@ -69,7 +69,7 @@ public class ChangeActivityTimesAdvancedTest {
 	testplan.addLeg(populationFactory.createLeg("car"));
 
 
-	Activity activity2 = populationFactory.createActivityFromCoord("work", ct.transform(sc.createCoord(13.0500, 52.441)));
+		Activity activity2 = populationFactory.createActivityFromCoord("work", ct.transform(new Coord(13.0500, 52.441)));
 	activity2.setEndTime(16*3600);
 	testplan.addActivity(activity2);
 

@@ -1,7 +1,6 @@
 package saleem.stockholmscenario.utils;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 //copied from project StockholmPT...Converts WSG84 to UTM System
@@ -64,7 +63,7 @@ public class CoordinateSystemConverter {
         if (Letter<'M')
             Northing = Northing + 10000000;
         Northing=Math.round(Northing*100)*0.01;
-        coord = new CoordImpl(Easting, Northing);
+        coord = new Coord(Easting, Northing);
         return coord;
     }
 }

@@ -17,7 +17,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import saleem.stockholmscenario.utils.CoordinateSystemConverter;
@@ -218,7 +217,7 @@ public class XMLReaderWriter {
 		List listElement = ((Element)(rootElement.getChildren("nodes").get(0))).getChildren("node");
 		for (int i = 0; i < listElement.size(); i++) {
 			 Element node = (Element) listElement.get(i);
-			 Coord coord = new CoordImpl(Double.parseDouble(node.getAttributeValue("x")), Double.parseDouble(node.getAttributeValue("y")));
+			Coord coord = new Coord(Double.parseDouble(node.getAttributeValue("x")), Double.parseDouble(node.getAttributeValue("y")));
 			 coord = ct.transform(coord);
 			 node.setAttribute("x", Double.toString(coord.getX()));
 			 node.setAttribute("y", Double.toString(coord.getY()));

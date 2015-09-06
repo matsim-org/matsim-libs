@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,7 +31,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ReplacePlanElementsTest extends MatsimTestCase {
@@ -41,7 +41,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	public void testReplaceActivity() {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
-		Activity newActivity = new ActivityImpl("s", new CoordImpl(200, 200));
+		Activity newActivity = new ActivityImpl("s", new Coord((double) 200, (double) 200));
 		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the activities is null
@@ -88,12 +88,12 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 */
 	private Plan createSamplePlan() {
 		PlanImpl plan = new PlanImpl(new PersonImpl(Id.create(1, Person.class)));
-		
-		plan.createAndAddActivity("h", new CoordImpl(0, 0));
+
+		plan.createAndAddActivity("h", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new CoordImpl(100, 100));
+		plan.createAndAddActivity("w", new Coord((double) 100, (double) 100));
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("h", new CoordImpl(0, 0));
+		plan.createAndAddActivity("h", new Coord((double) 0, (double) 0));
 		
 		return plan;
 	}

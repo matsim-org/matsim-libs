@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -16,7 +17,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -71,7 +71,7 @@ public class FacilitiesFileGenerator {
 		timesResult.close();
 		ResultSet facilitiesResult = dataBaseFacilities.executeQuery("SELECT external_id,x,y,id FROM Facilities");
 		while(facilitiesResult.next()) {
-			ActivityFacility facility = facilities.createAndAddFacility(Id.create(facilitiesResult.getInt(1), ActivityFacility.class), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
+			ActivityFacility facility = facilities.createAndAddFacility(Id.create(facilitiesResult.getInt(1), ActivityFacility.class), new Coord(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
 			int facilityId=facilitiesResult.getInt(4);
 			for(Tuple<String,Double> optionData:activityOptions.get(facilitiesResult.getInt(4))) {
 				ActivityOption option = ((ActivityFacilityImpl)facility).createActivityOption(optionData.getFirst());

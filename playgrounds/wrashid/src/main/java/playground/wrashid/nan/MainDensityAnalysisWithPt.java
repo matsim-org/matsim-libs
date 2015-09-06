@@ -28,14 +28,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainDensityAnalysisWithPt {
 
 	public static void main(String[] args) {
 		String networkFile="C:/experiments/berlin/output_network.xml.gz";
 		String eventsFile="C:/experiments/berlin/ITERS/it.50/50.events.xml.gz";
-		Coord center=new CoordImpl(4594503,5820304); // center=null means use all links
+		Coord center= new Coord((double) 4594503, (double) 5820304); // center=null means use all links
 		boolean isOldEventFile=false;
 		int binSizeInSeconds=300;
 		

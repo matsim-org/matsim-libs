@@ -2,6 +2,7 @@ package playground.balac.pcw;
 
 import com.google.inject.Provider;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -13,14 +14,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -33,7 +31,6 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;
 import playground.balac.utils.TransitRouterImplFactory;
-import playground.balac.utils.TransitRouterNetworkReaderMatsimV1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -210,15 +207,15 @@ public class PTRouting {
 			String[] arr = s.split(";");
 			
 			if (!(arr[1].startsWith("-") || arr[2].startsWith("-") || arr[3].startsWith("-") || arr[4].startsWith("-"))) {
-			
-			CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 			
 			
 			
 			Link lStart = lUtils.getClosestLink(coordStart);
-			
-			
-			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
+
+
+				Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 			
 
 			Link lEnd = lUtils.getClosestLink(coordEnd);

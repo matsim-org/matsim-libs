@@ -54,7 +54,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -196,7 +195,7 @@ public class CreateFreightTraffic {
 				double y = Double.parseDouble(parts[2]);
 				String name = "external";
 				if (parts.length >= 4) name = parts[3];
-				Zone zone = new Zone(id, new CoordImpl(x,y), name);
+				Zone zone = new Zone(id, new Coord(x, y), name);
 				this.zones.put(id, zone);
 			}
 		} // end try

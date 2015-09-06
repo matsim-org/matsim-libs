@@ -19,7 +19,6 @@ import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -74,8 +73,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-			    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				Link l = linkUtils.getClosestLink(coordStart);		    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -104,8 +103,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				Link l = linkUtils.getClosestLink(coordStart);		    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -132,8 +131,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 		    	Link l = linkUtils.getClosestLink(coordStart);			    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	

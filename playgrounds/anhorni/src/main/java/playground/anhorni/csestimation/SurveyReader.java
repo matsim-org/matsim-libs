@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class SurveyReader {
@@ -69,8 +69,8 @@ public class SurveyReader {
 				Location hlocation = new Location(Id.create(-1, Location.class));
 				person.setHomeLocation(hlocation);
 				hlocation.setCity(entrs[10].trim());
-				
-				CoordImpl hcoords = new CoordImpl(Double.parseDouble(entrs[12].trim()), Double.parseDouble(entrs[11].trim()));
+
+				Coord hcoords = new Coord(Double.parseDouble(entrs[12].trim()), Double.parseDouble(entrs[11].trim()));
 				
 				hlocation.setCoord(this.trafo.transform(hcoords)); // TODO: prüfen bei NULL
 				
@@ -86,7 +86,7 @@ public class SurveyReader {
 					person.setEmployed(hasJob);
 					person.setWorkLocation(wlocation);
 					wlocation.setCity(entrs[21].trim());
-					wlocation.setCoord(this.trafo.transform(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim()))));
+					wlocation.setCoord(this.trafo.transform(new Coord(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim()))));
 				
 					if (entrs[25].trim().contains("car")) person.setModeForWorking(SurveyControler.modes.indexOf("car"), true);
 					if (entrs[25].trim().contains("pt")) person.setModeForWorking(SurveyControler.modes.indexOf("pt"), true);

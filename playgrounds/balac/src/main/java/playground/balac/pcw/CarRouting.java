@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -29,7 +30,6 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -134,15 +134,15 @@ public void run(final String[] args) throws IOException {
 		
 		while(s != null) {
 			String[] arr = s.split(";");
-			
-			CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
+
+			Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 			
 			
 			
 			Link lStart = lUtils.getClosestLink(coordStart);
-			
-			
-			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
+
+
+			Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 			
 
 			Link lEnd = lUtils.getClosestLink(coordEnd);		

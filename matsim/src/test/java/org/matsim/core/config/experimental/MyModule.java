@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 /**
@@ -125,9 +124,7 @@ public class MyModule extends ReflectiveConfigGroup {
 		final String[] coords = coordField.split( "," );
 		if ( coords.length != 2 ) throw new IllegalArgumentException( coordField );
 
-		this.coordField = new CoordImpl(
-				Double.parseDouble( coords[ 0 ] ),
-				Double.parseDouble( coords[ 1 ] ) );
+		this.coordField = new Coord(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]));
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

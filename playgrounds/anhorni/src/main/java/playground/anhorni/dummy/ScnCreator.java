@@ -46,7 +46,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -115,7 +115,7 @@ public class ScnCreator {
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				Id<Coord> id = Id.create(parts[0], Coord.class);
-				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+				Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 				this.municipalities.put(id, coord);;
 			}
 		} 
@@ -132,7 +132,7 @@ public class ScnCreator {
 			
 			ActivityImpl homeAct = (ActivityImpl)plan.getPlanElements().get(0);
 			Coord homeLocation = homeAct.getCoord();
-			Coord newHomeLocation = new CoordImpl(homeLocation.getX() + this.randomize(), homeLocation.getY() + this.randomize());
+			Coord newHomeLocation = new Coord(homeLocation.getX() + this.randomize(), homeLocation.getY() + this.randomize());
 			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -141,7 +141,7 @@ public class ScnCreator {
 						act.setCoord(newHomeLocation);
 					}
 					else {
-						Coord newCoord = new CoordImpl(act.getCoord().getX() + this.randomize(), act.getCoord().getY() + this.randomize());
+						Coord newCoord = new Coord(act.getCoord().getX() + this.randomize(), act.getCoord().getY() + this.randomize());
 						act.setCoord(newCoord);
 					}
 				}
@@ -158,8 +158,8 @@ public class ScnCreator {
 			if (facility.getActivityOptions().size() == 1 && facility.getActivityOptions().containsKey("home")) continue;
 			Coord coord = facility.getCoord();
 			double xNew = coord.getX() + this.randomize();
-			double yNew = coord.getY() + this.randomize(); 
-			Coord newCoord = new CoordImpl(xNew, yNew);
+			double yNew = coord.getY() + this.randomize();
+			Coord newCoord = new Coord(xNew, yNew);
 
 			ActivityFacility newFacility = newFactory.createActivityFacility(facility.getId(), newCoord);
 			newFacilities.addActivityFacility(newFacility);
@@ -258,9 +258,9 @@ public class ScnCreator {
 			double minDistance = 999999999999999999.0;
 			Id<Coord> closestMunicipality = this.municipalities.firstKey();
 			for (Id<Coord> id : this.municipalities.keySet()) {
-				CoordImpl coord = (CoordImpl) this.municipalities.get(id);
-				if (coord.calcDistance(workCoord) < minDistance) {
-					minDistance = coord.calcDistance(workCoord);
+				Coord coord = this.municipalities.get(id);
+				if (CoordUtils.calcDistance(coord, workCoord) < minDistance) {
+					minDistance = CoordUtils.calcDistance(coord, workCoord);
 					closestMunicipality = id;
 				}
 			}

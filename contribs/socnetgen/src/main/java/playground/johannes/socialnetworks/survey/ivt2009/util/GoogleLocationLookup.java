@@ -32,7 +32,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -175,7 +174,7 @@ public class GoogleLocationLookup {
 				String[] tokens = buffer.toString().split(",");
 				double x = Double.parseDouble(tokens[0]);
 				double y = Double.parseDouble(tokens[1]);
-				coord = new CoordImpl(x, y);
+				coord = new Coord(x, y);
 				buffer = null;
 			}
 				

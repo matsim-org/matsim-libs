@@ -11,7 +11,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -40,9 +39,9 @@ public class TransitLineRemover {
 		final String TXL_BUS_LINES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_onlyTxlBusLines.xml.gz";
 		final String NO_BVG_BUSES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_noBvgBusLines.xml.gz";
 		final String ONLY_BVG_BUSES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_onlyBvgBusLines.xml.gz";
-		
-		Coord minCoord = new CoordImpl(4587744.0, 5824664.0);
-		Coord maxCoord = new CoordImpl(4588400.0, 5825400.0);
+
+		Coord minCoord = new Coord(4587744.0, 5824664.0);
+		Coord maxCoord = new Coord(4588400.0, 5825400.0);
 		
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule baseCaseTransitSchedule = builder.createTransitSchedule();

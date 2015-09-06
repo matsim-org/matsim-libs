@@ -4,10 +4,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class DefineCordonLinks {
 
@@ -16,7 +14,7 @@ public class DefineCordonLinks {
 	 */
 	public static void main(String[] args) {
 		String inputNetworkPath="\\\\kosrae.ethz.ch\\ivt-home\\wrashid\\data\\cvs\\ivt\\studies\\switzerland\\networks\\teleatlas-ivtcheu\\network.xml.gz";
-		Coord center = new CoordImpl(682548.0, 247525.5);
+		Coord center = new Coord(682548.0, 247525.5);
 		double radiusInMeters = 1500;
 		
 		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);

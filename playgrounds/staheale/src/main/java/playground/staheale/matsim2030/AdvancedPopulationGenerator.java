@@ -279,7 +279,7 @@ public class AdvancedPopulationGenerator {
 					//Plan plan = person.getSelectedPlan();
 					double xHome = Double.parseDouble(homeXcoord)-2000000; //change from CH1903+ to CH1903
 					double yHome = Double.parseDouble(homeYcoord)-1000000; //change from CH1903+ to CH1903
-					Coord coordsHome = sc.createCoord(xHome, yHome);
+					Coord coordsHome = new Coord(xHome, yHome);
 					List<PlanElement> pes = person.getSelectedPlan().getPlanElements();
 					if (pes.size() > 0){
 						Activity lastAct = ((Activity) pes.get( pes.size() -1 ));
@@ -338,7 +338,7 @@ public class AdvancedPopulationGenerator {
 
 						double xWork = Double.parseDouble(workXcoord)-2000000; //change from CH1903+ to CH1903
 						double yWork = Double.parseDouble(workYcoord)-1000000; //change from CH1903+ to CH1903
-						Coord coordsWork = sc.createCoord(xWork, yWork);
+						Coord coordsWork = new Coord(xWork, yWork);
 
 						for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 							if (pe instanceof Activity) {

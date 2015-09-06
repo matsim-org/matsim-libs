@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,7 +50,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
@@ -193,8 +193,8 @@ public class ControlerTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(100, 0));
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 100, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Link link = network.getFactory().createLink(Id.create(1, Link.class), node1, node2);
@@ -338,24 +338,28 @@ public class ControlerTest {
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
-		act1a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, 10.0));
+		double x1 = -50.0;
+		act1a = factory.createActivityFromCoord("h", new Coord(x1, 10.0));
 		act1a.setEndTime(7.0*3600);
 		plan1.addActivity(act1a);
 		leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = factory.createActivityFromCoord("h", f.scenario.createCoord(1075.0, -10.0));
+		double y1 = -10.0;
+		act1b = factory.createActivityFromCoord("h", new Coord(1075.0, y1));
 		plan1.addActivity(act1b);
 		// --- plan 2 ---
 		Plan plan2 = factory.createPlan();
 		person1.addPlan(plan2);
-		act2a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, -10.0));
+		double x = -50.0;
+		double y = -10.0;
+		act2a = factory.createActivityFromCoord("h", new Coord(x, y));
 		act2a.setEndTime(7.9*3600);
 		plan2.addActivity(act2a);
 		leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = factory.createActivityFromCoord("h", f.scenario.createCoord(1111.1, 10.0));
+		act2b = factory.createActivityFromCoord("h", new Coord(1111.1, 10.0));
 		plan2.addActivity(act2b);
 		population.addPerson(person1);
 
@@ -978,10 +982,11 @@ public class ControlerTest {
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
 //			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = this.network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(-100.0, 0.0));
-			this.node2 = this.network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(0.0, 0.0));
-			this.node3 = this.network.getFactory().createNode(Id.create(3, Node.class), new CoordImpl(1000.0, 0.0));
-			this.node4 = this.network.getFactory().createNode(Id.create(4, Node.class), new CoordImpl(1100.0, 0.0));
+			final double x = -100.0;
+			this.node1 = this.network.getFactory().createNode(Id.create(1, Node.class), new Coord(x, 0.0));
+			this.node2 = this.network.getFactory().createNode(Id.create(2, Node.class), new Coord(0.0, 0.0));
+			this.node3 = this.network.getFactory().createNode(Id.create(3, Node.class), new Coord(1000.0, 0.0));
+			this.node4 = this.network.getFactory().createNode(Id.create(4, Node.class), new Coord(1100.0, 0.0));
 			this.network.addNode(this.node1);
 			this.network.addNode(this.node2);
 			this.network.addNode(this.node3);

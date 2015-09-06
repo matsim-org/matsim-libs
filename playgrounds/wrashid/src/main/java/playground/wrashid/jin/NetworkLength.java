@@ -4,9 +4,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkLength {
 
@@ -16,8 +13,8 @@ public class NetworkLength {
 		
 //		Coord circleCenter=new CoordImpl(683243.7,247459.2);
 //		double radius=700;
-		
-	Coord circleCenter=new CoordImpl(682922.588,247474.957);
+
+		Coord circleCenter= new Coord(682922.588, 247474.957);
 		double radius=298;
 		
 		double networkLength=0;

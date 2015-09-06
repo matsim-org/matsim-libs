@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 public class FlexTransPersonImpl extends PersonImpl
@@ -74,7 +73,7 @@ public class FlexTransPersonImpl extends PersonImpl
           return;
         }
         if (act.getType().equals("tta")) {
-          CoordImpl coord = new CoordImpl(0.0D, 0.0D);
+          Coord coord = new Coord(0.0D, 0.0D);
           this.homeCoord = coord;
         }
       }

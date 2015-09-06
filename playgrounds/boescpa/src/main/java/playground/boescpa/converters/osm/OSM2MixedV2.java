@@ -28,7 +28,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -75,7 +74,7 @@ public class OSM2MixedV2 {
 		final String vehicleFile_Mixed = args[2];
 		final String vehicleFile_OnlyPT = args[3];
 		// Set spatial cutter
-		cutCenter = new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5]));
+		cutCenter = new Coord(Double.parseDouble(args[4]), Double.parseDouble(args[5]));
 		cutRadius = Integer.parseInt(args[6]);
 		// Prepare output
 		final String outputFolder = args[7] + "\\";

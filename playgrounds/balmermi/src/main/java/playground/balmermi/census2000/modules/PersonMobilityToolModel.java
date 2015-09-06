@@ -25,9 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -47,7 +45,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 	private static final String UNKNOWN = "unknown";
 	private static final String W = "w";
 	private static final String H = "h";
-	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
+	private static final Coord ZERO = new Coord(0.0, 0.0);
 
 	private final ModelMobiliyTools model = new ModelMobiliyTools();
 	private final Persons persons;

@@ -30,8 +30,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -156,20 +156,20 @@ public class DigicoreNetworkWriterTest {
 	private DigicoreNetwork buildSmallNetwork(){
 		DigicoreNetwork dn = new DigicoreNetwork();
 
-		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));		
-		da1.setCoord(new CoordImpl(0.0, 0.0));						
+		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
+		da1.setCoord(new Coord(0.0, 0.0));
 		da1.setFacilityId(Id.create(1, ActivityFacility.class));	
 		
 		DigicoreActivity da2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setCoord(new CoordImpl(0.0, 1.0));
+		da2.setCoord(new Coord(0.0, 1.0));
 		da2.setFacilityId(Id.create(2, ActivityFacility.class));
 		
 		DigicoreActivity da3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da3.setCoord(new CoordImpl(1.0, 1.0));
+		da3.setCoord(new Coord(1.0, 1.0));
 		da3.setFacilityId(Id.create(3, ActivityFacility.class));
 		
 		DigicoreActivity da4 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da4.setCoord(new CoordImpl(1.0, 0.0));
+		da4.setCoord(new Coord(1.0, 0.0));
 		da4.setFacilityId(Id.create(4, ActivityFacility.class));
 
 		dn.addArc(da1, da2);

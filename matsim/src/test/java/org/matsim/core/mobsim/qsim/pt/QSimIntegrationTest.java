@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
@@ -413,12 +414,12 @@ public class QSimIntegrationTest {
 
 			// setup: network
 			Network network = this.scenario.getNetwork();
-			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.scenario.createCoord(   0, 0));
-			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.scenario.createCoord(1000, 0));
-			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.scenario.createCoord(2000, 0));
-			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), this.scenario.createCoord(3000, 0));
-			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), this.scenario.createCoord(4000, 0));
-			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), this.scenario.createCoord(5000, 0));
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);

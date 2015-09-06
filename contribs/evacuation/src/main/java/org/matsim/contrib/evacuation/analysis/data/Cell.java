@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Cell {
 	private double timeSum;
@@ -38,7 +38,7 @@ public class Cell {
 	private List<Double> arrivalTimes;
 	private List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkLeaveTimes;
 	private List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkEnterTimes;
-	private CoordImpl coord;
+	private Coord coord;
 	private double clearingTime;
 	private Id<Cell> id;
 
@@ -123,11 +123,11 @@ public class Cell {
 		this.linkLeaveTimes.add(new Tuple<Tuple<Id<Link>, Id<Person>>, Double>(new Tuple<Id<Link>, Id<Person>>(linkId, personId), time));
 	}
 
-	public void setCoord(CoordImpl centroid) {
+	public void setCoord(Coord centroid) {
 		this.coord = centroid;
 	}
 
-	public CoordImpl getCoord() {
+	public Coord getCoord() {
 		return coord;
 	}
 

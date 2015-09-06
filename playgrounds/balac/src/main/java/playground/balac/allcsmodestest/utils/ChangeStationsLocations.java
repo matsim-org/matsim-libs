@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -29,11 +29,11 @@ public class ChangeStationsLocations {
 		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/CarSharing/CS_Stations_relocated.txt")));
 	    output.write(line1);
 	    output.newLine();
-		HashMap<String, CoordImpl> mapa = new HashMap<String, CoordImpl>();
+		HashMap<String, Coord> mapa = new HashMap<String, Coord>();
 
 		while ((line = reader.readLine()) != null) {
 		      String[] parts = StringUtils.explode(line, '\t');
-		      CoordImpl coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+			Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 		      mapa.put(parts[0], coord);	    	
 	    	
 	    }

@@ -19,7 +19,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class AgentModeScoreAnalysis {
 
@@ -32,8 +31,8 @@ public class AgentModeScoreAnalysis {
 		String eventsFile = "H:/thesis/pricing_tests/output_no_pricing_v5_subtours_JDEQSim_squeeze150_VC12pct_spreadtoll3/ITERS/it.50/50.events.xml.gz";
 		String plansFile = "H:/thesis/pricing_tests/output_no_pricing_v5_subtours_JDEQSim_squeeze150_VC12pct_spreadtoll3" +
 				"/output_plans.xml.gz";
-		
-		Coord center = new CoordImpl(682548.0, 247525.5); 
+
+		Coord center = new Coord(682548.0, 247525.5);
 
 		double radiusInMeters = 1500;
 		

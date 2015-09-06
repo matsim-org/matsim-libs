@@ -19,6 +19,7 @@
 
 package playground.wrashid.tryouts.routing;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +43,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class Main {
@@ -85,10 +85,10 @@ public class Main {
 		
 		Person person = new PersonImpl(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
-		CoordImpl fromCoord = new CoordImpl(xFromAct, yFromAct);
+		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = new ActivityImpl("h", fromCoord);
 		((ActivityImpl) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());
-		CoordImpl toCoord = new CoordImpl(xToAct, yToAct);
+		Coord toCoord = new Coord(xToAct, yToAct);
 		Activity toAct = new ActivityImpl("h", toCoord);
 		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 

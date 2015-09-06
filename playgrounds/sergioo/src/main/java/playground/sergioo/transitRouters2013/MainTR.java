@@ -12,7 +12,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -140,8 +139,8 @@ public class MainTR {
 		Coord[] origin = new Coord[numTests], destination = new Coord[numTests];
 		double[] dayTime = new double[numTests];
 		for(int i=0; i<numTests; i++) {
-			origin[i] = new CoordImpl(346469+(389194-346469)*Math.random(), 137211+(162536-137211)*Math.random());
-			destination[i] = new CoordImpl(346469+(389194-346469)*Math.random(), 137211+(162536-137211)*Math.random());
+			origin[i] = new Coord(346469 + (389194 - 346469) * Math.random(), 137211 + (162536 - 137211) * Math.random());
+			destination[i] = new Coord(346469 + (389194 - 346469) * Math.random(), 137211 + (162536 - 137211) * Math.random());
 			dayTime[i] = Math.random()*(endTime-startTime)+startTime;
 			//375009, 153261
 		}

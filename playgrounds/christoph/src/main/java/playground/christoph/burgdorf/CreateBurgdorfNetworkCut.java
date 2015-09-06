@@ -20,6 +20,7 @@
 
 package playground.christoph.burgdorf;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -33,8 +34,8 @@ public class CreateBurgdorfNetworkCut {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("../../matsim/mysimulations/burgdorf/input/network_burgdorf.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		new NetworkScenarioCut(scenario.createCoord(613789.0, 211908.0), 30000.0).run(scenario.getNetwork());
+
+		new NetworkScenarioCut(new Coord(613789.0, 211908.0), 30000.0).run(scenario.getNetwork());
 		
 		new NetworkWriter(scenario.getNetwork()).write("../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz");
 	}

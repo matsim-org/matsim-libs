@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -73,9 +72,7 @@ public class ExtractDriverBeeflyDetours {
 				isSelectedPlan = atts.getValue( "selected" ).equals( "yes" );
 			}
 			else if (isSelectedPlan && name.equals( "act" )) {
-				Coord coord = new CoordImpl(
-						 Double.parseDouble( atts.getValue( "x" ) ),
-						 Double.parseDouble( atts.getValue( "y" ) ));
+				Coord coord = new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y")));
 
 				String type = atts.getValue( "type" );
 				if (type.equals( "pick_up" )) {

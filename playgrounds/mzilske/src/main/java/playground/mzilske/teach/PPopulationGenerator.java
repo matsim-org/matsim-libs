@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -166,7 +165,7 @@ public class PPopulationGenerator implements Runnable {
   	      y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
   	      p = MGC.xy2Point(x, y);
   	   } while (!g.contains(p));
-  	   Coord coord = new CoordImpl(p.getX(), p.getY());
+		Coord coord = new Coord(p.getX(), p.getY());
   	   return coord;
   	}
 

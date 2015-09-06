@@ -20,6 +20,7 @@
 package playground.benjamin.internalization;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -354,16 +355,29 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void createNetwork() {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-20000.0,     0.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(-17500.0,     0.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord(-15500.0,     0.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( -2500.0,     0.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), scenario.createCoord(     0.0,     0.0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), scenario.createCoord( -5000.0, -8660.0));
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), scenario.createCoord(-15000.0, -8660.0));
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), scenario.createCoord( -7500.0,  2500.0));
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), scenario.createCoord( -7500.0, -2500.0));
-		Node node10 = network.createAndAddNode(Id.create("10", Node.class), scenario.createCoord( -7500.0, -5000.0));
+		double x8 = -20000.0;
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x8, 0.0));
+		double x7 = -17500.0;
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(x7, 0.0));
+		double x6 = -15500.0;
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(x6, 0.0));
+		double x5 = -2500.0;
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(x5, 0.0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(0.0, 0.0));
+		double x4 = -5000.0;
+		double y3 = -8660.0;
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(x4, y3));
+		double x3 = -15000.0;
+		double y2 = -8660.0;
+		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(x3, y2));
+		double x2 = -7500.0;
+		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(x2, 2500.0));
+		double x1 = -7500.0;
+		double y1 = -2500.0;
+		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(x1, y1));
+		double x = -7500.0;
+		double y = -5000.0;
+		Node node10 = network.createAndAddNode(Id.create("10", Node.class), new Coord(x, y));
 
 
 		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 27.78, 3600, 1, null, "22");

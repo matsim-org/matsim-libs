@@ -22,7 +22,7 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -38,8 +38,8 @@ public class FacilitiesSummary {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
 		int act_cnt = 0;
-		CoordImpl min_coord = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
-		CoordImpl max_coord = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		Coord min_coord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+		Coord max_coord = new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 		//            home,work,education,shop,leisure
 		int caps[] = {0   ,   0,        0,   0,      0};
 		int unlimit_cap_cnt = 0;

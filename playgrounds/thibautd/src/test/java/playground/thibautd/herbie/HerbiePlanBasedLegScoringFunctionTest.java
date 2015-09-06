@@ -58,7 +58,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -264,9 +263,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initFacilities() {
 		facilities = new ActivityFacilitiesImpl();
-		ActivityFacilityImpl fac = facilities.createAndAddFacility( Id.create( "h" , ActivityFacility.class ) , new CoordImpl( 0 , 0 ) );
+		ActivityFacilityImpl fac = facilities.createAndAddFacility( Id.create( "h" , ActivityFacility.class ) , new Coord((double) 0, (double) 0));
 		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( 0 , 24 * 3600 ) );
-		fac = facilities.createAndAddFacility( Id.create( "w" , ActivityFacility.class) , new CoordImpl( 0 , 0 ) );
+		fac = facilities.createAndAddFacility( Id.create( "w" , ActivityFacility.class) , new Coord((double) 0, (double) 0));
 		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( 7 , 20 * 3600 ) );
 	}
 
@@ -293,10 +292,10 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initNetwork() {
 		NetworkImpl nImpl = (NetworkImpl) ScenarioUtils.createScenario( config ).getNetwork();
-		Node n1 = nImpl.createAndAddNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
-		Node n2 = nImpl.createAndAddNode( Id.create( 2, Node.class ) , new CoordImpl( 1 , 0 ) );
-		Node n3 = nImpl.createAndAddNode( Id.create( 3, Node.class ) , new CoordImpl( 1 , 2 ) );
-		Node n4 = nImpl.createAndAddNode( Id.create( 4, Node.class ) , new CoordImpl( 4 , 2 ) );
+		Node n1 = nImpl.createAndAddNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
+		Node n2 = nImpl.createAndAddNode( Id.create( 2, Node.class ) , new Coord((double) 1, (double) 0));
+		Node n3 = nImpl.createAndAddNode( Id.create( 3, Node.class ) , new Coord((double) 1, (double) 2));
+		Node n4 = nImpl.createAndAddNode( Id.create( 4, Node.class ) , new Coord((double) 4, (double) 2));
 
 		nImpl.createAndAddLink( Id.create( 12 , Link.class ) , n1 , n2 , 1 , 1 , 1 , 1 );
 		nImpl.createAndAddLink( Id.create( 13 , Link.class ) , n1 , n3 , 1 , 1 , 1 , 1 );

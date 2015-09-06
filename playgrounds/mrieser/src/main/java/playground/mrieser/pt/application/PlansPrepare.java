@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -39,7 +40,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
@@ -72,7 +72,7 @@ public class PlansPrepare {
 		log.info("  # links = " + this.scenario.getNetwork().getLinks().size());
 	}
 
-	public void createDilutedPlans(final CoordImpl center, final double radius, final String fromFile, final String toFile) {
+	public void createDilutedPlans(final Coord center, final double radius, final String fromFile, final String toFile) {
 		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 
 		Network network = this.scenario.getNetwork();

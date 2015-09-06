@@ -11,7 +11,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -55,7 +54,7 @@ public class BernMembersSHP {
 			
 			String[] arr = s.split("\\t");
 			s = readLink1.readLine();
-			Coord coord = new CoordImpl(Double.parseDouble(arr[5]), Double.parseDouble(arr[4]));
+			Coord coord = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[4]));
 			WGS84toCH1903LV03 b = new WGS84toCH1903LV03();  //transforming coord from WGS84 to CH1903LV03
 			coord = b.transform(coord);
 			SimpleFeature ft = nodeFactory.createPoint(coord, new Object[] {Integer.toString(i)}, null);

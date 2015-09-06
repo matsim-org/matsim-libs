@@ -7,15 +7,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RemovePlansNotRelatedToStudyArea {
 
@@ -24,7 +21,7 @@ public class RemovePlansNotRelatedToStudyArea {
 		String inputNetworkFile = "C:/data/parkingSearch/zurich/input/network.xml.gz";
 		String inputFacilities = "C:/data/parkingSearch/zurich/input/facilities.xml.gz";
 
-		Coord center = new CoordImpl(683235.0, 247497.0);
+		Coord center = new Coord(683235.0, 247497.0);
 		double radiusInMeters = 1000;
 		boolean cut = false;
 

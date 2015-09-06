@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +46,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.FacilitiesWriter;
@@ -162,8 +162,8 @@ public class DemoScenario {
 			} catch (TransformException e) {
 				e.printStackTrace();
 			}
-			
-			((ActivityFacilityImpl)fac).setCoord(new CoordImpl(points[0], points[1]));
+
+			((ActivityFacilityImpl)fac).setCoord(new Coord(points[0], points[1]));
 		}
 		logger.info("Done.");
 		
@@ -213,8 +213,8 @@ public class DemoScenario {
 			} catch (TransformException e) {
 				e.printStackTrace();
 			}
-			
-			((NodeImpl) node).setCoord(new CoordImpl(points[0], points[1]));
+
+			((NodeImpl) node).setCoord(new Coord(points[0], points[1]));
 		}
 		logger.info("Done.");
 		

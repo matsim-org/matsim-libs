@@ -37,7 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -135,14 +135,13 @@ public class AnalyzeSelectedPlans {
 				// we do only have crowfly data for validation
 				if (leg.getRoute().getStartLinkId() != null && true == false) {
 				//if (leg.getRoute().getStartLink() != null) {
-					double crowFlyDistance = ((CoordImpl)this.network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord()).
-					calcDistance(this.network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
+					double crowFlyDistance = CoordUtils.calcDistance(this.network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), this.network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
 
 					distance = Math.max(crowFlyDistance, leg.getRoute().getDistance());
 				}
 				else {
 					ActivityImpl actPrevious = (ActivityImpl)actslegs.get(j-1);
-					distance = ((CoordImpl)actPrevious.getCoord()).calcDistance(nextAct.getCoord());
+					distance = CoordUtils.calcDistance(actPrevious.getCoord(), nextAct.getCoord());
 				}
 				trip.setDistance(distance);
 				this.tripAnalyzer.addTrip(trip);

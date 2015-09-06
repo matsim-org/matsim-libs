@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +31,6 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.data.v20.*;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,9 +43,9 @@ public class QLaneTest extends MatsimTestCase {
 
   private Network initNetwork(Network network) {
 		((NetworkImpl) network).setCapacityPeriod(3600.0);
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1, 0));
-		Node node3 = network.getFactory().createNode(Id.create(3, Node.class), new CoordImpl(2, 0));
+	  Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+	  Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 1, (double) 0));
+	  Node node3 = network.getFactory().createNode(Id.create(3, Node.class), new Coord((double) 2, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);

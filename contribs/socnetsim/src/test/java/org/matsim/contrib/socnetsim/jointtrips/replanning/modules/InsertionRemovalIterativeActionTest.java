@@ -44,7 +44,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -321,8 +320,8 @@ public class InsertionRemovalIterativeActionTest {
 	private JointPlan createPlanWithoutJointTrips() {
 		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
-		Coord coord1 = new CoordImpl( 0 , 0 );
-		Coord coord2 = new CoordImpl( 3600 , 21122012 );
+		Coord coord1 = new Coord((double) 0, (double) 0);
+		Coord coord2 = new Coord((double) 3600, (double) 21122012);
 
 		for (int i=0; i < N_COUPLES; i++) {
 			Id driverId1 = Id.create( "driver"+i , Person.class );

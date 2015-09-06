@@ -37,7 +37,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -267,11 +266,11 @@ import org.xml.sax.Attributes;
 			this.curract = this.currplan.createAndAddActivity(
 					atts.getValue(ATTR_TYPE), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
-				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+				coord = new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y")));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
-			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+			coord = new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y")));
 			this.curract = this.currplan.createAndAddActivity(
 					atts.getValue(ATTR_TYPE), coord);
 		} else {

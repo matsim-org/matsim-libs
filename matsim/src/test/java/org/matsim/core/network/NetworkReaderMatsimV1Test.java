@@ -23,6 +23,7 @@ package org.matsim.core.network;
 import java.util.Set;
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
@@ -101,8 +101,8 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	private Link prepareTestAllowedModes(final String modes) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		network.addNode(network.getFactory().createNode(Id.create("1", Node.class), new CoordImpl(0, 0)));
-		network.addNode(network.getFactory().createNode(Id.create("2", Node.class), new CoordImpl(1000, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0)));
+		network.addNode(network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0)));
 
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		Stack<String> context = new Stack<String>();

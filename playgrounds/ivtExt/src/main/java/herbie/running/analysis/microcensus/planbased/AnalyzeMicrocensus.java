@@ -21,6 +21,7 @@ package herbie.running.analysis.microcensus.planbased;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -33,9 +34,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.config.ConfigUtils;
 
+import org.matsim.core.utils.geometry.CoordUtils;
 import utils.Bins;
 
 /**
@@ -118,7 +119,7 @@ public class AnalyzeMicrocensus {
 	
 	private void dilutedZH() {
 		double aoiRadius = 30000.0;
-		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
+		final Coord aoiCenter = new Coord(683518.0, 246836.0);
 		
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(null, null, this.scenarioZH.getNetwork());
 		filter.setAlternativeAOI(aoiCenter, aoiRadius);
@@ -139,7 +140,7 @@ public class AnalyzeMicrocensus {
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
-							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
+							double distance = CoordUtils.calcDistance(previousAct.getCoord(), act.getCoord());
 							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						}
 					}
@@ -158,7 +159,7 @@ public class AnalyzeMicrocensus {
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
-							double distance = ((CoordImpl)previousAct.getCoord()).calcDistance(act.getCoord());
+							double distance = CoordUtils.calcDistance(previousAct.getCoord(), act.getCoord());
 							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						
 							if (previousAct.getType().equals("h")) {

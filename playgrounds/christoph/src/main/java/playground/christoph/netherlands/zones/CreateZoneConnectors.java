@@ -164,7 +164,7 @@ public class CreateZoneConnectors {
 			/*
 			 * Convert coordinate from WGS84 to EPSG:28992 (Netherlands Projection)
 			 */
-			Coord wgs84Coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
+			Coord wgs84Coord = new Coord(point.getCoordinate().x, point.getCoordinate().y);
 			Coord nodeCoord = ct.transform(wgs84Coord);
 			
 			Id<Node> nodeId = Id.create(String.valueOf(zoneId), Node.class);

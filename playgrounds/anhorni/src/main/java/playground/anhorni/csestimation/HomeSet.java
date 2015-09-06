@@ -8,7 +8,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class HomeSet {
@@ -99,7 +98,7 @@ public class HomeSet {
 		String str = "person " + this.person.getId().toString() + " " + person.getHomeLocation().getCoord().toString();
 		for (ShopLocation shop:this.shops.values()) {
 			str += " " + shop.getId().toString() + shop.getCoord().toString() + " d2h: " +
-		formatter.format(((CoordImpl)person.getHomeLocation().getCoord()).calcDistance(shop.getCoord()));
+		formatter.format(CoordUtils.calcDistance(((Coord) person.getHomeLocation().getCoord()), shop.getCoord()));
 		}
 		log.info(str);
 	}

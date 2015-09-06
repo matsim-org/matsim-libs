@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,9 +36,7 @@ import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -134,14 +133,14 @@ public class WalkBikeRouting {
 			
 			if (arr[0].equals("45"))
 				System.out.println();
-				CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
+			Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 				
 				
 				
 				Link lStartWalk = lUtilsWalk.getClosestLink(coordStart);
 				Link lStartBike = lUtilsBike.getClosestLink(coordStart);
-				
-				CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
+
+			Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 				
 	
 				Link lEndWalk = lUtilsWalk.getClosestLink(coordEnd);

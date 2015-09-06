@@ -24,8 +24,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
 
 import com.vividsolutions.jts.geom.Point;
 

@@ -19,9 +19,9 @@
 package playground.gregor.gis.worldmercatorvis;
 
 import org.geotools.geometry.jts.JTS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -40,7 +40,7 @@ public class NetworkConverter {
 	
 	public void run() {
 		for (Node n : this.sc.getNetwork().getNodes().values()) {
-			CoordImpl c = (CoordImpl) n.getCoord();
+			Coord c = n.getCoord();
 			Coordinate cc = new Coordinate(c.getX(),c.getY());
 			try {
 				JTS.transform(cc, cc, transform);

@@ -5,7 +5,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class EstimateRadiusOfHubSubMangers {
@@ -79,9 +78,9 @@ public class EstimateRadiusOfHubSubMangers {
 				// no distance can be calculated, if same sub manager selected
 				continue;
 			}
-			
-			Coord coordinateFirstHubSubManager=new CoordImpl(matrix.getDouble(rowFirstHubSubManager, 1),matrix.getDouble(rowFirstHubSubManager, 2));
-			Coord coordinateSecondHubSubManager=new CoordImpl(matrix.getDouble(rowSecondHubSubManager, 1),matrix.getDouble(rowSecondHubSubManager, 2));
+
+			Coord coordinateFirstHubSubManager= new Coord(matrix.getDouble(rowFirstHubSubManager, 1), matrix.getDouble(rowFirstHubSubManager, 2));
+			Coord coordinateSecondHubSubManager= new Coord(matrix.getDouble(rowSecondHubSubManager, 1), matrix.getDouble(rowSecondHubSubManager, 2));
 			
 			if (GeneralLib.getDistance(coordinateFirstHubSubManager, coordinateSecondHubSubManager)<minimumDistance){
 				minimumDistance=GeneralLib.getDistance(coordinateFirstHubSubManager, coordinateSecondHubSubManager);

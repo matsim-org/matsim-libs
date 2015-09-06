@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
@@ -32,7 +33,6 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -92,9 +92,9 @@ public class TravelTimeTask extends AnalyzerTask {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			Node n1 = ((NetworkImpl)network).getNearestNode(new CoordImpl(points1[0], points1[1]));
-			Node n2 = ((NetworkImpl)network).getNearestNode(new CoordImpl(points2[0], points2[1]));
+
+			Node n1 = ((NetworkImpl)network).getNearestNode(new Coord(points1[0], points1[1]));
+			Node n2 = ((NetworkImpl)network).getNearestNode(new Coord(points2[0], points2[1]));
 			
 			Path path = router.calcLeastCostPath(n1, n2, 0, null, null);
 			

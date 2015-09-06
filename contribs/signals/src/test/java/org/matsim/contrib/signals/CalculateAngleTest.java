@@ -111,11 +111,11 @@ public class CalculateAngleTest {
 		double y3 = Math.sin((alpha + (Math.PI / 2))) * 100.0;
 		double x4 = Math.cos(alpha) * 100.0;
 		double y4 = Math.sin(alpha) * 100.0;
-		Coord coord1 = sc.createCoord(x1, y1);
-		Coord coord2 = sc.createCoord(x2, y2);
-		Coord coord3 = sc.createCoord(x3, y3);
-		Coord coord4 = sc.createCoord(x4, y4);
-		Coord coord5 = sc.createCoord(0, 0);
+		Coord coord1 = new Coord(x1, y1);
+		Coord coord2 = new Coord(x2, y2);
+		Coord coord3 = new Coord(x3, y3);
+		Coord coord4 = new Coord(x4, y4);
+		Coord coord5 = new Coord((double) 0, (double) 0);
 		//the nodes
 		Node node1 = netfac.createNode(Id.create("1", Node.class), coord1);
 		net.addNode(node1);

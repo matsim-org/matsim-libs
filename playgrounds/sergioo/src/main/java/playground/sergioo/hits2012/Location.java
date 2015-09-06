@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.jdesktop.swingx.JXMapKit.DefaultProviders;
 import org.matsim.api.core.v01.Coord;
 
 import playground.sergioo.hits2012.Trip.PlaceType;

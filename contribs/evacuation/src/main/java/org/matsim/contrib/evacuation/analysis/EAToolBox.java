@@ -77,7 +77,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree.Rect;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -392,8 +391,8 @@ public class EAToolBox extends AbstractToolBox {
 					Rect boundingBox = new Rect(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
 					double gridSize = this.module.getEventHandler().getData().getCellSize();
 
-					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX - gridSize / 2, boundingBox.minY - gridSize / 2));
-					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX + gridSize / 2, boundingBox.maxY + gridSize / 2));
+					Coord minValues = this.ctInverse.transform(new Coord(boundingBox.minX - gridSize / 2, boundingBox.minY - gridSize / 2));
+					Coord maxValues = this.ctInverse.transform(new Coord(boundingBox.maxX + gridSize / 2, boundingBox.maxY + gridSize / 2));
 
 					double westmost = minValues.getX();
 					double soutmost = minValues.getY();

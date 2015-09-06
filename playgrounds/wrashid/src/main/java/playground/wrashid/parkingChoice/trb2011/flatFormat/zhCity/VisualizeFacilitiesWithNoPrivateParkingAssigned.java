@@ -3,7 +3,6 @@ package playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.utils.collections.QuadTree;

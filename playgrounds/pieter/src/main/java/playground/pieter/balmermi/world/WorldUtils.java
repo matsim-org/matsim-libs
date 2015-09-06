@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -63,7 +62,7 @@ public abstract class WorldUtils {
 			Coord max = zone.getMax();
 			double x = min.getX() + MatsimRandom.getRandom().nextDouble()*(max.getX() - min.getX());
 			double y = min.getY() + MatsimRandom.getRandom().nextDouble()*(max.getY() - min.getY());
-			return new CoordImpl(x, y);
+			return new Coord(x, y);
 		}
 
 		double x, y;
@@ -101,7 +100,7 @@ public abstract class WorldUtils {
 			x = center.getX();
 			y = center.getY();
 		}
-		return new CoordImpl(x, y);
+		return new Coord(x, y);
 	}
 
 }

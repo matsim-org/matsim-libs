@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 //this code calculates circulation flow or outflow, 
 //depending on what event handler you choose in OutFlowInfoCollectorWithPT
@@ -52,7 +51,7 @@ public class MainFlowAnalysisWithPt {
 		//Coord center=new CoordImpl(683139.3125,247387.9531);// high density center
 		//double radiusInMeters=2500;
 		//Coord center=new CoordImpl(683400.75,247500.0687); //(4-21)
-		Coord center=new CoordImpl(683139.3125,247387.9531);// high density center
+		Coord center= new Coord(683139.3125, 247387.9531);// high density center
 		double radiusInMeters=2000;
 		
 		

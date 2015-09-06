@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,7 +35,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -274,16 +274,16 @@ public class OptimalWalkPlanFinderTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000.0, 0.0));
+			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
 
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
 
 			this.person = new PersonImpl(Id.create("1", Person.class));
 			this.plan = this.person.createAndAddPlan(true);
 
-			CoordImpl homeLocation = new CoordImpl(0.0,1.0);
-			CoordImpl workLocation = new CoordImpl(1153.8461538461538,1.0);
+			Coord homeLocation = new Coord(0.0, 1.0);
+			Coord workLocation = new Coord(1153.8461538461538, 1.0);
 
 			ActivityImpl firstActivity = this.plan.createAndAddActivity("home", homeLocation);
 			firstActivity.setEndTime(firstLegStartTime);

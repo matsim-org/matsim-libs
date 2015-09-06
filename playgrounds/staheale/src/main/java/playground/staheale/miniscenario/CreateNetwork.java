@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -33,7 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -86,8 +87,8 @@ public class CreateNetwork {
 
 					Link l0 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), fromNode, toNode);
 					l0.setCapacity(linkCapacity);
-					l0.setFreespeed(freeSpeed);				
-					l0.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
+					l0.setFreespeed(freeSpeed);
+					l0.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 					this.scenario.getNetwork().addLink(l0);
 					linkCnt++;
 					this.addFacility(l0, facilityCnt);
@@ -96,7 +97,7 @@ public class CreateNetwork {
 					Link l1 = networkFactory.createLink(Id.create(linkCnt, Link.class), toNode, fromNode);
 					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
-					l1.setLength(((CoordImpl)toNode.getCoord()).calcDistance(fromNode.getCoord()));
+					l1.setLength(CoordUtils.calcDistance(toNode.getCoord(), fromNode.getCoord()));
 					this.scenario.getNetwork().addLink(l1);
 					linkCnt++;
 				}				
@@ -109,7 +110,7 @@ public class CreateNetwork {
 					Link l0 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), fromNode, toNode);
 					l0.setCapacity(linkCapacity);
 					l0.setFreespeed(freeSpeed);
-					l0.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
+					l0.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 					this.scenario.getNetwork().addLink(l0);
 					linkCnt++;
 
@@ -119,7 +120,7 @@ public class CreateNetwork {
 					Link l1 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), toNode, fromNode);
 					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
-					l1.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
+					l1.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 					this.scenario.getNetwork().addLink(l1);
 					linkCnt++;
 				}
@@ -213,7 +214,7 @@ public class CreateNetwork {
 		int stepsPerSide = (int)(sideLength/ spacing);
 		for (int i = 0; i <= stepsPerSide ; i++) {
 			for (int j = 0; j <= stepsPerSide; j++) {
-				Node n = networkFactory.createNode(Id.create(nodeCnt, Node.class), new CoordImpl(i * spacing, j * spacing));
+				Node n = networkFactory.createNode(Id.create(nodeCnt, Node.class), new Coord(i * spacing, j * spacing));
 				this.scenario.getNetwork().addNode(n);
 				nodeCnt++;
 			}

@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
@@ -92,8 +91,9 @@ public class FastTransitRouterCustomDataTest {
 		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
 
 		TransitRouter router = createTransitRouter(scenario, config, disutility, travelTime, transitNetwork, fastRouter);
-		
-		List<Leg> legs = router.calcRoute(scenario.createCoord(-100, 0), new CoordImpl(3100, 0), 5.9*3600, null);
+
+		double x = -100;
+		List<Leg> legs = router.calcRoute(new Coord(x, (double) 0), new Coord((double) 3100, (double) 0), 5.9*3600, null);
 		Assert.assertEquals(1, legs.size());
 		
 		/* the following is not really nice as a test, but I had to somehow
@@ -193,12 +193,12 @@ public class FastTransitRouterCustomDataTest {
 	private final void createTestSchedule(final Scenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
-		
-		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 500), false);
-		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1000, 0), false);
-		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(1500, 500), false);
-		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new CoordImpl(2000, 0), false);
+
+		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 500, (double) 500), false);
+		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
+		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord((double) 1500, (double) 500), false);
+		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new Coord((double) 2000, (double) 0), false);
 		
 		schedule.addStopFacility(f1);
 		schedule.addStopFacility(f2);

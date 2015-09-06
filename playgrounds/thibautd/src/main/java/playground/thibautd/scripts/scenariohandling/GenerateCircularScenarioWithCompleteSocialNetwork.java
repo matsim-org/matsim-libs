@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -95,9 +95,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 			final double angle = i * angleStep;
 			final Node newNode = net.getFactory().createNode(
 					Id.create( "node-"+angle , Node.class),
-					new CoordImpl(
-						radius * Math.cos( Math.PI * angle / 180 ),
-						radius * Math.sin( Math.PI * angle / 180 ) ) );
+					new Coord(radius * Math.cos(Math.PI * angle / 180), radius * Math.sin(Math.PI * angle / 180)));
 			net.addNode( newNode );
 			if ( firstNode == null ) firstNode = newNode;
 

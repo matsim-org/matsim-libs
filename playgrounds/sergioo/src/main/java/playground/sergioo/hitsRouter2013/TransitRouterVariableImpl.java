@@ -37,7 +37,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra.InitialNode;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWS;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkNode;
 

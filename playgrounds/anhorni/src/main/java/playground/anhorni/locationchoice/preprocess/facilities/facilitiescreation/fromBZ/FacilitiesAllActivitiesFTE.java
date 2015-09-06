@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -195,8 +195,8 @@ public class FacilitiesAllActivitiesFTE {
 //					f = facilities.createFacility(
 //							Id.create(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
 //							new CoordImpl(X, Y));
-					
-					f = facilities.createAndAddFacility(Id.create(tempFacilityId, ActivityFacility.class), new CoordImpl(X, Y));
+
+					f = facilities.createAndAddFacility(Id.create(tempFacilityId, ActivityFacility.class), new Coord(Double.parseDouble(X), Double.parseDouble(Y)));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before

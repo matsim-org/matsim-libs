@@ -23,7 +23,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -107,7 +106,7 @@ public class AddressLocator {
 			Element coords=((Element)((Element)((Element)results.item(i)).getElementsByTagName("geometry").item(0)).getElementsByTagName("location").item(0));
 			double latitude=Double.parseDouble(coords.getElementsByTagName("lat").item(0).getChildNodes().item(0).getNodeValue());
 			double longitude=Double.parseDouble(coords.getElementsByTagName("lng").item(0).getChildNodes().item(0).getNodeValue());
-			locations.add(new CoordImpl(longitude, latitude));
+			locations.add(new Coord(longitude, latitude));
 		}
 	}
 	/**
@@ -131,7 +130,7 @@ public class AddressLocator {
 			Element coords=((Element)((Element)((Element)results.item(0)).getElementsByTagName("geometry").item(0)).getElementsByTagName("location").item(0));
 			double latitude=Double.parseDouble(coords.getElementsByTagName("lat").item(0).getChildNodes().item(0).getNodeValue());
 			double longitude=Double.parseDouble(coords.getElementsByTagName("lng").item(0).getChildNodes().item(0).getNodeValue());
-			return new CoordImpl(longitude, latitude);
+			return new Coord(longitude, latitude);
 		}
 		return null;
 	}

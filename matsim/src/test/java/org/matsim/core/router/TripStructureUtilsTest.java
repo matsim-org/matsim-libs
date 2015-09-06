@@ -29,6 +29,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author thibautd
@@ -418,12 +418,12 @@ public class TripStructureUtilsTest {
 		plan.addActivity(
 				populationFactory.createActivityFromCoord(
 					"type",
-					new CoordImpl( 0 , 0 ) ) );
+						new Coord((double) 0, (double) 0)) );
 		plan.addLeg( populationFactory.createLeg( "mode" ) );
 		plan.addActivity(
 				populationFactory.createActivityFromCoord(
 					"type",
-					new CoordImpl( 0 , 0 ) ) );
+						new Coord((double) 0, (double) 0)) );
 
 		TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
 	}

@@ -27,8 +27,8 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -60,7 +60,7 @@ public class DigicoreVehicleReaderTest {
 		Assert.assertEquals("Wrong number of activities in chain.", 3, v2.getChains().get(0).getAllActivities().size());
 
 		Assert.assertTrue("Wrong activity type.", "minor".equalsIgnoreCase(v2.getChains().get(0).getAllActivities().get(1).getType()));
-		Assert.assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new CoordImpl(5, 5)));
+		Assert.assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new Coord((double) 5, (double) 5)));
 		Assert.assertEquals("Wrong start time.", 
 				v1.getChains().get(0).getAllActivities().get(1).getStartTime(), 
 				v2.getChains().get(0).getAllActivities().get(1).getStartTime(),
@@ -78,19 +78,19 @@ public class DigicoreVehicleReaderTest {
 		DigicoreChain dc = new DigicoreChain();
 		
 		DigicoreActivity da1 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da1.setCoord(new CoordImpl(0, 0));
+		da1.setCoord(new Coord((double) 0, (double) 0));
 		da1.setStartTime(0);
 		da1.setEndTime(5);
 		dc.add(da1);
 		
 		DigicoreActivity da2 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setCoord(new CoordImpl(5, 5));
+		da2.setCoord(new Coord((double) 5, (double) 5));
 		da2.setStartTime(10);
 		da2.setEndTime(15);
 		dc.add(da2);
 		
 		DigicoreActivity da3 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da3.setCoord(new CoordImpl(10, 10));
+		da3.setCoord(new Coord((double) 10, (double) 10));
 		da3.setStartTime(20);
 		da3.setEndTime(25);
 		dc.add(da3);

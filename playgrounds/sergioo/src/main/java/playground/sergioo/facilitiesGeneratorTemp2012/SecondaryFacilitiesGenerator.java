@@ -19,7 +19,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -163,7 +162,7 @@ public class SecondaryFacilitiesGenerator {
 				if(resultFacility.next()) {
 					ResultSet resultType = dataBaseAuxiliar.executeQuery("SELECT * FROM RealEstate_place_types WHERE name='"+resultFacility.getString(1)+"'");
 					if(resultType.next())
-						facilitiesPostalSector.put(postalCodeE.getKey(), new Tuple<String, Coord>(resultFacility.getString(1).toLowerCase(), new CoordImpl(resultFacility.getDouble(2), resultFacility.getDouble(3))));
+						facilitiesPostalSector.put(postalCodeE.getKey(), new Tuple<String, Coord>(resultFacility.getString(1).toLowerCase(), new Coord(resultFacility.getDouble(2), resultFacility.getDouble(3))));
 					resultType.close();
 				}
 				resultFacility.close();
@@ -411,7 +410,7 @@ public class SecondaryFacilitiesGenerator {
 								usedCodes.add(resultPostalCodes.getInt(1));
 								ResultSet resultRandomType = dataBaseAuxiliar.executeQuery("SELECT name FROM RealEstate_place_types,RealEstate_place_types_X_URA_place_types WHERE id=realestate_place_type_id AND ura_place_type_id="+(uRAPlaceType.ordinal()+1)+" ORDER BY RAND() LIMIT 1");
 								resultRandomType.next();
-								facilitiesPostalSector.put(resultPostalCodes.getInt(1), new Tuple<String,Coord>(resultRandomType.getString(1).toLowerCase(),new CoordImpl(resultPostalCodes.getDouble(2), resultPostalCodes.getDouble(3))));
+								facilitiesPostalSector.put(resultPostalCodes.getInt(1), new Tuple<String,Coord>(resultRandomType.getString(1).toLowerCase(), new Coord(resultPostalCodes.getDouble(2), resultPostalCodes.getDouble(3))));
 								fakeOneCreated=true;
 							}
 						if(fakeOneCreated==false)
@@ -429,7 +428,7 @@ public class SecondaryFacilitiesGenerator {
 		ResultSet resultPostalCodes = dataBasePostalCodes.executeQuery("SELECT zip,lng,lat FROM postal_codes");
 		Map<Integer,Coord> postalCodes = new HashMap<Integer, Coord>();
 		while(resultPostalCodes.next())
-			postalCodes.put(resultPostalCodes.getInt(1), new CoordImpl(resultPostalCodes.getDouble(2), resultPostalCodes.getDouble(3)));
+			postalCodes.put(resultPostalCodes.getInt(1), new Coord(resultPostalCodes.getDouble(2), resultPostalCodes.getDouble(3)));
 		resultPostalCodes.close();
 		dataBasePostalCodes.close();
 		//Buildings postal codes
@@ -448,7 +447,7 @@ public class SecondaryFacilitiesGenerator {
 					badPostalCode = true;
 				}
 			if(badPostalCode) {
-				Coord coord = new CoordImpl(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
+				Coord coord = new Coord(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
 				postalCode = postalCodes.keySet().iterator().next();
 				for(Entry<Integer, Coord> postalCodeE:postalCodes.entrySet())
 					if(CoordUtils.calcDistance(coord, postalCodeE.getValue())<CoordUtils.calcDistance(coord, postalCodes.get(postalCode)))
@@ -476,7 +475,7 @@ public class SecondaryFacilitiesGenerator {
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealEstate.properties"));
 		ResultSet resultFacilities = dataBaseBuildings.executeQuery("SELECT id_building_directory,longitude,latitude,type,post_code FROM building_directory");
 		while(resultFacilities.next()) {
-			Coord center = new CoordImpl(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
+			Coord center = new Coord(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
 			ActivityFacilityImpl facility;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {

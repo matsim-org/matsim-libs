@@ -80,7 +80,7 @@ public class PoznanServedRequestsReader
     {
         double x = scanner.nextDouble();
         double y = scanner.nextDouble();
-        return ct.transform(new CoordImpl(x, y));
+        return ct.transform(new Coord(x, y));
     }
 
 

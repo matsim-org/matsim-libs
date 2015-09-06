@@ -19,8 +19,8 @@ public class Coordinate {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("H:/thesis/output_no_pricing_v3_subtours/output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Coord center = scenario.createCoord(684281.6, 246570.3);
+
+		Coord center = new Coord(684281.6, 246570.3);
 		double distance = 1500.0;
 		double length = 50.0;
 		

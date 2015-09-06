@@ -21,8 +21,8 @@ package playground.michalm.chargerlocation;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.michalm.zone.Zone;
 
@@ -31,7 +31,7 @@ public class ChargerLocations
 {
     public static ChargerLocation createLocation(long id, double x, double y, double power)
     {
-        return new ChargerLocation(Id.create(id, ChargerLocation.class), new CoordImpl(x, y),
+        return new ChargerLocation(Id.create(id, ChargerLocation.class), new Coord(x, y),
                 power);
     }
 

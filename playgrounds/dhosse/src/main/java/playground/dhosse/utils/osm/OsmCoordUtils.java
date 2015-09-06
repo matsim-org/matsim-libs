@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
@@ -45,7 +44,7 @@ class OsmCoordUtils {
 	
 	
 	private static Coord getNodeCoord(Node node, CoordinateTransformation ct){
-		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+		return ct.transform(new Coord(node.getLongitude(), node.getLatitude()));
 	}
 	
 		
@@ -66,7 +65,7 @@ class OsmCoordUtils {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be returned in the transformed CRS. */
 		return ct.transform(c);
@@ -90,7 +89,7 @@ class OsmCoordUtils {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be in the transformed CRS. */
 		return ct.transform(c);
@@ -124,8 +123,8 @@ class OsmCoordUtils {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		
@@ -140,7 +139,7 @@ class OsmCoordUtils {
 			double xNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLongitude();
 			double yNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLatitude();
 
-			Coord coord = new CoordImpl(xNode, yNode);
+			Coord coord = new Coord(xNode, yNode);
 			
 			list.add(ct.transform(coord));
 		}		
@@ -215,8 +214,8 @@ class OsmCoordUtils {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		

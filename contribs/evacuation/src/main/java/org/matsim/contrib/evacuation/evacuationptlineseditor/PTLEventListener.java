@@ -33,7 +33,6 @@ import org.matsim.contrib.evacuation.control.ShapeFactory;
 import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
 import org.matsim.contrib.evacuation.model.shape.LineShape;
 import org.matsim.core.network.LinkQuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PTLEventListener extends AbstractListener {
 
@@ -158,7 +157,7 @@ public class PTLEventListener extends AbstractListener {
 		updateMousePosition(getGeoPixelPoint(point));
 		Point2D geoMousePos = controller.pixelToGeo(controller.getMousePosition());
 
-		Coord wCoord = new CoordImpl(geoMousePos.getY(), geoMousePos.getX());
+		Coord wCoord = new Coord(geoMousePos.getY(), geoMousePos.getX());
 		wCoord = this.controller.getCtOsm2Target().transform(wCoord);
 		return wCoord;
 	}

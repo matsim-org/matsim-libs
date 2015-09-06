@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -18,7 +19,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkSplitter {
 
@@ -71,7 +71,7 @@ public class NetworkSplitter {
 			double nodeDistanceOnMap = totalLinkLengthOnMap / newNumberOfLinks;
 
 			Integer count = 0;
-			CoordImpl newNodeXY = null;
+			Coord newNodeXY = null;
 			Id newLinkId = null;
 			Id newNodeId = null;
 
@@ -125,14 +125,14 @@ public class NetworkSplitter {
 		networkWriter.write(newNetworkPath);
 	}
 
-	private static CoordImpl convertDistanceToCoordinates(Link link, double distance) {
+	private static Coord convertDistanceToCoordinates(Link link, double distance) {
 		double x_diff = (link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX());
 		double y_diff = (link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY());
 		double thetarad = Math.atan2(y_diff, x_diff);
 		// System.out.println("Theta: "+thetarad);
 		double x = distance * Math.cos(thetarad);
 		double y = distance * Math.sin(thetarad);
-		CoordImpl pointXY = new CoordImpl(link.getFromNode().getCoord().getX() + x, link.getFromNode().getCoord().getY() + y);
+		Coord pointXY = new Coord(link.getFromNode().getCoord().getX() + x, link.getFromNode().getCoord().getY() + y);
 		// System.out.println("      x: "+(link.getFromNode().getCoord().getX()
 		// + x)+" y: "+(link.getFromNode().getCoord().getY() + y));
 		return pointXY;

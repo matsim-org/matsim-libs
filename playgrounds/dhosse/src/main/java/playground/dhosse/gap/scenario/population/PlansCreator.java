@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -561,8 +560,8 @@ public class PlansCreator {
 								
 								double x = signX * Global.random.nextDouble() * distance;
 								double y = signY * Math.sqrt(distance * distance - x * x);
-								
-								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+
+								c = new Coord(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 								
 								c = Global.UTM32NtoGK4.transform(c);
 								Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
@@ -604,8 +603,8 @@ public class PlansCreator {
 									}
 									
 								}while(facility == null);
-								
-								c = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
+
+								c = new Coord(facility.getCoord().getX(), facility.getCoord().getY());
 								
 							}
 							
@@ -824,8 +823,8 @@ public class PlansCreator {
 								
 								double x = signX * Global.random.nextDouble() * distance;
 								double y = signY * Math.sqrt(distance * distance - x * x);
-								
-								c = new CoordImpl(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+
+								c = new Coord(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 								
 								
 								if(type.equals(Global.ActType.work.name())){

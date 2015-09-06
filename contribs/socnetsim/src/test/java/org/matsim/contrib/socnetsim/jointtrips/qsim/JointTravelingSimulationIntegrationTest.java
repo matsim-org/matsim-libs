@@ -22,9 +22,9 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,7 +60,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -579,9 +578,11 @@ public class JointTravelingSimulationIntegrationTest {
 		int c = 0;
 		int d = 0;
 
-		final Node firstNode = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
+		final double y2 = d++;
+		final Node firstNode = network.getFactory().createNode( Id.create( c++ , Node.class ) , new Coord((double) 0, y2));
 		Node node1 = firstNode;
-		Node node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
+		final double y1 = d++;
+		Node node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new Coord((double) 0, y1));
 
 		network.addNode( node1 );
 		network.addNode( node2 );
@@ -589,7 +590,8 @@ public class JointTravelingSimulationIntegrationTest {
 
 		for (Id<Link> linkId : new Id[]{ TO_PU_LINK , PU_LINK , TRAVEL_LINK_1 , TRAVEL_LINK_2 , DO_LINK , TO_DESTINATION_LINK , DESTINATION_LINK }) {
 			node1 = node2;
-			node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
+			final double y = d++;
+			node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new Coord((double) 0, y));
 			network.addNode( node2 );
 			network.addLink( network.getFactory().createLink( linkId , node1 , node2 ) );
 		}

@@ -21,6 +21,7 @@
 package org.matsim.contrib.multimodal.router.util;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.HashMap;
@@ -43,9 +43,9 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 	
 	public void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));		
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));
+
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(1.0, 0.0));
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		link.setLength(1.0);
 		scenario.getNetwork().addNode(node1);
@@ -166,9 +166,9 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		PersonImpl p2 = new PersonImpl(Id.create(2, Person.class));
 		p2.setAge(20);
 		p2.setSex("m");
-		
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));
+
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(1.0, 0.0));
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		link.setLength(1.0);
 		scenario.getNetwork().addNode(node1);

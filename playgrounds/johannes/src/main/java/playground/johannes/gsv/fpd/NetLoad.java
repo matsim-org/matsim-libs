@@ -47,7 +47,6 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -141,8 +140,8 @@ public class NetLoad {
 						Point p1 = zones.get(i).getGeometry().getCentroid();
 						Point p2 = zones.get(j).getGeometry().getCentroid();
 
-						Node source = NetworkUtils.getNearestLink(network, new CoordImpl(p1.getX(), p1.getY())).getFromNode();
-						Node target = NetworkUtils.getNearestLink(network, new CoordImpl(p2.getX(), p2.getY())).getFromNode();
+						Node source = NetworkUtils.getNearestLink(network, new Coord(p1.getX(), p1.getY())).getFromNode();
+						Node target = NetworkUtils.getNearestLink(network, new Coord(p2.getX(), p2.getY())).getFromNode();
 
 						Path path = router.calcLeastCostPath(source, target, 0, null, null);
 

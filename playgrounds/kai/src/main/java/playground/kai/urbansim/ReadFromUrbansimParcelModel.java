@@ -28,7 +28,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -72,7 +71,7 @@ public class ReadFromUrbansimParcelModel {
 				long parcelIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("parcel_id")] ) ;
 				Id<ActivityFacility> parcelId = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
-				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
+				Coord coord = new Coord(Double.parseDouble(parts[idxFromKey.get("x_coord_sp")]), Double.parseDouble(parts[idxFromKey.get("y_coord_sp")]));
 
 				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcelId,coord) ;
 				facility.setDesc("urbansim location") ;
@@ -127,7 +126,7 @@ public class ReadFromUrbansimParcelModel {
 		for ( Entry<Id<Zone>,PseudoZone> entry : pseudoZones.entrySet() ) {
 			Id<Zone> zoneId = entry.getKey();
 			PseudoZone pz = entry.getValue() ;
-			Coord coord = new CoordImpl( pz.sumx/pz.cnt , pz.sumy/pz.cnt ) ;
+			Coord coord = new Coord(pz.sumx / pz.cnt, pz.sumy / pz.cnt);
 			zones.createAndAddFacility(Id.create(zoneId, ActivityFacility.class), coord) ;
 		}
 

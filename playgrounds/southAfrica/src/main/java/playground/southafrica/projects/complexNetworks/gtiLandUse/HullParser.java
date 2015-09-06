@@ -28,16 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -86,7 +81,7 @@ public class HullParser {
 				if(o instanceof Geometry){
 					Geometry g = (Geometry)o;
 					for(Coordinate c : g.getCoordinates()){
-						Coord saAlbers = new CoordImpl(c.x, c.y);
+						Coord saAlbers = new Coord(c.x, c.y);
 						Coord wgs84 = ct.transform(saAlbers);
 						
 						bw.write(String.format("%s,%.6f,%.6f\n", id.toString(), wgs84.getX(), wgs84.getY()));

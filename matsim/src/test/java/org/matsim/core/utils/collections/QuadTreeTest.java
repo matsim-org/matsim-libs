@@ -44,7 +44,6 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.core.utils.collections.QuadTree.Rect;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Test for {@link QuadTree}.
@@ -315,23 +314,23 @@ public class QuadTreeTest {
 		final Collection<Coord> all = new ArrayList<Coord>();
 		QuadTree<Coord> qt = new QuadTree<Coord>(0, 0, 40, 60);
 
-		all.add( new CoordImpl( 10.0, 10.0 ) );
-		all.add( new CoordImpl( 20.0, 20.0 ) );
-		all.add( new CoordImpl( 20.0, 30.0 ) );
-		all.add( new CoordImpl( 30.0, 30.0 ) );
-		all.add( new CoordImpl( 12.0, 15.0 ) );
-		all.add( new CoordImpl( 10.0, 25.0 ) );
+		all.add(new Coord(10.0, 10.0));
+		all.add(new Coord(20.0, 20.0));
+		all.add(new Coord(20.0, 30.0));
+		all.add(new Coord(30.0, 30.0));
+		all.add(new Coord(12.0, 15.0));
+		all.add(new Coord(10.0, 25.0));
 
 		// the 4 corners
-		all.add( new CoordImpl( 0.0, 0.0  ) );
-		all.add( new CoordImpl( 40.0, 0.0  ) );
-		all.add( new CoordImpl( 0.0, 60.0  ) );
-		all.add( new CoordImpl( 40.0, 60.0  ) );
+		all.add(new Coord(0.0, 0.0));
+		all.add(new Coord(40.0, 0.0));
+		all.add(new Coord(0.0, 60.0));
+		all.add(new Coord(40.0, 60.0));
 		// the 4 sides
-		all.add( new CoordImpl( 10.0, 60.0  ) );
-		all.add( new CoordImpl( 40.0, 10.0  ) );
-		all.add( new CoordImpl( 10.0, 0.0  ) );
-		all.add( new CoordImpl( 0.0, 10.0  ) );
+		all.add(new Coord(10.0, 60.0));
+		all.add(new Coord(40.0, 10.0));
+		all.add(new Coord(10.0, 0.0));
+		all.add(new Coord(0.0, 10.0));
 		for ( Coord coord : all ) qt.put( coord.getX() , coord.getY() , coord );
 
 		// put foci in different places, inside and on the limits
@@ -340,11 +339,11 @@ public class QuadTreeTest {
 		final double[] distances = new double[]{ 1 , 10 , 70 };
 		for ( double x1 : xPositions ) {
 			for ( double y1 : yPositions ) {
-			final Coord f1 = new CoordImpl( x1 , y1 );
+				final Coord f1 = new Coord(x1, y1);
 
 				for ( double x2 : xPositions ) {
 					for ( double y2 : yPositions ) {
-						final Coord f2 = new CoordImpl( x2 , y2 );
+						final Coord f2 = new Coord(x2, y2);
 						final double interfoci = CoordUtils.calcDistance( f1 , f2 );
 
 						for ( double distance : distances ) {
@@ -680,11 +679,11 @@ public class QuadTreeTest {
 	 */
 	static class TestExecutor implements QuadTree.Executor<String> {
 
-		public final Collection<Tuple<CoordImpl, String>> objects = new ArrayList<Tuple<CoordImpl, String>>();
+		public final Collection<Tuple<Coord, String>> objects = new ArrayList<Tuple<Coord, String>>();
 
 		@Override
 		public void execute(final double x, final double y, final String object) {
-			this.objects.add(new Tuple<CoordImpl, String>(new CoordImpl(x, y), object));
+			this.objects.add(new Tuple<Coord, String>(new Coord(x, y), object));
 		}
 
 	}

@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +42,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.fakes.FakeAgent;
@@ -74,12 +74,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(   0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2000, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(3000, 0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(4000, 0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(5000, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000.0, 10.0, 3600.0, 1);
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000.0, 10.0, 3600.0, 1);
@@ -172,10 +172,10 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(2500, 0), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(3500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord((double) 3500, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
@@ -219,9 +219,9 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
@@ -292,8 +292,8 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
 		stop1.setLinkId(Id.create("dummy", Link.class));
 		stop2.setLinkId(Id.create("dummy", Link.class));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
@@ -356,8 +356,8 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(1000, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
@@ -396,8 +396,8 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(1000, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
@@ -435,9 +435,9 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
 		double departureOffset3 = Time.UNDEFINED_TIME;
@@ -492,9 +492,9 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(2500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
 		stop1.setLinkId(Id.create("dummy", Link.class));
 		stop2.setLinkId(Id.create("dummy", Link.class));
 		stop3.setLinkId(Id.create("dummy", Link.class));

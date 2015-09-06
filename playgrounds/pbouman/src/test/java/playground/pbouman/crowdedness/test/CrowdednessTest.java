@@ -229,15 +229,15 @@ public class CrowdednessTest
 		NetworkFactory nw = net.getFactory();
 		
 		Node a, b, c, u, v, w;
-		
+
 		Node [] nodes = new Node [] {
-				a = nw.createNode(Id.create("a", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 - ySpan)),
-				b = nw.createNode(Id.create("b", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 + ySpan)),
-				c = nw.createNode(Id.create("c", Node.class), scen.createCoord(boxSize/2, boxSize / 2)),
+				a = nw.createNode(Id.create("a", Node.class), new Coord(boxSize / 2, boxSize / 2 - ySpan)),
+				b = nw.createNode(Id.create("b", Node.class), new Coord(boxSize / 2, boxSize / 2 + ySpan)),
+				c = nw.createNode(Id.create("c", Node.class), new Coord(boxSize / 2, boxSize / 2)),
 		
-				u = nw.createNode(Id.create("u", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
-				v = nw.createNode(Id.create("v", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
-				w = nw.createNode(Id.create("w", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2)),
+				u = nw.createNode(Id.create("u", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
+				v = nw.createNode(Id.create("v", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
+				w = nw.createNode(Id.create("w", Node.class), new Coord(longDist + boxSize / 2, boxSize / 2)),
 		};
 		
 		for (Node n : nodes)

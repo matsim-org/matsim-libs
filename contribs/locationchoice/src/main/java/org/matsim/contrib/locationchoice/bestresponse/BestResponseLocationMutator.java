@@ -40,7 +40,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -161,7 +160,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
-					Coord center = new CoordImpl(x,y);
+					Coord center = new Coord(x, y);
 
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					

@@ -11,7 +11,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.tools.network.obj.RectangularArea;
@@ -96,7 +95,7 @@ public class ParkingManager implements StartupListener {
 	}
 
 	public void addParkings(Collection<PParking> parkingCollection) {
-		RectangularArea rectangularArea=new RectangularArea(new CoordImpl(parkings.getMinEasting(),parkings.getMinNorthing()), new CoordImpl(parkings.getMaxEasting(),parkings.getMaxNorthing()));
+		RectangularArea rectangularArea=new RectangularArea(new Coord(parkings.getMinEasting(), parkings.getMinNorthing()), new Coord(parkings.getMaxEasting(), parkings.getMaxNorthing()));
 		
 		for (PParking parking : parkingCollection) {
 			

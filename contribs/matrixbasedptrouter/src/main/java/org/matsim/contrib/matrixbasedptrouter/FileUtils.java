@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Matrix;
 
@@ -62,7 +61,7 @@ final class FileUtils {
 				Long id = Long.parseLong( parts[idIDX] );
 				Id<PtStop> stopId = Id.create(id, PtStop.class);
 				// create pt stop coordinate
-				Coord ptStopCoord = new CoordImpl(parts[xCoordIDX], parts[yCoordIDX]);
+				Coord ptStopCoord = new Coord(Double.parseDouble(parts[xCoordIDX]), Double.parseDouble(parts[yCoordIDX]));
 
 				boolean isInBoundary = qTree.getMaxEasting() >= ptStopCoord.getX() && 
 						qTree.getMinEasting() <= ptStopCoord.getX() && 

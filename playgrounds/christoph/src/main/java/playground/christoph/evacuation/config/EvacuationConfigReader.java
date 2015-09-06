@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -96,7 +96,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if (CENTERCOORD.equalsIgnoreCase(name)) {
 			double x = Double.parseDouble(atts.getValue(X));
 			double y = Double.parseDouble(atts.getValue(Y));
-			EvacuationConfig.centerCoord = new CoordImpl(x, y);
+			EvacuationConfig.centerCoord = new Coord(x, y);
 			EvacuationConfig.innerRadius = Double.parseDouble(atts.getValue(INNERRADIUS));
 			EvacuationConfig.outerRadius = Double.parseDouble(atts.getValue(OUTERRADIUS));
 		} else if (HEIGHTINFORMATION.equalsIgnoreCase(name)) {

@@ -20,12 +20,12 @@
 package playground.mrieser.svi.converters;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -58,7 +58,7 @@ public class DynusTNetworkReader {
 			while ((line = reader.readLine()) != null) {
 				String[] parts = line.trim().split("\\s+");
 				if (parts.length == 3) {
-					Node n = nf.createNode(Id.create(parts[0], Node.class), new CoordImpl(parts[1], parts[2]));
+					Node n = nf.createNode(Id.create(parts[0], Node.class), new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
 					this.network.addNode(n);
 				} else {
 					log.warn("Cannot parse line " + line);

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -51,7 +52,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -153,11 +153,13 @@ public class MyRuns {
 		NodeImpl node = null;
 
 		node = new NodeImpl(Id.create(1, Node.class));
-		node.setCoord(new CoordImpl(-824635.0, -799519.0));
+		final double x = -824635.0;
+		final double y = -799519.0;
+		node.setCoord(new Coord(x, y));
 		network.addNode(node);
 
 		node = new NodeImpl(Id.create(2, Node.class));
-		node.setCoord(new CoordImpl(2732681.5, 2625289.25));
+		node.setCoord(new Coord(2732681.5, 2625289.25));
 		network.addNode(node);
 
 		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);

@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -185,7 +184,7 @@ public class RunTRBModel {
 				if ( name.equals( "act" ) && agentWithoutCoord != null ) {
 					final double x = Double.parseDouble( atts.getValue( "x" ) );
 					final double y = Double.parseDouble( atts.getValue( "y" ) );
-					agentWithoutCoord.setCoord( coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
+					agentWithoutCoord.setCoord( coordPool.getPooledInstance(new Coord(x, y)) );
 					agentWithoutCoord = null;
 				}
 

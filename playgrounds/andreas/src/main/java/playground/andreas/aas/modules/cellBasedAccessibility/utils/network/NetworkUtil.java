@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.helperObjects.Distances;
 
@@ -341,26 +340,28 @@ public class NetworkUtil {
 		 */
 		
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 1000));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000, 2000));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(2000, 2000));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 1000, (double) 0));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
 		LinkImpl link2 = (LinkImpl) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
 		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
 		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 
-		Distances distance1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, 0), node1);
+		Distances distance1 = NetworkUtil.getDistance2NodeV2(link1, new Coord((double) 100, (double) 0), node1);
 		log.info(distance1.getDisatancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
-		
-		Distances distance2 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, -10), node1);
+
+		final double y = -10;
+		Distances distance2 = NetworkUtil.getDistance2NodeV2(link1, new Coord((double) 100, y), node1);
 		log.info(distance2.getDisatancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
-		
-		Distances distance3 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(100, 1000), node2);
+
+		Distances distance3 = NetworkUtil.getDistance2NodeV2(link2, new Coord((double) 100, (double) 1000), node2);
 		log.info(distance3.getDisatancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
-		
-		Distances distance4 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(-100, 1000), node2);
+
+		final double x = -100;
+		Distances distance4 = NetworkUtil.getDistance2NodeV2(link2, new Coord(x, (double) 1000), node2);
 		log.info(distance4.getDisatancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
 	}
 }

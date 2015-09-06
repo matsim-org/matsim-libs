@@ -28,8 +28,6 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 
-import playground.michalm.taxi.TaxiRequestCreator;
-
 
 /**
  * @author jbischoff

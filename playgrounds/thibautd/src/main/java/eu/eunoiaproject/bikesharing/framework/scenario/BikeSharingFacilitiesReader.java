@@ -21,10 +21,10 @@ package eu.eunoiaproject.bikesharing.framework.scenario;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -69,9 +69,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 			facilities.addFacility(
 					facilities.getFactory().createBikeSharingFacility(
 						Id.create( idString, BikeSharingFacility.class ),
-						new CoordImpl(
-							Double.parseDouble( x ),
-							Double.parseDouble( y ) ),
+							new Coord(Double.parseDouble(x), Double.parseDouble(y)),
 						Id.create( linkId, Link.class ),
 						Integer.parseInt( capacity ),
 						Integer.parseInt( initialNumberOfBikes ) ) );

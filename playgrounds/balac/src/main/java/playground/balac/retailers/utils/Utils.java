@@ -33,7 +33,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -60,7 +59,7 @@ public abstract class Utils
     vector[0] = (link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY());
     vector[1] = (-(link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX()));
 
-    Coord coord = new CoordImpl(link.getCoord().getX() + vector[0] * EPSILON, link.getCoord().getY() + vector[1] * 0.0001D);
+    Coord coord = new Coord(link.getCoord().getX() + vector[0] * EPSILON, link.getCoord().getY() + vector[1] * 0.0001D);
     f.setCoord(coord);
     f.setLinkId(link.getId());
   }
@@ -237,7 +236,7 @@ public abstract class Utils
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
-	    Coord center = new CoordImpl(centerX, centerY);
+    Coord center = new Coord(centerX, centerY);
       for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
 	      if (f.getCoord().getX() < minx) minx = f.getCoord().getX();
 	      if (f.getCoord().getY() < miny) miny = f.getCoord().getY();
@@ -280,7 +279,7 @@ public static final QuadTree<ActivityFacility> createOutsideShopsQuadTreeWIthout
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
     double maxy = (-1.0D / 0.0D);
-    Coord center = new CoordImpl(centerX, centerY);
+  Coord center = new Coord(centerX, centerY);
     for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
       if (f.getCoord().getX() < minx) minx = f.getCoord().getX();
       if (f.getCoord().getY() < miny) miny = f.getCoord().getY();

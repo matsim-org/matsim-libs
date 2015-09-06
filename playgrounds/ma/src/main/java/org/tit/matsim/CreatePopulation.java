@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -102,8 +101,7 @@ public class CreatePopulation {
 				 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
 				 * Try to understand what is happening here [[ 2 ]]
 				 */
-				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
-						Double.parseDouble(parts[index_yHomeCoord]));
+				Coord homeCoord = new Coord(Double.parseDouble(parts[index_xHomeCoord]), Double.parseDouble(parts[index_yHomeCoord]));
 				ActivityFacility homeFacility = this.homeFacilitiesTree.get(homeCoord.getX(), homeCoord.getY());
 				personHomeAndWorkLocations.putAttribute(person.getId().toString(), "home", homeFacility);
 				
@@ -136,7 +134,7 @@ public class CreatePopulation {
 				/*
 				 * COORD: pay attention to coordinate systems!
 				 */
-				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+				Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 				this.municipalityCentroids.put(id, coord);
 			}
 			

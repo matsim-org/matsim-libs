@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -121,13 +120,13 @@ public class QueryLinkId extends AbstractQuery {
 						if (minDist - dist > epsilon) result.linkIds.clear();
 
 						minDist = dist;
-						Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-						result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+						Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
+						result.linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 					}
 
 				} else {
-					Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-					result.linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+					Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
+					result.linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -21,7 +22,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -302,7 +302,7 @@ public class BlnPlansGenerator {
 				String[] tripEntry = iterator.next();
 
 				// Read Activity from survey
-				ActivityImpl newAct = new ActivityImpl(this.getActType(tripEntry), new CoordImpl(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
+				ActivityImpl newAct = new ActivityImpl(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
 
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 

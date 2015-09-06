@@ -22,6 +22,7 @@ package playground.dgrether.teleportationVis;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -85,11 +86,11 @@ public class DgTeleportationVisEquil {
 			PopulationFactory fac = pop.getFactory();
 			Person pers = fac.createPerson(Id.create(i, Person.class));
 			pop.addPerson(pers);
-			Activity act1 = fac.createActivityFromCoord("h", sc.createCoord(0, 0));
+			Activity act1 = fac.createActivityFromCoord("h", new Coord((double) 0, (double) 0));
 			Link link1 = sc.getNetwork().getLinks().get(Id.create(id1, Link.class));
 			((ActivityImpl)act1).setLinkId(link1.getId());
 			act1.setEndTime(3600.0);
-			Activity act2 = fac.createActivityFromCoord("h", sc.createCoord(5000, 0));
+			Activity act2 = fac.createActivityFromCoord("h", new Coord((double) 5000, (double) 0));
 			Link link6 = sc.getNetwork().getLinks().get(Id.create(id2, Link.class));
 			((ActivityImpl)act2).setLinkId(link6.getId());
 			Leg leg = fac.createLeg(TransportMode.walk);

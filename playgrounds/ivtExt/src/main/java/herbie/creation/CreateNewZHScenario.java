@@ -20,6 +20,7 @@
 package herbie.creation;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
@@ -34,7 +35,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.population.algorithms.XY2Links;
@@ -227,7 +227,7 @@ public class CreateNewZHScenario {
 	private List<Id> dilutedZH(Population population) {
 		log.info("\tCutting scenario ...................................");
 		double aoiRadius = 30000.0;
-		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
+		final Coord aoiCenter = new Coord(683518.0, 246836.0);
 		
 		List<Id> persons2remove = new Vector<Id>();
 		

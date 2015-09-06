@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.vbmh.util.RemoveDuplicate;
 import playground.vbmh.vmEV.EVControlerListener;
@@ -112,8 +112,8 @@ public class Testcontroller {
 		System.out.println("Parking lot test abgeschlossen");
 		
 		System.out.println("Teste get public");
-		LinkedList<ParkingSpot> listeZweinev = parklistener.getParkHandler().getParkControl().getPublicParkings(new CoordImpl(683614, 4823965), false);
-		LinkedList<ParkingSpot> listeZwei = parklistener.getParkHandler().getParkControl().getPublicParkings(new CoordImpl(683614, 4823965), true);
+		LinkedList<ParkingSpot> listeZweinev = parklistener.getParkHandler().getParkControl().getPublicParkings(new Coord((double) 683614, (double) 4823965), false);
+		LinkedList<ParkingSpot> listeZwei = parklistener.getParkHandler().getParkControl().getPublicParkings(new Coord((double) 683614, (double) 4823965), true);
 		listeZwei.addAll(listeZweinev);
 		RemoveDuplicate.RemoveDuplicate(listeZwei);
 		for(ParkingSpot spot : listeZwei){

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -40,7 +40,7 @@ public class ReadCountStations implements TabularFileHandler{
 			CountStationDataBox cS = new CountStationDataBox();
 			cS.setShortName(row[0]);
 			cS.setUnitName(row[1]);
-			cS.setCoord(new CoordImpl(row[2].replace(',', '.'), row[3].replace(',', '.')));
+			cS.setCoord(new Coord(Double.parseDouble(row[2].replace(',', '.')), Double.parseDouble(row[3].replace(',', '.'))));
 			cS.setPosition(row[4]);
 			cS.setPositionDetail(row[5]);
 			cS.setDirection(row[6]);

@@ -68,7 +68,7 @@ public class RunPOnePersonPopulationGenerator {
 		 * we keep the home coordinates for later use (see below).
 		 * Note that we use the CoordinateTransformation created above.
 		 */
-		Coord homeCoordinates = sc.createCoord(14.31377, 51.76948);
+		Coord homeCoordinates = new Coord(14.31377, 51.76948);
 		Activity activity1 = populationFactory.createActivityFromCoord("home", ct.transform(homeCoordinates));
 		activity1.setEndTime(21600); // leave at 6 o'clock
 		plan.addActivity(activity1); // add the Activity to the Plan
@@ -81,7 +81,7 @@ public class RunPOnePersonPopulationGenerator {
 		/*
 		 * Create a "work" Activity, at a different location.
 		 */
-		Activity activity2 = populationFactory.createActivityFromCoord("work", ct.transform(sc.createCoord(14.34024, 51.75649)));
+		Activity activity2 = populationFactory.createActivityFromCoord("work", ct.transform(new Coord(14.34024, 51.75649)));
 		activity2.setEndTime(57600); // leave at 4 p.m.
 		plan.addActivity(activity2);
 		

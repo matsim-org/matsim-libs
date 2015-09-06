@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,7 +57,6 @@ import org.matsim.core.population.*;
 import org.matsim.core.population.routes.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -1163,9 +1163,9 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(3100, 0));
-		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(3200, 0));
-		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(3300, 0));
+		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 3100, (double) 0));
+		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new Coord((double) 3200, (double) 0));
+		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new Coord((double) 3300, (double) 0));
 		f.network.createAndAddLink(Id.create("4", Link.class), f.node4, node5, 1000, 10, 6000, 2);
 		Link link5 = f.network.createAndAddLink(Id.create("5", Link.class), node5, node6, 100, 10, 60000, 9);
 		Link link6 = f.network.createAndAddLink(Id.create("6", Link.class), node6, node7, 100, 10, 60000, 9);
@@ -1206,8 +1206,8 @@ public class QSimTest {
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Link link = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
@@ -1268,9 +1268,9 @@ public class QSimTest {
 
 		// build simple network with 2 links
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0.0, 0.0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000.0, 0.0));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(2000.0, 0.0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(2000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -1420,10 +1420,10 @@ public class QSimTest {
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1100, 0));
-			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(1200, 0));
+			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1100, (double) 0));
+			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 1200, (double) 0));
 			this.link1 = this.network.createAndAddLink(Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9);
 			this.link2 = this.network.createAndAddLink(Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2);
 			this.link3 = this.network.createAndAddLink(Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9);

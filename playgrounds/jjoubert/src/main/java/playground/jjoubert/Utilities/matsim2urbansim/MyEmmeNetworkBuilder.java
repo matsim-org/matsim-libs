@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -184,7 +183,7 @@ public class MyEmmeNetworkBuilder {
 					Integer nodeId = Integer.parseInt(values[nodeIdField]);
 					Double nodeX = Double.parseDouble(values[nodeXField]);
 					Double nodeY = Double.parseDouble(values[nodeYField]);
-					Coord cOld = new CoordImpl(nodeX, nodeY); 
+					Coord cOld = new Coord(nodeX, nodeY);
 					Coord cNew;
 					if(ct != null){
 						cNew = ct.transform(cOld);

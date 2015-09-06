@@ -21,6 +21,7 @@ package playground.anhorni.surprice.preprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -32,7 +33,6 @@ import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -500,12 +500,12 @@ public class CreateScenario {
 					NetworkUtils.getNearestLink(network, facility.getCoord()).getId()
 					);
 		}
-		
-		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+
+		Coord bellevue = new Coord(683518.0, 246836.0);
 		Zone tollZone =  new Zone("tollZone", bellevue, 2000.0); 
 		
-		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
-			if (bellevue.calcDistance(facility.getCoord()) < radius) {
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+			if (CoordUtils.calcDistance(bellevue, facility.getCoord()) < radius) {
 				tollZone.addFacility(facility);
 			}
 		}

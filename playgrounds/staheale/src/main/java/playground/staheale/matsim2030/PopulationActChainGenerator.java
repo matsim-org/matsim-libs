@@ -67,7 +67,7 @@ public class PopulationActChainGenerator {
 		Scenario scWrite = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population popWrite = scWrite.getPopulation();
 
-		Coord sampleCoords = sc.createCoord(500000,150000);
+		Coord sampleCoords = new Coord((double) 500000, (double) 150000);
 		
 		SortedMap<String,Integer> workingList = new TreeMap<String,Integer>();
 
@@ -122,7 +122,7 @@ public class PopulationActChainGenerator {
 			double homeCoordX = Double.parseDouble(homeX)-2000000; //change from CH1903+ to CH1903
 			String homeY = entries[3].trim();
 			double homeCoordY = Double.parseDouble(homeY)-1000000; //change from CH1903+ to CH1903
-			Coord coordsHome = sc.createCoord(homeCoordX, homeCoordY);
+			Coord coordsHome = new Coord(homeCoordX, homeCoordY);
 			//String age = entries[4].trim();
 			String mzId = entries[5].trim();
 			Id<Person> MZid = Id.create(mzId, Person.class);
@@ -134,7 +134,7 @@ public class PopulationActChainGenerator {
 				workCoordX = Double.parseDouble(workX)-2000000; //change from CH1903+ to CH1903
 				workY = entries[9].trim();
 				workCoordY = Double.parseDouble(workY)-1000000; //change from CH1903+ to CH1903
-				coordsWork = sc.createCoord(workCoordX, workCoordY);
+				coordsWork = new Coord(workCoordX, workCoordY);
 				
 			}
 			String gender = entries[10].trim();

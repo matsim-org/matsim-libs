@@ -32,6 +32,7 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -168,7 +168,7 @@ public class NetworkEmme2MATSim {
 				String carAssignStr = parts[3];
 				
 				if (useWGS84) {
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new CoordImpl(xxStrWGS84, yyStrWGS84));
+					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(Double.parseDouble(xxStrWGS84), Double.parseDouble(yyStrWGS84)));
 				}
 				else {
 					double xx = Double.valueOf(xxStr);
@@ -181,8 +181,8 @@ public class NetworkEmme2MATSim {
 					 */
 					xx = (xx + 50) * 1000;
 					yy = (yy + 500) * 1000;
-					
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new CoordImpl(xx, yy));
+
+					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(xx, yy));
 				}
 			}
 			
