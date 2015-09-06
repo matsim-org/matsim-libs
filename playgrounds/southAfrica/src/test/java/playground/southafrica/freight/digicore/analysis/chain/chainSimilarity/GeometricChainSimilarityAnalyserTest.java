@@ -28,8 +28,8 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -116,11 +116,11 @@ public class GeometricChainSimilarityAnalyserTest {
 		
 		/* Set up activities. */
 		DigicoreActivity a1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
-		a1.setCoord(new CoordImpl(0.5, 0.5));
+		a1.setCoord(new Coord(0.5, 0.5));
 		DigicoreActivity a2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
-		a2.setCoord(new CoordImpl(0.5, 2.5));
+		a2.setCoord(new Coord(0.5, 2.5));
 		DigicoreActivity a3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
-		a3.setCoord(new CoordImpl(2.5, 2.5));
+		a3.setCoord(new Coord(2.5, 2.5));
 		
 		/* Set up chains. */
 		DigicoreChain c1 = new DigicoreChain();

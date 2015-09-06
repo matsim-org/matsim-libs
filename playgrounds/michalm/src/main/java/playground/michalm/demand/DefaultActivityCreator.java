@@ -71,7 +71,7 @@ public class DefaultActivityCreator
         }
         while (!pointAcceptor.acceptPoint(zone, actType, p));
 
-        Coord coord = scenario.createCoord(p.getX(), p.getY());
+        Coord coord = new Coord(p.getX(), p.getY());
         Link link = NetworkUtils.getNearestLink(network, coord);
 
         ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);

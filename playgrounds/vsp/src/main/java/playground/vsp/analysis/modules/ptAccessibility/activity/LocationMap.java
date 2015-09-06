@@ -27,9 +27,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 /**
@@ -85,14 +85,14 @@ public class LocationMap {
 		cluster.put("b", types);
 		
 		LocationMap map = new LocationMap(cluster);
-		map.addActivity(new ActivityImpl("1", new CoordImpl(1,2)));
-		map.addActivity(new ActivityImpl("1", new CoordImpl(2,2)));
-		map.addActivity(new ActivityImpl("2", new CoordImpl(1,3)));
-		map.addActivity(new ActivityImpl("1", new CoordImpl(1,2)));
-		
-		map.addActivity(new ActivityImpl("3", new CoordImpl(1,2)));
-		
-		map.addActivity(new ActivityImpl("4", new CoordImpl(1,2)));
+		map.addActivity(new ActivityImpl("1", new Coord((double) 1, (double) 2)));
+		map.addActivity(new ActivityImpl("1", new Coord((double) 2, (double) 2)));
+		map.addActivity(new ActivityImpl("2", new Coord((double) 1, (double) 3)));
+		map.addActivity(new ActivityImpl("1", new Coord((double) 1, (double) 2)));
+
+		map.addActivity(new ActivityImpl("3", new Coord((double) 1, (double) 2)));
+
+		map.addActivity(new ActivityImpl("4", new Coord((double) 1, (double) 2)));
 		
 		for(Entry<String, List<ActivityLocation>> e: map.getType2Locations().entrySet()){
 			System.out.println(e.getValue().size() + " ActivityLocations of Type " + e.getKey() + " at:");

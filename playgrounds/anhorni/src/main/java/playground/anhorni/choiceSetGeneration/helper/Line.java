@@ -22,7 +22,6 @@ package playground.anhorni.choiceSetGeneration.helper;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -85,11 +84,8 @@ public class Line {
 		this.numberOfPersonsHH = numberOfPersons;
 		this.civilStatus = Integer.parseInt(entries[78].trim());
 		this.education = Integer.parseInt(entries[79].trim());
-		
-		this.homeCoordinates = new CoordImpl(
-				Double.parseDouble(entries[21].trim()), 
-				Double.parseDouble(entries[22].trim())
-				);
+
+		this.homeCoordinates = new Coord(Double.parseDouble(entries[21].trim()), Double.parseDouble(entries[22].trim()));
 		
 		this.personAttributes = new PersonAttributes(this.personWeight, this.age, this.gender, this.incomeHH, this.numberOfPersonsHH,
 				this.civilStatus, this.education);

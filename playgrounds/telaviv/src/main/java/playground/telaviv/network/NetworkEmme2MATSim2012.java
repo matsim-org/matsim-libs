@@ -34,6 +34,7 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -48,7 +49,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -345,8 +345,8 @@ public class NetworkEmme2MATSim2012 {
 				 */
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
-				
-				Node node = networkFactory.createNode(Id.create(idStr, Node.class), transformation.transform(new CoordImpl(xx, yy)));
+
+				Node node = networkFactory.createNode(Id.create(idStr, Node.class), transformation.transform(new Coord(xx, yy)));
 				network.addNode(node);
 			} else {
 				double xx = Double.valueOf(xxStr);
@@ -359,8 +359,8 @@ public class NetworkEmme2MATSim2012 {
 				 */
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
-				
-				Node node = networkFactory.createNode(Id.create(idStr, Node.class), new CoordImpl(xx, yy));
+
+				Node node = networkFactory.createNode(Id.create(idStr, Node.class), new Coord(xx, yy));
 				network.addNode(node);
 			}
 		}

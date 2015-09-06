@@ -38,9 +38,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -394,8 +392,8 @@ public class NmbmSurveyParser {
 		double radius = Math.random()*randomRadius;
 		double newX = coord.getX() + radius*Math.cos(angle);
 		double newY = coord.getY() + radius*Math.sin(angle);
-		
-		return new CoordImpl(newX, newY);
+
+		return new Coord(newX, newY);
 	}
 	
 	
@@ -414,8 +412,8 @@ public class NmbmSurveyParser {
 		double radius = Math.random()*randomRadius;
 		double newX = coord.getX() + radius*Math.cos(angle);
 		double newY = coord.getY() + radius*Math.sin(angle);
-		
-		return new CoordImpl(newX, newY);
+
+		return new Coord(newX, newY);
 	}
 
 
@@ -578,7 +576,7 @@ public class NmbmSurveyParser {
 		}
 		double x = mz.getInteriorPoint().getX();
 		double y = mz.getInteriorPoint().getY();
-		return new CoordImpl(x, y);
+		return new Coord(x, y);
 	}
 
 	

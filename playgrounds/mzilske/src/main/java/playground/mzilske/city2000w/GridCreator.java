@@ -71,7 +71,7 @@ public class GridCreator {
 	}
 
 	private Coord makeCoord(int i, int j) {
-		return scenario.createCoord(i * 1000, j * 1000);
+		return new Coord((double) (i * 1000), (double) (j * 1000));
 	}
 
 	private <T> Id<T> makeId(int i, int j, Class<T> type) {

@@ -14,7 +14,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -36,7 +35,7 @@ public class PersonsShoppingFacility {
 		int grocery = 0;
 		double centerX = 683217.0; 
 	    double centerY = 247300.0;
-	    CoordImpl coord = new CoordImpl(centerX, centerY);
+		Coord coord = new Coord(centerX, centerY);
 		int previousIn = 0;
 		int previousOut = 0;
 	    for(Person p:scenario.getPopulation().getPersons().values()) {

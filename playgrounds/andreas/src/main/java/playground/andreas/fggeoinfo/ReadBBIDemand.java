@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -44,7 +43,7 @@ public class ReadBBIDemand implements TabularFileHandler{
 			this.street = street;
 			this.description = description;
 			this.numberOfAgents = numberOfAgents;
-			this.location = new CoordImpl(xCoord, yCoord);
+			this.location = new Coord(xCoord, yCoord);
 			this.shareTXL = shareTXL;
 		}
 		

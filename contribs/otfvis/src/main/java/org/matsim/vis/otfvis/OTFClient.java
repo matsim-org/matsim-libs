@@ -24,7 +24,6 @@ import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
@@ -195,7 +194,7 @@ public final class OTFClient extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				double x = mainDrawer.getViewBoundsAsQuadTreeRect().centerX + mainDrawer.getQuad().offsetEast;
 				double y = mainDrawer.getViewBoundsAsQuadTreeRect().centerY + mainDrawer.getQuad().offsetNorth;
-				Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+				Coord center = coordinateTransformation.transform(new Coord(x, y));
 				double scale = mainDrawer.getScale();
 				int zoom = (int) log2(scale);
 				jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));

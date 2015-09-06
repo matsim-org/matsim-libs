@@ -23,7 +23,6 @@ package org.matsim.pt.transitSchedule;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
@@ -48,7 +47,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 
 	public void testInitialization() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new CoordImpl(30, 5);
+		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertEquals(id.toString(), stop.getId().toString());
 		assertEquals(coord.getX(), stop.getCoord().getX(), EPSILON);
@@ -58,7 +57,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 
 	public void testBlockingStop() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new CoordImpl(30, 5);
+		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertFalse(stop.getIsBlockingLane());
 		stop = createTransitStopFacility(id, coord, true);
@@ -67,7 +66,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 
 	public void testLink() {
 		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new CoordImpl(30, 5);
+		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getLinkId());
 		Link link = new FakeLink(Id.create(99, Link.class), null, null);
@@ -79,7 +78,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 
 	public void testName() {
 		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
-		Coord coord = new CoordImpl(10, 5);
+		Coord coord = new Coord((double) 10, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getName());
 		String name = "just some name.";

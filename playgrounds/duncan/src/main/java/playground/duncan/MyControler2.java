@@ -45,7 +45,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -80,7 +79,7 @@ public class MyControler2 {
 			final Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			Point center = polygon.getCentroid();
 //			Coord coord = new CoordImpl ( center.getY()/100000.-180.+2.15 , center.getX()/10000. ) ;
-			Coord coord = new CoordImpl ( center.getY() , center.getX() ) ;
+			Coord coord = new Coord(center.getY(), center.getX());
 			// (FIXME: should check if this really produces useful coordinates)
 
 			int nPersons = 0 ;

@@ -104,7 +104,7 @@ public class BarcelonaServedRequestsReader
         //FROM-y,FROM-x,TO-y,TO-x (all WGS84)
         double y = degMin2Deg(scanner.nextDouble());
         double x = degMin2Deg(scanner.nextDouble());
-        return ct.transform(new CoordImpl(x, y));
+        return ct.transform(new Coord(x, y));
     }
 
 

@@ -28,8 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class Households {
 
@@ -128,7 +127,7 @@ public class Households {
 
 							double x = Double.parseDouble(entries[11].trim());
 							double y = Double.parseDouble(entries[12].trim());
-							hh.coord = new CoordImpl(x,y);
+							hh.coord = new Coord(x, y);
 						}
 					} else {
 						if (hh_cat != hh.hh_cat) {

@@ -28,8 +28,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class NetworkMapper {
 	
@@ -105,7 +104,7 @@ public class NetworkMapper {
 				
 				if (xs.equals("-")) xs = "-1";
 				if (ys.equals("-")) ys = "-1";
-				CoordImpl coord = new CoordImpl(xs, ys);
+				Coord coord = new Coord(Double.parseDouble(xs), Double.parseDouble(ys));
 				
 				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidIVTCH, this.removeZeroVolumes);
 				String id = dataset + nr;

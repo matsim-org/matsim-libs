@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.gsv.visum.NetFileReader;
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
@@ -118,8 +117,8 @@ public class LeiDisParser {
 			String nodeId = record.get("CODE");
 			String xCoord = record.get("XKOORD");
 			String yCoord = record.get("YKOORD");
-			
-			coords.put(nodeId, new CoordImpl(Double.parseDouble(xCoord), Double.parseDouble(yCoord)));
+
+			coords.put(nodeId, new Coord(Double.parseDouble(xCoord), Double.parseDouble(yCoord)));
 			
 		}
 		

@@ -1,6 +1,5 @@
 package playground.sergioo.passivePlanning2012.core.scenario;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -42,10 +41,6 @@ public class ScenarioSocialNetwork implements Scenario {
 	@Override
 	public Config getConfig() {
 		return delegate.getConfig();
-	}
-	@Override
-	public Coord createCoord(double x, double y) {
-		return delegate.createCoord(x, y);
 	}
 	@Override
 	public void addScenarioElement(String name, Object o) {

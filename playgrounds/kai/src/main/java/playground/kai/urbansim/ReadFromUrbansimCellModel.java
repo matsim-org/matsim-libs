@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -83,7 +82,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 				int idx_x = idxFromKey.get("relative_x:i4") ;
 				int idx_y = idxFromKey.get("relative_y:i4") ;
-				Coord coord = new CoordImpl( parts[idx_x], parts[idx_y] ) ;
+				Coord coord = new Coord(Double.parseDouble(parts[idx_x]), Double.parseDouble(parts[idx_y]));
 
 				ActivityFacilityImpl facility = facilities.createAndAddFacility(id,coord) ;
 				facility.setDesc("urbansim location") ;

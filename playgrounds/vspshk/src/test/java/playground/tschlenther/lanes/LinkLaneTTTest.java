@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -147,11 +148,11 @@ public class LinkLaneTTTest {
 		
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
-		
-		Node node1 = factory.createNode(Id.createNodeId("1"), scenario.createCoord(0, 0));
-		Node node2 = factory.createNode(Id.createNodeId("2"), scenario.createCoord(0, 200));
-		Node node3 = factory.createNode(Id.createNodeId("3"), scenario.createCoord(0, 400));
-		Node node4 = factory.createNode(Id.createNodeId("4"), scenario.createCoord(0, 600));
+
+		Node node1 = factory.createNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+		Node node2 = factory.createNode(Id.createNodeId("2"), new Coord((double) 0, (double) 200));
+		Node node3 = factory.createNode(Id.createNodeId("3"), new Coord((double) 0, (double) 400));
+		Node node4 = factory.createNode(Id.createNodeId("4"), new Coord((double) 0, (double) 600));
 		
 		network.addNode(node1);
 		network.addNode(node2);
@@ -319,7 +320,7 @@ public class LinkLaneTTTest {
 			  [..200m..][...200m......][.200m.]	
 			 */
 			Node inbetweenNode = factory.createNode(Id.createNodeId("2.1"),
-					scenario.createCoord(0, 250));
+					new Coord((double) 0, (double) 250));
 			Link inbetweenLink = factory.createLink(Id.createLinkId("Link2.1"),
 					scenario.getNetwork().getNodes().get(Id.createNodeId("2")),
 					inbetweenNode);

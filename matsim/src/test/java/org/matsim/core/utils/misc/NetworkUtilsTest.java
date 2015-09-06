@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 
@@ -169,11 +168,11 @@ public class NetworkUtilsTest {
 	public void testGetBoundingBox() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id<Node> id = Id.create("dummy", Node.class);
-		nodes.add(new PseudoNode(id, new CoordImpl(100, 100)));
-		nodes.add(new PseudoNode(id, new CoordImpl(200, 105)));
-		nodes.add(new PseudoNode(id, new CoordImpl(120, 250)));
-		nodes.add(new PseudoNode(id, new CoordImpl(150, 300)));
-		nodes.add(new PseudoNode(id, new CoordImpl(50, 199)));
+		nodes.add(new PseudoNode(id, new Coord((double) 100, (double) 100)));
+		nodes.add(new PseudoNode(id, new Coord((double) 200, (double) 105)));
+		nodes.add(new PseudoNode(id, new Coord((double) 120, (double) 250)));
+		nodes.add(new PseudoNode(id, new Coord((double) 150, (double) 300)));
+		nodes.add(new PseudoNode(id, new Coord((double) 50, (double) 199)));
 		double[] box = NetworkUtils.getBoundingBox(nodes);
 		assertEquals(50, box[0], EPSILON); // minX
 		assertEquals(100, box[1], EPSILON); // miny
@@ -185,11 +184,21 @@ public class NetworkUtilsTest {
 	public void testGetBoundingBox_negativeNodesOnly() {
 		Collection<Node> nodes = new ArrayList<Node>();
 		Id<Node> id = Id.create("dummy", Node.class);
-		nodes.add(new PseudoNode(id, new CoordImpl(-100, -100)));
-		nodes.add(new PseudoNode(id, new CoordImpl(-200, -105)));
-		nodes.add(new PseudoNode(id, new CoordImpl(-120, -250)));
-		nodes.add(new PseudoNode(id, new CoordImpl(-150, -300)));
-		nodes.add(new PseudoNode(id, new CoordImpl(-50, -199)));
+		final double x4 = -100;
+		final double y4 = -100;
+		nodes.add(new PseudoNode(id, new Coord(x4, y4)));
+		final double x3 = -200;
+		final double y3 = -105;
+		nodes.add(new PseudoNode(id, new Coord(x3, y3)));
+		final double x2 = -120;
+		final double y2 = -250;
+		nodes.add(new PseudoNode(id, new Coord(x2, y2)));
+		final double x1 = -150;
+		final double y1 = -300;
+		nodes.add(new PseudoNode(id, new Coord(x1, y1)));
+		final double x = -50;
+		final double y = -199;
+		nodes.add(new PseudoNode(id, new Coord(x, y)));
 		double[] box = NetworkUtils.getBoundingBox(nodes);
 		assertEquals(-200, box[0], EPSILON); // minX
 		assertEquals(-300, box[1], EPSILON); // minY
@@ -312,7 +321,7 @@ public class NetworkUtilsTest {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
-			nodes[i] = network.createAndAddNode(Id.create(i, Node.class), new CoordImpl(1000 * i, 0));
+			nodes[i] = network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 		}
 		for (int i = 0; i < numOfLinks; i++) {
 			network.createAndAddLink(Id.create(i, Link.class), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
@@ -327,7 +336,7 @@ public class NetworkUtilsTest {
 
 		public MultimodalFixture() {
 			for (int i = 0; i < this.nodes.length; i++) {
-				this.nodes[i] = this.network.createAndAddNode(Id.create(i, Node.class), new CoordImpl(1000 * i, 0));
+				this.nodes[i] = this.network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 			}
 			for (int i = 0; i < this.links.length; i++) {
 				this.links[i] = this.network.createAndAddLink(Id.create(i, Link.class), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, 1);

@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -115,19 +116,19 @@ class CreateTestScenario {
 		NetworkFactory factory = net.getFactory();
 		
 		Node n;
-		n = factory.createNode(Id.create("A", Node.class), sc.createCoord(1000, 2000));
+		n = factory.createNode(Id.create("A", Node.class), new Coord((double) 1000, (double) 2000));
 		net.addNode(n);
-		
-		n = factory.createNode(Id.create("C", Node.class), sc.createCoord(11000, 2000));
+
+		n = factory.createNode(Id.create("C", Node.class), new Coord((double) 11000, (double) 2000));
 		net.addNode(n);
-		
-		n = factory.createNode(Id.create("B1", Node.class), sc.createCoord(6000, 4000));
+
+		n = factory.createNode(Id.create("B1", Node.class), new Coord((double) 6000, (double) 4000));
 		net.addNode(n);
-		
-		n = factory.createNode(Id.create("B2", Node.class), sc.createCoord(6000, 2000));
+
+		n = factory.createNode(Id.create("B2", Node.class), new Coord((double) 6000, (double) 2000));
 		net.addNode(n);
-		
-		n = factory.createNode(Id.create("B3", Node.class), sc.createCoord(6000, 1000));
+
+		n = factory.createNode(Id.create("B3", Node.class), new Coord((double) 6000, (double) 1000));
 		net.addNode(n);
 	}
 	

@@ -1,5 +1,6 @@
 package org.matsim.contrib.matsim4urbansim.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -42,11 +43,11 @@ public class CreateOrthogonalTestNetwork {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), scenario.createCoord(500, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), scenario.createCoord(0, 0));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), scenario.createCoord(0, 375));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), scenario.createCoord(500, 375));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), scenario.createCoord(1000, 375));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 500, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 0, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 375));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 500, (double) 375));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 1000, (double) 375));
 
 		// add links (bi-directional)
 		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500, freespeed, capacity, numLanes);

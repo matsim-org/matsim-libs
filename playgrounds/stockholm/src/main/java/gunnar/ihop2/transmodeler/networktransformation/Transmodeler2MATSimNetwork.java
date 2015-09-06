@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -121,9 +120,7 @@ public class Transmodeler2MATSimNetwork {
 			// final Coord coord = new CoordImpl(
 			// 1e-6 * transmodelerNode.getLongitude(),
 			// 1e-6 * transmodelerNode.getLatitude());
-			final Coord coord = coordinateTransform.transform(new CoordImpl(
-					1e-6 * transmodelerNode.getLongitude(),
-					1e-6 * transmodelerNode.getLatitude()));
+			final Coord coord = coordinateTransform.transform(new Coord(1e-6 * transmodelerNode.getLongitude(), 1e-6 * transmodelerNode.getLatitude()));
 
 			final Node matsimNode = matsimNetworkFactory.createNode(
 					Id.create(transmodelerNode.getId(), Node.class), coord);

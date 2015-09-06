@@ -21,6 +21,7 @@
 package org.matsim.integration.timevariantnetworks;
 
 import junit.framework.Assert;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -49,7 +50,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsLogger;
@@ -262,10 +262,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);

@@ -346,9 +346,8 @@ public class CreateSelectedPlansTables {
 			return this.myPopulation;
 		}
 
-		@Override
 		public Coord createCoord(double x, double y) {
-			return this.scenario.createCoord(x, y);
+			return new Coord(x, y);
 		}
 
 		@Override

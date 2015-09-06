@@ -20,6 +20,7 @@
 
 package playground.mrieser.pt.demo;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -82,9 +83,9 @@ public class BlockingStopDemo {
 //		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord((double) (i * 500), (double) 0));
 			network.addNode(nodes[i]);
-			nodes[i+nOfLinks+1] = network.getFactory().createNode(Id.create(i+nOfLinks+1, Node.class), this.scenario.createCoord(i * 500, 500));
+			nodes[i+nOfLinks+1] = network.getFactory().createNode(Id.create(i+nOfLinks+1, Node.class), new Coord((double) (i * 500), (double) 500));
 			network.addNode(nodes[i+nOfLinks+1]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
@@ -112,7 +113,7 @@ public class BlockingStopDemo {
 
 		// line 1
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), this.scenario.createCoord(1000 + i*500, 0), false);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((double) (1000 + i * 500), (double) 0), false);
 			stops[i].setLinkId(Id.create(i+1, Link.class));
 			schedule.addStopFacility(stops[i]);
 			stopList.add(builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
@@ -139,7 +140,7 @@ public class BlockingStopDemo {
 		// line 2
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, TransitStopFacility.class), this.scenario.createCoord(1000 + i*500, 500), true);
+			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, TransitStopFacility.class), new Coord((double) (1000 + i * 500), (double) 500), true);
 			stops[i+nOfStops].setLinkId(Id.create(i+1+nOfLinks, Link.class));
 			schedule.addStopFacility(stops[i+nOfStops]);
 			stopList.add(builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));

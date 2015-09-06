@@ -26,7 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -79,7 +78,7 @@ public class CoordTransform {
 			NodeY = Double.parseDouble(nodeArray[row][3]);
 			
 			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
-			Coord old = new CoordImpl(NodeX, NodeY);
+			Coord old = new Coord(NodeX, NodeY);
 			Coord trans = ct.transform(old);	
 			Long = trans.getX();
 			Lat = trans.getY();

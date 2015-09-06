@@ -155,8 +155,7 @@ public class CreateDemand {
 				 * Otherwise add a leg and an activity (destination activity)
 				 */
 				if (!personId.equals(previousPerson)) {
-					Coord coordOrigin = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordOrigin]), 
-							Double.parseDouble(parts[index_yCoordOrigin]));
+					Coord coordOrigin = new Coord(Double.parseDouble(parts[index_xCoordOrigin]), Double.parseDouble(parts[index_yCoordOrigin]));
 					
 					Activity activity = 
 						populationFactory.createActivityFromCoord("home", coordOrigin);
@@ -184,8 +183,7 @@ public class CreateDemand {
 					/*
 					 * Add activity given its type.
 					 */
-					Coord coordDestination = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordDestination]), 
-							Double.parseDouble(parts[index_yCoordDestination]));
+					Coord coordDestination = new Coord(Double.parseDouble(parts[index_xCoordDestination]), Double.parseDouble(parts[index_yCoordDestination]));
 										
 					String activityType = parts[index_activityType].trim();
 					if (activityType.startsWith("w")) worker = true;

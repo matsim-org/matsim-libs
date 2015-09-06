@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ParkingArrivalEvent extends Event {
 
@@ -86,7 +85,7 @@ public class ParkingArrivalEvent extends Event {
 		if (destCoordXString==null || destCoordYString==null){
 			return null;
 		} else {
-			return new CoordImpl(Double.parseDouble(destCoordXString),Double.parseDouble(destCoordYString));
+			return new Coord(Double.parseDouble(destCoordXString), Double.parseDouble(destCoordYString));
 		}
 	}
 	

@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
@@ -93,7 +92,7 @@ public class NetworkSink implements SinkSource {
 
 
 	private void readNode(Node osmNode) {
-		CoordImpl osmCoord = new CoordImpl(osmNode.getLongitude(), osmNode.getLatitude());
+		Coord osmCoord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
 		Coord transformedCoord = transform.transform(osmCoord);
 		org.matsim.api.core.v01.network.Node node = network.getFactory().createNode(Id.create(osmNode.getId(), org.matsim.api.core.v01.network.Node.class), transformedCoord);
 		network.addNode(node);

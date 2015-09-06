@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,7 +42,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -319,14 +319,14 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 
 		public MultiModeFixture() {
 			this.network.setCapacityPeriod(3600.0);
-			this.nodes[0] = network.createAndAddNode(Id.create(0, Node.class), new CoordImpl(0, 0));
-			this.nodes[1] = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(1000, 0));
-			this.nodes[2] = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(2000, 0));
-			this.nodes[3] = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(3000, 0));
-			this.nodes[4] = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(0, 1000));
-			this.nodes[5] = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(1000, 1000));
-			this.nodes[6] = network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(2000, 1000));
-			this.nodes[7] = network.createAndAddNode(Id.create(7, Node.class), new CoordImpl(3000, 1000));
+			this.nodes[0] = network.createAndAddNode(Id.create(0, Node.class), new Coord((double) 0, (double) 0));
+			this.nodes[1] = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
+			this.nodes[2] = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 2000, (double) 0));
+			this.nodes[3] = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 3000, (double) 0));
+			this.nodes[4] = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 0, (double) 1000));
+			this.nodes[5] = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 1000, (double) 1000));
+			this.nodes[6] = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 2000, (double) 1000));
+			this.nodes[7] = network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 3000, (double) 1000));
 			this.links[0] = network.createAndAddLink(Id.create(0, Link.class), this.nodes[0], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[1] = network.createAndAddLink(Id.create(1, Link.class), this.nodes[1], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[2] = network.createAndAddLink(Id.create(2, Link.class), this.nodes[2], this.nodes[3], 1000.0, 100.0, 3600.0, 1.0);

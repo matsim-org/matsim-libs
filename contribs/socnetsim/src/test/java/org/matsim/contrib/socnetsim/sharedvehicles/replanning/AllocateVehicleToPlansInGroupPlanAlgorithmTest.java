@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +43,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -77,7 +77,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			plan.setPerson( person );
 			indivPlans.add( plan );
 
-			plan.addActivity( popFact.createActivityFromCoord( "h" , new CoordImpl( 12, 34 ) ) );
+			plan.addActivity( popFact.createActivityFromCoord( "h" , new Coord((double) 12, (double) 34)) );
 			if ( i % 2 == 0 ) {
 				plan.addLeg( popFact.createLeg( "some_non_vehicular_mode" ) );
 			}
@@ -99,7 +99,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				plan.setPerson( person );
 				plans.put( person.getId() , plan );
 
-				plan.addActivity( popFact.createActivityFromCoord( "h" , new CoordImpl( 12, 34 ) ) );
+				plan.addActivity( popFact.createActivityFromCoord( "h" , new Coord((double) 12, (double) 34)) );
 				if ( (j+1) % 2 == 0 ) {
 					plan.addLeg( popFact.createLeg( "some_non_vehicular_mode" ) );
 				}

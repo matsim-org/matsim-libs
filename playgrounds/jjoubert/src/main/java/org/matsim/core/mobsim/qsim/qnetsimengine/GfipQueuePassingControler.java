@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import com.google.inject.Provider;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -64,7 +65,6 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.*;
@@ -216,13 +216,13 @@ public class GfipQueuePassingControler {
 
 		/* Build the octagon network. */
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n1 = nf.createNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		sc.getNetwork().addNode(n1);
-		Node n2 = nf.createNode(Id.create("2", Node.class), new CoordImpl(10000, 0));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 10000, (double) 0));
 		sc.getNetwork().addNode(n2);
-		Node n3 = nf.createNode(Id.create("3", Node.class), new CoordImpl(60000, 0));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 60000, (double) 0));
 		sc.getNetwork().addNode(n3);
-		Node n4 = nf.createNode(Id.create("4", Node.class), new CoordImpl(70000, 0));
+		Node n4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 70000, (double) 0));
 		sc.getNetwork().addNode(n4);
 
 		/* Links with fixed capacity. */

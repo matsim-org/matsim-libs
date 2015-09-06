@@ -35,7 +35,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -122,7 +121,7 @@ public class ReadFromUrbanSimModel {
 				zone_ID = Id.create( zoneIdAsLong , ActivityFacility.class) ;
 
 				// get the coordinates of that parcel
-				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
+				coord = new Coord(Double.parseDouble(parts[indexXCoodinate]), Double.parseDouble(parts[indexYCoodinate]));
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = zones.createAndAddFacility(zone_ID,coord);
@@ -188,7 +187,7 @@ public class ReadFromUrbanSimModel {
 				parcel_ID = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
 				// get the coordinates of that parcel
-				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
+				coord = new Coord(Double.parseDouble(parts[indexXCoodinate]), Double.parseDouble(parts[indexYCoodinate]));
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcel_ID,coord);
@@ -253,7 +252,7 @@ public class ReadFromUrbanSimModel {
 			zone_ID = entry.getKey();
 			pz = entry.getValue();
 			// compute the average center of a zone
-			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
+			coord = new Coord(pz.sumXCoordinate / pz.count, pz.sumYCoordinate / pz.count);
 			zones.createAndAddFacility(zone_ID, coord);
 		}
 		log.info( "Done with constructing urbansim zones. Constucted " + zones.getFacilities().size() + " zones.");

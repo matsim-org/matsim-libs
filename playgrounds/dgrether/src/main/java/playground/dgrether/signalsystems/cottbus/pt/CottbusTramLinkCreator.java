@@ -38,7 +38,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -83,8 +82,8 @@ public class CottbusTramLinkCreator {
 				String[] result = line.split(";");
 				
 			    if (result[0].equals("b")){
-			    	
-			    	Coord xy =ct.transform(new CoordImpl(Double.parseDouble(result[4]), Double.parseDouble(result[5])));
+
+					Coord xy =ct.transform(new Coord(Double.parseDouble(result[4]), Double.parseDouble(result[5])));
 			    	Id<Node> nodeId = Id.create("pt"+result[1], Node.class);
 			    	Node n = network.getFactory().createNode(nodeId, xy);
 			    	nodeList.add(n);

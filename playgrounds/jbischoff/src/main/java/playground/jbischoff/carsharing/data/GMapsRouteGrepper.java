@@ -29,7 +29,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
+
 /**
  * @author jbischoff
  *
@@ -37,8 +37,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class GMapsRouteGrepper {
 
 public static void main(String[] args)  {
-	Coord c = new CoordImpl(52.519580833333,13.359681944444);
-	Coord d = new CoordImpl(52.470137777778,13.335396944444);
+	Coord c = new Coord(52.519580833333, 13.359681944444);
+	Coord d = new Coord(52.470137777778, 13.335396944444);
 	System.out.println(System.currentTimeMillis());
 	GMapsRouteGrepper gr = new GMapsRouteGrepper(c, d);
 

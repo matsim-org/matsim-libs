@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -54,7 +53,7 @@ public class distancesBetweenTrips_1week {
 				  startLat = agentTrips.getDouble(3);
 				  startLon = agentTrips.getDouble(4);
 				  rStartTime=agentTrips.getString(1);
-				  Coord coordStart =new CoordImpl(startLon, startLat);
+				  Coord coordStart = new Coord(startLon, startLat);
 				  Coord UTMStart = ct.transform(coordStart);
 				  startLon=UTMStart.getX();
 				  startLat=UTMStart.getY();
@@ -75,7 +74,7 @@ public class distancesBetweenTrips_1week {
 			  else{
 				  firstLat = agentTrips.getDouble(3);
 				  firstLon = agentTrips.getDouble(4);
-				  Coord coordStart =new CoordImpl(firstLon, firstLat);
+				  Coord coordStart = new Coord(firstLon, firstLat);
 				  Coord UTMStart = ct.transform(coordStart);
 				  firstLon=UTMStart.getX();
 				  firstLat=UTMStart.getY();				  
@@ -86,8 +85,8 @@ public class distancesBetweenTrips_1week {
 			  rEndTime = c.calculateEndTime(agentTrips.getString(1),agentTrips.getDouble(2));
 			  
 			  endLat = agentTrips.getDouble(5);
-			  endLon = agentTrips.getDouble(6);			  
-			  Coord coordEnd =new CoordImpl(endLon, endLat);
+			  endLon = agentTrips.getDouble(6);
+				Coord coordEnd = new Coord(endLon, endLat);
 			  Coord UTMEnd = ct.transform(coordEnd);
 			  endLon=UTMEnd.getX();
 			  endLat=UTMEnd.getY();

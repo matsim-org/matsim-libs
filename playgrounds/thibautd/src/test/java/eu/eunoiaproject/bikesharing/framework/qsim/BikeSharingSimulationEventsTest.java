@@ -22,6 +22,7 @@ package eu.eunoiaproject.bikesharing.framework.qsim;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +45,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
@@ -77,15 +77,15 @@ public class BikeSharingSimulationEventsTest {
 		final BikeSharingFacility station =
 				stations.getFactory().createBikeSharingFacility(
 					stationId,
-					new CoordImpl( 0 , 0 ),
+						new Coord((double) 0, (double) 0),
 					linkId,
 					2,
 					1 );
 		stations.addFacility( station );
 
 		/* network creation */ {
-			final Node node1 = scenario.getNetwork().getFactory().createNode( Id.create( 1 , Node.class) , new CoordImpl( 0 , 1 ) );
-			final Node node2 = scenario.getNetwork().getFactory().createNode( Id.create( 2 , Node.class ) , new CoordImpl( 1 , 0 ) );
+			final Node node1 = scenario.getNetwork().getFactory().createNode( Id.create( 1 , Node.class) , new Coord((double) 0, (double) 1));
+			final Node node2 = scenario.getNetwork().getFactory().createNode( Id.create( 2 , Node.class ) , new Coord((double) 1, (double) 0));
 			final Link link = scenario.getNetwork().getFactory().createLink( linkId , node1 , node2 );
 
 			scenario.getNetwork().addNode( node1 );

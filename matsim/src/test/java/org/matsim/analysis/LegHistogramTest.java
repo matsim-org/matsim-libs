@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -48,8 +48,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testDeparturesMiscModes() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 
@@ -100,8 +100,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testNofBins() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 
@@ -139,8 +139,8 @@ public class LegHistogramTest extends MatsimTestCase {
 
 	public void testReset() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 

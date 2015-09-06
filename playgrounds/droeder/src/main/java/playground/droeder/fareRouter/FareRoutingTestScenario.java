@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -135,22 +134,22 @@ class FareRoutingTestScenario {
 		
 		person = factory.createPerson(Id.create("1", Person.class));
 		plan = factory.createPlan();
-		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
+		plan.addActivity(factory.createActivityFromCoord("h", new Coord(0., 0.)));
 		leg = factory.createLeg("pt");
 		leg.setDepartureTime(6*3600);
 		plan.addLeg(leg);
-		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(3500., 0.)));
+		plan.addActivity(factory.createActivityFromCoord("h", new Coord(3500., 0.)));
 		person.addPlan(plan);
 		person.getCustomAttributes().put(MyTicketFactory.USEFLATRATE, new Boolean(true));
 		population.addPerson(person);
 		
 		person = factory.createPerson(Id.create("2", Person.class));
 		plan = factory.createPlan();
-		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
+		plan.addActivity(factory.createActivityFromCoord("h", new Coord(0., 0.)));
 		leg = factory.createLeg("pt");
 		leg.setDepartureTime(6*3600);
 		plan.addLeg(leg);
-		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(3500., 0.)));
+		plan.addActivity(factory.createActivityFromCoord("h", new Coord(3500., 0.)));
 		person.addPlan(plan);
 		person.getCustomAttributes().put(MyTicketFactory.USEFLATRATE, new Boolean(false));
 		population.addPerson(person);
@@ -164,15 +163,15 @@ class FareRoutingTestScenario {
 	private static void createSchedule(Scenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
-		
-		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 0), false);
-		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1000, 0), false);
-		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(1500, 0), false);
-		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new CoordImpl(2000, 0), false);
-		TransitStopFacility f6 = f.createTransitStopFacility(Id.create("6", TransitStopFacility.class), new CoordImpl(2500, 0), false);
-		TransitStopFacility f7 = f.createTransitStopFacility(Id.create("7", TransitStopFacility.class), new CoordImpl(3000, 0), false);
-		TransitStopFacility f8 = f.createTransitStopFacility(Id.create("8", TransitStopFacility.class), new CoordImpl(3500, 0), false);
+
+		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
+		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new Coord((double) 2000, (double) 0), false);
+		TransitStopFacility f6 = f.createTransitStopFacility(Id.create("6", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
+		TransitStopFacility f7 = f.createTransitStopFacility(Id.create("7", TransitStopFacility.class), new Coord((double) 3000, (double) 0), false);
+		TransitStopFacility f8 = f.createTransitStopFacility(Id.create("8", TransitStopFacility.class), new Coord((double) 3500, (double) 0), false);
 		
 		schedule.addStopFacility(f1);
 		schedule.addStopFacility(f2);

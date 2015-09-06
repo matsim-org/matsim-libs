@@ -21,7 +21,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -77,8 +76,8 @@ public class MembershipAssigner {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 		
 		double access = 0.0;
-		
-		Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+
+			Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements())
 	    {
 	      if ((pe instanceof Activity))
@@ -119,8 +118,8 @@ public class MembershipAssigner {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
 			double access = 0.0;
-			
-			Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+
+			Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements())
 		    {
 		      if ((pe instanceof Activity))

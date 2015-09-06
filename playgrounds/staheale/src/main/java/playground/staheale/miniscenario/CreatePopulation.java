@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +36,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.staheale.preprocess.AgentMemories;
@@ -108,16 +108,16 @@ public class CreatePopulation {
 	
 	private void createPersons() {
 		double sideLength = Double.parseDouble(config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "sideLength"));
-		Zone centerZone = new Zone("centerZone", new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 2000.0, 2000.0);	
+		Zone centerZone = new Zone("centerZone", new Coord(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 2000.0, 2000.0);
 		this.initZone(centerZone);
-		
-		Zone topLeftZone =  new Zone("topLeftZone", new CoordImpl(0.0, sideLength), 2000.0, 2000.0); 
+
+		Zone topLeftZone =  new Zone("topLeftZone", new Coord(0.0, sideLength), 2000.0, 2000.0);
 		this.initZone(topLeftZone);
-		Zone bottomLeftZone =  new Zone("bottomLeftZone", new CoordImpl(0.0, 2000.0), 2000.0, 2000.0); 
+		Zone bottomLeftZone =  new Zone("bottomLeftZone", new Coord(0.0, 2000.0), 2000.0, 2000.0);
 		this.initZone(bottomLeftZone);
-		Zone bottomRightZone =  new Zone("bottomRightZone", new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
-		this.initZone(bottomRightZone);		
-		Zone topRightZone = new Zone("topRightZone", new CoordImpl(sideLength - 2000.0, sideLength), 2000.0, 2000.0);
+		Zone bottomRightZone =  new Zone("bottomRightZone", new Coord(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
+		this.initZone(bottomRightZone);
+		Zone topRightZone = new Zone("topRightZone", new Coord(sideLength - 2000.0, sideLength), 2000.0, 2000.0);
 		this.initZone(topRightZone);
 //		Zone bottomRightLargeZone = new Zone("bottomRightLargeZone", (Coord) new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
 //		this.initZone(bottomRightLargeZone);

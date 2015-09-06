@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -58,9 +59,9 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		// build network
 		Network network = scenario.getNetwork();
 		NetworkFactory nBuilder = network.getFactory();
-		Node node1 = nBuilder.createNode(nodeId1, scenario.createCoord(0, 0));
-		Node node2 = nBuilder.createNode(nodeId2, scenario.createCoord(1000, 0));
-		Node node3 = nBuilder.createNode(nodeId3, scenario.createCoord(2000, 0));
+		Node node1 = nBuilder.createNode(nodeId1, new Coord((double) 0, (double) 0));
+		Node node2 = nBuilder.createNode(nodeId2, new Coord((double) 1000, (double) 0));
+		Node node3 = nBuilder.createNode(nodeId3, new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -73,8 +74,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory sBuilder = schedule.getFactory();
 
-		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(1000.0, 0), false);
-		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(2000.0, 0), false);
+		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(1000.0, (double) 0), false);
+		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(2000.0, (double) 0), false);
 		stopF1.setLinkId(link1.getId());
 		stopF2.setLinkId(link2.getId());
 		schedule.addStopFacility(stopF1);

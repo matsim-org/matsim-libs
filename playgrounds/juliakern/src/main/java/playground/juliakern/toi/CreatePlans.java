@@ -48,7 +48,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-
 public class CreatePlans {
 	
 	static String csvFile = "input/oslo/Stefan_trondheim.csv"; 
@@ -153,8 +152,8 @@ public class CreatePlans {
 						trip = currline.split(cvsSplitBy);
 						Double startx = Double.parseDouble(trip[4]);
 						Double starty = Double.parseDouble(trip[5]);
-						
-						Coord startCoordinates = scenario.createCoord(startx,starty);
+
+					Coord startCoordinates = new Coord(startx, starty);
 						//create activity
 						String actType = "work";
 						if(trip[2].equals("1"))actType="home";
@@ -169,7 +168,7 @@ public class CreatePlans {
 				}
 				Double endx = Double.parseDouble(trip[7]);
 				Double endy = Double.parseDouble(trip[8]);
-				Coord endCoordinates = scenario.createCoord(endx, endy);
+				Coord endCoordinates = new Coord(endx, endy);
 				Activity lastAct = populationFactory.createActivityFromCoord("home", endCoordinates);
 				plan.addActivity(lastAct);
 //				logger.info("x=" + endx + " y=" + endy);

@@ -50,7 +50,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -325,7 +325,7 @@ public class NmbmQTBuilder {
 				/* Get the home location of the household. */
 				Point homePoint = this.zones.get(Id.create(sa[12], MyZone.class)).getInteriorPoint();
 				Point altHomePoint = getRandomInteriorPoint(this.zones.get(Id.create(sa[12], MyZone.class)));
-				Coord homeCoord = new CoordImpl(altHomePoint.getX(), altHomePoint.getY());
+				Coord homeCoord = new Coord(altHomePoint.getX(), altHomePoint.getY());
 				
 				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
 				
@@ -486,7 +486,7 @@ public class NmbmQTBuilder {
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
 			Plan closestPlan = qt.get(c.getX(), c.getY());
-			double radius = ((CoordImpl)c).calcDistance( ((ActivityImpl)closestPlan.getPlanElements().get(0)).getCoord());
+			double radius = CoordUtils.calcDistance(c, ((ActivityImpl) closestPlan.getPlanElements().get(0)).getCoord());
 			Collection<Plan> plans = qt.get(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -502,7 +502,7 @@ public class NmbmQTBuilder {
 		
 		/* Rank the plans based on distance. */
 		for(Plan plan : plansToRank){
-			double d = ((CoordImpl)c).calcDistance( ((ActivityImpl)plan.getPlanElements().get(0)).getCoord() );
+			double d = CoordUtils.calcDistance(c, ((ActivityImpl) plan.getPlanElements().get(0)).getCoord());
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

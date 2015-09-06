@@ -7,10 +7,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.toronto.sotr.SOTRMultiNodeDijkstra.Path;
 import playground.toronto.sotr.calculators.SOTRDisutilityCalculator;

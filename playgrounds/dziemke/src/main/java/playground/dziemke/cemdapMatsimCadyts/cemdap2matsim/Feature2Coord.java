@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -105,7 +104,7 @@ public class Feature2Coord {
 		while (true) {
 			Point point = getRandomCoordinate(envelope);
 			if (point.within(geometry)) {
-				return new CoordImpl(point.getX(),point.getY());
+				return new Coord(point.getX(), point.getY());
 			}
 		}
 	}

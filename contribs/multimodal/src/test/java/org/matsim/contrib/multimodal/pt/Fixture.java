@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.multimodal.pt;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -103,11 +104,11 @@ import java.util.List;
 	}
 	
 	void buildNetwork() {
-		this.nodes[0] = this.network.getFactory().createNode(Id.create("0", Node.class),  this.scenario.createCoord(    0, 5000));
-		this.nodes[1] = this.network.getFactory().createNode(Id.create("1", Node.class),  this.scenario.createCoord( 4000, 5000));
-		this.nodes[2] = this.network.getFactory().createNode(Id.create("2", Node.class),  this.scenario.createCoord( 8000, 5000));
-		this.nodes[3] = this.network.getFactory().createNode(Id.create("3", Node.class),  this.scenario.createCoord(12000, 5000));
-		this.nodes[4] = this.network.getFactory().createNode(Id.create("4", Node.class),  this.scenario.createCoord(16000, 5000));
+		this.nodes[0] = this.network.getFactory().createNode(Id.create("0", Node.class), new Coord((double) 0, (double) 5000));
+		this.nodes[1] = this.network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 4000, (double) 5000));
+		this.nodes[2] = this.network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 8000, (double) 5000));
+		this.nodes[3] = this.network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 12000, (double) 5000));
+		this.nodes[4] = this.network.getFactory().createNode(Id.create("4", Node.class), new Coord((double) 16000, (double) 5000));
 		for (int i = 0; i < 5; i++) {
 			this.network.addNode(this.nodes[i]);
 		}
@@ -133,9 +134,9 @@ import java.util.List;
 	}
 
 	void buildStops() {
-		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), this.scenario.createCoord( 4000,  5002), true);
-		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), this.scenario.createCoord( 8000,  4998), true);
-		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), this.scenario.createCoord(12000,  5002), true);
+		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), new Coord((double) 4000, (double) 5002), true);
+		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), new Coord((double) 8000, (double) 4998), true);
+		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), new Coord((double) 12000, (double) 5002), true);
 		this.stopFacilities[0].setName("A");
 		this.stopFacilities[1].setName("B");
 		this.stopFacilities[2].setName("C");

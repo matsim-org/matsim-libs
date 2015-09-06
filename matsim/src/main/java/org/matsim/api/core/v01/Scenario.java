@@ -50,7 +50,7 @@ public interface Scenario {
 	
 	Config getConfig();
 
-	Coord createCoord(double x, double y);
+	;
 
 	/**
 	 * Adds the given object to the scenario, such it can be

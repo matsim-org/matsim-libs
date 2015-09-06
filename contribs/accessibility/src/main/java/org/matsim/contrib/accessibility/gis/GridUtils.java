@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.CSVWriter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -91,7 +90,7 @@ public final class GridUtils {
 				Point centroid = factory.createPoint(new Coordinate(centerX, centerY));
 				
 				if(boundary.contains(centroid)) {
-					Coord center = new CoordImpl(centerX, centerY);
+					Coord center = new Coord(centerX, centerY);
 					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
 					setPoints++;
 				}
@@ -136,8 +135,8 @@ public final class GridUtils {
 				// check if x, y is within network boundary
 				if (centerX <= maxX && centerX >= minX && 
 					centerY <= maxY && centerY >= minY) {
-					
-					Coord center = new CoordImpl(centerX, centerY);
+
+					Coord center = new Coord(centerX, centerY);
 					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
 					setPoints++;
 				}

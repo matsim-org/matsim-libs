@@ -25,7 +25,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * The collection of zone objects in MATSim.
@@ -41,9 +40,12 @@ public class ZoneLayer extends LayerImpl {
 		Coord center = null;
 		Coord min = null;
 		Coord max = null;
-		if ((center_x != null) && (center_y != null)) { center = new CoordImpl(center_x, center_y); }
-		if ((min_x != null) && (min_y != null)) { min = new CoordImpl(min_x, min_y); }
-		if ((max_x != null) && (max_y != null)) { max = new CoordImpl(max_x, max_y); }
+		if ((center_x != null) && (center_y != null)) {
+			center = new Coord(Double.parseDouble(center_x), Double.parseDouble(center_y)); }
+		if ((min_x != null) && (min_y != null)) {
+			min = new Coord(Double.parseDouble(min_x), Double.parseDouble(min_y)); }
+		if ((max_x != null) && (max_y != null)) {
+			max = new Coord(Double.parseDouble(max_x), Double.parseDouble(max_y)); }
 		Zone z = new Zone(id, center, min, max);
 		Map<Id,BasicLocation> locations = this.getLocations();
 		locations.put(id,z);

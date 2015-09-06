@@ -53,7 +53,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -281,8 +280,8 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		Coord c1 = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[2]), Double.parseDouble(args[3])));
-		Coord c2 = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5])));
+		Coord c1 = coordinateTransformation.transform(new Coord(Double.parseDouble(args[2]), Double.parseDouble(args[3])));
+		Coord c2 = coordinateTransformation.transform(new Coord(Double.parseDouble(args[4]), Double.parseDouble(args[5])));
 		new BusLaneAdderWindow("Bus lanes adder", scenario.getNetwork(), new File(args[1]), new double[]{c1.getX(), c1.getY()}, new double[]{c2.getX(), c2.getY()}, args[6], coordinateTransformation).setVisible(true);
 	}
 

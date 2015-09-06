@@ -19,13 +19,13 @@
 
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 import playground.wrashid.lib.obj.Coord;
 
 public class CityZone {
 
-	private CoordImpl zoneCentreCoord;
+	private Coord zoneCentreCoord;
 	private String id;
 	private String name;
 	private double pctBlueParking;
@@ -58,7 +58,7 @@ public class CityZone {
 		this.parkingGarageFee2h=double1;
 	}
 
-	public CoordImpl getZoneCentreCoord() {
+	public Coord getZoneCentreCoord() {
 		return zoneCentreCoord;
 	}
 
@@ -87,7 +87,7 @@ public class CityZone {
 	}
 
 	public void setZoneCentreCoord(double x, double y) {
-		this.zoneCentreCoord=new CoordImpl(x, y);
+		this.zoneCentreCoord= new Coord(x, y);
 	}
 
 	

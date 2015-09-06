@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.michalm.berlin.BerlinZoneUtils;
@@ -104,7 +103,7 @@ public class BerlinTaxiActivityCreator
         }
         while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
 
-        Coord coord = scenario.createCoord(p.getX(), p.getY());
+        Coord coord = new Coord(p.getX(), p.getY());
         Coord coordt = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         Link link = NetworkUtils.getNearestLink(network, coordt);
 

@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,7 +37,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -136,12 +136,12 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory builder = network.getFactory();
 
-		Node node1 = builder.createNode(Id.create(1, Node.class), new CoordImpl(0, 1000));
-		Node node2 = builder.createNode(Id.create(2, Node.class), new CoordImpl(0, 2000));
-		Node node3 = builder.createNode(Id.create(3, Node.class), new CoordImpl(0, 3000));
-		Node node4 = builder.createNode(Id.create(4, Node.class), new CoordImpl(0, 4000));
-		Node node5 = builder.createNode(Id.create(5, Node.class), new CoordImpl(0, 5000));
-		Node node6 = builder.createNode(Id.create(6, Node.class), new CoordImpl(0, 6000));
+		Node node1 = builder.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 1000));
+		Node node2 = builder.createNode(Id.create(2, Node.class), new Coord((double) 0, (double) 2000));
+		Node node3 = builder.createNode(Id.create(3, Node.class), new Coord((double) 0, (double) 3000));
+		Node node4 = builder.createNode(Id.create(4, Node.class), new Coord((double) 0, (double) 4000));
+		Node node5 = builder.createNode(Id.create(5, Node.class), new Coord((double) 0, (double) 5000));
+		Node node6 = builder.createNode(Id.create(6, Node.class), new Coord((double) 0, (double) 6000));
 
 		network.addNode(node1);
 		network.addNode(node2);

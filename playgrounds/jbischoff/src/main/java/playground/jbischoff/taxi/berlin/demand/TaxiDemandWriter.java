@@ -47,10 +47,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -407,8 +404,8 @@ public class TaxiDemandWriter
         //		log.info("Zone" + zoneId);
         if (this.municipalityMap.containsKey(zoneId.toString())) {
             point = getRandomPointInFeature(this.rnd, this.municipalityMap.get(zoneId.toString()));
-            CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
-            return BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coordImpl);
+            Coord coord = new Coord(point.getX(), point.getY());
+            return BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         }
         else {
             log.error(zoneId.toString() + "does not exist in shapedata");

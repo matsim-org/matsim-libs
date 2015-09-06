@@ -35,7 +35,6 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -81,9 +80,7 @@ public class ParkAndRideFacilitiesXmlReader extends MatsimXmlParser {
 		final String x = atts.getValue( X_COORD_ATT );
 		final String y = atts.getValue( Y_COORD_ATT );
 
-		return new CoordImpl(
-				Double.parseDouble( x ),
-				Double.parseDouble( y ));
+		return new Coord(Double.parseDouble(x), Double.parseDouble(y));
 	}
 
 	private static final <T> Id<T> getId( final Attributes atts , final String qName , final Class<T> idType ) {

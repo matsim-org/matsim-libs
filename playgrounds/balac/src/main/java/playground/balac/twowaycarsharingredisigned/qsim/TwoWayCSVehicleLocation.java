@@ -10,10 +10,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TwoWayCSVehicleLocation {
@@ -47,8 +45,8 @@ public class TwoWayCSVehicleLocation {
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
-	    
-	    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+			Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 			Link l = linkUtils.getClosestLink(coordStart);
 	    	
 	    	//Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));

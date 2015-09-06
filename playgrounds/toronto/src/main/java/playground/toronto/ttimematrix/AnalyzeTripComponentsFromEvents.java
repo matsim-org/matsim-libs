@@ -3,6 +3,7 @@ package playground.toronto.ttimematrix;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -14,7 +15,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -91,7 +91,7 @@ public class AnalyzeTripComponentsFromEvents {
 			double y = Double.parseDouble(tr.current().get("y"));
 			
 			NodeImpl n = new NodeImpl(zoneId);
-			n.setCoord(new CoordImpl(x, y));
+			n.setCoord(new Coord(x, y));
 			network.addNode(n);
 		}
 		tr.close();

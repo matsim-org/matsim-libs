@@ -3,7 +3,6 @@ package playground.wrashid.PSF.data.hubCoordinates;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -15,7 +14,7 @@ public class VisualizeHubLocations {
 		BasicPointVisualizer visualizer=new BasicPointVisualizer();
 		
 		for (int i=0;i<matrix.getNumberOfRows();i++){
-			Coord coord=new CoordImpl(matrix.getDouble(i, 1), matrix.getDouble(i, 2));
+			Coord coord= new Coord(matrix.getDouble(i, 1), matrix.getDouble(i, 2));
 			visualizer.addPointCoordinate(coord, Long.toString(matrix.convertDoubleToInteger(i, 0)), Color.RED);
 		}
 		

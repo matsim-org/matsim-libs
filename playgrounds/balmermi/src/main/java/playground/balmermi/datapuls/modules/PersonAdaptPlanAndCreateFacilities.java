@@ -22,6 +22,7 @@ package playground.balmermi.datapuls.modules;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -31,7 +32,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -122,7 +122,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 				if (a.getType().equals("tta") || a.getType().equals("home")) {
 					int x = (int)a.getCoord().getX();
 					int y = (int)a.getCoord().getY();
-					CoordImpl c = new CoordImpl(x,y);
+					Coord c = new Coord((double) x, (double) y);
 					ActivityFacilityImpl af = facs.get(x,y);
 					if (af == null) {
 						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
@@ -132,7 +132,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 						if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);
 					}
-					else if (((CoordImpl)af.getCoord()).equals(c)) {
+					else if (af.getCoord().equals(c)) {
 						ActivityOptionImpl ao = (ActivityOptionImpl) af.getActivityOptions().get(a.getType());
 						if (ao == null) {
 							ao = af.createActivityOption(a.getType());

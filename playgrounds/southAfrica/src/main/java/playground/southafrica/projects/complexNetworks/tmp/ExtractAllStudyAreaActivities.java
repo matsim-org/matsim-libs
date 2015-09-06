@@ -33,7 +33,6 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -140,16 +139,26 @@ public class ExtractAllStudyAreaActivities {
 	private static QuadTree<Coord> buildQuadTree(){
 		QuadTree<Coord> qt = new QuadTree<Coord>(130000.0, -3707000.0, 152000.0, -3684000.0);
 
-		qt.put(130048.2549,-3685018.8482, new CoordImpl(130048.2549,-3685018.8482));
-		qt.put(148048.2549,-3702339.3562, new CoordImpl(148048.2549,-3702339.3562));
-		qt.put(148798.2549,-3704504.4197, new CoordImpl(148798.2549,-3704504.4197));
-		qt.put(149548.2549,-3706669.4833, new CoordImpl(149548.2549,-3706669.4833));
-		qt.put(151048.2549,-3706669.4833, new CoordImpl(151048.2549,-3706669.4833));
-		qt.put(148048.2549,-3701473.3308, new CoordImpl(148048.2549,-3701473.3308));
-		qt.put(146548.2549,-3697143.2038, new CoordImpl(146548.2549,-3697143.2038));
-		qt.put(146548.2549,-3704937.4325, new CoordImpl(146548.2549,-3704937.4325));
-		qt.put(148048.2549,-3705803.4579, new CoordImpl(148048.2549,-3705803.4579));
-		qt.put(130048.2549,-3684152.8228, new CoordImpl(130048.2549,-3684152.8228));
+		final double y9 = -3685018.8482;
+		qt.put(130048.2549,-3685018.8482, new Coord(130048.2549, y9));
+		final double y8 = -3702339.3562;
+		qt.put(148048.2549,-3702339.3562, new Coord(148048.2549, y8));
+		final double y7 = -3704504.4197;
+		qt.put(148798.2549,-3704504.4197, new Coord(148798.2549, y7));
+		final double y6 = -3706669.4833;
+		qt.put(149548.2549,-3706669.4833, new Coord(149548.2549, y6));
+		final double y5 = -3706669.4833;
+		qt.put(151048.2549,-3706669.4833, new Coord(151048.2549, y5));
+		final double y4 = -3701473.3308;
+		qt.put(148048.2549,-3701473.3308, new Coord(148048.2549, y4));
+		final double y3 = -3697143.2038;
+		qt.put(146548.2549,-3697143.2038, new Coord(146548.2549, y3));
+		final double y2 = -3704937.4325;
+		qt.put(146548.2549,-3704937.4325, new Coord(146548.2549, y2));
+		final double y1 = -3705803.4579;
+		qt.put(148048.2549,-3705803.4579, new Coord(148048.2549, y1));
+		final double y = -3684152.8228;
+		qt.put(130048.2549,-3684152.8228, new Coord(130048.2549, y));
 
 		return qt;
 	}

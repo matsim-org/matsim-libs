@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -51,9 +52,9 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -94,8 +95,12 @@ public class DgFigure9ScenarioGenerator {
 	private int cycle = 120;
 	
 	public ScenarioImpl loadScenario(){
-		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals_coordinated.xml");
-		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
+		
+		Config config = ConfigUtils.loadConfig(baseDir + "config_signals_coordinated.xml");
+		MatsimRandom.reset(config.global().getRandomSeed());
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(sc);
+		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
@@ -420,14 +425,16 @@ public class DgFigure9ScenarioGenerator {
 		NetworkFactory fac = net.getFactory();
 		double scale = 300.0;
 		Node n1, n2, n3, n4, n5, n6, n7, n8;
-		net.addNode(n1 = fac.createNode(Id.create(1, Node.class), sc.createCoord(0, 0)));
-		net.addNode(n2 = fac.createNode(Id.create(2, Node.class), sc.createCoord(1.0*scale, 0)));
-		net.addNode(n3 = fac.createNode(Id.create(3, Node.class), sc.createCoord(2.0*scale, 1.0*scale)));
-		net.addNode(n4 = fac.createNode(Id.create(4, Node.class), sc.createCoord(3.0*scale, 1.0*scale)));
-		net.addNode(n5 = fac.createNode(Id.create(5, Node.class), sc.createCoord(4.0*scale, 0)));
-		net.addNode(n6 = fac.createNode(Id.create(6, Node.class), sc.createCoord(5.0*scale, 0)));
-		net.addNode(n7 = fac.createNode(Id.create(7, Node.class), sc.createCoord(2.0*scale, -1.0*scale)));
-		net.addNode(n8 = fac.createNode(Id.create(8, Node.class), sc.createCoord(3.0*scale, -1.0*scale)));
+		net.addNode(n1 = fac.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0)));
+		net.addNode(n2 = fac.createNode(Id.create(2, Node.class), new Coord(1.0 * scale, (double) 0)));
+		net.addNode(n3 = fac.createNode(Id.create(3, Node.class), new Coord(2.0 * scale, 1.0 * scale)));
+		net.addNode(n4 = fac.createNode(Id.create(4, Node.class), new Coord(3.0 * scale, 1.0 * scale)));
+		net.addNode(n5 = fac.createNode(Id.create(5, Node.class), new Coord(4.0 * scale, (double) 0)));
+		net.addNode(n6 = fac.createNode(Id.create(6, Node.class), new Coord(5.0 * scale, (double) 0)));
+		double y1 = -1.0*scale;
+		net.addNode(n7 = fac.createNode(Id.create(7, Node.class), new Coord(2.0 * scale, y1)));
+		double y = -1.0*scale;
+		net.addNode(n8 = fac.createNode(Id.create(8, Node.class), new Coord(3.0 * scale, y)));
 		Link l = fac.createLink(id12, n1, n2);
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);

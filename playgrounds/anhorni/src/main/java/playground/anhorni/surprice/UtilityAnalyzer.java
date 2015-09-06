@@ -38,7 +38,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import playground.anhorni.surprice.analysis.SupriceBoxPlot;
@@ -170,9 +169,9 @@ public class UtilityAnalyzer {
 	}
 	
 	private void initZones(double sideLength) {
-		this.zones.add(new Zone("centerZone", (Coord) new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0));
-		this.zones.add(new Zone("topLeftZone", (Coord) new CoordImpl(0.0, sideLength), 1000.0, 1000.0));
-		this.zones.add(new Zone("bottomLeftZone", (Coord) new CoordImpl(0.0, 1000.0), 1000.0, 1000.0));
-		this.zones.add(new Zone("bottomRightZone", (Coord) new CoordImpl(sideLength - 1000.0, 0.0), 1000.0, 1000.0));
+		this.zones.add(new Zone("centerZone", (Coord) new Coord(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 1000.0, 1000.0));
+		this.zones.add(new Zone("topLeftZone", (Coord) new Coord(0.0, sideLength), 1000.0, 1000.0));
+		this.zones.add(new Zone("bottomLeftZone", (Coord) new Coord(0.0, 1000.0), 1000.0, 1000.0));
+		this.zones.add(new Zone("bottomRightZone", (Coord) new Coord(sideLength - 1000.0, 0.0), 1000.0, 1000.0));
 	}
 }

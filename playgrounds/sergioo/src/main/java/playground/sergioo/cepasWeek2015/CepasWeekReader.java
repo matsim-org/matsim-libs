@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -319,8 +318,8 @@ public class CepasWeekReader {
 					List<Activity> activitiesList = new ArrayList<>();
 					for(Trip trip:cardTrips) {
 						double time = trip.day.ordinal()*DAY_IN_SECONDS + trip.startTime;
-						Coord locA = new CoordImpl(stops.get(toString(lastTrip.endStop))[0],stops.get(toString(lastTrip.endStop))[1]);
-						Coord locB = new CoordImpl(stops.get(toString(trip.startStop))[0],stops.get(toString(trip.startStop))[1]);
+						Coord locA = new Coord(stops.get(toString(lastTrip.endStop))[0], stops.get(toString(lastTrip.endStop))[1]);
+						Coord locB = new Coord(stops.get(toString(trip.startStop))[0], stops.get(toString(trip.startStop))[1]);
 						double distance = CoordUtils.calcDistance(cT.transform(locA), cT.transform(locB));
 						if(trip.transfer==0 && distance<MAX_DISTANCE) {
 							activitiesList.add(new Activity(day, lastTrip.startTime + lastTrip.duration*MINUTE_IN_SECONDS, time-prevTime, /*lastTrip.endLocation*/lastTrip.endStop));

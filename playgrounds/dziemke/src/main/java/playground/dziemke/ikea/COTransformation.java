@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -58,7 +57,7 @@ public class COTransformation {
 		while((line=bufferedReader.readLine()) != null){
 			String parts[] = line.split(";");
 
-			Coord coordinates = new CoordImpl(parts[index_x],parts[index_y]);
+			Coord coordinates = new Coord(Double.parseDouble(parts[index_x]), Double.parseDouble(parts[index_y]));
 			Coord coordinatesTransformed = ct.transform(coordinates);
 			
 		writer.write(parts[index_id]+";"+coordinatesTransformed.getX()+";"+coordinatesTransformed.getY());

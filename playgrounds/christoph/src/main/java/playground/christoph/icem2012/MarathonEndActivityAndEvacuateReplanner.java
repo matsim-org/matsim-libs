@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
@@ -85,7 +84,7 @@ public class MarathonEndActivityAndEvacuateReplanner extends WithinDayDuringActi
 						XORShiftRandom xor = new XORShiftRandom((long) withinDayAgent.getId().hashCode());
 						double x = coord.getX() + xor.nextDouble() - 1.0;	// +/- 0.5m
 						double y = coord.getY() + xor.nextDouble() - 1.0;	// +/- 0.5m
-						((ActivityImpl) currentActivity).setCoord(scenario.createCoord(x, y));
+						((ActivityImpl) currentActivity).setCoord(new Coord(x, y));
 					}
 				}
 			}

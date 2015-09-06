@@ -3,6 +3,7 @@
  */
 package playground.tschlenther.Link2Link;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -56,14 +57,15 @@ public class Link2LinkTestNetworkCreator {
 	public void createNetwork(){
 		Network network = this.scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
-		
-		Node node1 = factory.createNode(Id.createNodeId("1"), scenario.createCoord(0, 0));
-		Node node2 = factory.createNode(Id.createNodeId("2"), scenario.createCoord(0, 1000));
-		Node node3 = factory.createNode(Id.createNodeId("3"), scenario.createCoord(0, 2000));
-		Node node4 = factory.createNode(Id.createNodeId("4"), scenario.createCoord(500, 2500));
-		Node node5 = factory.createNode(Id.createNodeId("5"), scenario.createCoord(-500, 2500));
-		Node node6 = factory.createNode(Id.createNodeId("6"), scenario.createCoord(0, 3000));
-		Node node7 = factory.createNode(Id.createNodeId("7"), scenario.createCoord(0, 4000));
+
+		Node node1 = factory.createNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+		Node node2 = factory.createNode(Id.createNodeId("2"), new Coord((double) 0, (double) 1000));
+		Node node3 = factory.createNode(Id.createNodeId("3"), new Coord((double) 0, (double) 2000));
+		Node node4 = factory.createNode(Id.createNodeId("4"), new Coord((double) 500, (double) 2500));
+		double x = -500;
+		Node node5 = factory.createNode(Id.createNodeId("5"), new Coord(x, (double) 2500));
+		Node node6 = factory.createNode(Id.createNodeId("6"), new Coord((double) 0, (double) 3000));
+		Node node7 = factory.createNode(Id.createNodeId("7"), new Coord((double) 0, (double) 4000));
 
 		network.addNode(node1);
 		network.addNode(node2);

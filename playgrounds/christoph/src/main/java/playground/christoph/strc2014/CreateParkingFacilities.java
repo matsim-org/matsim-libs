@@ -158,7 +158,7 @@ public class CreateParkingFacilities {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(privateInsideParkingFile);
 		for (SimpleFeature feature : features) {
 			Point point = (Point) feature.getAttribute(0);
-			Coord coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
+			Coord coord = new Coord(point.getCoordinate().x, point.getCoordinate().y);
 			String name = ((Double) feature.getAttribute(1)).toString();
 			double capacity = (Double) feature.getAttribute(4);
 			
@@ -193,7 +193,7 @@ public class CreateParkingFacilities {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(privateOutsideParkingFile);
 		for (SimpleFeature feature : features) {
 			Point point = (Point) feature.getAttribute(0);
-			Coord coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
+			Coord coord = new Coord(point.getCoordinate().x, point.getCoordinate().y);
 			String name = (String) feature.getAttribute(1);
 			double capacity = (Double) feature.getAttribute(4);
 			
@@ -236,7 +236,7 @@ public class CreateParkingFacilities {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(garageParkingFile);
 		for (SimpleFeature feature : features) {
 			Point point = (Point) feature.getAttribute(0);
-			Coord coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
+			Coord coord = new Coord(point.getCoordinate().x, point.getCoordinate().y);
 			String name = (String) feature.getAttribute(4);
 			double capacity = (Double) feature.getAttribute(6);
 			
@@ -282,7 +282,7 @@ public class CreateParkingFacilities {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(streetParkingFile);
 		for (SimpleFeature feature : features) {
 			Point point = (Point) feature.getAttribute(0);
-			Coord coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
+			Coord coord = new Coord(point.getCoordinate().x, point.getCoordinate().y);
 		
 			// check whether coordinate is inside the area covered by the network
 			if (coord.getX() < minX || coord.getX() > maxX || coord.getY() < minY || coord.getY() > maxY) continue;

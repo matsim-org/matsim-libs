@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -22,8 +21,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -32,9 +29,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -103,12 +98,12 @@ public class LanesTest {
 
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
-		
-		Node node1 = factory.createNode(Id.createNodeId("1"), scenario.createCoord(0, 0));
-		Node node2 = factory.createNode(Id.createNodeId("2"), scenario.createCoord(0, 200));
-		Node node3 = factory.createNode(Id.createNodeId("3"), scenario.createCoord(0, 400));
-		Node node4 = factory.createNode(Id.createNodeId("4"), scenario.createCoord(0, 600));
-		Node node5 = factory.createNode(Id.createNodeId("5"), scenario.createCoord(0, 800));
+
+		Node node1 = factory.createNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+		Node node2 = factory.createNode(Id.createNodeId("2"), new Coord((double) 0, (double) 200));
+		Node node3 = factory.createNode(Id.createNodeId("3"), new Coord((double) 0, (double) 400));
+		Node node4 = factory.createNode(Id.createNodeId("4"), new Coord((double) 0, (double) 600));
+		Node node5 = factory.createNode(Id.createNodeId("5"), new Coord((double) 0, (double) 800));
 		
 		network.addNode(node1);
 		network.addNode(node2);

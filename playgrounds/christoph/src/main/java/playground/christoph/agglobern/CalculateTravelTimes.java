@@ -36,7 +36,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
@@ -120,7 +120,7 @@ public class CalculateTravelTimes {
 			Data fromData = fromEntry.getValue();
 			
 			Link fromLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), fromData.coord1903);
-			double fromDistance = ((CoordImpl)fromLink.getCoord()).calcDistance(fromData.coord1903);
+			double fromDistance = CoordUtils.calcDistance(fromLink.getCoord(), fromData.coord1903);
 
 			travelTimes[from] = new double[dataLines.size()];
 			int to = 0;
@@ -139,7 +139,7 @@ public class CalculateTravelTimes {
 				}
 				
 				Link toLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), toData.coord1903);
-				double toDistance = ((CoordImpl)toLink.getCoord()).calcDistance(toData.coord1903);
+				double toDistance = CoordUtils.calcDistance(toLink.getCoord(), toData.coord1903);
 				
 				/*
 				 * If both coordinates were mapped to the same Link.
@@ -149,8 +149,8 @@ public class CalculateTravelTimes {
 				if (fromLink.getId().equals(toLink.getId())) {
 					log.warn("Two different zones were mapped to the same Link - there may be a Problem with the Network resolution. "
 							+ "FromId: " + fromId + ", ToId: " + toId);
-					
-					double distance = ((CoordImpl)fromData.coord1903).calcDistance(toData.coord1903);
+
+					double distance = CoordUtils.calcDistance(fromData.coord1903, toData.coord1903);
 					travelTimes[from][to] = distance/connectorSpeed;
 					to++;
 					counter.incCounter();
@@ -233,11 +233,11 @@ public class CalculateTravelTimes {
 			
 			double x1903 = parseDouble(cols[3]);
 			double y1903 = parseDouble(cols[4]);
-			data.coord1903 = scenario.createCoord(x1903, y1903);
+			data.coord1903 = new Coord(x1903, y1903);
 			
 			double xWGS84 = parseDouble(cols[5]);
 			double yWGS84 = parseDouble(cols[6]);
-			data.coordWGS84 = scenario.createCoord(xWGS84, yWGS84);
+			data.coordWGS84 = new Coord(xWGS84, yWGS84);
 							
 			dataLines.put(data.id, data);
 		}

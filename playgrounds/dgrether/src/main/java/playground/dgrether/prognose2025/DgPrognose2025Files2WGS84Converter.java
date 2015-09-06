@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.DgPaths;
@@ -87,7 +86,7 @@ public class DgPrognose2025Files2WGS84Converter {
 				yCoordString = columns[indexY];
 				xCoord = Double.parseDouble(xCoordString);
 				yCoord = Double.parseDouble(yCoordString);
-				coord = new CoordImpl(xCoord, yCoord);
+				coord = new Coord(xCoord, yCoord);
 				coord = this.transform.getTransformed(coord);
 
 				//create the new String with the transformed Coordinate

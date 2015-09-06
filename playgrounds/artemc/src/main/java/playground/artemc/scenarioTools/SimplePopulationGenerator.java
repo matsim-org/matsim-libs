@@ -10,6 +10,7 @@ package playground.artemc.scenarioTools;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -18,7 +19,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.artemc.utils.Writer;
@@ -64,25 +64,25 @@ public class SimplePopulationGenerator {
 
 			Double x=0.0;
 			Double y=0.0;
-			CoordImpl homeLocation;
-			CoordImpl workLocation;
+			Coord homeLocation;
+			Coord workLocation;
 			
 			do{
 				/*Home location*/
 				do{
 					x = (corridorLength/6*generator.nextGaussian() + corridorLength /3);
 				}while(x<0 || x>corridorLength );
-				y = (generator.nextDouble()-0.5)*1000 + 1000;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;
 
-				homeLocation = new CoordImpl(x,y);
+				homeLocation = new Coord(x, y);
 
 				/*Work location*/
 				do{
 					x = (corridorLength /6*generator.nextGaussian() + 2*corridorLength/3);
 				}while(x<0 || x>corridorLength);
-				y = (generator.nextDouble()-0.5)*1000 + 1000;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;
 
-				workLocation = new CoordImpl(x,y);
+				workLocation = new Coord(x, y);
 			}while(homeLocation.getX() > workLocation.getX());
 
 			//Add person attributes

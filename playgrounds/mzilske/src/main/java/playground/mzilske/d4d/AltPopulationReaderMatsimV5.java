@@ -49,7 +49,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -216,11 +215,11 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			Id<Link> linkId = Id.create(xmlr.getAttributeValue("", "link"), Link.class);
 			curract = (ActivityImpl) population.getFactory().createActivityFromLinkId(xmlr.getAttributeValue("", "type"), linkId);
 			if ((xmlr.getAttributeValue("", "x") != null) && (xmlr.getAttributeValue("", "y") != null)) {
-				coord = new CoordImpl(xmlr.getAttributeValue("", "x"), xmlr.getAttributeValue("", "y"));
+				coord = new Coord(Double.parseDouble(xmlr.getAttributeValue("", "x")), Double.parseDouble(xmlr.getAttributeValue("", "y")));
 				curract.setCoord(coord);
 			}
 		} else if ((xmlr.getAttributeValue("", "x") != null) && (xmlr.getAttributeValue("", "y") != null)) {
-			coord = new CoordImpl(xmlr.getAttributeValue(""	, "x"), xmlr.getAttributeValue("", "y"));
+			coord = new Coord(Double.parseDouble(xmlr.getAttributeValue("", "x")), Double.parseDouble(xmlr.getAttributeValue("", "y")));
 			curract = (ActivityImpl) population.getFactory().createActivityFromCoord(xmlr.getAttributeValue("", "type"), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");

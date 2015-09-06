@@ -21,6 +21,7 @@
 package playground.andreas.intersection;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.LinkedList;
 
@@ -162,13 +162,13 @@ public class PlansGeneratorControler extends Controler {
 		PersonImpl p = new PersonImpl(Id.create(String.valueOf(ii), Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
-			ActivityImpl act1 = plan.createAndAddActivity("h", new CoordImpl(100., 100.));
+			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
 			act1.setLinkId(fromLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createAndAddLeg(TransportMode.car);
-			ActivityImpl act2 = plan.createAndAddActivity("h", new CoordImpl(200., 200.));
+			ActivityImpl act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
 			act2.setLinkId(toLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 

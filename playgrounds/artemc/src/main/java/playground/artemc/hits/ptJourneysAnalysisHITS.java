@@ -1,7 +1,6 @@
 package playground.artemc.hits;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.artemc.utils.DataBaseAdmin;
@@ -169,7 +168,7 @@ public class ptJourneysAnalysisHITS {
 				
 					startLat = agentTrips.getDouble(6);
 					startLon = agentTrips.getDouble(7);
-					Coord coordStart =new CoordImpl(startLon, startLat);
+					Coord coordStart = new Coord(startLon, startLat);
 					Coord UTMStart = ct.transform(coordStart);
 					startLon=UTMStart.getX();
 					startLat=UTMStart.getY();
@@ -190,7 +189,7 @@ public class ptJourneysAnalysisHITS {
 				if(tripID==1 && stageID==1){
 					firstLat = agentTrips.getDouble(6);
 					firstLon = agentTrips.getDouble(7);
-					Coord coordStart =new CoordImpl(firstLon, firstLat);
+					Coord coordStart = new Coord(firstLon, firstLat);
 					Coord UTMStart = ct.transform(coordStart);
 					firstLon=UTMStart.getX();
 					firstLat=UTMStart.getY();	
@@ -200,8 +199,8 @@ public class ptJourneysAnalysisHITS {
 			  
 			  
 				endLat = agentTrips.getDouble(8);
-				endLon = agentTrips.getDouble(9);			  
-				Coord coordEnd =new CoordImpl(endLon, endLat);
+				endLon = agentTrips.getDouble(9);
+				Coord coordEnd = new Coord(endLon, endLat);
 				Coord UTMEnd = ct.transform(coordEnd);
 				endLon=UTMEnd.getX();
 				endLat=UTMEnd.getY();

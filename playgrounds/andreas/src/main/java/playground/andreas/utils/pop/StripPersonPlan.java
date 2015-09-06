@@ -19,6 +19,7 @@
 
 package playground.andreas.utils.pop;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -33,7 +34,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Reset all "personal" attributes of a person
@@ -68,7 +68,7 @@ public class StripPersonPlan extends NewPopulation {
 				ActivityImpl act = (ActivityImpl) pE;
 				int x = (int) (act.getCoord().getX() / 100.0);
 				int y = (int) (act.getCoord().getY() / 100.0);
-				act.setCoord(new CoordImpl(x * 100.0, y * 100.0));
+				act.setCoord(new Coord(x * 100.0, y * 100.0));
 			}
 		}
 

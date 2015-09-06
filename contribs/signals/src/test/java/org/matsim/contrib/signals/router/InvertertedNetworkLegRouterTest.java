@@ -21,6 +21,7 @@ package org.matsim.contrib.signals.router;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,7 +40,6 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-
 
 
 /**
@@ -148,14 +148,15 @@ public class InvertertedNetworkLegRouterTest {
 		public Fixture() {
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
-			Node n1 = nf.createNode(Id.create("1", Node.class), this.s.createCoord(0, 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), this.s.createCoord(0, 1000));
-			Node n3 = nf.createNode(Id.create("3", Node.class), this.s.createCoord(0, 2000));
-			Node n4 = nf.createNode(Id.create("4", Node.class), this.s.createCoord(500, 3000));
-			Node n5 = nf.createNode(Id.create("5", Node.class), this.s.createCoord(0, 3000));
-			Node n6 = nf.createNode(Id.create("6", Node.class), this.s.createCoord(-500, 3000));
-			Node n7 = nf.createNode(Id.create("7", Node.class), this.s.createCoord(0, 4000));
-			Node n8 = nf.createNode(Id.create("8", Node.class), this.s.createCoord(0, 5000));
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 0, (double) 2000));
+			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 500, (double) 3000));
+			Node n5 = nf.createNode(Id.create("5", Node.class), new Coord((double) 0, (double) 3000));
+			double x = -500;
+			Node n6 = nf.createNode(Id.create("6", Node.class), new Coord(x, (double) 3000));
+			Node n7 = nf.createNode(Id.create("7", Node.class), new Coord((double) 0, (double) 4000));
+			Node n8 = nf.createNode(Id.create("8", Node.class), new Coord((double) 0, (double) 5000));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);

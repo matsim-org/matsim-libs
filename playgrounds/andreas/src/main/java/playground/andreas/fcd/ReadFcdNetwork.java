@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -62,7 +61,7 @@ public class ReadFcdNetwork implements TabularFileHandler{
 			log.info("Ignoring: " + tempBuffer);
 		} else {
 			Id<FcdNetworkPoint> id = Id.create(row[0], FcdNetworkPoint.class);
-			Coord coord = new CoordImpl(row[2], row[1]);
+			Coord coord = new Coord(Double.parseDouble(row[2]), Double.parseDouble(row[1]));
 			double direction = Double.parseDouble(row[3]);
 			
 			this.networkMap.put(id, new FcdNetworkPoint(id, coord, direction));

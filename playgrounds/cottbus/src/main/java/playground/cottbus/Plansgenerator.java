@@ -40,7 +40,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author	rschneid-btu
@@ -327,8 +326,8 @@ public class Plansgenerator {
 		final int visPlaces = 2000; //better visualization of start and target
 		final Coord startCoord = start.getToNode().getCoord();
 		final Coord targetCoord = target.getFromNode().getCoord();
-		final Coord homeCoord = new CoordImpl(startCoord.getX()-visPlaces,startCoord.getY()+visPlaces);
-		final Coord workCoord = new CoordImpl(targetCoord.getX()+visPlaces,targetCoord.getY()-visPlaces);
+		final Coord homeCoord = new Coord(startCoord.getX() - visPlaces, startCoord.getY() + visPlaces);
+		final Coord workCoord = new Coord(targetCoord.getX() + visPlaces, targetCoord.getY() - visPlaces);
 
 		final int AMOUNT_OF_CARS = (int)((CARS_PER_HOUR * DURATION * 1.0) / 3600);
 //		System.out.println("start: "+start.getId()+" zielLink: "+target.getId()+" cars: "+AMOUNT_OF_CARS+ "c/h: "+CARS_PER_HOUR+" dur: "+((DURATION*1.0)/3600));

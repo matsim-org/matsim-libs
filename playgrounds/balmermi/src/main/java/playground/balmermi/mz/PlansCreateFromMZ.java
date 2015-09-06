@@ -42,7 +42,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
 
@@ -121,14 +120,14 @@ public class PlansCreateFromMZ {
 				entries[3] = Integer.toString(departure);
 
 				// start coordinate (round to hectare)
-				Coord from = new CoordImpl(entries[4].trim(),entries[5].trim());
+				Coord from = new Coord(Double.parseDouble(entries[4].trim()), Double.parseDouble(entries[5].trim()));
 				from.setX(Math.round(from.getX()/100.0)*100);
 				from.setY(Math.round(from.getY()/100.0)*100);
 				entries[4] = Double.toString(from.getX());
 				entries[5] = Double.toString(from.getY());
 
 				// start coordinate (round to hectare)
-				Coord to = new CoordImpl(entries[6].trim(),entries[7].trim());
+				Coord to = new Coord(Double.parseDouble(entries[6].trim()), Double.parseDouble(entries[7].trim()));
 				to.setX(Math.round(to.getX()/100.0)*100);
 				to.setY(Math.round(to.getY()/100.0)*100);
 				entries[6] = Double.toString(to.getX());

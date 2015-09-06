@@ -63,7 +63,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Time;
@@ -691,7 +690,7 @@ public class ShopsOf2005ToFacilities {
 					// transform coordinates
 					String[] coordinates = point.getCoordinates().get(0).split(",");
 					//System.out.println(point.getCoordinates().get(0));
-					Coord wgs84Coords = new CoordImpl(coordinates[0], coordinates[1]);
+					Coord wgs84Coords = new Coord(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
 					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 					Coord ch1903Coordinates = trafo.transform(wgs84Coords);
 
@@ -1659,7 +1658,7 @@ public class ShopsOf2005ToFacilities {
 				aShop.setDescription(facilityId);
 
 				// transform coordinates incl. toggle easting and northing
-				northWestCH1903 = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
+				northWestCH1903 = new Coord(facility.getCoord().getX(), facility.getCoord().getY());
 				northWestWGS84 = trafo.transform(northWestCH1903);
 
 				// have to iterate this over opening times

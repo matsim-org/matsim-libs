@@ -35,7 +35,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author johannes
@@ -55,7 +54,7 @@ public class Visum2MatsimRoadNetwork {
 			@Override
 			public void handleRow(Map<String, String> row) {
 				Id<Node> id = Id.create(row.get("NR"), Node.class);
-				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
+				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				network.createAndAddNode(id, coord);
 			}
 

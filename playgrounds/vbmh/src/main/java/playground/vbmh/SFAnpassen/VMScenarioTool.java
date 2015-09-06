@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -19,7 +20,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -35,7 +35,8 @@ public class VMScenarioTool {
 	static Scenario scenario;
 	static double xCoord = 678773;
 	static double yCoord = 4908813;
-	static CoordImpl brookings = new CoordImpl(xCoord, yCoord);
+	static Coord brookings = new Coord(xCoord, yCoord);
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
@@ -64,7 +65,7 @@ public class VMScenarioTool {
 		// A G G L O 
 		double xCoord = 678773;
 		double yCoord = 4908813;
-		CoordImpl brookings = new CoordImpl(xCoord, yCoord);
+		Coord brookings = new Coord(xCoord, yCoord);
 		//------------------
 				
 		//Verzeichnisse erstellen

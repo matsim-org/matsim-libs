@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -133,12 +132,12 @@ public class SubPopulationPlans4Patna {
 
 					if(fromZoneId.equals(zoneId) ) {
 						p = getRandomPointsFromWard(feature);
-						Coord fromZoneCoord = scenario.createCoord(p.getX(), p.getY());
+						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = ct.transform(fromZoneCoord);
 					}
 					else if (toZoneId.equals(zoneId)){
 						q = getRandomPointsFromWard(feature);
-						Coord toZoneCoord = scenario.createCoord(q.getX(), q.getY());
+						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= ct.transform(toZoneCoord);
 					}
 				}
@@ -151,11 +150,11 @@ public class SubPopulationPlans4Patna {
 					SimpleFeature feature = iterator.next();
 					
 					p = getRandomPointsFromWard(feature);
-					Coord fromZoneCoord = scenario.createCoord(p.getX(), p.getY());
+					Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 					homeZoneCoordTransform = ct.transform(fromZoneCoord);
 
 					q = getRandomPointsFromWard(feature);
-					Coord toZoneCoord = scenario.createCoord(q.getX(), q.getY());
+					Coord toZoneCoord = new Coord(q.getX(), q.getY());
 					workZoneCoordTransform= ct.transform(toZoneCoord);
 				}
 			}

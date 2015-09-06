@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -51,9 +52,9 @@ public class DgSensorTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n1 = nf.createNode(Id.create(1, Node.class), sc.createCoord(0, 0));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		net.addNode(n1);
-		Node n2 = nf.createNode(Id.create(2, Node.class), sc.createCoord(500, 0));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new Coord((double) 500, (double) 0));
 		net.addNode(n2);
 		Link l = nf.createLink(Id.create(1, Link.class), n1, n2);
 		net.addLink(l);

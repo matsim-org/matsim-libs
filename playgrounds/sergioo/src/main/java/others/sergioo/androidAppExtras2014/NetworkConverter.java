@@ -19,7 +19,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -76,7 +75,7 @@ public class NetworkConverter {
 			Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
 			Node[] nodes = new Node[coords.length];
 			for(int n=0; n<nodes.length; n++) {
-				Coord coord = new CoordImpl(coords[n].x, coords[n].y);
+				Coord coord = new Coord(coords[n].x, coords[n].y);
 				for(Node node:network.getNodes().values())
 					if(node.getCoord().equals(coord))
 						nodes[n] = node;

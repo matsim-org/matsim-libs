@@ -16,7 +16,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.andreas.bln.pop.SharedNetScenario;
 import playground.andreas.mzilske.bvg09.DataPrepare;
@@ -49,8 +48,8 @@ public class DeriveSmallScenarioFromBigOne {
 		String outMultimodalNetworkFile = "./network.multimodal.xml.gz";
 		String outRoutedPlansFile = "./plan.routedOevModell.xml.gz";
 
-		Coord minXY = new CoordImpl(4590999.0, 5805999.0);
-		Coord maxXY = new CoordImpl(4606021.0, 5822001.0);
+		Coord minXY = new Coord(4590999.0, 5805999.0);
+		Coord maxXY = new Coord(4606021.0, 5822001.0);
 
 
 		log.info("Start DeriveSmallScenarioFromBigOne");

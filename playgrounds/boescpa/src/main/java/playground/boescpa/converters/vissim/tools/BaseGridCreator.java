@@ -24,12 +24,12 @@ package playground.boescpa.converters.vissim.tools;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -79,7 +79,7 @@ public class BaseGridCreator implements ConvEvents.BaseGridCreator {
 		do {
 			long longitude = sides[0];
 			do {
-				mutualRepresentation.addNode(networkFactory.createNode(Id.create(cellId++, Node.class), new CoordImpl(longitude, latitude)));
+				mutualRepresentation.addNode(networkFactory.createNode(Id.create(cellId++, Node.class), new Coord((double) longitude, (double) latitude)));
 				longitude += gridcellsize;
 			} while (longitude < (maxLongitude + gridcellsize));
 			latitude += gridcellsize;

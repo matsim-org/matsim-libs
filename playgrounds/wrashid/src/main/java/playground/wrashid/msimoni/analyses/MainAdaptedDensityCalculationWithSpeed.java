@@ -60,7 +60,7 @@ public class MainAdaptedDensityCalculationWithSpeed {
 		
 		 int binSizeInSeconds = 300; 
 		  double radiusInMeters =		 1000;
-		  center = scenario.createCoord(682548.0, 247525.5);
+		center = new Coord(682548.0, 247525.5);
 		 
 		/**
 		int binSizeInSeconds = 300; // 5 minute bins

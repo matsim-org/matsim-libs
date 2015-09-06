@@ -32,7 +32,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -47,9 +46,9 @@ public class PopulationModeConverter {
 	public static void main(String[] args) {
 		
 		PopulationModeConverter pm = new PopulationModeConverter();
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
-		Coord xymin = ct.transform(new CoordImpl(13.2794,52.4687));
-		Coord xymax = ct.transform(new CoordImpl(13.4804, 52.5583));
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+		Coord xymin = ct.transform(new Coord(13.2794, 52.4687));
+		Coord xymax = ct.transform(new Coord(13.4804, 52.5583));
 		pm.box = BoundingBox.createBoundingBox(xymin.getX(),xymin.getY(),xymax.getX(),xymax.getY());
 		pm.run("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz","C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/ITERS/it.100/bvg.run132.25pct.100.plans.xml.gz","C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/ITERS/it.100/cp.tar.gz");
 		

@@ -3,10 +3,8 @@ package playground.wrashid.brawand.algorithm;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainA {
 
@@ -20,7 +18,7 @@ public class MainA {
 		for (int i=1;i<matrix.getNumberOfRows();i++){
 			WeightedDemand wd=new WeightedDemand();
 			wd.demandCount=matrix.getInteger(i, 1);
-			wd.coord=new CoordImpl(matrix.getDouble(i, 2), matrix.getDouble(i, 3));
+			wd.coord= new Coord(matrix.getDouble(i, 2), matrix.getDouble(i, 3));
 			demand.add(wd);
 			possibleChargingLocations.add(wd.coord);
 		}

@@ -80,7 +80,7 @@ public class PoznanTaxiZoneReader
             String id = st.nextToken();
             String x = st.nextToken();
             String y = st.nextToken();
-            coords.put(id, ct.transform(new CoordImpl(x, y)));
+            coords.put(id, ct.transform(new Coord(Double.parseDouble(x), Double.parseDouble(y))));
         }
     }
 

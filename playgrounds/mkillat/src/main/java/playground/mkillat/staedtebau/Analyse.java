@@ -26,7 +26,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -356,15 +355,15 @@ public class Analyse implements Runnable {
 		Map <String, Double> von8nach5 = Verbinden(kd8_rein, kd5_raus);
 		Map <String, Double> von8nach6 = Verbinden(kd8_rein, kd6_raus);
 		Map <String, Double> von8nach7 = Verbinden(kd8_rein, kd7_raus);
-		
-		Coord kd1 = new CoordImpl(13.39659333, 52.48638676);
-		Coord kd2 = new CoordImpl(13.39442611, 52.48647823);
-		Coord kd3 = new CoordImpl(13.38602006, 52.48736022);
-		Coord kd4 = new CoordImpl(13.38644251, 52.49006487);
-		Coord kd5 = new CoordImpl(13.39087889, 52.49228923);
-		Coord kd6 = new CoordImpl(13.39274101, 52.49192912);
-		Coord kd7 = new CoordImpl(13.39440331, 52.49156902);
-		Coord kd8 = new CoordImpl(13.39806587, 52.48888896);
+
+		Coord kd1 = new Coord(13.39659333, 52.48638676);
+		Coord kd2 = new Coord(13.39442611, 52.48647823);
+		Coord kd3 = new Coord(13.38602006, 52.48736022);
+		Coord kd4 = new Coord(13.38644251, 52.49006487);
+		Coord kd5 = new Coord(13.39087889, 52.49228923);
+		Coord kd6 = new Coord(13.39274101, 52.49192912);
+		Coord kd7 = new Coord(13.39440331, 52.49156902);
+		Coord kd8 = new Coord(13.39806587, 52.48888896);
 		
 		List <Population> populations = new ArrayList<Population>();
 		populations.add(createPopulation(von1nach2, kd1, kd2));
@@ -511,14 +510,14 @@ public class Analyse implements Runnable {
 			Person person = factory.createPerson(Id.create(id, Person.class));
 			population.addPerson(person);
 			Plan plan = factory.createPlan();
-			Activity home = factory.createActivityFromCoord("home",  ct.transform(scenario.createCoord (coordReinX, coordReinY)));
+			Activity home = factory.createActivityFromCoord("home",  ct.transform(new Coord(coordReinX, coordReinY)));
 			home.setEndTime(entry.getValue() + Math.random()* 300 + 1 );
 			plan.addActivity(home);
 			Leg homeToWork = factory.createLeg(TransportMode.car);
 			plan.addLeg(homeToWork);
-			
-			
-			Activity work = factory.createActivityFromCoord("work", ct.transform(scenario.createCoord(coordRausX, coordRausY)));
+
+
+			Activity work = factory.createActivityFromCoord("work", ct.transform(new Coord(coordRausX, coordRausY)));
 			work.setEndTime(14 * 60 * 60);
 			plan.addActivity(work);
 			

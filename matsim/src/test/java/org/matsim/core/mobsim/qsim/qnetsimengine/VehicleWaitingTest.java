@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,7 +41,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -88,9 +88,9 @@ public class VehicleWaitingTest {
 		
 		final NetworkFactory netFact = sc.getNetwork().getFactory();
 
-		final Node node1 = netFact.createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
-		final Node node2 = netFact.createNode( Id.create( 2, Node.class ) , new CoordImpl( 0 , 1000 ) );
-		final Node node3 = netFact.createNode( Id.create( 3, Node.class ) , new CoordImpl( 1000 , 1000 ) );
+		final Node node1 = netFact.createNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
+		final Node node2 = netFact.createNode( Id.create( 2, Node.class ) , new Coord((double) 0, (double) 1000));
+		final Node node3 = netFact.createNode( Id.create( 3, Node.class ) , new Coord((double) 1000, (double) 1000));
 		
 		sc.getNetwork().addNode( node1 );
 		sc.getNetwork().addNode( node2 );

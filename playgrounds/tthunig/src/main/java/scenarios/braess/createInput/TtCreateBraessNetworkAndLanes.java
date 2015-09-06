@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -114,28 +115,29 @@ public final class TtCreateBraessNetworkAndLanes {
 		NetworkFactory fac = net.getFactory();
 
 		// create nodes
+		double x = -200;
 		net.addNode(fac.createNode(Id.createNodeId(0),
-				scenario.createCoord(-200, 200)));
+				new Coord(x, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(1),
-				scenario.createCoord(0, 200)));
+				new Coord((double) 0, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(2),
-				scenario.createCoord(200, 200)));
+				new Coord((double) 200, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(3),
-				scenario.createCoord(400, 400)));
+				new Coord((double) 400, (double) 400)));
 		net.addNode(fac.createNode(Id.createNodeId(4),
-				scenario.createCoord(400, 0)));
+				new Coord((double) 400, (double) 0)));
 		net.addNode(fac.createNode(Id.createNodeId(5),
-				scenario.createCoord(600, 200)));
+				new Coord((double) 600, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(6),
-				scenario.createCoord(800, 200)));
+				new Coord((double) 800, (double) 200)));
 		
 		if (simulateInflowCap){
 			net.addNode(fac.createNode(Id.createNodeId(23),
-					scenario.createCoord(250, 250)));
+					new Coord((double) 250, (double) 250)));
 			net.addNode(fac.createNode(Id.createNodeId(24),
-					scenario.createCoord(250, 150)));
-			net.addNode(fac.createNode(Id.createNodeId(45), 
-					scenario.createCoord(450, 50)));
+					new Coord((double) 250, (double) 150)));
+			net.addNode(fac.createNode(Id.createNodeId(45),
+					new Coord((double) 450, (double) 50)));
 		}
 		
 		// create links

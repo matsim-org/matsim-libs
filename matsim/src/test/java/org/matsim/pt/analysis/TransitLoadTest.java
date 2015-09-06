@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -50,10 +50,10 @@ public class TransitLoadTest {
 	public void testTransitLoad_singleLine() {
 		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = factory.createTransitSchedule();
-		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);
 		schedule.addStopFacility(stop3);

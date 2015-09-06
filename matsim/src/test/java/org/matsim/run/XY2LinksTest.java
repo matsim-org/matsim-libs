@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -67,7 +67,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", new CoordImpl(50, 25));
+		ActivityImpl a1 = plan.createAndAddActivity("h", new Coord((double) 50, (double) 25));
 		a1.setEndTime(3600);
 
 		// write person to file

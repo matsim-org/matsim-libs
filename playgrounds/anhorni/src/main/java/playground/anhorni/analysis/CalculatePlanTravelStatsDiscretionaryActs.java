@@ -31,7 +31,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 
 public class CalculatePlanTravelStatsDiscretionaryActs {
@@ -86,8 +86,7 @@ public class CalculatePlanTravelStatsDiscretionaryActs {
 				if (pe instanceof Activity) {
 					
 					if (((Activity) pe).getType().startsWith("s") || ((Activity) pe).getType().startsWith("l")) {
-						double distance = ((CoordImpl)((Activity) pe).getCoord()).calcDistance(
-								plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
+						double distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity) pe)).getCoord());
 						if (((Activity) pe).getType().startsWith("s")) {
 							this.shopBins.addVal(distance, 1.0);
 						}

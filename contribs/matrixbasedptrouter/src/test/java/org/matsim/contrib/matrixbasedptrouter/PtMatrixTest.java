@@ -41,7 +41,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * This class tests the pt simulation of MATSim for a simple network created with CreateTestNetwork.java.

@@ -2,7 +2,6 @@ package playground.artemc.hits;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.artemc.utils.DataBaseAdmin;
@@ -35,8 +34,8 @@ public class StopFinder {
 			String stopId=allStops.getString(1);
 			double stopLat=allStops.getDouble(2);
 			double stopLon=allStops.getDouble(3);
-			
-			Coord coordStart = new CoordImpl(stopLon, stopLat);
+
+			Coord coordStart = new Coord(stopLon, stopLat);
 			Coord UTMStart = ct.transform(coordStart);
 			stopLon=UTMStart.getX();
 			stopLat=UTMStart.getY();	

@@ -25,11 +25,11 @@ import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class AgentDestinations {
 	
-	private TreeMap<Integer, List<CoordImpl>> destinations = new TreeMap<Integer, List<CoordImpl>>();
+	private TreeMap<Integer, List<Coord>> destinations = new TreeMap<Integer, List<Coord>>();
 	private Id agentId;
 	
 	public AgentDestinations(Id id) {
@@ -38,7 +38,7 @@ public class AgentDestinations {
 	
 	public void addDestination(int activityNumber, Coord coord) {
 		if (this.destinations.get(activityNumber) == null) this.destinations.put(activityNumber, new Vector<CoordImpl>());
-		this.destinations.get(activityNumber).add((CoordImpl)coord);
+		this.destinations.get(activityNumber).add(coord);
 	}
 	
 	public double getAverageDistanceFromCenterPointForAllActivities() {
@@ -50,25 +50,25 @@ public class AgentDestinations {
 	}
 	
 	public double getAverageDistanceFromCenterPoint(int activityNumber) {
-		CoordImpl center = this.getCenterPoint(activityNumber);
+		Coord center = this.getCenterPoint(activityNumber);
 		
 		double distance = 0.0;
-		for (CoordImpl coord : this.destinations.get(activityNumber)) {
-			distance += center.calcDistance(coord);
+		for (Coord coord : this.destinations.get(activityNumber)) {
+			distance += CoordUtils.calcDistance(center, coord);
 		}
 		distance /= this.destinations.get(activityNumber).size();
 		return distance;
 	}
 	
-	private CoordImpl getCenterPoint(int activityNumber) {
+	private Coord getCenterPoint(int activityNumber) {
 		double x = 0.0;
 		double y = 0.0;
-		for (CoordImpl coord : this.destinations.get(activityNumber)) {
+		for (Coord coord : this.destinations.get(activityNumber)) {
 			x += coord.getX();
 			y += coord.getY();
 		}
 		x /= this.destinations.get(activityNumber).size();
 		y /= this.destinations.get(activityNumber).size();
-		return new CoordImpl(x,y);
+		return new Coord(x, y);
 	}
 }

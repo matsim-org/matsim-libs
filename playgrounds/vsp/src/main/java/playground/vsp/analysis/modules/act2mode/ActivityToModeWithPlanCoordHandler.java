@@ -46,8 +46,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.pt.PtConstants;
 
-import playground.vsp.analysis.modules.act2mode.ActivityToMode;
-
 /**
  * @author droeder,
  * 

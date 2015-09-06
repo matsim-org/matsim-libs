@@ -25,31 +25,31 @@ import org.matsim.api.core.v01.Coord;
 public abstract class CoordUtils {
 	
 	public static Coord createCoord( final double xx, final double yy ) {
-		return new CoordImpl( xx, yy ) ;
+		return new Coord(xx, yy);
 	}
 	
 	public static Coord plus ( Coord coord1, Coord coord2 ) {
 		double xx = coord1.getX() + coord2.getX();
 		double yy = coord1.getY() + coord2.getY();
-		return new CoordImpl( xx, yy ) ;
+		return new Coord(xx, yy);
 	}
 	
 	public static Coord minus ( Coord coord1, Coord coord2 ) {
 		double xx = coord1.getX() - coord2.getX();
 		double yy = coord1.getY() - coord2.getY();
-		return new CoordImpl( xx, yy ) ;
+		return new Coord(xx, yy);
 	}
 	
 	public static Coord scalarMult( double alpha, Coord coord ) {
 		double xx = alpha * coord.getX() ;
 		double yy = alpha * coord.getY() ;
-		return new CoordImpl( xx, yy ) ;
+		return new Coord(xx, yy);
 	}
 	
 	public static Coord getCenter( Coord coord1, Coord coord2 ) {
 		double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
 		double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
-		return new CoordImpl( xx, yy ) ;
+		return new Coord(xx, yy);
 	}
 	
 	public static double length( Coord coord1 ) {
@@ -57,7 +57,8 @@ public abstract class CoordUtils {
 	}
 	
 	public static Coord rotateToRight( Coord coord1 ) {
-		return new CoordImpl( coord1.getY(), -coord1.getX() ) ;
+		final double y = -coord1.getX();
+		return new Coord(coord1.getY(), y);
 	}
 	
 	public static Coord getCenterWOffset( Coord coord1, Coord coord2 ) {
@@ -131,7 +132,7 @@ public abstract class CoordUtils {
 			// (x | y) is not on the line segment, but after lineTo
 			return calcDistance(lineTo, point);
 		}
-		return calcDistance(new CoordImpl(lineFrom.getX() + u*lineDX, lineFrom.getY() + u*lineDY), point);
+		return calcDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
 	}
 
 }

@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
@@ -66,10 +66,10 @@ public class AssignLocations {
 	}
 
 
-	private final ActivityFacility getFacilities(CoordImpl coordStart, CoordImpl coordEnd) {
+	private final ActivityFacility getFacilities(Coord coordStart, Coord coordEnd) {
 		double x = (coordStart.getX() + coordEnd.getX()) / 2.0;
 		double y = (coordStart.getY() + coordEnd.getY()) / 2.0;
-		double radius = coordStart.calcDistance(coordEnd);
+		double radius = CoordUtils.calcDistance(coordStart, coordEnd);
 		return this.getFacilities(x, y, radius);
 	}
 
@@ -77,8 +77,8 @@ public class AssignLocations {
 	//////////////////////////////////////////////////////////////////////
 
 	private final void assignLocation(ActivityImpl act, ActivityFacility start, ActivityFacility end) {
-		CoordImpl c_start = (CoordImpl)start.getCoord();
-		CoordImpl c_end   = (CoordImpl)end.getCoord();
+		Coord c_start = start.getCoord();
+		Coord c_end   = end.getCoord();
 
 		double dx = c_end.getX() - c_start.getX();
 		double dy = c_end.getX() - c_start.getX();

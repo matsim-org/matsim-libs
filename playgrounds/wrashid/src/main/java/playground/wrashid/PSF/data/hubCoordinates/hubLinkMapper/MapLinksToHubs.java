@@ -30,7 +30,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.HashMapInverter;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 // TODO: I could it make faster by introducing hierarchical mapping 
@@ -51,7 +50,7 @@ public class MapLinksToHubs {
 		int numberOfLinksProcessedStatistics=0;
 		for (Link link:network.getLinks().values()){
 			for (int i=0;i<matrix.getNumberOfRows();i++){
-				Coord coordinateOfCurrentHubSubManager=new CoordImpl(matrix.getDouble(i, 1),matrix.getDouble(i, 2));
+				Coord coordinateOfCurrentHubSubManager= new Coord(matrix.getDouble(i, 1), matrix.getDouble(i, 2));
 				
 				if (GeneralLib.getDistance(link.getCoord(), coordinateOfCurrentHubSubManager)<averageHubSubManagers){
 					linkHubMapping.put(link.getId(), matrix.convertDoubleToInteger(i, 0));

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,7 +42,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
@@ -93,7 +93,7 @@ public class DilutedZurichFilter {
 
 		log.info("  calculate area of interest... ");
 		double radius = 30000.0;
-		final CoordImpl center = new CoordImpl(683518.0,246836.0);
+		final Coord center = new Coord(683518.0, 246836.0);
 		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 

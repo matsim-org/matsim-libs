@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
@@ -194,7 +193,7 @@ public class GeolocalizeCsvDataWithMapquest {
 				fields[ 7 ] = result.getLongitude().toString();
 				fields[ 8 ] = result.getLatitude().toString();
 
-				final Coord wgsCoord = new CoordImpl( result.getLongitude() , result.getLatitude() );
+				final Coord wgsCoord = new Coord(result.getLongitude(), result.getLatitude());
 				final Coord chCoord = new WGS84toCH1903LV03().transform( wgsCoord );
 				fields[ 9 ] = ""+chCoord.getX();
 				fields[ 10 ] = ""+chCoord.getY();
@@ -317,7 +316,7 @@ public class GeolocalizeCsvDataWithMapquest {
 			maxY = Math.max( maxY , c.getY() );
 		}
 
-		return new CoordImpl( (minX + maxX) / 2 , (minY + maxY) / 2 );
+		return new Coord((minX + maxX) / 2, (minY + maxY) / 2);
 	}
 
 	private static void filterBadAddresses(

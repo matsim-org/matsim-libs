@@ -67,7 +67,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -80,9 +79,6 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -195,7 +191,7 @@ public class WorkFacilitiesGeneration {
 				Id<ActivityFacility> areaId =  Id.create(buildingsR.getString(1), ActivityFacility.class);
 				ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreas.get(areaId);
 				MPAreaData mPAreaData = dataMPAreas.get(areaId);
-				ActivityFacilityImpl building = facilities.createAndAddFacility(Id.create(buildingsR.getString(3), ActivityFacility.class), coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5))));
+				ActivityFacilityImpl building = facilities.createAndAddFacility(Id.create(buildingsR.getString(3), ActivityFacility.class), coordinateTransformation.transform(new Coord(buildingsR.getDouble(4), buildingsR.getDouble(5))));
 				building.setDesc(mPAreaData.getType());
 				double proportion = buildingsR.getDouble(2);
 				for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
@@ -804,7 +800,7 @@ public class WorkFacilitiesGeneration {
 		SortedMap<String, Coord> stopsBase = new TreeMap<String, Coord>();
 		ResultSet stopsResult = dataBaseAux.executeQuery("SELECT * FROM stops");
 		while(stopsResult.next())
-			stopsBase.put(stopsResult.getString(1), new CoordImpl(stopsResult.getDouble(3), stopsResult.getDouble(2)));
+			stopsBase.put(stopsResult.getString(1), new Coord(stopsResult.getDouble(3), stopsResult.getDouble(2)));
 		stopsResult.close();
 		System.out.println("Stops done!");
 		Map<Id<TransitStopFacility>, Double> stops = new HashMap<Id<TransitStopFacility>, Double>();

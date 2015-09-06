@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -18,7 +19,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -261,8 +261,8 @@ public class oldEmme2MatsimConverter {
 				boolean isZone = cells[0].contains("*");
 				
 				NodeImpl n = new NodeImpl(Id.create(cells[1], Node.class));
-				n.setCoord(new CoordImpl(cells[2], 
-						cells[3].length() == 6 ? "4" + cells[3] : cells[3])); 
+				final double y = Double.parseDouble(cells[3].length() == 6 ? "4" + cells[3] : cells[3]);
+				n.setCoord(new Coord(Double.parseDouble(cells[2]), y));
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
 				
 				n.setType(isZone ? "Zone" : "");
@@ -474,7 +474,7 @@ public class oldEmme2MatsimConverter {
 				
 				if (!tweakedNodes.contains(lrtLane.getFromNode().getId())){
 					NodeImpl N = (NodeImpl) lrtLane.getFromNode();
-					N.setCoord(new CoordImpl(sumX / incomingTransfers.size(), sumY / incomingTransfers.size()));
+					N.setCoord(new Coord(sumX / incomingTransfers.size(), sumY / incomingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
 			}
@@ -496,7 +496,7 @@ public class oldEmme2MatsimConverter {
 				
 				if (!tweakedNodes.contains(lrtLane.getToNode().getId())){
 					NodeImpl N = (NodeImpl) lrtLane.getToNode();
-					N.setCoord(new CoordImpl(sumX / outgoingTransfers.size(), sumY / outgoingTransfers.size()));
+					N.setCoord(new Coord(sumX / outgoingTransfers.size(), sumY / outgoingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
 			}

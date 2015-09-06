@@ -50,7 +50,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import others.sergioo.util.geometry.Point2D;
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
@@ -485,7 +484,7 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public void isOk() {
 		Point2D center = panel.getCenter();
-		Coord coord = new CoordImpl(center.getX(), center.getY());
+		Coord coord = new Coord(center.getX(), center.getY());
 		selectedLinkIndex = routePath.isPathJoined();
 		if(selectedLinkIndex==-1) {
 			selectedLinkIndex = routePath.isUs()?routePath.isPathWithoutUs():-1;

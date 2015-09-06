@@ -47,7 +47,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -174,8 +173,8 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private ActivityFacilitiesImpl createZones() {
 		// create dummy zone facilities
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		zones.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(0., 0.));
-		zones.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(200., 100.));
+		zones.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(0., 0.));
+		zones.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord(200., 100.));
 		return zones;
 	}
 	

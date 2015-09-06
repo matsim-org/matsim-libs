@@ -31,12 +31,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
-import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -149,7 +143,7 @@ public class MergeNoiseCSVFile {
 				}
 				
 				lineCounter++;
-				rp2Coord.put(rpId, new CoordImpl(x, y));
+				rp2Coord.put(rpId, new Coord(x, y));
 				
 			}
 			

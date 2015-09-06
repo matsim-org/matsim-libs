@@ -27,12 +27,15 @@ package playground.cottbus;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -59,10 +62,13 @@ public class CottbusController {
 		//NetVis.main(visargs);
 		
 		// visualization via OTFVis
-		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
-		Scenario sc = scl.loadScenario();
-		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, e);
+		Config conf = ConfigUtils.loadConfig(config);
+		MatsimRandom.reset(conf.global().getRandomSeed());
+		Scenario sc = ScenarioUtils.createScenario(conf);
+		ScenarioUtils.loadScenario(sc);
+		
+		EventsManager e = EventsUtils.createEventsManager();
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(sc, e);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, e, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);

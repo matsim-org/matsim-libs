@@ -26,7 +26,6 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -34,18 +33,18 @@ public class LeisureFacilityExtractor {
 
 	private QuadTreeRing<ActivityFacility> actTree;
 	private boolean assignInAnyCase = false;
-	private CoordImpl treeCenter = new CoordImpl(683508.5, 246832.9063);
+	private Coord treeCenter = new Coord(683508.5, 246832.9063);
 
 	public LeisureFacilityExtractor(final QuadTreeRing<ActivityFacility> actTree) {
 		this.actTree = actTree;
 	}
 
-	public final ActivityFacility getFacility(CoordImpl coordStart, double radius) {
+	public final ActivityFacility getFacility(Coord coordStart, double radius) {
 
 		int maxCnt = 15;
 		int cnt = 0;
 		Collection<ActivityFacility> locs = new Vector<ActivityFacility>();
-		CoordImpl center = coordStart;
+		Coord center = coordStart;
 		double smallRadius = Math.max(500.0, radius * 0.1);
 
 		while (locs.size() == 0 && cnt < maxCnt) {
@@ -95,7 +94,7 @@ public class LeisureFacilityExtractor {
 		return locations.get(r);
 	}
 
-	private Collection<ActivityFacility> getFacilitiesFromTree(CoordImpl coordStart, double radius, double q, int cnt) {
+	private Collection<ActivityFacility> getFacilitiesFromTree(Coord coordStart, double radius, double q, int cnt) {
 
 		Collection<ActivityFacility> locs =
 			this.actTree.get(coordStart.getX(), coordStart.getY(), (Math.pow(1.0 + q, cnt) * radius), (Math.pow(1.0 - q, cnt) * radius));
@@ -112,7 +111,7 @@ public class LeisureFacilityExtractor {
 		return locs;
 	}
 
-	private CoordImpl shootIntoTheWild(CoordImpl coordStart, double radius) {
+	private Coord shootIntoTheWild(Coord coordStart, double radius) {
 		double xStart = coordStart.getX();
 		double yStart = coordStart.getY();
 
@@ -123,15 +122,15 @@ public class LeisureFacilityExtractor {
 		double xCenter = xStart + xDelta;
 		double yCenter = yStart + yDelta;
 
-		return new CoordImpl(xCenter, yCenter);
+		return new Coord(xCenter, yCenter);
 	}
 
 	private Collection<ActivityFacility> getFacilityForLongDistances(Coord coordStart, double radius) {
-		CoordImpl center = this.getCenterForLongDistances(coordStart, radius);
+		Coord center = this.getCenterForLongDistances(coordStart, radius);
 		return this.actTree.get(center.getX(), center.getY(), 8.0 * 1000.0);
 	}
 
-	private CoordImpl getCenterForLongDistances(Coord coordStart, double radius)  {
+	private Coord getCenterForLongDistances(Coord coordStart, double radius)  {
 		double distance2Treecenter = CoordUtils.calcDistance(treeCenter, coordStart);
 		double factor = radius / distance2Treecenter;
 
@@ -140,7 +139,7 @@ public class LeisureFacilityExtractor {
 
 		double xCenter = coordStart.getX() + xDelta;
 		double yCenter = coordStart.getY() + yDelta;
-		return new CoordImpl(xCenter, yCenter);
+		return new Coord(xCenter, yCenter);
 	}
 
 	private ActivityFacility getClosestFacility(Coord coordStart, Coord center, double radius) {

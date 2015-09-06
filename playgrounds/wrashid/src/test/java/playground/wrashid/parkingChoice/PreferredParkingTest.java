@@ -21,12 +21,12 @@ package playground.wrashid.parkingChoice;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
@@ -121,13 +121,13 @@ public class PreferredParkingTest extends MatsimTestCase {
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				ParkingImpl parking = new ParkingImpl(new CoordImpl(i * 1000 + 500, j * 1000 + 500));
+				ParkingImpl parking = new ParkingImpl(new Coord((double) (i * 1000 + 500), (double) (j * 1000 + 500)));
 				parking.setMaxCapacity(parkingCapacity);
 				parkingCollection.add(parking);
 			}
 		}
 
-		PreferredParking preferredParking = new PreferredParking(new CoordImpl(1000.0, 1000), "EV, Mobility");
+		PreferredParking preferredParking = new PreferredParking(new Coord(1000.0, (double) 1000), "EV, Mobility");
 		preferredParking.setMaxCapacity(parkingCapacity);
 		parkingCollection.add(preferredParking);
 

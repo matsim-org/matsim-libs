@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -54,7 +53,7 @@ public class CarSharingStations
 	    while ((line = reader.readLine()) != null) {
 	      String[] parts = StringUtils.explode(line, '\t');
 	      if (parts.length == 7) {
-	        CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+            Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 	        int cars = Integer.parseInt(parts[6]);
 	        LinkImpl stationLink = MyLinkUtils.getClosestLink(this.network, coord);
 	        CarSharingStation csStation = new CarSharingStation(Id.create(parts[0], CarSharingStation.class), coord, stationLink, cars);
@@ -83,7 +82,7 @@ public class CarSharingStations
 	    while ((line1 = reader1.readLine()) != null) {
 	      String[] parts = StringUtils.explode(line1, '\t');
 	      if (parts.length == 4) {
-	        CoordImpl coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+            Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 	        
 
 	        int cars = Integer.parseInt(mapa.get(parts[0]));

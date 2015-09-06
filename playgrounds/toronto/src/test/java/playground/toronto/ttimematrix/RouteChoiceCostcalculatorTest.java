@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -127,10 +128,10 @@ public class RouteChoiceCostcalculatorTest {
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), this.scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), this.scenario.createCoord(50, 100));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), this.scenario.createCoord(50, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), this.scenario.createCoord(100, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 100));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 50, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 100, (double) 0));
 
 		// add links
 		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
