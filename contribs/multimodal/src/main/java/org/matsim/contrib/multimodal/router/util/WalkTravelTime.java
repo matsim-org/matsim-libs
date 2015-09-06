@@ -272,10 +272,9 @@ public class WalkTravelTime implements TravelTime {
 				}
 			}
 			
-			int age = p.getAge();
+			Integer age = p.getAge();
 			
-			// by default, age is set to Integer.MIN_VALUE in PersonImpl  
-			if (age == Integer.MIN_VALUE) {
+			if (age == null) {
 				if (ageWarnCount.get() < 10) {
 					incAgeWarnCount("Person's age is not defined. Ignoring age dependent walk speed factor.");
 				}
