@@ -123,7 +123,7 @@ import org.matsim.core.utils.misc.Time;
 				out.write(person.getSex());
 				out.write("\"");
 			}
-			if (person.getAge() != Integer.MIN_VALUE) {
+			if (person.getAge() != null) {
 				out.write(" age=\"");
 				out.write(Integer.toString(person.getAge()));
 				out.write("\"");

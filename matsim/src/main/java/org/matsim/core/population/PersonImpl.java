@@ -131,7 +131,7 @@ public class PersonImpl implements Person {
 	}
 
 	@Deprecated // use PersonAttributes
-	public final int getAge() {
+	public final Integer getAge() {
 		return (Integer) getCustomAttributes().get(AGE);
 	}
 
