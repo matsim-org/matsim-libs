@@ -19,19 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.thibautd.utils.DesiresConverter;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -58,7 +55,7 @@ public class DumpTravelCardsInObjectAttributesFile {
 		}
 
 		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter( attributes );
-		writer.putAttributeConverter( Desires.class , new DesiresConverter() );
+		//writer.putAttributeConverter( Desires.class , new DesiresConverter() );
 		writer.writeFile( outAttributes );
 	}
 }

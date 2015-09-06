@@ -253,7 +253,8 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
+		if ( true ) throw new RuntimeException( "desires are gone" );
+		double typicalDuration = 0;//((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;

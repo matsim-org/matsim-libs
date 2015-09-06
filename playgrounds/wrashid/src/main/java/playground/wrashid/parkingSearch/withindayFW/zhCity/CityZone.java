@@ -24,7 +24,7 @@ import playground.wrashid.lib.obj.Coord;
 
 public class CityZone {
 
-	private Coord zoneCentreCoord;
+	private playground.wrashid.lib.obj.Coord zoneCentreCoord;
 	private String id;
 	private String name;
 	private double pctBlueParking;

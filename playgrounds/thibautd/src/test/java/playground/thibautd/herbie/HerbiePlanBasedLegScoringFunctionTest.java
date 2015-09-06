@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,11 +35,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -62,16 +56,13 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+
+import java.util.*;
 
 /**
  * @author thibautd
@@ -99,9 +90,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private static Plan getCarPlan() {
 		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
-		Desires desires = person.createDesires( "bwarf" );
-		desires.putActivityDuration( "h" , 12 * 3600 );
-		desires.putActivityDuration( "w" , 12 * 3600 );
+		//Desires desires = person.createDesires( "bwarf" );
+		//desires.putActivityDuration( "h" , 12 * 3600 );
+		//desires.putActivityDuration( "w" , 12 * 3600 );
 		PlanImpl plan = new PlanImpl( person );
 
 		Activity act = plan.createAndAddActivity( "h" );
@@ -136,9 +127,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private static Plan getPtPlanNoTransfer() {
 		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
-		Desires desires = person.createDesires( "bwarf" );
-		desires.putActivityDuration( "h" , 12 * 3600 );
-		desires.putActivityDuration( "w" , 12 * 3600 );
+		//Desires desires = person.createDesires( "bwarf" );
+		//desires.putActivityDuration( "h" , 12 * 3600 );
+		//desires.putActivityDuration( "w" , 12 * 3600 );
 		PlanImpl plan = new PlanImpl( person );
 
 		Activity act = plan.createAndAddActivity( "h" );
@@ -171,9 +162,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private static Plan getPtPlanTransfer() {
 		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class) );
-		Desires desires = person.createDesires( "bwarf" );
-		desires.putActivityDuration( "h" , 12 * 3600 );
-		desires.putActivityDuration( "w" , 12 * 3600 );
+		//Desires desires = person.createDesires( "bwarf" );
+		//desires.putActivityDuration( "h" , 12 * 3600 );
+		//desires.putActivityDuration( "w" , 12 * 3600 );
 		PlanImpl plan = new PlanImpl( person );
 
 		Activity act = plan.createAndAddActivity( "h" );
@@ -221,9 +212,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private static Plan getWalkPlan() {
 		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
-		Desires desires = person.createDesires( "bwarf" );
-		desires.putActivityDuration( "h" , 12 * 3600 );
-		desires.putActivityDuration( "w" , 12 * 3600 );
+		//Desires desires = person.createDesires( "bwarf" );
+		//desires.putActivityDuration( "h" , 12 * 3600 );
+		//desires.putActivityDuration( "w" , 12 * 3600 );
 		PlanImpl plan = new PlanImpl( person );
 
 		for (double tt=60; tt <= 2*3600; tt *= 1.5) {
@@ -308,6 +299,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	@Test
+	@Ignore
 	public void testLegScores() {
 		Random random = new Random( 42 );
 		double amplitude = 100;
@@ -355,6 +347,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPlanScores() {
 		HerbiePlanBasedScoringFunctionFactory planBasedScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(

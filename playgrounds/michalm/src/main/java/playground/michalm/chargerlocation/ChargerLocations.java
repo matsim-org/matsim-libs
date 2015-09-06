@@ -46,5 +46,4 @@ public class ChargerLocations
 
         return locations;
     }
-
 }

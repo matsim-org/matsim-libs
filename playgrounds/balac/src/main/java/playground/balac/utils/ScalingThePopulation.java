@@ -10,7 +10,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
 
 public class ScalingThePopulation {
 
@@ -40,13 +39,13 @@ public class ScalingThePopulation {
 				p.setSex(originalPerson.getSex());
 				p.setEmployed(originalPerson.isEmployed());
 				p.addTravelcard("unknown");
-				Desires d = originalPerson.getDesires();
-				p.createDesires(d.getDesc());
-				p.getDesires().setDesc(d.getDesc());
-				for (String type : d.getActivityDurations().keySet()) {
-					
-					p.getDesires().putActivityDuration(type, d.getActivityDuration(type));
-				}
+				//Desires d = originalPerson.getDesires();
+				//p.createDesires(d.getDesc());
+				//p.getDesires().setDesc(d.getDesc());
+				//for (String type : d.getActivityDurations().keySet()) {
+				//
+				//	p.getDesires().putActivityDuration(type, d.getActivityDuration(type));
+				//}
 				
 				scenario.getPopulation().addPerson(p);
 			}			
