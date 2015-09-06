@@ -60,8 +60,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String WAITING  = "waiting";
 	private static final String WAITING_PT  = "waitingPt";
 
-	private static final String CONSTANT = "constant_";
-
 	private static final String WRITE_EXPERIENCED_PLANS = "writeExperiencedPlans";
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
@@ -72,7 +70,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
-	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -117,11 +114,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					+ "mode-parameters (see output of any recent run), and mode-specific monetary "
 					+ "distance rate.") ;
 		}
-		else if (key.startsWith(CONSTANT)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
-			modeParams.setConstant(Double.parseDouble(value));
-		}
-
 		else if ( WAITING_PT.equals( key ) ) {
 			setMarginalUtlOfWaitingPt_utils_hr( Double.parseDouble( value ) );
 		}
