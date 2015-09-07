@@ -21,7 +21,6 @@
 package org.matsim.core.config.groups;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -70,6 +69,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
+	private final ScoringParameterSet scoringParametersDelegate = new ScoringParameterSet();
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -667,75 +667,20 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
 	}
 
-	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
-		private ReflectiveDelegate() {
-			super( PlanCalcScoreConfigGroup.GROUP_NAME );
+	private static class ScoringParameterSet extends ReflectiveConfigGroup {
+		private ScoringParameterSet() {
+			super( "scoringParameters" );
 		}
 
-		private double learningRate = 1.0;
-		private double brainExpBeta = 1.0;
-		private double pathSizeLogitBeta = 1.0;
 		private double lateArrival = -18.0;
 		private double earlyDeparture = -0.0;
 		private double performing = +6.0;
 
 		private double waiting = -0.0;
 
-
 		private double marginalUtilityOfMoney = 1.0 ;
 
 		private double utilityOfLineSwitch = - 1 ;
-
-		private boolean usingOldScoringBelowZeroUtilityDuration = false ;
-
-		private boolean writeExperiencedPlans = false;
-
-		private Double fractionOfIterationsToStartScoreMSA = null ;
-
-		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-		public Double getFractionOfIterationsToStartScoreMSA() {
-			return fractionOfIterationsToStartScoreMSA;
-		}
-		@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-		public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
-			testForLocked() ;
-			this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
-		}
-
-		@StringGetter( LEARNING_RATE )
-		public double getLearningRate() {
-			return learningRate;
-		}
-		@StringSetter( LEARNING_RATE )
-		public void setLearningRate(double learningRate) {
-			testForLocked() ;
-			this.learningRate = learningRate;
-		}
-
-		@StringGetter( BRAIN_EXP_BETA )
-		public double getBrainExpBeta() {
-			return brainExpBeta;
-		}
-
-		@StringSetter( BRAIN_EXP_BETA )
-		public void setBrainExpBeta(double brainExpBeta) {
-			testForLocked() ;
-			this.brainExpBeta = brainExpBeta;
-		}
-
-		@StringGetter( PATH_SIZE_LOGIT_BETA )
-		public double getPathSizeLogitBeta() {
-			return pathSizeLogitBeta;
-		}
-
-		@StringSetter( PATH_SIZE_LOGIT_BETA )
-		public void setPathSizeLogitBeta(double beta) {
-			testForLocked() ;
-			if ( beta != 0. ) {
-				log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
-			}
-			this.pathSizeLogitBeta = beta;
-		}
 
 		@StringGetter( LATE_ARRIVAL )
 		public double getLateArrival_utils_hr() {
@@ -791,6 +736,87 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
 
+		private static int setWaitingCnt=0 ;
+
+		@StringGetter( WAITING )
+		public double getMarginalUtlOfWaiting_utils_hr() {
+			return this.waiting;
+		}
+
+		@StringSetter( WAITING )
+		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
+			testForLocked() ;
+			if ( (waiting != 0.) && (setWaitingCnt<1) ) {
+				setWaitingCnt++ ;
+				log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
+						"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
+			}
+			this.waiting = waiting;
+		}
+	}
+
+
+	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
+		private ReflectiveDelegate() {
+			super( PlanCalcScoreConfigGroup.GROUP_NAME );
+		}
+
+		private double learningRate = 1.0;
+		private double brainExpBeta = 1.0;
+		private double pathSizeLogitBeta = 1.0;
+
+		private boolean writeExperiencedPlans = false;
+
+		private Double fractionOfIterationsToStartScoreMSA = null ;
+
+		private boolean usingOldScoringBelowZeroUtilityDuration = false;
+
+		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+		public Double getFractionOfIterationsToStartScoreMSA() {
+			return fractionOfIterationsToStartScoreMSA;
+		}
+		@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+		public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
+			testForLocked() ;
+			this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
+		}
+
+		@StringGetter( LEARNING_RATE )
+		public double getLearningRate() {
+			return learningRate;
+		}
+		@StringSetter( LEARNING_RATE )
+		public void setLearningRate(double learningRate) {
+			testForLocked() ;
+			this.learningRate = learningRate;
+		}
+
+		@StringGetter( BRAIN_EXP_BETA )
+		public double getBrainExpBeta() {
+			return brainExpBeta;
+		}
+
+		@StringSetter( BRAIN_EXP_BETA )
+		public void setBrainExpBeta(double brainExpBeta) {
+			testForLocked() ;
+			this.brainExpBeta = brainExpBeta;
+		}
+
+		@StringGetter( PATH_SIZE_LOGIT_BETA )
+		public double getPathSizeLogitBeta() {
+			return pathSizeLogitBeta;
+		}
+
+		@StringSetter( PATH_SIZE_LOGIT_BETA )
+		public void setPathSizeLogitBeta(double beta) {
+			testForLocked() ;
+			if ( beta != 0. ) {
+				log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
+			}
+			this.pathSizeLogitBeta = beta;
+		}
+
+
 		@StringGetter( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION )
 		public boolean isUsingOldScoringBelowZeroUtilityDuration() {
 			return usingOldScoringBelowZeroUtilityDuration;
@@ -814,23 +840,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
-		private static int setWaitingCnt=0 ;
-
-		@StringGetter( WAITING )
-		public double getMarginalUtlOfWaiting_utils_hr() {
-			return this.waiting;
-		}
-
-		@StringSetter( WAITING )
-		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
-			testForLocked() ;
-			if ( (waiting != 0.) && (setWaitingCnt<1) ) {
-				setWaitingCnt++ ;
-				log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
-						"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
-			}
-			this.waiting = waiting;
-		}
 	}
 
 	public double getLearningRate() {
@@ -858,43 +867,43 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public double getLateArrival_utils_hr() {
-		return delegate.getLateArrival_utils_hr();
+		return scoringParametersDelegate.getLateArrival_utils_hr();
 	}
 
 	public void setLateArrival_utils_hr(double lateArrival) {
-		delegate.setLateArrival_utils_hr(lateArrival);
+		scoringParametersDelegate.setLateArrival_utils_hr(lateArrival);
 	}
 
 	public double getEarlyDeparture_utils_hr() {
-		return delegate.getEarlyDeparture_utils_hr();
+		return scoringParametersDelegate.getEarlyDeparture_utils_hr();
 	}
 
 	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		delegate.setEarlyDeparture_utils_hr(earlyDeparture);
+		scoringParametersDelegate.setEarlyDeparture_utils_hr(earlyDeparture);
 	}
 
 	public double getPerforming_utils_hr() {
-		return delegate.getPerforming_utils_hr();
+		return scoringParametersDelegate.getPerforming_utils_hr();
 	}
 
 	public void setPerforming_utils_hr(double performing) {
-		delegate.setPerforming_utils_hr(performing);
+		scoringParametersDelegate.setPerforming_utils_hr(performing);
 	}
 
 	public double getMarginalUtilityOfMoney() {
-		return delegate.getMarginalUtilityOfMoney();
+		return scoringParametersDelegate.getMarginalUtilityOfMoney();
 	}
 
 	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		delegate.setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+		scoringParametersDelegate.setMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
 	public double getUtilityOfLineSwitch() {
-		return delegate.getUtilityOfLineSwitch();
+		return scoringParametersDelegate.getUtilityOfLineSwitch();
 	}
 
 	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		delegate.setUtilityOfLineSwitch(utilityOfLineSwitch);
+		scoringParametersDelegate.setUtilityOfLineSwitch(utilityOfLineSwitch);
 	}
 
 	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
@@ -915,10 +924,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public double getMarginalUtlOfWaiting_utils_hr() {
-		return delegate.getMarginalUtlOfWaiting_utils_hr();
+		return scoringParametersDelegate.getMarginalUtlOfWaiting_utils_hr();
 	}
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		delegate.setMarginalUtlOfWaiting_utils_hr(waiting);
+		scoringParametersDelegate.setMarginalUtlOfWaiting_utils_hr(waiting);
 	}
 	
 	public void setFractionOfIterationsToStartScoreMSA( Double val ) {
