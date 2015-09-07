@@ -31,18 +31,15 @@ public class VehicleAbortEvent extends Event {
 	public static final String EVENT_TYPE = "vehicleAbort";
 	
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id<Vehicle> vehicleId;
 	private final Id<Link> linkId;
-	private final String legMode;
 
-	public VehicleAbortEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId, final String legMode) {
+	public VehicleAbortEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.linkId = linkId;
-		this.legMode = legMode;
 	}
 	
 	public Id<Vehicle> getVehicleId() {
@@ -53,10 +50,6 @@ public class VehicleAbortEvent extends Event {
 		return this.linkId;
 	}
 
-	public String getLegMode() {
-		return this.legMode;
-	}
-	
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -67,9 +60,6 @@ public class VehicleAbortEvent extends Event {
 		Map<String, String> attr = super.getAttributes();
 		if (this.linkId != null) {
 			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		}
-		if (this.legMode != null) {
-			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		return attr;

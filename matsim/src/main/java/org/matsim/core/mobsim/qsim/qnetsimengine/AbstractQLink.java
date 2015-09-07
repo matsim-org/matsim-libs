@@ -195,7 +195,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				else stuckAgents.add(veh.getDriver().getId());
 
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+						new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
@@ -258,7 +258,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 			else stuckAgents.add(veh.getDriver().getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
