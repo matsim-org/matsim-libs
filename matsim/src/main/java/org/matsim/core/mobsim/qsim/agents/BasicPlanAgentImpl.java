@@ -74,10 +74,6 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-//		this.getEvents().processEvent(new Link2WaitEvent(now, this.getId(), this.getDestinationLinkId(), this.vehicle.getId(), getCurrentLeg().getMode()));
-//		// yy Theresa, I would argue that this is the wrong place for this method.  It is a vehicle (or network) method, not a person method.
-//		// kai, sep'15
-		
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
