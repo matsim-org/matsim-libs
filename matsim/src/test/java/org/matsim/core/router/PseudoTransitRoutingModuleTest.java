@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.old;
+package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +44,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PseudoTransitLegRouterTest {
+public class PseudoTransitRoutingModuleTest {
 
 	@Test
 	public void testRouteLeg() {
@@ -60,12 +60,16 @@ public class PseudoTransitLegRouterTest {
 		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
-		double tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 2.0, 1.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+		double tt = new PseudoTransitRoutingModule(
+				"mode", f.s.getPopulation().getFactory(),
+				f.s.getNetwork(), routeAlgo, 2.0, 1.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(400.0, tt, 1e-8);
 		Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof GenericRoute);
 		Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
-		tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 3.0, 2.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+		tt = new PseudoTransitRoutingModule(
+				"mode", f.s.getPopulation().getFactory(),
+				f.s.getNetwork(), routeAlgo, 3.0, 2.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(600.0, tt, 1e-8);
 		Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
 		Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);

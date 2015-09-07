@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.old;
+package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +39,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -48,7 +47,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-public class NetworkLegRouterTest {
+public class NetworkRoutingModuleTest {
 
 	@Test
 	public void testRouteLeg() {
@@ -64,7 +63,13 @@ public class NetworkLegRouterTest {
 		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
-		double tt = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+		double tt =
+                new NetworkRoutingModule(
+                        TransportMode.car,
+                        f.s.getPopulation().getFactory(),
+                        f.s.getNetwork(),
+                        routeAlgo,
+                        routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(100.0, tt, 1e-8);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
@@ -90,7 +95,13 @@ public class NetworkLegRouterTest {
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
-			NetworkLegRouter router = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory) ;
+			NetworkRoutingModule router =
+                    new NetworkRoutingModule(
+							TransportMode.car,
+							f.s.getPopulation().getFactory(),
+							f.s.getNetwork(),
+							routeAlgo,
+							routeFactory) ;
 
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(100.0, tt, 1e-8);
@@ -110,7 +121,13 @@ public class NetworkLegRouterTest {
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
-			NetworkLegRouter router = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory) ;
+			NetworkRoutingModule router =
+					new NetworkRoutingModule(
+							TransportMode.car,
+							f.s.getPopulation().getFactory(),
+							f.s.getNetwork(),
+							routeAlgo,
+							routeFactory) ;
 
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(100.0, tt, 1e-8);

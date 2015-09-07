@@ -16,14 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.old;
+package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.NetworkRoutingModule;
+import org.matsim.core.router.PseudoTransitRoutingModule;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -42,21 +45,32 @@ public final class DefaultRoutingModules {
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
 			ModeRoutingParams params ) {
-		LegRouter toWrap = new PseudoTransitLegRouter( net, routeAlgo, params.getTeleportedModeFreespeedFactor(), params.getBeelineDistanceFactor(), 
+		return new PseudoTransitRoutingModule(
+				mode,
+				popFac,
+				net,
+				routeAlgo,
+				params.getTeleportedModeFreespeedFactor(),
+				params.getBeelineDistanceFactor(),
 				((PopulationFactoryImpl) popFac).getModeRouteFactory() ) ;
-		return new LegRouterWrapper( mode, popFac, toWrap ) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
-		LegRouter toWrap = new TeleportationLegRouter( ((PopulationFactoryImpl) popFac).getModeRouteFactory(), 
-				params.getTeleportedModeSpeed(), params.getBeelineDistanceFactor() 
-				 ) ;
-		return new LegRouterWrapper( mode, popFac, toWrap ) ;
+		return new TeleportationRoutingModule(
+				mode,
+				popFac,
+				((PopulationFactoryImpl) popFac).getModeRouteFactory(),
+				params.getTeleportedModeSpeed(),
+                params.getBeelineDistanceFactor() );
 	}
 
 	public static RoutingModule createNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		LegRouter toWrap = new NetworkLegRouter(net, routeAlgo, ((PopulationFactoryImpl) popFact).getModeRouteFactory() ) ;
-		return new LegRouterWrapper( mode, popFact, toWrap ) ;
+		return new NetworkRoutingModule(
+				mode,
+				popFact,
+				net,
+				routeAlgo,
+				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
 	}
 
 }

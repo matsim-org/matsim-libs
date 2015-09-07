@@ -17,8 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.old;
+package playground.johannes.utils;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -26,73 +27,71 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
- * Calculates a route along links in a network, but doesn't really use that route, but
- * only the travel time of it for teleportation purposes.
- * Typically, this class is used with a free-flow travel speed router and some
- * speedfactor > 1.0 (often 2.0), so "estimate" travel times with a non-car mode.
+ * Calculates a route along links on a given network.
  *
  * @author mrieser
  */
-final class PseudoTransitLegRouter implements LegRouter {
+@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
+ public final class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
 	private final ModeRouteFactory routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
-	private final double speedFactor;
-	private final double beelineDistanceFactor;
 
-	 PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final ModeRouteFactory routeFactory) {
+	@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
+	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
-		this.speedFactor = speedFactor;
-		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.routeFactory = routeFactory;
 	}
 
 	@Override
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
-		int travTime = 0;
-		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-		final Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
+		double travTime = 0;
+		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+		Link toLink = this.network.getLinks().get(toAct.getLinkId());
+		
+		/* Remove this and next three lines once debugged. */
+		if(fromLink == null || toLink == null){
+			Logger.getLogger(NetworkLegRouter.class).error("  ==>  null from/to link for person " + person.getId().toString());
+		}
+		if (fromLink == null) throw new RuntimeException("fromLink "+fromAct.getLinkId()+" missing.");
+		if (toLink == null) throw new RuntimeException("toLink "+toAct.getLinkId()+" missing.");
+
+		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
+		Node endNode = toLink.getFromNode(); // the target is the start of the link
+
+//		CarRoute route = null;
+		Path path = null;
 		if (toLink != fromLink) {
-			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
+			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
-			// so let's calculate the final part.
-			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
-			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.speedFactor);
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
-			route.setTravelTime(travTime);
-			double dist = 0;
-			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
-				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-			} else {
-				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
-			}
-			route.setDistance(dist * beelineDistanceFactor);
+			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
+			route.setTravelTime((int) path.travelTime);
+			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, this.network));
 			leg.setRoute(route);
+			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
+			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
 			travTime = 0;
 		}
+
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10

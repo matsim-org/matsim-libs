@@ -68,8 +68,11 @@ public class InvertertedNetworkLegRouterTest {
 		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
 		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));
 
-		InvertedNetworkLegRouter router = new InvertedNetworkLegRouter(f.s, lcpFactory, 
-				tc, tt);
+		InvertedNetworkRoutingModule router =
+				new InvertedNetworkRoutingModule(
+						"mode",
+						f.s.getPopulation().getFactory(),
+						f.s, lcpFactory,tc, tt);
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		

@@ -51,7 +51,7 @@ import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;

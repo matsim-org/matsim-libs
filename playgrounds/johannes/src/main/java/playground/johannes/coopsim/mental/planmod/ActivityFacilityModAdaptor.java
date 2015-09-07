@@ -22,7 +22,7 @@ package playground.johannes.coopsim.mental.planmod;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.router.old.NetworkLegRouter;
+import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;

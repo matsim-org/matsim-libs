@@ -35,7 +35,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouter;
 
