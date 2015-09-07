@@ -577,7 +577,7 @@ public class PTQLink implements NetsimLink {
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode()));
 			boolean handled = this.addTransitToBuffer(now, veh);
 
 			if (!handled) {

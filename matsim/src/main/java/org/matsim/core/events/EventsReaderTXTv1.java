@@ -86,7 +86,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 				data = new PersonStuckEvent(time, agentId, linkId, null);
 				break;
 			case 4:
-				data = new Wait2LinkEvent(time, agentId, linkId, null);
+				data = new Wait2LinkEvent(time, agentId, linkId, null, null);
 				break;
 			case 6:
 				data = new PersonDepartureEvent(time, agentId, linkId, null);

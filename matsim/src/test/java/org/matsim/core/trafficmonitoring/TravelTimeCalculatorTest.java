@@ -32,6 +32,7 @@ import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -409,7 +410,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id<Person> agId1 = Id.create(1510, Person.class);
 		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
 
-		ttc.handleEvent(new Wait2LinkEvent(100, agId1, link1.getId(), vehId)); //TransportMode.car
+		ttc.handleEvent(new Wait2LinkEvent(100, agId1, link1.getId(), vehId, TransportMode.car));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), vehId));
 		ttc.handleEvent(new LinkEnterEvent(200, agId1, link2.getId(), vehId));
 		ttc.handleEvent(new LinkLeaveEvent(300, agId1, link2.getId(), vehId));
@@ -426,7 +427,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = NetworkImpl.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
-		config.setAnalyzedModes("car");
+		config.setAnalyzedModes(TransportMode.car);
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
@@ -446,8 +447,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
 		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1)); //TransportMode.car
-		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2)); //TransportMode.walk
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk));
 		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
 		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));
@@ -487,8 +488,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
 		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1)); //TransportMode.car
-		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2)); //TransportMode.walk
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk));
 		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
 		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));
@@ -527,8 +528,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
 		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1)); //TransportMode.car
-		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2)); //TransportMode.walk
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk));
 		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
 		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));

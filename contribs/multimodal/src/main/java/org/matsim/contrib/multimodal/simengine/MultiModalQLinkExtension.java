@@ -98,7 +98,7 @@ class MultiModalQLinkExtension {
 		this.activateLink();
 
 		this.simEngine.getEventsManager().processEvent(
-				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
+				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null, mobsimAgent.getMode()));
 	}
 
 	boolean moveLink(double now) {
