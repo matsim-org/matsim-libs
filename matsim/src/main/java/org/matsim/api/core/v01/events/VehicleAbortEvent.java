@@ -58,9 +58,7 @@ public class VehicleAbortEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		if (this.linkId != null) {
-			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		}
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		return attr;
 	}
