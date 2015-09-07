@@ -1,4 +1,4 @@
-package playground.mzilske.jdeqsimengine;
+package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.QSim;

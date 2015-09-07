@@ -1,4 +1,4 @@
-package playground.mzilske.jdeqsimengine;
+package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;

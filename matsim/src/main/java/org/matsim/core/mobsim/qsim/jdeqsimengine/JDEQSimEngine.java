@@ -1,4 +1,4 @@
-package playground.mzilske.jdeqsimengine;
+package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
 import java.util.HashMap;
 

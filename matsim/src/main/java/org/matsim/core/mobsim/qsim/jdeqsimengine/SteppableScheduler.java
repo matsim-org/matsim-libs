@@ -1,4 +1,4 @@
-package playground.mzilske.jdeqsimengine;
+package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.jdeqsim.Message;
