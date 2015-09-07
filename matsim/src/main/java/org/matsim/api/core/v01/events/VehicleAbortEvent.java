@@ -28,7 +28,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class VehicleAbortEvent extends Event {
 
-	public static final String EVENT_TYPE = "vehicleAbort";
+	public static final String EVENT_TYPE = "vehicle aborts";
 	
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";

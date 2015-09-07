@@ -34,7 +34,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortEvent;
@@ -140,7 +140,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	
 	/* package */ final void letVehicleArrive(QVehicle qveh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();;
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new Link2WaitEvent(now , qveh.getDriver().getId(), 
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
 				this.link.getId(), qveh.getId(), qveh.getDriver().getMode() ) ) ;
 		
 		this.network.simEngine.letVehicleArrive(qveh);
