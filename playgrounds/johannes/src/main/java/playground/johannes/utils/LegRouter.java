@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NullMoveChecker.java
+ * LegRouter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.tsplanoptimizer.framework;
 
-import java.util.Iterator;
+package playground.johannes.utils;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * Forbids the moves which do not change the solution.
- *
- * @author thibautd
+ * @deprecated this is part of the old (mono-leg trip) approach.
+ * Use the RoutingModule interface instead.
  */
-public class NullMoveChecker<T> implements TabuChecker<T> {
+@Deprecated // use RoutingModule (with TripRouter) instead. kai, mar'15
+public interface LegRouter {
 
-	@Override
-	public void notifyMove(
-			final Solution<? extends T> currentSolution,
-			final Move toApply,
-			final double resultingFitness) {
-		// do nothing
-	}
+	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime);
 
-	@Override
-	public boolean isTabu(
-			final Solution<? extends T> solution,
-			final Move move) {
-		final Solution<?> newSolution = move.apply( solution );
-
-		final Iterator<? extends Value> oldIt = solution.getGenotype().iterator();
-		final Iterator<? extends Value> newIt = newSolution.getGenotype().iterator();
-
-		while (oldIt.hasNext()) {
-			if (!oldIt.next().getValue().equals( newIt.next().getValue() )) {
-				// a different value was found
-				return false;
-			}
-		}
-
-		if (newIt.hasNext()) {
-			throw new RuntimeException( "unexpected new solution length" );
-		}
-
-		// all values were identical
-		return true;
-	}
 }
-

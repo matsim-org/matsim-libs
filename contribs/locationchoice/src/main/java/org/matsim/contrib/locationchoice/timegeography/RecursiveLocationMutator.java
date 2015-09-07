@@ -33,7 +33,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
