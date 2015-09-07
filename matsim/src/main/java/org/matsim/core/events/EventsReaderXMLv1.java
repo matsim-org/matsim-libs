@@ -115,10 +115,10 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(new PersonStuckEvent(time, Id.create(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON), Person.class), linkId, mode));
 		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new VehicleLeavesTrafficEvent(time, Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE)));
-		} else if (VehicleAbortEvent.EVENT_TYPE.equals(eventType)) {
-			String linkIdString = atts.getValue(VehicleAbortEvent.ATTRIBUTE_LINK);
+		} else if (VehicleAbortsEvent.EVENT_TYPE.equals(eventType)) {
+			String linkIdString = atts.getValue(VehicleAbortsEvent.ATTRIBUTE_LINK);
 			Id<Link> linkId = linkIdString == null ? null : Id.create(linkIdString, Link.class);
-			this.events.processEvent(new VehicleAbortEvent(time, Id.create(atts.getValue(VehicleAbortEvent.ATTRIBUTE_VEHICLE), Vehicle.class), linkId));
+			this.events.processEvent(new VehicleAbortsEvent(time, Id.create(atts.getValue(VehicleAbortsEvent.ATTRIBUTE_VEHICLE), Vehicle.class), linkId));
 		}else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
 			this.events.processEvent(new PersonMoneyEvent(time, Id.create(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT))));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {

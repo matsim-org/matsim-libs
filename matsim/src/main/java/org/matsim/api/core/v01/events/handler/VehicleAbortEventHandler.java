@@ -20,9 +20,9 @@
 
 package org.matsim.api.core.v01.events.handler;
 
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface VehicleAbortEventHandler extends EventHandler {
-	public void handleEvent (VehicleAbortEvent event);
+	public void handleEvent (VehicleAbortsEvent event);
 }

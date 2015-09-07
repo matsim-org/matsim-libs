@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -123,7 +123,7 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 	}
 
 	@Override
-	public void handleEvent(VehicleAbortEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		this.handleArrivalOrStuck(event, event.getVehicleId());		
 	}
 	

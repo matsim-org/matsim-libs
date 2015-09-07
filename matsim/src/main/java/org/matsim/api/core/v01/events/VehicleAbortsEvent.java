@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-public class VehicleAbortEvent extends Event {
+public class VehicleAbortsEvent extends Event {
 
 	public static final String EVENT_TYPE = "vehicle aborts";
 	
@@ -36,7 +36,7 @@ public class VehicleAbortEvent extends Event {
 	private final Id<Vehicle> vehicleId;
 	private final Id<Link> linkId;
 
-	public VehicleAbortEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
+	public VehicleAbortsEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.linkId = linkId;

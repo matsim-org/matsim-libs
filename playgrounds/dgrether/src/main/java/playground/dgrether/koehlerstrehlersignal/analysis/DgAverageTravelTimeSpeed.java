@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -138,7 +138,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	}
 
 	@Override
-	public void handleEvent(VehicleAbortEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		this.networkEnterTimesByVehicleId.remove(event.getVehicleId());
 	}
 
