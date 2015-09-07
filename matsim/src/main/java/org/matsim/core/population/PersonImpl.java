@@ -46,7 +46,7 @@ public final class PersonImpl implements Person {
 	private Customizable customizableDelegate;
 
 	@Deprecated // please try to use the factory: pop.getFactory().create...
-	protected PersonImpl(final Id<Person> id) {
+	 PersonImpl(final Id<Person> id) {
 		this.id = id;
 	}
 
