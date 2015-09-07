@@ -58,10 +58,10 @@ public class MatsimEventsReader implements MatsimSomeReader {
 	 */
 	public void readFile(final String filename) {
 		String lcFilename = filename.toLowerCase(Locale.ROOT);
-		if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
-			new EventsReaderTXTv1(this.events).readFile(filename);
-		} else if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
+		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
 			new XmlEventsReader(this.events).readFile(filename);
+		} else if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
+			new EventsReaderTXTv1(this.events).readFile(filename);
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
 		}
