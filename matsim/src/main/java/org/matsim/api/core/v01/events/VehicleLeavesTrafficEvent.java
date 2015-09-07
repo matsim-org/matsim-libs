@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.vehicles.Vehicle;
 
-public class Link2WaitEvent extends Event implements HasPersonId {
+public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
 
-	public static final String EVENT_TYPE = "link2wait";
+	public static final String EVENT_TYPE = "vehicle leaves traffic";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	public static final String ATTRIBUTE_LINK = "link";
@@ -42,7 +42,7 @@ public class Link2WaitEvent extends Event implements HasPersonId {
 	private final Id<Vehicle> vehicleId;
 	private final String networkMode;
 
-	public Link2WaitEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId, String networkMode) {
+	public VehicleLeavesTrafficEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId, String networkMode) {
 		super(time);
 		this.driverId = driverId;
 		this.linkId = linkId;

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
@@ -183,7 +183,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 	
 	@Override
-	public void handleEvent(Link2WaitEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
 			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
 		}

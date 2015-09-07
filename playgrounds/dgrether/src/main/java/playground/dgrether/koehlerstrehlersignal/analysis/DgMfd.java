@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortEvent;
@@ -123,7 +123,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Link
 	}
 	
 	@Override
-	public void handleEvent(Link2WaitEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		this.handleLeaveNetworkOrArrival(event.getVehicleId());
 	}
 

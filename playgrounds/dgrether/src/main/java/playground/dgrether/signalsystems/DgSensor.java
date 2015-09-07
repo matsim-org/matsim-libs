@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
@@ -45,7 +45,7 @@ public class DgSensor {
 	
 	private boolean doDistanceMonitoring = false;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
-	private Map<Id<Vehicle>, Link2WaitEvent> link2WaitEventPerVehicleId = null;
+	private Map<Id<Vehicle>, VehicleLeavesTrafficEvent> link2WaitEventPerVehicleId = null;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> inActivityDistanceCarLocatorMap = null;
 	
 	public DgSensor(Link link){
@@ -67,7 +67,7 @@ public class DgSensor {
 	private void enableDistanceMonitoring() {
 		this.doDistanceMonitoring = true;
 		this.distanceMeterCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
-		this.link2WaitEventPerVehicleId = new HashMap<Id<Vehicle>, Link2WaitEvent>();
+		this.link2WaitEventPerVehicleId = new HashMap<Id<Vehicle>, VehicleLeavesTrafficEvent>();
 		this.inActivityDistanceCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
 	}
 
@@ -106,7 +106,7 @@ public class DgSensor {
 		}
 	}
 	
-	public void handleEvent(Link2WaitEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		this.vehiclesOnLink--;
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){

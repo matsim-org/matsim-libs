@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
@@ -104,7 +104,7 @@ public class DgSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 		
-		Link2WaitEvent link2WaitEvent = new Link2WaitEvent(110.0, agId2, link.getId(), vehId2, TransportMode.car);
+		VehicleLeavesTrafficEvent link2WaitEvent = new VehicleLeavesTrafficEvent(110.0, agId2, link.getId(), vehId2, TransportMode.car);
 		sensor.handleEvent(link2WaitEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
@@ -174,7 +174,7 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 		
-		Link2WaitEvent link2WaitEvent = new Link2WaitEvent(101.0, agId2, link.getId(), vehId2, TransportMode.car);
+		VehicleLeavesTrafficEvent link2WaitEvent = new VehicleLeavesTrafficEvent(101.0, agId2, link.getId(), vehId2, TransportMode.car);
 		sensor.handleEvent(link2WaitEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);

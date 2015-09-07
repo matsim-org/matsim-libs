@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortEvent;
@@ -214,7 +214,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	@Override
-	public void handleEvent(final Link2WaitEvent event) {
+	public void handleEvent(final VehicleLeavesTrafficEvent event) {
 		/* remove EnterEvents from list when a vehicle arrives.
 		 * otherwise, the activity duration would counted as travel time, when the
 		 * vehicle departs again and leaves the link! */
