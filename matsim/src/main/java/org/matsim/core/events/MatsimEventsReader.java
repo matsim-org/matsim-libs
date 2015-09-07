@@ -61,7 +61,7 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
 			new XmlEventsReader(this.events).readFile(filename);
 		} else if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
-			new EventsReaderTXTv1(this.events).readFile(filename);
+			throw new RuntimeException("text events are no longer supported. Please use MATSim 0.6.1 or earlier to read text events.");
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
 		}

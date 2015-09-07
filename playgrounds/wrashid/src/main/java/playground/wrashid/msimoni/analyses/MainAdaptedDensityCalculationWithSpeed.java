@@ -11,8 +11,8 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class MainAdaptedDensityCalculationWithSpeed {
@@ -88,7 +88,7 @@ public class MainAdaptedDensityCalculationWithSpeed {
 
 		//EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		//reader.parse(eventsFile);
-		 EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		 reader.readFile(eventsFile);
 
 		HashMap<Id, double[]> densities = calculateDensities(links,
