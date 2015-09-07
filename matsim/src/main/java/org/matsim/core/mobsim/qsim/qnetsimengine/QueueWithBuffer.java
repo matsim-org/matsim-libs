@@ -19,10 +19,15 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Link2WaitEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortEvent;
@@ -42,8 +47,6 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.*;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
@@ -531,11 +534,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private void letVehicleArrive(final double now, QVehicle veh) {
 
 		qLink.addParkedVehicle(veh);
-
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new Link2WaitEvent(now, veh.getDriver().getId(), 
-				this.link.getId(), veh.getId(), veh.getDriver().getMode() ) ) ;
-		// yyyy I think that this needs to be in QLinkImpl (to bracketed the reverse event), but there is currently no corresponding method
-		// there. kai, sep'15
 
 		network.simEngine.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh, now);

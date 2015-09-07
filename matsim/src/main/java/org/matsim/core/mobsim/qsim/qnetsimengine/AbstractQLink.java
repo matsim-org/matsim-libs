@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Link2WaitEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortEvent;
@@ -126,6 +127,11 @@ abstract class AbstractQLink extends QLinkInternalI {
 	@Override
 	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
+		
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();;
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new Link2WaitEvent(now , qveh.getDriver().getId(), 
+				this.link.getId(), qveh.getId(), qveh.getDriver().getMode() ) ) ;
+		
 		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
 			if ( wrnCnt < 1 ) {
 				wrnCnt++ ;
@@ -416,6 +422,11 @@ abstract class AbstractQLink extends QLinkInternalI {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
+	}
+
+	public void letVehicleArrive(QVehicle veh) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
