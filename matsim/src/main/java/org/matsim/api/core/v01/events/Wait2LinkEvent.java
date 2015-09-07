@@ -35,7 +35,7 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
-	public static final String ATTRIBUTE_DRIVER = "driver";
+	public static final String ATTRIBUTE_DRIVER = "person";
 
 	private final Id<Person> driverId;
 	private final Id<Link> linkId;
