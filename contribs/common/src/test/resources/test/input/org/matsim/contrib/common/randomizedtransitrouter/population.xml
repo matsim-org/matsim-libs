@@ -1,0 +1,904 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+	<person employed="no" age="12" id="1">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="2">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="3">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="4">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="5">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="6">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="7">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="8">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="9">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="10">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="11">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="12">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="13">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="14">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="15">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="16">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="17">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="18">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="19">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="20">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="21">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="22">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="23">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="24">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="25">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="26">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="27">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="28">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="29">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="30">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="31">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="32">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="33">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="34">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="35">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="36">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="37">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="38">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="39">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="40">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="41">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="42">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="43">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="44">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="45">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="46">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="47">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="48">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="49">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="50">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="51">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="52">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="53">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="54">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="55">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="56">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="57">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="58">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="59">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="60">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="61">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="62">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="63">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="64">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="65">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="66">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="67">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="68">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="69">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="70">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="71">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="72">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="73">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="74">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="75">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="76">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="77">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="78">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="79">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="80">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="81">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="82">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="83">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="84">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="85">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="86">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="87">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="88">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="89">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="90">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="91">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="92">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="93">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="94">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="95">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="96">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="97">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="98">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="99">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+	<person employed="no" age="12" id="100">
+		<plan selected="yes">
+			<act end_time="07:16:00" y="5800000" x="4600333" type="home" />
+			<leg mode="pt" />
+			<act end_time="12:35:00" y="5821600" x="4600333" type="education_100" />
+			<leg mode="pt" />
+			<act y="5800000" x="4600333" type="home" />
+		</plan>
+	</person>
+</plans>

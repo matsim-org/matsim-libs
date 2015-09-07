@@ -134,30 +134,12 @@ public class EventsReadersTest extends MatsimTestCase {
 
 	}
 
-	public final void testTxtReader() {
-		EventsManager events = EventsUtils.createEventsManager();
-		TestHandler handler = new TestHandler();
-		events.addHandler(handler);
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-		reader.readFile(getClassInputDirectory() + "events.txt");
-		assertEquals("number of read events", 8, handler.eventCounter);
-	}
-
 	public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(getClassInputDirectory() + "events.xml");
-		assertEquals("number of read events", 8, handler.eventCounter);
-	}
-
-	public final void testAutoFormatReaderTxt() {
-		EventsManager events = EventsUtils.createEventsManager();
-		TestHandler handler = new TestHandler();
-		events.addHandler(handler);
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(getClassInputDirectory() + "events.txt");
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 
