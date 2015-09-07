@@ -1,5 +1,8 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -12,14 +15,15 @@ import org.matsim.facilities.ActivityFacilities;
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 
-public class BasePersonImpl extends PersonImpl implements BasePerson {
+public class BasePersonImpl implements BasePerson {
+	private Person delegate ;
 
 	//Attributes
 	private BasePlan basePlan = new BasePlanImpl(this);
 	
 	//Constructors
 	public BasePersonImpl(Id<Person> id) {
-		super(id);
+		delegate = PersonImpl.createPerson(id) ;
 	}
 
 	//Static methods
@@ -57,5 +61,45 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	public void setBasePlan(BasePlan basePlan) {
 		this.basePlan = basePlan;
 	}
+
+		@Override
+			public List<? extends Plan> getPlans() {
+			return delegate.getPlans();
+		}
+
+		@Override
+			public boolean addPlan(Plan p) {
+			return delegate.addPlan(p);
+		}
+
+		@Override
+			public boolean removePlan(Plan p) {
+			return delegate.removePlan(p);
+		}
+
+		@Override
+			public Plan getSelectedPlan() {
+			return delegate.getSelectedPlan();
+		}
+
+		@Override
+			public void setSelectedPlan(Plan selectedPlan) {
+			delegate.setSelectedPlan(selectedPlan);
+		}
+
+		@Override
+			public Plan createCopyOfSelectedPlanAndMakeSelected() {
+			return delegate.createCopyOfSelectedPlanAndMakeSelected();
+		}
+
+		@Override
+			public Id<Person> getId() {
+			return delegate.getId();
+		}
+
+		@Override
+			public Map<String, Object> getCustomAttributes() {
+			return delegate.getCustomAttributes();
+		}
 
 }

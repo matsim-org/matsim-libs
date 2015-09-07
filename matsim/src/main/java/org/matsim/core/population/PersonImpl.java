@@ -34,7 +34,7 @@ import java.util.TreeSet;
 /**
  * Default implementation of {@link Person} interface.
  */
-public class PersonImpl implements Person {
+public final class PersonImpl implements Person {
 
 	protected List<Plan> plans = new ArrayList<Plan>(6);
 	protected Id<Person> id;
