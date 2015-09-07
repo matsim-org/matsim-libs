@@ -683,7 +683,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			network.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			
 			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
@@ -694,7 +694,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		for (QVehicle veh : buffer) {
 			network.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			
 			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
