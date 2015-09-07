@@ -29,6 +29,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -336,7 +337,7 @@ public class PSim implements Mobsim {
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
-                Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId); // TODO vehId is missing. TransportMode.car ?!
+                Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId, PtConstants.NETWORK_MODE);
                 LinkEnterEvent linkEnterEvent = null;
                 LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink, agentId);
                 eventQueue.add(wait2Link);
