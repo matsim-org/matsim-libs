@@ -170,7 +170,7 @@ public class MyRuns {
 		for (int i = 0; i < max; i++) {
 			String expectedRouteDescription = "kti=300614=6616=456.78=4258=8500301";
 			KtiPtRoute testee = new KtiPtRoute(null, null, plansCalcRouteKtiInfo);
-			testee.setRouteDescription(null, expectedRouteDescription, null);
+			testee.setRouteDescription(expectedRouteDescription);
 			if (i == skip) {
 				logger.info("Constructed " + i + " KtiPtRoute objects with processing route descriptions.");
 				skip += max / 10;

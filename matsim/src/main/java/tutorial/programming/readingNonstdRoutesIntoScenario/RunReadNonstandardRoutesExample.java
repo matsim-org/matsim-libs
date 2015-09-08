@@ -31,7 +31,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;

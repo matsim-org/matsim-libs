@@ -28,16 +28,15 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 
 /**
  * @author thibautd
  */
-public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute , NetworkRoute {
+public class AccessEgressNetworkBasedTeleportationRoute implements Route , NetworkRoute {
 	private double accessTime = Double.NaN;
 	private double egressTime = Double.NaN;
 	private double linkTime = Double.NaN;
@@ -103,10 +102,7 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 	@Override
 	public void setRouteDescription(
-			final Id<Link> startLinkId,
-			final String routeDescription,
-			final Id<Link> endLinkId) {
-		setStartLinkId( startLinkId );
+			final String routeDescription) {
 
 		final JSONObject json = new JSONObject( new JSONTokener( routeDescription ) );
 		
@@ -124,8 +120,6 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 		}
 
 		this.links = ids;
-
-		setEndLinkId( endLinkId );
 	}
 
 	public List<Id<Link>> getLinks() {
@@ -184,10 +178,10 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 				new AccessEgressNetworkBasedTeleportationRoute();
 
 		// not the most efficient way, but the safest facing refactorings.
+		clone.setStartLinkId(getStartLinkId());
+		clone.setEndLinkId(getEndLinkId());
 		clone.setRouteDescription(
-				getStartLinkId(),
-				getRouteDescription(),
-				getEndLinkId() );
+				getRouteDescription());
 		clone.setDistance( getDistance() );
 
 		return clone;
@@ -198,7 +192,6 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 		setStartLinkId( startLinkId );
 		setLinks( linkIds );
 		setEndLinkId( endLinkId );
-		
 	}
 
 	@Override

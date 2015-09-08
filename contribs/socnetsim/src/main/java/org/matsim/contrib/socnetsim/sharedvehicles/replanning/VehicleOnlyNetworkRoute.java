@@ -97,9 +97,22 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 	}
 
 	@Override
+	public String getRouteDescription() {
+		return null;
+	}
+	
+	@Override
+	public void setRouteDescription(String routeDescription) {
+	}
+	
+	@Override
+	public String getRouteType() {
+		return null;
+	}
+	
+	@Override
 	public void setTravelCost(double travelCost) {
 		throw new UnsupportedOperationException();
-		
 	}
 
 	@Override

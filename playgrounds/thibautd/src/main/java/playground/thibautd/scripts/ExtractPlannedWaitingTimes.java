@@ -32,6 +32,9 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -39,10 +42,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 /**
  * @author thibautd
@@ -161,13 +160,13 @@ public class ExtractPlannedWaitingTimes {
 			if (currentMode.equals( JointActingTypes.DRIVER )) {
 				// we do not care of ODs
 				DriverRoute route = new DriverRoute( (Id) null , null );
-				route.setRouteDescription( null , content , null );
+				route.setRouteDescription(content);
 
 				jointTimes.notifyDriverStartTime( currentId , route.getPassengersIds() , now );
 			}
 			else if (currentMode.equals( JointActingTypes.PASSENGER )) {
 				PassengerRoute route = new PassengerRoute( null , null );
-				route.setRouteDescription( null , content , null );
+				route.setRouteDescription(content);
 				jointTimes.notifyPassengerStartTime( currentId , route.getDriverId() , now );
 			}
 		}

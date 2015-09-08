@@ -80,8 +80,8 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	}
 
 	@Override
-	public void setRouteDescription(final Id<Link> startLinkId, final String routeDescription, final Id<Link> endLinkId) {
-		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
+	public void setRouteDescription(final String routeDescription) {
+		super.setRouteDescription(routeDescription);
 		if (routeDescription.startsWith(IDENTIFIER_1)) {
 			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
 			this.accessStopId = Id.create(parts[1], TransitStopFacility.class);

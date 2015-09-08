@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.Facility;
@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * Defines a route for bike sharing legs.
  * @author thibautd
  */
-public class BikeSharingRoute implements GenericRoute, NetworkRoute {
+public class BikeSharingRoute implements Route, NetworkRoute {
 	private final NetworkRoute routeDelegate;
 	private Id<BikeSharingFacility> originStation;
 	private Id<BikeSharingFacility> destinationStation;
@@ -137,11 +137,7 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 	// generic route (necessary for IO)
 	@Override
 	public void setRouteDescription(
-			final Id<Link> startLinkId,
-			final String routeDescription,
-			final Id<Link> endLinkId) {
-		this.routeDelegate.setStartLinkId( startLinkId );
-		this.routeDelegate.setEndLinkId( endLinkId );
+			final String routeDescription) {
 		final String[] stations = routeDescription.trim().split( " " );
 		if ( stations.length < 2 ) throw new IllegalArgumentException( routeDescription );
 		this.originStation = Id.create( stations[ 0 ], BikeSharingFacility.class );
@@ -151,7 +147,7 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 		for ( int i=2; i < stations.length; i++ ) {
 			links.add( Id.createLinkId( stations[ i ] ) );
 		}
-		setLinkIds( startLinkId , links , endLinkId );
+		setLinkIds( getStartLinkId() , links , getEndLinkId());
 	}
 
 	@Override

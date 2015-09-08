@@ -3,14 +3,19 @@ package playground.singapore.ptsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
@@ -38,9 +43,9 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if(planElement instanceof ActivityImpl && !((ActivityImpl)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				if(act!=null) {
-					act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
-					ptAct.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
-					((ActivityImpl) planElement).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
+					act.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
+					ptAct.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
+					((ActivityImpl) planElement).setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 				}
 				act = (ActivityImpl) planElement;
 				if(eStopId2!=null) {
@@ -60,7 +65,9 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 				Route route = ((Leg)planElement).getRoute();
 				if(route!=null) {
 					ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) factory.createRoute(route.getStartLinkId(), route.getEndLinkId());
-					eRoute.setRouteDescription(route.getStartLinkId(), ((GenericRoute)route).getRouteDescription(), route.getEndLinkId());
+					eRoute.setStartLinkId(route.getStartLinkId());
+					eRoute.setEndLinkId(route.getEndLinkId());
+					eRoute.setRouteDescription(route.getRouteDescription());
 					Id aStopId = eRoute.getAccessStopId();
 					eStopId = eRoute.getEgressStopId();
 					if(act!=null)
@@ -68,7 +75,7 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 					ptAct.setLinkId(aStopId);
 				}
 				else if(act!=null)
-					act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
+					act.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 				act = null;
 			}
 		}
