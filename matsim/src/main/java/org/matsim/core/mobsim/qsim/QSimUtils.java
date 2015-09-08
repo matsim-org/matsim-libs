@@ -24,21 +24,23 @@ package org.matsim.core.mobsim.qsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NewNetworkChangeEventsEngine;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueEngine;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueEngineModule;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 import org.matsim.core.scenario.ScenarioElementsModule;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author nagel
@@ -48,51 +50,61 @@ public class QSimUtils {
 	private QSimUtils() {}
 
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
+		final Collection<AbstractQSimPlugin> plugins = defaultQSimPlugins(scenario.getConfig());
+		return createQSim(scenario, eventsManager, plugins);
+	}
+
+	private static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
 		AbstractModule module = new AbstractModule() {
 			@Override
 			public void install() {
 				install(new ScenarioElementsModule());
-				install(new MessageQueueEngineModule());
+				for (AbstractQSimPlugin plugin : plugins) {
+					for (AbstractModule module : plugin.modules()) {
+						install(module);
+					}
+				}
 				bind(Scenario.class).toInstance(scenario);
 				bind(EventsManager.class).toInstance(eventsManager);
 				bind(QSim.class).asEagerSingleton();
 				bind(Netsim.class).to(QSim.class);
-				bind(ActivityEngine.class).asEagerSingleton();
-				bind(QNetsimEngine.class);
-				bind(TeleportationEngine.class).asEagerSingleton();
-				if (getConfig().transit().isUseTransit()) {
-					bind(AgentFactory.class).to(TransitAgentFactory.class).asEagerSingleton();
-					bind(TransitQSimEngine.class).asEagerSingleton();
-					bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
-				} else {
-					bind(AgentFactory.class).to(DefaultAgentFactory.class).asEagerSingleton();
-				}
-				if (scenario.getConfig().network().isTimeVariantNetwork()) {
-					bind(NewNetworkChangeEventsEngine.class).asEagerSingleton();
-				}
-				bind(PopulationAgentSource.class).asEagerSingleton();
 			}
 		};
 		Injector injector = Injector.createInjector(scenario.getConfig(), module);
 		QSim qSim = injector.getInstance(QSim.class);
-		if (scenario.getConfig().transit().isUseTransit()) {
-			TransitQSimEngine transitEngine = injector.getInstance(TransitQSimEngine.class);
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
+		for (AbstractQSimPlugin plugin : plugins) {
+			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {
+				qSim.addMobsimEngine(injector.getInstance(mobsimEngine));
+			}
+			for (Class<? extends ActivityHandler> activityHandler : plugin.activityHandlers()) {
+				qSim.addActivityHandler(injector.getInstance(activityHandler));
+			}
+			for (Class<? extends DepartureHandler> mobsimEngine : plugin.departureHandlers()) {
+				qSim.addDepartureHandler(injector.getInstance(mobsimEngine));
+			}
+			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
+				qSim.addQueueSimulationListeners(injector.getInstance(mobsimListener));
+			}
+			for (Class<? extends AgentSource> agentSource : plugin.agentSources()) {
+				qSim.addAgentSource(injector.getInstance(agentSource));
+			}
 		}
-		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(injector.getInstance(NewNetworkChangeEventsEngine.class));
-		}
-		qSim.addQueueSimulationListeners(injector.getInstance(MessageQueueEngine.class));
-		ActivityEngine activityEngine = injector.getInstance(ActivityEngine.class);
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = injector.getInstance(QNetsimEngine.class);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		qSim.addMobsimEngine(injector.getInstance(TeleportationEngine.class));
-		qSim.addAgentSource(injector.getInstance(PopulationAgentSource.class));
 		return qSim;
+	}
+
+	private static Collection<AbstractQSimPlugin> defaultQSimPlugins(Config config) {
+		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
+		plugins.add(new MessageQueuePlugin());
+		plugins.add(new ActivityEnginePlugin());
+		plugins.add(new QNetsimEnginePlugin());
+		if (config.network().isTimeVariantNetwork()) {
+			plugins.add(new NetworkChangeEventsPlugin());
+		}
+		if (config.transit().isUseTransit()) {
+			plugins.add(new TransitEnginePlugin());
+		}
+		plugins.add(new TeleportationPlugin());
+		plugins.add(new PopulationPlugin());
+		return plugins;
 	}
 }

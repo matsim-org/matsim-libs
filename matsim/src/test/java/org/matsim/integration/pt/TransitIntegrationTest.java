@@ -39,10 +39,7 @@ public class TransitIntegrationTest {
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("test/scenarios/pt-tutorial/population2.xml");
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 

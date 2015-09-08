@@ -75,7 +75,7 @@ public class QNetsimEngine implements MobsimEngine {
 	private final AbstractAgentSnapshotInfoBuilder positionInfoBuilder;
 
 	private final double stucktimeCache;
-	private final DepartureHandler dpHandler;
+	private final VehicularDepartureHandler dpHandler;
 
 	private double infoTime = 0;
 
@@ -412,7 +412,7 @@ public class QNetsimEngine implements MobsimEngine {
 		return this.stucktimeCache;
 	}
 
-	public DepartureHandler getDepartureHandler() {
+	public VehicularDepartureHandler getDepartureHandler() {
 		return dpHandler;
 	}
 

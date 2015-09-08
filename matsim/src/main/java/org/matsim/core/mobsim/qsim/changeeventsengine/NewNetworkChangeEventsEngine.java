@@ -12,7 +12,7 @@ import org.matsim.core.network.NetworkImpl;
 import javax.inject.Inject;
 import java.util.Collection;
 
-public class NewNetworkChangeEventsEngine implements MobsimEngine {
+class NewNetworkChangeEventsEngine implements MobsimEngine {
 
 	private final MessageQueue messageQueue;
 	private final Network network;
