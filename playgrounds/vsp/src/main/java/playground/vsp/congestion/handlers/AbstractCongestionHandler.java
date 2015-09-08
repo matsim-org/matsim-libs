@@ -223,7 +223,7 @@ Wait2LinkEventHandler {
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
-			double earliestLeaveTime = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime()) + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+			double earliestLeaveTime = getLastLeavingTime(linkInfo) + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTime + 1.){
 				// bottleneck no longer active; remove data:
 				linkInfo.getFlowQueue().clear();
@@ -299,7 +299,8 @@ Wait2LinkEventHandler {
 		return linkInfo ;
 	}
 
-	private static double getLastLeavingTime(Map<Id<Person>, Double> personId2LinkLeaveTime) {
+	private static double getLastLeavingTime(LinkCongestionInfo linkInfo ) {
+		Map<Id<Person>, Double> personId2LinkLeaveTime = linkInfo.getPersonId2linkLeaveTime() ;
 
 		double lastLeavingFromThatLink = Double.NEGATIVE_INFINITY;
 		for (Id<Person> id : personId2LinkLeaveTime.keySet()){
