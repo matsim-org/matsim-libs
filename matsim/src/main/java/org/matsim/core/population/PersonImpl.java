@@ -20,13 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -34,20 +27,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 /**
  * Default implementation of {@link Person} interface.
  */
-public class PersonImpl implements Person {
-
-	private final static Logger log = Logger.getLogger(PersonImpl.class);
+public final class PersonImpl implements Person {
 
 	protected List<Plan> plans = new ArrayList<Plan>(6);
 	protected Id<Person> id;
-	private String sex;
-	private int age = Integer.MIN_VALUE;
-	private String hasLicense;
-	private String carAvail;
-	private Boolean isEmployed = false;
 
 	private TreeSet<String> travelcards = null;
 
@@ -56,8 +46,12 @@ public class PersonImpl implements Person {
 	private Customizable customizableDelegate;
 
 	@Deprecated // please try to use the factory: pop.getFactory().create...
-	public PersonImpl(final Id<Person> id) {
+	 PersonImpl(final Id<Person> id) {
 		this.id = id;
+	}
+
+	public static Person createPerson(final Id<Person> id) {
+		return new PersonImpl(id);
 	}
 
 	@Override
@@ -73,31 +67,12 @@ public class PersonImpl implements Person {
 		return this.plans.add(plan);
 	}
 
-	@Deprecated // use methods of interface Person
-	public PlanImpl createAndAddPlan(final boolean selected) {
-		PlanImpl p = new PlanImpl(this);
-		this.addPlan(p);
-		if (selected) {
-			this.setSelectedPlan(p);
-		}
-		return p;
-	}
-
 	@Override
 	public final void setSelectedPlan(final Plan selectedPlan) {
 		if (selectedPlan != null && !plans.contains( selectedPlan )) {
 			throw new IllegalStateException("The plan to be set as selected is not null nor stored in the person's plans");
 		}
 		this.selectedPlan = selectedPlan;
-	}
-
-	public void removeUnselectedPlans() {
-		for (Iterator<Plan> iter = this.getPlans().iterator(); iter.hasNext(); ) {
-			Plan plan = iter.next();
-			if (!plan.isSelected()) {
-				iter.remove();
-			}
-		}
 	}
 
 	@Override
@@ -123,94 +98,12 @@ public class PersonImpl implements Person {
 		this.id = id;
 	}
 
-	@Deprecated // use PersonAttributes
-	public final String getSex() {
-		return this.sex;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final int getAge() {
-		return this.age;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final String getLicense() {
-		return this.hasLicense;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final boolean hasLicense() {
-		return ("yes".equals(this.hasLicense)) || ("true".equals(this.hasLicense));
-	}
-
-	@Deprecated // use PersonAttributes
-	public final String getCarAvail() {
-		return this.carAvail;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final Boolean isEmployed() {
-		return this.isEmployed;
-	}
-
-	@Deprecated // use PersonAttributes
-	public void setAge(final int age) {
-		if ((age < 0) && (age != Integer.MIN_VALUE)) {
-			throw new NumberFormatException("A person's age has to be an integer >= 0.");
-		}
-		this.age = age;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final void setSex(final String sex) {
-		this.sex = (sex == null) ? null : sex.intern();
-	}
-
-	@Deprecated // use PersonAttributes
-	public final void setLicence(final String licence) {
-		this.hasLicense = (licence == null) ? null : licence.intern();
-	}
-
-	@Deprecated // use PersonAttributes
-	public final void setCarAvail(final String carAvail) {
-		this.carAvail = (carAvail == null) ? null : carAvail.intern();
-	}
-
-	@Deprecated // use PersonAttributes
-	public final void setEmployed(final Boolean employed) {
-		this.isEmployed = employed;
-	}
-
-	@Deprecated // use PersonAttributes
-	public final void addTravelcard(final String type) {
-		if (this.travelcards == null) {
-			this.travelcards = new TreeSet<String>();
-		}
-		if (this.travelcards.contains(type)) {
-			log.info(this + "[type=" + type + " already exists]");
-		} else {
-			this.travelcards.add(type.intern());
-		}
-	}
-
-
-	@Deprecated // use PersonAttributes
-	public final TreeSet<String> getTravelcards() {
-		return this.travelcards;
-	}
-
 	@Override
 	public final String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("[id=").append(this.getId()).append("]");
-		b.append("[sex=").append(this.getSex()).append("]");
-		b.append("[age=").append(this.getAge()).append("]");
-		b.append("[license=").append(this.getLicense()).append("]");
-		b.append("[car_avail=").append(this.getCarAvail()).append("]");
-		b.append("[employed=").append((isEmployed() == null ? "null" : (isEmployed ? "yes" : "no"))).append("]");
-		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
 		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
-	  return b.toString();
+		return b.toString();
 	}
 
 	@Override

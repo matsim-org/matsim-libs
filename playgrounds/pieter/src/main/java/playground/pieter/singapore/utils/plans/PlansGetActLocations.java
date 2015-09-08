@@ -15,7 +15,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -32,7 +31,7 @@ public class PlansGetActLocations {
 					+ tableName
 					+ "(full_pop_pid varchar(45),facility_id varchar(45), activity varchar(45)) ");
             for (Id<Person> personId : plans.getPersons().keySet()) {
-                PersonImpl person = (PersonImpl) plans.getPersons().get(
+                Person person = plans.getPersons().get(
                         personId);
 
                 for (int i = person.getPlans().size() - 1; i >= 0; i--) {

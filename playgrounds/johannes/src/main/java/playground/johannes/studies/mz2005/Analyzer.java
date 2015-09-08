@@ -31,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -90,7 +89,7 @@ public class Analyzer {
 		SocialSparseGraph graph = gbuilder.createGraph();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			plans.add(person.getSelectedPlan());
-			gbuilder.addVertex(graph, new SocialPerson((PersonImpl) person), MatsimCoordUtils.coordToPoint(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord()));
+			gbuilder.addVertex(graph, new SocialPerson(person), MatsimCoordUtils.coordToPoint(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord()));
 		}
 		
 		

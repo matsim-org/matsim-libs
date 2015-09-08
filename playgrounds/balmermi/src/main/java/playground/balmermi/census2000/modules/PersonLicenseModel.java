@@ -22,7 +22,7 @@ package playground.balmermi.census2000.modules;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -66,9 +66,9 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		boolean hasLicense = model.calcLicenseOwnership();
-		if (hasLicense) { ((PersonImpl) person).setLicence(YES); } else { ((PersonImpl) person).setLicence(NO); }
+		if (hasLicense) { PersonUtils.setLicence(person, YES); } else { PersonUtils.setLicence(person, NO); }
 		if ((p.getAge() < 18) && (hasLicense)) {
-			((PersonImpl) person).setLicence(NO);
+			PersonUtils.setLicence(person, NO);
 		}
 	}
 

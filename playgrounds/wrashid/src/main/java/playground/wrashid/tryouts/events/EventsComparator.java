@@ -1,8 +1,8 @@
 package playground.wrashid.tryouts.events;
 
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 public class EventsComparator {
 
@@ -15,7 +15,7 @@ public class EventsComparator {
 		events1.addHandler(eventStatistics);
 		
 		events1.initProcessing();
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events1);
+		MatsimEventsReader reader = new MatsimEventsReader(events1);
 		reader.readFile(eventsFilePath);
 		events1.finishProcessing();
 		
@@ -28,7 +28,7 @@ public class EventsComparator {
 		events2.addHandler(eventStatistics2);
 		
 		events2.initProcessing();
-		reader = new EventsReaderTXTv1(events2);
+		reader = new MatsimEventsReader(events2);
 		reader.readFile(eventsFilePath);
 		events2.finishProcessing();
 		

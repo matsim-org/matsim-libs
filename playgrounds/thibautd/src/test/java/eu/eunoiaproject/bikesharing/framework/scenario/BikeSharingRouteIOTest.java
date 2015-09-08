@@ -159,7 +159,7 @@ public class BikeSharingRouteIOTest {
 	}
 
 	private Person wrapInPlan( final BikeSharingRoute outRoute ) {
-		final Person person = new PersonImpl( Id.createPersonId( "p" ) );
+		final Person person = PersonImpl.createPerson(Id.createPersonId("p"));
 
 		final Plan plan = new PlanImpl( person );
 		person.addPlan( plan );

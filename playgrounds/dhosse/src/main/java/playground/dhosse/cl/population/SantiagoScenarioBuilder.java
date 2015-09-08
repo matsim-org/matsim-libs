@@ -77,7 +77,7 @@ public class SantiagoScenarioBuilder {
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
 	static String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/";		//outputDir of this class -> input for Matsim (KT)
+	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";		//outputDir of this class -> input for Matsim (KT)
 	
 	static String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
 	static String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
@@ -154,7 +154,25 @@ public class SantiagoScenarioBuilder {
 		
 		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioOut);
 		aap.run();
-		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
+		
+		//now "pt interaction" activities has neither maxduration nor start/end time -> Error when running (KT, 25.08.2015)
+		Population population = aap.getOutPop();
+	
+		for (Person p : population.getPersons().values()){
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if (pe instanceof Activity){
+				 Activity act = (Activity) pe;
+				  if ((act.getEndTime() == Time.UNDEFINED_TIME ) && (act.getStartTime()  == Time.UNDEFINED_TIME) && act.getType() =="pt iNaNH"){
+					  act.setMaximumDuration(0.);
+				  }
+				}
+			}
+			
+		}
+		new PopulationWriter(population).write(outputDir + "plans/plans_final.xml.gz");
+		
+		//before Insertion (KT 25.08.2015)
+//		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
 		
 		SortedMap<String, Tuple<Double, Double>> acts = aap.getActivityType2TypicalAndMinimalDuration();
 		
@@ -174,6 +192,8 @@ public class SantiagoScenarioBuilder {
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 		
 		Scenario scenarioFinal = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		//What happens here? looks for me like just read & write population to the same file... (KT, 24.08.2015)
 		new MatsimPopulationReader(scenarioFinal).readFile(outputDir + "plans/plans_final.xml.gz");
 		Population populationFinal = scenarioFinal.getPopulation();
 		

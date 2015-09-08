@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleType;
 
@@ -41,7 +41,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 public class EnergyConsumptionTest extends MatsimTestCase {
 
 	private EnergyConsumptionPlugin runWithModel(EnergyConsumptionModel energyConsumptionModel){
-		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.xml";
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		LinkedListValueHashMap<Id<Vehicle>, Vehicle> vehicles=new LinkedListValueHashMap<>();
@@ -51,7 +51,7 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 		
 		events.addHandler(energyConsumptionPlugin);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		
 		reader.readFile(eventsFile);
 		

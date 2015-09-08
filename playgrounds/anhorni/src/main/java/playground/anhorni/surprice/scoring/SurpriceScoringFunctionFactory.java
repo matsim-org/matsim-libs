@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -61,12 +60,12 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				CharyparNagelScoringParameters.getBuilder(config).create(),
                 this.controler.getScenario().getNetwork(),
 				this.memories.getMemory(person.getId()),
-				this.day, (PersonImpl)person, 
+				this.day, person,
 				(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {
 			scoringFunctionAccumulator.addScoringFunction(new SupriceTollScoringFunction(
-					CharyparNagelScoringParameters.getBuilder(config).create(), (PersonImpl)person, this.day,
+					CharyparNagelScoringParameters.getBuilder(config).create(), person, this.day,
 					(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		}				
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));

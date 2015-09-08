@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -51,8 +51,8 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		String netFileName = "test/scenarios/berlin/network.xml"; 
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		
-		String eventsFileName = getOutputDirectory() + "events.txt.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
+		String eventsFileName = getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -71,7 +71,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
+		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
 		QSim qSim = new QSim(scenario, events);
@@ -95,6 +95,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		writer.closeFile();
 
+		System.out.println("reffile: " + referenceEventsFileName);
 		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
 		
 	}
@@ -103,8 +104,8 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = getOutputDirectory() + "events.txt.gz";
-		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
+		String eventsFileName = getOutputDirectory() + "events.xml.gz";
+		String referenceEventsFileName = getInputDirectory() + "events.xml.gz";
 
 		MatsimRandom.reset(7411L);
 
@@ -123,7 +124,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
+		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		eventsManager.addHandler(writer);
 
 		QSim qSim = new QSim(scenario, eventsManager);

@@ -21,11 +21,7 @@
 package playground.anhorni.surprice.scoring;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -40,7 +36,7 @@ import playground.anhorni.surprice.AgentMemory;
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double score;
-	private PersonImpl person;
+	private Person person;
 	private double lastTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
@@ -58,7 +54,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private int legCnt = -1;        
     
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, AgentMemory memory, 
-    		String day, PersonImpl person, double dudm) {
+    		String day, Person person, double dudm) {
 		this.params = params;
         this.network = network;
         this.memory = memory;

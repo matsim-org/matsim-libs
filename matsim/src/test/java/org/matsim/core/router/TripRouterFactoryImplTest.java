@@ -132,7 +132,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( Id.create( "toto", Person.class ) ));
+				PersonImpl.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 
@@ -204,7 +204,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( Id.create( "toto", Person.class ) ));
+				PersonImpl.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 

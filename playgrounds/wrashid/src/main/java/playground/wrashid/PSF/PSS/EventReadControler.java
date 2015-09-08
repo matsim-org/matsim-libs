@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 public class EventReadControler extends Controler {
@@ -33,9 +35,19 @@ public class EventReadControler extends Controler {
 	private void runLocal(){
 		//if (buffer == null){
 			// the processing happens during the reading process
-			BufferedEventsReaderTXTv1 reader = new BufferedEventsReaderTXTv1(getEvents());
+			buffer = new ArrayList<>();
+			MatsimEventsReader reader = new MatsimEventsReader(getEvents());
+			getEvents().addHandler(new BasicEventHandler() {
+				@Override
+				public void reset(int iteration) {
+				}
+	
+				@Override
+				public void handleEvent(Event event) {
+					buffer.add(event);
+				}
+			});
 			reader.readFile(pathToEventsFile);
-			buffer=reader.getBuffer();
 			/*
 		} else {
 			// if events buffered, process events directly

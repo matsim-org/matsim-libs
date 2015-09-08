@@ -28,8 +28,8 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 
 /**
@@ -50,10 +50,10 @@ public class PersonCarAvailability implements PopulationTask {
 	@Override
 	public void apply(Population pop) {
 		for(Person person : pop.getPersons().values()) {
-			double p = fractions.get(((PersonImpl)person).getAge());
+			double p = fractions.get(PersonUtils.getAge(person));
 			
 			if(random.nextDouble() < p)
-				((PersonImpl)person).setCarAvail("always");
+				PersonUtils.setCarAvail(person, "always");
 		}
 
 	}

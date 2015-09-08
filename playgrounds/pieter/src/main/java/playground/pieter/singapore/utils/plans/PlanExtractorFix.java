@@ -11,8 +11,8 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 
+import org.matsim.core.population.PersonUtils;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
@@ -59,9 +59,9 @@ class PlanExtractorFix {
 			while (pid_it.hasNext()) {
 				
 				Id<Person> personId = pid_it.next();
-				PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+				Person person = plans.getPersons().get(personId);
 
-				String assignedMode = person.getCarAvail().equals("always")?"car":"pt";
+				String assignedMode = PersonUtils.getCarAvail(person).equals("always")?"car":"pt";
 				if(assignedMode.equals("car"))
 					carCount++;
 				ResultSet rs = dba

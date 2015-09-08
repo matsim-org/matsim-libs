@@ -42,7 +42,7 @@ import java.util.Random;
 public class ActivitySequenceMutatorAlgorithmTest {
 	@Test
 	public void testTwoActivities() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "somebody" , Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -74,7 +74,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testOneActivities() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "somebody" , Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -100,7 +100,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testZeroActivities() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "somebody" , Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -120,7 +120,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testStage() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "somebody" , Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );

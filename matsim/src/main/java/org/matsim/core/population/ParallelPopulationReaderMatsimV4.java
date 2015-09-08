@@ -126,7 +126,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		else {
 			// If it is an new person, create a new person and a list for its attributes.
 			if (PERSON.equals(name)) {
-				PersonImpl person = (PersonImpl) this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
+				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 				currentPersonXmlData = new ArrayList<Tag>();
 				PersonTag personTag = new PersonTag();
 				personTag.person = person;
@@ -310,7 +310,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	}
 	
 	public final class PersonTag extends Tag {
-		PersonImpl person;
+		Person person;
 	}
 	
 	public final class EndTag extends Tag {

@@ -198,7 +198,7 @@ public class ModdedConverterE {
 
 						}
 
-						PersonImpl p = new PersonImpl(Id.create(personId, Person.class));
+						Person p = PersonImpl.createPerson(Id.create(personId, Person.class));
 						PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);

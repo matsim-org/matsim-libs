@@ -20,7 +20,8 @@
 package playground.johannes.socialnetworks.graph.social;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * @author illenberger
@@ -28,7 +29,7 @@ import org.matsim.core.population.PersonImpl;
  */
 public class SocialPerson {
 
-	private PersonImpl person;
+	private Person person;
 	
 	private String name;
 	
@@ -40,7 +41,7 @@ public class SocialPerson {
 	
 	private String civilStatus;
 	
-	public SocialPerson(PersonImpl person) {
+	public SocialPerson(Person person) {
 		this.person = person;
 	}
 	
@@ -57,7 +58,7 @@ public class SocialPerson {
 	}
 	
 	public int getAge() {
-		return person.getAge();
+		return PersonUtils.getAge(person);
 	}
 	
 	public String getCitizenship() {
@@ -92,7 +93,7 @@ public class SocialPerson {
 		this.civilStatus = civilStatus;
 	}
 	
-	public PersonImpl getPerson() {
+	public Person getPerson() {
 		return person;
 	}
 }

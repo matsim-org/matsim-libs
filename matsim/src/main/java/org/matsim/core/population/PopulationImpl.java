@@ -47,7 +47,7 @@ public final class PopulationImpl implements Population {
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
 	
-	private Map<Id<Person>, PersonImpl> persons = new LinkedHashMap<Id<Person>, PersonImpl>();
+	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
@@ -82,14 +82,14 @@ public final class PopulationImpl implements Population {
 
 		if (!this.isStreaming) {
 			// streaming is off, just add the person to our list
-			this.persons.put(p.getId(), (PersonImpl) p);
+			this.persons.put(p.getId(), p);
 		} else {
 			// streaming is on, run algorithm on the person and write it to file.
 
 			/* Add Person to map, for algorithms might reference to the person
 			 * with "agent = population.getPersons().get(personId);"
 			 * remove it after running the algorithms! */
-			this.persons.put(p.getId(), (PersonImpl) p);
+			this.persons.put(p.getId(), p);
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {

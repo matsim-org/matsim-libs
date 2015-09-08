@@ -40,7 +40,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -83,7 +82,7 @@ public class Main {
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, freespeed, freespeed);
 
 		
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = new ActivityImpl("h", fromCoord);
@@ -93,8 +92,9 @@ public class Main {
 		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 
 		for (int i = 0; i < 1000; i++) {
-			double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,
-					7.0 * 3600);
+			//double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,
+			//		7.0 * 3600);
+			throw new UnsupportedOperationException( "if you need this, please use a RoutingModule instead" );
 		}
 	}
 

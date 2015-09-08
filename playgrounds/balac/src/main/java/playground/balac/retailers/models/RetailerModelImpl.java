@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -20,7 +19,7 @@ public class RetailerModelImpl
   implements RetailerModel
 {
   protected static final Logger log = Logger.getLogger(RetailerModelImpl.class);
-  protected final Map<Id<Person>, PersonImpl> persons = new TreeMap<Id<Person>, PersonImpl>();
+  protected final Map<Id<Person>, Person> persons = new TreeMap<Id<Person>, Person>();
   protected final Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   protected Controler controler;
   protected Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;

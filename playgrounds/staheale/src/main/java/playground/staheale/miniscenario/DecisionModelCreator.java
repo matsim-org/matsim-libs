@@ -20,14 +20,14 @@
 
 package playground.staheale.miniscenario;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.staheale.preprocess.AgentMemory;
 import playground.staheale.preprocess.DecisionModel;
 
 public class DecisionModelCreator {
 	
-	public DecisionModel createDecisionModelForAgent(PersonImpl person, AgentMemory memory) {
+	public DecisionModel createDecisionModelForAgent(Person person, AgentMemory memory) {
 		DecisionModel model = new DecisionModel();
 		model.setMemory(memory);
 		

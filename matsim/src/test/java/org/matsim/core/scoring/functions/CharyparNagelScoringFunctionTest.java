@@ -51,6 +51,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -84,7 +85,7 @@ public class CharyparNagelScoringFunctionTest {
 
 	private double calcScore(final Fixture f) {
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
-		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(new PersonImpl(Id.create("1", Person.class)));
+		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(PersonImpl.createPerson(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
 				testee.handleActivity((Activity) planElement);
@@ -571,8 +572,8 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
-		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan1 = person1.createAndAddPlan(true);
+		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = plan1.createAndAddActivity("home", (Id<Link>)null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
@@ -618,7 +619,7 @@ public class CharyparNagelScoringFunctionTest {
 
 	private static class Fixture {
 		protected Config config = null;
-		private PersonImpl person = null;
+		private Person person = null;
 		private PlanImpl plan = null;
 		private Scenario scenario;
 		private NetworkImpl network;
@@ -702,8 +703,8 @@ public class CharyparNagelScoringFunctionTest {
 			this.network.createAndAddLink(Id.create("8", Link.class), node8, node9, 5000, 50, 3600, 1);
 			Link link9 = this.network.createAndAddLink(Id.create("9", Link.class), node9, node10, 500, 25, 3600, 1);
 
-			this.person = new PersonImpl(Id.create("1", Person.class));
-			this.plan = this.person.createAndAddPlan(true);
+			this.person = PersonImpl.createPerson(Id.create("1", Person.class));
+			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			ActivityImpl firstActivity = this.plan.createAndAddActivity("h", link1.getId());
 			firstActivity.setEndTime(firstLegStartTime);

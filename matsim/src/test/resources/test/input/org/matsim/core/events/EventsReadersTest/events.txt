@@ -1,9 +1,0 @@
-T_GBL	VEH_ID	LEG_NR	LINK_ID	FROM_NODE_ID	EVENT_FLAG	DESCRIPTION
-21610	1	0	2	0	8	actend h
-21620	2	1	3	0	6	departure
-21630	3	2	4	0	4	wait2link
-21640	4	3	5	0	2	left link
-21650	5	4	6	0	5	entered link
-21660	6	5	7	0	0	arrival
-21670	7	6	8	0	7	actstart w
-21680	8	7	9	0	3	stuckAndAbort

@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -67,11 +68,11 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 				
 				// copy attributes if possible
 				if (person instanceof PersonImpl && experiencedPerson instanceof PersonImpl) {
-					((PersonImpl) experiencedPerson).setAge(((PersonImpl) person).getAge());
-					((PersonImpl) experiencedPerson).setCarAvail(((PersonImpl) person).getCarAvail());
-					((PersonImpl) experiencedPerson).setEmployed(((PersonImpl) person).isEmployed());
-					((PersonImpl) experiencedPerson).setLicence(((PersonImpl) person).getLicense());
-					((PersonImpl) experiencedPerson).setSex(((PersonImpl) person).getSex());
+					PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
+					PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));
+					PersonUtils.setEmployed(experiencedPerson, PersonUtils.isEmployed(person));
+					PersonUtils.setLicence(experiencedPerson, PersonUtils.getLicense(person));
+					PersonUtils.setSex(experiencedPerson, PersonUtils.getSex(person));
 				}
 				
 				experiencedPopulation.addPerson(experiencedPerson);

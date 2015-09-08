@@ -180,7 +180,7 @@ public class CMCFScenarioGeneratorNoReroute {
 		Link l6 = this.network.getLinks().get(Id.create(6, Link.class));
 
 		for (int i = 1; i <= 7200; i++) {
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2

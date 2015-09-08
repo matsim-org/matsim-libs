@@ -29,7 +29,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import playground.ciarif.flexibletransports.IO.CarSharingSummaryWriter;
 import playground.ciarif.flexibletransports.IO.PersonsSummaryWriter;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
@@ -63,7 +62,7 @@ public class CarSharingListener implements IterationEndsListener {
     this.plansCalcRouteFtInfo.prepare(network);
       for (Person person : this.controler.getScenario().getPopulation().getPersons().values()) {
       Plan plan = person.getSelectedPlan();
-      PersonImpl p = (PersonImpl)person;
+      Person p = person;
       for (PlanElement pe : plan.getPlanElements()) {
         if (pe instanceof LegImpl) {
           LegImpl leg = (LegImpl)pe;

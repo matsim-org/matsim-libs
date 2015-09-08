@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -219,7 +220,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		PersonImpl matsimPerson = new PersonImpl(Id.create(record.id, Person.class));
+		Person matsimPerson = PersonImpl.createPerson(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;
@@ -231,19 +232,19 @@ public class GraphBuilder {
 		if(age < 0)
 			errLogger.logNoAge(record.isEgo);
 		else
-			matsimPerson.setAge(age);
+			PersonUtils.setAge(matsimPerson, age);
 		
 		String sex = sqlData.getSex(record);
 		if(sex != null)
-			matsimPerson.setSex(sex);
+			PersonUtils.setSex(matsimPerson, sex);
 		else
 			errLogger.logNoSex(record.isEgo);
 		
 		if(record.isEgo)
-			matsimPerson.setLicence(sqlData.getLicense(record));
+			PersonUtils.setLicence(matsimPerson, sqlData.getLicense(record));
 		
 		if(record.isEgo)
-			matsimPerson.setCarAvail(sqlData.getCarAvail(record));
+			PersonUtils.setCarAvail(matsimPerson, sqlData.getCarAvail(record));
 		
 		person.setCitizenship(sqlData.getCitizenship(record));
 		person.setEducation(sqlData.getEducation(record));
