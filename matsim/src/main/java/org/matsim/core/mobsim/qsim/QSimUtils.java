@@ -54,7 +54,7 @@ public class QSimUtils {
 		return createQSim(scenario, eventsManager, plugins);
 	}
 
-	private static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
+	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
 		AbstractModule module = new AbstractModule() {
 			@Override
 			public void install() {
