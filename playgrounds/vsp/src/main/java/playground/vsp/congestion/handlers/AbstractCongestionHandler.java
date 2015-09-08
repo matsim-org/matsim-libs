@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -223,7 +222,7 @@ Wait2LinkEventHandler {
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
-			double earliestLeaveTime = getLastLeavingTime(linkInfo) + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTime + 1.){
 				// bottleneck no longer active; remove data:
 				linkInfo.getFlowQueue().clear();
@@ -270,7 +269,6 @@ Wait2LinkEventHandler {
 		linkInfo.getFlowQueue().add( personId );
 		linkInfo.getDelayQueue().add( personId ) ;
 		
-		linkInfo.getPersonId2linkLeaveTime().put( personId, now );
 	}
 
 	private final LinkCongestionInfo getOrCreateLinkInfo(Id<Link> linkId) {
@@ -297,18 +295,6 @@ Wait2LinkEventHandler {
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
 		
 		return linkInfo ;
-	}
-
-	private static double getLastLeavingTime(LinkCongestionInfo linkInfo ) {
-		Map<Id<Person>, Double> personId2LinkLeaveTime = linkInfo.getPersonId2linkLeaveTime() ;
-
-		double lastLeavingFromThatLink = Double.NEGATIVE_INFINITY;
-		for (Id<Person> id : personId2LinkLeaveTime.keySet()){
-			if (personId2LinkLeaveTime.get(id) > lastLeavingFromThatLink) {
-				lastLeavingFromThatLink = personId2LinkLeaveTime.get(id);
-			}
-		}
-		return lastLeavingFromThatLink;
 	}
 
 	public final void writeCongestionStats(String fileName) {

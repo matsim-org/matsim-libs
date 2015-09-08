@@ -90,7 +90,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			
 		} else {
 			causingLink = event.getLinkId();
-			causingAgent = linkInfo.getLastLeavingAgent().getPersonId() ;
+			causingAgent = linkInfo.getLastLeaveEvent().getPersonId() ;
 			congestionType = "flowCapacity";
 		}
 		
@@ -106,10 +106,10 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		boolean isLinkFree = false;
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-		if(linkInfo.getLastLeavingAgent() == null) return true;
+		if(linkInfo.getLastLeaveEvent() == null) return true;
 		
 		// first check if agent will be delayed because of flowCapacity
-		double freeSpeedLeaveTimeOfLastLeftAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(linkInfo.getLastLeavingAgent());
+		double freeSpeedLeaveTimeOfLastLeftAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(linkInfo.getLastLeaveEvent());
 		double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 		
 		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
@@ -118,11 +118,12 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		if (timeHeadway < minTimeHeadway) isLinkFree = false;
 		else isLinkFree = true;
 		
-		double lastLeaveTime = linkInfo.getPersonId2linkLeaveTime().get(linkInfo.getLastLeavingAgent()); 
+//		double lastLeaveTime = linkInfo.getPersonId2linkLeaveTime().get(linkInfo.getLastLeaveEvent()); 
 		/*
 		 *  TODO : yet to fix this, at the moment (sep 15), lastLeaveTime will throw NullPointException because
 		 *  this map is cleared in AbstractCongestionHandler before the calculateCongestion() call.
 		 */
+		double lastLeaveTime = linkInfo.getLastLeaveEvent().getTime() ;
 		
 		/*
 		 * the following check ensures that the time gap between the current agent and last left agent is more than MarginalDelayPerLeavingVehicle_sec

@@ -47,7 +47,6 @@ public final class LinkCongestionInfo {
 	private Id<Link> linkId;
 	private double freeTravelTime;
 	private double marginalDelayPerLeavingVehicle_sec;
-	private Map<Id<Person>, Double> personId2linkLeaveTime = new HashMap<Id<Person>, Double>();
 	private LinkedList<Id<Person>> flowQueue = new LinkedList<Id<Person>>();
 	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
@@ -74,9 +73,6 @@ public final class LinkCongestionInfo {
 	public void setFreeTravelTime(double freeTravelTime) {
 		this.freeTravelTime = freeTravelTime;
 	}
-	public Map<Id<Person>, Double> getPersonId2linkLeaveTime() {
-		return personId2linkLeaveTime;
-	}
 	public LinkedList<Id<Person>> getFlowQueue() {
 		return flowQueue;
 	}
@@ -87,7 +83,7 @@ public final class LinkCongestionInfo {
 			Map<Id<Person>, Double> personId2freeSpeedLeaveTime) {
 		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
 	}
-	public LinkLeaveEvent getLastLeavingAgent() {
+	public LinkLeaveEvent getLastLeaveEvent() {
 		return lastLeavingAgent;
 	}
 	public void memorizeLastLinkLeaveEvent(LinkLeaveEvent event) {

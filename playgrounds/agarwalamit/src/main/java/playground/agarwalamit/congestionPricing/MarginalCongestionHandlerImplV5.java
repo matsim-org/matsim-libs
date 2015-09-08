@@ -130,7 +130,7 @@ public final class MarginalCongestionHandlerImplV5 implements PersonDepartureEve
 
 		if(delay > 0.){
 			totalDelay += delay;
-			if (linkInfo.getLastLeavingAgent()==null){
+			if (linkInfo.getLastLeaveEvent()==null){
 				if(delay==1) {
 					roundingErrors+=delay;
 					log.error("Agent "+event.getPersonId()+" is leaving link "+event.getLinkId()+" at time "+event.getTime()+". Delay is 1 sec and no one left link before (no causing agent). \n"
@@ -145,7 +145,7 @@ public final class MarginalCongestionHandlerImplV5 implements PersonDepartureEve
 					return;
 				}
 			}
-			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
+			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeaveEvent().toString());
 
 			CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, "Delay", causingAgent, 
 					personId, delay, linkId, linkInfo.getPersonId2linkEnterTime().get(causingAgent));

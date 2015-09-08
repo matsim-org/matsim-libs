@@ -108,7 +108,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		double linkLeaveTime = event.getTime();
 
 		LinkCongestionInfo lci = link2LinkCongestionInfo.get(linkId);
-		lci.getPersonId2linkLeaveTime().put(pId, linkLeaveTime);
 		
 		double freeSpeedLeaveTime = lci.getPersonId2freeSpeedLeaveTime().get(pId);
 
@@ -214,7 +213,12 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			for(int ii = noOfDelayedAgents-2; ii>=0;ii--){
 				Id<Person> thisPerson = leavingAgents.get(ii);
 				thisPesonDelayingOtherPersons++;
-				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
+
+//				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
+				double headway = lci.getLastLeaveEvent().getTime() - event.getTime() ;
+				// ????
+				
+				
 				double delayToPayFor = thisPesonDelayingOtherPersons * headway;
 				
 				this.totalInternalizedDelay += delayToPayFor;
