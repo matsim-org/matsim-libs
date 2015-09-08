@@ -167,7 +167,7 @@ public final class SeepQLinkImpl extends AbstractQLink implements SignalizeableI
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), 1.0)
 					);
 
 			if ( this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
