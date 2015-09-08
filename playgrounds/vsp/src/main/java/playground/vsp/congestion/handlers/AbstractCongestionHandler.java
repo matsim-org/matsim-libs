@@ -197,11 +197,20 @@ Wait2LinkEventHandler {
 			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
 			
 			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
+
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
+
 			calculateCongestion(event);
-			addAgentToFlowAndDelayQueues(event, event.getTime(), personId, linkInfo );
+
+			linkInfo.getFlowQueue().add( personId );
+			linkInfo.getDelayQueue().add( personId ) ;
 			
 			linkInfo.memorizeLastLinkLeaveEvent( event );
+			
+//			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
+//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
+			// fails tests, dunno why. kai, sep'15
+		
 		}
 		
 	}
@@ -262,13 +271,6 @@ Wait2LinkEventHandler {
 		}
 
 		return agentDelay;
-	}
-
-	private final static void addAgentToFlowAndDelayQueues(LinkLeaveEvent event, double now, Id<Person> personId, LinkCongestionInfo linkInfo) {
-
-		linkInfo.getFlowQueue().add( personId );
-		linkInfo.getDelayQueue().add( personId ) ;
-		
 	}
 
 	private final LinkCongestionInfo getOrCreateLinkInfo(Id<Link> linkId) {
