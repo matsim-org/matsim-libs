@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
@@ -44,7 +44,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
  * @author thibautd
  */
 public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-			Wait2LinkEventHandler, Link2WaitEventHandler, VehicleArrivesAtFacilityEventHandler, 
+			Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler, 
 			VehicleAbortEventHandler {
 	private static final Logger log =
 		Logger.getLogger(DeactivableTravelTimeProvider.class);

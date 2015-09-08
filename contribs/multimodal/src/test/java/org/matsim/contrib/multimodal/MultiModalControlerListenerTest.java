@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.multimodal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -29,15 +32,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
@@ -49,9 +56,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.vehicles.Vehicle;
 
 public class MultiModalControlerListenerTest {
 
@@ -305,15 +310,15 @@ public class MultiModalControlerListenerTest {
 		return person;
 	}
 
-	private static class LinkModeChecker implements LinkLeaveEventHandler, PersonDepartureEventHandler,
-	PersonArrivalEventHandler {
+	private static class LinkModeChecker implements LinkLeaveEventHandler, Wait2LinkEventHandler,
+	VehicleLeavesTrafficEventHandler {
 
 		int arrivalCount = 0;
 		int linkLeftCount = 0;
 
 		private final Network network;
-		private final Map<Id<Person>, String> modes = new HashMap<>();
-		private final Map<Id<Person>, Double> departures = new HashMap<>();
+		private final Map<Id<Vehicle>, String> modes = new HashMap<>();
+		private final Map<Id<Vehicle>, Double> departures = new HashMap<>();
 		final Map<String, Integer> leftCountPerMode = new HashMap<>();
 		final Map<String, Double> travelTimesPerMode = new HashMap<>();
 
@@ -341,35 +346,35 @@ public class MultiModalControlerListenerTest {
 		}
 
 		@Override
-		public void handleEvent(PersonDepartureEvent event) {
-			this.modes.put(event.getPersonId(), event.getLegMode());
-			this.departures.put(event.getPersonId(), event.getTime());
+		public void handleEvent(Wait2LinkEvent event) {
+			this.modes.put(event.getVehicleId(), event.getNetworkMode());
+			this.departures.put(event.getVehicleId(), event.getTime());
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = this.network.getLinks().get(event.getLinkId());
-
-			if (!link.getAllowedModes().contains(this.modes.get(event.getPersonId()))) {
-				log.error(this.modes.get(event.getPersonId()));
+			String mode = this.modes.get(event.getVehicleId());
+			
+			if (!link.getAllowedModes().contains(mode)) {
+				log.error(mode);
 			}
 
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(event.getPersonId())));
+			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
 
 			this.linkLeftCount++;
 
-			String mode = this.modes.get(event.getPersonId());
 			int count = this.leftCountPerMode.get(mode);
 			this.leftCountPerMode.put(mode, count + 1);
 		}
 
 		@Override
-		public void handleEvent(PersonArrivalEvent event) {
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
 			this.arrivalCount++;
-			String mode = this.modes.remove(event.getPersonId());
+			String mode = this.modes.remove(event.getVehicleId());
 
-			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
+			double tripTravelTime = event.getTime() - this.departures.remove(event.getVehicleId());
 			double modeTravelTime = this.travelTimesPerMode.get(mode);
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}

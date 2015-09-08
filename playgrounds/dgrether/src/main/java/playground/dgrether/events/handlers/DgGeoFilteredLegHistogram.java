@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
@@ -63,7 +63,7 @@ import playground.dgrether.events.GeospatialEventTools;
  *  based on implementation of mrieser in the org.matsim project
  *
  */
-public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, Link2WaitEventHandler, VehicleAbortEventHandler{
+public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortEventHandler{
 
 	private Map<Id<Vehicle>, LinkEnterEvent> firstTimeSeenMap;
 	private Map<Id<Vehicle>, LinkLeaveEvent> lastTimeSeenMap;
