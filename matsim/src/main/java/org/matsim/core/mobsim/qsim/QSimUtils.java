@@ -30,8 +30,10 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NewNetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueEngine;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueEngineModule;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
@@ -50,6 +52,7 @@ public class QSimUtils {
 			@Override
 			public void install() {
 				install(new ScenarioElementsModule());
+				install(new MessageQueueEngineModule());
 				bind(Scenario.class).toInstance(scenario);
 				bind(EventsManager.class).toInstance(eventsManager);
 				bind(QSim.class).asEagerSingleton();
@@ -65,7 +68,7 @@ public class QSimUtils {
 					bind(AgentFactory.class).to(DefaultAgentFactory.class).asEagerSingleton();
 				}
 				if (scenario.getConfig().network().isTimeVariantNetwork()) {
-					bind(NetworkChangeEventsEngine.class).asEagerSingleton();
+					bind(NewNetworkChangeEventsEngine.class).asEagerSingleton();
 				}
 				bind(PopulationAgentSource.class).asEagerSingleton();
 			}
@@ -79,8 +82,9 @@ public class QSimUtils {
 			qSim.addMobsimEngine(transitEngine);
 		}
 		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(injector.getInstance(NetworkChangeEventsEngine.class));
+			qSim.addMobsimEngine(injector.getInstance(NewNetworkChangeEventsEngine.class));
 		}
+		qSim.addQueueSimulationListeners(injector.getInstance(MessageQueueEngine.class));
 		ActivityEngine activityEngine = injector.getInstance(ActivityEngine.class);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);

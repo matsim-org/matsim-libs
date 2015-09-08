@@ -6,7 +6,7 @@ import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
 
 import javax.inject.Inject;
 
-class MessageQueueEngine implements MobsimBeforeSimStepListener {
+public class MessageQueueEngine implements MobsimBeforeSimStepListener {
 
 	private final SteppableScheduler scheduler;
 
