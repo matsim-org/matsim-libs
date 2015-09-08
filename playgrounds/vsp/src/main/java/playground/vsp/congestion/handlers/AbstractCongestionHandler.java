@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -149,14 +150,8 @@ PersonStuckEventHandler {
 
 	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
-			// car!
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				// no one entered or left this link before
-				createLinkInfo(event.getLinkId());
-			}
-
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId() ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
@@ -169,22 +164,14 @@ PersonStuckEventHandler {
 			this.personId2legNr.put( event.getPersonId(), cnt + 1 ) ; 
 		}
 		this.personId2linkNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
-
 	}
 
 	@Override
 	public final void handleEvent(LinkEnterEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
-
-		} else {
-			// car!
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				// no one entered or left this link before
-				createLinkInfo(event.getLinkId());
-			}
-
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());	
+		} else { // car! 
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId() ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		}
@@ -197,15 +184,10 @@ PersonStuckEventHandler {
 	public final void handleEvent(LinkLeaveEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
+		} else { // car!
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
 
-		} else {
-			// car!
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				// no one left this link before
-				createLinkInfo(event.getLinkId());
-			}
-
-			updateFlowQueue(event);
+			updateFlowQueue(event.getTime(), linkInfo );
 			calculateCongestion(event);
 			addAgentToFlowQueue(event);
 		}
@@ -215,22 +197,21 @@ PersonStuckEventHandler {
 
 	// ############################################################################################################################################################
 
-	private final void updateFlowQueue(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+	private final static void updateFlowQueue(double time, LinkCongestionInfo linkInfo) {
 
-		if (linkInfo.getLeavingAgents().isEmpty() ) {
+		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// No agent is being tracked for that link.
 
 		} else {
 
 			double earliestLeaveTime = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime()) + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 
-			if (event.getTime() > earliestLeaveTime + 1.){
+			if ( time > earliestLeaveTime + 1.){
 				// Flow congestion has disappeared on that link.
 
 				// Deleting the information of agents previously leaving that link.
-				linkInfo.getLeavingAgents().clear();
-				linkInfo.getPersonId2linkLeaveTime().clear();
+				linkInfo.getFlowQueue().clear();
+//				linkInfo.getPersonId2linkLeaveTime().clear();
 
 				// yy looks to me link getLeavingAgents is not needed; getPersonId2linkLeaveTime().keySet() would return the
 				// same result (and make the code faster).  kai, aug'15
@@ -238,33 +219,28 @@ PersonStuckEventHandler {
 		}
 	}
 
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> vehicleId, double agentDelay) {
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId);
-
-		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
-		List<Id<Person>> reverseList = new ArrayList<Id<Person>>();
-		reverseList.addAll(linkInfo.getLeavingAgents());
-		Collections.reverse(reverseList);
-		// (yy do we really need this reverting?  I find this rather unstable: Someone overlooks something, and it ends up sorted 
-		// wrongly.  There are, as alternatives, SortedSet and SortedMap, and ascending/descending iterators.  kai, sep'15 )
-
-		for (Id<Person> personId : reverseList){
-			double delayForThisPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
+		
+		for ( Iterator<Id<Person>> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
+			Id<Person> causingPersonId = it.next() ;
+			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
 			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
 
-			if(delayForThisPerson==0.) return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
+			if(delayAllocatedToThisCausingPerson==0.) {
+				return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
+			}
 			
-			if (vehicleId.toString().equals(personId.toString())) {
+			if (affectedVehId.toString().equals(causingPersonId.toString())) {
 				//					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
-				CongestionEvent congestionEvent = new CongestionEvent(now, "flowStorageCapacity", personId, 
-						Id.createPersonId(vehicleId), delayForThisPerson, linkId, 
-						linkInfo.getPersonId2linkEnterTime().get(personId));
+				CongestionEvent congestionEvent = new CongestionEvent(now, "flowStorageCapacity", causingPersonId, 
+						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, linkInfo.getPersonId2linkEnterTime().get(causingPersonId));
 				this.events.processEvent(congestionEvent);
-				this.totalInternalizedDelay += delayForThisPerson ;
+				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
 			}
-			agentDelay = agentDelay - delayForThisPerson ; 
+			agentDelay = agentDelay - delayAllocatedToThisCausingPerson ; 
 		}
 
 		if (agentDelay <= 1.) {
@@ -293,13 +269,18 @@ PersonStuckEventHandler {
 
 //		linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 
-		linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
+		linkInfo.getFlowQueue().add(Id.createPersonId(event.getVehicleId()));
 		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
 	}
 
-	private final void createLinkInfo(Id<Link> linkId) {
-		LinkCongestionInfo linkInfo = new LinkCongestionInfo();	
+	private final LinkCongestionInfo getOrCreateLinkInfo(Id<Link> linkId) {
+		
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId ) ;
+		if (linkInfo != null){ 
+			return linkInfo ;
+		}
+		linkInfo = new LinkCongestionInfo();	
 
 		Network network = this.scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
@@ -315,6 +296,8 @@ PersonStuckEventHandler {
 		linkInfo.setStorageCapacityCars(storageCapacity_cars);
 
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
+		
+		return linkInfo ;
 	}
 
 	private static double getLastLeavingTime(Map<Id<Person>, Double> personId2LinkLeaveTime) {

@@ -115,9 +115,9 @@ Wait2LinkEventHandler {
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
 
-		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event);
+		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayOnTheLink);
 
-		if( linkInfo.getLeavingAgents().isEmpty()){
+		if( linkInfo.getFlowQueue().isEmpty()){
 			// (getLeavingAgents is NOT the queue, i.e. NOT all agents with delay, but only those agents where time
 			// headway approx 1/cap, i.e. "flow" queue. So we get here only if we are spillback delayed, and our own bottleneck
 			// is not active)
@@ -243,14 +243,14 @@ Wait2LinkEventHandler {
 	 * <p> <code> if( leavingAgents.isEmpty() ) { checkForTimeGap} </code>
 	 * <p> 
 	 * <p> A test is available, see {@link CombinedFlowAndStorageDelayTest}.
+	 * @param delayOnTheLink TODO
 	 */
-	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event){
+	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event, double remainingDelay ){
 
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-		double remainingDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 
-		if(linkInfo.getLeavingAgents().isEmpty()){
+		if(linkInfo.getFlowQueue().isEmpty()){
 
 			double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 			double marginalFlowDelay = linkInfo.getMarginalDelayPerLeavingVehicle_sec();

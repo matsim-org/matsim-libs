@@ -116,7 +116,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 		if(delay > 0.){
 			totalDelay += delay;
-			lci.getLeavingAgents().add(pId);
+			lci.getFlowQueue().add(pId);
 
 			List<Id<Person>> enteringAgentsList = new ArrayList<Id<Person>>(lci.getPersonId2linkEnterTime().keySet());
 			
@@ -185,7 +185,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 	private void throwCongestionEvents(LinkLeaveEvent event) {
 		LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getLeavingAgents());
+		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getFlowQueue());
 		Id<Person> nullAffectedAgent = Id.createPersonId("NullAgent");
 
 		switch (congestionImpl) {
@@ -201,7 +201,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 				lci.getPersonId2freeSpeedLeaveTime().remove(person);
 			}
 
-			lci.getLeavingAgents().clear();
+			lci.getFlowQueue().clear();
 		}
 			break;
 		case KN:

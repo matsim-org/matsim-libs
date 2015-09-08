@@ -25,6 +25,7 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public final class LinkCongestionInfo {
 	private double freeTravelTime;
 	private double marginalDelayPerLeavingVehicle_sec;
 	private Map<Id<Person>, Double> personId2linkLeaveTime = new HashMap<Id<Person>, Double>();
-	private List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>();
+	private LinkedList<Id<Person>> flowQueue = new LinkedList<Id<Person>>();
 	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
 	private Id<Person> lastLeavingAgent;
@@ -73,8 +74,8 @@ public final class LinkCongestionInfo {
 	public Map<Id<Person>, Double> getPersonId2linkLeaveTime() {
 		return personId2linkLeaveTime;
 	}
-	public List<Id<Person>> getLeavingAgents() {
-		return leavingAgents;
+	public LinkedList<Id<Person>> getFlowQueue() {
+		return flowQueue;
 	}
 	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
 		return personId2freeSpeedLeaveTime;

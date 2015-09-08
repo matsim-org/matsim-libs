@@ -64,7 +64,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 		String congestionType;
 		
 //		if(isLinkFree(event)){
-		if(linkInfo.getLeavingAgents().isEmpty()){
+		if(linkInfo.getFlowQueue().isEmpty()){
 			/*
 			 * Instead of the above if statement, I should use the commented if statement (isLinkFree). So that, 
 			 * if an agent is first delayed by flowCapacity and then storageCapacity, it charges correct agent.
