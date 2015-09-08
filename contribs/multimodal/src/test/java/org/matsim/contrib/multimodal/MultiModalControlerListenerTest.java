@@ -361,7 +361,7 @@ public class MultiModalControlerListenerTest {
 			}
 
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
+			Assert.assertTrue(link.getAllowedModes().contains(mode));
 
 			this.linkLeftCount++;
 
