@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
-import playground.mzilske.jdeqsimengine.SteppableScheduler;
+import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

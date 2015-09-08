@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -266,7 +265,7 @@ public class RunArentzeModel {
 				if ( name.equals( "act" ) && missCoord ) {
 					final double x = Double.parseDouble( atts.getValue( "x" ) );
 					final double y = Double.parseDouble( atts.getValue( "y" ) );
-					coords.add( coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
+					coords.add( coordPool.getPooledInstance(new Coord(x, y)) );
 					missCoord = false;
 				}
 

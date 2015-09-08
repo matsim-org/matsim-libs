@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -42,7 +41,7 @@ public class GoogleGeocode {
 		public String getGK4(){
 			CoordinateTransformation coorTransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 					TransformationFactory.DHDN_GK4);
-			Coord coord = coorTransform.transform(new CoordImpl(this.lon, this.lat));
+			Coord coord = coorTransform.transform(new Coord(Double.parseDouble(this.lon), Double.parseDouble(this.lat)));
 			return new String(coord.getX() + ", " + coord.getY());
 			
 		}

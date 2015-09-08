@@ -28,9 +28,9 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -212,13 +212,13 @@ public class PathDependentNetworkTest {
 		/* Chain A -> C -> D */
 		DigicoreActivity da1_A = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		da1_A.setFacilityId(Id.create("A", ActivityFacility.class));
-		da1_A.setCoord(new CoordImpl(0, 10));
+		da1_A.setCoord(new Coord((double) 0, (double) 10));
 		DigicoreActivity da1_C = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		da1_C.setFacilityId(Id.create("C", ActivityFacility.class));
-		da1_C.setCoord(new CoordImpl(5, 5));
+		da1_C.setCoord(new Coord((double) 5, (double) 5));
 		DigicoreActivity da1_D = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		da1_D.setFacilityId(Id.create("D", ActivityFacility.class));
-		da1_D.setCoord(new CoordImpl(10, 10));
+		da1_D.setCoord(new Coord((double) 10, (double) 10));
 		DigicoreChain c1 = new DigicoreChain();
 		c1.add(da1_A);
 		c1.add(da1_C);
@@ -228,13 +228,13 @@ public class PathDependentNetworkTest {
 		/* Chain A -> C -> E */
 		DigicoreActivity da2_A = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da2_A.setFacilityId(Id.create("A", ActivityFacility.class));
-		da2_A.setCoord(new CoordImpl(0, 10));
+		da2_A.setCoord(new Coord((double) 0, (double) 10));
 		DigicoreActivity da2_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da2_C.setFacilityId(Id.create("C", ActivityFacility.class));
-		da2_C.setCoord(new CoordImpl(5, 5));
+		da2_C.setCoord(new Coord((double) 5, (double) 5));
 		DigicoreActivity da2_E = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da2_E.setFacilityId(Id.create("E", ActivityFacility.class));
-		da2_E.setCoord(new CoordImpl(10, 0));
+		da2_E.setCoord(new Coord((double) 10, (double) 0));
 		DigicoreChain c2 = new DigicoreChain();
 		c2.add(da2_A);
 		c2.add(da2_C);
@@ -244,13 +244,13 @@ public class PathDependentNetworkTest {
 		/* Chain B -> C -> D */
 		DigicoreActivity da3_B = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da3_B.setFacilityId(Id.create("B", ActivityFacility.class));
-		da3_B.setCoord(new CoordImpl(0, 0));
+		da3_B.setCoord(new Coord((double) 0, (double) 0));
 		DigicoreActivity da3_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da3_C.setFacilityId(Id.create("C", ActivityFacility.class));
-		da3_C.setCoord(new CoordImpl(5, 5));
+		da3_C.setCoord(new Coord((double) 5, (double) 5));
 		DigicoreActivity da3_D = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da3_D.setFacilityId(Id.create("D", ActivityFacility.class));
-		da3_D.setCoord(new CoordImpl(10, 10));
+		da3_D.setCoord(new Coord((double) 10, (double) 10));
 		DigicoreChain c3 = new DigicoreChain();
 		c3.add(da3_B);
 		c3.add(da3_C);
@@ -260,17 +260,17 @@ public class PathDependentNetworkTest {
 		/* A -> ?? -> B -> C -> ?? */
 		DigicoreActivity da4_A = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da4_A.setFacilityId(Id.create("A", ActivityFacility.class));
-		da4_A.setCoord(new CoordImpl(0, 10));
-		DigicoreActivity da4_dummy1 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da4_dummy1.setCoord(new CoordImpl(20, 10));
+		da4_A.setCoord(new Coord((double) 0, (double) 10));
+		DigicoreActivity da4_dummy1 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH);
+		da4_dummy1.setCoord(new Coord((double) 20, (double) 10));
 		DigicoreActivity da4_B = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da4_B.setFacilityId(Id.create("B", ActivityFacility.class));
-		da4_B.setCoord(new CoordImpl(0, 0));
+		da4_B.setCoord(new Coord((double) 0, (double) 0));
 		DigicoreActivity da4_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da4_C.setFacilityId(Id.create("C", ActivityFacility.class));
-		da4_C.setCoord(new CoordImpl(5, 5));
-		DigicoreActivity da4_dummy2 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da4_dummy2.setCoord(new CoordImpl(20, 10));
+		da4_C.setCoord(new Coord((double) 5, (double) 5));
+		DigicoreActivity da4_dummy2 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH);
+		da4_dummy2.setCoord(new Coord((double) 20, (double) 10));
 		DigicoreChain c4 = new DigicoreChain();
 		c4.add(da4_A);
 		c4.add(da4_dummy1);

@@ -145,7 +145,7 @@ public class PersonalizableDisutilityIntegrationTest {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(this.scenario).readFile("test/scenarios/equil/network.xml");
 			
-			this.person = new PersonImpl(Id.create(1, Person.class));
+			this.person = PersonImpl.createPerson(Id.create(1, Person.class));
 			
 			this.vehicle = new VehicleImpl(null, null);
 			

@@ -21,11 +21,10 @@ package playground.johannes.socialnetworks.gis;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.studies.gis.SpanningTree;
 import playground.johannes.studies.gis.SpanningTree.NodeData;
@@ -58,8 +57,8 @@ public class TraveTimeCostFunction implements SpatialCostFunction {
 	
 	@Override
 	public double costs(Point p1, Point p2) {
-		Node start = network.getNearestNode(new CoordImpl(p1.getX(), p1.getY()));
-		Node target = network.getNearestNode(new CoordImpl(p2.getX(), p2.getY()));
+		Node start = network.getNearestNode(new Coord(p1.getX(), p1.getY()));
+		Node target = network.getNearestNode(new Coord(p2.getX(), p2.getY()));
 		
 		if(start != lastNode) {
 			spanningTree.setOrigin(start);

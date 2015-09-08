@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
-import com.google.inject.Provider;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,9 +64,11 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.inject.Provider;
+
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 
 public class CadytsIntegrationTest {
 
@@ -178,7 +180,7 @@ public class CadytsIntegrationTest {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
+				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

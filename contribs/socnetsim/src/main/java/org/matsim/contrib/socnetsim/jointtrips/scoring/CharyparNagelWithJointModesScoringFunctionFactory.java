@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -32,12 +36,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * @author thibautd
@@ -65,7 +65,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 			final StageActivityTypes typesNotToScore,
 			final Scenario scenario) {
 		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
-		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 

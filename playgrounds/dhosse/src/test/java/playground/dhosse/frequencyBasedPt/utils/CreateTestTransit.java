@@ -3,13 +3,13 @@ package playground.dhosse.frequencyBasedPt.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -33,23 +33,23 @@ public class CreateTestTransit {
 	public static TransitSchedule createTestSchedule(Network network, int nRoutes){
 		
 		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
-		
-		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create("stop_1", TransitStopFacility.class), new CoordImpl(150,150), false);
+
+		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create("stop_1", TransitStopFacility.class), new Coord((double) 150, (double) 150), false);
 		stop1.setLinkId(Id.create(1, Link.class));
-		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create("stop_3", TransitStopFacility.class), new CoordImpl(300,150), false);
+		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create("stop_3", TransitStopFacility.class), new Coord((double) 300, (double) 150), false);
 		stop3.setLinkId(Id.create(3, Link.class));
-		TransitStopFacility stop5 = factory.createTransitStopFacility(Id.create("stop_5", TransitStopFacility.class), new CoordImpl(450,150), false);
+		TransitStopFacility stop5 = factory.createTransitStopFacility(Id.create("stop_5", TransitStopFacility.class), new Coord((double) 450, (double) 150), false);
 		stop5.setLinkId(Id.create(5, Link.class));
-		TransitStopFacility stop7 = factory.createTransitStopFacility(Id.create("stop_7", TransitStopFacility.class), new CoordImpl(300,150), false);
+		TransitStopFacility stop7 = factory.createTransitStopFacility(Id.create("stop_7", TransitStopFacility.class), new Coord((double) 300, (double) 150), false);
 		stop7.setLinkId(Id.create(7, Link.class));
-		
-		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create("stop_2", TransitStopFacility.class), new CoordImpl(0,150), false);
+
+		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create("stop_2", TransitStopFacility.class), new Coord((double) 0, (double) 150), false);
 		stop2.setLinkId(Id.create(2, Link.class));
-		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create("stop_4", TransitStopFacility.class), new CoordImpl(150,150), false);
+		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create("stop_4", TransitStopFacility.class), new Coord((double) 150, (double) 150), false);
 		stop4.setLinkId(Id.create(4, Link.class));
-		TransitStopFacility stop6 = factory.createTransitStopFacility(Id.create("stop_6", TransitStopFacility.class), new CoordImpl(300,150), false);
+		TransitStopFacility stop6 = factory.createTransitStopFacility(Id.create("stop_6", TransitStopFacility.class), new Coord((double) 300, (double) 150), false);
 		stop6.setLinkId(Id.create(6, Link.class));
-		TransitStopFacility stop8 = factory.createTransitStopFacility(Id.create("stop_8", TransitStopFacility.class), new CoordImpl(450,150), false);
+		TransitStopFacility stop8 = factory.createTransitStopFacility(Id.create("stop_8", TransitStopFacility.class), new Coord((double) 450, (double) 150), false);
 		stop8.setLinkId(Id.create(8, Link.class));
 		
 		TransitSchedule schedule = factory.createTransitSchedule();

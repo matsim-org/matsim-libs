@@ -44,10 +44,10 @@ public class AgentId2PersonMap {
 	 * @param agentIds Set of agent ids of interest
 	 * @return Returns a map holding the populations person for each given agent id
 	 */
-	public static TreeMap<Id, PersonImpl> getAgentId2PersonMap(Population pop, Set<Id> agentIds){
+	public static TreeMap<Id, Person> getAgentId2PersonMap(Population pop, Set<Id> agentIds){
 		AgentId2PersonMap.log.setLevel(AgentId2PersonMap.logLevel);
 		
-		TreeMap<Id, PersonImpl> agentId2PersonMap = new TreeMap<Id, PersonImpl>();
+		TreeMap<Id, Person> agentId2PersonMap = new TreeMap<Id, Person>();
 		
 		log.debug("Parsing population...");
 		
@@ -55,7 +55,7 @@ public class AgentId2PersonMap {
 			if(agentIds.contains(person.getId())){
 				// person is of interest
 				if(person instanceof PersonImpl){
-					agentId2PersonMap.put(person.getId(), (PersonImpl) person);
+					agentId2PersonMap.put(person.getId(), person);
 				} else {
 					log.debug(person + " is not of type PersonImpl, but of type " + person.getClass() + ". Don't know how to handle that one.");
 				}

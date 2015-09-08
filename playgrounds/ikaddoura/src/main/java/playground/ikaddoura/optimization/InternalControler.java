@@ -33,7 +33,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
 
@@ -138,11 +137,11 @@ public class InternalControler {
 
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
 		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
-		planCalcScoreConfigGroup.setMonetaryDistanceCostRateCar(MONETARY_DISTANCE_COST_RATE_CAR);
+		planCalcScoreConfigGroup.setMonetaryDistanceRateCar(MONETARY_DISTANCE_COST_RATE_CAR);
 
 		planCalcScoreConfigGroup.setConstantWalk(CONSTANT_WALK);
 		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
-		planCalcScoreConfigGroup.setMonetaryDistanceCostRatePt(MONETARY_DISTANCE_COST_RATE_PT);
+		planCalcScoreConfigGroup.setMonetaryDistanceRatePt(MONETARY_DISTANCE_COST_RATE_PT);
 		
 		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
 		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT_IN_VEHICLE);
@@ -155,6 +154,7 @@ public class InternalControler {
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
 				planCalcScoreConfigGroup,
+				scenario.getConfig().scenario(),
 				scenario.getNetwork(), 
 				STUCK_SCORE);
 		

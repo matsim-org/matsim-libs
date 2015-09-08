@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
@@ -175,14 +174,14 @@ public class ParkingLoader {
 	}
 
 	private static void addDummyParking(LinkedList<PParking> parkings) {
-		PublicParking parking = new PublicParking(new CoordImpl(100000000,100000000));
+		PublicParking parking = new PublicParking(new Coord((double) 100000000, (double) 100000000));
 		parking.setMaxCapacity(100000000000.0);
 		parking.setParkingId(Id.create("backupParking", PParking.class));
 		parking.setType("public");
 		parkings.add(parking);
-		
-		
-		parking = new PublicParking(new CoordImpl(100000000,100000000));
+
+
+		parking = new PublicParking(new Coord((double) 100000000, (double) 100000000));
 		parking.setMaxCapacity(100000000000.0);
 		parking.setParkingId(Id.create("gp-bkp", PParking.class));
 		parking.setType("public");

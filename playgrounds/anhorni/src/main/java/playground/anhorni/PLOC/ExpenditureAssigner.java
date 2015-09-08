@@ -21,7 +21,6 @@ package playground.anhorni.PLOC;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -46,13 +45,13 @@ public class ExpenditureAssigner {
 			
 	public void assignExpenditures(Population population) {
 		for (Person p :population.getPersons().values()) {
-			this.assignExpenditureGaussian((PersonImpl)p);
+			this.assignExpenditureGaussian(p);
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(personAttributes);
 		attributesWriter.writeFile(path + "input/PLOC/3towns/personExpenditures.xml");
 	}
 				
-	public void assignExpenditureGaussian(PersonImpl person) {		
+	public void assignExpenditureGaussian(Person person) {
 		int townId = (Integer) person.getCustomAttributes().get("townId");
 		double expenditure = Math.sqrt(Math.pow(this.randomNumberGenerator.nextGaussian() * sigma[townId] + mu[townId], 2)) ;
 		personAttributes.putAttribute(person.getId().toString(), "expenditure", expenditure); 

@@ -76,7 +76,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 
 		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
+		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceRateCar();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 
 		constCar		= planCalcScoreConfigGroup.getConstantCar();

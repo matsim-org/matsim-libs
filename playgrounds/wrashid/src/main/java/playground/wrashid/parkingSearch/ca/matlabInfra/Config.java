@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
@@ -49,7 +48,7 @@ public class Config {
 	}
 
 	public static boolean isInsideStudyArea(double x, double y) {
-		return isInsideStudyArea(new CoordImpl(x,y));
+		return isInsideStudyArea(new Coord(x, y));
 	}
 	
 	public static boolean isInsideStudyArea(Coord coord) {

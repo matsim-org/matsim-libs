@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 
 /**
  * @author dgrether
@@ -35,9 +37,12 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_TRANSIT = "useTransit";
 	private static final String USE_VEHICLES = "useVehicles";
+	private static final String SIMULATION_PERIOD_DAYS = "simulationPeriodInDays"; // is not yet written to log-output so we can still rename it internally
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
+
+	private int simulationPeriodInDays = 1;
 	
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
@@ -98,19 +103,11 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	
 	
 
-//	public boolean isUseLanes() {
-//		return this.useLanes;
-//	}
-
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	void setUseLanes(@SuppressWarnings("unused") final boolean useLanes) {
 		throw new RuntimeException( getMessage( USE_LANES ) ) ;
 	}
-
-//	public boolean isUseHouseholds() {
-//		return this.useHouseholds;
-//	}
 
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
@@ -124,23 +121,22 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
 	}
 	
-//	@SuppressWarnings("static-method")
-//	@Deprecated // since jul'15
-//	public Boolean getUseVehicles() {
-//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
-//	}
-	
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	public void setUseTransit(@SuppressWarnings("unused") final Boolean b) {
 		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
 
-//	@SuppressWarnings("static-method")
-//	@Deprecated // since jul'15
-//	public Boolean getUseTransit() {
-//		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
-//	}
+	@StringSetter( SIMULATION_PERIOD_DAYS )
+	public void setSimulationPeriodInDays(final int simulationPeriodInDays) {
+		this.simulationPeriodInDays = simulationPeriodInDays;
+	}
+	
+	@StringGetter( SIMULATION_PERIOD_DAYS )
+	public int getSimulationPeriodInDays() {
+		return this.simulationPeriodInDays;
+	}
+
 	
 	private static String getMessage( String module ) {
 		return "The " + module + " switch is no longer operational.  The file is loaded if the file name"

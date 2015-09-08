@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -254,7 +253,7 @@ public class TransitNetworkSink implements Sink {
 					if (allNodesTracker.get(relationMember.getMemberId())) {
 //						System.out.println(relationMember.getMemberId());
 						Node node = nodeReader.get(relationMember.getMemberId()).getEntity();
-						Coord coordinate = coordinateTransformation.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+						Coord coordinate = coordinateTransformation.transform(new Coord(node.getLongitude(), node.getLatitude()));
 						String role = relationMember.getMemberRole();
 						if (role.isEmpty() || role.startsWith("stop")) {
 							stopsH.addLast(node);
@@ -317,7 +316,7 @@ public class TransitNetworkSink implements Sink {
 		Iterator<Node> j = stopNodes.iterator();
 		Iterator<Double> k = travelTimes.iterator();
 		Node firstStopNode = j.next();
-		Coord firstCoordinate = coordinateTransformation.transform(new CoordImpl(firstStopNode.getLongitude(), firstStopNode.getLatitude()));
+		Coord firstCoordinate = coordinateTransformation.transform(new Coord(firstStopNode.getLongitude(), firstStopNode.getLatitude()));
 		Map<String, String> firstStopTags = new TagCollectionImpl(firstStopNode.getTags()).buildMap();
 		String firstStopName = firstStopTags.get("name");
 		if(firstStopName != null){
@@ -341,7 +340,7 @@ public class TransitNetworkSink implements Sink {
 				linkId = nextLinkId;
 			}
 			Node stopNode = j.next();
-			Coord coordinate = coordinateTransformation.transform(new CoordImpl(stopNode.getLongitude(), stopNode.getLatitude()));
+			Coord coordinate = coordinateTransformation.transform(new Coord(stopNode.getLongitude(), stopNode.getLatitude()));
 			Map<String, String> stopTags = new TagCollectionImpl(stopNode.getTags()).buildMap();
 			String stopName = stopTags.get("name");
 			if(stopName != null){

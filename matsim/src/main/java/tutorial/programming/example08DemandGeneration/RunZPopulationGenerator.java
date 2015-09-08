@@ -123,7 +123,7 @@ public class RunZPopulationGenerator {
 			 * - set the start time to 0.0
 			 * - add the Activity to the plan.
 			 */
-			Coord homeCoord =  scenario.createCoord(entry.h_x, entry.h_y);
+			Coord homeCoord = new Coord(entry.h_x, entry.h_y);
 			Activity homeActivity = populationFactory.createActivityFromCoord("home", homeCoord);
 			homeActivity.setStartTime(0.0);
 			plan.addActivity(homeActivity);
@@ -150,7 +150,7 @@ public class RunZPopulationGenerator {
 			 *  Create person's Trips and add them to the Plan.
 			 */
 			for (ZCensusEntry personEntry : personEntries) {
-				endCoord = scenario.createCoord(personEntry.d_x, personEntry.d_y);
+				endCoord = new Coord(personEntry.d_x, personEntry.d_y);
 				transportMode = getTransportMode(personEntry.tripmode);
 				String activityType = getActivityType(personEntry.trippurpose);
 

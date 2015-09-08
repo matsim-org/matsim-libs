@@ -68,7 +68,7 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testMonoLegPlan() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "id", Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
@@ -99,7 +99,7 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testMultiLegPlan() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "id", Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
@@ -140,7 +140,7 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testDummyActsPlan() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "id", Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
@@ -188,7 +188,7 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testPtPlan() throws Exception {
-		final Plan plan = new PlanImpl( new PersonImpl( Id.create( "id", Person.class ) ) );
+		final Plan plan = new PlanImpl(PersonImpl.createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );

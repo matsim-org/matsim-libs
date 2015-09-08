@@ -35,7 +35,6 @@ import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -72,8 +71,8 @@ public class ProcessNoiseImmissions {
 	}
 
 	public static void main(String[] args) {
-		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/baseCase/ITERS/it.100/immissions/";
-		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/baseCase/receiverPoints/receiverPoints.csv";
+		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/immissions/";
+		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
 
 		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, 100);
 		readNoiseFile.run();
@@ -159,7 +158,7 @@ public class ProcessNoiseImmissions {
 				}
 				
 				lineCounter++;
-				rp2Coord.put(rpId, new CoordImpl(x, y));
+				rp2Coord.put(rpId, new Coord(x, y));
 				
 			}
 			

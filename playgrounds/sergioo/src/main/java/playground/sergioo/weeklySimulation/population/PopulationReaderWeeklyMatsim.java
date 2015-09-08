@@ -33,12 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -170,15 +165,15 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
 		this.currperson = new BasePersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
-		this.currperson.setCarAvail(atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed(VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 
@@ -213,12 +208,12 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			}
 			this.curract = new ActivityImpl(atts.getValue(ATTR_ACT_TYPE), coord, linkId);
 			this.currplan.addActivity(curract);
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			this.curract = new ActivityImpl(atts.getValue(ATTR_ACT_TYPE), coord);
 			this.currplan.addActivity(curract);
 		} else {

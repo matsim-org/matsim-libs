@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -93,7 +92,7 @@ public class EvacuationScenarioCleaner {
 
 	private void handle(Link link) {
 		Id<Node> id = Id.create("en"+link.getId().toString(), Node.class);
-		CoordImpl cc = new CoordImpl(link.getFromNode().getCoord().getX()+10, link.getFromNode().getCoord().getY());
+		Coord cc = new Coord(link.getFromNode().getCoord().getX() + 10, link.getFromNode().getCoord().getY());
 		Node n = this.scenario.getNetwork().getFactory().createNode(id, cc);
 		this.scenario.getNetwork().addNode(n);
 		link.setToNode(n);

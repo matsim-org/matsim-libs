@@ -27,8 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.old.NetworkLegRouter;
+import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -85,7 +84,7 @@ public class InitialStateGenerator {
 			plan.addActivity(home3);
 			
 			person.addPlan(plan);
-			((PersonImpl)person).setSelectedPlan(plan);
+			person.setSelectedPlan(plan);
 		}
 	}
 }

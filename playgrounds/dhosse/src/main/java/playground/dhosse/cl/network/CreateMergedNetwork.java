@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -16,7 +17,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -32,7 +32,7 @@ public class CreateMergedNetwork {
 	
 	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/network/";		//outputDir of this class -> input for Matsim (KT)
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
 
 	public static void main(String[] args) {
 		createDir(new File(outputDir));
@@ -54,7 +54,7 @@ public class CreateMergedNetwork {
 
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
-		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new CoordImpl(345165, 6304696));
+		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
 		network.addNode(node);
 		
 		Link link01 = netFactory.createLink(Id.createLinkId("l_add_01"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315588")), network, 50.2, 40/3.6, 600, 1);
@@ -164,7 +164,7 @@ public class CreateMergedNetwork {
 		
 		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
 		
-		convertNet2Shape(network, crs, outputDir+"viz/"); 
+		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
 		calcMinMaxCoord(network);
 		
 		System.out.println("### Finished network creation. ###");

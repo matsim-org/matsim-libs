@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
@@ -72,8 +71,8 @@ public class NodeTableHandler extends TableHandler {
 			id = Id.create(record.get(ID_KEY), Node.class);
 		else
 			id = idGenerator.generateId(record.get(ID_KEY), Node.class);
-		
-		Coord c = new CoordImpl(Double.parseDouble(record.get(XCOORD)), Double.parseDouble(record.get(YCOORD)));
+
+		Coord c = new Coord(Double.parseDouble(record.get(XCOORD)), Double.parseDouble(record.get(YCOORD)));
 		Node node = network.getFactory().createNode(id, transform.transform(c));
 		network.addNode(node);
 	}

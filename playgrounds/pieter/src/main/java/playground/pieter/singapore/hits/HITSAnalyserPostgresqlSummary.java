@@ -29,7 +29,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.XY2Links;
@@ -530,7 +529,7 @@ public class HITSAnalyserPostgresqlSummary {
 		// ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		while (rs.next()) {
 			try {
-				zip2Coord.put(rs.getInt("pcode"), new CoordImpl(rs.getDouble("x_utm48n"), rs.getDouble("y_utm48n")));
+				zip2Coord.put(rs.getInt("pcode"), new Coord(rs.getDouble("x_utm48n"), rs.getDouble("y_utm48n")));
 
 			} catch (NullPointerException e) {
 				System.out.println(rs.getInt("pcode"));

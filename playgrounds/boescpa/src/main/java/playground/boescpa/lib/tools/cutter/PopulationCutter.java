@@ -37,7 +37,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.HashMap;
@@ -74,7 +73,7 @@ public class PopulationCutter {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
-        Coord center = new CoordImpl(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
+        Coord center = new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
         int radius = Integer.parseInt(args[3]);
 
         PopulationCutter cutter = new PopulationCutter(scenario);

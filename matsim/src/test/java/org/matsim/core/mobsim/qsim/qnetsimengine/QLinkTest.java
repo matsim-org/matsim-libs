@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +43,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -78,7 +78,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		QVehicle v = new QVehicle(f.basicVehicle);
 
-		PersonImpl p = new PersonImpl(Id.create("1", Person.class));
+		Person p = PersonImpl.createPerson(Id.create("1", Person.class));
 		p.addPlan(new PlanImpl());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
@@ -89,7 +89,7 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(PersonImpl p, QSim simulation) {
+	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation) {
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation);
 		simulation.insertAgentIntoMobsim(agent); 
 		return agent;
@@ -106,7 +106,7 @@ public class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		PersonImpl p = new PersonImpl(Id.create(23, Person.class));
+		Person p = PersonImpl.createPerson(Id.create(23, Person.class));
 		PlanImpl plan = new PlanImpl();
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
@@ -159,7 +159,7 @@ public class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		PersonImpl p = new PersonImpl(Id.create(42, Person.class));
+		Person p = PersonImpl.createPerson(Id.create(42, Person.class));
 		p.addPlan(new PlanImpl());
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
@@ -194,7 +194,7 @@ public class QLinkTest extends MatsimTestCase {
 
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		PersonImpl pers = new PersonImpl(Id.create(80, Person.class));
+		Person pers = PersonImpl.createPerson(Id.create(80, Person.class));
 		Plan plan = new PlanImpl();
 		pers.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
@@ -248,9 +248,9 @@ public class QLinkTest extends MatsimTestCase {
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, (EventsUtils.createEventsManager()));
@@ -259,14 +259,14 @@ public class QLinkTest extends MatsimTestCase {
         QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
 		QVehicle v1 = new QVehicle(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
-		PersonImpl p = createPerson(Id.createPersonId(1), scenario, link1, link2);
+		Person p = createPerson(Id.createPersonId(1), scenario, link1, link2);
 		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.endActivityAndComputeNextState(0);
 
 		QVehicle v2 = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
-		PersonImpl p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
+		Person p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
 		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
@@ -311,9 +311,9 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private static PersonImpl createPerson(Id<Person> personId, ScenarioImpl scenario, Link link1, Link link2) {
-		PersonImpl p = new PersonImpl( personId );
-		PlanImpl plan = p.createAndAddPlan(true);
+	private static Person createPerson(Id<Person> personId, ScenarioImpl scenario, Link link1, Link link2) {
+		Person p = PersonImpl.createPerson(personId);
+		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
 		plan.createAndAddActivity("h", link1.getId());
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link1.getId(), link2.getId());
@@ -333,19 +333,19 @@ public class QLinkTest extends MatsimTestCase {
 		VehicleType largeVehType = new VehicleTypeImpl(Id.create("largeVehicleType", VehicleType.class));
 		largeVehType.setPcuEquivalents(5);
 		QVehicle veh1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
-		PersonImpl p1 = createPerson2(Id.createPersonId(5), f);
+		Person p1 = createPerson2(Id.createPersonId(5), f);
 		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim);
 		veh1.setDriver(driver1);
 		driver1.setVehicle(veh1);
 		driver1.endActivityAndComputeNextState(0.0);
 		QVehicle veh25 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
-		PersonImpl p2 = createPerson2(Id.createPersonId(6), f);
+		Person p2 = createPerson2(Id.createPersonId(6), f);
 		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim);
 		veh25.setDriver(driver25);
 		driver25.setVehicle(veh25);
 		driver25.endActivityAndComputeNextState(0.0);
 		QVehicle veh5 = new QVehicle(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
-		PersonImpl p3 = createPerson2(Id.createPersonId(7), f);
+		Person p3 = createPerson2(Id.createPersonId(7), f);
 		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim);
 		veh5.setDriver(driver5);
 		driver5.setVehicle(veh5);
@@ -380,8 +380,8 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private PersonImpl createPerson2(Id<Person> personId, Fixture f) {
-		PersonImpl p = new PersonImpl( personId );
+	private Person createPerson2(Id<Person> personId, Fixture f) {
+		Person p = PersonImpl.createPerson(personId);
 		Plan plan = new PlanImpl();
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
@@ -400,15 +400,15 @@ public class QLinkTest extends MatsimTestCase {
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1001, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1001, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 10 * 7.5, 7.5, 3600.0, 1.0);
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node2, node2, 2 * 7.5, 7.5, 3600.0, 1.0);
 
 		for (int i = 0; i < 5; i++) {
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new PlanImpl();
 			Activity act = new ActivityImpl("h", link1.getId());
 			act.setEndTime(7*3600);
@@ -466,9 +466,9 @@ public class QLinkTest extends MatsimTestCase {
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
-			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1, 0));
-			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1001, 0));
+			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
+			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1001, (double) 0));
 			this.link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			sim = (QSim) QSimUtils.createDefaultQSim(scenario, (EventsUtils.createEventsManager()));

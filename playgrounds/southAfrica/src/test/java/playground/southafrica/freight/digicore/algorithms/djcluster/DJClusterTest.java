@@ -26,9 +26,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
-
-import playground.southafrica.freight.digicore.algorithms.djcluster.DJCluster;
 
 public class DJClusterTest{
 	
@@ -66,37 +63,37 @@ public class DJClusterTest{
 		List<Coord> al = new ArrayList<Coord>();
 		
 		// Cluster 1
-		Coord c1 = new CoordImpl(2, 1);
+		Coord c1 = new Coord((double) 2, (double) 1);
 		al.add(c1);
-		Coord c2 = new CoordImpl(1, 2);
+		Coord c2 = new Coord((double) 1, (double) 2);
 		al.add(c2);
-		Coord c3 = new CoordImpl(1, 3);
+		Coord c3 = new Coord((double) 1, (double) 3);
 		al.add(c3);
-		Coord c4 = new CoordImpl(1, 4);
+		Coord c4 = new Coord((double) 1, (double) 4);
 		al.add(c4);
-		Coord c5 = new CoordImpl(2, 5);
+		Coord c5 = new Coord((double) 2, (double) 5);
 		al.add(c5);
-		Coord c6 = new CoordImpl(3, 4);
+		Coord c6 = new Coord((double) 3, (double) 4);
 		al.add(c6);
-		Coord c7 = new CoordImpl(3, 3);
+		Coord c7 = new Coord((double) 3, (double) 3);
 		al.add(c7);
-		Coord c8 = new CoordImpl(3, 2);
+		Coord c8 = new Coord((double) 3, (double) 2);
 		al.add(c8);
 			
 		// Cluster 2
-		Coord c9 = new CoordImpl(7, 3);
+		Coord c9 = new Coord((double) 7, (double) 3);
 		al.add(c9);
-		Coord c10 = new CoordImpl(6, 4);
+		Coord c10 = new Coord((double) 6, (double) 4);
 		al.add(c10);
-		Coord c11 = new CoordImpl(7, 5);
+		Coord c11 = new Coord((double) 7, (double) 5);
 		al.add(c11);
-		Coord c12 = new CoordImpl(8, 4);
+		Coord c12 = new Coord((double) 8, (double) 4);
 		al.add(c12);
 		
 		// Cluster 3 - not enough points
-		Coord c13 = new CoordImpl(4, 7);
+		Coord c13 = new Coord((double) 4, (double) 7);
 		al.add(c13);
-		Coord c14 = new CoordImpl(5, 7);
+		Coord c14 = new Coord((double) 5, (double) 7);
 		al.add(c14);
 
 		return al;

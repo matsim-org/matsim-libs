@@ -23,9 +23,9 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -80,7 +80,7 @@ public class FacilitiesWork9To18 {
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
-				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new Coord(Double.parseDouble(X), Double.parseDouble(Y)));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities
@@ -94,7 +94,7 @@ public class FacilitiesWork9To18 {
 			}
 
 			for (int i=0; i<B01S3; i++) {
-				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new Coord(Double.parseDouble(X), Double.parseDouble(Y)));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities

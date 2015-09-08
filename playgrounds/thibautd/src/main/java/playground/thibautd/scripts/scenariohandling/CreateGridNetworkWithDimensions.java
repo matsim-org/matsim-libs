@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.utils.UniqueIdFactory;
@@ -190,7 +190,7 @@ public class CreateGridNetworkWithDimensions {
 			nodes.add(
 					factory.createNode(
 						nodeIdFactory.createNextId(Node.class),
-						new CoordImpl( i * length , y ) ) );
+							new Coord(i * length, y)) );
 		}
 		return nodes;
 	}

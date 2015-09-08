@@ -27,7 +27,6 @@ import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -67,8 +66,7 @@ public class EmissionVehicleGenerator {
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(netFile);
 		this.scenario = ScenarioUtils.createScenario(config);
-		ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(this.scenario);
-		scLoader.loadScenario();
+		ScenarioUtils.loadScenario(this.scenario);
 		
 		this.inputVehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(this.inputVehicles);

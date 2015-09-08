@@ -31,12 +31,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
-import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -50,13 +44,13 @@ public class MergeNoiseCSVFile {
 
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
-	private double endTime = 24. * 3600.;
+	private double endTime = 30. * 3600.;
 		
-	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/consideredAgentUnits/";
-	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/receiverPoints/receiverPoints.csv";
-		
+	String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/damages_receiverPoint/";
+	String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
+	
 	private String separator = ";";
-	private String label = "consideredAgentUnits";
+	private String label = "damages_receiverPoint";
 	
 	private String outputPath = workingDirectory;
 	
@@ -149,7 +143,7 @@ public class MergeNoiseCSVFile {
 				}
 				
 				lineCounter++;
-				rp2Coord.put(rpId, new CoordImpl(x, y));
+				rp2Coord.put(rpId, new Coord(x, y));
 				
 			}
 			

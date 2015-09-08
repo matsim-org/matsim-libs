@@ -21,9 +21,9 @@ package playground.anhorni.PLOC;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -37,7 +37,7 @@ public class SinglePlanGenerator {
 		this.facilities = facilities;
 	}
 	
-	public PlanImpl generatePlan(boolean worker, boolean shortWorker, PersonImpl p) {
+	public PlanImpl generatePlan(boolean worker, boolean shortWorker, Person p) {
 		PlanImpl plan;
 		if (worker) plan = generateWorkPlan(p, shortWorker);
 		//else plan = generateNonWorkPlan(p);
@@ -45,7 +45,7 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateHomePlan(PersonImpl p) {
+	private PlanImpl generateHomePlan(Person p) {
 		int homeIndex = 1;
 		int facilityIndex = 1;
 		if ((Integer)p.getCustomAttributes().get("townId") == 1) {
@@ -77,7 +77,7 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateNonWorkPlan(PersonImpl p) {
+	private PlanImpl generateNonWorkPlan(Person p) {
 		
 		int homeIndex = 1;
 		int facilityIndex = 1;
@@ -120,7 +120,7 @@ public class SinglePlanGenerator {
 		return plan;
 	}
 	
-	private PlanImpl generateWorkPlan(PersonImpl p, boolean shortWorker) {
+	private PlanImpl generateWorkPlan(Person p, boolean shortWorker) {
 		int homeIndex = 1;
 		int facilityIndex = 1;
 		if ((Integer)p.getCustomAttributes().get("townId") == 1) {

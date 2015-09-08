@@ -3,6 +3,7 @@ package playground.jbischoff.networkChange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -44,9 +45,9 @@ public class ChangeableNetworkCreatorTest {
 		this.personId1 = Id.create("1", Person.class);
 		Network net = sc.getNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n1 = nf.createNode(id1, sc.createCoord(0, 0));
+		Node n1 = nf.createNode(id1, new Coord((double) 0, (double) 0));
 		net.addNode(n1);
-		Node n2 = nf.createNode(id2, sc.createCoord(500, 0));
+		Node n2 = nf.createNode(id2, new Coord((double) 500, (double) 0));
 		net.addNode(n2);
 	
 		Link l = nf.createLink(this.linkId1, n1, n2);

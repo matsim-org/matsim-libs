@@ -56,7 +56,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceCostRate() != 0. ) {
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceRate() != 0. ) {
 			log.error( "monetary distance cost rate for "+mode+" different from zero but not used in accessibility computations");
 		}
 

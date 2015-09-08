@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -189,10 +189,10 @@ public class TransitRouteTest extends MatsimTestCase {
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(Id.create(3, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(Id.create(4, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(Id.create(3, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(Id.create(4, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		TransitRouteStop stop1 = new TransitRouteStopImpl(stopFacility1, 50, 60);
 		TransitRouteStop stop2 = new TransitRouteStopImpl(stopFacility2, 150, 260);
 		TransitRouteStop stop3 = new TransitRouteStopImpl(stopFacility3, 250, 260);

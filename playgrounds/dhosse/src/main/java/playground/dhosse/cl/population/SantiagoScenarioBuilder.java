@@ -62,7 +62,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -78,7 +77,7 @@ public class SantiagoScenarioBuilder {
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
 	static String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/creationResults/";		//outputDir of this class -> input for Matsim (KT)
+	static String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";		//outputDir of this class -> input for Matsim (KT)
 	
 	static String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
 	static String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
@@ -155,7 +154,25 @@ public class SantiagoScenarioBuilder {
 		
 		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioOut);
 		aap.run();
-		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
+		
+		//now "pt interaction" activities has neither maxduration nor start/end time -> Error when running (KT, 25.08.2015)
+		Population population = aap.getOutPop();
+	
+		for (Person p : population.getPersons().values()){
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if (pe instanceof Activity){
+				 Activity act = (Activity) pe;
+				  if ((act.getEndTime() == Time.UNDEFINED_TIME ) && (act.getStartTime()  == Time.UNDEFINED_TIME) && act.getType() =="pt iNaNH"){
+					  act.setMaximumDuration(0.);
+				  }
+				}
+			}
+			
+		}
+		new PopulationWriter(population).write(outputDir + "plans/plans_final.xml.gz");
+		
+		//before Insertion (KT 25.08.2015)
+//		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
 		
 		SortedMap<String, Tuple<Double, Double>> acts = aap.getActivityType2TypicalAndMinimalDuration();
 		
@@ -175,6 +192,8 @@ public class SantiagoScenarioBuilder {
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 		
 		Scenario scenarioFinal = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		//What happens here? looks for me like just read & write population to the same file... (KT, 24.08.2015)
 		new MatsimPopulationReader(scenarioFinal).readFile(outputDir + "plans/plans_final.xml.gz");
 		Population populationFinal = scenarioFinal.getPopulation();
 		
@@ -228,8 +247,12 @@ public class SantiagoScenarioBuilder {
 		
 //		top=-33.0144 left=-71.3607 bottom=-33.8875 right=-70.4169
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", Constants.toCRS);
-		Coord leftBottom = ct.transform(new CoordImpl(-71.3607 ,-33.8875));
-		Coord rightTop = ct.transform(new CoordImpl(-70.4169, -33.0144));
+		final double x1 = -71.3607;
+		final double y1 = -33.8875;
+		Coord leftBottom = ct.transform(new Coord(x1, y1));
+		final double x = -70.4169;
+		final double y = -33.0144;
+		Coord rightTop = ct.transform(new Coord(x, y));
 		double minX = leftBottom.getX();
 		double maxX = rightTop.getX();
 		double minY = leftBottom.getY();
@@ -338,8 +361,12 @@ public class SantiagoScenarioBuilder {
 	private static Population getRest(Population allPersons, Population population1, Population population2){
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
-		Coord leftBottom = ct.transform(new CoordImpl(-71.3607, -33.8875));
-		Coord rightTop = ct.transform(new CoordImpl(-70.4169, -33.0144));
+		final double x1 = -71.3607;
+		final double y1 = -33.8875;
+		Coord leftBottom = ct.transform(new Coord(x1, y1));
+		final double x = -70.4169;
+		final double y = -33.0144;
+		Coord rightTop = ct.transform(new Coord(x, y));
 		double minX = leftBottom.getX();
 		double maxX = rightTop.getX();
 		double minY = leftBottom.getY();
@@ -743,84 +770,84 @@ public class SantiagoScenarioBuilder {
 		carParams.setConstant(0.0);
 		carParams.setMarginalUtilityOfDistance(0.0);
 		carParams.setMarginalUtilityOfTraveling(-1.056);
-		carParams.setMonetaryDistanceCostRate(-0.248);
+		carParams.setMonetaryDistanceRate(-0.248);
 		pcs.addModeParams(carParams);
 		
 		ModeParams busParams = new ModeParams(Constants.Modes.bus.toString());
 		busParams.setConstant(0.0);
 		busParams.setMarginalUtilityOfDistance(0.0);
 		busParams.setMarginalUtilityOfTraveling(-1.056);
-		busParams.setMonetaryDistanceCostRate(-0.0);
+		busParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(busParams);
 		
 		ModeParams metroParams = new ModeParams(Constants.Modes.metro.toString());
 		metroParams.setConstant(0.0);
 		metroParams.setMarginalUtilityOfDistance(0.0);
 		metroParams.setMarginalUtilityOfTraveling(-1.056);
-		metroParams.setMonetaryDistanceCostRate(-0.0);
+		metroParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(metroParams);
 		
 		ModeParams colectivoParams = new ModeParams(Constants.Modes.colectivo.toString());
 		colectivoParams.setConstant(0.0);
 		colectivoParams.setMarginalUtilityOfDistance(0.0);
 		colectivoParams.setMarginalUtilityOfTraveling(-1.056);
-		colectivoParams.setMonetaryDistanceCostRate(-0.0);
+		colectivoParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(colectivoParams);
 		
 		ModeParams schoolBusParams = new ModeParams(Constants.Modes.school_bus.toString());
 		schoolBusParams.setConstant(0.0);
 		schoolBusParams.setMarginalUtilityOfDistance(0.0);
 		schoolBusParams.setMarginalUtilityOfTraveling(-1.056);
-		schoolBusParams.setMonetaryDistanceCostRate(-0.0);
+		schoolBusParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(schoolBusParams);
 		
 		ModeParams taxiParams = new ModeParams(Constants.Modes.taxi.toString());
 		taxiParams.setConstant(0.0);
 		taxiParams.setMarginalUtilityOfDistance(0.0);
 		taxiParams.setMarginalUtilityOfTraveling(-1.056);
-		taxiParams.setMonetaryDistanceCostRate(-0.0);
+		taxiParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(taxiParams);
 		
 		ModeParams walkParams = new ModeParams(TransportMode.walk);
 		walkParams.setConstant(0.0);
 		walkParams.setMarginalUtilityOfDistance(0.0);
 		walkParams.setMarginalUtilityOfTraveling(-1.056);
-		walkParams.setMonetaryDistanceCostRate(-0.0);
+		walkParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(walkParams);
 		
 		ModeParams bikeParams = new ModeParams(TransportMode.bike);
 		bikeParams.setConstant(0.0);
 		bikeParams.setMarginalUtilityOfDistance(0.0);
 		bikeParams.setMarginalUtilityOfTraveling(-1.056);
-		bikeParams.setMonetaryDistanceCostRate(-0.0);
+		bikeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(bikeParams);
 		
 		ModeParams motorcycleParams = new ModeParams(Constants.Modes.motorcycle.toString());
 		motorcycleParams.setConstant(0.0);
 		motorcycleParams.setMarginalUtilityOfDistance(0.0);
 		motorcycleParams.setMarginalUtilityOfTraveling(-1.056);
-		motorcycleParams.setMonetaryDistanceCostRate(-0.0);
+		motorcycleParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(motorcycleParams);
 		
 		ModeParams trainParams = new ModeParams(Constants.Modes.train.toString());
 		trainParams.setConstant(0.0);
 		trainParams.setMarginalUtilityOfDistance(0.0);
 		trainParams.setMarginalUtilityOfTraveling(-1.056);
-		trainParams.setMonetaryDistanceCostRate(-0.0);
+		trainParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(trainParams);
 		
 		ModeParams rideParams = new ModeParams(TransportMode.ride);
 		rideParams.setConstant(0.0);
 		rideParams.setMarginalUtilityOfDistance(0.0);
 		rideParams.setMarginalUtilityOfTraveling(-1.056);
-		rideParams.setMonetaryDistanceCostRate(-0.0);
+		rideParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(rideParams);
 		
 		ModeParams otherModeParams = new ModeParams(TransportMode.other);
 		otherModeParams.setConstant(0.0);
 		otherModeParams.setMarginalUtilityOfDistance(0.0);
 		otherModeParams.setMarginalUtilityOfTraveling(-1.056);
-		otherModeParams.setMonetaryDistanceCostRate(-0.0);
+		otherModeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(otherModeParams);
 		
 	}

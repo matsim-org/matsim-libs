@@ -44,6 +44,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_UTM33N = "WGS84_UTM33N"; // Berlin
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
+    public final static String WGS84_UTM31N = "WGS84_UTM31N"; // Barcelona/Spain
 	public final static String CH1903_LV03_GT = "CH1903_LV03_GT"; //use geotools also for swiss coordinate system
 	public final static String CH1903_LV03_Plus_GT = "CH1903_LV03_Plus_GT"; //use geotools also for swiss coordinate system
 	public final static String WGS84_SVY21 = "WGS84_SVY21"; //Singapore2

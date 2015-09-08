@@ -38,7 +38,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
-	public enum EventsFileFormat {txt, xml}
+	public enum EventsFileFormat {xml}
 
 	public static final String GROUP_NAME = "controler";
 

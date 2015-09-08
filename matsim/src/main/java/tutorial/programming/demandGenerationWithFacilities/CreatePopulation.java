@@ -16,9 +16,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -86,11 +85,11 @@ class CreatePopulation {
 				 * Create a person and add it to the population
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
-				((PersonImpl)person).setAge(Integer.parseInt(parts[index_age]));
+				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;
 				if (parts[index_workLocation].equals("-1")) employed = false; 
-				((PersonImpl)person).setEmployed(employed);
+				PersonUtils.setEmployed(person, employed);
 				population.addPerson(person);
 
 				/* 
@@ -98,8 +97,7 @@ class CreatePopulation {
 				 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
 				 * Try to understand what is happening here [[ 2 ]]
 				 */
-				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
-						Double.parseDouble(parts[index_yHomeCoord]));
+				Coord homeCoord = new Coord(Double.parseDouble(parts[index_xHomeCoord]), Double.parseDouble(parts[index_yHomeCoord]));
 				ActivityFacility homeFacility = this.homeFacilitiesTree.get(homeCoord.getX(), homeCoord.getY());
 				if (homeFacility == null) {
 					throw new RuntimeException();
@@ -136,7 +134,7 @@ class CreatePopulation {
 				/*
 				 * COORD: pay attention to coordinate systems!
 				 */
-				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+				Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 				this.municipalityCentroids.put(id, coord);;
 			}
 			bufferedReader.close();

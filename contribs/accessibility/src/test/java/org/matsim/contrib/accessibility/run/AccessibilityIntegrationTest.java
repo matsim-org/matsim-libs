@@ -48,7 +48,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -439,11 +438,11 @@ public class AccessibilityIntegrationTest {
 					}
 
 					final AccessibilityResults actual = new AccessibilityResults();
-					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(x, y));
-					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(x, y));
-					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(x, y));
-					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(x, y));
-					actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(x, y));
+					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new Coord(x, y));
+					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new Coord(x, y));
+					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new Coord(x, y));
+					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new Coord(x, y));
+					actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new Coord(x, y));
 
 					Assert.assertTrue(
 							"accessibility at coord " + x + "," + y + " does not match for "+

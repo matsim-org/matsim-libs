@@ -6,7 +6,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 /**
@@ -45,7 +44,7 @@ public class Parking {
 ///*
 	@XmlTransient
 	public Coord getCoordinate(){
-		Coord coordinate = new CoordImpl(coordinateX, coordinateY);
+		Coord coordinate = new Coord(coordinateX, coordinateY);
 		return coordinate;
 	}//*/
 	

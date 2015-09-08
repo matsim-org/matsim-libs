@@ -196,7 +196,7 @@ public class CompareMain {
 		config.planCalcScore().setPerforming_utils_hr(0);
 		config.planCalcScore().setTravelingOther_utils_hr(-6);
 		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+		config.planCalcScore().setMonetaryDistanceRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
         config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(10);

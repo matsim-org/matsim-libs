@@ -29,15 +29,12 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.jjoubert.Utilities.KernelDensityEstimation.MyRaster;
 import playground.jjoubert.Utilities.MyShapefileReader;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class RunKdeAnalyser {
@@ -182,7 +179,7 @@ public class RunKdeAnalyser {
 					String header = sc.nextLine();
 					while(sc.hasNextLine()){
 						String [] line = sc.nextLine().split(",");
-						Coord coord = new CoordImpl(Double.parseDouble(line[1]),Double.parseDouble(line[2]));
+						Coord coord = new Coord(Double.parseDouble(line[1]), Double.parseDouble(line[2]));
 						mr.processPoint(coord);
 						
 						if(++counter == multiplier){
@@ -203,7 +200,7 @@ public class RunKdeAnalyser {
 					String header = sc.nextLine();
 					while(sc.hasNextLine()){
 						String [] line = sc.nextLine().split(",");
-						Coord coord = new CoordImpl(Double.parseDouble(line[1]),Double.parseDouble(line[2]));
+						Coord coord = new Coord(Double.parseDouble(line[1]), Double.parseDouble(line[2]));
 						mr.processPoint(coord);
 						
 						if(++counter == multiplier){

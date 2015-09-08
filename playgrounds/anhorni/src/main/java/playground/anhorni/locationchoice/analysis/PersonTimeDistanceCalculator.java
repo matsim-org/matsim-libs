@@ -20,8 +20,8 @@
 package playground.anhorni.locationchoice.analysis;
 
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
 
 /*
  * This is a helper class for TravelTimeandDistanceStats
@@ -41,7 +41,7 @@ public class PersonTimeDistanceCalculator {
 		numberOfLegs=0;
 	}
 
-	public static void run(final PersonImpl person){
+	public static void run(final Person person){
 
 		init();
 

@@ -6,8 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.events.MatsimEventsReader;
 
 
 public class MainDensityAnalysisWithPt {
@@ -30,9 +29,9 @@ public class MainDensityAnalysisWithPt {
 		
 		String networkFile="C:/data/zhengn-backup-may-2013/zhengn/OUTPUT_JUNE/cordon_pricing_normal_50iters(rough links)/output_network.xml.gz";
 		String eventsFile="C:/data/zhengn-backup-may-2013/zhengn/OUTPUT_JUNE/cordon_pricing_normal_50iters(rough links)/ITERS/it.50/50.events.txt.gz";
-		
-		
-		Coord center=new CoordImpl(683400.75,247500.0687);
+
+
+		Coord center= new Coord(683400.75, 247500.0687);
 		//Coord center=new CoordImpl(683139.3125,247387.9531);// high density center
 		double radiusInMeters=2000;
 		
@@ -55,7 +54,7 @@ public class MainDensityAnalysisWithPt {
 		events.addHandler(inflowHandler); // add handler
 		events.addHandler(outflowHandler);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 	
 		reader.readFile(eventsFile); //where we find events data
 		

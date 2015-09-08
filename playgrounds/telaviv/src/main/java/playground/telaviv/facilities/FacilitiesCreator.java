@@ -45,7 +45,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -323,8 +322,8 @@ public class FacilitiesCreator {
 				 */
 				double unitVectorX = dY/length;
 				double unitVectorY = -dX/length;
-				
-				Coord coord = scenario.createCoord(centerX + unitVectorX, centerY + unitVectorY);
+
+				Coord coord = new Coord(centerX + unitVectorX, centerY + unitVectorY);
 				
 				facility = activityFacilities.getFactory().createActivityFacility(
 						Id.create(externalLink.getId().toString(), ActivityFacility.class), coord);
@@ -523,7 +522,7 @@ public class FacilitiesCreator {
 			double y = minY + random.nextDouble() * (maxY - minY);
 
 			Point point = geometryFactory.createPoint(new Coordinate(x, y));
-			if (zoneGeometry.contains(point)) list.add(fromWGS84CoordinateTransformation.transform(new CoordImpl(x, y)));
+			if (zoneGeometry.contains(point)) list.add(fromWGS84CoordinateTransformation.transform(new Coord(x, y)));
 		}
 		return list;
 	}

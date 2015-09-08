@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
@@ -63,7 +63,7 @@ public class ChooseRandomSingleLegMode implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		boolean forbidCar = false;
 		if (!this.ignoreCarAvailability) {
-			String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
+			String carAvail = PersonUtils.getCarAvail(plan.getPerson());
 			if ("never".equals(carAvail)) {
 				forbidCar = true;
 			}

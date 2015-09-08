@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
   </parent>
   <dependencies>
   <dependency>
@@ -22,7 +22,7 @@
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>vsp</artifactId>
-  		<version>0.7.0-SNAPSHOT</version>
+  		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
   </dependencies>
   <modelVersion>4.0.0</modelVersion>

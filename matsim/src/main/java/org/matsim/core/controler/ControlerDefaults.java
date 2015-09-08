@@ -42,7 +42,7 @@ public class ControlerDefaults {
 	private ControlerDefaults(){} // should not be instantiated
 
 	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
-		return new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()) ;
+		return new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()) ;
 	}
 
 	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {

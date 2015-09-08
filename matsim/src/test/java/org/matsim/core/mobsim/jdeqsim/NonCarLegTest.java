@@ -8,12 +8,19 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class NonCarLegTest extends AbstractJDEQSimTest {
 
 	public void test_EmptyCarRoute() {
-		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/input/org/matsim/core/mobsim/jdeqsim/config2.xml").loadScenario();
+		Config config = ConfigUtils.loadConfig("test/input/org/matsim/core/mobsim/jdeqsim/config2.xml");
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+
 		this.runJDEQSim(scenario);
 		
 		// at least one event

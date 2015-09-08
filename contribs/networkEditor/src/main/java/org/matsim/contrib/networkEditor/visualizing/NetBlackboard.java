@@ -47,7 +47,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -467,7 +466,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			if(this.line.active) {
 				line.active = false;
 			} else {
-				centerAt(inverseTransform(new CoordImpl(evt.getPoint().x, evt.getPoint().y)));
+				centerAt(inverseTransform(new Coord((double) evt.getPoint().x, (double) evt.getPoint().y)));
 				this.zoom(0.05);
 			}
 			this.repaint();
@@ -478,14 +477,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 			if(actualMode == Mode.NONE)
 				return;
 			else if(actualMode == Mode.SELECTION) {
-				CoordImpl mousePos = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+				Coord mousePos = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 				this.setActiveSomething(mousePos);
 				this.controls.updateTable();
 				/*if(activeLink != null)
                     addLinkInSelectedLinkList(activeLink, true);*/
 			} else if(actualMode == Mode.PAINTING) {
 				if(line.active == false) {
-					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+					Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 					LinkNodeCoord lnc = setLinePoint(c);
 					line.start = inverseTransform(lnc.coord);
 					line.linkClosestToStart = null;//lnc.link;
@@ -493,7 +492,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 					//System.out.println(line.start);
 					line.active = true;
 				} else {
-					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+					Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 					LinkNodeCoord lnc = setLinePoint(c);
 					line.end = lnc.coord;
 					line.start = transform(line.start);
@@ -507,7 +506,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 					javax.swing.JOptionPane.showMessageDialog(this, "You must select a link.", null, javax.swing.JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+				Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 				if(this.splitActiveLink(inverseTransform(c))==false)
 					javax.swing.JOptionPane.showMessageDialog(this, "Invalid selection, link not cut.", null, javax.swing.JOptionPane.WARNING_MESSAGE);
 			}
@@ -519,7 +518,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Point p = this.getMousePosition();
 		if(p==null)
 			return;
-		CoordImpl mousePos = new CoordImpl(p.x, p.y);
+		Coord mousePos = new Coord((double) p.x, (double) p.y);
 		Coord transformed = inverseTransform(mousePos);
 		this.lblCoordinates.setText("("+String.format("%d", (int)transformed.getX())+","+String.format("%d", (int)transformed.getY())+")");
 		this.repaint();
@@ -591,26 +590,26 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
 		if(actualMode == Mode.MOVING && move.active == false) {
 			move.active = true;
-			move.start = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+			move.start = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 		} else if(actualMode == Mode.SELECTION && selectionSquare.active == false) {
 			if(isControlPressed == false)
 				this.selectedLinkList.clear();
 			selectionSquare.active = true;
-			selectionSquare.start = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+			selectionSquare.start = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 			this.repaint();
 		}
 	}//GEN-LAST:event_formMousePressed
 
 	private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
 		if (actualMode == Mode.MOVING && move.active == true) {
-			move.end = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
+			move.end = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 			this.moveViewBox(-(move.end.getX()-move.start.getX()), -(move.end.getY()-move.start.getY()));
 			move.active = false;
 			this.repaint();
 		} else if(actualMode == Mode.SELECTION && (this.net != null) && selectionSquare.active == true) {
 			Point p = this.getMousePosition();
 			if(p != null) {
-				selectionSquare.end = new CoordImpl(p.x, p.y);
+				selectionSquare.end = new Coord((double) p.x, (double) p.y);
 				addLinkInsideSquareOnList();
 			}
 			selectionSquare.active = false;
@@ -890,11 +889,11 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void addLinkInsideSquareOnList() {
 		final double midX = (selectionSquare.start.getX()+selectionSquare.end.getX())/2.0;
 		final double midY = (selectionSquare.start.getY()+selectionSquare.end.getY())/2.0;
-		Coord mid = inverseTransform(new CoordImpl(midX, midY));
+		Coord mid = inverseTransform(new Coord(midX, midY));
 		final double dist = CoordUtils.calcDistance(mid, inverseTransform(selectionSquare.end));
 		//System.out.println("mid = " + mid + ", dist = " + dist);
 		Collection<Node> nodes = net.getNearestNodes(mid, dist*8);
-		Coord start = new CoordImpl(selectionSquare.start), end = new CoordImpl(selectionSquare.end);
+		Coord start = new Coord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new Coord(selectionSquare.end.getX(), selectionSquare.end.getY());
 		for(Node node : nodes) {
 			for(Link l : node.getInLinks().values()) {
 				if(insideSquare(l, start, end))
@@ -1087,8 +1086,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	public void moveViewBox(double dx, double dy) {
 		if(Math.abs(dx) > getWidth() || Math.abs(dy) > getHeight())
 			return;
-		Coord origin = inverseTransform(new CoordImpl(0,0));
-		Coord moves = inverseTransform(new CoordImpl(dx, dy));
+		Coord origin = inverseTransform(new Coord((double) 0, (double) 0));
+		Coord moves = inverseTransform(new Coord(dx, dy));
 		curX += (moves.getX()-origin.getX());
 		curY += (moves.getY()-origin.getY());
 	}
@@ -1122,7 +1121,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		x = (x*this.getWidth())/boxSizeX + 10;
 		y = (y*this.getHeight())/boxSizeY + 10;
 		y = getHeight() - y;
-		Coord result = new CoordImpl(x, y);
+		Coord result = new Coord(x, y);
 		return result;
 	}
 
@@ -1140,7 +1139,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		y = (y*boxSizeY)/getHeight();
 		x = x + curX;
 		y = y + curY;
-		Coord result = new CoordImpl(x, y);
+		Coord result = new Coord(x, y);
 		return result;
 	}
 
@@ -1300,7 +1299,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return
 	 */
 	protected Coord getMidPoint() {
-		return new CoordImpl(curX+offX/2, curY+offY/2);
+		return new Coord(curX + offX / 2, curY + offY / 2);
 	}
 
 	/*
@@ -1345,7 +1344,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			nx = P1.getX()-dx*rel;
 		if(P1.getY()>P2.getY())
 			ny = P1.getY()-dy*rel;
-		Coord result = new CoordImpl(nx, ny);
+		Coord result = new Coord(nx, ny);
 		return result;
 	}
 
@@ -1606,7 +1605,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	protected PairLinkNode getClosestThing(Coord Pos) {
 		Coord transformed = inverseTransform(Pos);
 		Link link = getNearestLinkImproved(transformed, offX/4.0);
-		Coord P1 = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE), P2 = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+		Coord P1 = new Coord(Double.MAX_VALUE, Double.MAX_VALUE), P2 = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
 		if(link != null) {
 			P1 = transform(link.getFromNode().getCoord());
 			P2 = transform(link.getToNode().getCoord());
@@ -1634,7 +1633,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		g.setColor(Color.GRAY);
 		Point p = this.getMousePosition();
 		if(p == null) return;
-		Coord end = new CoordImpl(p.getX(), p.getY());
+		Coord end = new Coord(p.getX(), p.getY());
 		LinearRing ring = GeometryTools.getRectangle(GeometryTools.MATSimCoordToCoordinate(selectionSquare.start), GeometryTools.MATSimCoordToCoordinate(end));
 		Polygon poly = GeometryTools.toJavaPolygon(ring);
 		g.drawPolygon(poly);
@@ -1652,7 +1651,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Coord end;
 		Point p = this.getMousePosition();
 		if(p == null) return;
-		end = new CoordImpl(p.getX(), p.getY());
+		end = new Coord(p.getX(), p.getY());
 		g.setColor(Color.BLACK);
 		//System.out.println(end.getX() + " " + end.getY());
 		g.drawLine((int)transformed.getX(), (int)transformed.getY(), (int)end.getX(), (int)end.getY());
@@ -1719,8 +1718,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 		boolean active;
 		LineOnBoard() {
 			active = false;
-			start = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
 			nodeClosestToStart = nodeClosestToEnd = null;
 			linkClosestToStart = linkClosestToEnd = null;
 		}
@@ -1731,8 +1730,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 		boolean active;
 		MoveOnBoard() {
 			active = false;
-			start = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
 		}
 	}
 
@@ -1741,8 +1740,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 		boolean active;
 		SquareOnBoard() {
 			active = false;
-			start = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
 		}
 	}
 

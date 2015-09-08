@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.*;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,7 +45,7 @@ public class ReflectiveModuleTest {
 		final MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField( 1000 );
 		dumpedModule.setIdField( Id.create( 123, Link.class ) );
-		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
+		dumpedModule.setCoordField(new Coord((double) 265, (double) 463));
 		dumpedModule.setTestEnumField( MyEnum.VALUE2 );
 		dumpedModule.setNonNull( "null" );
 

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
@@ -90,7 +90,7 @@ public class PlansFilterByLegMode {
 						hasOtherLegMode = true;
 					}
 				}
-				if (this.legModeIsCar && never.equals(((PersonImpl) person).getCarAvail())) {
+				if (this.legModeIsCar && never.equals(PersonUtils.getCarAvail(person))) {
 					// person cannot drive car if she has no car. this means, the person was given a lift by someone else
 					// --> do not include this person, as we're only interested in the driver
 					if ( cnt < 1 ) {

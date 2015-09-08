@@ -55,7 +55,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -105,13 +104,13 @@ public class NoiseTest {
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong coord for receiver point Id '10'", new CoordImpl(500, 100).toString(), noiseContext.getReceiverPoints().get(Id.create(10, ReceiverPoint.class)).getCoord().toString());
+		Assert.assertEquals("wrong coord for receiver point Id '10'", new Coord((double) 500, (double) 100).toString(), noiseContext.getReceiverPoints().get(Id.create(10, ReceiverPoint.class)).getCoord().toString());
 		
 		// test the allocation of activity coordinates to the nearest receiver point
-		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(300, 300)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(150, 150)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(100, 100)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(500, 500)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 300, (double) 300)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 150, (double) 150)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 100, (double) 100)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 500, (double) 500)).toString());
 					
 		// test the allocation of relevant links to the receiver point
 		Assert.assertEquals("wrong relevant link for receiver point Id '15'", 3, noiseContext.getReceiverPoints().get(Id.create("15", Link.class)).getLinkId2distanceCorrection().size());
@@ -1390,22 +1389,22 @@ public class NoiseTest {
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
 		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
 		
-		System.out.println("emission: " + emission);
-		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
-		
-		if (emission >= emissionPlusOneCar) {
-			System.out.println(" :-(");
-		} else {
-			System.out.println(" :-)");
-		}
-		
-		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
-		
-		if (emission >= emissionPlusOneHGV) {
-			System.out.println(" :-(");
-		} else {
-			System.out.println(" :-)");
-		}
+//		System.out.println("emission: " + emission);
+//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
+//		
+//		if (emission >= emissionPlusOneCar) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
+//		
+//		if (emission >= emissionPlusOneHGV) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
 
 	}
 	

@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 public class RetailZone
@@ -16,16 +15,16 @@ public class RetailZone
   private QuadTree<ActivityFacility> shopsQuadTree;
   private ArrayList<Person> persons = new ArrayList<Person>();
   private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
-  private CoordImpl minCoord;
-  private CoordImpl maxCoord;
+  private Coord minCoord;
+  private Coord maxCoord;
 
   public RetailZone(Id<RetailZone> id, Double minx, Double miny, Double maxx, Double maxy)
   {
     this.id = id;
     this.personsQuadTree = new QuadTree<Person>(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
     this.shopsQuadTree = new QuadTree<ActivityFacility>(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
-    this.minCoord = new CoordImpl(minx.toString(), miny.toString());
-    this.maxCoord = new CoordImpl(maxx.toString(), maxy.toString());
+    this.minCoord = new Coord(Double.parseDouble(minx.toString()), Double.parseDouble(miny.toString()));
+    this.maxCoord = new Coord(Double.parseDouble(maxx.toString()), Double.parseDouble(maxy.toString()));
   }
 
   public Id<RetailZone> getId() {
@@ -58,10 +57,10 @@ public class RetailZone
   public QuadTree<ActivityFacility> getShopsQuadTree() {
     return this.shopsQuadTree; }
 
-  public CoordImpl getMaxCoord() {
+  public Coord getMaxCoord() {
     return this.maxCoord; }
 
-  public CoordImpl getMinCoord() {
+  public Coord getMinCoord() {
     return this.minCoord;
   }
 }

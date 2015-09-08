@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -107,14 +108,14 @@ public class CostNavigationRouteSample {
     	
     	Network network = scenario.getNetwork();
     	NetworkFactory networkFactory = network.getFactory();
-    	
-    	Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(0.0, 0.0));
-    	Node n7 = networkFactory.createNode(Id.create("n7", Node.class), scenario.createCoord(0.0, 0.0));
+
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), new Coord(0.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), new Coord(0.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord(0.0, 0.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord(0.0, 0.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord(0.0, 0.0));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), new Coord(0.0, 0.0));
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), new Coord(0.0, 0.0));
     	
     	network.addNode(n1);
     	network.addNode(n2);

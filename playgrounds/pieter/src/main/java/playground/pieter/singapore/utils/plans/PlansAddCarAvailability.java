@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 class PlansAddCarAvailability {
 	public void run(Population plans) {
@@ -13,7 +13,7 @@ class PlansAddCarAvailability {
 				+ " algorithm...");
 
         for (Id<Person> personId : plans.getPersons().keySet()) {
-            PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+            Person person = plans.getPersons().get(personId);
 
             for (int i = person.getPlans().size() - 1; i >= 0; i--) {
                 Plan plan = person.getPlans().get(i);
@@ -27,9 +27,9 @@ class PlansAddCarAvailability {
 
                 }
                 if (carAvail)
-                    person.setCarAvail("always");
+                    PersonUtils.setCarAvail(person, "always");
                 else
-                    person.setCarAvail("never");
+                    PersonUtils.setCarAvail(person, "never");
             }
 
         }

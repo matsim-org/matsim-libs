@@ -8,6 +8,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -42,7 +43,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -436,12 +436,12 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
-		
-		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
+
+		Coord coordStart = new Coord(startLink.getCoord().getX(), startLink.getCoord().getY());
 		
 		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, startLink.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
+
+		Coord coordEnd = new Coord(destinationLink.getCoord().getX(), destinationLink.getCoord().getY());
 
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, destinationLink.getId());
 		

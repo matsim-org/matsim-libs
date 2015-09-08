@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
@@ -153,7 +152,7 @@ public class PTScheduleCreatorDefaultV2 {
 				Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 				double xCoord = Double.parseDouble(newLine.substring(8, 18));
 				double yCoord = Double.parseDouble(newLine.substring(19, 29));
-				Coord coord = this.transformation.transform(new CoordImpl(xCoord, yCoord));
+				Coord coord = this.transformation.transform(new Coord(xCoord, yCoord));
 				String stopName = newLine.substring(39, newLine.length());
 				createStop(stopId, coord, stopName);
 				newLine = readsLines.readLine();

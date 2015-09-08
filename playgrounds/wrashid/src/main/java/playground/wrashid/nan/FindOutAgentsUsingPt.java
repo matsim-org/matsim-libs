@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 
 public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnterEventHandler {
@@ -23,11 +23,11 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 		FindOutAgentsUsingPt findOutPt=new FindOutAgentsUsingPt();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
+		EventsManager events = EventsUtils.createEventsManager();  //create new object of events-manager class
 		
 		events.addHandler(findOutPt);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 	
 //		String eventsFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/output/equil/ITERS/it.5/5.events.txt.gz";
 		String eventsFile="H:/data/experiments/Mohit/10pct ZH/ITERS/it.50/50.events.txt.gz";

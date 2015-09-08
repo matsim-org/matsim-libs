@@ -15,7 +15,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.tools.events.FilterAgents;
 import playground.wrashid.lib.tools.network.obj.ComplexRectangularSelectionArea;
@@ -66,7 +65,7 @@ public class FilterEventsForCommunity {
 		//includeInSection.add(rectangleWattwil);
 		//RectangularArea rectangleBuchs = new RectangularArea(new CoordImpl(748300,222700   ), new CoordImpl(756800, 230000));
 		//includeInSection.add(rectangleBuchs);
-		RectangularArea rectangleZernez = new RectangularArea(new CoordImpl(792900,165100   ), new CoordImpl(817400, 179050));
+		RectangularArea rectangleZernez = new RectangularArea(new Coord((double) 792900, (double) 165100), new Coord((double) 817400, (double) 179050));
 		includeInSection.add(rectangleZernez);
 		
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = new ComplexRectangularSelectionArea(includeInSection,

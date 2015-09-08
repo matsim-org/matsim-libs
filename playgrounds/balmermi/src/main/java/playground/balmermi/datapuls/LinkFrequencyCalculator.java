@@ -18,8 +18,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -70,7 +70,7 @@ public class LinkFrequencyCalculator {
 		FrequencyAnalyser fa = new FrequencyAnalyser(scenario.getNetwork(),linkIds);
 		EventsManager eManager = EventsUtils.createEventsManager();
 		eManager.addHandler(fa);
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(eManager);
+		MatsimEventsReader reader = new MatsimEventsReader(eManager);
 		
 		Map<Id<Link>, List<Integer>> freqs = new TreeMap<>();
 		for (Id<Link> lid : linkIds) { freqs.put(lid,new ArrayList<Integer>()); }

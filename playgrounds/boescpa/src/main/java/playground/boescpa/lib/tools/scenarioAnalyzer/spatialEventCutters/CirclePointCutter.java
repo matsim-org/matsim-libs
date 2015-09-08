@@ -24,7 +24,6 @@ package playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class CirclePointCutter implements SpatialEventCutter {
 
 	public CirclePointCutter(int cuttingRadius, double xCoord, double yCoord) {
 		this.radius = cuttingRadius;
-		this.center = new CoordImpl(xCoord, yCoord);
+		this.center = new Coord(xCoord, yCoord);
 		this.linkCache = new HashMap<>();
 	}
 

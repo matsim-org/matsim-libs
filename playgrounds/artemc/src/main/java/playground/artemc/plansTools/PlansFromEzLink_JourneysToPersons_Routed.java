@@ -26,7 +26,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -236,8 +235,8 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 					}
 
 					//Transform coordinates to UTM48N
-					Coord coordStart =new CoordImpl(startLon, startLat);
-					Coord coordEnd =new CoordImpl(endLon, endLat);
+					Coord coordStart = new Coord(startLon, startLat);
+					Coord coordEnd = new Coord(endLon, endLat);
 					Coord UTMStart = ct.transform(coordStart);
 					Coord UTMEnd = ct.transform(coordEnd);
 					startLon=UTMStart.getX();

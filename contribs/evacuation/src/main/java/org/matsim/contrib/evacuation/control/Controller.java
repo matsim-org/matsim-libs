@@ -80,7 +80,6 @@ import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -602,9 +601,9 @@ public class Controller {
 		}
 
 		// calculate center and bounding box
-		Coord centerC = new CoordImpl((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
-		Coord min = new CoordImpl(e.getMinX(), e.getMinY());
-		Coord max = new CoordImpl(e.getMaxX(), e.getMaxY());
+		Coord centerC = new Coord((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
+		Coord min = new Coord(e.getMinX(), e.getMinY());
+		Coord max = new Coord(e.getMaxX(), e.getMaxY());
 
 		// also process links (to link quad tree)
 		if (processLinks) {

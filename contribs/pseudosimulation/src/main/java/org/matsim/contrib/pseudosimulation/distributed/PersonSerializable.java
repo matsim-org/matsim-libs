@@ -10,18 +10,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
+import org.matsim.core.population.PersonUtils;
 
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
 
     public PersonSerializable(Person p) {
         this.id = p.getId().toString();
-        PersonImpl person = (PersonImpl) p;
-        this.sex = person.getSex();
-        this.age = person.getAge();
-        this.hasLicense = person.getLicense();
-        this.carAvail = person.getCarAvail();
+        Person person = p;
+        this.sex = PersonUtils.getSex(person);
+        this.age = PersonUtils.getAge(person);
+        this.hasLicense = PersonUtils.getLicense(person);
+        this.carAvail = PersonUtils.getCarAvail(person);
         for (Plan plan : person.getPlans()) {
             PlanSerializable planSerializable = new PlanSerializable(plan);
             plans.add(planSerializable);
@@ -37,18 +37,17 @@ public class PersonSerializable implements Serializable {
     private String carAvail;
     PlanSerializable selectedPlan = null;
     private TreeSet<String> travelcards = null;
-    protected Desires desires = null;
 
     private Boolean isEmployed;
 
     public Person getPerson() {
-        PersonImpl person = new PersonImpl(Id.createPersonId(id));
-        person.setAge(age);
-        person.setCarAvail(carAvail);
+        Person person = PersonImpl.createPerson(Id.createPersonId(id));
+        PersonUtils.setAge(person, age);
+        PersonUtils.setCarAvail(person, carAvail);
 
-        person.setEmployed(isEmployed);
-        person.setLicence(hasLicense);
-        person.setSex(sex);
+        PersonUtils.setEmployed(person, isEmployed);
+        PersonUtils.setLicence(person, hasLicense);
+        PersonUtils.setSex(person, sex);
         for (PlanSerializable planSer : plans) {
             Plan plan = planSer.getPlan(person);
             person.addPlan(plan);

@@ -23,6 +23,7 @@ package playground.ikaddoura.optimization.scoring;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -38,8 +39,8 @@ public class OptimizationScoringFunctionFactory implements ScoringFunctionFactor
 	private Network network;
 	
 
-	public OptimizationScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Network network, double stuckScore) {
-		this.params = CharyparNagelScoringParameters.getBuilder(planCalcScoreConfigGroup).create();
+	public OptimizationScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, final ScenarioConfigGroup scenarioConfig, Network network, double stuckScore) {
+		this.params = CharyparNagelScoringParameters.getBuilder(planCalcScoreConfigGroup, scenarioConfig).create();
 		this.network = network;
 		this.STUCKING_SCORE = stuckScore;
 	}

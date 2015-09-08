@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -23,10 +22,8 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 public class Main {
@@ -91,8 +88,8 @@ public class Main {
 		int i=0;
 		while(line!=null) {
 			String[] parts=line.split(";");
-			Coord start = coordinateTransformation.transform(new CoordImpl(parts[3], parts[4]));
-			Coord end = coordinateTransformation.transform(new CoordImpl(parts[5], parts[6]));
+			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
+			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[5]), Double.parseDouble(parts[6])));
 			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getNetwork()).getNearestNode(start), ((NetworkImpl)scenario.getNetwork()).getNearestNode(end), 0, null, null);
 			double distance = 0;
 			for(Link link:path.links)

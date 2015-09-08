@@ -25,6 +25,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -120,7 +121,7 @@ public class RunDemandGenerationFromShapefileExample {
 
 			//work activity on a random link within one of the commercial areas
 			Point p = getRandomPointInFeature(rnd, commercial);
-			Activity work = pb.createActivityFromCoord("w", scenario.createCoord(p.getX(), p.getY()));
+			Activity work = pb.createActivityFromCoord("w", new Coord(p.getX(), p.getY()));
 			double startTime = 8*3600;
 			work.setStartTime(startTime);
 			work.setEndTime(startTime + 6*3600);
@@ -130,7 +131,7 @@ public class RunDemandGenerationFromShapefileExample {
 
 			//recreation activity on a random link within one of the recreation area
 			p = getRandomPointInFeature(rnd, recreation);
-			Activity leisure = pb.createActivityFromCoord("l", scenario.createCoord(p.getX(), p.getY()));
+			Activity leisure = pb.createActivityFromCoord("l", new Coord(p.getX(), p.getY()));
 			leisure.setEndTime(3600*19);
 			plan.addActivity(leisure);
 
@@ -152,7 +153,7 @@ public class RunDemandGenerationFromShapefileExample {
 			pop.addPerson( pers ) ;
 			Plan plan = pb.createPlan();
 			Point p = getRandomPointInFeature(rnd, ft);
-			Activity act = pb.createActivityFromCoord("h", scenario.createCoord(p.getX(), p.getY()));
+			Activity act = pb.createActivityFromCoord("h", new Coord(p.getX(), p.getY()));
 			plan.addActivity(act);
 			pers.addPlan( plan ) ;
 		}

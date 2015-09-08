@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -188,8 +189,8 @@ public class PopulationReaderMatsimV4Test {
 	public void testReadActivity() {
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(0, 1000));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node1, node2, 1000.0, 10.0, 2000.0, 1);
 		final Population population = scenario.getPopulation();
 

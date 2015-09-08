@@ -20,8 +20,8 @@
 
 package playground.mrieser.pt.fares;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -31,8 +31,8 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_DifferentCostsPerKilometer() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
-		final ActivityFacilityImpl toStop = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
+		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
+		final ActivityFacilityImpl toStop = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 2100, (double) 200));
 
 		assertEquals(2.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, toStop), EPSILON);
 		assertEquals(1.0, new BeelineDistanceBasedFares(0.5).getSingleTripCost(fromStop, toStop), EPSILON);
@@ -41,7 +41,7 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_SameFromAsTo() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
+		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
 
 		assertEquals(0.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, fromStop), EPSILON);
 	}

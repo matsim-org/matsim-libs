@@ -44,7 +44,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -97,8 +96,8 @@ public class VBBRouteCatcher {
 //				Coord d = new CoordImpl(52.470137777778,13.335396944444);
 				
 				//Salzufer-Hoenow
-				Coord c = new CoordImpl(52.5188,13.32183);
-				Coord d = new CoordImpl(52.5307913,13.6303349);
+				Coord c = new Coord(52.5188, 13.32183);
+				Coord d = new Coord(52.5307913, 13.6303349);
 				VBBRouteCatcher rc = new VBBRouteCatcher(c,d,System.currentTimeMillis(),"vbbTest.xml.gz");
 			}
 			private void run(Coord from, Coord to, long departureTime)  {

@@ -8,22 +8,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.path.VrpPathCalculatorImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -86,15 +79,16 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 				// of multimodality unecessary from a behavioral point of view.
 				// However, checking the mode restriction for each link is expensive,
 				// so it is not worth doing it if it is not necessary. (td, oct. 2012)
-				if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-					((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
+				if (routeAlgo instanceof Dijkstra) {
+					((Dijkstra) routeAlgo).setModeRestriction(
 						Collections.singleton( TransportMode.car ));
-					((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
+					((Dijkstra) routeAlgoPtFreeFlow).setModeRestriction(
 						Collections.singleton( TransportMode.car ));
 				}
 				else {
 					// this is impossible to reach when using the algorithms of org.matsim.*
 					// (all implement IntermodalLeastCostPathCalculator)
+					throw new RuntimeException();
 				}
 			}
 			

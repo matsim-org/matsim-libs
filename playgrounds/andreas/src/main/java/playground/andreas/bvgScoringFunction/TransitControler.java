@@ -8,7 +8,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -97,11 +97,10 @@ public class TransitControler extends Controler {
 		config.planCalcScore().addActivityParams(transitActivityParams);
 		
 		// reading the scenario (based on the config):
-		ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
-		ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		TransitControler tc = new TransitControler(sc);
-        tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), tc.getScenario().getNetwork()));
+        tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), config.scenario(), new BvgScoringFunctionConfigGroup(config), tc.getScenario().getNetwork()));
 		
 
 

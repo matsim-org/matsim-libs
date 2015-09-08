@@ -41,8 +41,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
@@ -68,19 +66,18 @@ import java.util.Random;
 public class EconomicsControler {
 	
 	private static final Logger log = Logger.getLogger(EconomicsControler.class);
-	private static final String path = "../../shared-svn/studies/ihab/economics/";
+	private static final String path = "/Users/ihab/Documents/workspace/runs-svn/economics/";
 	
 	private final int minDemand = 0;
-	private final int maxDemand = 1000;
-	private final int incrementDemand = 100;
+	private final int maxDemand = 10;
+	private final int incrementDemand = 1;
 	
 	private final double minCost = 1000.;
-	private final double maxCost = 3000.;
-	private final double incrementCost = 100.;
+	private final double maxCost = 2500.;
+	private final double incrementCost = 50.;
 	
 	private Map<Integer, Double> demand2privateCost = new HashMap<Integer, Double>();
 	private Map<Integer, Double> demand2externalCost = new HashMap<Integer, Double>();
-	private Map<Integer, Double> demand2socialCost = new HashMap<Integer, Double>();
 	
 	private Map<Double, Integer> cost2demand = new HashMap<Double, Integer>();
 	
@@ -88,10 +85,10 @@ public class EconomicsControler {
 				
 		EconomicsControler main = new EconomicsControler();
 		main.generateCostAsFunctionOfDemand(); // cost as function of demand (fixed demand)
-		main.generateDemandAsFunctionOfCost(); // demand as function of cost (fixed cost)
-		main.standardRunNoPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
-		main.standardRunFlatPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
-		main.standardRunUserSpecifictPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
+//		main.generateDemandAsFunctionOfCost(); // demand as function of cost (fixed cost)
+//		main.standardRunNoPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
+//		main.standardRunFlatPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
+//		main.standardRunUserSpecifictPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
 	}
 	
 	private void standardRunUserSpecifictPricing() {
@@ -308,22 +305,21 @@ public class EconomicsControler {
 			double totalExternalCost = -1 * (config.planCalcScore().getTraveling_utils_hr() / 3600) * economicsControlerListener.getCongestionHandler().getTotalDelay();
 			this.demand2externalCost.put(demand, totalExternalCost);
 			
-			double socialCost = totalPrivateCost + totalExternalCost;
-			this.demand2socialCost.put(demand, socialCost);
-			
 			log.info("#####################################################################");
 			log.info("Demand: " + demand);
-			log.info("Total Private Cost: " + totalPrivateCost);
+			log.info("Total Delay: " + economicsControlerListener.getCongestionHandler().getTotalDelay());
+			log.info("Total Travel Cost: " + totalPrivateCost);
 			log.info("Total External Cost: " + totalExternalCost);
-			log.info("Total Social Cost: " + socialCost);
 			log.info("#####################################################################");
 
+			economicsControlerListener.getCongestionHandler().writeCongestionStats(path + "output_CostAsFunctionOfDemand_" + demand + "/congestionStats.csv" );
+			
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-				bw.write("Demand;Private Cost;Social Cost");
+				bw.write("Demand;Total Travel Cost;Total Delay Cost");
 				bw.newLine();
 				for (Integer demandInMap : this.demand2privateCost.keySet()){
-					bw.write(demandInMap + ";" + this.demand2privateCost.get(demandInMap) + ";" + this.demand2socialCost.get(demandInMap));
+					bw.write(demandInMap + ";" + this.demand2privateCost.get(demandInMap) + ";" + this.demand2externalCost.get(demandInMap));
 					bw.newLine();
 				}
 				
@@ -340,8 +336,8 @@ public class EconomicsControler {
 		
 		for (int personNr = 0; personNr < demand; personNr++) {
 			
-			Coord homeLocation = getHomeCoord();	
-			Coord workLocation = new CoordImpl(15000., 0.);	
+			Coord homeLocation = getHomeCoord();
+			Coord workLocation = new Coord(15000., 0.);
 			
 			Person person = population.getFactory().createPerson(Id.create("person_" + personNr, Person.class));
 			Plan plan = population.getFactory().createPlan();
@@ -368,7 +364,7 @@ public class EconomicsControler {
 		
 		double space = maxXCoord - minXCoord;
 		double randomXCoord = calculateRandomlyDistributedValue(maxXCoord - (space/2.0), (space/2.0));
-		Coord zoneCoord = new CoordImpl(randomXCoord, 0);
+		Coord zoneCoord = new Coord(randomXCoord, (double) 0);
 		return zoneCoord;
 	}
 	

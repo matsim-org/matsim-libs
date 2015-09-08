@@ -3,18 +3,14 @@ package playground.gregor.scenariogen.hybrid;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -24,7 +20,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ScenGen {
@@ -113,19 +108,23 @@ public class ScenGen {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(4.6,4.6));
-		Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(4.4,0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(9.2,4.6));
-		Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(4.4,9.2));
-		Node n4 = fac.createNode(Id.create("4", Node.class), new CoordImpl(0,4.6));
-		Node n5 = fac.createNode(Id.create("5", Node.class), new CoordImpl(-5,4.6));
-		Node n6 = fac.createNode(Id.create("6", Node.class), new CoordImpl(-20,4.6));
-		Node n7 = fac.createNode(Id.create("7", Node.class), new CoordImpl(14.2,4.6));
-		Node n8 = fac.createNode(Id.create("8", Node.class), new CoordImpl(29.2,4.6));
-		Node n9 = fac.createNode(Id.create("9", Node.class), new CoordImpl(4.4,-5));
-		Node n10 = fac.createNode(Id.create("10", Node.class), new CoordImpl(4.4,-20));
-		Node n11 = fac.createNode(Id.create("11", Node.class), new CoordImpl(4.4,14.2));
-		Node n12 = fac.createNode(Id.create("12", Node.class), new CoordImpl(4.4,29.2));
+		Node n0 = fac.createNode(Id.create("0", Node.class), new Coord(4.6, 4.6));
+		Node n1 = fac.createNode(Id.create("1", Node.class), new Coord(4.4, (double) 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), new Coord(9.2, 4.6));
+		Node n3 = fac.createNode(Id.create("3", Node.class), new Coord(4.4, 9.2));
+		Node n4 = fac.createNode(Id.create("4", Node.class), new Coord((double) 0, 4.6));
+		final double x1 = -5;
+		Node n5 = fac.createNode(Id.create("5", Node.class), new Coord(x1, 4.6));
+		final double x = -20;
+		Node n6 = fac.createNode(Id.create("6", Node.class), new Coord(x, 4.6));
+		Node n7 = fac.createNode(Id.create("7", Node.class), new Coord(14.2, 4.6));
+		Node n8 = fac.createNode(Id.create("8", Node.class), new Coord(29.2, 4.6));
+		final double y1 = -5;
+		Node n9 = fac.createNode(Id.create("9", Node.class), new Coord(4.4, y1));
+		final double y = -20;
+		Node n10 = fac.createNode(Id.create("10", Node.class), new Coord(4.4, y));
+		Node n11 = fac.createNode(Id.create("11", Node.class), new Coord(4.4, 14.2));
+		Node n12 = fac.createNode(Id.create("12", Node.class), new Coord(4.4, 29.2));
 
 		net.addNode(n0);
 		net.addNode(n1);

@@ -20,7 +20,18 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,8 +39,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -41,15 +52,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
 
 
 public class WalkDistanceEstimator {
@@ -133,7 +137,7 @@ public class WalkDistanceEstimator {
 		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes(), sAll.getConfig().planCalcScore());
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);
-		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));
+		new MatsimEventsReader(em).readFile(sb.getIterationEventsFile("100"));
 		Dijkstra router = new Dijkstra(sAll.getNetwork(),tc,ttc.getLinkTravelTimes());
 		Set<String> ptSet = new TreeSet<String>();
 		ptSet.add(TransportMode.pt);
@@ -255,7 +259,7 @@ public class WalkDistanceEstimator {
 		log.info("Calculating sub-place distances.");
 		NetworkImpl ni = (NetworkImpl) sPt.getNetwork();
 		for(MyZone sp : spList){
-			CoordImpl centroid = new CoordImpl(sp.getCentroid().getX(), sp.getCentroid().getY());
+			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
 			Node closest = ni.getNearestNode(centroid);
 			Double d = CoordUtils.calcDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			

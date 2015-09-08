@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -36,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
@@ -74,10 +74,10 @@ public class QuadTreeRouting {
 		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(minX,minY));
-		Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(minX,maxY));
-		Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(maxX,maxY));
-		Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(maxX,minY));
+		Node n0 = fac.createNode(Id.create("0", Node.class), new Coord(minX, minY));
+		Node n1 = fac.createNode(Id.create("1", Node.class), new Coord(minX, maxY));
+		Node n2 = fac.createNode(Id.create("2", Node.class), new Coord(maxX, maxY));
+		Node n3 = fac.createNode(Id.create("3", Node.class), new Coord(maxX, minY));
 		net.addNode(n0);net.addNode(n1);net.addNode(n2);net.addNode(n3);
 
 		//visualization stuff

@@ -32,11 +32,11 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.referencing.FactoryException;
@@ -177,8 +177,8 @@ public class PlanPrimaryActivity implements PopulationTask {
 //			}
 			
 			plan.addLeg(pop.getFactory().createLeg("undefined"));
-			
-			plan.addActivity(pop.getFactory().createActivityFromCoord("work", new CoordImpl(point.getX(), point.getY())));
+
+			plan.addActivity(pop.getFactory().createActivityFromCoord("work", new Coord(point.getX(), point.getY())));
 			
 			ProgressLogger.step();
 		}

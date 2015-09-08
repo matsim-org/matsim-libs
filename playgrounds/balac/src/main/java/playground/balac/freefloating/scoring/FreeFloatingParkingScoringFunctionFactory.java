@@ -35,13 +35,13 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 		
 		scoringFunctionSum.addScoringFunction(
 			      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(), 
-			    		  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore()).create(), 
+			    		  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create(), 
 			      this.controler.getConfig(), 
 			      this.controler.getScenario().getNetwork()));
-		scoringFunctionSum.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(),  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore()).create(), null, ((ScenarioImpl) this.controler.getScenario()).getActivityFacilities()));
+		scoringFunctionSum.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(),  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create(), null, ((ScenarioImpl) this.controler.getScenario()).getActivityFacilities()));
 				   
-		scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore()).create()));
-		scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore()).create()));
+		scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create()));
+		scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create()));
 		scoringFunctionSum.addScoringFunction(new ParkingScoringFunction(person
 				.getSelectedPlan(),parkingScoreManager));
 		return scoringFunctionSum;

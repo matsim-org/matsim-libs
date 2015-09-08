@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -111,16 +111,16 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 
 		// calc i index
-		int age = person.getAge();
+		int age = PersonUtils.getAge(person);
 		int i = -1;
 		if (age < 6) { i = 0; }
 		else if (age < 8) { i = 2; }
 		else if (age < 66) { i = 4; }
 		else { i = 6; }
-		if (person.isEmployed()) { i++; }
+		if (PersonUtils.isEmployed(person)) { i++; }
 
 		// calc j index
 		Plan plan = person.getPlans().get(0);

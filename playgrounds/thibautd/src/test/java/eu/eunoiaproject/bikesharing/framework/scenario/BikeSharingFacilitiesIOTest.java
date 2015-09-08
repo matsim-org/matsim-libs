@@ -25,12 +25,12 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -110,7 +110,7 @@ public class BikeSharingFacilitiesIOTest {
 			fs.addFacility(
 					fs.getFactory().createBikeSharingFacility(
 						Id.create( i , BikeSharingFacility.class),
-						new CoordImpl( r.nextDouble() , r.nextDouble() ),
+							new Coord(r.nextDouble(), r.nextDouble()),
 						Id.create( r.nextInt( 20 ) , Link.class),
 						r.nextInt( 2000 ),
 						r.nextInt( 2000 ) ) );

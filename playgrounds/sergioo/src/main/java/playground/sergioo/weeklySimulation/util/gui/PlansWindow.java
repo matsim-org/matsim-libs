@@ -21,7 +21,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -57,7 +56,7 @@ public class PlansWindow extends JFrame implements ActionListener, KeyListener {
 		this.population = scenario.getPopulation();
 		Collection<BasePerson> toBeAdded = new ArrayList<BasePerson>();
 		for(Person person: population.getPersons().values())
-			toBeAdded.add(BasePersonImpl.convertToBasePerson((PersonImpl) person));
+			toBeAdded.add(BasePersonImpl.convertToBasePerson(person));
 		for(Person person:toBeAdded) {
 			population.getPersons().remove(person.getId());
 			population.addPerson(person);

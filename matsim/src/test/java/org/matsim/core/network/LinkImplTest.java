@@ -27,12 +27,12 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl.HashSetCache;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -61,11 +61,11 @@ public class LinkImplTest {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		final NetworkImpl network = new NetworkImpl();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 1000));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000, 2000));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(2000, 2000));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 1000, (double) 0));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
 		LinkImpl link2 = (LinkImpl) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
 		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
@@ -74,91 +74,106 @@ public class LinkImplTest {
 		// do the following cases for each link
 
 		// case 1: point is orthogonal next to link.fromNode, test both sides of link
-		Assert.assertEquals(10.0, link1.calcDistance(new CoordImpl(10.0, 0.0)), EPSILON);
-		Assert.assertEquals(12.5, link1.calcDistance(new CoordImpl(-12.5, 0.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*65.4*65.4), link2.calcDistance(new CoordImpl(65.4, 1000.0-65.4)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*76.5*76.5), link2.calcDistance(new CoordImpl(-76.5, 1000.0+76.5)), EPSILON);
-		Assert.assertEquals(123.987, link3.calcDistance(new CoordImpl(1000.0, 2000.0-123.987)), EPSILON);
-		Assert.assertEquals(23.87, link3.calcDistance(new CoordImpl(1000.0, 2000.0+23.87)), EPSILON);
-		Assert.assertEquals(Math.sqrt(32.4*32.4*1.25), link4.calcDistance(new CoordImpl(2000.0+32.4, 2000-32.4/2.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(56.8*56.8*1.25), link4.calcDistance(new CoordImpl(2000.0-56.8, 2000+56.8/2.0)), EPSILON);
+		Assert.assertEquals(10.0, link1.calcDistance(new Coord(10.0, 0.0)), EPSILON);
+		final double x7 = -12.5;
+		Assert.assertEquals(12.5, link1.calcDistance(new Coord(x7, 0.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*65.4*65.4), link2.calcDistance(new Coord(65.4, 1000.0 - 65.4)), EPSILON);
+		final double x6 = -76.5;
+		Assert.assertEquals(Math.sqrt(2*76.5*76.5), link2.calcDistance(new Coord(x6, 1000.0 + 76.5)), EPSILON);
+		Assert.assertEquals(123.987, link3.calcDistance(new Coord(1000.0, 2000.0 - 123.987)), EPSILON);
+		Assert.assertEquals(23.87, link3.calcDistance(new Coord(1000.0, 2000.0 + 23.87)), EPSILON);
+		Assert.assertEquals(Math.sqrt(32.4*32.4*1.25), link4.calcDistance(new Coord(2000.0 + 32.4, 2000 - 32.4 / 2.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(56.8*56.8*1.25), link4.calcDistance(new Coord(2000.0 - 56.8, 2000 + 56.8 / 2.0)), EPSILON);
 
 		// case 2: point is behind link, but exactly on extension of the link's line
-		Assert.assertEquals(15.0, link1.calcDistance(new CoordImpl(0.0, -15.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(50.0), link2.calcDistance(new CoordImpl(-5.0, 995.0)), EPSILON);
-		Assert.assertEquals(12.35, link3.calcDistance(new CoordImpl(987.65, 2000.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(2250.0, 2500.0)), EPSILON);
+		final double y6 = -15.0;
+		Assert.assertEquals(15.0, link1.calcDistance(new Coord(0.0, y6)), EPSILON);
+		final double x5 = -5.0;
+		Assert.assertEquals(Math.sqrt(50.0), link2.calcDistance(new Coord(x5, 995.0)), EPSILON);
+		Assert.assertEquals(12.35, link3.calcDistance(new Coord(987.65, 2000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new Coord(2250.0, 2500.0)), EPSILON);
 
 		// case 3: point is behind and on the side of link, test both sides of link
-		Assert.assertEquals(Math.sqrt(325.0), link1.calcDistance(new CoordImpl(10.0, -15.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(625.0), link1.calcDistance(new CoordImpl(-15.0, -20.0)), EPSILON);
-		Assert.assertEquals(50.5, link2.calcDistance(new CoordImpl(0.0, 949.5)), EPSILON);
-		Assert.assertEquals(51.5, link2.calcDistance(new CoordImpl(-51.5, 1000.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(970.0, 1980.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new CoordImpl(980.0, 2030.0)), EPSILON);
-		Assert.assertEquals(145.7, link4.calcDistance(new CoordImpl(2000.0, 2145.7)), EPSILON);
-		Assert.assertEquals(89.0, link4.calcDistance(new CoordImpl(2089.0, 2000.0)), EPSILON);
+		final double y5 = -15.0;
+		Assert.assertEquals(Math.sqrt(325.0), link1.calcDistance(new Coord(10.0, y5)), EPSILON);
+		final double x4 = -15.0;
+		final double y4 = -20.0;
+		Assert.assertEquals(Math.sqrt(625.0), link1.calcDistance(new Coord(x4, y4)), EPSILON);
+		Assert.assertEquals(50.5, link2.calcDistance(new Coord(0.0, 949.5)), EPSILON);
+		final double x3 = -51.5;
+		Assert.assertEquals(51.5, link2.calcDistance(new Coord(x3, 1000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new Coord(970.0, 1980.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(1300.0), link3.calcDistance(new Coord(980.0, 2030.0)), EPSILON);
+		Assert.assertEquals(145.7, link4.calcDistance(new Coord(2000.0, 2145.7)), EPSILON);
+		Assert.assertEquals(89.0, link4.calcDistance(new Coord(2089.0, 2000.0)), EPSILON);
 
 		// case 4: point is orthogonal next to link.toNode, test both sides of link
-		Assert.assertEquals(5.0, link1.calcDistance(new CoordImpl(-5.0, 1000.0)), EPSILON);
-		Assert.assertEquals(7.5, link1.calcDistance(new CoordImpl(7.5, 1000.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*234.5*234.5), link2.calcDistance(new CoordImpl(1234.5, 2000.0-234.5)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*11.1*11.1), link2.calcDistance(new CoordImpl(1000.0-11.1, 2000.0+11.1)), EPSILON);
-		Assert.assertEquals(43.3, link3.calcDistance(new CoordImpl(2000.0, 1956.7)), EPSILON);
-		Assert.assertEquals(10.3, link3.calcDistance(new CoordImpl(2000.0, 2010.3)), EPSILON);
-		Assert.assertEquals(Math.sqrt(44.4*44.4*1.25), link4.calcDistance(new CoordImpl(1000-44.4, +22.2)), EPSILON);
-		Assert.assertEquals(Math.sqrt(66.6*66.6*1.25), link4.calcDistance(new CoordImpl(1000+66.6, -33.3)), EPSILON);
+		final double x2 = -5.0;
+		Assert.assertEquals(5.0, link1.calcDistance(new Coord(x2, 1000.0)), EPSILON);
+		Assert.assertEquals(7.5, link1.calcDistance(new Coord(7.5, 1000.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*234.5*234.5), link2.calcDistance(new Coord(1234.5, 2000.0 - 234.5)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*11.1*11.1), link2.calcDistance(new Coord(1000.0 - 11.1, 2000.0 + 11.1)), EPSILON);
+		Assert.assertEquals(43.3, link3.calcDistance(new Coord(2000.0, 1956.7)), EPSILON);
+		Assert.assertEquals(10.3, link3.calcDistance(new Coord(2000.0, 2010.3)), EPSILON);
+		final double y3 = +22.2;
+		Assert.assertEquals(Math.sqrt(44.4*44.4*1.25), link4.calcDistance(new Coord(1000 - 44.4, y3)), EPSILON);
+		final double y2 = -33.3;
+		Assert.assertEquals(Math.sqrt(66.6*66.6*1.25), link4.calcDistance(new Coord(1000 + 66.6, y2)), EPSILON);
 
 		// case 5: point is in front of link, but exactly on extension of the link's line
-		Assert.assertEquals(23.4, link1.calcDistance(new CoordImpl(0, 1023.4)), EPSILON);
-		Assert.assertEquals(Math.sqrt(200.0), link2.calcDistance(new CoordImpl(1010, 2010.0)), EPSILON);
-		Assert.assertEquals(987.6, link3.calcDistance(new CoordImpl(2987.6, 2000.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new CoordImpl(750.0, -500.0)), EPSILON);
+		Assert.assertEquals(23.4, link1.calcDistance(new Coord((double) 0, 1023.4)), EPSILON);
+		Assert.assertEquals(Math.sqrt(200.0), link2.calcDistance(new Coord((double) 1010, 2010.0)), EPSILON);
+		Assert.assertEquals(987.6, link3.calcDistance(new Coord(2987.6, 2000.0)), EPSILON);
+		final double y1 = -500.0;
+		Assert.assertEquals(Math.sqrt(250.0*250.0 + 500.0*500.0), link4.calcDistance(new Coord(750.0, y1)), EPSILON);
 
 		// case 6: point is in front of link and on side of link, test both sides of link
-		Assert.assertEquals(5.0, link1.calcDistance(new CoordImpl(-3.0, 1004.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(113.0), link1.calcDistance(new CoordImpl(8.0, 1007.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link2.calcDistance(new CoordImpl(1100.0, 2050.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link2.calcDistance(new CoordImpl(1050.0, 2100.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link3.calcDistance(new CoordImpl(2100.0, 2050.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link3.calcDistance(new CoordImpl(2050.0, 1900.0)), EPSILON);
-		Assert.assertEquals(50.0, link4.calcDistance(new CoordImpl(1000.0, -50.0)), EPSILON);
-		Assert.assertEquals(49.0, link4.calcDistance(new CoordImpl(951.0, 0.0)), EPSILON);
+		final double x1 = -3.0;
+		Assert.assertEquals(5.0, link1.calcDistance(new Coord(x1, 1004.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(113.0), link1.calcDistance(new Coord(8.0, 1007.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link2.calcDistance(new Coord(1100.0, 2050.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link2.calcDistance(new Coord(1050.0, 2100.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(100.0*100.0+50.0*50.0), link3.calcDistance(new Coord(2100.0, 2050.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(50.0*50.0+100.0*100.0), link3.calcDistance(new Coord(2050.0, 1900.0)), EPSILON);
+		final double y = -50.0;
+		Assert.assertEquals(50.0, link4.calcDistance(new Coord(1000.0, y)), EPSILON);
+		Assert.assertEquals(49.0, link4.calcDistance(new Coord(951.0, 0.0)), EPSILON);
 
 		// case 7: point is on the side of link, between from- and to-Node, test both sides of link
-		Assert.assertEquals(42.0, link1.calcDistance(new CoordImpl(-42.0, 987.65)), EPSILON);
-		Assert.assertEquals(123.4, link1.calcDistance(new CoordImpl(123.4, 98.765)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*125.0*125.0), link2.calcDistance(new CoordImpl(500.0, 1250.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(2*250.0*250.0), link2.calcDistance(new CoordImpl(500.0, 2000.0)), EPSILON);
-		Assert.assertEquals(658.3, link3.calcDistance(new CoordImpl(1234.5, 2000.0-658.3)), EPSILON);
-		Assert.assertEquals(422.1, link3.calcDistance(new CoordImpl(1846.3, 2422.1)), EPSILON);
-		Assert.assertEquals(Math.sqrt(250.0*250.0+125.0*125.0), link4.calcDistance(new CoordImpl(2000.0, 1375.0)), EPSILON);
-		Assert.assertEquals(Math.sqrt(500.0*500.0+250.0*250.0), link4.calcDistance(new CoordImpl(1000.0, 1250.0)), EPSILON);
+		final double x = -42.0;
+		Assert.assertEquals(42.0, link1.calcDistance(new Coord(x, 987.65)), EPSILON);
+		Assert.assertEquals(123.4, link1.calcDistance(new Coord(123.4, 98.765)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*125.0*125.0), link2.calcDistance(new Coord(500.0, 1250.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(2*250.0*250.0), link2.calcDistance(new Coord(500.0, 2000.0)), EPSILON);
+		Assert.assertEquals(658.3, link3.calcDistance(new Coord(1234.5, 2000.0 - 658.3)), EPSILON);
+		Assert.assertEquals(422.1, link3.calcDistance(new Coord(1846.3, 2422.1)), EPSILON);
+		Assert.assertEquals(Math.sqrt(250.0*250.0+125.0*125.0), link4.calcDistance(new Coord(2000.0, 1375.0)), EPSILON);
+		Assert.assertEquals(Math.sqrt(500.0*500.0+250.0*250.0), link4.calcDistance(new Coord(1000.0, 1250.0)), EPSILON);
 
 		// case 8: point is *on* the link (exactly on fromnode, exactly on tonode, exactly between somewhere)
 		Assert.assertEquals("point = link1.fromNode", 0.0, link1.calcDistance(link1.getFromNode().getCoord()), EPSILON);
 		Assert.assertEquals("point = link1.toNode", 0.0, link1.calcDistance(link1.getToNode().getCoord()), EPSILON);
-		Assert.assertEquals("point on link1", 0.0, link1.calcDistance(new CoordImpl(0.0, 135.79)), EPSILON);
+		Assert.assertEquals("point on link1", 0.0, link1.calcDistance(new Coord(0.0, 135.79)), EPSILON);
 
 		Assert.assertEquals("point = link2.fromNode", 0.0, link2.calcDistance(link2.getFromNode().getCoord()), EPSILON);
 		Assert.assertEquals("point = link2.toNode", 0.0, link2.calcDistance(link2.getToNode().getCoord()), EPSILON);
-		Assert.assertEquals("point on link2", 0.0, link2.calcDistance(new CoordImpl(65.43, 1065.43)), EPSILON);
+		Assert.assertEquals("point on link2", 0.0, link2.calcDistance(new Coord(65.43, 1065.43)), EPSILON);
 
 		Assert.assertEquals("point = link3.fromNode", 0.0, link3.calcDistance(link3.getFromNode().getCoord()), EPSILON);
 		Assert.assertEquals("point = link3.toNode", 0.0, link3.calcDistance(link3.getToNode().getCoord()), EPSILON);
-		Assert.assertEquals("point on link3", 0.0, link3.calcDistance(new CoordImpl(1234.5678, 2000.0)), EPSILON);
+		Assert.assertEquals("point on link3", 0.0, link3.calcDistance(new Coord(1234.5678, 2000.0)), EPSILON);
 
 		Assert.assertEquals("point = link4.fromNode", 0.0, link4.calcDistance(link4.getFromNode().getCoord()), EPSILON);
 		Assert.assertEquals("point = link4.toNode", 0.0, link4.calcDistance(link4.getToNode().getCoord()), EPSILON);
-		Assert.assertEquals("point on link4", 0.0, link4.calcDistance(new CoordImpl(1750.0, 1500.0)), EPSILON);
+		Assert.assertEquals("point on link4", 0.0, link4.calcDistance(new Coord(1750.0, 1500.0)), EPSILON);
 	}
 
 	@Test
 	public void testSetAttributes() {
 		NetworkImpl network = new NetworkImpl();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(50, 50));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 50));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 1000.0, 1.0);
 		Assert.assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
 		link1.setLength(1000.0);
@@ -174,8 +189,8 @@ public class LinkImplTest {
 	@Test
 	public void testAllowedModes() {
 		NetworkImpl network = new NetworkImpl();
-		Node n1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node n2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Node n1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link l = network.createAndAddLink(Id.create(1, Link.class), n1, n2, 1000, 10, 3600, 1);
 
 		// test default

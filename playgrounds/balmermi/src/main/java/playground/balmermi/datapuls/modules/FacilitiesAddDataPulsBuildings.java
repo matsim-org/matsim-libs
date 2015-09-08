@@ -27,7 +27,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -73,7 +72,7 @@ public class FacilitiesAddDataPulsBuildings {
 				// 0          1         2    3    4    5           6       7             8           9         10      11         12
 				if (line_cnt==0) { line_cnt++; continue; }
 				String[] entries = curr_line.split(",", -1);
-				Coord coord = new CoordImpl(entries[entries.length-6].trim(),entries[entries.length-5].trim());
+				Coord coord = new Coord(Double.parseDouble(entries[entries.length - 6].trim()), Double.parseDouble(entries[entries.length - 5].trim()));
 				double cap = Double.parseDouble(entries[entries.length-1].trim());
 				if (cap < 1.0) { cap = 1.0; }
 				Id<ActivityFacility> id = Id.create(entries[0].trim(), ActivityFacility.class);

@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -368,7 +367,7 @@ public class LinkImpl implements Link {
 	public Coord getCoord() {
 		Coord fromXY = getFromNode().getCoord();
 		Coord toXY = getToNode().getCoord();
-		return new CoordImpl((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
+		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
 	}
 
 	public Network getNetwork() {

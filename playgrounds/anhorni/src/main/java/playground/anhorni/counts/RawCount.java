@@ -19,7 +19,7 @@
 
 package playground.anhorni.counts;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class RawCount {
 	String id;
@@ -36,7 +36,7 @@ public class RawCount {
 	String linkidNavteq;
 	String linkidIVTCH;
 	
-	CoordImpl coord;
+	Coord coord;
 	
 	
 	public RawCount(String id, String year, String month,
@@ -117,11 +117,11 @@ public class RawCount {
 		this.linkidIVTCH = linkidIVTCH;
 	}
 
-	public CoordImpl getCoord() {
+	public Coord getCoord() {
 		return coord;
 	}
 
-	public void setCoord(CoordImpl coord) {
+	public void setCoord(Coord coord) {
 		this.coord = coord;
 	}
 

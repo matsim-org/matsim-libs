@@ -48,7 +48,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.func
 			final KtiConfigGroup ktiConfigGroup,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities) {
-		super(scenario.getConfig().planCalcScore(), scenario.getNetwork());
+		super(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork());
 		this.scenario = scenario;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
@@ -63,17 +63,17 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.func
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				person.getSelectedPlan(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
 				this.facilityPenalties,
 				this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				person.getSelectedPlan(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
 				scenario.getConfig(),
                 scenario.getNetwork(),
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 		
 		return scoringFunctionAccumulator;
 	}

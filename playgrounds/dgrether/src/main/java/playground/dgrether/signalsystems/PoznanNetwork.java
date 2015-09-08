@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -400,7 +401,7 @@ public class PoznanNetwork
 
     private static Node createAndAddNode(String id, double x, double y)
     {
-        Node node = netFactory.createNode(Id.create(id, Node.class), scenario.createCoord(x, y));
+        Node node = netFactory.createNode(Id.create(id, Node.class), new Coord(x, y));
         network.addNode(node);
         return node;
     }

@@ -29,9 +29,9 @@ import org.matsim.testcases.MatsimTestCase;
 public class RemoveAgentsTest extends MatsimTestCase {
 
 	public void testBasic(){
-		String inputEventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
+		String inputEventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.xml";
 		
-		String outputEventsFile=getOutputDirectory() + "output-events.txt.gz";
+		String outputEventsFile=getOutputDirectory() + "output-events.xml.gz";
 		
 		HashSet<Id<Person>> agentIds = new HashSet<>();
 		

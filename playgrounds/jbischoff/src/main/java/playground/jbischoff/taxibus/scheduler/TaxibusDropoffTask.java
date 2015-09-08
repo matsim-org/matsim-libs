@@ -35,7 +35,7 @@ public class TaxibusDropoffTask
 
     public TaxibusDropoffTask(double beginTime, double endTime, TaxibusRequest request)
     {
-        super(beginTime, endTime, request.getFromLink());
+        super(beginTime, endTime, request.getToLink());
 
         this.request = request;
         request.setDropoffTask(this);

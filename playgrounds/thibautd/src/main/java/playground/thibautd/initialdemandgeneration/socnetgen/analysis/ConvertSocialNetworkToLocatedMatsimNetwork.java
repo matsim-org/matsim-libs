@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -93,7 +92,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 				if ( name.equals( "act" ) && id != null ) {
 					final double x = Double.parseDouble( atts.getValue( "x" ) );
 					final double y = Double.parseDouble( atts.getValue( "y" ) );
-					map.put( id ,  coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
+					map.put( id ,  coordPool.getPooledInstance(new Coord(x, y)) );
 					id = null;
 				}
 

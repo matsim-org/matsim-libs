@@ -13,7 +13,6 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
@@ -165,7 +164,7 @@ class PlanSerializable implements Serializable {
         }
 
         public Coord getCoord() {
-            return new CoordImpl(x, y);
+            return new Coord(x, y);
 
         }
     }

@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.Attributes;
 
@@ -100,7 +99,7 @@ public class SocialSparseGraphMLReader
 		/*
 		 * create a social person and social vertex
 		 */
-		SocialPerson sPerson = new SocialPerson((PersonImpl) person);
+		SocialPerson sPerson = new SocialPerson(person);
 		SocialSparseVertex vertex = builder.addVertex(getGraph(), sPerson, SpatialGraphML.newPoint(attrs));
 		/*
 		 * add citizenship attribute

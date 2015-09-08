@@ -20,7 +20,6 @@
 package org.matsim.vis.otfvis.data;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 
@@ -44,7 +43,7 @@ class OTFTransformation implements CoordinateTransformation {
 	@Override
 	public Coord transform(Coord coord) {
 		Coord c = this.delegate.transform(coord);
-		Coord c2 = new CoordImpl(c.getX() - this.offsetEast, c.getY() - this.offsetNorth);
+		Coord c2 = new Coord(c.getX() - this.offsetEast, c.getY() - this.offsetNorth);
 		return c2;
 	}
 }

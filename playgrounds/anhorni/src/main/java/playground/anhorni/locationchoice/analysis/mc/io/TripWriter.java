@@ -25,7 +25,8 @@ import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.locationchoice.analysis.mc.MZ;
@@ -142,10 +143,10 @@ public class TripWriter {
 			while (trips_it.hasNext()) {
 				MZTrip trip = trips_it.next();
 				
-				CoordImpl coordStart = trip.getCoordStart();
-				CoordImpl coordEnd = trip.getCoordEnd();
-				
-				double dist = coordStart.calcDistance(coordEnd)/1000.0;
+				Coord coordStart = trip.getCoordStart();
+				Coord coordEnd = trip.getCoordEnd();
+
+				double dist = CoordUtils.calcDistance(coordStart, coordEnd) /1000.0;
 				double dur = trip.getDuration();
 				
 				String s = trip.getPersonId().toString() + "\t";

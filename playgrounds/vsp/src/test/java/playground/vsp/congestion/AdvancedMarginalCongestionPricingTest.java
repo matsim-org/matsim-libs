@@ -36,6 +36,7 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -76,7 +77,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -136,7 +140,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -187,7 +194,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

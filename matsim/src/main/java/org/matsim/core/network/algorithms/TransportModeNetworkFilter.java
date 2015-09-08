@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.LinkImpl;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -83,6 +84,7 @@ public final class TransportModeNetworkFilter {
 				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
+				((LinkImpl) link2).setType(((LinkImpl) link).getType());
 				subNetwork.addLink(link2);
 			}
 		}

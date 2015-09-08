@@ -53,7 +53,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 	public EmissionResponsibilityTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
+		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceRateCar();
 		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.emissionModule = emissionModule;
 		this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;

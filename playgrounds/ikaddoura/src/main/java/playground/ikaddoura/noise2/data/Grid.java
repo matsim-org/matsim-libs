@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -178,7 +177,7 @@ public class Grid {
 			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + gridParams.getReceiverPointGap() ; x = x + gridParams.getReceiverPointGap()) {
 				
 				Id<ReceiverPoint> id = Id.create(counter, ReceiverPoint.class);
-				Coord coord = new CoordImpl(x, y);
+				Coord coord = new Coord(x, y);
 				
 				ReceiverPoint rp = new ReceiverPoint(id, coord);
 								

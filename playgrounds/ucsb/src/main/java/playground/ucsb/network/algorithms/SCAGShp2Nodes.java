@@ -21,11 +21,11 @@
 package playground.ucsb.network.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
@@ -79,7 +79,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 			Coordinate c = new Coordinate((f.getBounds().getMinX() + f.getBounds().getMaxX())/2.0, (f.getBounds().getMinY() + f.getBounds().getMaxY())/2.0);
 
 			// add node
-			Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
+			Node n = network.getFactory().createNode(nodeId, new Coord(c.x, c.y));
 			network.addNode(n);
 
 			// node type

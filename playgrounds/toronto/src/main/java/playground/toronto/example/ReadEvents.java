@@ -21,8 +21,8 @@
 package playground.toronto.example;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 
 public class ReadEvents {
@@ -30,7 +30,7 @@ public class ReadEvents {
 	public static void main(String[] args) {
 		// Instance which takes over line by line of the events file
 		// and throws events of added types
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		// An example of an events handler which takes
 		// "LinkLeaveEvents" to calculate total volumes per link of the network
@@ -40,7 +40,7 @@ public class ReadEvents {
 		events.addHandler(dlvc);
 		
 		// Reader to read events line by line and paases it over to the events object
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile("events.txt.gz");
 		
 		// an example output of the DailyLinkVolumeCalc

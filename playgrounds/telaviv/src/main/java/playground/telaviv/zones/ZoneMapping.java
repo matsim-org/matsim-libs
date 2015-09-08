@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -329,7 +328,7 @@ public class ZoneMapping {
 			double x = fromX + i * dXSection;
 			double y = fromY + i * dYSection;
 
-			Coord pointCoord = coordinateTransformation.transform(new CoordImpl(x, y));
+			Coord pointCoord = coordinateTransformation.transform(new Coord(x, y));
 			Point point = factory.createPoint(new Coordinate(pointCoord.getX(), pointCoord.getY()));
 			
 //			Point point = factory.createPoint(new Coordinate(x, y));

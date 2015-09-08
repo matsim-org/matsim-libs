@@ -20,7 +20,6 @@
 package playground.johannes.coopsim.util;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -39,7 +38,7 @@ public class MatsimCoordUtils {
 	}
 	
 	public static Coord pointToCoord(Point point) {
-		return new CoordImpl(point.getX(), point.getY());
+		return new Coord(point.getX(), point.getY());
 	}
 	
 }

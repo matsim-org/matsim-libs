@@ -100,11 +100,6 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 						}
 					}));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					sc.getConfig(),
-					tripRouterFactory) );
-
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
 				(VehicleRessources) sc.getScenarioElement(

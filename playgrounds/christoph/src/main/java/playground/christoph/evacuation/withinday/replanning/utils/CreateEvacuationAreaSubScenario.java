@@ -145,8 +145,8 @@ public class CreateEvacuationAreaSubScenario {
 		transportModes.add(TransportMode.ride);
 		
 		NetworkFactory networkFactory = subNetwork.getFactory();
-		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 
-		Coord exitNode2Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
+		Coord exitNode1Coord = new Coord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
+		Coord exitNode2Coord = new Coord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
 		Node exitNode1 = networkFactory.createNode(Id.create(AddExitLinksToNetwork.exitNode + "1", Node.class), exitNode1Coord);
 		Node exitNode2 = networkFactory.createNode(Id.create(AddExitLinksToNetwork.exitNode + "2", Node.class), exitNode2Coord);
 		Link exitLink = networkFactory.createLink(Id.create(AddExitLinksToNetwork.exitLink, Link.class), exitNode1, exitNode2);
@@ -274,7 +274,7 @@ public class CreateEvacuationAreaSubScenario {
 
 		@Override
 		public Coord createCoord(double x, double y) {
-			return this.scenario.createCoord(x, y);
+			return new Coord(x, y);
 		}
 
 		@Override

@@ -26,9 +26,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -71,7 +71,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		private void writeAgent(AgentSnapshotInfo agInfo, ByteBuffer out) {
 			String id = agInfo.getId().toString();
 			ByteBufferUtils.putString(out, id);
-			Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(agInfo.getEasting(), agInfo.getNorthing()));
+			Point2D.Double point = OTFServerQuadTree.transform(new Coord(agInfo.getEasting(), agInfo.getNorthing()));
 			out.putFloat((float) point.getX());
 			out.putFloat((float) point.getY());
 			out.putInt(agInfo.getAgentState().ordinal() ) ;

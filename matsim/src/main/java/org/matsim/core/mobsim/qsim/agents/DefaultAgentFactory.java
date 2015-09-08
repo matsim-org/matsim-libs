@@ -24,6 +24,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 
+import javax.inject.Inject;
+
 /**
  * Design decisions:<ul>
  * <li> Class is final since there is an interface.  Please use interface directly. kai, nov'11
@@ -33,6 +35,7 @@ public final class DefaultAgentFactory implements AgentFactory {
 
 	private final Netsim simulation;
 
+	@Inject
 	public DefaultAgentFactory(final Netsim simulation) {
 		this.simulation = simulation;
 	}

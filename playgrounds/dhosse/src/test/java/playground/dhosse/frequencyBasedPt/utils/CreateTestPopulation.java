@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateTestPopulation {
 	
@@ -23,9 +22,10 @@ public class CreateTestPopulation {
 
         PopulationFactory factory = scenario.getPopulation().getFactory();
 		Population population = scenario.getPopulation();
-		
-		Coord homeCoord = new CoordImpl(-10, 150);
-		Coord workCoord = new CoordImpl(610,150);
+
+		final double x = -10;
+		Coord homeCoord = new Coord(x, (double) 150);
+		Coord workCoord = new Coord((double) 610, (double) 150);
 		
 		for(int i=0;i<nPersons;i++){
 			

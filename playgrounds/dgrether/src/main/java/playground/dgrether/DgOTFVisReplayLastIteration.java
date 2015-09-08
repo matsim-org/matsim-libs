@@ -1,31 +1,37 @@
 package playground.dgrether;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import playground.dgrether.utils.DgConfigCleaner;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.io.*;
+import playground.dgrether.utils.DgConfigCleaner;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -115,14 +121,13 @@ public class DgOTFVisReplayLastIteration {
 		// disable snapshot writing as the snapshot should not be overwritten
 		config.qsim().setSnapshotPeriod(0.0);
 
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		Scenario sc = loader.loadScenario();
+		Scenario sc = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(
 				sc.getConfig().controler().getOutputDirectory(),
 						false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, events);
-		if ((boolean) ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(sc, events);
+		if (ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(
 					new FromDataBuilder(sc, events)
 							.createAndInitializeSignalSystemsManager());

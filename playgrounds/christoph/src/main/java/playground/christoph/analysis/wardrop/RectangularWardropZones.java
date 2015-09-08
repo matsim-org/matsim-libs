@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RectangularWardropZones extends WardropZonesImpl{
 
@@ -140,8 +139,8 @@ public class RectangularWardropZones extends WardropZonesImpl{
 		
 		double xCoord = xMin + (xIndex * dx + dx/2);
 		double yCoord = yMax - (yIndex * dy + dy/2);
-		
-		Coord coord = new CoordImpl(xCoord, yCoord);
+
+		Coord coord = new Coord(xCoord, yCoord);
 		
 		return coord;
 	}

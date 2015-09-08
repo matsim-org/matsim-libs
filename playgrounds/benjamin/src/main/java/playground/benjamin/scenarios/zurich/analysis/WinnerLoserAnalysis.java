@@ -31,8 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -66,13 +64,12 @@ public class WinnerLoserAnalysis {
 	public void run(final String[] args) throws IOException {
 		//instancing scenario1 with a config (path to network and plans)
 		Config config = ConfigUtils.createConfig();
-		Scenario sc1 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario sc1 = ScenarioUtils.createScenario(config);
 		config.network().setInputFile(netfile);
 		config.plans().setInputFile(plansfile1);
 		
 		//loading scenario1 and getting the population1
-		ScenarioLoaderImpl sl1 = new ScenarioLoaderImpl(sc1) ;
-		sl1.loadScenario() ;
+		ScenarioUtils.loadScenario(sc1);
 		Population population1 = sc1.getPopulation();
 		
 
@@ -80,13 +77,12 @@ public class WinnerLoserAnalysis {
 		
 		//instancing scenario2 with a config (path to network and plans)
 		Config config2 = ConfigUtils.createConfig();
-		Scenario sc2 = (ScenarioImpl) ScenarioUtils.createScenario(config2);
+		Scenario sc2 = ScenarioUtils.createScenario(config2);
 		config2.network().setInputFile(netfile);
 		config2.plans().setInputFile(plansfile2);
 		
 		//loading scenario2 and getting the population2
-		ScenarioLoaderImpl sl2 = new ScenarioLoaderImpl(sc2) ;
-		sl2.loadScenario() ;
+		ScenarioUtils.loadScenario(sc2);
 		Population population2 = sc2.getPopulation();
 		
 	//===

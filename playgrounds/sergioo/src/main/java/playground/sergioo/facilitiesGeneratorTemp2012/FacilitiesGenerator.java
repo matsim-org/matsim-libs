@@ -16,7 +16,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -92,7 +91,7 @@ public class FacilitiesGenerator {
 		int numFacNoActivities = 0;
 		while(resultFacilities.next()) {
 			ActivityFacilityImpl facility;
-			Coord center = new CoordImpl(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
+			Coord center = new Coord(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
 			boolean newFacility = false;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {

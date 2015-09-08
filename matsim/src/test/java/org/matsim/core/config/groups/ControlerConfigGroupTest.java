@@ -45,36 +45,33 @@ public class ControlerConfigGroupTest {
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
 		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with setEventsFileFormat
-		cg.setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
+		cg.setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		formats = cg.getEventsFileFormats();
-		Assert.assertEquals(2, formats.size());
-		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
 		cg.setEventsFileFormats(EnumSet.noneOf(EventsFileFormat.class));
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(0, formats.size());
 		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with addParam
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "xml,txt");
+		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "xml");
 		formats = cg.getEventsFileFormats();
-		Assert.assertEquals(2, formats.size());
+		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
-		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "");
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(0, formats.size());
 		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with non-conform formatting
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, " txt\t, xml\t\t  ");
+		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, " xml\t\t  ");
 		formats = cg.getEventsFileFormats();
-		Assert.assertEquals(2, formats.size());
-		Assert.assertTrue(formats.contains(EventsFileFormat.txt));
+		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("txt,xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to non-conform none
 		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "  \t ");
 		formats = cg.getEventsFileFormats();

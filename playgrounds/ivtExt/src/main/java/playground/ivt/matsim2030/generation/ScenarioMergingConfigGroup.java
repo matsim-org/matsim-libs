@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * For increased modularity, the different scenario elements
@@ -43,7 +42,7 @@ public class ScenarioMergingConfigGroup extends ReflectiveConfigGroup {
 
 	private double samplingRate = 0.1;
 
-	private Coord dilutionCenter = new CoordImpl(683518.0,246836.0);
+	private Coord dilutionCenter = new Coord(683518.0, 246836.0);
 	private double dilutionRadiusKm = 30;
 	private boolean performDilution = true;
 
@@ -127,7 +126,7 @@ public class ScenarioMergingConfigGroup extends ReflectiveConfigGroup {
 		final double x = Double.parseDouble( xy[ 0 ] );
 		final double y = Double.parseDouble( xy[ 1 ] );
 
-		setDilutionCenter( new CoordImpl( x , y ) );
+		setDilutionCenter(new Coord(x, y));
 	}
 
 	@StringGetter( "dilutionRadiusKm" )

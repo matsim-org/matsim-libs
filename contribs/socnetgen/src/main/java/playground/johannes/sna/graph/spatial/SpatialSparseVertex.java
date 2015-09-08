@@ -22,7 +22,6 @@ package playground.johannes.sna.graph.spatial;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.sna.graph.SparseVertex;
 
@@ -70,7 +69,7 @@ public class SpatialSparseVertex extends SparseVertex implements SpatialVertex {
 	 * @deprecated will be replaced by {@link #getPoint()}.
 	 */
 	public Coord getCoordinate() {
-		return new CoordImpl(point.getCoordinate().x, point.getCoordinate().y);
+		return new Coord(point.getCoordinate().x, point.getCoordinate().y);
 	}
 
 	/**

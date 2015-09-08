@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +43,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -83,10 +83,10 @@ public class JointTripRouterFactoryTest {
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
-		Node node1inst = net.createAndAddNode( node1 , new CoordImpl( 0 , 1 ) );
-		Node node2inst = net.createAndAddNode( node2 , new CoordImpl( 0 , 2 ) );
-		Node node3inst = net.createAndAddNode( node3 , new CoordImpl( 0 , 3 ) );
-		Node node4inst = net.createAndAddNode( node4 , new CoordImpl( 0 , 4 ) );
+		Node node1inst = net.createAndAddNode( node1 , new Coord((double) 0, (double) 1));
+		Node node2inst = net.createAndAddNode( node2 , new Coord((double) 0, (double) 2));
+		Node node3inst = net.createAndAddNode( node3 , new Coord((double) 0, (double) 3));
+		Node node4inst = net.createAndAddNode( node4 , new Coord((double) 0, (double) 4));
 
 		net.createAndAddLink( link1 , node1inst , node2inst , 1 , 1 , 1 , 1 );
 		net.createAndAddLink( link2 , node2inst , node3inst , 1 , 1 , 1 , 1 );
@@ -97,7 +97,7 @@ public class JointTripRouterFactoryTest {
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
-		PersonImpl pers = new PersonImpl( driverId );
+		Person pers = PersonImpl.createPerson(driverId);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -116,7 +116,7 @@ public class JointTripRouterFactoryTest {
 		dLeg.setRoute( dRoute );
 
 		// passenger
-		pers = new PersonImpl( passengerId );
+		pers = PersonImpl.createPerson(passengerId);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -124,18 +124,18 @@ public class JointTripRouterFactoryTest {
 
 		ActivityImpl a = plan.createAndAddActivity( "home" , link1 );
 		a.setEndTime( 1246534 );
-		a.setCoord( new CoordImpl( 0 , 1 ) );
+		a.setCoord(new Coord((double) 0, (double) 1));
 		plan.createAndAddLeg( TransportMode.walk );
 		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 );
 		a.setMaximumDuration( 0 );
-		a.setCoord( new CoordImpl( 0 , 2 ) );
+		a.setCoord(new Coord((double) 0, (double) 2));
 		Leg pLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 );
 		a.setMaximumDuration( 0 );
-		a.setCoord( new CoordImpl( 0 , 3 ) );
+		a.setCoord(new Coord((double) 0, (double) 3));
 		plan.createAndAddLeg( TransportMode.walk );
 		a = plan.createAndAddActivity( "home" , link3 );
-		a.setCoord( new CoordImpl( 0 , 4 ) );
+		a.setCoord(new Coord((double) 0, (double) 4));
 
 		PassengerRoute pRoute = new PassengerRoute( link1 , link3 );
 		pRoute.setDriverId( driverId );

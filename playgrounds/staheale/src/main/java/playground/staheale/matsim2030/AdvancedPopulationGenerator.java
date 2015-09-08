@@ -23,11 +23,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -141,7 +137,7 @@ public class AdvancedPopulationGenerator {
 			Id<Person> MZid = Id.create(hhnr.concat(zielpnr), Person.class);
 			if (mz_population.getPersons().containsKey(MZid)) {
 				Person p = mz_population.getPersons().get(MZid);
-				PersonImpl person = (PersonImpl) p;
+				Person person = p;
 				if (person.getSelectedPlan() != null){
 					person.getSelectedPlan().setScore(mzWeight);
 				}
@@ -231,7 +227,7 @@ public class AdvancedPopulationGenerator {
 						Plan planRem = person.getSelectedPlan();
 						person.removePlan(planRem);
 					} 
-					Person random_mz_p = mz.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
+					Person random_mz_p = mz.getRandomWeightedMZPerson(PersonUtils.getAge(person), PersonUtils.getSex(person), PersonUtils.getLicense(person), has_work, has_educ);
 					if (random_mz_p == null) {
 						if (UnknownGroupList.contains(recId) != true) {
 							UnknownGroupList.add(recId);
@@ -240,13 +236,13 @@ public class AdvancedPopulationGenerator {
 						}
 						//log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
 						//case of person over 24
-						if (person.getAge() > 24){
-							random_mz_p = mz.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, false);
+						if (PersonUtils.getAge(person) > 24){
+							random_mz_p = mz.getRandomWeightedMZPerson(PersonUtils.getAge(person), PersonUtils.getSex(person), PersonUtils.getLicense(person), has_work, false);
 							//log.warn("=> Assigning same demographics (>24) except that education status is set false. NOTE: Works only for CH-Microcensus 2010.");
 						}
 						//case of person under 25
 						else {
-							random_mz_p = mz.getRandomWeightedMZPerson(person.getAge(),person.getSex(),"no", has_work, has_educ);
+							random_mz_p = mz.getRandomWeightedMZPerson(PersonUtils.getAge(person), PersonUtils.getSex(person),"no", has_work, has_educ);
 							//log.warn("=> Assigning same demographics (<24) except that license status is set false. NOTE: Works only for CH-Microcensus 2010.");
 						}
 
@@ -279,7 +275,7 @@ public class AdvancedPopulationGenerator {
 					//Plan plan = person.getSelectedPlan();
 					double xHome = Double.parseDouble(homeXcoord)-2000000; //change from CH1903+ to CH1903
 					double yHome = Double.parseDouble(homeYcoord)-1000000; //change from CH1903+ to CH1903
-					Coord coordsHome = sc.createCoord(xHome, yHome);
+					Coord coordsHome = new Coord(xHome, yHome);
 					List<PlanElement> pes = person.getSelectedPlan().getPlanElements();
 					if (pes.size() > 0){
 						Activity lastAct = ((Activity) pes.get( pes.size() -1 ));
@@ -315,7 +311,7 @@ public class AdvancedPopulationGenerator {
 							if (pe instanceof Leg) {
 								LegImpl l = (LegImpl) pe;
 								if (l.getMode().equals("other") || l.getMode().equals("abroad_teleport")) {
-									if (person.getLicense().equals("yes")) {
+									if (PersonUtils.getLicense(person).equals("yes")) {
 										l.setMode("car");
 										//log.info("leg mode of person with recId " +recId+ " is changed to car");
 
@@ -338,7 +334,7 @@ public class AdvancedPopulationGenerator {
 
 						double xWork = Double.parseDouble(workXcoord)-2000000; //change from CH1903+ to CH1903
 						double yWork = Double.parseDouble(workYcoord)-1000000; //change from CH1903+ to CH1903
-						Coord coordsWork = sc.createCoord(xWork, yWork);
+						Coord coordsWork = new Coord(xWork, yWork);
 
 						for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 							if (pe instanceof Activity) {

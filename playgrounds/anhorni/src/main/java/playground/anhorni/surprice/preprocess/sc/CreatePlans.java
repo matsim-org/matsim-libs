@@ -22,18 +22,15 @@ package playground.anhorni.surprice.preprocess.sc;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -59,9 +56,9 @@ public class CreatePlans {
 	public void run(String outPath) {
 		int nbrPersons = 500;
 		for (int i = 0; i < nbrPersons; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
+			PersonImpl person = PersonImpl.createPerson(Id.create(i, Person.class));
 			this.scenario.getPopulation().addPerson(person);
-			person.createAndAddPlan(true);
+			PersonUtils.createAndAddPlan(person, true);
 			Plan plan = person.getSelectedPlan();
 			
 			int offset = 1; //rnd.nextInt(600);
@@ -69,7 +66,8 @@ public class CreatePlans {
 			homeAct.setEndTime(6.0 * 3600.0 + offset);
 			
 			homeAct.setFacilityId(Id.create(1, ActivityFacility.class));
-			homeAct.setCoord(new CoordImpl(-100.0, 0.0));
+			final double x = -100.0;
+			homeAct.setCoord(new Coord(x, 0.0));
 			homeAct.setLinkId(Id.create(1, Link.class));
 			
 			((PlanImpl) plan).createAndAddLeg("car");
@@ -82,7 +80,7 @@ public class CreatePlans {
 			act.setStartTime(6.0 * 3600.0 + 100.0 + 1.0 * offset);
 			
 			act.setFacilityId(Id.create(2, ActivityFacility.class));
-			act.setCoord(new CoordImpl(2100.0, 0.0));
+			act.setCoord(new Coord(2100.0, 0.0));
 			act.setLinkId(Id.create(5, Link.class));
 			
 			

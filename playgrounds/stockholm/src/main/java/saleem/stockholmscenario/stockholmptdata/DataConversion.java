@@ -1,7 +1,6 @@
 package saleem.stockholmscenario.stockholmptdata;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class DataConversion {
@@ -64,7 +63,7 @@ public class DataConversion {
         if (Letter<'M')
             Northing = Northing + 10000000;
         Northing=Math.round(Northing*100)*0.01;
-        coord = new CoordImpl(Easting, Northing);
+        coord = new Coord(Easting, Northing);
         return coord;
     }
 

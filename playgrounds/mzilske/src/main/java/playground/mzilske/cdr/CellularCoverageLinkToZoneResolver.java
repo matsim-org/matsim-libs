@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
@@ -36,7 +35,7 @@ public final class CellularCoverageLinkToZoneResolver implements
 		CellTower cellTower = cellularCoverage.cellTowers.get(zoneId);
 		Geometry cell = cellTower.cell;
 		Point p = getRandomPointInFeature(MatsimRandom.getRandom(), cell);
-		Coord coord = new CoordImpl(p.getX(), p.getY());
+		Coord coord = new Coord(p.getX(), p.getY());
 		Link link = NetworkUtils.getNearestLink(((NetworkImpl) network), coord);
 		return link.getId();
 	}

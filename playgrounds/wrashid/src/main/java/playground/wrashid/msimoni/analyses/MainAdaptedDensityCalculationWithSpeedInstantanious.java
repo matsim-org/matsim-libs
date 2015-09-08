@@ -51,7 +51,7 @@ public class MainAdaptedDensityCalculationWithSpeedInstantanious {
 			config.network().setInputFile(networkFile);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			//center = scenario.createCoord(682548.0, 247525.5);
-			center = scenario.createCoord(0, 0);
+			center = new Coord((double) 0, (double) 0);
 			
 			Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 			

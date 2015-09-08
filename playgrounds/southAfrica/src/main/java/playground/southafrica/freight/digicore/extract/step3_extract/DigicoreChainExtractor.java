@@ -32,7 +32,6 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -108,7 +107,7 @@ public class DigicoreChainExtractor implements Runnable {
 								xSum += Double.parseDouble(saa[2]);
 								ySum += Double.parseDouble(saa[3]);
 							}
-							Coord cOriginal = new CoordImpl(xSum/(double)lineBuffer.size(), ySum/(double)lineBuffer.size());
+							Coord cOriginal = new Coord(xSum / (double) lineBuffer.size(), ySum / (double) lineBuffer.size());
 							Coord cFinal = ct.transform(cOriginal);
 							activity.setCoord(cFinal);
 							

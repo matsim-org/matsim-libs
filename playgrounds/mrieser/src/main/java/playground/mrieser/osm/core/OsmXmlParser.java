@@ -22,7 +22,7 @@ package playground.mrieser.osm.core;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -74,7 +74,7 @@ import playground.mrieser.osm.core.OsmParser.OsmWay;
 			long id = Long.parseLong(atts.getValue("id"));
 			double lat = Double.parseDouble(atts.getValue("lat"));
 			double lon = Double.parseDouble(atts.getValue("lon"));
-			this.currentNode = new OsmNode(id, new CoordImpl(lon, lat));
+			this.currentNode = new OsmNode(id, new Coord(lon, lat));
 		} else if ("way".equals(name) & this.wayHandler != null) {
 			this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
 		} else if ("relation".equals(name) & this.relHandler != null) {

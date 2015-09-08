@@ -33,7 +33,6 @@ import org.matsim.contrib.evacuation.control.ShapeFactory;
 import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
 import org.matsim.contrib.evacuation.model.shape.LineShape;
 import org.matsim.core.network.LinkQuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RCEEventListener extends AbstractListener
 {
@@ -184,8 +183,8 @@ public class RCEEventListener extends AbstractListener
 	{
 		updateMousePosition(getGeoPixelPoint(point));
 		Point2D geoMousePos = controller.pixelToGeo(controller.getMousePosition());
-		
-		Coord wCoord = new CoordImpl(geoMousePos.getY(), geoMousePos.getX()); // *********** TODO
+
+		Coord wCoord = new Coord(geoMousePos.getY(), geoMousePos.getX()); // *********** TODO
 		wCoord = this.controller.getCtOsm2Target().transform(wCoord);
 		return wCoord;
 	}

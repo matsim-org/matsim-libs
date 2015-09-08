@@ -34,11 +34,6 @@ public abstract class AbstractRoutingNetworkFactory implements RoutingNetworkFac
 	}
 	
 	@Override
-	public Link createLink(Id<Link> id, Id<Node> fromNodeId, Id<Node> toNodeId) {
-		throw new RuntimeException("Not supported operation!");
-	}
-
-	@Override
 	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
 		throw new RuntimeException("Not supported operation!");
 	}

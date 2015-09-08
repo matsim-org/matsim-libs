@@ -105,8 +105,8 @@ public class NetworkSimplifier {
 									// Try to merge both links by guessing the resulting links attributes
 									LinkImpl link = (LinkImpl) network.getFactory().createLink(
 											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
-											inLink.getFromNode().getId(),
-											outLink.getToNode().getId()
+											inLink.getFromNode(),
+											outLink.getToNode()
 											);
 
 									// length can be summed up

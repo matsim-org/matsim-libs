@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
@@ -21,7 +22,6 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class LinkStopsToNearestNode {
 
@@ -88,11 +88,11 @@ public class LinkStopsToNearestNode {
 			
 			// Get nearest node for the mode-filtered network (or base, if no mode is specified). This will be slow, but hopefully okay.
 			if (modes.isEmpty()){
-				N = (NodeImpl) noHighways.getNearestNode(new CoordImpl(stopLon, stopLat));
+				N = (NodeImpl) noHighways.getNearestNode(new Coord(stopLon, stopLat));
 			}
 			else{
-				
-				CoordImpl c = new CoordImpl(stopLon, stopLat);
+
+				Coord c = new Coord(stopLon, stopLat);
 				
 				if (modes.equals("[Bus]")){
 					N = (NodeImpl) BusNetwork.getNearestNode(c);

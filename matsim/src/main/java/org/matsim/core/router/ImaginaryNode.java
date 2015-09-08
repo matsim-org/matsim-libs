@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra. 
@@ -59,8 +58,8 @@ public class ImaginaryNode implements Node {
 		
 		sumX /= initialNodes.size();
 		sumY /= initialNodes.size();
-		
-		this.coord = new CoordImpl(sumX, sumY);
+
+		this.coord = new Coord(sumX, sumY);
 	}
 	
 	@Override

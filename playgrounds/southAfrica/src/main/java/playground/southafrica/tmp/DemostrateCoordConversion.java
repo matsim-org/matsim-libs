@@ -21,7 +21,6 @@ package playground.southafrica.tmp;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -33,8 +32,8 @@ public class DemostrateCoordConversion {
 		String cy = args[1];
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
-		
-		Coord cOld = new CoordImpl(Double.parseDouble(cx), Double.parseDouble(cy));
+
+		Coord cOld = new Coord(Double.parseDouble(cx), Double.parseDouble(cy));
 		
 		Coord cNew = ct.transform(cOld);
 		LOG.info("Old coord: " + cOld.toString());

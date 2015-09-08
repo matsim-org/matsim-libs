@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainterManager;
@@ -75,7 +74,7 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 			selectedNodesId.remove(getIdNearestSelectedNode(x, y));
 	}
 	private Id<Node> getIdNearestSelectedNode(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
 		for(Id<Node> nodeId:selectedNodesId) {

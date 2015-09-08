@@ -32,11 +32,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,7 +55,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 	private static final String W = "w";
 	private static final String H = "h";
-	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
+	private static final Coord ZERO = new Coord(0.0, 0.0);
 	private final Persons persons;
 	private final Municipalities municipalities; // Da cambiare per PersonStreaming
 	private ModelModeChoice model;
@@ -120,7 +119,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			Subtour sub = personSubtour.getSubtours().get(i);
 			int mainpurpose = sub.getPurpose();
 			// choose mode choice model based on main purpose
-			if (plan.getPerson().getAge() >=18) {
+			if (PersonUtils.getAge(plan.getPerson()) >=18) {
 				if (mainpurpose == 0) {model = new ModelModeChoiceWork18Plus();}
 				else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
 				else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
@@ -142,7 +141,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 //			boolean ride_possible = true;
 			boolean ride_possible = false;
 			double rd2 = MatsimRandom.getRandom().nextDouble ();
-			if (plan.getPerson().hasLicense()) {}
+			if (PersonUtils.hasLicense(plan.getPerson())) {}
 			else {
 				if (rd2 < 0.60) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership
 				// at the household level or something similar
@@ -154,7 +153,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			//boolean pt = true;
 			boolean pt = false; // Should be substituted with actual access to pt;
 			double rd3 = MatsimRandom.getRandom().nextDouble ();
-			if (plan.getPerson().getCarAvail().equals("always")) {
+			if (PersonUtils.getCarAvail(plan.getPerson()).equals("always")) {
 				if (rd3 < 0.45) {pt = true;}
 				System.out.println("pt = " + pt );
 			}
@@ -177,12 +176,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			model.setPt(pt);
 			model.setRide(ride_possible);
 			model.setDistanceHome2Work(dist_h_w);
-			model.setAge(plan.getPerson().getAge());
-			model.setLicenseOwnership(plan.getPerson().hasLicense());
-			model.setCar(plan.getPerson().getCarAvail());
-			model.setTickets(plan.getPerson().getTravelcards());
+			model.setAge(PersonUtils.getAge(plan.getPerson()));
+			model.setLicenseOwnership(PersonUtils.hasLicense(plan.getPerson()));
+			model.setCar(PersonUtils.getCarAvail(plan.getPerson()));
+			model.setTickets(PersonUtils.getTravelcards(plan.getPerson()));
 			model.setBike(has_bike);
-			model.setMale (plan.getPerson().getSex());
+			model.setMale (PersonUtils.getSex(plan.getPerson()));
 			//model.setHHDimension(p.getHousehold().getPersonCount());
 
 			// To be used when mun data is not available in order to have a reasonable distributions of starting points

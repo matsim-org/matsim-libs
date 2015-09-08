@@ -26,12 +26,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 
@@ -456,18 +456,18 @@ public abstract class AbstractNetworkRouteTest {
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new CoordImpl(   0, 500));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(   0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2000, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(3000, 0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(4000, 0));
-		Node node11 = network.createAndAddNode(Id.create("11", Node.class), new CoordImpl(   0, 1000));
-		Node node12 = network.createAndAddNode(Id.create("12", Node.class), new CoordImpl(1000, 1000));
-		Node node13 = network.createAndAddNode(Id.create("13", Node.class), new CoordImpl(2000, 1000));
-		Node node14 = network.createAndAddNode(Id.create("14", Node.class), new CoordImpl(3000, 1000));
-		Node node15 = network.createAndAddNode(Id.create("15", Node.class), new CoordImpl(4000, 1000));
-		Node node16 = network.createAndAddNode(Id.create("16", Node.class), new CoordImpl(5000, 1000));
+		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new Coord((double) 0, (double) 500));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
+		Node node11 = network.createAndAddNode(Id.create("11", Node.class), new Coord((double) 0, (double) 1000));
+		Node node12 = network.createAndAddNode(Id.create("12", Node.class), new Coord((double) 1000, (double) 1000));
+		Node node13 = network.createAndAddNode(Id.create("13", Node.class), new Coord((double) 2000, (double) 1000));
+		Node node14 = network.createAndAddNode(Id.create("14", Node.class), new Coord((double) 3000, (double) 1000));
+		Node node15 = network.createAndAddNode(Id.create("15", Node.class), new Coord((double) 4000, (double) 1000));
+		Node node16 = network.createAndAddNode(Id.create("16", Node.class), new Coord((double) 5000, (double) 1000));
 
 		network.createAndAddLink(Id.create("0", Link.class), node0, node1,  500.0, 100.0, 3600.0, 1);
 		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1);

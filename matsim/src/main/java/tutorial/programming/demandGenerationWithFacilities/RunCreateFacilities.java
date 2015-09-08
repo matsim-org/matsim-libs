@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.*;
 
 import java.io.BufferedReader;
@@ -65,9 +64,8 @@ public class RunCreateFacilities {
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
-				
-				Coord coord = new CoordImpl(Double.parseDouble(parts[index_xCoord]),
-						Double.parseDouble(parts[index_yCoord]));
+
+				Coord coord = new Coord(Double.parseDouble(parts[index_xCoord]), Double.parseDouble(parts[index_yCoord]));
 				
 				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(cnt, ActivityFacility.class), coord);
 				this.scenario.getActivityFacilities().addActivityFacility(facility);
@@ -98,9 +96,8 @@ public class RunCreateFacilities {
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
-				
-				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
-						Double.parseDouble(parts[index_yHomeCoord]));
+
+				Coord homeCoord = new Coord(Double.parseDouble(parts[index_xHomeCoord]), Double.parseDouble(parts[index_yHomeCoord]));
 				
 				ActivityFacility facility = this.scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(startIndex + cnt, ActivityFacility.class), homeCoord);
 				addActivityOption(facility, "home");

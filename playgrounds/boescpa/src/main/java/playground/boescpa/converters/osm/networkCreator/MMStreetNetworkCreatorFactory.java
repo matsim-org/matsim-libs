@@ -21,8 +21,8 @@
 
 package playground.boescpa.converters.osm.networkCreator;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -46,7 +46,7 @@ public class MMStreetNetworkCreatorFactory {
 		MultimodalNetworkCreatorStreets networkCreator = new MultimodalNetworkCreatorStreets(network);
 		// detailed street network only around Switzerland:
 		networkCreator.addOsmFilter(new OsmFilter.OsmFilterEllipse(
-				transformation.transform(new CoordImpl(8.2363579,46.7976954)), 150000, 200000, 0.71577, 6));
+				transformation.transform(new Coord(8.2363579, 46.7976954)), 150000, 200000, 0.71577, 6));
 		// but take all highway network:
 		networkCreator.addOsmFilter(new OsmFilter.OsmFilterTakeAll(2));
 		return networkCreator;
@@ -56,7 +56,7 @@ public class MMStreetNetworkCreatorFactory {
 		MultimodalNetworkCreatorStreets networkCreator = new MultimodalNetworkCreatorStreets(network);
 		// detailed street network only around Switzerland:
 		networkCreator.addOsmFilter(new OsmFilter.OsmFilterRectangle(
-				transformation.transform(new CoordImpl(5.936507,47.811547)), transformation.transform(new CoordImpl(10.517806,45.834786)), 6));
+				transformation.transform(new Coord(5.936507, 47.811547)), transformation.transform(new Coord(10.517806, 45.834786)), 6));
 		// but take all highway network:
 		networkCreator.addOsmFilter(new OsmFilter.OsmFilterTakeAll(2));
 		return networkCreator;

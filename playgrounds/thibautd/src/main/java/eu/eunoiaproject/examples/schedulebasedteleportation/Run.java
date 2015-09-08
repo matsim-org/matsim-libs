@@ -68,7 +68,6 @@ public class Run {
 		// if actual simulation of transit is disabled, the transit schedule
 		// is not loaded automatically: we need to do it by hand
 		if ( !config.transit().isUseTransit() ) {
-			((ScenarioImpl) scenario).createTransitScheduleContainer();
 			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
 			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
 

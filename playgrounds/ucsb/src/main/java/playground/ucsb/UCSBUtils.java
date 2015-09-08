@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -70,7 +69,7 @@ public abstract class UCSBUtils {
 		while (true) {
 			Point point = getRandomCoordinate(envelope);
 			if (point.within(geometry)) {
-				return new CoordImpl(point.getX(),point.getY());
+				return new Coord(point.getX(), point.getY());
 			}
 		}
 	}

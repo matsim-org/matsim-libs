@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -240,7 +239,7 @@ public class GeneralGrid{
 			bw.newLine();
 			Collection<Point> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
 			for(Point p : list){
-				Coord original = new CoordImpl(new Double(p.getX()), new Double(p.getY()));
+				Coord original = new Coord(new Double(p.getX()), new Double(p.getY()));
 				Coord wgs84 = null;
 				if(ct != null){
 					wgs84 = ct.transform(original);

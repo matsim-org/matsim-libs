@@ -1,5 +1,6 @@
 package playground.sergioo.hitsRouter2013;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -10,7 +11,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -49,7 +49,7 @@ public class HitsRouter {
 			for(int p2=0;p2<1000;p2++)
 				lines.add(scenario.getTransitSchedule().getTransitLines().get(""));
 			transitRouterVariableImpl.setAllowedLines(lines);
-			Path path = transitRouterVariableImpl.calcPathRoute(new CoordImpl("", ""), new CoordImpl("", ""), new Double(""), null);
+			Path path = transitRouterVariableImpl.calcPathRoute(new Coord(Double.parseDouble(""), Double.parseDouble("")), new Coord(Double.parseDouble(""), Double.parseDouble("")), new Double(""), null);
 		}
 	}
 

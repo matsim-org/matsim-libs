@@ -27,29 +27,22 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.CRSUtilities;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.io.ActivityType;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.PointUtils;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;

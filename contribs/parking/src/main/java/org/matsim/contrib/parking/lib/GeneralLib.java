@@ -19,9 +19,27 @@
 
 package org.matsim.contrib.parking.lib;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.StringTokenizer;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -53,7 +71,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -67,10 +84,9 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
 
 public class GeneralLib {
 
@@ -112,9 +128,7 @@ public class GeneralLib {
 		sc.getConfig().setParam("facilities", "inputFacilitiesFile",
 				facilititiesPath);
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
-
-		sl.loadScenario();
+		ScenarioUtils.loadScenario(sc);
 
 		return sc;
 	}
@@ -129,9 +143,7 @@ public class GeneralLib {
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
-
-		sl.loadScenario();
+		ScenarioUtils.loadScenario(sc);
 
 		return sc.getNetwork();
 	}
@@ -741,13 +753,13 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		PersonImpl newPerson = new PersonImpl(person.getId());
+		Person newPerson = PersonImpl.createPerson(person.getId());
 		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		newPerson.removeUnselectedPlans();
+		PersonUtils.removeUnselectedPlans(newPerson);
 		return newPerson;
 	}
 

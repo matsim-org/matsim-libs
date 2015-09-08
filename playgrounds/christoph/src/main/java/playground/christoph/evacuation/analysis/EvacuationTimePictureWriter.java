@@ -62,7 +62,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.kml.KMZWriter;
@@ -815,7 +814,7 @@ public class EvacuationTimePictureWriter {
 		double length = Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 		double scale = 0.4;
 		scale = l.getLength() * scale;
-		Coord vec = new CoordImpl(coordFrom.getX() + (xDiff * scale/length), coordFrom.getY() + (yDiff * scale/length));
+		Coord vec = new Coord(coordFrom.getX() + (xDiff * scale / length), coordFrom.getY() + (yDiff * scale / length));
 		return vec;
 	}
 }

@@ -23,9 +23,9 @@ package playground.mrieser.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -35,12 +35,12 @@ public class MultipleFareSystemsTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(1100, 1200));
-		final ActivityFacilityImpl stop4 = facilities.createAndAddFacility(Id.create(4, ActivityFacility.class), new CoordImpl(2100, 1200));
-		final ActivityFacilityImpl stop5 = facilities.createAndAddFacility(Id.create(5, ActivityFacility.class), new CoordImpl(100, 1200));
-		final ActivityFacilityImpl stop6 = facilities.createAndAddFacility(Id.create(6, ActivityFacility.class), new CoordImpl(2100, 2200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 100, (double) 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 2100, (double) 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 1100, (double) 1200));
+		final ActivityFacilityImpl stop4 = facilities.createAndAddFacility(Id.create(4, ActivityFacility.class), new Coord((double) 2100, (double) 1200));
+		final ActivityFacilityImpl stop5 = facilities.createAndAddFacility(Id.create(5, ActivityFacility.class), new Coord((double) 100, (double) 1200));
+		final ActivityFacilityImpl stop6 = facilities.createAndAddFacility(Id.create(6, ActivityFacility.class), new Coord((double) 2100, (double) 2200));
 
 		// first TableLookupFares, connecting Stops 1-3
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares1 = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();

@@ -29,7 +29,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.GeodeticCalculator;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
@@ -134,7 +133,7 @@ public class CoordinateShifter {
 				writer.write(String.valueOf(geodeticCalculator.getOrthodromicDistance()));
 
 				// round coordinate to hectare level
-				Coord swissCoord = new WGS84toCH1903LV03().transform(new CoordImpl(lon, lat));				
+				Coord swissCoord = new WGS84toCH1903LV03().transform(new Coord(lon, lat));
 				swissCoord.setX(Math.round(swissCoord.getX()/100.0)*100);
 				swissCoord.setY(Math.round(swissCoord.getY()/100.0)*100);
 				

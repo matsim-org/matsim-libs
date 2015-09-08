@@ -26,8 +26,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class PermissibleModesCalculatorImpl implements PermissibleModesCalculator {
 	private final List<String> availableModes;
@@ -55,17 +56,17 @@ public class PermissibleModesCalculatorImpl implements PermissibleModesCalculato
 	public Collection<String> getPermissibleModes(final Plan plan) {
 		if (!considerCarAvailability) return availableModes; 
 
-		final PersonImpl person;
+		final Person person;
 		try {
-			person = (PersonImpl) plan.getPerson();
+			person = plan.getPerson();
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException( "I need a PersonImpl to get car availability" );
 		}
 
 		final boolean carAvail =
-			!"no".equals( person.getLicense() ) &&
-			!"never".equals( person.getCarAvail() );
+			!"no".equals( PersonUtils.getLicense(person) ) &&
+			!"never".equals( PersonUtils.getCarAvail(person) );
 
 		return carAvail ? availableModes : availableModesWithoutCar;
 	}

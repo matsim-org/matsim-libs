@@ -1,7 +1,6 @@
 package playground.artemc.hits;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.artemc.utils.DataBaseAdmin;
@@ -22,7 +21,7 @@ public class AssignStopsToHitsTester {
 		StopFinder sf = new StopFinder();
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N");
-		Coord coordStart = new CoordImpl(103.777885, 1.295161);
+		Coord coordStart = new Coord(103.777885, 1.295161);
 		Coord UTMStart = ct.transform(coordStart);
 		double stopLon=UTMStart.getX();
 		double stopLat=UTMStart.getY();

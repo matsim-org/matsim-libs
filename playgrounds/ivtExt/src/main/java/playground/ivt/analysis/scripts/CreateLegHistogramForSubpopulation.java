@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -82,9 +81,7 @@ public class CreateLegHistogramForSubpopulation {
 
 		final Network network = readNetwork( inputNetworkFile );
 
-		final Coord center = new CoordImpl(
-				args.getDoubleValue( "-x" ),
-				args.getDoubleValue( "-y" ) );
+		final Coord center = new Coord(args.getDoubleValue("-x"), args.getDoubleValue("-y"));
 		final double radius = 1000 * args.getDoubleValue( "-r" );
 
 		final ObjectAttributes atts = new ObjectAttributes();

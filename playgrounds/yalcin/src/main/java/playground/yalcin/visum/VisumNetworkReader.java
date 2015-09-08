@@ -25,8 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -94,7 +94,7 @@ public class VisumNetworkReader {
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.Stop stop = new VisumNetwork.Stop(Id.create(parts[idxNo], VisumNetwork.Stop.class), parts[idxName],
-					new CoordImpl(Double.parseDouble(parts[idxXcoord]), Double.parseDouble(parts[idxYcoord])));
+					new Coord(Double.parseDouble(parts[idxXcoord]), Double.parseDouble(parts[idxYcoord])));
 			this.network.addStop(stop);
 			// proceed to next line
 			line = reader.readLine();

@@ -15,7 +15,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
-import playground.wrashid.artemis.output.ChargingLog;
 import playground.wrashid.artemis.smartCharging.ChargingTime;
 import playground.wrashid.artemis.smartCharging.SmartCharger;
 import playground.wrashid.lib.MathLib;

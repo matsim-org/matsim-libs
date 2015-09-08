@@ -591,7 +591,7 @@ public final class MarathonRunner implements StartupListener,
 		 * Use a coordinate which should be outside the evacuation area but still is feasible.
 		 * Otherwise the AStarLandmarks algorithm could be confused and loose some performance.
 		 */
-		Coord rescueNodeCoord = this.scenario.createCoord(683595.0, 244940.0); // somewhere in Lake Zurich
+		Coord rescueNodeCoord = new Coord(683595.0, 244940.0); // somewhere in Lake Zurich
 		Id<Node> rescueNodeId = Id.create("rescueNode", Node.class);
 		Node rescueNode = this.scenario.getNetwork().getFactory().createNode(rescueNodeId, rescueNodeCoord);
 		this.scenario.getNetwork().addNode(rescueNode);
@@ -623,8 +623,7 @@ public final class MarathonRunner implements StartupListener,
 		 * first rescue node. The link between them gets equipped with the
 		 * rescue facility that is the destination of the evacuated persons.
 		 */
-		Coord rescueNodeCoord2 = this.scenario.createCoord(rescueNodeCoord.getX() + 1.0, 
-				rescueNodeCoord.getY() + 1.0);
+		Coord rescueNodeCoord2 = new Coord(rescueNodeCoord.getX() + 1.0, rescueNodeCoord.getY() + 1.0);
 		Id<Node> rescueNodeId2 = Id.create("rescueNode2", Node.class);
 		Node rescueNode2 = this.scenario.getNetwork().getFactory().createNode(rescueNodeId2, rescueNodeCoord2);
 		this.scenario.getNetwork().addNode(rescueNode2);

@@ -106,5 +106,6 @@ public final class LinkCongestionInfo {
 	}
 	public List<Id<Person>> getDelayQueue() {
 		return this.delayQueue ;
-	}
+	}	
+
 }

@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.map2mapmatching.gui.core.Camera;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkPainterManager {
@@ -91,7 +90,7 @@ public class NetworkPainterManager {
 		return network.getLinks().values();
 	}
 	protected Id<Link> getIdNearestLink(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Link link: network.getLinks().values()) {
@@ -111,7 +110,7 @@ public class NetworkPainterManager {
 		return null;
 	}
 	protected Id<Node> getIdNearestNode(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
 		for(Node node:network.getNodes().values()) {

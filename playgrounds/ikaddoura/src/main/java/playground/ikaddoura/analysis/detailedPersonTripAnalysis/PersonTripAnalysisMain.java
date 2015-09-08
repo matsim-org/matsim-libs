@@ -50,8 +50,7 @@ import playground.vsp.congestion.events.CongestionEventsReader;
  * 
  * Provides the following analysis: 
  * 
- * TODO
- * aggregated information: total travel time, total congestion cost, total noise damages, total travel related user benefits, total toll revenues, system welfare
+ * aggregated results: number of trips, number of stuck trips, travel time, travel distance, caused/affected congestion, caused/affected noise cost, toll payments, user benefits, welfare
  * 
  * trip-based information
  * person ; trip no.; leg mode ; stuckAbort (trip) ; VTTS (trip) ; departure time (trip) ; trip arrival time (trip) ; travel time (trip) ; travel distance (trip) ; toll payment (trip) ; caused noise cost (trip) ; caused congestion (trip) ; affected congestion (trip)
@@ -78,23 +77,22 @@ public class PersonTripAnalysisMain {
 	
 	private static String noiseEventsFile;
 	private static String congestionEventsFile;
-	
+		
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
 			throw new RuntimeException("Aborting...");
 			
 		} else {			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_config.xml";
+			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_network.xml.gz";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_config.xml";
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/output_plans.xml.gz";
+			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
+			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/detailedAnalysis/";
+			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_plans.xml.gz";
 			
-			noiseEventsFile = null;
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/ITERS/it.100/100.events.xml.gz";
-
+			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
+			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
 		}
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
@@ -114,8 +112,7 @@ public class PersonTripAnalysisMain {
 		}
 				
 		Config config = ConfigUtils.loadConfig(configFile);	
-//		config.plans().setInputFile(populationFile);
-		config.plans().setInputFile(null);
+		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
@@ -168,7 +165,7 @@ public class PersonTripAnalysisMain {
 		}	
 		
 		// noise events analysis
-		
+	
 		if (noiseHandler.isCaughtNoiseEvent()) {
 			log.info("Noise events have already been analyzed based on the standard events file.");
 		} else {
@@ -184,29 +181,15 @@ public class PersonTripAnalysisMain {
 		// print the results
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, null, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
 				
 		log.info("Print trip information...");
 		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.walk, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.pt, basicHandler, vttsHandler, congestionHandler, noiseHandler);
-		log.info("Print trip information... Done.");
-		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TransportMode.bike, basicHandler, vttsHandler, congestionHandler, noiseHandler);
+		analysis.printTripInformation(outputPath, null, basicHandler, vttsHandler, congestionHandler, noiseHandler);
 		log.info("Print trip information... Done.");
 
 		log.info("Print person information...");
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);	
+		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);	
 		log.info("Print person information... Done.");
 		
 		SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2amount(), 3600., 30 * 3600.);
@@ -214,6 +197,9 @@ public class PersonTripAnalysisMain {
 		
 		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2amount(), 2000., 40 * 1000.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);
+		
+		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);
+		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);
 	}
 }
 		

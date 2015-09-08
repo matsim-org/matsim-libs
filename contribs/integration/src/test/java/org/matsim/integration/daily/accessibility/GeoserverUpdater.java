@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -50,7 +49,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax(); y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
+				Coord saAlbersCoord = new Coord(x + 0.5 * spatialGrid.getResolution(), y + 0.5 * spatialGrid.getResolution());
 				Coord wgs84Coord = transformation.transform(saAlbersCoord);
 				featureBuilder.add(fac.createPoint(MGC.coord2Coordinate(wgs84Coord)));
 				featureBuilder.add(x);

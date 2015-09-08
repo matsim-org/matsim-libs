@@ -10,9 +10,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -52,7 +50,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 			int EGID = privateParkingIndoorFile.getInteger(i, 0);
 			int capacity= privateParkingIndoorFile.getInteger(i, 3);
 			totalDistributedCapacity+=capacity;
-			Coord coord=new CoordImpl(privateParkingIndoorFile.getDouble(i, 1),privateParkingIndoorFile.getDouble(i, 2));
+			Coord coord= new Coord(privateParkingIndoorFile.getDouble(i, 1), privateParkingIndoorFile.getDouble(i, 2));
 			
 			if (i==14955){
 				System.out.println();

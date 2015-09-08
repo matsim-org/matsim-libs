@@ -24,7 +24,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -180,7 +179,7 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 				addLayer(new Layer(stationsPainterF));
 				addLayer(new Layer(stationsPainterG));
 				addLayer(new Layer(stationsPainterH));
-				addLayer(new Layer(new CircleLegendPainter(Color.LIGHT_GRAY, scale, new double[]{1000,500,200,100,50}, 2000, new CoordImpl(376844, 139837))));
+				addLayer(new Layer(new CircleLegendPainter(Color.LIGHT_GRAY, scale, new double[]{1000,500,200,100,50}, 2000, new Coord((double) 376844, (double) 139837))));
 				Collection<double[]> bounds = new ArrayList<double[]>();
 				bounds.add(new double[]{346153, 162947});
 				bounds.add(new double[]{391844, 136837});

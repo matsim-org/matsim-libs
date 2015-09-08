@@ -13,7 +13,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.kti.controler.KTIControler;
 import playground.wrashid.parkingChoice.ParkingModule;
@@ -88,10 +87,10 @@ public class ParkingHerbieControler {
 					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
 					for (PParking parking : parkingCollection) {
-						Coord clusterCenter1 = new CoordImpl(684149.1, 246562.3);
-						Coord clusterCenter2 = new CoordImpl(682361.4, 248520.4);
-						Coord clusterCenter3 = new CoordImpl(681551.2, 247606.6);
-						Coord clusterCenter4 = new CoordImpl(683206.5, 247454.3);
+						Coord clusterCenter1 = new Coord(684149.1, 246562.3);
+						Coord clusterCenter2 = new Coord(682361.4, 248520.4);
+						Coord clusterCenter3 = new Coord(681551.2, 247606.6);
+						Coord clusterCenter4 = new Coord(683206.5, 247454.3);
 
 						if (!(parking instanceof PrivateParking)) {
 							if (rand.nextDouble()<percentagePublicParkingsToKeep/100.0){
@@ -251,11 +250,11 @@ public class ParkingHerbieControler {
 	}
 
 	public static Coord getCoordinatesQuaiBridgeZH() {
-		return new CoordImpl(683423.0, 246819.0);
+		return new Coord(683423.0, 246819.0);
 	}
 
 	public static Coord getCoordinatesLindenhofZH() {
-		return new CoordImpl(683235.0, 247497.0);
+		return new Coord(683235.0, 247497.0);
 	}
 
 }

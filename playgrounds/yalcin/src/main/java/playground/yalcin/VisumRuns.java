@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -45,7 +45,7 @@ public class VisumRuns {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		final CoordImpl location = new CoordImpl(682.247, 251.044);
+		final Coord location = new Coord(682.247, 251.044);
 		final Collection<VisumNetwork.Stop> stops = vNetwork.findStops(location, 0.4);
 		System.out.println("found the following stops:");
 		for (VisumNetwork.Stop stop : stops) {

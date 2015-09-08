@@ -12,8 +12,9 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 public class CoordinatesConverter {
@@ -64,8 +65,8 @@ public class CoordinatesConverter {
 				data.CH_Lat = cols[2].trim();
 				{
 					CH1903LV03toWGS84 ChToWg = new CH1903LV03toWGS84();
-					CoordImpl chCoord = new CoordImpl (data.CH_Lon, data.CH_Lat);
-					CoordImpl wgCoord = (CoordImpl) ChToWg.transform(chCoord);
+					Coord chCoord = new Coord(Double.parseDouble(data.CH_Lon), Double.parseDouble(data.CH_Lat));
+					Coord wgCoord = ChToWg.transform(chCoord);
 					data.WGS84_Lat = ((Double) wgCoord.getX()).toString();
 					data.WGS84_Lon = ((Double) wgCoord.getY()).toString();
 				}

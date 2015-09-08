@@ -21,6 +21,7 @@ package playground.agarwalamit.congestionPricing.testExamples.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -66,11 +67,11 @@ class MergingNetworkAndPlans {
 
 	void createNetwork(){
 
-		Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
-		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(0, 100));
-		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(500, 150));
-		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(1000, 100));
-		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(1000, 0));
+		Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+		Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 0, (double) 100));
+		Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 500, (double) 150));
+		Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
+		Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
 
 		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,100.0,20.0,3600,1,null,"7");
 		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,100.0,110.0,360,1,null,"7");

@@ -17,7 +17,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -84,7 +83,7 @@ public class EWTWindow extends LayersWindow {
 			{
 				addLayer(new Layer(new NetworkPainter(scenario.getNetwork())));
 				addLayer(new Layer(stationsPainter));
-				addLayer(new Layer(new CircleLegendPainter(Color.LIGHT_GRAY, scale, new double[]{500,200,100,50,20}, 2000, new CoordImpl(376844, 139837))));
+				addLayer(new Layer(new CircleLegendPainter(Color.LIGHT_GRAY, scale, new double[]{500,200,100,50,20}, 2000, new Coord((double) 376844, (double) 139837))));
 				double xMin = Double.MAX_VALUE, yMin = Double.MAX_VALUE, xMax = -Double.MAX_VALUE, yMax = -Double.MAX_VALUE;
 				for(TransitRouteStop stop:route.getStops()) {
 					writer.println(stop.getStopFacility().getId()+

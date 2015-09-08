@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +44,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -272,9 +272,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 
-		DummyFacility dummyStartFacility = new DummyFacility(new CoordImpl(startLink.getCoord()), startLink.getId());
+		DummyFacility dummyStartFacility = new DummyFacility(new Coord(startLink.getCoord().getX(), startLink.getCoord().getY()), startLink.getId());
 
-		DummyFacility dummyEndFacility = new DummyFacility(new CoordImpl(destinationLink.getCoord()), destinationLink.getId());
+		DummyFacility dummyEndFacility = new DummyFacility(new Coord(destinationLink.getCoord().getX(), destinationLink.getCoord().getY()), destinationLink.getId());
 
 		for(PlanElement pe1: this.tripRouter.calcRoute("car", dummyStartFacility, dummyEndFacility, now, this.basicAgentDelegate.getPerson() )) {
 			// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.

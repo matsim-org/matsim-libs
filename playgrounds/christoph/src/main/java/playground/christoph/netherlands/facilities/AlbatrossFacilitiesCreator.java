@@ -38,7 +38,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -125,8 +124,8 @@ public class AlbatrossFacilitiesCreator {
 				 */
 				double unitVectorX = dY/length;
 				double unitVectorY = -dX/length;
-				
-				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
+
+				Coord coord = new Coord(centerX + unitVectorX, centerY + unitVectorY);
 				
 				ActivityFacilityImpl facility = (ActivityFacilityImpl) activityFacilities.getFactory().createActivityFacility(linkId, coord);
 				activityFacilities.addActivityFacility(facility);

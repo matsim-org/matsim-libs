@@ -1,15 +1,16 @@
 package playground.vbmh.controler;
 
+import java.io.File;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+
 import playground.vbmh.vmEV.EVControlerListener;
 import playground.vbmh.vmParking.ParkControlerListener;
 import playground.vbmh.vmParking.ParkScoringFactory;
-
-import java.io.File;
 
 
 public class SFControler1 {
@@ -73,7 +74,7 @@ public class SFControler1 {
 		
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
-        ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getScenario().getNetwork());
+        ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getConfig().scenario(), controler.getScenario().getNetwork());
 		controler.setScoringFunctionFactory(factory);
 	
 		//Spezialpreis Test:
