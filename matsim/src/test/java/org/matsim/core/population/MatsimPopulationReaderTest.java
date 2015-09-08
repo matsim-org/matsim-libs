@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -83,6 +84,31 @@ public class MatsimPopulationReaderTest {
 		Assert.assertTrue(planElements.get(1) instanceof Leg);
 		Assert.assertTrue(planElements.get(2) instanceof Leg);
 		Assert.assertTrue(planElements.get(3) instanceof Leg);
+		Assert.assertTrue(planElements.get(4) instanceof Activity);
+	}
+		
+	@Test
+	public void testReadFile_v5_multipleSuccessiveLegsWithRoutes() {
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Assert.assertEquals(0, s.getPopulation().getPersons().size());
+		new MatsimPopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegsWithRoutes.xml");
+		Assert.assertEquals(1, s.getPopulation().getPersons().size());
+		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
+		Assert.assertNotNull(person);
+		Plan plan = person.getSelectedPlan();
+		List<PlanElement> planElements = plan.getPlanElements();
+		Assert.assertEquals(5, planElements.size());
+		
+		Assert.assertTrue(planElements.get(0) instanceof Activity);
+		Assert.assertTrue(planElements.get(1) instanceof Leg);
+		Assert.assertEquals(Id.create("1", Link.class), ((Leg) planElements.get(1)).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(1)).getRoute().getEndLinkId());
+		Assert.assertTrue(planElements.get(2) instanceof Leg);
+		Assert.assertEquals(Id.create("2", Link.class), ((Leg) planElements.get(2)).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(2)).getRoute().getEndLinkId());
+		Assert.assertTrue(planElements.get(3) instanceof Leg);
+		Assert.assertEquals(Id.create("4", Link.class), ((Leg) planElements.get(3)).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("6", Link.class), ((Leg) planElements.get(3)).getRoute().getEndLinkId());
 		Assert.assertTrue(planElements.get(4) instanceof Activity);
 	}
 	

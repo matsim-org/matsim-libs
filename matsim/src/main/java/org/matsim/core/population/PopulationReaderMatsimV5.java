@@ -137,7 +137,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			this.prevAct = this.curract;
 			this.curract = null;
 		} else if (ROUTE.equals(name)) {
-			this.routeDescription = content;
+			endRoute(content);
 		}
 	}
 
@@ -224,77 +224,88 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
-			Id<Link> startLinkId = null;
-			if (this.currRoute.getStartLinkId() != null) {
-				startLinkId = this.currRoute.getStartLinkId();
-			} else if (this.prevAct.getLinkId() != null) {
-				startLinkId = this.prevAct.getLinkId();
-			}
-			Id<Link> endLinkId = null;
-			if (this.currRoute.getEndLinkId() != null) {
-				endLinkId = this.currRoute.getEndLinkId();
-			} else if (this.curract.getLinkId() != null) {
-				endLinkId = this.curract.getLinkId();
-			}
-			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-				if (Double.isNaN(this.currRoute.getDistance())) {
-                    Coord fromCoord = getCoord(this.prevAct);
-                    Coord toCoord = getCoord(this.curract);
-                    if (fromCoord != null && toCoord != null) {
-                        double dist = CoordUtils.calcDistance(fromCoord, toCoord);
-                        if ( this.scenario.getConfig().plansCalcRoute().
-                        		getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-                        	double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
-                        			getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
-                        	//                        		getBeelineDistanceFactor();
-                        	this.currRoute.setDistance(estimatedNetworkDistance);
-                        }
-                    }
-				}
-				if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-					this.currRoute.setTravelTime(this.currleg.getTravelTime());
-				}
-			} else if (this.currRoute instanceof NetworkRoute) {
-				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
-				if (linkIds.size() > 0) {
-					linkIds.remove(0);
-				}
-				if (linkIds.size() > 0) {
-					linkIds.remove(linkIds.size() - 1);
-				}
-				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-				if (Double.isNaN(this.currRoute.getDistance())) {
-					if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-						this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
-					}
-				}
-				if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-					this.currRoute.setTravelTime(this.currleg.getTravelTime());
-				}
-			} else {
-				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
-			}
-			this.routeDescription = null;
-			this.currRoute = null;
+			finishLastRoute();
 		}
 	}
 
-    private Coord getCoord(Activity fromActivity) {
-        Coord fromCoord;
-        if (fromActivity.getCoord() != null) {
-            fromCoord = fromActivity.getCoord();
-        } else {
-            if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-                fromCoord = this.scenario.getNetwork().getLinks().get(fromActivity.getLinkId()).getCoord();
-            } else {
-                fromCoord = null;
-            }
-        }
-        return fromCoord;
-    }
+	private void finishLastRoute() {
+		Id<Link> startLinkId = null;
+		if (this.currRoute.getStartLinkId() != null) {
+			startLinkId = this.currRoute.getStartLinkId();
+		} else if (this.prevAct.getLinkId() != null) {
+			startLinkId = this.prevAct.getLinkId();
+		}
+		Id<Link> endLinkId = null;
+		if (this.currRoute.getEndLinkId() != null) {
+			endLinkId = this.currRoute.getEndLinkId();
+		} else if (this.curract != null && this.curract.getLinkId() != null) {
+			endLinkId = this.curract.getLinkId();
+		}
+		if (this.currRoute instanceof GenericRoute) {
+			((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
+			if (Double.isNaN(this.currRoute.getDistance())) {
+				Coord fromCoord = getCoord(this.prevAct);
+				Coord toCoord = getCoord(this.curract);
+				if (fromCoord != null && toCoord != null) {
+					double dist = CoordUtils.calcDistance(fromCoord, toCoord);
+					if ( this.scenario.getConfig().plansCalcRoute().
+							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
+						this.currRoute.setDistance(estimatedNetworkDistance);
+					}
+				}
+			}
+			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+				this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			}
+		} else if (this.currRoute instanceof NetworkRoute) {
+			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
+			if (linkIds.size() > 0) {
+				linkIds.remove(0);
+			}
+			if (linkIds.size() > 0) {
+				linkIds.remove(linkIds.size() - 1);
+			}
+			((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
+			if (Double.isNaN(this.currRoute.getDistance())) {
+				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+				}
+			}
+			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+				this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			}
+		} else {
+			throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
+		}
+		this.routeDescription = null;
+		this.currRoute = null;
 
-    private void startLeg(final Attributes atts) {
+	}
+
+	private Coord getCoord(Activity activity) {
+		if (activity == null) {
+			return null;
+		}
+		Coord fromCoord;
+		if (activity.getCoord() != null) {
+			fromCoord = activity.getCoord();
+		} else {
+			if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+				fromCoord = this.scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+			} else {
+				fromCoord = null;
+			}
+		}
+		return fromCoord;
+	}
+
+	private void startLeg(final Attributes atts) {
+		if (this.routeDescription != null) {
+			finishLastRoute();
+		}
+
 		String mode = atts.getValue(ATTR_LEG_MODE);
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
@@ -310,7 +321,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
-				this.currleg.getMode(), 
+				"links".equals(atts.getValue("type")) ? "car" : this.currleg.getMode(), // ugly hack for now: if the route is of type "links", use "car" as this has highest probability to return a LinkNetworkRoute 
 				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
 						endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
@@ -324,7 +335,56 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
 			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
 		}
+	}
 
+	private void endRoute(final String content) {
+		this.routeDescription = content;
+
+		if (this.currRoute instanceof GenericRoute) {
+			Id<Link> startLinkId = this.currRoute.getStartLinkId();
+			Id<Link> endLinkId = this.currRoute.getEndLinkId();
+			((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
+			if (Double.isNaN(this.currRoute.getDistance())) {
+				Coord fromCoord = getCoord(this.prevAct);
+				Coord toCoord = getCoord(this.curract);
+				if (fromCoord != null && toCoord != null) {
+					double dist = CoordUtils.calcDistance(fromCoord, toCoord);
+					if ( this.scenario.getConfig().plansCalcRoute().
+							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
+						this.currRoute.setDistance(estimatedNetworkDistance);
+					}
+				}
+			}
+			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+				this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			}
+		} else if (this.currRoute instanceof NetworkRoute) {
+			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
+			Id<Link> startLinkId = this.currRoute.getStartLinkId();
+			Id<Link> endLinkId = this.currRoute.getEndLinkId();
+			if (linkIds.size() > 0) {
+				startLinkId = linkIds.remove(0);
+			}
+			if (linkIds.size() > 0) {
+				endLinkId = linkIds.remove(linkIds.size() - 1);
+			}
+			((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
+			if (Double.isNaN(this.currRoute.getDistance())) {
+				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+				}
+			}
+			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+				this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			}
+		}
+		if (this.currRoute.getEndLinkId() != null) {
+			// this route is complete
+			this.currRoute = null;
+			this.routeDescription = null;
+		}
 	}
 
 }
