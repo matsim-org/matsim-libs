@@ -805,7 +805,7 @@ public class TransitQueueSimulationTest {
         }
 
 
-        assertEquals(29, allEvents.size());
+        assertEquals(30, allEvents.size());
 
         int idx = -1;
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent);
@@ -837,6 +837,7 @@ public class TransitQueueSimulationTest {
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // walk
         assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);
+        assertTrue(allEvents.get(++idx) instanceof VehicleLeavesTrafficEvent);
         assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);
