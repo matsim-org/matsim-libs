@@ -237,7 +237,7 @@ public class AgentEventMessage extends Message {
 				
 
 			} else {
-				event = new Wait2LinkEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId);
+				event = new Wait2LinkEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId, 1.0);
 				eventsManager.processEvent(event);
 				setCurrentLinkIndex(-1);
 				Id linkId = curAct.getLinkId();
