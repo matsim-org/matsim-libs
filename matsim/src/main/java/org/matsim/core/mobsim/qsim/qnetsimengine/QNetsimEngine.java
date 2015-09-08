@@ -51,6 +51,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
@@ -116,6 +118,7 @@ public class QNetsimEngine implements MobsimEngine {
 	//		}
 	//	}
 
+	@Inject
 	public QNetsimEngine(final QSim sim) {
 		this(sim, null);
 	}
