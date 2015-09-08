@@ -86,7 +86,6 @@ Wait2LinkEventHandler {
 	 * linkEnterTime is required later (2) and these agents should not be charged since they already left the link. 
 	 */
 	private Map<Id<Link>,List<Id<Person>>> linkId2ExcludeEnteringAgentsList = new HashMap<>();
-	private Map<Id<Vehicle>,Id<Person>> vehicleId2personId = new HashMap<>() ;
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
@@ -100,13 +99,6 @@ Wait2LinkEventHandler {
 		}
 	}
 	
-	@Override
-	public void handleEvent( Wait2LinkEvent event ) {
-		// map to be able to get driver from vehicle:
-		this.vehicleId2personId.put( event.getVehicleId(), event.getPersonId() ) ;
-	}
-
-
 	@Override
 	void calculateCongestion(LinkLeaveEvent event) {
 

@@ -42,11 +42,13 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -73,7 +75,8 @@ LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler, 
-PersonStuckEventHandler {
+PersonStuckEventHandler,
+Wait2LinkEventHandler {
 
 	private final static Logger log = Logger.getLogger(AbstractCongestionHandler.class);
 
@@ -96,6 +99,8 @@ PersonStuckEventHandler {
 
 	Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
+
+	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -149,6 +154,11 @@ PersonStuckEventHandler {
 	}
 
 	@Override
+	public final void handleEvent( Wait2LinkEvent event ) {
+		this.vehicleId2personId.put( event.getVehicleId(), event.getPersonId() ) ;
+	}
+	
+	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
 			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId() ) ;
@@ -186,8 +196,9 @@ PersonStuckEventHandler {
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		} else { // car!
 			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
-
-			updateFlowQueue(event.getTime(), linkInfo );
+			
+			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
+			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 			calculateCongestion(event);
 			addAgentToFlowQueue(event);
 		}
@@ -197,24 +208,23 @@ PersonStuckEventHandler {
 
 	// ############################################################################################################################################################
 
-	private final static void updateFlowQueue(double time, LinkCongestionInfo linkInfo) {
+	private final static void updateFlowAndDelayQueues(double time, Id<Person> personId, LinkCongestionInfo linkInfo) {
+		if ( linkInfo.getDelayQueue().isEmpty() ) {
+			// queue is already empty; nothing to do
+		} else {
+			double delay = time - linkInfo.getPersonId2freeSpeedLeaveTime().get( personId ) - 1 ;
+			if ( delay < 0 ) {
+				linkInfo.getDelayQueue().clear() ;
+			}
+		}
 
 		if (linkInfo.getFlowQueue().isEmpty() ) {
-			// No agent is being tracked for that link.
-
+			// queue is already empty; nothing to do
 		} else {
-
 			double earliestLeaveTime = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime()) + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-
 			if ( time > earliestLeaveTime + 1.){
-				// Flow congestion has disappeared on that link.
-
-				// Deleting the information of agents previously leaving that link.
+				// bottleneck no longer active; remove data:
 				linkInfo.getFlowQueue().clear();
-//				linkInfo.getPersonId2linkLeaveTime().clear();
-
-				// yy looks to me link getLeavingAgents is not needed; getPersonId2linkLeaveTime().keySet() would return the
-				// same result (and make the code faster).  kai, aug'15
 			}
 		}
 	}
