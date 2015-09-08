@@ -36,18 +36,22 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
 	public static final String ATTRIBUTE_DRIVER = "person";
+	public static final String ATTRIBUTE_POSITION = "relativePosition";
 
 	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 	private final String networkMode;
+	private final double relativePositionOnLink;
 
-	public Wait2LinkEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId, String networkMode) {
+	
+	public Wait2LinkEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId, String networkMode, double relativePositionOnLink) {
 		super(time);
 		this.driverId = driverId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 		this.networkMode = networkMode;
+		this.relativePositionOnLink = relativePositionOnLink;
 	}
 	
 	public Id<Person> getPersonId() {
@@ -70,6 +74,10 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 		return networkMode;
 	}
 	
+	public double getRelativePositionOnLink() {
+		return relativePositionOnLink;
+	}
+	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -81,6 +89,7 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 		if (this.networkMode != null) {
 			attr.put(ATTRIBUTE_NETWORKMODE, networkMode);
 		}
+		attr.put(ATTRIBUTE_POSITION, Double.toString(this.relativePositionOnLink));
 		return attr;
 	}
 }

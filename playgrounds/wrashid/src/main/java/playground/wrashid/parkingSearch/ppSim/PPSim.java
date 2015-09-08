@@ -115,7 +115,7 @@ public class PPSim implements Mobsim {
 			List<Id<Link>> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
 			
 			if (linkIds.size()>2){
-				event=new Wait2LinkEvent(time,personId,leg.getRoute().getStartLinkId(),personId, leg.getMode());
+				event=new Wait2LinkEvent(time,personId,leg.getRoute().getStartLinkId(),personId, leg.getMode(), 1.0);
 				eventsManager.processEvent(event);
 				
 				for (int i=1;i<linkIds.size()-1;i++){

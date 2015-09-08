@@ -216,7 +216,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 						agent.getId(),
 						linkId,
 						vehicleId, 
-						agent.getMode()) );
+						agent.getMode(), 1.0) );
 
 			chooseRunnable().addArrivalEvent(
 					// do not travel on first link

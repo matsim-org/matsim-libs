@@ -284,7 +284,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			Iterator<TransitRouteStop> stopIterator = stops.iterator();
 			TransitRouteStop firstStop = stopIterator.next();
 			Id departureLinkId = firstStop.getStopFacility().getLinkId();
-			Event wait2Link = new Wait2LinkEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE);
+			Event wait2Link = new Wait2LinkEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE, 1.0);
 			hiResEvents.addLast(wait2Link);
 			Id fromLinkId = departureLinkId;
 			Iterator<Event> eventIterator = loResEvents.iterator();

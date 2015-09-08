@@ -141,7 +141,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/* package */ final void letVehicleArrive(QVehicle qveh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();;
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
-				this.link.getId(), qveh.getId(), qveh.getDriver().getMode() ) ) ;
+				this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
 		
 		this.network.simEngine.letVehicleArrive(qveh);
 	}

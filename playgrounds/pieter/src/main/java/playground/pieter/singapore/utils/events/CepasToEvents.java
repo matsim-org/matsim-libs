@@ -1323,7 +1323,7 @@ public class CepasToEvents {
                 Event personEntersVehicle = new PersonEntersVehicleEvent(
                         (double) cluster.orderedDwellEvents.firstKey() - 0.002, driverId, busRegNum);
                 Event wait2Link = new Wait2LinkEvent((double) cluster.orderedDwellEvents.firstKey() - 0.001, driverId,
-                        departureLinkId, busRegNum, PtConstants.NETWORK_MODE);
+                        departureLinkId, busRegNum, PtConstants.NETWORK_MODE, 1.0);
                 this.eventQueue.addLast(driverStarts);
                 this.eventQueue.addLast(transitDriverDeparture);
                 this.eventQueue.addLast(personEntersVehicle);
