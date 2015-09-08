@@ -152,7 +152,7 @@ public final class MarginalCongestionHandlerImplV5 implements PersonDepartureEve
 			this.events.processEvent(congestionEvent);
 			System.out.println(congestionEvent.toString());
 		}
-		linkInfo.setLastLeavingAgent(personId);
+		linkInfo.memorizeLastLinkLeaveEvent(event);
 	}
 
 	/**

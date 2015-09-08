@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
@@ -50,7 +51,7 @@ public final class LinkCongestionInfo {
 	private LinkedList<Id<Person>> flowQueue = new LinkedList<Id<Person>>();
 	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
-	private Id<Person> lastLeavingAgent;
+	private LinkLeaveEvent lastLeavingAgent;
 
 	private double storageCapacityCars;
 	private LinkedList<Id<Person>> delayQueue = new LinkedList<>() ;
@@ -86,11 +87,11 @@ public final class LinkCongestionInfo {
 			Map<Id<Person>, Double> personId2freeSpeedLeaveTime) {
 		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
 	}
-	public Id<Person> getLastLeavingAgent() {
+	public LinkLeaveEvent getLastLeavingAgent() {
 		return lastLeavingAgent;
 	}
-	public void setLastLeavingAgent(Id<Person> lastLeavingAgent) {
-		this.lastLeavingAgent = lastLeavingAgent;
+	public void memorizeLastLinkLeaveEvent(LinkLeaveEvent event) {
+		this.lastLeavingAgent = event;
 	}
 	
 	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {

@@ -90,7 +90,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 			
 		} else {
 			causingLink = event.getLinkId();
-			causingAgent = linkInfo.getLastLeavingAgent();
+			causingAgent = linkInfo.getLastLeavingAgent().getPersonId() ;
 			congestionType = "flowCapacity";
 		}
 		
