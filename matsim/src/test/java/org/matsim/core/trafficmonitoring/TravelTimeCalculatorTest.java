@@ -24,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,6 +38,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -49,6 +56,8 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -314,9 +323,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);
-
+				
 		new MatsimEventsReader(events).readFile(eventsFilename);
-
+		
 		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.0 * 3600, null, null), EPSILON);
