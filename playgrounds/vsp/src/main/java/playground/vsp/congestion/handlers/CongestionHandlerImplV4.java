@@ -51,10 +51,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.vsp.congestion.CombinedFlowAndStorageDelayTest;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
+//import playground.vsp.congestion.CombinedFlowAndStorageDelayTest;
+//cannot import from test area: will fail on build server.  kai, sep'15
 
 /**
  * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
@@ -242,7 +243,7 @@ Wait2LinkEventHandler {
 	 * Thus, 
 	 * <p> <code> if( leavingAgents.isEmpty() ) { checkForTimeGap} </code>
 	 * <p> 
-	 * <p> A test is available, see {@link CombinedFlowAndStorageDelayTest}.
+	 * <p> A test is available, see {@link playground.vsp.congestion.CombinedFlowAndStorageDelayTest}.
 	 * @param delayOnTheLink TODO
 	 */
 	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event, double remainingDelay ){
