@@ -200,7 +200,7 @@ Wait2LinkEventHandler {
 			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 			calculateCongestion(event);
-			addAgentToFlowQueue(event);
+			addAgentToFlowAndDelayQueues(event);
 		}
 		
 	}
@@ -263,24 +263,15 @@ Wait2LinkEventHandler {
 		return agentDelay;
 	}
 
-	private final void addAgentToFlowQueue(LinkLeaveEvent event) {
+	private final void addAgentToFlowAndDelayQueues(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		// Start tracking delays caused by that agent leaving the link.
 
-		//		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getVehicleId())){
-		//			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + ". Map 'personId2linkLeaveTime' at time step " + event.getTime() + ":");
-		//			for (Id id : linkInfo.getPersonId2linkLeaveTime().keySet()) {
-		//				log.warn(id + " // " + linkInfo.getPersonId2linkLeaveTime().get(id));
-		//			}
-		//		}
-		//		if (linkInfo.getLeavingAgents().contains(event.getVehicleId())){
-		//			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents').");
-		//		}
-
-//		linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
-
-		linkInfo.getFlowQueue().add(Id.createPersonId(event.getVehicleId()));
-		linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
+		Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
+		
+		linkInfo.getFlowQueue().add( personId );
+		linkInfo.getDelayQueue().add( personId ) ;
+		
+		linkInfo.getPersonId2linkLeaveTime().put( personId, event.getTime());
 		linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
 	}
 
