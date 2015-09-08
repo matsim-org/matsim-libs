@@ -59,6 +59,9 @@ public class GroupingUtils {
 					socialNetwork,
 					planPerPerson.keySet() );
 
+		assert planPerPerson.keySet().containsAll( jpTies.keySet() ) : planPerPerson+" "+jpTies;
+		assert planPerPerson.keySet().equals( subnet.keySet() ) : planPerPerson +" != "+ subnet;
+
 		final Collection<Collection<Plan>> groups = new ArrayList<Collection<Plan>>();
 		while ( !subnet.isEmpty() ) {
 			final Set<Id> group =
@@ -68,8 +71,17 @@ public class GroupingUtils {
 							subnet,
 							jpTies );
 
+			assert planPerPerson.keySet().containsAll( group ) : planPerPerson +" - "+group+" - "+groups;
+
 			final Collection<Plan> plans = new ArrayList<Plan>();
-			for ( Id id : group ) plans.add( planPerPerson.remove( id ) );
+			for ( Id id : group ) {
+				plans.add( planPerPerson.remove( id ) );
+			}
+
+			assert !CollectionUtils.intersects( planPerPerson.keySet() , group ) : planPerPerson+" intersect "+group;
+			assert planPerPerson.keySet().containsAll( jpTies.keySet() ) : planPerPerson+" "+jpTies;
+			assert planPerPerson.keySet().equals( subnet.keySet() ) : planPerPerson+"  "+subnet;
+
 			groups.add( plans );
 		}
 
@@ -143,25 +155,27 @@ public class GroupingUtils {
 			final Random random,
 			final Map<Id<Person>, Set<Id<Person>>> netmap,
 			final Map<Id, Set<Id>> jpTies) {
+		assert netmap.keySet().containsAll( jpTies.keySet() ) : netmap+" != "+jpTies;
 		final Set<Id> group = new LinkedHashSet<Id>();
 
 		final Queue<Id> egoStack = Collections.asLifoQueue( new ArrayDeque<Id>( netmap.size() ) );
 		egoStack.add( CollectionUtils.getElement( 0 , netmap.keySet() ) );
 
-		while ( !egoStack.isEmpty() && group.size() < params.getMaxGroupSize() ) {
+		while ( !egoStack.isEmpty() /*&& group.size() < params.getMaxGroupSize()*/ ) {
 			final Id ego = egoStack.remove();
-			group.add( ego );
 			final Set<Id<Person>> alters = netmap.remove( ego );
-			if ( alters == null ) continue;
-
 			final Set<Id> jpAlters = jpTies.remove( ego );
+
+			if ( alters == null ) continue;
+			group.add( ego );
+
 			if ( jpAlters != null && random.nextDouble() >= params.getJointPlanBreakingProbability() ) {
 				// keep jp
 				for ( Id alter : jpAlters ) {
 					alters.remove( alter );
 					egoStack.add(alter);
 					// already add, so that joint plan not broken by early abort
-					group.add( ego );
+					// group.add( alter );
 				}
 			}
 
@@ -171,6 +185,13 @@ public class GroupingUtils {
 				}
 			}
 		}
+
+		for ( Id<Person> p : group )  {
+			netmap.remove( p );
+			jpTies.remove( p );
+		}
+
+		assert netmap.keySet().containsAll( jpTies.keySet() ) : netmap+" != "+jpTies;
 
 		return group;
 	}
