@@ -35,7 +35,7 @@ public class VehicleLeavesTrafficEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final VehicleLeavesTrafficEvent event1 = new VehicleLeavesTrafficEvent(8463.7301, Id.create("483", Person.class), 
-				Id.create("783", Link.class), Id.create("veh7", Vehicle.class), TransportMode.car);
+				Id.create("783", Link.class), Id.create("veh7", Vehicle.class), TransportMode.car,1.0);
 		final VehicleLeavesTrafficEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());
