@@ -71,7 +71,6 @@ import playground.dhosse.cl.Constants;
 
 public class SantiagoScenarioBuilder {
 
-//	static String svnWorkingDir = "../../shared-svn/studies/countries/cl/";
 	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
 	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
@@ -91,7 +90,7 @@ public class SantiagoScenarioBuilder {
 	
 	private static double n = 0.;
 	
-	private static final String pathForMatsim = "../../runs-svn/santiago/run9/";		//path within config file to the in-/output files 
+	private static final String pathForMatsim = "../../runs-svn/santiago/run9/";		//TODO: path within config file to in-/output files 
 	private static final String outPlans = "plans_final";								//name of plan file
 	
 	
@@ -105,6 +104,7 @@ public class SantiagoScenarioBuilder {
 	 * </ol>
 	 * 
 	 * Along with the generation of plans, an input config file is created and written.
+	 * Todo-marks show positions for essential config settings e.g. pathes and names of in-/output.  
 	 * 
 	 * @param args
 	 */
