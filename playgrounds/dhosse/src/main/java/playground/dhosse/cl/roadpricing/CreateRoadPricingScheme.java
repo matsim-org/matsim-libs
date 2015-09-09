@@ -30,9 +30,20 @@ public class CreateRoadPricingScheme {
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
 	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/roadpricing/" ; //outputDir of this class -> input for Matsim (KT)
 
-	private static final String NETFILE = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/network_merged_cl.xml.gz";	
+	//Data of tolled links (Input from Alejandro) 
+	private static final String TollDataFILE = workingDirInputFiles + ".csv" ; //TODO: Name and include it
+	//Network the CSIdFile correspondent to -> to generate the coordinates of tolled links for the case, that link-Ids have changed.
+	private static final String NETFILE_tollLinks = workingDirInputFiles + "santiago_merged_cl.xml.gz";		//TODO: check if correct Network
+		
+	// recent network-File
+	private static final String NETFILE_current = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/network_merged_cl.xml.gz";	
 	
 	/**
+	 * first preparations for Creation of RoadPricingScheme for the santiago scenario.
+	 * TODO: Needs the input from Alejandro and than bringing the data in here.
+	 * TODO: Read Ids of Links, generate there coordinates 
+	 * TODO: Read costs and times 
+	 * 
 	 * Generates a RoadPricingScheme from some InputDate (not available yet).
 	 * currently it is not VehicleTypeDependent, so "car" values are used.
 	 * 
@@ -42,7 +53,7 @@ public class CreateRoadPricingScheme {
 		File file = new File(outputDir);
 		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(NETFILE);
+		config.network().setInputFile(NETFILE_current);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		createRPScheme(scenario);
@@ -57,7 +68,7 @@ public class CreateRoadPricingScheme {
 		rps.setDescription("RoadPricingScheme for the Santiago scenario. ");
 		rps.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		
-//		extractCurrentLinkIds(scenario.getNetwork()); //TODO: not implemented in creation process here
+		extractCurrentLinkIds(scenario.getNetwork()); //TODO: not implemented in creation process here
 		
 		rps.addLinkCost(Id.createLinkId(356), 3600.0, 7200., 1);
 		
@@ -73,7 +84,9 @@ public class CreateRoadPricingScheme {
 		Map<String, ArrayList<Id<Link>>> roadName2LinkIdList = new TreeMap<String,ArrayList<Id<Link>>>();
 		Map<String, ArrayList<Double>> oldLinkIdString2LinkCoordinates = new TreeMap<String, ArrayList<Double>>();
 		
-		//TODO: why using oldLinkId? (KT, 2015-09-07)
+		String nameOfRoad = "nameOfRoad";
+		
+		//using oldLinkId as identifier (KT, 2015-09-07)
 		//Search link (id) in current network
 		roadName2LinkIdList.put("nameOfRoad", null); //TODO: enter correctName
 		for (String oldLinkIdString : oldLinkIdString2LinkCoordinates.keySet()){
