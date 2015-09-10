@@ -98,7 +98,7 @@ Wait2LinkEventHandler {
 	}
 	
 	@Override
-	void calculateCongestion(LinkLeaveEvent event) {
+	final void calculateCongestion(LinkLeaveEvent event) {
 
 		storeExcludedEnteringAgents(event);
 

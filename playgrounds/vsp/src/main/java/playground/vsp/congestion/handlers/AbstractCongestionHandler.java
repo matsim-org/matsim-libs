@@ -102,8 +102,6 @@ Wait2LinkEventHandler {
 
 	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
-	private Map<Id<Person>,DelayInfo> personId2DelayInfo = new HashMap<>() ;
-
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
@@ -214,9 +212,11 @@ Wait2LinkEventHandler {
 			linkInfo.memorizeLastLinkLeaveEvent( event );
 			
 //			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
+			// in V4, it is removed at agent _arrival_ and then it seems to work. 
+			
 //			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			// fails tests, dunno why. kai, sep'15
-		
+
 		}
 		
 	}
@@ -238,10 +238,13 @@ Wait2LinkEventHandler {
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTime + 1.) {
+				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
+				
 				// bottleneck no longer active; remove data:
 				linkInfo.getFlowQueue().clear();
 			}
 		}
+
 	}
 
 	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
