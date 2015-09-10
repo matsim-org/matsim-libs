@@ -35,10 +35,12 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -46,10 +48,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler {
+	
 	private static final Logger logger = Logger.getLogger(DemandPerLinkHandler.class);
 
-	Map<Id<Person>, Tuple<Id<Link>, Double>> linkEnterPerPersonId = new HashMap<>();
+	Map<Id<Vehicle>, Id<Person>> vehicleId2DriverId = new HashMap<>();
+	
+	Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkEnterPerVehId = new HashMap<>();
 	Map<Id<Person>, Tuple<Id<Link>, Double>> arrivalPerPersonId = new HashMap<>();
 	Map<Id<Person>, Tuple<Id<Link>, Double>> departurePerPersonId = new HashMap<>();
 	
@@ -76,7 +81,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		this.time2LinkIdAndCongestionTime.clear();
 		logger.info("Resetting congestion time aggregation to " + this.time2LinkIdAndCongestionTime);
 		
-		linkEnterPerPersonId.clear();
+		linkEnterPerVehId.clear();
 		arrivalPerPersonId.clear();
 		departurePerPersonId.clear();
 		
@@ -85,9 +90,14 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		vehicleId2DriverId.put(event.getVehicleId(), event.getPersonId());
+	}
+
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
-		this.linkEnterPerPersonId.put(event.getPersonId(), linkId2Time);
+		this.linkEnterPerVehId.put(event.getVehicleId(), linkId2Time);
 	}
 	
 	public void handleEvent(final LinkLeaveEvent event) {
@@ -117,28 +127,29 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		}
 		
 		
-		Id<Person> personId = event.getPersonId();
-		if(!this.linkEnterPerPersonId.containsKey(personId)){
+		Id<Vehicle> vehId = event.getVehicleId();
+		Id<Person> driverId = vehicleId2DriverId.get(vehId);
+		if(!this.linkEnterPerVehId.containsKey(vehId)){
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
-				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
+				logger.warn("Vehicle " + vehId + " is leaving link " + linkId + " without having entered. " +
 				"Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveWarnCnt++;
 			return;
 		}
-		double enterTime = this.linkEnterPerPersonId.get(personId).getSecond();
+		double enterTime = this.linkEnterPerVehId.get(vehId).getSecond();
 		double travelTime;
-		if(!this.arrivalPerPersonId.containsKey(personId) || !this.departurePerPersonId.containsKey(personId)){
+		if(!this.arrivalPerPersonId.containsKey(driverId) || !this.departurePerPersonId.containsKey(driverId)){
 			travelTime = linkLeaveTime - enterTime;
 		}
-		else if(!this.arrivalPerPersonId.get(personId).getFirst().equals(event.getLinkId())
-				|| !this.departurePerPersonId.get(personId).getFirst().equals(event.getLinkId())){
+		else if(!this.arrivalPerPersonId.get(driverId).getFirst().equals(event.getLinkId())
+				|| !this.departurePerPersonId.get(driverId).getFirst().equals(event.getLinkId())){
 
 			travelTime = linkLeaveTime - enterTime;
 		} else {
-		double arrivalTime = this.arrivalPerPersonId.get(personId).getSecond();		
-		double departureTime = this.departurePerPersonId.get(personId).getSecond();	
+		double arrivalTime = this.arrivalPerPersonId.get(driverId).getSecond();		
+		double departureTime = this.departurePerPersonId.get(driverId).getSecond();	
 		travelTime = linkLeaveTime - enterTime - departureTime + arrivalTime;	
 		}
 		
