@@ -19,7 +19,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -603,7 +602,7 @@ public class VWRCreateDemand {
 		      y = g.getEnvelopeInternal().getMinY() + random.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 		      p = MGC.xy2Point(x, y);
 		   } while (!g.contains(p));
-		   Coord coord = new CoordImpl(p.getX(), p.getY());
+		   Coord coord = new Coord(p.getX(), p.getY());
 		   return coord;
 		}
 	
@@ -673,7 +672,7 @@ public class VWRCreateDemand {
 	private Map<String,Coord> geometryMapToCoordMap(Map<String,Geometry> geometries) {
 		Map<String,Coord> coords = new HashMap<String,Coord>();
 		for (Map.Entry<String,Geometry> entry : geometries.entrySet()) {
-			Coord coord = new CoordImpl(entry.getValue().getCoordinate().x, entry.getValue().getCoordinate().y);
+			Coord coord = new Coord(entry.getValue().getCoordinate().x, entry.getValue().getCoordinate().y);
 			coords.put(entry.getKey(), coord);
 		}
 		return coords;
@@ -693,7 +692,7 @@ public class VWRCreateDemand {
 				System.out.println(row[0]);
 				Double x = Double.parseDouble(row[2]);
 				Double y = Double.parseDouble(row[1]);
-				Coord coords = new CoordImpl(x,y);
+				Coord coords = new Coord(x,y);
 				this.facilityMap.put(row[0],ct.transform(coords));
 //			} catch (NumberFormatException e){
 			} catch (Exception e){
