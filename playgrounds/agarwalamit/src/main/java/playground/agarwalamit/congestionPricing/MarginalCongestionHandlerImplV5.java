@@ -41,9 +41,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
+import playground.vsp.congestion.CongestionUtils;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
-import playground.vsp.congestion.handlers.AbstractCongestionHandler;
 
 /**
  * @author amit
@@ -92,7 +92,7 @@ public final class MarginalCongestionHandlerImplV5 implements PersonDepartureEve
 
 	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfo linkInfo = AbstractCongestionHandler.getOrCreateLinkInfo(link.getId(), linkId2congestionInfo, scenario) ;
+			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(link.getId(), linkId2congestionInfo, scenario) ;
 			linkId2congestionInfo.put(link.getId(), linkInfo);
 		}
 	}

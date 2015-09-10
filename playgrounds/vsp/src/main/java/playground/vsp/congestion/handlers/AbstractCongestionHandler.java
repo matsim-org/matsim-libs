@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,12 +50,12 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.Vehicle;
 
+import playground.vsp.congestion.AgentOnLinkInfo;
+import playground.vsp.congestion.CongestionUtils;
 import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
@@ -70,7 +71,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-public abstract class AbstractCongestionHandler implements
+abstract class AbstractCongestionHandler implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
@@ -101,6 +102,8 @@ Wait2LinkEventHandler {
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
 	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
+
+	private Map<Id<Person>,AgentOnLinkInfo> personId2AgentInfo = new LinkedHashMap<>() ;
 
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -161,9 +164,16 @@ Wait2LinkEventHandler {
 	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
+			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
+			
+			AgentOnLinkInfo.Builder builder = new AgentOnLinkInfo.Builder() ;
+			builder.setAgentId( event.getPersonId() ) ;
+			builder.setLinkId( event.getLinkId() ) ;
+			builder.setEnterTime( event.getTime() ) ;
+			builder.setFreeSpeedLeaveTime( event.getTime()+1. ) ;
+			this.personId2AgentInfo.put( event.getPersonId(), builder.build() ) ;
 		}
 
 		//--
@@ -181,7 +191,7 @@ Wait2LinkEventHandler {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		} else { // car! 
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
+			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		}
@@ -197,7 +207,7 @@ Wait2LinkEventHandler {
 		} else { // car!
 			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId(), linkId2congestionInfo, scenario);
+			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), linkId2congestionInfo, scenario);
 
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 
@@ -288,35 +298,6 @@ Wait2LinkEventHandler {
 		}
 
 		return agentDelay;
-	}
-
-	public static final LinkCongestionInfo getOrCreateLinkInfo( Id<Link> linkId, Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo, Scenario scenario) {
-		// a bit awkward to pass the scenario, but allows to make it static.  kai, sep'15
-		
-		LinkCongestionInfo linkInfo = linkId2congestionInfo.get( linkId ) ;
-		if (linkInfo != null){ 
-			return linkInfo ;
-		}
-		LinkCongestionInfo.Builder builder = new LinkCongestionInfo.Builder();
-		Network network = scenario.getNetwork();
-		Link link = network.getLinks().get(linkId);
-		builder.setLinkId(link.getId());
-
-		builder.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
-
-		double flowCapacity_capPeriod = link.getCapacity() * scenario.getConfig().qsim().getFlowCapFactor();
-		double marginalDelay_sec = ((1 / (flowCapacity_capPeriod / scenario.getNetwork().getCapacityPeriod()) ) );
-		builder.setMarginalDelayPerLeavingVehicle_sec(marginalDelay_sec);
-
-		double storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) 
-				/ ((NetworkImpl)network).getEffectiveCellSize()) * scenario.getConfig().qsim().getStorageCapFactor() );
-		builder.setStorageCapacityCars(storageCapacity_cars);
-		
-		linkInfo = builder.build() ;
-
-		linkId2congestionInfo.put(link.getId(), linkInfo);
-		
-		return linkInfo ;
 	}
 
 	public final void writeCongestionStats(String fileName) {

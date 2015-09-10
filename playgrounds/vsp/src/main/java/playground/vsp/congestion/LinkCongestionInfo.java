@@ -22,6 +22,7 @@
  */
 package playground.vsp.congestion;
 
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -73,11 +74,13 @@ public final class LinkCongestionInfo {
 	private final double marginalDelayPerLeavingVehicle_sec;
 	private final double storageCapacityCars;
 
-	private final LinkedList<DelayInfo> flowQueue = new LinkedList<>();
-	private final Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
-	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
-	private final LinkedList<DelayInfo> delayQueue = new LinkedList<>() ;
-	
+	private final Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<>();
+	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<>();
+
+	private final Deque<DelayInfo> flowQueue = new LinkedList<>();
+	private final Deque<DelayInfo> delayQueue = new LinkedList<>() ;
+	private final Deque<AgentOnLinkInfo> agentsOnLink = new LinkedList<>() ;
+
 	private LinkLeaveEvent lastLeavingAgent;
 
 	public Id<Link> getLinkId() {
@@ -98,7 +101,7 @@ public final class LinkCongestionInfo {
 	public void memorizeLastLinkLeaveEvent(LinkLeaveEvent event) {
 		this.lastLeavingAgent = event;
 	}
-	
+
 	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {
 		return personId2linkEnterTime;
 	}
@@ -111,15 +114,18 @@ public final class LinkCongestionInfo {
 	 * Vehicles that have left the link in previous time steps, while the bottleneck was "active".  
 	 * The flow queue is in consequence interrupted when the bottleneck is not active, which is when time headway > 1/cap + eps
 	 */
-	public LinkedList<DelayInfo> getFlowQueue() {
+	public Deque<DelayInfo> getFlowQueue() {
 		return flowQueue;
 	}
 	/**
 	 * Vehicles that have left the link in previous time steps with a delay.  
 	 * The delay queue is in consequence interrupted when vehicles leave the link without a delay.
 	 */
-	public LinkedList<DelayInfo> getDelayQueue() {
+	public Deque<DelayInfo> getDelayQueue() {
 		return this.delayQueue ;
+	}
+	public Deque<AgentOnLinkInfo> getAgentsOnLink() {
+		return this.agentsOnLink ;
 	}
 
 }
