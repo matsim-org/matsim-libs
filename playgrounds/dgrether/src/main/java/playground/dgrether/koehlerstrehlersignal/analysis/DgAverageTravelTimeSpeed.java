@@ -24,22 +24,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
@@ -51,10 +53,8 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, 
-		VehicleAbortEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler{
+		VehicleAbortEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonLeavesVehicleEventHandler{
 
-	private static final Logger log = Logger.getLogger(DgAverageTravelTimeSpeed.class);
-	
 	private Network network;
 	private Map<Id<Vehicle>, Double> networkEnterTimesByVehicleId;
 	private Set<Id<Person>> seenPersonIds;
@@ -87,6 +87,11 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	}
 
 	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		vehId2SetOfPersonIdsMap.get(event.getVehicleId()).remove(event.getPersonId());
+	}
+
+	@Override
 	public void handleEvent(Wait2LinkEvent event) {
 		if (network.getLinks().containsKey(event.getLinkId())) {
 			handleVehicleSeen(event.getVehicleId(), event.getTime());
@@ -107,27 +112,22 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (network.getLinks().containsKey(event.getLinkId())) {
-			Double linkEnterTime = this.networkEnterTimesByVehicleId.remove(event.getVehicleId());
-			if (linkEnterTime != null) {
-				this.sumTravelTime += event.getTime() - linkEnterTime;
-				this.sumDistance += network.getLinks().get(event.getLinkId()).getLength();
-			}
-		}
-		else{
-			log.error("Link wasn't found.");
-		}
+		handleVehicleLeft(event.getVehicleId(), event.getLinkId(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (network.getLinks().containsKey(event.getLinkId())) {
-			Double vehEnterTime = this.networkEnterTimesByVehicleId.remove(event.getVehicleId());
+		handleVehicleLeft(event.getVehicleId(), event.getLinkId(), event.getTime());		
+	}
+
+	private void handleVehicleLeft(Id<Vehicle> vehId, Id<Link> linkId, double time) {
+		if (network.getLinks().containsKey(linkId)) {
+			Double vehEnterTime = this.networkEnterTimesByVehicleId.remove(vehId);
 			if (vehEnterTime != null) {
-				this.sumTravelTime += event.getTime() - vehEnterTime;
-				this.sumDistance += network.getLinks().get(event.getLinkId()).getLength();
+				this.sumTravelTime += time - vehEnterTime;
+				this.sumDistance += network.getLinks().get(linkId).getLength();
 			}
-		}		
+		}
 	}
 
 	@Override
