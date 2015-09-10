@@ -70,7 +70,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-abstract class AbstractCongestionHandler implements
+public abstract class AbstractCongestionHandler implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
@@ -161,7 +161,7 @@ Wait2LinkEventHandler {
 	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId() ) ;
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
@@ -181,7 +181,7 @@ Wait2LinkEventHandler {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		} else { // car! 
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId() ) ;
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		}
@@ -197,7 +197,7 @@ Wait2LinkEventHandler {
 		} else { // car!
 			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId(), linkId2congestionInfo, scenario);
 
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 
@@ -290,28 +290,31 @@ Wait2LinkEventHandler {
 		return agentDelay;
 	}
 
-	private final LinkCongestionInfo getOrCreateLinkInfo(Id<Link> linkId) {
+	public static final LinkCongestionInfo getOrCreateLinkInfo( Id<Link> linkId, Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo, Scenario scenario) {
+		// a bit awkward to pass the scenario, but allows to make it static.  kai, sep'15
 		
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId ) ;
+		LinkCongestionInfo linkInfo = linkId2congestionInfo.get( linkId ) ;
 		if (linkInfo != null){ 
 			return linkInfo ;
 		}
-		linkInfo = new LinkCongestionInfo();	
-
-		Network network = this.scenario.getNetwork();
+		LinkCongestionInfo.Builder builder = new LinkCongestionInfo.Builder();
+		Network network = scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
-		linkInfo.setLinkId(link.getId());
-		linkInfo.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
+		builder.setLinkId(link.getId());
 
-		double flowCapacity_capPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-		double marginalDelay_sec = ((1 / (flowCapacity_capPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+		builder.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
+
+		double flowCapacity_capPeriod = link.getCapacity() * scenario.getConfig().qsim().getFlowCapFactor();
+		double marginalDelay_sec = ((1 / (flowCapacity_capPeriod / scenario.getNetwork().getCapacityPeriod()) ) );
+		builder.setMarginalDelayPerLeavingVehicle_sec(marginalDelay_sec);
 
 		double storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) 
-				/ ((NetworkImpl)network).getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
-		linkInfo.setStorageCapacityCars(storageCapacity_cars);
+				/ ((NetworkImpl)network).getEffectiveCellSize()) * scenario.getConfig().qsim().getStorageCapFactor() );
+		builder.setStorageCapacityCars(storageCapacity_cars);
+		
+		linkInfo = builder.build() ;
 
-		this.linkId2congestionInfo.put(link.getId(), linkInfo);
+		linkId2congestionInfo.put(link.getId(), linkInfo);
 		
 		return linkInfo ;
 	}

@@ -25,7 +25,6 @@ package playground.vsp.congestion;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -41,26 +40,48 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public final class LinkCongestionInfo {
+	public static class Builder {
+		private Id<Link> linkId;
+		private double freeTravelTime;
+		private double marginalDelayPerLeavingVehicle_sec;
+		private double storageCapacityCars;
+		public Builder setLinkId( Id<Link> id ) {
+			this.linkId = id ; return this ;
+		}
+		public Builder setFreeTravelTime( double val ) {
+			this.freeTravelTime = val ; return this ;
+		}
+		public Builder setMarginalDelayPerLeavingVehicle_sec( double val ){
+			this.marginalDelayPerLeavingVehicle_sec = val ; return this ;
+		}
+		public Builder setStorageCapacityCars( double val ) {
+			this.storageCapacityCars = val ; return this ;
+		}
+		public LinkCongestionInfo build() {
+			return new LinkCongestionInfo( this.linkId, this.freeTravelTime, this.marginalDelayPerLeavingVehicle_sec, this.storageCapacityCars ) ;
+		}
+	}
+	private LinkCongestionInfo( Id<Link> linkId, double freeTravelTime, double marginalDelayPerLeavingVehicle_sec, double storageCapacityCars ) {
+		this.linkId = linkId ; 
+		this.freeTravelTime = freeTravelTime ;
+		this.marginalDelayPerLeavingVehicle_sec = marginalDelayPerLeavingVehicle_sec ;
+		this.storageCapacityCars = storageCapacityCars ;
+	}
+
+	private final Id<Link> linkId;
+	private final double freeTravelTime;
+	private final double marginalDelayPerLeavingVehicle_sec;
+	private final double storageCapacityCars;
+
+	private final LinkedList<DelayInfo> flowQueue = new LinkedList<>();
+	private final Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
+	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
+	private final LinkedList<DelayInfo> delayQueue = new LinkedList<>() ;
 	
-	private Id<Link> linkId;
-	private double freeTravelTime;
-	private double marginalDelayPerLeavingVehicle_sec;
-	private LinkedList<DelayInfo> flowQueue = new LinkedList<>();
-	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
 	private LinkLeaveEvent lastLeavingAgent;
 
-	private double storageCapacityCars;
-	private LinkedList<DelayInfo> delayQueue = new LinkedList<>() ;
-	
 	public Id<Link> getLinkId() {
 		return linkId;
-	}
-	public void setLinkId(Id<Link> linkId) {
-		this.linkId = linkId;
-	}
-	public void setMarginalDelayPerLeavingVehicle(double marginalDelay_sec) {
-		this.marginalDelayPerLeavingVehicle_sec = marginalDelay_sec;
 	}
 	public double getMarginalDelayPerLeavingVehicle_sec() {
 		return marginalDelayPerLeavingVehicle_sec;
@@ -68,15 +89,8 @@ public final class LinkCongestionInfo {
 	public double getFreeTravelTime() {
 		return freeTravelTime;
 	}
-	public void setFreeTravelTime(double freeTravelTime) {
-		this.freeTravelTime = freeTravelTime;
-	}
 	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
 		return personId2freeSpeedLeaveTime;
-	}
-	public void setPersonId2freeSpeedLeaveTime(
-			Map<Id<Person>, Double> personId2freeSpeedLeaveTime) {
-		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
 	}
 	public LinkLeaveEvent getLastLeaveEvent() {
 		return lastLeavingAgent;
@@ -88,17 +102,11 @@ public final class LinkCongestionInfo {
 	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {
 		return personId2linkEnterTime;
 	}
-	public void setPersonId2linkEnterTime(Map<Id<Person>, Double> personId2linkEnterTime) {
-		this.personId2linkEnterTime = personId2linkEnterTime;
-	}
 
 	public double getStorageCapacityCars() {
 		return storageCapacityCars;
 	}
 
-	public void setStorageCapacityCars(double storageCapacityCars) {
-		this.storageCapacityCars = storageCapacityCars;
-	}
 	/**
 	 * Vehicles that have left the link in previous time steps, while the bottleneck was "active".  
 	 * The flow queue is in consequence interrupted when the bottleneck is not active, which is when time headway > 1/cap + eps

@@ -44,6 +44,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
+import playground.vsp.congestion.handlers.AbstractCongestionHandler;
 
 /**
  * Based on Laemmel2011Diss
@@ -72,11 +73,11 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 	private void storeLinkInfo(){
 		for(Link l : this.scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfo lci = new LinkCongestionInfo();
-			lci.setLinkId(l.getId());
-			double flowCapacity_CapPeriod = l.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-			lci.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+			LinkCongestionInfo lci = AbstractCongestionHandler.getOrCreateLinkInfo(l.getId(), link2LinkCongestionInfo, this.scenario ) ;
+//			lci.setLinkId(l.getId());
+//			double flowCapacity_CapPeriod = l.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+//			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
+//			lci.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 			link2LinkCongestionInfo.put(l.getId(), lci);
 		}
 	}

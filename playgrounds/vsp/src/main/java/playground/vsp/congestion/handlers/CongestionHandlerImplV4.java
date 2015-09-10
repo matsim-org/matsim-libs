@@ -166,7 +166,7 @@ Wait2LinkEventHandler {
 
 			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
 
-			if(remainingDelay==0) {
+			if(remainingDelay<=0) {
 				break;
 			} else {
 				// !! this is where the recursive call is !!
@@ -177,14 +177,12 @@ Wait2LinkEventHandler {
 		return remainingDelay;
 	}
 
-	private double processSpillbackDelays(double delayToChargeFor, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
-
-		double remainingDelay = delayToChargeFor;
-		Id<Person> affectedPerson = event.getPersonId();
+	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
-		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
+		List<Id<Person>> personsEnteredOnSpillBackCausingLink = 
+				new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
 
 		personsEnteredOnSpillBackCausingLink.removeAll(this.linkId2ExcludeEnteringAgentsList.get(spillbackCausingLink)); 
 		// these agents shoudld not be charged because they have already left the link.
@@ -195,13 +193,12 @@ Wait2LinkEventHandler {
 		//		thus, must use LinkedHashMap for perosnId2LinkEnterTime.
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
-		double marginalDelaysPerLeavingVehicle = spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec();
-
 		while(remainingDelay > 0  && enteredPersonsListIterator.hasNext()){
 
 			Id<Person> causingPerson = enteredPersonsListIterator.next();
+			Id<Person> affectedPerson = event.getPersonId();
 
-			double agentDelay = Math.min(marginalDelaysPerLeavingVehicle, remainingDelay);
+			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
 					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
@@ -212,7 +209,7 @@ Wait2LinkEventHandler {
 		}
 
 		if(remainingDelay>0){
-			// now charge leaving agents
+			// now charge agents that have already left:
 			// TODO here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
 			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
 		}
