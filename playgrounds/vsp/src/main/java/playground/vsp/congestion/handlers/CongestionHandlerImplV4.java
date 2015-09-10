@@ -153,27 +153,16 @@ Wait2LinkEventHandler {
 	}
 
 	private double  allocateStorageDelayToDownstreamLinks(double remainingDelay, Id<Link> linkId, LinkLeaveEvent event){
+		final Deque<Id<Link>> spillBackCausingLinks = this.linkId2SpillBackCausingLinks.get(linkId);
 
 		// if linkId is not registered (by other vehicles) as having spill-back, we return:
-		if(! this.linkId2SpillBackCausingLinks.containsKey(linkId)) {
+		if( spillBackCausingLinks==null || spillBackCausingLinks.isEmpty() ) {
 			return remainingDelay;
 		}
-
-		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLinks.get(linkId));
-		// (this is a defensive copy, since the  next step is modifying this list)
-		
-		if(spillBackCausingLinks.isEmpty()) {
-			return remainingDelay;
-		}
-
-		Collections.reverse(spillBackCausingLinks);
-		// (yy do we really need this reverting?  I find this rather unstable: Someone overlooks something, and it ends up sorted 
-		// wrongly.  There are, as alternatives, SortedSet and SortedMap, and ascending/descending iterators.  kai, sep'15)
 
 		// Go through all those outgoing links that have (ever) reported a blockage ...
-		Iterator<Id<Link>> spillBackLinkIterator = spillBackCausingLinks.iterator();
-		while (remainingDelay > 0. && spillBackLinkIterator.hasNext()){
-			Id<Link> spillBackCausingLink = spillBackLinkIterator.next();
+		for ( Iterator<Id<Link>> it = spillBackCausingLinks.descendingIterator() ; it.hasNext() && remainingDelay > 0. ; ) {
+			Id<Link> spillBackCausingLink = it.next();
 
 			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
 
