@@ -21,12 +21,16 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.*;
-import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.*;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.source.mid2008.generator.*;
-import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.processing.ResolveRoundTripsTask;
+import playground.johannes.synpop.source.mid2008.processing.SetFirstActivityTypeTask;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -97,13 +101,20 @@ public class PopulationGenerator {
 		/*
 		 * filter legs		
 		 */
-		PersonTaskComposite pComposite = new PersonTaskComposite();
-		pComposite.addComponent(new DeleteNegativeDurationTask());
-		pComposite.addComponent(new DeleteMissingTimesTask());
-		pComposite.addComponent(new DeleteOverlappingLegsTask());
+		final EpisodeTaskComposite pComposite = new EpisodeTaskComposite();
+
+		pComposite.addComponent(new ValidateNegativeLegDuration());
+		pComposite.addComponent(new ValidateMissingLegTimes());
+		pComposite.addComponent(new ValidateOverlappingLegs());
 		
 		logger.info(String.format("Filtering %s legs...", persons.size()));
-		persons = TaskRunner.runAndDeletePerson(new ConstrainedPersonTask("datasource", "midtrips", pComposite), persons);
+		TaskRunner.validatePersons(new ConstrainedPersonTask("datasource", "midtrips", new PersonTask() {
+			@Override
+			public void apply(Person person) {
+				for (Episode e : person.getEpisodes())
+					pComposite.apply(e);
+			}
+		}), persons);
 		logger.info(String.format("After filter: %s persons.", persons.size()));
 		/*
 		 * generate activities
@@ -112,7 +123,7 @@ public class PopulationGenerator {
 		composite.addComponent(new InsertActivitiesTask(new PlainFactory()));
 		composite.addComponent(new SetActivityTypeTask());
 		composite.addComponent(new SetFirstActivityTypeTask());
-		composite.addComponent(new RoundTripTask());
+		composite.addComponent(new ResolveRoundTripsTask(new PlainFactory()));
 		composite.addComponent(new SetActivityTimeTask());
 		composite.addComponent(new FixMissingActTimesTask());
 		

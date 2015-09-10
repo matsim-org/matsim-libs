@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.synpop.data.*;
 
 /**
@@ -56,8 +55,8 @@ public class WeCommuterPredicate implements Predicate {
 					if (val != null) {
 						double d = Double.parseDouble(val);
 						if (d > threshold) {
-							if (ActivityType.WORK.equalsIgnoreCase(prev2.getAttribute(CommonKeys.ACTIVITY_TYPE))
-									|| ActivityType.WORK.equalsIgnoreCase(next2.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+							if (ActivityTypes.WORK.equalsIgnoreCase(prev2.getAttribute(CommonKeys.ACTIVITY_TYPE))
+									|| ActivityTypes.WORK.equalsIgnoreCase(next2.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 								cnt++;
 								weLeg = leg2;
 							}

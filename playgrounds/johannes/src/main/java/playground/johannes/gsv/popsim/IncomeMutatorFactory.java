@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.util.Random;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.AttributeChangeListener;
+import playground.johannes.synpop.sim.Mutator;
 import playground.johannes.synpop.sim.PersonAttributeMutator;
 import playground.johannes.synpop.sim.RandomIntGenerator;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
+
+import java.util.Random;
 
 /**
  * @author johannes

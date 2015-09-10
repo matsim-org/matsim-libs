@@ -20,17 +20,17 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.source.mid2008.MiDValues;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -68,18 +68,18 @@ public class PersonFilter {
 		TaskRunner.run(new Convert2MiscType(), persons);
 		
 		logger.info("Removing non mobile persons...");
-		persons = TaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.mob.xml", persons);
 		
 		logger.info("Removing non car persons...");
-		persons = TaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
+		TaskRunner.validatePersons(new DeleteModes("car"), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.car.xml", persons);
 		
 		logger.info("Removing legs with less than 3 KM...");
 		TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
-		persons = TaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		
 //		writer.write(outDir + "pop.car.wo3km.xml", persons);
@@ -87,7 +87,7 @@ public class PersonFilter {
 		
 		logger.info("Removing legs with more than 1000 KM...");
 		TaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
-		persons = TaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.car.3-1000km.xml", persons);
 		

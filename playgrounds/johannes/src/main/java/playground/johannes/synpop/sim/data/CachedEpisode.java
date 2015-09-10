@@ -74,6 +74,16 @@ public class CachedEpisode extends CachedElement implements Episode {
     }
 
     @Override
+    public void insertActivity(Segment activity, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void insertLeg(Segment leg, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
     public void removeActivity(Segment activity) {
         throw new UnsupportedOperationException("Structural modification not allowed.");
     }

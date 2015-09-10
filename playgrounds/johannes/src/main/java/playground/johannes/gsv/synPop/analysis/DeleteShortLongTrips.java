@@ -19,11 +19,10 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.Set;
 
@@ -67,17 +66,17 @@ public class DeleteShortLongTrips implements EpisodeTask {
 				Attributable prev = plan.getActivities().get(i);
 				Attributable next = plan.getActivities().get(i + 1);
 
-				if (ActivityType.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				if (ActivityTypes.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (plan.getActivities().size() > i + 2) {
 						Attributable act = plan.getActivities().get(i + 2);
-						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							next.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
-				} else if (ActivityType.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				} else if (ActivityTypes.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (i - 1 >= 0) {
 						Attributable act = plan.getActivities().get(i - 1);
-						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							prev.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
@@ -130,11 +129,11 @@ public class DeleteShortLongTrips implements EpisodeTask {
 			Attributable prevAct2 = plan.getActivities().get(candidate);
 			Attributable nextAct2 = plan.getActivities().get(candidate + 1);
 
-			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
-					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)
+					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)) {
 				return true;
-			} else if (nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
-					&& prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+			} else if (nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)
+					&& prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)) {
 				return true;
 			} else {
 				return false;

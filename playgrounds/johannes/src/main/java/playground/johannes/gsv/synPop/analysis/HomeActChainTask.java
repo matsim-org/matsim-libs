@@ -23,12 +23,11 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class HomeActChainTask extends AnalyzerTask {
 			for(int i = 0; i < plan.getActivities().size(); i++) {
 				String type = (String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
 				achain.add(type);
-				if(type.equalsIgnoreCase(ActivityType.HOME) && i > 0) {
+				if(type.equalsIgnoreCase(ActivityTypes.HOME) && i > 0) {
 					String chain = StringUtils.join(achain, "-");
 					chains.adjustOrPutValue(chain, 1, 1);
 					tripCounts.adjustOrPutValue(achain.size() - 1, 1, 1);

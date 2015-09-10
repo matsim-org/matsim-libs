@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -33,7 +33,7 @@ public class ToHomePredicate implements Predicate {
 	@Override
 	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
 		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(nextType)) {
+		if (ActivityTypes.HOME.equalsIgnoreCase(nextType)) {
 			return true;
 		} else {
 			return false;

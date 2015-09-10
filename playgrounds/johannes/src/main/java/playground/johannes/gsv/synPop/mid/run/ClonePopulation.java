@@ -21,12 +21,12 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.ApplySampleProbas;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 
 import java.util.Random;
 import java.util.Set;
@@ -57,7 +57,7 @@ public class ClonePopulation {
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
 //		logger.info("Deleting persons with no legs..." );
-//		persons = TaskRunner.runAndDeleteEpisode(new DeleteNoLegs(), persons);
+//		persons = TaskRunner.validateEpisodes(new DeleteNoLegs(), persons);
 //		logger.info("Population size = " + persons.size());
 		
 		XMLWriter writer = new XMLWriter();
