@@ -79,7 +79,7 @@ public final class LinkCongestionInfo {
 
 	private final Deque<DelayInfo> flowQueue = new LinkedList<>();
 	private final Deque<DelayInfo> delayQueue = new LinkedList<>() ;
-	private final Deque<AgentOnLinkInfo> agentsOnLink = new LinkedList<>() ;
+	private final LinkedHashMap<Id<Person>, AgentOnLinkInfo> agentsOnLink = new LinkedHashMap<>() ;
 
 	private LinkLeaveEvent lastLeavingAgent;
 
@@ -124,7 +124,7 @@ public final class LinkCongestionInfo {
 	public Deque<DelayInfo> getDelayQueue() {
 		return this.delayQueue ;
 	}
-	public Deque<AgentOnLinkInfo> getAgentsOnLink() {
+	public LinkedHashMap<Id<Person>, AgentOnLinkInfo> getAgentsOnLink() {
 		return this.agentsOnLink ;
 	}
 

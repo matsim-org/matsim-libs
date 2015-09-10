@@ -10,17 +10,17 @@ public final class AgentOnLinkInfo {
 		private Id<Link> linkId;
 		private Double enterTime;
 		private Double freeSpeedLeaveTime;
-		public void setAgentId(Id<Person> personId) {
-			this.personId = personId ;
+		public Builder setAgentId(Id<Person> personId) {
+			this.personId = personId ; return this ;
 		}
-		public void setLinkId(Id<Link> linkId) {
-			this.linkId = linkId ;
+		public Builder setLinkId(Id<Link> linkId) {
+			this.linkId = linkId ; return this ;
 		}
-		public void setEnterTime(double time) {
-			this.enterTime = time ;
+		public Builder setEnterTime(double time) {
+			this.enterTime = time ; return this ;
 		}
-		public void setFreeSpeedLeaveTime(double d) {
-			this.freeSpeedLeaveTime = d ;
+		public Builder setFreeSpeedLeaveTime(double d) {
+			this.freeSpeedLeaveTime = d ; return this ;
 		}
 		public final AgentOnLinkInfo build() {
 			return new AgentOnLinkInfo( personId, linkId, enterTime, freeSpeedLeaveTime ) ;

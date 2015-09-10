@@ -88,6 +88,8 @@ Wait2LinkEventHandler {
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
+		super.handleEvent(event);
+		
 		if(event.getLegMode().equals(TransportMode.car)) {
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
 
@@ -110,9 +112,8 @@ Wait2LinkEventHandler {
 		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayOnTheLink);
 
 		if( linkInfo.getFlowQueue().isEmpty()){
-			// (flow queue contains only those agents where time
-			// headway approx 1/cap. So we get here only if we are spillback delayed, and our own bottleneck
-			// is not active)
+			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
+			// and our own bottleneck is not active)
 
 			Id<Person> driverId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(driverId);
@@ -171,6 +172,7 @@ Wait2LinkEventHandler {
 			} else {
 				// !! this is where the recursive call is !!
 				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
+				// yy this looks like depth-first allocation to me; should probably also try breadth-first allocation. kai, sep'15
 			}
 		}
 

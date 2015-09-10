@@ -39,12 +39,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -77,7 +79,8 @@ LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler, 
 PersonStuckEventHandler,
-Wait2LinkEventHandler {
+Wait2LinkEventHandler,
+PersonArrivalEventHandler {
 
 	private final static Logger log = Logger.getLogger(AbstractCongestionHandler.class);
 
@@ -102,8 +105,6 @@ Wait2LinkEventHandler {
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
 	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
-
-	private Map<Id<Person>,AgentOnLinkInfo> personId2AgentInfo = new LinkedHashMap<>() ;
 
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -168,12 +169,9 @@ Wait2LinkEventHandler {
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 			
-			AgentOnLinkInfo.Builder builder = new AgentOnLinkInfo.Builder() ;
-			builder.setAgentId( event.getPersonId() ) ;
-			builder.setLinkId( event.getLinkId() ) ;
-			builder.setEnterTime( event.getTime() ) ;
-			builder.setFreeSpeedLeaveTime( event.getTime()+1. ) ;
-			this.personId2AgentInfo.put( event.getPersonId(), builder.build() ) ;
+			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() )
+					.setLinkId( event.getLinkId() ).setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
+			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
 		}
 
 		//--
@@ -194,10 +192,15 @@ Wait2LinkEventHandler {
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
+
+			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() ).setLinkId( event.getLinkId() )
+					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
+			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
 		}
 		// ---
 		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
 		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
+		
 	}
 
 	@Override
@@ -226,9 +229,15 @@ Wait2LinkEventHandler {
 			
 //			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			// fails tests, dunno why. kai, sep'15
-
+			
+			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 		}
-		
+	}
+	
+	@Override
+	public /*final*/ void handleEvent( PersonArrivalEvent event ) {
+		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario) ;
+		linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 	}
 
 
