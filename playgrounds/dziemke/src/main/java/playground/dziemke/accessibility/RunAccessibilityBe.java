@@ -30,9 +30,13 @@ public class RunAccessibilityBe {
 	public static void main(String[] args) {
 		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
-		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
-		String outputDirectory = "../../shared-svn/projects/accessibility_berlin/output/02/";
+//		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+		// same network at alternate location
+		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+//		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
+		// now using work facilities
+		String facilitiesFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/08/facilities_buildings.xml";
+		String outputDirectory = "../../../../Workspace/shared-svn/projects/accessibility_berlin/output/02/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";

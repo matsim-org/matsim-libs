@@ -75,7 +75,7 @@ public class RunAmenityReaderForBe {
 //		}
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", crs);
-		AmenityReader msr = new AmenityReader(osmFile, ct, buildOsmToMatsimTypeMap());
+		AmenityReader msr = new AmenityReader(osmFile, ct, buildOsmAmentityTypeToMatsimTypeMap());
 		try {
 			msr.parseAmenity(osmFile);
 			msr.writeFacilities(facilityFile);
@@ -144,48 +144,53 @@ public class RunAmenityReaderForBe {
 	}
 	
 
-	private static Map<String, String> buildOsmToMatsimTypeMap(){
+	private static Map<String, String> buildOsmAmentityTypeToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
 		
-		map.put("school", "e");
-		map.put("kindergarten", "e");
-		map.put("college", "e");
-		map.put("university", "e");
+		// used to be "e"
+		map.put("school", "education");
+		map.put("kindergarten", "education");
+		map.put("college", "education");
+		map.put("university", "education");
 		
-		map.put("bar", "l");
-		map.put("cafe", "l");
-		map.put("fast_food", "l");
-		map.put("food_court", "l");
-		map.put("ice_cream", "l");
-		map.put("pub", "l");
-		map.put("restaurant", "l");
-		map.put("arts_centre", "l");
-		map.put("cinema", "l");
-		map.put("nightclub", "l");
-		map.put("stripclub", "l");
-		map.put("theatre", "l");
-		map.put("brothel", "l");
+		// used to be "l"
+		map.put("bar", "leisure");
+		map.put("cafe", "leisure");
+		map.put("fast_food", "leisure");
+		map.put("food_court", "leisure");
+		map.put("ice_cream", "leisure");
+		map.put("pub", "leisure");
+		map.put("restaurant", "leisure");
+		map.put("arts_centre", "leisure");
+		map.put("cinema", "leisure");
+		map.put("nightclub", "leisure");
+		map.put("stripclub", "leisure");
+		map.put("theatre", "leisure");
+		map.put("brothel", "leisure");
 		
-		map.put("clinic", "m");
-		map.put("dentist", "m");
-		map.put("doctors", "m");
-		map.put("hospital", "m");
-		map.put("nursing_home", "m");
-		map.put("pharmacy", "m");
+		// used to be "m"
+		map.put("clinic", "medical");
+		map.put("dentist", "medical");
+		map.put("doctors", "medical");
+		map.put("hospital", "medical");
+		map.put("nursing_home", "medical");
+		map.put("pharmacy", "medical");
 		
-		map.put("polic", "p");
+		// used to be "p"
+		map.put("polic", "police");
 		
-		map.put("library", "t");
-		map.put("car_wash", "t");
-		map.put("fuel", "t");
-		map.put("atm", "t");
-		map.put("bank", "t");
-		map.put("bureau_de_change", "t");
-		map.put("social_centre", "t");
-		map.put("marketplace", "t");
-		map.put("place_of_worship", "t");
-		map.put("post_office", "t");
-		map.put("townhall", "t");
+		// used to be "t"
+		map.put("library", "other");
+		map.put("car_wash", "other");
+		map.put("fuel", "other");
+		map.put("atm", "other");
+		map.put("bank", "other");
+		map.put("bureau_de_change", "other");
+		map.put("social_centre", "other");
+		map.put("marketplace", "other");
+		map.put("place_of_worship", "other");
+		map.put("post_office", "other");
+		map.put("townhall", "other");
 		return map;
 	}
 	

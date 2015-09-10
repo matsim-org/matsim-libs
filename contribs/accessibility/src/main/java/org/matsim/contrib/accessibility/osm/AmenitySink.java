@@ -122,10 +122,11 @@ public class AmenitySink implements Sink {
 //	}
 
 	private void processFacilities(ActivityFacilitiesFactory aff,
-			Map<Long,? extends EntityContainer> nodeMap) {
-		for(long n : nodeMap.keySet()){
-			Entity entity = nodeMap.get(n).getEntity();
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long n : entityMap.keySet()){
+			Entity entity = entityMap.get(n).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			
 			/* Check amenities */
 			String amenity = tags.get("amenity");
 			String matsimType = null;
@@ -161,6 +162,7 @@ public class AmenitySink implements Sink {
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
 			}
+			
 			/* Check shops */
 			String shops = tags.get("shop");
 			if(shops != null){

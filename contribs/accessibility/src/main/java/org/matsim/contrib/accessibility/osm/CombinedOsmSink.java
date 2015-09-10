@@ -61,8 +61,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  * @author dziemke
  */
-public class LandUseBuildingSink implements Sink {
-	private final Logger log = Logger.getLogger(LandUseBuildingSink.class);
+public class CombinedOsmSink implements Sink {
+	private final Logger log = Logger.getLogger(CombinedOsmSink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;
@@ -71,6 +71,12 @@ public class LandUseBuildingSink implements Sink {
 	private ObjectAttributes facilityAttributes;
 	private Map<String, String> landUseTypeMap = new HashMap<>();
 	private Map<String, String> buildingTypeMap = new HashMap<>();
+	
+	//
+	private Map<String, String> amenityTypeMap = new HashMap<>();
+	String toCRS = TransformationFactory.DHDN_GK4;
+	//
+	
 	private Map<String, Integer> typeCount = new HashMap<>();
 	
 	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
@@ -84,12 +90,21 @@ public class LandUseBuildingSink implements Sink {
 	private PolygonFeatureFactory polygonFeatureFactory;
 
 	
-	public LandUseBuildingSink(CoordinateTransformation ct, Map<String, String> osmLandUseToMatsimType, 
-			Map<String, String> osmBuildingToMatsimType, double buildingTypeFromVicinityRange,
+	public CombinedOsmSink(CoordinateTransformation ct, Map<String, String> osmLandUseToMatsimType, 
+			Map<String, String> osmBuildingToMatsimType, 
+			//
+			Map<String, String> osmAmenityToMatsimType,
+			//
+			double buildingTypeFromVicinityRange,
 			String[] tagsToIgnoreBuildings) {
 		this.ct = ct;
 		this.landUseTypeMap = osmLandUseToMatsimType;
 		this.buildingTypeMap = osmBuildingToMatsimType;
+		
+		//
+		this.amenityTypeMap = osmAmenityToMatsimType;
+		//
+		
 		this.nodeMap = new HashMap<Long, NodeContainer>();
 		this.wayMap = new HashMap<Long, WayContainer>();
 		this.relationMap = new HashMap<Long, RelationContainer>();
@@ -112,14 +127,26 @@ public class LandUseBuildingSink implements Sink {
 		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		
-		String landUseType = "type";
-		initLandUseFeatureType(landUseType);
+//		String landUseType = "type";
+//		initLandUseFeatureType(landUseType, this.toCRS);
+		initLandUseFeatureType(this.toCRS);
 
 		/* First check all the ways for land use. */
 		processLandUseAreas(aff, wayMap);
 		
 		/* Second, check all the ways for buildings. */
 		processBuildings(aff, wayMap);
+		
+		//
+		/* First check all the point features. */
+		processFacilities(aff, nodeMap);
+		
+		/* Second, check for way features. */
+		processFacilities(aff, wayMap);
+
+		/* Thirdly, check for relation. */
+		processFacilities(aff, relationMap);
+		//
 		
 		log.info("featureErrorCounter = " + featureErrorCounter);
 		log.info("buildingErrorCounter = " + buildingErrorCounter);
@@ -142,28 +169,35 @@ public class LandUseBuildingSink implements Sink {
 			if(matsimActivityType != null){
 				Coord[] coords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature feature = createLandUseFeature(coords, matsimActivityType);
+				
+				// TODO check if the following is needed
 				if (feature == null) {
 					continue;
 				}
+				//
+				
 				this.features.add(feature);
 			}
 		}
 	}
 	
 	
-	private void initLandUseFeatureType(String landUseType) {
+	// private void initLandUseFeatureType(String landUseType, String toCRS) {
+	private void initLandUseFeatureType(String toCRS) {
 		
 		// TODO make CRS adjustable
 		
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder().
-		setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
+		//setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
+		setCrs(MGC.getCRS(toCRS)).
 		//setName("buildings").
 		setName("land_use").
-		addAttribute(landUseType, String.class).
+		addAttribute("type", String.class).
 		create();
 	}	
 	
 	
+	// creates a feature in form of a polygon that is defined by its vertices, which are defined by its coordinates
 	private SimpleFeature createLandUseFeature(Coord[] coords, String matsimActivityType) {
 		Object[] attributes = new Object[]{matsimActivityType};
 
@@ -210,6 +244,9 @@ public class LandUseBuildingSink implements Sink {
 			// Entities that possess an "amenity" tag need to be excluded here, because they are already considered via the AmenityReader
 //			if(buildingType != null && amenityType == null) {
 			if(buildingType != null && ignoreBecauseOfTag == false) {
+				
+				
+				
 				String name = tags.get("name");
 				if(name == null){
 //					log.warn("Building " + entityKey + " does not have a name.");
@@ -227,6 +264,8 @@ public class LandUseBuildingSink implements Sink {
 				Coord coord = CoordUtils.getCoord(entity, ct, nodeMap, wayMap, relationMap);
 				Coord[] buildingCoords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature buildingAsFeature = createLandUseFeature(buildingCoords, null);
+				// TODO should not be called land use feature
+				
 				if (buildingAsFeature == null) {
 					log.error("The feature of building " + entityKey + " is null!");
 					this.buildingErrorCounter++;
@@ -280,6 +319,80 @@ public class LandUseBuildingSink implements Sink {
 			}
 		}
 	}
+	
+	
+	//////////////////////////////////////
+	private void processFacilities(ActivityFacilitiesFactory aff,
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long n : entityMap.keySet()){
+			Entity entity = entityMap.get(n).getEntity();
+			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			
+			/* Check amenities */
+			String amenity = tags.get("amenity");
+			String matsimType = null;
+			if(amenity != null) {
+				matsimType = getActivityType(amenity, this.amenityTypeMap);
+			}
+			if(matsimType != null){
+				String activityType = getActivityType(amenity, this.amenityTypeMap);
+				String name = tags.get("name");
+				if(name != null){
+					/* Check education level. */
+					if(activityType.equalsIgnoreCase("e")){
+//						getEducationLevel(name);
+					}					
+				} else{
+					log.warn("      ---> Amenity " + n + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				//Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				ActivityFacility af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = aff.createActivityFacility(newId, coord);
+					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOption ao = aff.createActivityOption(activityType);
+				af.addActivityOption(ao);
+//				setFacilityDetails(ao);
+//				nodeFacilities++;
+			}
+			
+			/* Check shops */
+			String shops = tags.get("shop");
+			if(shops != null){
+				String name = tags.get("name");
+				if(name == null){
+					log.warn("      ---> Shop " + n + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+//				Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				ActivityFacility af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = aff.createActivityFacility(newId, coord);					
+					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOption ao = aff.createActivityOption("s");
+				af.addActivityOption(ao);
+//				setFacilityDetails(ao);
+//				shoppingCounter++;
+//				nodeFacilities++;
+			}
+		}
+	}
+	//////////////////////////////////////////
 
 	
 	private String getActivityTypeFromLandUseArea(GeometryFactory geometryFactory,	String buildingType, Coord coord) {
@@ -433,6 +546,20 @@ public class LandUseBuildingSink implements Sink {
 		MapUtils.addToInteger(osmType, typeCount, 0, 1);
 		return matsimType;
 	}
+	
+	
+	
+	/////////////////////////////////////////////////
+//	private String getActivityType(String amenity){
+//		String type = typeMap.get(amenity);
+//		if(type == null){
+//			log.warn("Do not have an activity type mapping for " + amenity + "! Returning NULL.");
+//		} else{
+//		}
+//		MapUtils.addToInteger(type, typeCount, 0, 1);
+//		return type;
+//	}
+	//////////////////////////////////////
 
 
 	@Override
