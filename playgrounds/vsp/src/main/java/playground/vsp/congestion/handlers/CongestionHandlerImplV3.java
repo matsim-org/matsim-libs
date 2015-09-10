@@ -72,7 +72,7 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 			throw new RuntimeException("The total delay is below 0. Aborting...");
 			
 		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
-			// The agent was leaving the link without a delay.
+			// The agent was leaving the link without a delay.  Nothing to do ...
 			
 		} else {
 			// The agent was leaving the link with a delay.
@@ -94,9 +94,10 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 						this.addToDelayNotInternalized_storageCapacity( storageDelay ) ;
 						log.warn("Delay which is not internalized: " + this.getDelayNotInternalized_storageCapacity());
 					}
-					
 				} else {
-					throw new RuntimeException("There is a delay resulting from the storage capacity on link " + event.getLinkId() + ": " + storageDelay + ". Aborting...");
+					throw new RuntimeException("There is a delay resulting from the storage capacity on link " + event.getLinkId() + ": " 
+							+ storageDelay + ". Aborting...");
+					// not really sure why it aborts here when it is configured as not looking for storage constraints ... kai, spe'15
 				}
 			} 
 		}
@@ -104,7 +105,8 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-	
+		// I read the following as: remove non-allocated delays from agents once they are no longer on a leg. kai, sep'15
+		
 		if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
 			// skip that person
 			

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -77,7 +78,7 @@ Wait2LinkEventHandler {
 	}
 
 	private Scenario scenario;
-	private Map<Id<Link>,List<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<Id<Link>, List<Id<Link>>>();
+	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
 
 	/**
 	 * This list is used to store entering agents, (1) which can not be cleared in personId2EnteringAgents map because 
@@ -109,8 +110,8 @@ Wait2LinkEventHandler {
 		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayOnTheLink);
 
 		if( linkInfo.getFlowQueue().isEmpty()){
-			// (getLeavingAgents is NOT the queue, i.e. NOT all agents with delay, but only those agents where time
-			// headway approx 1/cap, i.e. "flow" queue. So we get here only if we are spillback delayed, and our own bottleneck
+			// (flow queue contains only those agents where time
+			// headway approx 1/cap. So we get here only if we are spillback delayed, and our own bottleneck
 			// is not active)
 
 			Id<Person> driverId = this.vehicleId2personId.get( event.getVehicleId() ) ;
@@ -120,10 +121,12 @@ Wait2LinkEventHandler {
 		} 
 
 		// charge for the flow delay; remaining delays are said to be storage delay
+		// (might be able to skip this if flow queue is empty, but maybe do this just in case ...)
 		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnTheLink);
 
 		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
 
+			// !! calling the following method is the big difference to V3 !!!
 			double remainingStorageDelay = allocateStorageDelayToDownstreamLinks(storageDelay, event.getLinkId(), event);
 
 			if(remainingStorageDelay > 0.) {
@@ -144,14 +147,12 @@ Wait2LinkEventHandler {
 			this.linkId2SpillBackCausingLinks.get(currentLink).remove(spillBackCausingLink);
 			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
 		} else {
-			this.linkId2SpillBackCausingLinks.put(currentLink, new ArrayList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
+			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
 
 		}
 	}
 
-	private double  allocateStorageDelayToDownstreamLinks(double storageDelay, Id<Link> linkId, LinkLeaveEvent event){
-
-		double remainingDelay = storageDelay;
+	private double  allocateStorageDelayToDownstreamLinks(double remainingDelay, Id<Link> linkId, LinkLeaveEvent event){
 
 		// if linkId is not registered (by other vehicles) as having spill-back, we return:
 		if(! this.linkId2SpillBackCausingLinks.containsKey(linkId)) {
@@ -159,7 +160,11 @@ Wait2LinkEventHandler {
 		}
 
 		List<Id<Link>> spillBackCausingLinks = new ArrayList<>(this.linkId2SpillBackCausingLinks.get(linkId));
-		if(spillBackCausingLinks.isEmpty()) return remainingDelay;
+		// (this is a defensive copy, since the  next step is modifying this list)
+		
+		if(spillBackCausingLinks.isEmpty()) {
+			return remainingDelay;
+		}
 
 		Collections.reverse(spillBackCausingLinks);
 		// (yy do we really need this reverting?  I find this rather unstable: Someone overlooks something, and it ends up sorted 
@@ -175,8 +180,8 @@ Wait2LinkEventHandler {
 			if(remainingDelay==0) {
 				break;
 			} else {
-				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
 				// !! this is where the recursive call is !!
+				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
 			}
 		}
 
