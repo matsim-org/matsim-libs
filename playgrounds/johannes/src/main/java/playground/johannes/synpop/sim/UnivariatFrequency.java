@@ -49,7 +49,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private double hamiltonianValue;
 
-    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements,
+    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
         this.discretizer = discretizer;
         this.attrKey = attrKey;

@@ -55,10 +55,8 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private double hamiltonianValue;
 
-    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements, String
+    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
-//        this.xDataKey = Converters.getObjectKey(xAttrKey);
-//        this.yDataKey = Converters.getObjectKey(yAttrKey);
         this.xAttrKey = xAttrKey;
         this.yAttrKey = yAttrKey;
         this.xDataDiscr = xDataDiscr;
@@ -91,7 +89,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void initSimulationValues(Set<? extends CachedElement> elements, String xAttrKey, String yAttrKey) {
+    private void initSimulationValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey) {
         bucketSums = new DynamicDoubleArray(100, Double.NaN);
         bucketCounts = new DynamicIntArray(100, -1);
 
