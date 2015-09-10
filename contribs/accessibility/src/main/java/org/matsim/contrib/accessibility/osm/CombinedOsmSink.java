@@ -138,14 +138,14 @@ public class CombinedOsmSink implements Sink {
 		processBuildings(aff, wayMap);
 		
 		//
-//		/* First check all the point features. */
-//		processFacilities(aff, nodeMap);
-//		
-//		/* Second, check for way features. */
-//		processFacilities(aff, wayMap);
-//
-//		/* Thirdly, check for relation. */
-//		processFacilities(aff, relationMap);
+		/* First check all the point features. */
+		processFacilities(aff, nodeMap);
+		
+		/* Second, check for way features. */
+		processFacilities(aff, wayMap);
+
+		/* Thirdly, check for relation. */
+		processFacilities(aff, relationMap);
 		//
 		
 		log.info("featureErrorCounter = " + featureErrorCounter);
@@ -322,76 +322,76 @@ public class CombinedOsmSink implements Sink {
 	
 	
 	//////////////////////////////////////
-//	private void processFacilities(ActivityFacilitiesFactory aff,
-//			Map<Long,? extends EntityContainer> entityMap) {
-//		for(long n : entityMap.keySet()){
-//			Entity entity = entityMap.get(n).getEntity();
-//			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
-//			
-//			/* Check amenities */
-//			String amenity = tags.get("amenity");
-//			String matsimType = null;
-//			if(amenity != null) {
-//				matsimType = getActivityType(amenity);
-//			}
-//			if(matsimType != null){
-//				String activityType = getActivityType(amenity);
-//				String name = tags.get("name");
-//				if(name != null){
-//					/* Check education level. */
-//					if(activityType.equalsIgnoreCase("e")){
-////						getEducationLevel(name);
-//					}					
-//				} else{
-//					log.warn("      ---> Amenity " + n + " without a name.");
-//				}
-//
-//				/* Facility identified. Now get the centroid of all members. */ 
-//				//Coord coord = getCoord(entity);
-//				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-//				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
-//				ActivityFacility af;
-//				if(!facilities.getFacilities().containsKey(newId)){
-//					af = aff.createActivityFacility(newId, coord);
-//					((ActivityFacilityImpl)af).setDesc(name);
-//					facilities.addActivityFacility(af);
-//				} else{
-//					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-//				}
-//				ActivityOption ao = aff.createActivityOption(activityType);
-//				af.addActivityOption(ao);
-////				setFacilityDetails(ao);
-////				nodeFacilities++;
-//			}
-//			
-//			/* Check shops */
-//			String shops = tags.get("shop");
-//			if(shops != null){
-//				String name = tags.get("name");
-//				if(name == null){
-//					log.warn("      ---> Shop " + n + " without a name.");
-//				}
-//
-//				/* Facility identified. Now get the centroid of all members. */ 
-////				Coord coord = getCoord(entity);
-//				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-//				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
-//				ActivityFacility af;
-//				if(!facilities.getFacilities().containsKey(newId)){
-//					af = aff.createActivityFacility(newId, coord);					
-//					((ActivityFacilityImpl)af).setDesc(name);
-//					facilities.addActivityFacility(af);
-//				} else{
-//					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-//				}
-//				ActivityOption ao = aff.createActivityOption("s");
-//				af.addActivityOption(ao);
-////				setFacilityDetails(ao);
-////				shoppingCounter++;
-////				nodeFacilities++;
-//			}
-//		}
-//	}
+	private void processFacilities(ActivityFacilitiesFactory aff,
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long n : entityMap.keySet()){
+			Entity entity = entityMap.get(n).getEntity();
+			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			
+			/* Check amenities */
+			String amenity = tags.get("amenity");
+			String matsimType = null;
+			if(amenity != null) {
+				matsimType = getActivityType(amenity, this.amenityTypeMap);
+			}
+			if(matsimType != null){
+				String activityType = getActivityType(amenity, this.amenityTypeMap);
+				String name = tags.get("name");
+				if(name != null){
+					/* Check education level. */
+					if(activityType.equalsIgnoreCase("e")){
+//						getEducationLevel(name);
+					}					
+				} else{
+					log.warn("      ---> Amenity " + n + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				//Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				ActivityFacility af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = aff.createActivityFacility(newId, coord);
+					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOption ao = aff.createActivityOption(activityType);
+				af.addActivityOption(ao);
+//				setFacilityDetails(ao);
+//				nodeFacilities++;
+			}
+			
+			/* Check shops */
+			String shops = tags.get("shop");
+			if(shops != null){
+				String name = tags.get("name");
+				if(name == null){
+					log.warn("      ---> Shop " + n + " without a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+//				Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				ActivityFacility af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = aff.createActivityFacility(newId, coord);					
+					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOption ao = aff.createActivityOption("s");
+				af.addActivityOption(ao);
+//				setFacilityDetails(ao);
+//				shoppingCounter++;
+//				nodeFacilities++;
+			}
+		}
+	}
 	//////////////////////////////////////////
 
 	
