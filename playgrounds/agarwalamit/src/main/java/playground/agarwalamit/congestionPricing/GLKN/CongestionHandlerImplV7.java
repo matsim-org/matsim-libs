@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -115,7 +116,10 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 		if(delay > 0.){
 			totalDelay += delay;
-			lci.getFlowQueue().add(pId);
+
+			Double linkEnterTime = lci.getPersonId2linkEnterTime().get( pId ) ;
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId(pId).setLinkEnterTime( linkEnterTime ).build() ;
+			lci.getFlowQueue().add( delayInfo );
 
 			List<Id<Person>> enteringAgentsList = new ArrayList<Id<Person>>(lci.getPersonId2linkEnterTime().keySet());
 			
@@ -184,7 +188,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 	private void throwCongestionEvents(LinkLeaveEvent event) {
 		LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getFlowQueue());
+//		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getFlowQueue());
 		Id<Person> nullAffectedAgent = Id.createPersonId("NullAgent");
 
 		switch (congestionImpl) {
@@ -192,7 +196,13 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		{
 			double queueDissolveTime = event.getTime() /*+ lci.getMarginalDelayPerLeavingVehicle_sec()*/; // not yet sure, if this is right.
 			
-			for(Id<Person> person : leavingAgents){
+//			for(Id<Person> person : leavingAgents){
+			for( DelayInfo delayInfo : lci.getFlowQueue() ) {
+				// yy this is what I found.  But (1) is the Laemmel approach using the flow queue (and not the delay queue), and
+				// (2) is it going through vehicles that are ahead (downstream) from the current vehicle, or those that are behind?
+				// kai, sep'15
+				
+				Id<Person> person = delayInfo.personId ;
 				double delayToPayFor = queueDissolveTime - lci.getPersonId2freeSpeedLeaveTime().get(person);
 				this.totalInternalizedDelay += delayToPayFor;
 				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "GL_Approach", person, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(person));
@@ -205,13 +215,24 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			break;
 		case KN:
 		{
-			int noOfDelayedAgents = leavingAgents.size();
+//			int noOfDelayedAgents = leavingAgents.size();
+			int noOfDelayedAgents = lci.getDelayQueue().size() ;
 			
 			if(noOfDelayedAgents < 2) return; // can't calculate headway from one agent only
+			// yy don't know in which sequence this is treated here, but std logic would have myself not yet in the queue
+			// so that "1" (instead of 2) would suffice.  kai, sep'15
+			
+			
 			int thisPesonDelayingOtherPersons = 0;
 			
 			for(int ii = noOfDelayedAgents-2; ii>=0;ii--){
-				Id<Person> thisPerson = leavingAgents.get(ii);
+				// yy this is what I found.  But (1) is the Laemmel approach using the flow queue (and not the delay queue), and
+				// (2) is it going through vehicles that are ahead (downstream) from the current vehicle, or those that are behind?
+				// kai, sep'15
+
+//				Id<Person> thisPerson = leavingAgents.get(ii);
+				// yyyy does not work (any more). Fixing other things first ... kai, sep'15
+				
 				thisPesonDelayingOtherPersons++;
 
 //				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
@@ -222,7 +243,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 				double delayToPayFor = thisPesonDelayingOtherPersons * headway;
 				
 				this.totalInternalizedDelay += delayToPayFor;
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "KN_Approach", thisPerson, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(thisPerson));
+				Id<Person> thisPerson = null ; // yyyy a fix to make it compile. kai, sep'15
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "KN_Approach", thisPerson, 
+						nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(thisPerson));
 				this.events.processEvent(congestionEvent);
 			}
 		}

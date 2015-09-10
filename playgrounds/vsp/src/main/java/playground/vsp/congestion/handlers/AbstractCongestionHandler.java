@@ -55,6 +55,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.Vehicle;
 
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -100,6 +101,8 @@ Wait2LinkEventHandler {
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
 	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
+
+	private Map<Id<Person>,DelayInfo> personId2DelayInfo = new HashMap<>() ;
 
 	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -194,17 +197,20 @@ Wait2LinkEventHandler {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		} else { // car!
-			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
-			
 			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
+
+			LinkCongestionInfo linkInfo = getOrCreateLinkInfo(event.getLinkId());
 
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 
 			calculateCongestion(event);
-
-			linkInfo.getFlowQueue().add( personId );
-			linkInfo.getDelayQueue().add( personId ) ;
 			
+			Double linkEnterTime = linkInfo.getPersonId2linkEnterTime().get( personId ) ;
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( linkEnterTime ).build() ;
+			
+			linkInfo.getFlowQueue().add( delayInfo ) ;
+			linkInfo.getDelayQueue().add( delayInfo ) ;
+
 			linkInfo.memorizeLastLinkLeaveEvent( event );
 			
 //			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
@@ -227,12 +233,11 @@ Wait2LinkEventHandler {
 				linkInfo.getDelayQueue().clear() ;
 			}
 		}
-
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-			if ( time > earliestLeaveTime + 1.){
+			if ( time > earliestLeaveTime + 1.) {
 				// bottleneck no longer active; remove data:
 				linkInfo.getFlowQueue().clear();
 			}
@@ -242,8 +247,12 @@ Wait2LinkEventHandler {
 	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId);
 		
-		for ( Iterator<Id<Person>> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
-			Id<Person> causingPersonId = it.next() ;
+		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
+			// "add" will, presumably, add at the end.  So the newest are latest.  So a descending
+			
+			DelayInfo delayInfo = it.next();
+			
+			Id<Person> causingPersonId = delayInfo.personId ;
 			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
 			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
 
@@ -252,11 +261,16 @@ Wait2LinkEventHandler {
 			}
 			
 			if (affectedVehId.toString().equals(causingPersonId.toString())) {
-				//					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+				// log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
+				// (one place where we need the link enter time way beyond the time when the vehicle is on the link)
+
+//				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
+				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
+				
 				CongestionEvent congestionEvent = new CongestionEvent(now, "flowStorageCapacity", causingPersonId, 
-						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, linkInfo.getPersonId2linkEnterTime().get(causingPersonId));
+						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
 				this.events.processEvent(congestionEvent);
 				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
 			}

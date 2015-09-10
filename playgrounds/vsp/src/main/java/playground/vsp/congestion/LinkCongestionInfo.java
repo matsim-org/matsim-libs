@@ -22,7 +22,6 @@
  */
 package playground.vsp.congestion;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -33,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -47,13 +45,13 @@ public final class LinkCongestionInfo {
 	private Id<Link> linkId;
 	private double freeTravelTime;
 	private double marginalDelayPerLeavingVehicle_sec;
-	private LinkedList<Id<Person>> flowQueue = new LinkedList<Id<Person>>();
+	private LinkedList<DelayInfo> flowQueue = new LinkedList<>();
 	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<Id<Person>, Double>();
 	private LinkLeaveEvent lastLeavingAgent;
 
 	private double storageCapacityCars;
-	private LinkedList<Id<Person>> delayQueue = new LinkedList<>() ;
+	private LinkedList<DelayInfo> delayQueue = new LinkedList<>() ;
 	
 	public Id<Link> getLinkId() {
 		return linkId;
@@ -72,9 +70,6 @@ public final class LinkCongestionInfo {
 	}
 	public void setFreeTravelTime(double freeTravelTime) {
 		this.freeTravelTime = freeTravelTime;
-	}
-	public LinkedList<Id<Person>> getFlowQueue() {
-		return flowQueue;
 	}
 	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
 		return personId2freeSpeedLeaveTime;
@@ -104,8 +99,19 @@ public final class LinkCongestionInfo {
 	public void setStorageCapacityCars(double storageCapacityCars) {
 		this.storageCapacityCars = storageCapacityCars;
 	}
-	public List<Id<Person>> getDelayQueue() {
+	/**
+	 * Vehicles that have left the link in previous time steps, while the bottleneck was "active".  
+	 * The flow queue is in consequence interrupted when the bottleneck is not active, which is when time headway > 1/cap + eps
+	 */
+	public LinkedList<DelayInfo> getFlowQueue() {
+		return flowQueue;
+	}
+	/**
+	 * Vehicles that have left the link in previous time steps with a delay.  
+	 * The delay queue is in consequence interrupted when vehicles leave the link without a delay.
+	 */
+	public LinkedList<DelayInfo> getDelayQueue() {
 		return this.delayQueue ;
-	}	
+	}
 
 }
