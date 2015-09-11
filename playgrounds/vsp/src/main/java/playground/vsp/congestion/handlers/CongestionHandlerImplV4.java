@@ -83,31 +83,11 @@ Wait2LinkEventHandler {
 	private Scenario scenario;
 	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
 
-	/**
-	 * This list is used to store entering agents, (1) which can not be cleared in personId2EnteringAgents map because 
-	 * linkEnterTime is required later (2) and these agents should not be charged since they already left the link. 
-	 */
-	private Map<Id<Link>,List<Id<Person>>> linkId2ExcludeEnteringAgentsList = new HashMap<>();
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event){
-		super.handleEvent(event);
-
-		if(event.getLegMode().equals(TransportMode.car)) {
-			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
-
-			for (Id<Link>linkId : this.linkId2ExcludeEnteringAgentsList.keySet()){
-				// This is necessary so that an agent once charged can be charged again if causing storageDelay.
-				this.linkId2ExcludeEnteringAgentsList.get(linkId).remove(event.getPersonId());
-			}
-		}
-	}
-
 	@Override
 	final void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-		
+
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
 
@@ -139,20 +119,6 @@ Wait2LinkEventHandler {
 
 		} else {
 			this.addToDelayNotInternalized_storageCapacity(storageDelay);
-		}
-	}
-
-	private void memorizeSpillBackCausingLinkForCurrentLink(Id<Link> currentLink, Id<Link> spillBackCausingLink) {
-		if( this.linkId2SpillBackCausingLinks.containsKey( currentLink ) ) {
-			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
-			 * first removing the link (optional operation) and then adding it to the end of the list.
-			 * Necessary in part because links are never removed from this data structure.
-			 */
-			this.linkId2SpillBackCausingLinks.get(currentLink).remove(spillBackCausingLink);
-			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
-		} else {
-			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
-
 		}
 	}
 
@@ -193,26 +159,23 @@ Wait2LinkEventHandler {
 			// (didn't find an easier way both to be able to remove by Id and to iterate from back. sep'15, kai)
 			AgentOnLinkInfo agentInfo = it.next() ;
 			Id<Person> causingPersonId = agentInfo.getPersonId() ;
-			//			if ( !this.linkId2ExcludeEnteringAgentsList.get( spillbackCausingLink ).contains( causingPersonId ) ) 
-			{
-				double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPersonId, affectedPersonId, 
-						agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
-				this.getEventsManager().processEvent(congestionEvent); 
+			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPersonId, affectedPersonId, 
+					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
+			this.getEventsManager().processEvent(congestionEvent); 
 
-				this.addToTotalInternalizedDelay(agentDelay);
+			this.addToTotalInternalizedDelay(agentDelay);
 
-				remainingDelay = remainingDelay - agentDelay;
-				if (remainingDelay <=0 ) {
-					break ;
-				}
+			remainingDelay = remainingDelay - agentDelay;
+			if (remainingDelay <=0 ) {
+				break ;
 			}
 		}
 
 		if(remainingDelay>0){
 			// now charge agents that have already left:
-			// TODO here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
+			// here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
 			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
 		}
 
@@ -240,21 +203,22 @@ Wait2LinkEventHandler {
 		if(linkInfo.getFlowQueue().isEmpty()){
 			// (i.e. time headway of current vehicle to previous vehicle > 1/cap)
 
-			double timeGap = 0;
+			double originalTimeGap = 0;
 
 			for ( Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ; it.hasNext() ; ) {
 				DelayInfo causingAgentDelayInfo = it.next() ;
 				Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
 
+				originalTimeGap = affectedAgentDelayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
+				// meaning that the original time gap would have been < 1/cap
 
-				timeGap = affectedAgentDelayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
-
-				if(timeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
+				if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 					double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 					// this person should be charged here.
 					CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", causingAgentId, 
-							event.getPersonId(), agentDelay, event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(event.getPersonId()) );
+							event.getPersonId(), agentDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
 					this.getEventsManager().processEvent(congestionEvent); 
+					System.err.println( congestionEvent ) ;
 					this.addToTotalInternalizedDelay(agentDelay);
 
 					remainingDelay = remainingDelay - agentDelay;
@@ -273,4 +237,18 @@ Wait2LinkEventHandler {
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
 	}
 
+	private void memorizeSpillBackCausingLinkForCurrentLink(Id<Link> currentLink, Id<Link> spillBackCausingLink) {
+		if( this.linkId2SpillBackCausingLinks.containsKey( currentLink ) ) {
+			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
+			 * first removing the link (optional operation) and then adding it to the end of the list.
+			 * Necessary in part because links are never removed from this data structure.
+			 */
+			this.linkId2SpillBackCausingLinks.get(currentLink).remove(spillBackCausingLink);
+			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
+		} else {
+			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
+			
+		}
+	}
 }
+
