@@ -34,7 +34,7 @@ import java.util.TreeSet;
 /**
  * Default implementation of {@link Person} interface.
  */
-public class PersonImpl implements Person {
+public final class PersonImpl implements Person {
 
 	protected List<Plan> plans = new ArrayList<Plan>(6);
 	protected Id<Person> id;
@@ -46,7 +46,7 @@ public class PersonImpl implements Person {
 	private Customizable customizableDelegate;
 
 	@Deprecated // please try to use the factory: pop.getFactory().create...
-	protected PersonImpl(final Id<Person> id) {
+	 PersonImpl(final Id<Person> id) {
 		this.id = id;
 	}
 

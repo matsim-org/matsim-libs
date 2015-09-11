@@ -81,7 +81,6 @@ public class Controler extends AbstractController {
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
 	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";

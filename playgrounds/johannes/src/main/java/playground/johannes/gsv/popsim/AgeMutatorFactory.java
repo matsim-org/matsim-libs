@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.synpop.sim.Mutator;
+
+import java.util.Random;
 
 /**
  * @author johannes

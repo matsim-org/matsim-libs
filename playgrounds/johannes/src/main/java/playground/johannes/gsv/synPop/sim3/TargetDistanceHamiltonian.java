@@ -25,6 +25,7 @@ import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.Hamiltonian;
 
 /**
  * @author johannes

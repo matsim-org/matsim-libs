@@ -21,13 +21,13 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.InterpolatingDiscretizer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.Hamiltonian;
 
 import java.util.Collection;
 
@@ -124,7 +124,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.sim.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
 	public double evaluate(Person person) {

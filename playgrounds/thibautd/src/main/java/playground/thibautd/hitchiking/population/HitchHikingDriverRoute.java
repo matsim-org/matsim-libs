@@ -26,14 +26,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.GenericRoute;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
  * @author thibautd
  */
-public class HitchHikingDriverRoute extends AbstractRoute implements GenericRoute {
+public class HitchHikingDriverRoute extends AbstractRoute {
 	private static final String PU_DO_SEP = "|";
 	private static final String DO_DO_SEP = ";";
 
@@ -58,12 +57,7 @@ public class HitchHikingDriverRoute extends AbstractRoute implements GenericRout
 
 	@Override
 	public void setRouteDescription(
-			final Id<Link> startLinkId,
-			final String routeDescription,
-			final Id<Link> endLinkId) {
-		setStartLinkId( startLinkId );
-		setEndLinkId( endLinkId );
-
+			final String routeDescription) {
 		String[] puAndDos = routeDescription.trim().split( PU_DO_SEP );
 		puLinkId = Id.create( puAndDos[0].trim() , Link.class );
 

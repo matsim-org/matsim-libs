@@ -1,27 +1,23 @@
 package playground.wrashid.lib.tools.events;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.events.handler.EventHandler;
 
 
 public class SampleEvents {
@@ -38,13 +34,13 @@ public class SampleEvents {
 //		String inputEventsFile = "H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
 //		String outputEventsFile = "H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/events sampling/5pct-sample-2-events.txt.txt.gz";
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		EventsFilter eventsFilter = new EventsFilter(outputEventsFile, sampleFraction);
 
 		events.addHandler(eventsFilter);
 
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 
 		reader.readFile(inputEventsFile);
 
@@ -72,7 +68,8 @@ public class SampleEvents {
 			ignorePersonsSet=new HashSet<Id>(); 
 		}
 
-		public void handleEvent(ActivityEndEvent event) {
+		@Override
+	public void handleEvent(ActivityEndEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -96,7 +93,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(ActivityStartEvent event) {
+		@Override
+	public void handleEvent(ActivityStartEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -110,7 +108,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(PersonArrivalEvent event) {
+		@Override
+	public void handleEvent(PersonArrivalEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -124,7 +123,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(PersonDepartureEvent event) {
+		@Override
+	public void handleEvent(PersonDepartureEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -138,7 +138,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(PersonStuckEvent event) {
+		@Override
+	public void handleEvent(PersonStuckEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -152,7 +153,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(PersonMoneyEvent event) {
+		@Override
+	public void handleEvent(PersonMoneyEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -166,7 +168,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(Wait2LinkEvent event) {
+		@Override
+	public void handleEvent(Wait2LinkEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -180,7 +183,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(LinkEnterEvent event) {
+		@Override
+	public void handleEvent(LinkEnterEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {
@@ -194,7 +198,8 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(LinkLeaveEvent event) {
+		@Override
+	public void handleEvent(LinkLeaveEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {

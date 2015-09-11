@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -43,11 +43,11 @@ public class JourneyPurposeHandler implements LegAttributeHandler {
 		} else if(purpose.equalsIgnoreCase("andere Privatreise")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
 		} else if(purpose.equalsIgnoreCase("Dienst- oder Geschäftsreise")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS);
 		} else if(purpose.equalsIgnoreCase("Fahrt als Berufspendler | Wochenendpendler")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "wecommuter");
 		} else {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.MISC);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.MISC);
 		}
 	}
 

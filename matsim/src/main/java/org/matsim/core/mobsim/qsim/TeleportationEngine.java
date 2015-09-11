@@ -18,6 +18,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 
+import javax.inject.Inject;
 import java.util.*;
 
 public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
@@ -43,6 +44,7 @@ VisData {
 	private Scenario scenario;
 	private EventsManager eventsManager;
 
+	@Inject
 	public TeleportationEngine(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;

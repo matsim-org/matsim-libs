@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.MatsimEventsReader;
 
 //this code calculates circulation flow or outflow, 
 //depending on what event handler you choose in OutFlowInfoCollectorWithPT
@@ -71,7 +71,7 @@ public class MainFlowAnalysisWithPt {
 		events.addHandler(flowAnalyzer); // add handler
 		//eventsInflow.addHandler(inflowAnalyzer);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		//EventsReaderTXTv1 readerInflow= new EventsReaderTXTv1(eventsInflow);
 		
 		reader.readFile(eventsFile); //where we find events data

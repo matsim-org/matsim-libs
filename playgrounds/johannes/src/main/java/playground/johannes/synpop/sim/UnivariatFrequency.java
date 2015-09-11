@@ -19,7 +19,6 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Person;

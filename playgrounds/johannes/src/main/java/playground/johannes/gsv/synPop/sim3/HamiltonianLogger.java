@@ -26,7 +26,7 @@ import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.Hamiltonian;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
@@ -35,7 +35,7 @@ public class SetMissingActTypes implements EpisodeTask {
 	public void apply(Episode plan) {
 		for(Attributable act : plan.getActivities()) {
 			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE) == null) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.LEISURE);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.LEISURE);
 			}
 		}
 		

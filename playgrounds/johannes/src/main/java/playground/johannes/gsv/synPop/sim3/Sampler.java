@@ -23,7 +23,8 @@ import org.apache.log4j.Logger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.Hamiltonian;
+import playground.johannes.synpop.sim.Mutator;
 
 import java.util.Collection;
 import java.util.List;

@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -504,12 +503,14 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		route.setDistance(distance);
 		route.setTravelTime( travelTime);
 		
+		route.setStartLinkId(startLink.getId());
+		route.setEndLinkId(destinationLink.getId());
 		if (mode.equals("twowaycarsharing"))
-			route.setRouteDescription(startLink.getId(), "TW_" + (twVehId), destinationLink.getId());
+			route.setRouteDescription("TW_" + (twVehId));
 		else if (mode.equals("onewaycarsharing"))
-			route.setRouteDescription(startLink.getId(), "OW_" + (owVehId), destinationLink.getId());
+			route.setRouteDescription("OW_" + (owVehId));
 		else if (mode.equals("freefloating"))
-			route.setRouteDescription(startLink.getId(), "FF_" + (ffVehId), destinationLink.getId());
+			route.setRouteDescription("FF_" + (ffVehId));
 
 
 		carLeg.setRoute(route);
@@ -1058,7 +1059,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

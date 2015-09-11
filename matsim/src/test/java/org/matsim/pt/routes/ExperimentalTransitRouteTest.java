@@ -22,8 +22,6 @@ package org.matsim.pt.routes;
 
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +34,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
+
+import junit.framework.TestCase;
 
 public class ExperimentalTransitRouteTest extends TestCase {
 
@@ -52,8 +52,8 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testInitializationStops() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 5, (double) 11), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 18, (double) 7), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(5, 11), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(18, 7), false);
 		Link link1 = new FakeLink(Id.create(3, Link.class));
 		Link link2 = new FakeLink(Id.create(4, Link.class));
 		stop1.setLinkId(link1.getId());
@@ -93,7 +93,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testSetRouteDescription_PtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1===5===11===1980===1055", null);
+		route.setRouteDescription("PT1===5===11===1980===1055");
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
 		assertEquals("1980", route.getRouteId().toString());
@@ -103,7 +103,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testSetRouteDescription_PtRouteWithDescription() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "PT1===5===11===1980===1055===this is a===valid route", null);
+		route.setRouteDescription("PT1===5===11===1980===1055===this is a===valid route");
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
 		assertEquals("1980", route.getRouteId().toString());
@@ -113,7 +113,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testSetRouteDescription_NonPtRoute() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		route.setRouteDescription(null, "23 42 7 21", null);
+		route.setRouteDescription("23 42 7 21");
 		assertNull(route.getAccessStopId());
 		assertNull(route.getLineId());
 		assertNull(route.getEgressStopId());

@@ -193,8 +193,8 @@ public class ControlerTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 100, (double) 0));
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(100, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Link link = network.getFactory().createLink(Id.create(1, Link.class), node1, node2);
@@ -527,8 +527,6 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
 	}
@@ -568,38 +566,6 @@ public class ControlerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsTxt() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
-
-		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setWriteEventsInterval(1);
-		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new FakeMobsim();
-					}
-				});
-			}
-		});
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
 	public void testSetWriteEventsXml() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
@@ -624,39 +590,6 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0,  Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testSetWriteEventsTxtXml() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
-
-		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setWriteEventsInterval(1);
-		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new FakeMobsim();
-					}
-				});
-			}
-		});
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 

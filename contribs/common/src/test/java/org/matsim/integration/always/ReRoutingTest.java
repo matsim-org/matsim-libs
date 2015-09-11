@@ -45,7 +45,7 @@ public class ReRoutingTest extends MatsimTestCase {
 		config.qsim().setTimeStepSize(10.0);
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
+		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setLastIteration(1);
 
 		/*

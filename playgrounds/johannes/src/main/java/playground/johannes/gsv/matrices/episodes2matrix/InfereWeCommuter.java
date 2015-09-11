@@ -19,12 +19,8 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -58,10 +54,10 @@ public class InfereWeCommuter implements EpisodeTask {
                         String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
                         String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
-                        if(ActivityType.WORK.equalsIgnoreCase(prevType) & ActivityType.HOME.equalsIgnoreCase
+                        if(ActivityTypes.WORK.equalsIgnoreCase(prevType) & ActivityTypes.HOME.equalsIgnoreCase
                                 (nextType)) {
                             leg.setAttribute(CommonKeys.LEG_PURPOSE, WECOMMUTER);
-                        } else if (ActivityType.WORK.equalsIgnoreCase(nextType) & ActivityType.HOME.equalsIgnoreCase
+                        } else if (ActivityTypes.WORK.equalsIgnoreCase(nextType) & ActivityTypes.HOME.equalsIgnoreCase
                                 (prevType)) {
                             leg.setAttribute(CommonKeys.LEG_PURPOSE, WECOMMUTER);
                         }

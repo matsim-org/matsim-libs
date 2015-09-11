@@ -20,6 +20,9 @@
 
 package playground.sergioo.typesPopulation2013.population;
 
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,7 +33,8 @@ import org.matsim.core.population.PersonUtils;
 /**
  * Default implementation of {@link Person} interface.
  */
-public class PersonImplPops extends PersonImpl {
+public class PersonImplPops implements Person {
+	private final Person delegate ;
 
 	public static final String DEFAULT_POP = "-1";
 	public static final Id<Population> DEFAULT_POP_ID = Id.create(DEFAULT_POP, Population.class);
@@ -38,15 +42,15 @@ public class PersonImplPops extends PersonImpl {
 	private Id<Population> populationId;
 
 	public PersonImplPops(Id<Person> id) {
-		super(id);
+		delegate = PersonImpl.createPerson(id);
 		this.populationId = DEFAULT_POP_ID;
 	}
 	public PersonImplPops(Id<Person> id, Id<Population> populationId) {
-		super(id);
+		delegate = PersonImpl.createPerson(id);
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
 	}
 	public PersonImplPops(Person person, Id<Population> populationId) {
-		super(person.getId());
+		delegate = PersonImpl.createPerson(person.getId());
 		PersonUtils.setAge(this, PersonUtils.getAge(person));
 		PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(person));
 		PersonUtils.setEmployed(this, PersonUtils.isEmployed(person));
@@ -64,5 +68,29 @@ public class PersonImplPops extends PersonImpl {
 	public void setPopulationId(Id<Population> populationId) {
 		this.populationId = populationId;
 	}
+		public List<? extends Plan> getPlans() {
+			return delegate.getPlans();
+		}
+		public boolean addPlan(Plan p) {
+			return delegate.addPlan(p);
+		}
+		public boolean removePlan(Plan p) {
+			return delegate.removePlan(p);
+		}
+		public Plan getSelectedPlan() {
+			return delegate.getSelectedPlan();
+		}
+		public void setSelectedPlan(Plan selectedPlan) {
+			delegate.setSelectedPlan(selectedPlan);
+		}
+		public Plan createCopyOfSelectedPlanAndMakeSelected() {
+			return delegate.createCopyOfSelectedPlanAndMakeSelected();
+		}
+		public Id<Person> getId() {
+			return delegate.getId();
+		}
+		public Map<String, Object> getCustomAttributes() {
+			return delegate.getCustomAttributes();
+		}
 
 }

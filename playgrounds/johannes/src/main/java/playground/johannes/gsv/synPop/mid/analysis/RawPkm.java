@@ -21,13 +21,12 @@ package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 import java.io.IOException;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.source.mid2008.generator.RowHandler;
-import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 /**
  * @author johannes
@@ -91,16 +90,16 @@ public class RawPkm {
 			}
 
 			if (typeId.equalsIgnoreCase("Erreichen des Arbeitsplatzes")) {
-				return ActivityType.WORK;
+				return ActivityTypes.WORK;
 
 			} else if (typeId.equalsIgnoreCase("dienstlich oder geschäftlich")) {
-				return ActivityType.BUSINESS;
+				return ActivityTypes.BUSINESS;
 
 			} else if (typeId.equalsIgnoreCase("Erreichen der Ausbildungsstätte oder Schule")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else if (typeId.equalsIgnoreCase("Einkauf")) {
-				return ActivityType.SHOP;
+				return ActivityTypes.SHOP;
 
 			} else if (typeId.equalsIgnoreCase("private Erledigungen")) {
 				return "private";
@@ -128,19 +127,19 @@ public class RawPkm {
 						return "vacations_long";
 					}
 				}
-				return ActivityType.LEISURE;
+				return ActivityTypes.LEISURE;
 
 			} else if (typeId.equalsIgnoreCase("nach Hause")) {
-				return ActivityType.HOME;
+				return ActivityTypes.HOME;
 
 			} else if (typeId.equalsIgnoreCase("zur Schule oder Vorschule")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else if (typeId.equalsIgnoreCase("Kindertagesstätte oder Kindergarten")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else {
-				return ActivityType.MISC;
+				return ActivityTypes.MISC;
 			}
 
 		}

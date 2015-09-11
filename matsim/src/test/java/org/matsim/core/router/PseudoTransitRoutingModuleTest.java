@@ -37,9 +37,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,9 +54,9 @@ public class PseudoTransitRoutingModuleTest {
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.pt);
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
+		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
+		Activity toAct = new ActivityImpl("h", new Coord(0, 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
 		double tt = new PseudoTransitRoutingModule(
@@ -65,7 +64,7 @@ public class PseudoTransitRoutingModuleTest {
 				f.s.getNetwork(), routeAlgo, 2.0, 1.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(400.0, tt, 1e-8);
 		Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
-		Assert.assertTrue(leg.getRoute() instanceof GenericRoute);
+		Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 		Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		tt = new PseudoTransitRoutingModule(
 				"mode", f.s.getPopulation().getFactory(),
@@ -81,10 +80,10 @@ public class PseudoTransitRoutingModuleTest {
 		public Fixture() {
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
-			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
-			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 0, (double) 2000));
-			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 0, (double) 3000));
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord(0, 1000));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord(0, 2000));
+			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord(0, 3000));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);

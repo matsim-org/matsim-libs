@@ -19,11 +19,11 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -36,56 +36,56 @@ public class LegPurposeHandler implements LegAttributeHandler {
 		String val = attributes.get(VariableNames.LEG_MAIN_TYPE);
 
 		if(val.equalsIgnoreCase("1")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.WORK);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.WORK);
 			
 		} else if(val.equalsIgnoreCase("2")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS);
 			
 		} else if(val.equalsIgnoreCase("3")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
 			
 		} else if(val.equalsIgnoreCase("4")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.SHOP);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.SHOP);
 			
 		} else if(val.equalsIgnoreCase("5")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.PRIVATE);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.PRIVATE);
 			
 		} else if(val.equalsIgnoreCase("6")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.PICKDROP);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.PICKDROP);
 			
 		} else if(val.equalsIgnoreCase("7")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.LEISURE);
 			
 			String subtype = attributes.get(VariableNames.LEG_SUB_TYPE);
 			if(subtype != null) {
 				if(subtype.equalsIgnoreCase("701")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.VISIT);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VISIT);
 				} else if(subtype.equalsIgnoreCase("702")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.CULTURE);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.CULTURE);
 				} else if(subtype.equalsIgnoreCase("703")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.CULTURE);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.CULTURE);
 				} else if(subtype.equalsIgnoreCase("701")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.SPORT);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.SPORT);
 				} else if(subtype.equalsIgnoreCase("706")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.GASTRO);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.GASTRO);
 				} else if(subtype.equalsIgnoreCase("708")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.VACATIONS_SHORT);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_SHORT);
 				} else if(subtype.equalsIgnoreCase("709")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.VACATIONS_LONG);
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_LONG);
 				}
 			}
 			
 		} else if(val.equalsIgnoreCase("8")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.HOME);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.HOME);
 			
 		} else if(val.equalsIgnoreCase("31")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
 			
 		} else if(val.equalsIgnoreCase("32")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
 			
 		} else {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.MISC);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.MISC);
 		}
 		
 	}
