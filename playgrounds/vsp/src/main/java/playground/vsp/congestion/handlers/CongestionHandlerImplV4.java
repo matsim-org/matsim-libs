@@ -80,12 +80,12 @@ Wait2LinkEventHandler {
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
 
-		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayInfo, delayOnTheLink);
-		// yyyy check if we really need this
 
 		if( linkInfo.getFlowQueue().isEmpty()){
 			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
 			// and our own bottleneck is not active)
+
+			delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayInfo, delayOnTheLink);
 
 			Id<Person> driverId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(driverId);
@@ -189,32 +189,28 @@ Wait2LinkEventHandler {
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 
-		if(linkInfo.getFlowQueue().isEmpty()){
-			// (i.e. time headway of current vehicle to previous vehicle > 1/cap)
+		double originalTimeGap = 0;
 
-			double originalTimeGap = 0;
+		for ( Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ; it.hasNext() ; ) {
+			DelayInfo causingAgentDelayInfo = it.next() ;
+			Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
 
-			for ( Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ; it.hasNext() ; ) {
-				DelayInfo causingAgentDelayInfo = it.next() ;
-				Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
+			originalTimeGap = affectedAgentDelayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
+			// meaning that the original time gap would have been < 1/cap
 
-				originalTimeGap = affectedAgentDelayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
-				// meaning that the original time gap would have been < 1/cap
+			if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
+				double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+				// this person should be charged here.
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", causingAgentId, 
+						event.getPersonId(), agentDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
+				this.getEventsManager().processEvent(congestionEvent); 
+				System.err.println( congestionEvent ) ;
+				this.addToTotalInternalizedDelay(agentDelay);
 
-				if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
-					double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
-					// this person should be charged here.
-					CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", causingAgentId, 
-							event.getPersonId(), agentDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
-					this.getEventsManager().processEvent(congestionEvent); 
-					System.err.println( congestionEvent ) ;
-					this.addToTotalInternalizedDelay(agentDelay);
-
-					remainingDelay = remainingDelay - agentDelay;
-				} else {
-					// since timeGap is higher than marginalFlowDelay, no need for further look up.
-					break;
-				}
+				remainingDelay = remainingDelay - agentDelay;
+			} else {
+				// since timeGap is higher than marginalFlowDelay, no need for further look up.
+				break;
 			}
 		}
 		return remainingDelay;
