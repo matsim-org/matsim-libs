@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,6 +51,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
+import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -70,7 +72,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 
 public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler,
-Wait2LinkEventHandler {
+Wait2LinkEventHandler, CongestionEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
@@ -89,7 +91,7 @@ Wait2LinkEventHandler {
 	@Override
 	public void handleEvent(PersonArrivalEvent event){
 		super.handleEvent(event);
-		
+
 		if(event.getLegMode().equals(TransportMode.car)) {
 			this.getLinkId2congestionInfo().get(event.getLinkId()).getPersonId2linkEnterTime().remove(event.getPersonId());
 
@@ -99,17 +101,19 @@ Wait2LinkEventHandler {
 			}
 		}
 	}
-	
+
 	@Override
 	final void calculateCongestion(LinkLeaveEvent event) {
 
 		storeExcludedEnteringAgents(event);
+		// yyyy check if we really need this
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		if(delayOnTheLink==0) return;
 
 		delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayOnTheLink);
+		// yyyy check if we really need this
 
 		if( linkInfo.getFlowQueue().isEmpty()){
 			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
@@ -180,34 +184,31 @@ Wait2LinkEventHandler {
 	}
 
 	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
+		Id<Person> affectedPersonId = event.getPersonId();
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.getLinkId2congestionInfo().get(spillbackCausingLink);
-		List<Id<Person>> personsEnteredOnSpillBackCausingLink = 
-				new ArrayList<Id<Person>>(spillbackLinkCongestionInfo.getPersonId2linkEnterTime().keySet()); 
 
-		personsEnteredOnSpillBackCausingLink.removeAll(this.linkId2ExcludeEnteringAgentsList.get(spillbackCausingLink)); 
-		// these agents shoudld not be charged because they have already left the link.
-		// TODO : need to find a better way to do this.
+		final LinkedList<AgentOnLinkInfo> agentsOnLinksAsDeque = new LinkedList<AgentOnLinkInfo>( spillbackLinkCongestionInfo.getAgentsOnLink().values() );
+		for ( Iterator<AgentOnLinkInfo> it = agentsOnLinksAsDeque.descendingIterator() ; it.hasNext() ; ) {
+			// (didn't find an easier way both to be able to remove by Id and to iterate from back. sep'15, kai)
+			AgentOnLinkInfo agentInfo = it.next() ;
+			Id<Person> causingPersonId = agentInfo.getPersonId() ;
+//			if ( !this.linkId2ExcludeEnteringAgentsList.get( spillbackCausingLink ).contains( causingPersonId ) ) 
+			{
+				double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-		Collections.reverse(personsEnteredOnSpillBackCausingLink);
-		//		cant use leavingAgents list for the order of entering agents since it is modified in updateFlowQueue(...) before calculateCongestion(...).
-		//		thus, must use LinkedHashMap for perosnId2LinkEnterTime.
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPersonId, affectedPersonId, 
+						agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
+				this.getEventsManager().processEvent(congestionEvent); 
 
-		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
-		while(remainingDelay > 0  && enteredPersonsListIterator.hasNext()){
+				this.addToTotalInternalizedDelay(agentDelay);
 
-			Id<Person> causingPerson = enteredPersonsListIterator.next();
-			Id<Person> affectedPerson = event.getPersonId();
-
-			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
-
-			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPerson, affectedPerson, agentDelay, spillbackCausingLink,
-					spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPerson) );
-			this.getEventsManager().processEvent(congestionEvent); 
-			this.addToTotalInternalizedDelay(agentDelay);
-
-			remainingDelay = remainingDelay - agentDelay;
+				remainingDelay = remainingDelay - agentDelay;
+				if (remainingDelay <=0 ) {
+					break ;
+				}
+			}
 		}
 
 		if(remainingDelay>0){
@@ -315,6 +316,11 @@ Wait2LinkEventHandler {
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
+	}
+
+	@Override
+	public void handleEvent(CongestionEvent event) {
+		//		System.err.println( event );
 	}
 
 }
