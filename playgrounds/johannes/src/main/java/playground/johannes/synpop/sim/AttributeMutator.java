@@ -17,31 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-
-import java.util.Random;
+import playground.johannes.synpop.sim.data.CachedElement;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class AttributeMutator implements RandomElementMutator {
 
-	private final Random random;
+    private final Object dataKey;
 
-	private final HistogramSync histSync;
+    private final AttributeChangeListener listener;
 
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
+    private final ValueGenerator generator;
 
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
+    private Object oldValue;
 
+    public AttributeMutator(Object dataKey, ValueGenerator generator, AttributeChangeListener listener) {
+        this.dataKey = dataKey;
+        this.listener = listener;
+        this.generator = generator;
+    }
+
+    @Override
+    public boolean modify(CachedElement element) {
+        oldValue = element.getData(dataKey);
+        Object newValue = generator.newValue(element);
+        element.setData(dataKey, newValue);
+
+        if (listener != null) listener.onChange(dataKey, oldValue, newValue, element);
+
+        return true;
+    }
+
+    @Override
+    public void revert(CachedElement element) {
+        Object newValue = element.getData(dataKey);
+        element.setData(dataKey, oldValue);
+
+        if (listener != null) listener.onChange(dataKey, newValue, oldValue, element);
+
+    }
 }

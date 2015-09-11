@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.popsim;
 
+import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.sim.Mutator;
 
 import java.util.ArrayList;
 import java.util.List;

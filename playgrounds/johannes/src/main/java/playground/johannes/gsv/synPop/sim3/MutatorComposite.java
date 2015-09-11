@@ -21,7 +21,6 @@ package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.sim.Mutator;
 
 import java.util.List;
 import java.util.Random;

@@ -20,10 +20,10 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.*;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.sim.Hamiltonian;
 
 import java.util.Arrays;
 import java.util.Set;

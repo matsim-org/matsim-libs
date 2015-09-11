@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,16 +19,20 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.util.List;
 
-public interface Mutator {
+/**
+ * @author johannes
+ */
+public interface Mutator<T extends Attributable> {
 
-	public List<Person> select(List<Person> persons);
+    public List<T> select(List<CachedPerson> population);
 
-	public boolean modify(List<Person> persons);
-	
-	public void revert(List<Person> persons);
-	
+    public boolean modify(List<T> elements);
+
+    public void revert(List<T> elements);
+
 }

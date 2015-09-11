@@ -24,12 +24,13 @@ import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.sim.data.CachedElement;
+import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -186,7 +187,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
     }
 
     @Override
-    public double evaluate(Person person) {
+    public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
 

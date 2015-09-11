@@ -2,7 +2,6 @@ package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.sim.Mutator;
 
 import java.util.Random;
 

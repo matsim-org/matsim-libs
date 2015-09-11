@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
 
-	private final Random random;
+    private List<Double> thetas = new ArrayList<Double>();
 
-	private final HistogramSync histSync;
+    public void addComponent(Hamiltonian h) {
+        super.addComponent(h);
+        thetas.add(1.0);
+    }
 
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
+    public void addComponent(Hamiltonian h, double theta) {
+        super.addComponent(h);
+        thetas.add(theta);
+    }
 
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
+    public void removeComponent(Hamiltonian h) {
+        int idx = components.indexOf(h);
+        super.removeComponent(h);
+        thetas.remove(idx);
+    }
 
+    /*
+     * TODO: hide access?
+     */
+    public List<Hamiltonian> getComponents() {
+        return components;
+    }
+
+    @Override
+    public double evaluate(Collection<CachedPerson> population) {
+        double sum = 0;
+
+        for (int i = 0; i < components.size(); i++) {
+            sum += thetas.get(i) * components.get(i).evaluate(population);
+        }
+
+        return sum;
+    }
 }

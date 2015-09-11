@@ -20,23 +20,21 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.DependendLegVariableAnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainFactory;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.sim.*;
-import playground.johannes.synpop.sim.AgeMutatorFactory;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -63,7 +61,7 @@ public class Simulator {
 //
 //		}
 
-		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		task.addTask(new AgeIncomeCorrelation());
 		task.addTask(new DependendLegVariableAnalyzerTask(CommonKeys.LEG_START_TIME, CommonKeys.LEG_ROUTE_DISTANCE));
 		task.addTask(new MunicipalityDistanceTask());
@@ -74,12 +72,12 @@ public class Simulator {
 
 //		persons = PersonCloner.weightedClones(persons, 100000, random);
 
-		HamiltonianComposite h = new HamiltonianComposite();
+		final HamiltonianComposite h = new HamiltonianComposite();
 //		h.addComponent(new DistanceVector(persons, random), 100);
 //		Hamiltonian h = new DistanceVector(persons);
 
 		Set<PlainPerson> simPersons = new HashSet<>(100000);
-		Set<CachedPerson> cachedPersons = new HashSet<>(100000);
+
 		for(int i = 0; i < 100000; i++) {
 			PlainPerson p = new PlainPerson(String.valueOf(i));
 
@@ -90,10 +88,9 @@ public class Simulator {
 //			p.setUserData(DistanceVector.AGE_KEY, new Double(p.getAttribute(CommonKeys.PERSON_AGE)));
 
 			simPersons.add(p);
-			cachedPersons.add(new CachedPerson(p));
 		}
 
-		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
+		MutatorComposite<? extends Attributable> factory = new MutatorComposite<>(random);
 //		factory.addFactory(new IncomeMutatorFactory(random));
 //		HistogramSync1D histSyncAge = new HistogramSync1D((Set<PlainPerson>)refPersons, (Set<PlainPerson>)simPersons, CommonKeys.PERSON_AGE,
 //				DistanceVector
@@ -114,45 +111,59 @@ public class Simulator {
 //		h.addComponent(histSyncIncome, 70000);
 //		h.addComponent(histSyncAgeIncomeMean, 0.05);
 
-		UnivariatFrequency ageHamiltonian = new UnivariatFrequency(refPersons, cachedPersons, CommonKeys.PERSON_AGE,
+		UnivariatFrequency ageHamiltonian = new UnivariatFrequency(refPersons, simPersons, CommonKeys.PERSON_AGE,
 				new LinearDiscretizer(1.0));
 		h.addComponent(ageHamiltonian, 1000000);// * cachedPersons.size());
 
 //		UnivariatFrequency income = new UnivariatFrequency(refPersons, cachedPersons, CommonKeys.HH_INCOME, new
 //				InterpolatingDiscretizer(personValues(refPersons, CommonKeys.HH_INCOME)));
-		UnivariatFrequency income = new UnivariatFrequency(refPersons, cachedPersons, CommonKeys.HH_INCOME, new
+		UnivariatFrequency income = new UnivariatFrequency(refPersons, simPersons, CommonKeys.HH_INCOME, new
 				LinearDiscretizer(500));
 		h.addComponent(income, 10000000);
 
-		BivariatMean ageIncome = new BivariatMean(refPersons, cachedPersons, CommonKeys.PERSON_AGE, CommonKeys
+		BivariatMean ageIncome = new BivariatMean(refPersons, simPersons, CommonKeys.PERSON_AGE, CommonKeys
 				.HH_INCOME, new LinearDiscretizer(1.0));
 		h.addComponent(ageIncome, 5);
 
 		AttributeChangeListenerComposite c1 = new AttributeChangeListenerComposite();
 		c1.addComponent(ageHamiltonian);
 		c1.addComponent(ageIncome);
-		factory.addFactory(new AgeMutatorFactory(c1, random));
+		factory.addMutator(new AgeMutatorBuilder(c1, random).build());
 
 		AttributeChangeListenerComposite c2 = new AttributeChangeListenerComposite();
 		c2.addComponent(income);
 		c2.addComponent(ageIncome);
-		factory.addFactory(new IncomeMutatorFactory(c2, random));
+		factory.addMutator(new IncomeMutatorFactory(c2, random).build());
 
-		Sampler sampler = new Sampler(cachedPersons, h, factory, random);
+		MarkovEngine sampler = new MarkovEngine(simPersons, h, factory, random);
 
-		SamplerListenerComposite listener = new SamplerListenerComposite();
+		MarkovEngineListenerComposite listener = new MarkovEngineListenerComposite();
 
 //		Map<Object, String> map = new HashMap<>();
 //		map.put(DistanceVector.AGE_KEY, CommonKeys.PERSON_AGE);
 //		map.put(DistanceVector.INCOME_KEY, CommonKeys.HH_INCOME);
 
 //		listener.addComponent(new SynchronizeUserData(map, 100000));
-		listener.addComponent(new AnalyzerListener(task, "/home/johannes/gsv/germany-scenario/sim/output/", 100000));
-		listener.addComponent(new HamiltonianLogger(h, 100000));
+		listener.addComponent(new MarkovEngineListener() {
 
-		sampler.setSamplerListener(listener);
+			AnalyzerListener l = new AnalyzerListener(task, "/home/johannes/gsv/germany-scenario/sim/output/", 100000);
 
-		sampler.run(4000001, 1);
+			@Override
+			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+				l.afterStep(population, null, accepted);
+			}
+		});
+		listener.addComponent(new MarkovEngineListener() {
+			HamiltonianLogger l = new HamiltonianLogger(h, 100000);
+			@Override
+			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+				l.afterStep(population, null, accepted);
+			}
+		});
+
+		sampler.setListener(listener);
+
+		sampler.run(4000001);
 	}
 
 	private static double[] personValues(Set<? extends Person> persons, String attrKey) {

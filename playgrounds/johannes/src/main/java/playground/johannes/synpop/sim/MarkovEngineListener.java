@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.util.Random;
+import java.util.Collection;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public interface MarkovEngineListener {
 
-	private final Random random;
-
-	private final HistogramSync histSync;
-
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
-
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
+    void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted);
 
 }

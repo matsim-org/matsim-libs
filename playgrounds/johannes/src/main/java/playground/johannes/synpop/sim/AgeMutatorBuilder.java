@@ -19,66 +19,38 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.DoubleConverter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * @author johannes
  */
-public class PersonAttributeMutator implements Mutator {
+public class AgeMutatorBuilder implements MutatorBuilder<CachedPerson> {
 
-    private final Object dataKey;
-
-    private final AttributeChangeListener listener;
-
-    private final ValueGenerator generator;
-
-    private Object oldValue;
-
-    private final List<Person> mutations;
+    public static final Object AGE_DATA_KEY = new Object();
 
     private final Random random;
 
-    public PersonAttributeMutator(Object dataKey, Random random, ValueGenerator generator, AttributeChangeListener
-            listener) {
-        this.dataKey = dataKey;
-        this.random = random;
+    private final RandomIntGenerator generator;
+
+    private final AttributeChangeListener listener;
+
+    public AgeMutatorBuilder(AttributeChangeListener listener, Random random) {
         this.listener = listener;
-        this.generator = generator;
+        this.random = random;
+        generator = new RandomIntGenerator(random, 0, 100);
 
-        mutations = new ArrayList<>(1);
-        mutations.add(null);
+        Converters.register(CommonKeys.PERSON_AGE, AGE_DATA_KEY, DoubleConverter.getInstance());
     }
 
     @Override
-    public List<Person> select(List<Person> persons) {
-        mutations.set(0, persons.get(random.nextInt(persons.size())));
-        return mutations;
-    }
-
-    @Override
-    public boolean modify(List<Person> persons) {
-        CachedPerson person = (CachedPerson)persons.get(0);
-        oldValue = person.getData(dataKey);
-        Object newValue = generator.newValue(person);
-        person.setData(dataKey, newValue);
-
-        if(listener != null) listener.onChange(dataKey, oldValue, newValue, person);
-
-        return true;
-    }
-
-    @Override
-    public void revert(List<Person> persons) {
-        CachedPerson person = (CachedPerson)persons.get(0);
-        Object newValue = person.getData(dataKey);
-        person.setData(dataKey, oldValue);
-
-        if(listener != null) listener.onChange(dataKey, newValue, oldValue, person);
-
+    public Mutator<CachedPerson> build() {
+        RandomElementMutator em = new AttributeMutator(AGE_DATA_KEY, generator, listener);
+        Mutator<CachedPerson> m = new RandomPersonMutator(em, random);
+        return m;
     }
 }

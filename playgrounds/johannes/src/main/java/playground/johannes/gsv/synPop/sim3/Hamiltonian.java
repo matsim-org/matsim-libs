@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-
-import java.util.Random;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public interface Hamiltonian {
 
-	private final Random random;
-
-	private final HistogramSync histSync;
-
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
-
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
-
+	public double evaluate(Person person);
+	
 }

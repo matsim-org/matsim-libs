@@ -20,10 +20,10 @@
 package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.sim.Hamiltonian;
 
 import java.util.ArrayList;
 import java.util.Collection;

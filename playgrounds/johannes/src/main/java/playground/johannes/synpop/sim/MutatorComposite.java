@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,36 +19,45 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.data.DoubleConverter;
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
+import java.util.List;
 import java.util.Random;
 
 /**
  * @author johannes
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class MutatorComposite<T extends Attributable> implements Mutator<T> {
 
-    public static final Object AGE_DATA_KEY = new Object();
+    private final ChoiceSet<Mutator> mutators;
 
-    private final Random random;
+    private Mutator active;
 
-    private final RandomIntGenerator generator;
+    public MutatorComposite(Random random) {
+        mutators = new ChoiceSet<>(random);
+    }
 
-    private final AttributeChangeListener listener;
-
-    public AgeMutatorFactory(AttributeChangeListener listener, Random random) {
-        this.listener = listener;
-        this.random = random;
-        generator = new RandomIntGenerator(random, 0, 100);
-
-        Converters.register(CommonKeys.PERSON_AGE, AGE_DATA_KEY, DoubleConverter.getInstance());
+    public void addMutator(Mutator mutator) {
+        mutators.addChoice(mutator);
     }
 
     @Override
-    public Mutator newInstance() {
-        return new PersonAttributeMutator(AGE_DATA_KEY, random, generator, listener);
+    public List<T> select(List<CachedPerson> persons) {
+        active = mutators.randomChoice();
+        return active.select(persons);
     }
+
+    @Override
+    public boolean modify(List<T> persons) {
+        return active.modify(persons);
+    }
+
+    @Override
+    public void revert(List<T> persons) {
+        active.revert(persons);
+
+    }
+
 }

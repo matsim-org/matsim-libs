@@ -19,7 +19,9 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.sim.data.CachedPerson;
+
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -27,6 +29,6 @@ import playground.johannes.synpop.data.Person;
  */
 public interface Hamiltonian {
 
-	public double evaluate(Person person);
+	public double evaluate(Collection<CachedPerson> population);
 	
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim;
 
-package playground.johannes.gsv.popsim;
+import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-
-import java.util.Random;
+import java.util.List;
 
 /**
- * @author johannes
- *
+ * @author jillenberger
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class RandomTripMutator implements Mutator<CachedSegment> {
 
-	private final Random random;
+    @Override
+    public List<CachedSegment> select(List<CachedPerson> population) {
+        return null;
+    }
 
-	private final HistogramSync histSync;
+    @Override
+    public boolean modify(List<CachedSegment> elements) {
+        return false;
+    }
 
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
+    @Override
+    public void revert(List<CachedSegment> elements) {
 
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
-
+    }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class RandomPersonMutator implements Mutator<CachedPerson> {
 
-	private final Random random;
+    private final RandomElementMutator delegate;
 
-	private final HistogramSync histSync;
+    private final Random random;
 
-	public AgeMutatorFactory(Random random, HistogramSync histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
+    private final List<CachedPerson> mutation;
 
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
-	}
+    public RandomPersonMutator(RandomElementMutator delegate, Random random) {
+        this.delegate = delegate;
+        this.random = random;
+        mutation = new ArrayList<>(1);
+        mutation.add(null);
+    }
 
+    @Override
+    public List<CachedPerson> select(List<CachedPerson> population) {
+        mutation.set(0, population.get(random.nextInt(population.size())));
+        return mutation;
+    }
+
+    @Override
+    public boolean modify(List<CachedPerson> elements) {
+        return delegate.modify(elements.get(0));
+    }
+
+    @Override
+    public void revert(List<CachedPerson> elements) {
+        delegate.revert(elements.get(0));
+
+    }
 }
