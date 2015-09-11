@@ -34,8 +34,8 @@ import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
- * Class to run a simulation of the braess scenario without signals. It also
- * analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * Class to run a simulation of the braess scenario with or without signals. 
+ * It analyzes the simulation with help of AnalyseBraessSimulation.java.
  * 
  * @author tthunig
  * 

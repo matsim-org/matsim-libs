@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -53,7 +53,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, 
-		VehicleAbortEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonLeavesVehicleEventHandler{
+		VehicleAbortsEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonLeavesVehicleEventHandler{
 
 	private Network network;
 	private Map<Id<Vehicle>, Double> networkEnterTimesByVehicleId;

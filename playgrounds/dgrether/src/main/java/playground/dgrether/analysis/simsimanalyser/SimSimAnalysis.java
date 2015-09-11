@@ -42,8 +42,8 @@ import org.matsim.counts.CountSimComparisonImpl;
 public class SimSimAnalysis {
 	private static final Logger log = Logger.getLogger(SimSimAnalysis.class);
 	
-	public Map<Id, List<CountSimComparison>> createCountSimComparisonByLinkId(Network network, VolumesAnalyzer vaCounts, VolumesAnalyzer vaSim){
-		Map<Id, List<CountSimComparison>> countSimComp = new HashMap<Id, List<CountSimComparison>>(network.getLinks().size());
+	public Map<Id<Link>, List<CountSimComparison>> createCountSimComparisonByLinkId(Network network, VolumesAnalyzer vaCounts, VolumesAnalyzer vaSim){
+		Map<Id<Link>, List<CountSimComparison>> countSimComp = new HashMap<Id<Link>, List<CountSimComparison>>(network.getLinks().size());
 
 		for (Link l : network.getLinks().values()) {
 			double[] volumesCounts = vaCounts.getVolumesPerHourForLink(l.getId());

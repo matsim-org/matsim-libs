@@ -304,7 +304,7 @@ public class DgAnalyseCottbusKS2010 {
 
 	private void createAndWriteSimSimComparison(Result baseResult, Result result) {
 		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
-		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
+		Map<Id<Link>, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
 		String shapeBase = baseResult.runInfo.runId + "_it_" + baseResult.runInfo.iteration + "_vs_";
 		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration;
 

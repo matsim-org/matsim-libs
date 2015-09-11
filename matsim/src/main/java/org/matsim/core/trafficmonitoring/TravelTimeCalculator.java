@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -65,7 +65,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler, 
-	VehicleAbortEventHandler {
+	VehicleAbortsEventHandler {
 
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 			"agent is not known the turning move travel time cannot be calculated!";

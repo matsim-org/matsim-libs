@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +48,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author dgrether
  */
-public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortEventHandler, Wait2LinkEventHandler {
+public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler, Wait2LinkEventHandler {
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
