@@ -77,15 +77,14 @@ Wait2LinkEventHandler {
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 
-		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
-		if(delayOnTheLink==0) return;
-
+		double remainingDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		if(remainingDelay==0) return;
 
 		if( linkInfo.getFlowQueue().isEmpty()){
 			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
 			// and our own bottleneck is not active)
 
-			delayOnTheLink = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayInfo, delayOnTheLink);
+			remainingDelay = checkForFlowDelayWhenLeavingAgentsListIsEmpty(event, delayInfo, remainingDelay);
 
 			Id<Person> driverId = this.vehicleId2personId.get( event.getVehicleId() ) ;
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(driverId);
@@ -95,19 +94,19 @@ Wait2LinkEventHandler {
 
 		// charge for the flow delay; remaining delays are said to be storage delay
 		// (might be able to skip this if flow queue is empty, but maybe do this just in case ...)
-		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), delayOnTheLink);
+		remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), remainingDelay);
 
-		if(this.isCalculatingStorageCapacityConstraints() && storageDelay > 0){
+		if(this.isCalculatingStorageCapacityConstraints() && remainingDelay > 0){
 
 			// !! calling the following method is the big difference to V3 !!!
-			double remainingStorageDelay = allocateStorageDelayToDownstreamLinks(storageDelay, event.getLinkId(), event);
+			remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, event.getLinkId(), event);
 
-			if(remainingStorageDelay > 0.) {
-				throw new RuntimeException(remainingStorageDelay+" sec delay is not internalized. Aborting...");
+			if(remainingDelay > 0.) {
+				throw new RuntimeException(remainingDelay+" sec delay is not internalized. Aborting...");
 			}
 
 		} else {
-			this.addToDelayNotInternalized_storageCapacity(storageDelay);
+			this.addToDelayNotInternalized_storageCapacity(remainingDelay);
 		}
 	}
 
@@ -186,7 +185,7 @@ Wait2LinkEventHandler {
 		// this class, when I found it, started from the personId2freeSpeedLeaveTime data structure, and somehow reduced it, presumably
 		// by those who had not yet left he link, those who had in the meantime arrived, "self", etc.  I say "presumably" because
 		// I did not fully find out.  The tests, however, do not fail if one simply takes the "delay queue" as input. kai, sep'15
-
+		
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 
 		double originalTimeGap = 0;
@@ -200,11 +199,9 @@ Wait2LinkEventHandler {
 
 			if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 				double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
-				// this person should be charged here.
 				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", causingAgentId, 
 						event.getPersonId(), agentDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
 				this.getEventsManager().processEvent(congestionEvent); 
-				System.err.println( congestionEvent ) ;
 				this.addToTotalInternalizedDelay(agentDelay);
 
 				remainingDelay = remainingDelay - agentDelay;

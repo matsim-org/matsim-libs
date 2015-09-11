@@ -210,12 +210,12 @@ PersonArrivalEventHandler {
 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), linkId2congestionInfo, scenario);
 
-			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
-
 			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
 			
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).build() ;
+
+			updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
 			
@@ -244,11 +244,11 @@ PersonArrivalEventHandler {
 
 	// ############################################################################################################################################################
 
-	private final static void updateFlowAndDelayQueues(double time, Id<Person> personId, LinkCongestionInfo linkInfo) {
+	private final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
-			double delay = time - linkInfo.getPersonId2freeSpeedLeaveTime().get( personId ) - 1 ;
+			double delay = time - delayInfo.freeSpeedLeaveTime ;
 			if ( delay < 0 ) {
 				linkInfo.getDelayQueue().clear() ;
 			}
@@ -260,7 +260,9 @@ PersonArrivalEventHandler {
 			if ( time > earliestLeaveTime + 1.) {
 				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
 				
-				// bottleneck no longer active; remove data:
+				// bottleneck no longer active. However, first check for combination of flow and storage delay:
+				
+				
 				linkInfo.getFlowQueue().clear();
 			}
 		}
