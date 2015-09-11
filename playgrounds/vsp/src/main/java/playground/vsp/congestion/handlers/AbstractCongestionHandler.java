@@ -214,13 +214,13 @@ PersonArrivalEventHandler {
 
 			updateFlowAndDelayQueues(event.getTime(), personId, linkInfo );
 
-			calculateCongestion(event);
-			
 			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
 			
-			Double linkEnterTime = linkInfo.getPersonId2linkEnterTime().get( personId ) ;
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( linkEnterTime )
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).build() ;
+
+			calculateCongestion(event, delayInfo);
+			
 			
 			linkInfo.getFlowQueue().add( delayInfo ) ;
 			linkInfo.getDelayQueue().add( delayInfo ) ;
@@ -352,7 +352,7 @@ PersonArrivalEventHandler {
 		return delayNotInternalized_spillbackNoCausingAgent;
 	}
 
-	abstract void calculateCongestion(LinkLeaveEvent event);
+	abstract void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo);
 
 	final boolean isAllowingForStorageCapacityConstraint() {
 		return allowingForStorageCapacityConstraint;

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 
 /** 
@@ -52,7 +53,7 @@ public final class CongestionHandlerImplV3 extends AbstractCongestionHandler imp
 	}
 	
 	@Override
-	void calculateCongestion(LinkLeaveEvent event) {
+	void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		

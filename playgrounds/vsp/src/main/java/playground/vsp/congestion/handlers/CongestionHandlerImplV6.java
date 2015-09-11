@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -52,7 +53,7 @@ public class CongestionHandlerImplV6 extends AbstractCongestionHandler {
 	private Scenario scenario;
 	
 	@Override
-	void calculateCongestion(LinkLeaveEvent event) {
+	void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
