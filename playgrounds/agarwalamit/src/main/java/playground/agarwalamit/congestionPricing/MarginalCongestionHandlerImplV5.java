@@ -41,9 +41,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.vsp.congestion.CongestionUtils;
-import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
+import playground.vsp.congestion.handlers.CongestionUtils;
+import playground.vsp.congestion.handlers.LinkCongestionInfo;
 
 /**
  * @author amit

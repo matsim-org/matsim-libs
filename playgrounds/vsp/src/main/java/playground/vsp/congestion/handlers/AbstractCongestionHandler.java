@@ -57,9 +57,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
-import playground.vsp.congestion.CongestionUtils;
 import playground.vsp.congestion.DelayInfo;
-import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 /**
@@ -390,4 +388,9 @@ PersonArrivalEventHandler {
 	final EventsManager getEventsManager(){
 		return this.events;
 	}
+	final Scenario getScenario() {
+		return this.scenario ;
+	}
+
+
 }

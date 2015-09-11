@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.vsp.congestion;
+package playground.vsp.congestion.handlers;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -32,6 +32,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+
+import playground.vsp.congestion.AgentOnLinkInfo;
+import playground.vsp.congestion.DelayInfo;
 
 
 /**

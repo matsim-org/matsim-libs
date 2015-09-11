@@ -22,25 +22,17 @@
  */
 package playground.vsp.congestion.handlers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -53,7 +45,6 @@ import org.matsim.core.router.TripStructureUtils;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
-import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 //import playground.vsp.congestion.CombinedFlowAndStorageDelayTest;
@@ -77,10 +68,8 @@ Wait2LinkEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
-		this.scenario = scenario;
 	}
 
-	private Scenario scenario;
 	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
 
 	@Override
@@ -232,7 +221,7 @@ Wait2LinkEventHandler {
 	}
 
 	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
-		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
+		List<PlanElement> planElements = this.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
 	}
@@ -247,7 +236,7 @@ Wait2LinkEventHandler {
 			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
 		} else {
 			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
-			
+
 		}
 	}
 }

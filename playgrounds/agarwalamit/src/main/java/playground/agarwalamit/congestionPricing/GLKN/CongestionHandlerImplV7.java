@@ -41,10 +41,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.congestion.CongestionUtils;
 import playground.vsp.congestion.DelayInfo;
-import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
+import playground.vsp.congestion.handlers.CongestionUtils;
+import playground.vsp.congestion.handlers.LinkCongestionInfo;
 
 /**
  * Based on Laemmel2011Diss

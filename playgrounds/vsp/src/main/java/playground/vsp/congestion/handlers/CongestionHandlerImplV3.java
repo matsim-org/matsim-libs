@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.congestion.DelayInfo;
-import playground.vsp.congestion.LinkCongestionInfo;
 
 /** 
  * In this implementation the causing agent for a delay resulting from the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.

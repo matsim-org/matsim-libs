@@ -28,10 +28,10 @@ public final class AgentOnLinkInfo {
 
 	}
 
-	private Id<Person> personId;
-	private Id<Link> linkId;
-	private Double enterTime;
-	private Double freeSpeedLeaveTime;
+	private final  Id<Person> personId;
+	private final Id<Link> linkId;
+	private final Double enterTime;
+	private final Double freeSpeedLeaveTime;
 
 
 	public AgentOnLinkInfo(Id<Person> personId2, Id<Link> linkId, Double enterTime2, Double freeSpeedLeaveTime) {
