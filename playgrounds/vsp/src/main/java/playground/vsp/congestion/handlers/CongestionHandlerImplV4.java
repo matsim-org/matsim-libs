@@ -52,6 +52,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -72,7 +73,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 
 public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler,
-Wait2LinkEventHandler, CongestionEventHandler {
+Wait2LinkEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
@@ -104,9 +105,6 @@ Wait2LinkEventHandler, CongestionEventHandler {
 
 	@Override
 	final void calculateCongestion(LinkLeaveEvent event) {
-
-		storeExcludedEnteringAgents(event);
-		// yyyy check if we really need this
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnTheLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
@@ -231,32 +229,34 @@ Wait2LinkEventHandler, CongestionEventHandler {
 	 * @param delayOnTheLink TODO
 	 */
 	private double checkForFlowDelayWhenLeavingAgentsListIsEmpty(LinkLeaveEvent event, double remainingDelay ){
-
+		// this class, when I found it, started from the personId2freeSpeedLeaveTime data structure, and somehow reduced it, presumably
+		// by those who had not yet left he link, those who had in the meantime arrived, "self", etc.  I say "presumably" because
+		// I did not fully find out.  The tests, however, do not fail if one simply takes the "delay queue" as input. kai, sep'15
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 
 		if(linkInfo.getFlowQueue().isEmpty()){
-
+			// (i.e. time headway of current vehicle to previous vehicle > 1/cap)
+			
 			double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 			double marginalFlowDelay = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			double timeGap = 0;
 
-			// this is sorted based on higher to lower values.
-			Map<Id<Person>,Double> personId2FreeSpeedTime = sortByValues(linkInfo.getPersonId2freeSpeedLeaveTime());
-			boolean startComparingTimeGap = false;
-			for(Id<Person> personId : personId2FreeSpeedTime.keySet()){
+				for ( Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ; it.hasNext() ; ) {
+					DelayInfo info = it.next() ;
+					Id<Person> personId = info.personId ;
 
-				if(startComparingTimeGap){
 
-					double freeSpeedTimeOfAgent = personId2FreeSpeedTime.get(personId);
-					timeGap = freeSpeedLeaveTimeOfNowAgent - freeSpeedTimeOfAgent;
+					timeGap = freeSpeedLeaveTimeOfNowAgent - info.freeSpeedLeaveTime ;
 
 					if(timeGap < marginalFlowDelay) {
 						double agentDelay = Math.min(marginalFlowDelay, remainingDelay);
 						// this person should be charged here.
-						CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", personId, event.getPersonId(), agentDelay, event.getLinkId(),
+						CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", personId, 
+								event.getPersonId(), agentDelay, event.getLinkId(),
 								linkInfo.getPersonId2linkEnterTime().get(event.getPersonId()) );
 						this.getEventsManager().processEvent(congestionEvent); 
+						System.err.println( congestionEvent );
 						this.addToTotalInternalizedDelay(agentDelay);
 
 						remainingDelay = remainingDelay - agentDelay;
@@ -264,63 +264,15 @@ Wait2LinkEventHandler, CongestionEventHandler {
 						// since timeGap is higher than marginalFlowDelay, no need for further look up.
 						break;
 					}
-				}
-				if( personId.equals(event.getPersonId()) ) startComparingTimeGap = true;
 			}
 		}
 		return remainingDelay;
-	}
-
-
-	/**
-	 * @param map
-	 * @return a map sorted by its value in the reverse order (Descending order).
-	 */
-	private static Map<Id<Person>,Double> sortByValues (Map<Id<Person>,Double> map) { 
-
-		List<Entry<Id<Person>,Double>> list = new LinkedList<Entry<Id<Person>,Double>>(map.entrySet());
-		Comparator<Entry<Id<Person>,Double>> sortByValueComparator = new Comparator<Entry<Id<Person>,Double>> () {
-			@Override
-			public int compare(Entry<Id<Person>, Double> left,
-					Entry<Id<Person>, Double> right) {
-				return -( left.getValue().compareTo(right.getValue()) );
-			}
-		};
-
-		Collections.sort(list, sortByValueComparator);
-
-		Map<Id<Person>,Double> sortedHashMap = new LinkedHashMap<Id<Person>, Double>();
-		for (Iterator<Entry<Id<Person>,Double>> it = list.iterator(); it.hasNext();) {
-			Entry<Id<Person>,Double> entry = it.next();
-			sortedHashMap.put(entry.getKey(), entry.getValue());
-		} 
-		return sortedHashMap;
-	}
-
-	/**
-	 * @param event
-	 * <p> As stated above, these stored agents are not guilty (they have already left the link). 
-	 * Directly, can not remove from the PersonId2EnterTime map because linkEnterTime is required later.
-	 */
-	private void storeExcludedEnteringAgents(LinkLeaveEvent event){
-		if(this.linkId2ExcludeEnteringAgentsList.containsKey(event.getLinkId())){
-			List<Id<Person>> excludedEnteringAgents = this.linkId2ExcludeEnteringAgentsList.get(event.getLinkId());
-			excludedEnteringAgents.add(event.getPersonId());
-		} else {
-			List<Id<Person>> excludedEnteringAgents = new ArrayList<Id<Person>>(Arrays.asList(event.getPersonId()));
-			this.linkId2ExcludeEnteringAgentsList.put(event.getLinkId(), excludedEnteringAgents);
-		}
 	}
 
 	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 		Leg leg = TripStructureUtils.getLegs(planElements).get( this.personId2legNr.get( personId ) ) ;
 		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.personId2linkNr.get( personId ) ) ;
-	}
-
-	@Override
-	public void handleEvent(CongestionEvent event) {
-		//		System.err.println( event );
 	}
 
 }

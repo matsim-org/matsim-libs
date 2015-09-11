@@ -53,7 +53,7 @@ public final class AgentOnLinkInfo {
 		return enterTime;
 	}
 
-	public final Double getSetFreeSpeedLeaveTime() {
+	public final Double getFreeSpeedLeaveTime() {
 		return freeSpeedLeaveTime;
 	}
 

@@ -216,8 +216,11 @@ PersonArrivalEventHandler {
 
 			calculateCongestion(event);
 			
+			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
+			
 			Double linkEnterTime = linkInfo.getPersonId2linkEnterTime().get( personId ) ;
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( linkEnterTime ).build() ;
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( linkEnterTime )
+					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).build() ;
 			
 			linkInfo.getFlowQueue().add( delayInfo ) ;
 			linkInfo.getDelayQueue().add( delayInfo ) ;

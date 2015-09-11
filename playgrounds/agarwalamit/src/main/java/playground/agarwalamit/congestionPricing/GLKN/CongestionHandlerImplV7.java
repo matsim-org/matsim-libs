@@ -119,7 +119,8 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			totalDelay += delay;
 
 			Double linkEnterTime = lci.getPersonId2linkEnterTime().get( pId ) ;
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId(pId).setLinkEnterTime( linkEnterTime ).build() ;
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId(pId).setLinkEnterTime( linkEnterTime )
+					.setFreeSpeedLeaveTime(freeSpeedLeaveTime).build() ;
 			lci.getFlowQueue().add( delayInfo );
 
 			List<Id<Person>> enteringAgentsList = new ArrayList<Id<Person>>(lci.getPersonId2linkEnterTime().keySet());
