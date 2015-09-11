@@ -17,42 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.processing;
+
+
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  *
  */
-public interface ActivityType {
+public class ValidateOverlappingLegs implements EpisodeTask {
 
-	String HOME = "home";
+	@Override
+	public void apply(Episode episode) {
+		for(int i = 1; i < episode.getLegs().size(); i++) {
+			String startTime = episode.getLegs().get(i).getAttribute(CommonKeys.LEG_START_TIME);
+			String endTime = episode.getLegs().get(i - 1).getAttribute(CommonKeys.LEG_END_TIME);
 
-	String WORK = "work";
-	
-	String BUSINESS = "buisiness";
-	
-	String LEISURE = "leisure";
-	
-	String EDUCATION = "edu";
-	
-	String SHOP = "shop";
-	
-	String MISC = "misc";
+			if(startTime != null && endTime != null) {
+				double s = Double.parseDouble(startTime);
+				double e = Double.parseDouble(endTime);
 
-	String VACATIONS_SHORT = "vacations_short";
-
-	String VACATIONS_LONG = "vacations_long";
-
-	String VISIT = "visit";
-
-	String CULTURE = "culture";
-
-	String SPORT = "sport";
-
-	String GASTRO = "gastro";
-
-	String PRIVATE = "private";
-
-	String PICKDROP = "pickdrop";
-	
+				if(s < e) {
+					episode.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
+					return;
+				}
+			}
+		}
+	}
 }

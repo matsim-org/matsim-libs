@@ -17,17 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim3;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  *
  */
-public interface Hamiltonian {
+public class ValidateNegativeLegDuration implements EpisodeTask {
 
-	public double evaluate(Person person);
-	
+	@Override
+	public void apply(Episode episode) {
+		for(Attributable leg : episode.getLegs()) {
+			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
+			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
+
+			if(start != null && end != null) {
+				int s = Integer.parseInt(start);
+				int e = Integer.parseInt(end);
+
+				if(s > e) {
+					episode.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
+					return;
+				}
+			}
+		}
+	}
 }

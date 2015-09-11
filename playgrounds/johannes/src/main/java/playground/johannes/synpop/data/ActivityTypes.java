@@ -17,41 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
-
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.processing.PersonTask;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
  *
  */
-public class DeleteNegativeDurationTask implements PersonTask {
+public interface ActivityTypes {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
-	 */
-	@Override
-	public void apply(Person person1) {
-		PlainPerson person = (PlainPerson)person1;
-		for(Attributable leg : person.getPlan().getLegs()) {
-			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
-			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
-			
-			if(start != null && end != null) {
-				int s = Integer.parseInt(start);
-				int e = Integer.parseInt(end);
-				
-				if(s > e) {
-					person.setAttribute(CommonKeys.DELETE, "true");
-					return;
-				}
-			}
-		}
+	String HOME = "home";
 
-	}
+	String WORK = "work";
+	
+	String BUSINESS = "buisiness";
+	
+	String LEISURE = "leisure";
+	
+	String EDUCATION = "edu";
+	
+	String SHOP = "shop";
+	
+	String MISC = "misc";
 
+	String VACATIONS_SHORT = "vacations_short";
+
+	String VACATIONS_LONG = "vacations_long";
+
+	String VISIT = "visit";
+
+	String CULTURE = "culture";
+
+	String SPORT = "sport";
+
+	String GASTRO = "gastro";
+
+	String PRIVATE = "private";
+
+	String PICKDROP = "pickdrop";
+	
 }

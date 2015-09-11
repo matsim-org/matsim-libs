@@ -17,28 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008.run;
+package playground.jbischoff.taxi.usability;
 
-import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainFactory;
-import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.source.mid2008.processing.SortLegsTask;
+import java.io.PrintWriter;
 
-import java.util.Set;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 /**
- * @author johannes
+ * @author  jbischoff
+ *
  */
-public class Validator {
+public class TaxiStatsControlerListener implements IterationEndsListener {
 
-    public static final void main(String args[]) {
-        Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], new PlainFactory());
+	
+	
+	private final MatsimVrpContext context;
+	private final TaxiConfigGroup tcg;
 
-        TaskRunner.run(new SortLegsTask(MiDKeys.LEG_INDEX, new SortLegsTask.IntComparator()), persons);
+	public TaxiStatsControlerListener(MatsimVrpContext context, TaxiConfigGroup tcg) {
+		this.tcg = tcg;
+		this.context = context;
+	}
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
 
-        PopulationIO.writeToXML(args[1], persons);
-    }
+		 PrintWriter pw = new PrintWriter(System.out);
+	        pw.println(tcg.getAlgorithmConfig());
+	        pw.println("m\t" + context.getVrpData().getVehicles().size());
+	        pw.println("n\t" + context.getVrpData().getRequests().size());
+	        pw.println(TaxiStats.HEADER);
+	        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
+	        pw.println(stats);
+	        pw.flush();
+	}
+
 }

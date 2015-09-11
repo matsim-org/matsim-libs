@@ -17,31 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class SetFirstActivityTypeTask implements EpisodeTask {
+public class ValidateNoPlans implements PersonTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
-	 */
 	@Override
-	public void apply(Episode plan) {
-		if(plan.getLegs().size() > 0 ) {
-		Attributable firstLeg = plan.getLegs().get(0);
-		Attributable firstAct = plan.getActivities().get(0);
-		
-		firstAct.setAttribute(CommonKeys.ACTIVITY_TYPE, firstLeg.getAttribute(MiDKeys.LEG_ORIGIN));
+	public void apply(Person person) {
+		if(person.getEpisodes().size() == 0) {
+			person.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
 		}
+
 	}
 
 }

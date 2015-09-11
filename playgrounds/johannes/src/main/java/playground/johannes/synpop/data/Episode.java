@@ -34,6 +34,10 @@ public interface Episode extends Attributable {
 
     void addLeg(Segment leg);
 
+    void insertActivity(Segment activity, int index);
+
+    void insertLeg(Segment leg, int index);
+
     void removeActivity(Segment activity);
 
     void removeLeg(Segment leg);

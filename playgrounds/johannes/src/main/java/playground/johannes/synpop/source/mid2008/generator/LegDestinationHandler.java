@@ -19,9 +19,9 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Map;
@@ -35,8 +35,8 @@ public class LegDestinationHandler implements LegAttributeHandler {
     public void handle(Segment leg, Map<String, String> attributes) {
         String val = attributes.get(VariableNames.LEG_DESTINATION);
 
-        if(val.equalsIgnoreCase("1")) leg.setAttribute(MiDKeys.LEG_DESTINATION, ActivityType.HOME);
-        else if(val.equalsIgnoreCase("2")) leg.setAttribute(MiDKeys.LEG_DESTINATION, ActivityType.WORK);
+        if(val.equalsIgnoreCase("1")) leg.setAttribute(MiDKeys.LEG_DESTINATION, ActivityTypes.HOME);
+        else if(val.equalsIgnoreCase("2")) leg.setAttribute(MiDKeys.LEG_DESTINATION, ActivityTypes.WORK);
         else if(val.equalsIgnoreCase("3")) leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.IN_TOWN);
         else if(val.equalsIgnoreCase("4")) leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.OUT_OF_TOWN);
         else if(val.equalsIgnoreCase("5")) leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.ROUND_TRIP);

@@ -19,11 +19,12 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.sim.Mutator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes

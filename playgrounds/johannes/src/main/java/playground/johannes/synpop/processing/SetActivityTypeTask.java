@@ -17,34 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.processing;
 
+
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  *
  */
-public class DeleteMissingTimesTask implements PersonTask {
+public class SetActivityTypeTask implements EpisodeTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
-	 */
 	@Override
-	public void apply(Person person1) {
-		PlainPerson person = (PlainPerson)person1;
-		for(Attributable leg : person.getPlan().getLegs()) {
-			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
-			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
+	public void apply(Episode episode) {
+		if(episode.getLegs().isEmpty()) {
+			episode.getActivities().get(0).setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.HOME);
+		}
+		
+		for(int i = 0; i < episode.getLegs().size(); i++) {
+			Attributable leg = episode.getLegs().get(i);
+			Attributable act = episode.getActivities().get(i + 1);
 			
-			if(start == null && end == null) {
-				person.setAttribute(CommonKeys.DELETE, "true");
-				return;
-			}
+			act.setAttribute(CommonKeys.ACTIVITY_TYPE, leg.getAttribute(CommonKeys.LEG_PURPOSE));
 		}
 
 	}

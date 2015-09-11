@@ -17,36 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.mid2008.processing;
 
-
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 /**
  * @author johannes
- *
  */
-public class SetActivityTypeTask implements EpisodeTask {
+public class SetFirstActivityTypeTask implements EpisodeTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
-	 */
-	@Override
-	public void apply(Episode plan) {
-		if(plan.getLegs().isEmpty()) {
-			plan.getActivities().get(0).setAttribute(CommonKeys.ACTIVITY_TYPE, "home");
-		}
-		
-		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Attributable leg = plan.getLegs().get(i);
-			Attributable act = plan.getActivities().get(i + 1);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_TYPE, leg.getAttribute(CommonKeys.LEG_PURPOSE));
-		}
+    @Override
+    public void apply(Episode episode) {
+        if (episode.getLegs().size() > 0) {
+            Attributable firstLeg = episode.getLegs().get(0);
+            Attributable firstAct = episode.getActivities().get(0);
 
-	}
+            String origin = firstLeg.getAttribute(MiDKeys.LEG_ORIGIN);
+            if (ActivityTypes.HOME.equals(origin) || ActivityTypes.WORK.equals(origin)) {
+                firstAct.setAttribute(CommonKeys.ACTIVITY_TYPE, origin);
+            }
+
+        }
+    }
 
 }

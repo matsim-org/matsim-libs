@@ -17,52 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.sim;
 
-
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.processing.PersonTask;
 
-/**
- * @author johannes
- *
- */
-public class DeleteOverlappingLegsTask implements PersonTask {
+import java.util.List;
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
-	 */
-	@Override
-	public void apply(Person person1) {
-		PlainPerson person = (PlainPerson)person1;
-		/*
-		 * Check for overlapping legs.
-		 */
-		double prevEnd = 0;
-		for(Attributable leg : person.getPlan().getLegs()) {
-			String startStr = leg.getAttribute(CommonKeys.LEG_START_TIME);
-			if(startStr != null) {
-				double start = Double.parseDouble(startStr);
-				if(start < prevEnd) {
-					person.setAttribute(CommonKeys.DELETE, "true");
-					return;
-				}
-			}
-			String endStr = leg.getAttribute(CommonKeys.LEG_END_TIME);
-			if(endStr != null) {
-				prevEnd = Double.parseDouble(endStr);
-			} else {
-				if(startStr == null) {
-					person.setAttribute(CommonKeys.DELETE, "true"); // redundant with DeleteMissingTimesTask
-					return;
-				}
-				prevEnd = Double.parseDouble(startStr) + 1;
-			}	
-		}
+public interface Mutator {
 
-	}
+	public List<Person> select(List<Person> persons);
 
+	public boolean modify(List<Person> persons);
+	
+	public void revert(List<Person> persons);
+	
 }

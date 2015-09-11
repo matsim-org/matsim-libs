@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.sim.Mutator;
 
 import java.util.ArrayList;
 import java.util.List;

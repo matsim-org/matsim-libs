@@ -19,7 +19,6 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.sim.data.CachedPerson;
 

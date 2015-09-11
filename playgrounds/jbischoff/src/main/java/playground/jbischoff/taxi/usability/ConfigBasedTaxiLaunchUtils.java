@@ -50,8 +50,8 @@ public class ConfigBasedTaxiLaunchUtils {
 		context.setScenario(controler.getScenario());
 		VrpData vrpData = TaxiLauncherUtils.initTaxiData(context.getScenario(), tcg.getVehiclesFile(), tcg.getRanksFile());
 		context.setVrpData(vrpData);	 
-    
-       
+		TaxiStatsControlerListener tscl = new TaxiStatsControlerListener(context,tcg);
+		controler.addControlerListener(tscl);
         TripRouterFactory factory = new TaxiTripRouterFactory(controler); 
 		controler.setTripRouterFactory(factory);
 		controler.addOverridingModule(new AbstractModule() {

@@ -17,19 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim3;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Episode;
 
-import java.util.List;
+/**
+ * @author johannes
+ *
+ */
+public class ValidateMissingLegTimes implements EpisodeTask {
 
-public interface Mutator {
+	@Override
+	public void apply(Episode episode) {
+		for(Attributable leg : episode.getLegs()) {
+			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
+			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);
 
-	public List<Person> select(List<Person> persons);
+			if(start == null || end == null) {
+				episode.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
+				return;
+			}
+		}
 
-	public boolean modify(List<Person> persons);
-	
-	public void revert(List<Person> persons);
-	
+	}
 }

@@ -17,24 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.processing.PersonTask;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class DeleteNoPlans implements PersonTask {
+public interface Hamiltonian {
 
-	@Override
-	public void apply(Person person) {
-		if(person.getEpisodes().size() == 0) {
-			person.setAttribute(CommonKeys.DELETE, "true");
-		}
-
-	}
-
+	public double evaluate(Person person);
+	
 }

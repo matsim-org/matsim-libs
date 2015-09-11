@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,35 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.processing;
 
-package playground.johannes.gsv.matrices.episodes2matrix;
-
-import playground.johannes.synpop.data.ActivityTypes;
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.Segment;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class SetLegPurposes implements EpisodeTask {
-
-
+public class SetActivityTimesTask implements EpisodeTask {
     @Override
     public void apply(Episode episode) {
-        for(int i = 0; i < episode.getLegs().size(); i++) {
-            Attributable leg = episode.getLegs().get(i);
-            String nextType = episode.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
-            /*
-            If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use
-            the next activity type.
-             */
-            if(ActivityTypes.HOME.equalsIgnoreCase(nextType)) {
-                String prevType = episode.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, prevType);
-            } else {
-                leg.setAttribute(CommonKeys.LEG_PURPOSE, nextType);
+        if (episode.getActivities().size() == 1) {
+            Segment act = episode.getActivities().get(0);
+            act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
+            act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
+        } else {
+
+            for (int i = 0; i < episode.getActivities().size(); i++) {
+                Segment act = episode.getActivities().get(i);
+
+                if (i == 0) act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
+                else
+                    act.setAttribute(CommonKeys.ACTIVITY_START_TIME, act.previous().getAttribute(CommonKeys.LEG_END_TIME));
+
+                if (i == episode.getActivities().size() - 1) {
+                    int startTime = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));
+                    startTime = Math.max(startTime + 1, 86400);
+                    act.setAttribute(CommonKeys.ACTIVITY_END_TIME, String.valueOf(startTime));
+                } else {
+                    act.setAttribute(CommonKeys.ACTIVITY_END_TIME, act.next().getAttribute(CommonKeys.LEG_START_TIME));
+                }
             }
         }
     }
