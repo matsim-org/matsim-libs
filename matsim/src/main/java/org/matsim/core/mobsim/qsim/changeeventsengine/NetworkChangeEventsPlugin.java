@@ -1,21 +1,26 @@
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
-import org.matsim.core.controler.AbstractModule;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 public class NetworkChangeEventsPlugin extends AbstractQSimPlugin {
 
+	public NetworkChangeEventsPlugin(Config config) {
+		super(config);
+	}
+
 	@Override
-	public Collection<? extends org.matsim.core.controler.AbstractModule> modules() {
+	public Collection<? extends Module> modules() {
 		return Collections.singletonList(new AbstractModule() {
 			@Override
-			public void install() {
+			protected void configure() {
 				bind(NewNetworkChangeEventsEngine.class).asEagerSingleton();
 			}
 		});

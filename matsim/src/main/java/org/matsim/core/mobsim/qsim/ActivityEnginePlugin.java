@@ -1,6 +1,8 @@
 package org.matsim.core.mobsim.qsim;
 
-import org.matsim.core.controler.AbstractModule;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
@@ -9,12 +11,16 @@ import java.util.Collection;
 
 public class ActivityEnginePlugin extends AbstractQSimPlugin {
 
+	public ActivityEnginePlugin(Config config) {
+		super(config);
+	}
+
 	@Override
-	public Collection<? extends AbstractModule> modules() {
-		Collection<AbstractModule> result = new ArrayList<>();
+	public Collection<? extends Module> modules() {
+		Collection<Module> result = new ArrayList<>();
 		result.add(new AbstractModule() {
 			@Override
-			public void install() {
+			public void configure() {
 				bind(ActivityEngine.class).asEagerSingleton();
 			}
 		});

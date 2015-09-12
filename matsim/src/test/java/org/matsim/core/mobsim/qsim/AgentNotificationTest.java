@@ -1,11 +1,8 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.google.inject.AbstractModule;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -16,17 +13,9 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -45,7 +34,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 
-import junit.framework.Assert;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+
 
 public class AgentNotificationTest {
 
@@ -218,16 +215,16 @@ public class AgentNotificationTest {
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
 		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin());
-		plugins.add(new ActivityEnginePlugin());
-		plugins.add(new TeleportationPlugin());
-		plugins.add(new AbstractQSimPlugin() {
+		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
+		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
+		plugins.add(new TeleportationPlugin(scenario.getConfig()));
+		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
 			@Override
 			public Collection<? extends AbstractModule> modules() {
 				Collection<AbstractModule> result = new ArrayList<>();
 				result.add(new AbstractModule() {
 					@Override
-					public void install() {
+					public void configure() {
 						bind(PopulationAgentSource.class).asEagerSingleton();
 						bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					}
@@ -247,16 +244,19 @@ public class AgentNotificationTest {
 		eventsManager.addHandler(handler);
 		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
 		qSim.run();
-		for (Event event : handler.getEvents()) {
-			if (event instanceof PersonDepartureEvent) {
-				Assert.assertEquals(25200.0, event.getTime());
+		assumeThat(handler.getEvents(), hasItem(
+				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
+		assertThat(handler.getEvents(), hasItem(
+				is(both(eventWithTime(25800.0)).and(instanceOf(MyAgentFactory.MyAgent.HomesicknessEvent.class)))));
+	}
+
+	private Matcher<Event> eventWithTime(double time) {
+		return new FeatureMatcher<Event, Double>(is(time), "time", "time") {
+			@Override
+			protected Double featureValueOf(Event event) {
+				return event.getTime();
 			}
-			if (event instanceof MyAgentFactory.MyAgent.HomesicknessEvent) {
-				// Agent becomes homesick 10 minutes after departure
-				Assert.assertEquals(25800.0, event.getTime());
-			}
-			System.out.println(event);
-		}
+		};
 	}
 
 	private Scenario createSimpleScenario() {
