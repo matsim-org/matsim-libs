@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim.data;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
-
-import java.util.Random;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.gsv.synPop.data.FacilityData;
 
 /**
- * @author johannes
- *
+ * @author jillenberger
  */
-public class IncomeMutator extends AttributeMutator {
+public class ActivityFacilityConverter implements Converter {
 
-	private final Random random;
+    private static ActivityFacilityConverter instance;
 
-	public IncomeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, histSync);
-		this.random = random;
-	}
+    public static ActivityFacilityConverter getInstance(FacilityData data) {
+        if(instance == null) {
+            instance = new ActivityFacilityConverter(data);
+        }
 
-	@Override
-	protected Double newValue(PlainPerson person) {
-		return new Double(random.nextInt(8000));
-	}
+        return instance;
+    }
 
+    private final FacilityData data;
+
+    public ActivityFacilityConverter(FacilityData data) {
+        this.data = data;
+    }
+
+    @Override
+    public Object toObject(String value) {
+        return data.getAll().getFacilities().get(value);
+    }
+
+    @Override
+    public String toString(Object value) {
+        return ((ActivityFacility)value).getId().toString();
+    }
 }

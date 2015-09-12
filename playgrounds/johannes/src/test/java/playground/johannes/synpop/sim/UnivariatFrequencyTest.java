@@ -69,7 +69,7 @@ public class UnivariatFrequencyTest extends TestCase {
         cachedPersons.add(c3);
 
         Object dataKey = new Object();
-        Converters.register("attribute", dataKey, DoubleConverter.getInstance());
+        Converters.registerWithObjectKey("attribute", dataKey, DoubleConverter.getInstance());
 
         UnivariatFrequency uf = new UnivariatFrequency(refPersons, cachedPersons, "attribute", new LinearDiscretizer
                 (1.0));

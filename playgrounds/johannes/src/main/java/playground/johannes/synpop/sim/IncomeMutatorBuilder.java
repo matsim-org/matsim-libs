@@ -17,50 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.DoubleConverter;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Random;
 
 /**
  * @author johannes
- * 
  */
-public class SynchronizeUserData implements SamplerListener {
+public class IncomeMutatorBuilder implements MutatorBuilder<CachedPerson> {
 
-	private final long interval;
+    public static final Object INCOME_DATA_KEY = new Object();
 
-	private final AtomicLong iters;
+    private final Random random;
 
-	private final Map<Object, String> keys;
+    private final RandomIntGenerator generator;
 
-	public SynchronizeUserData(Map<Object, String> keys, long interval) {
-		this.keys = keys;
-		this.iters = new AtomicLong();
-		this.interval = interval;
-	}
+    private final AttributeChangeListener listener;
 
-	@Override
-	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
-		if (iters.get() % interval == 0) {
-			for (Map.Entry<Object, String> keyPair : keys.entrySet()) {
-				for (Person person : population) {
-					Object value = ((PlainPerson)person).getUserData(keyPair.getKey());
-					if (value != null) {
-						person.setAttribute(keyPair.getValue(), String.valueOf(value));
-					} else {
-						person.setAttribute(keyPair.getValue(), null);
-					}
-				}
-			}
-		}
+    public IncomeMutatorBuilder(AttributeChangeListener listener, Random random) {
+        this.random = random;
+        this.listener = listener;
+        generator = new RandomIntGenerator(random, 500, 8000);
 
-		iters.incrementAndGet();
-	}
+        Converters.registerWithObjectKey(CommonKeys.HH_INCOME, INCOME_DATA_KEY, DoubleConverter.getInstance());
+    }
 
+    @Override
+    public Mutator<CachedPerson> build() {
+        RandomElementMutator em = new AttributeMutator(INCOME_DATA_KEY, generator, listener);
+        Mutator<CachedPerson> m = new RandomPersonMutator(em, random);
+        return m;
+
+    }
 }

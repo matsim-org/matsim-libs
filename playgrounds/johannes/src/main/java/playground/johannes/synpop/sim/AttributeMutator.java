@@ -44,11 +44,16 @@ public class AttributeMutator implements RandomElementMutator {
     public boolean modify(CachedElement element) {
         oldValue = element.getData(dataKey);
         Object newValue = generator.newValue(element);
-        element.setData(dataKey, newValue);
 
-        if (listener != null) listener.onChange(dataKey, oldValue, newValue, element);
+        if(newValue != null) {
+            element.setData(dataKey, newValue);
 
-        return true;
+            if (listener != null) listener.onChange(dataKey, oldValue, newValue, element);
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

@@ -31,7 +31,7 @@ import java.util.Random;
  */
 public class AgeMutatorBuilder implements MutatorBuilder<CachedPerson> {
 
-    public static final Object AGE_DATA_KEY = new Object();
+    private final Object ageDataKey;
 
     private final Random random;
 
@@ -44,12 +44,12 @@ public class AgeMutatorBuilder implements MutatorBuilder<CachedPerson> {
         this.random = random;
         generator = new RandomIntGenerator(random, 0, 100);
 
-        Converters.register(CommonKeys.PERSON_AGE, AGE_DATA_KEY, DoubleConverter.getInstance());
+        ageDataKey = Converters.register(CommonKeys.PERSON_AGE, DoubleConverter.getInstance());
     }
 
     @Override
     public Mutator<CachedPerson> build() {
-        RandomElementMutator em = new AttributeMutator(AGE_DATA_KEY, generator, listener);
+        RandomElementMutator em = new AttributeMutator(ageDataKey, generator, listener);
         Mutator<CachedPerson> m = new RandomPersonMutator(em, random);
         return m;
     }

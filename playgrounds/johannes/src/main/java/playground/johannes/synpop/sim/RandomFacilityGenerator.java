@@ -18,53 +18,56 @@
  * *********************************************************************** */
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.sim.data.ActivityFacilityConverter;
-import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.CachedElement;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author jillenberger
  */
-public class FacilityMutatorBuilder implements MutatorBuilder {
+public class RandomFacilityGenerator implements ValueGenerator {
 
-    private final Random random;
+    private static final Object IGNORE_KEY = new Object();
 
     private final FacilityData facilityData;
 
     private final List<String> blacklist;
 
-    private AttributeChangeListener listener;
-
-    public FacilityMutatorBuilder(DataPool dataPool, Random random) {
-        this.facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
-        this.random = random;
-        blacklist = new ArrayList<>();
+    public RandomFacilityGenerator(FacilityData data) {
+        this.facilityData = data;
+        this.blacklist = new ArrayList<>();
     }
 
     public void addToBlacklist(String type) {
         blacklist.add(type);
     }
 
-    public void setListener(AttributeChangeListener listener) {
-        this.listener = listener;
-    }
-
     @Override
-    public Mutator build() {
-        Object dataKey = Converters.register(CommonKeys.ACTIVITY_FACILITY, ActivityFacilityConverter.getInstance(facilityData));
+    public Object newValue(CachedElement element) {
+        CachedSegment act = (CachedSegment) element;
+        /*
+        Won't work if activity types change.
+         */
+        String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+        Boolean ignore = (Boolean) act.getData(IGNORE_KEY);
+        if (ignore == null) {
+            ignore = false;
 
-        RandomFacilityGenerator generator = new RandomFacilityGenerator(facilityData);
-        AttributeMutator attMutator = new AttributeMutator(dataKey, generator, listener);
-        RandomActMutator actMutator = new RandomActMutator(attMutator, random);
+            if (type != null) {
+                if (blacklist.contains(type)) ignore = true;
+            }
 
-        return actMutator;
+            act.setData(IGNORE_KEY, ignore);
+        }
+
+        if (!ignore) {
+            return facilityData.randomFacility(type);
+        } else {
+            return null;
+        }
     }
-
 }

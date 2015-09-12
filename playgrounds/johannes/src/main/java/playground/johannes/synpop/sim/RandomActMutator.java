@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,44 +16,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.sim.*;
-import playground.johannes.synpop.sim.AttributeMutator;
+import playground.johannes.synpop.sim.data.CachedEpisode;
 import playground.johannes.synpop.sim.data.CachedPerson;
-import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.data.DoubleConverter;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class IncomeMutatorFactory implements MutatorBuilder<CachedPerson> {
+public class RandomActMutator implements Mutator<CachedSegment> {
 
-    public static final Object INCOME_DATA_KEY = new Object();
+    private final RandomElementMutator delegate;
 
     private final Random random;
 
-    private final RandomIntGenerator generator;
+    private final List<CachedSegment> mutation;
 
-    private final AttributeChangeListener listener;
-
-    public IncomeMutatorFactory(AttributeChangeListener listener, Random random) {
+    public RandomActMutator(RandomElementMutator delegate, Random random) {
+        this.delegate = delegate;
         this.random = random;
-        this.listener = listener;
-        generator = new RandomIntGenerator(random, 500, 8000);
 
-        Converters.register(CommonKeys.HH_INCOME, INCOME_DATA_KEY, DoubleConverter.getInstance());
+        mutation = new ArrayList<>(1);
+        mutation.add(null);
     }
 
     @Override
-    public Mutator<CachedPerson> build() {
-        RandomElementMutator em = new AttributeMutator(INCOME_DATA_KEY, generator, listener);
-        Mutator<CachedPerson> m = new RandomPersonMutator(em, random);
-        return m;
+    public List<CachedSegment> select(List<CachedPerson> population) {
+        CachedPerson p = population.get(random.nextInt(population.size()));
+        CachedEpisode e = (CachedEpisode) p.getEpisodes().get(0); //TODO: Or better random episode?
+        CachedSegment s = (CachedSegment) e.getActivities().get(random.nextInt(e.getActivities().size()));
 
+        mutation.set(0, s);
+
+        return mutation;
+    }
+
+    @Override
+    public boolean modify(List<CachedSegment> elements) {
+        return delegate.modify(mutation.get(0));
+    }
+
+    @Override
+    public void revert(List<CachedSegment> elements) {
+        delegate.revert(mutation.get(0));
     }
 }
