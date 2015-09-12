@@ -261,9 +261,13 @@ PersonArrivalEventHandler {
 				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
 				
 				// bottleneck no longer active. However, first check for combination of flow and storage delay:
-				
-				
-				linkInfo.getFlowQueue().clear();
+//				DelayInfo causingAgentInfo = linkInfo.getFlowQueue().getLast() ;
+//				double timeGap = delayInfo.freeSpeedLeaveTime - causingAgentInfo.freeSpeedLeaveTime ; 
+//				if ( timeGap > linkInfo.getMarginalDelayPerLeavingVehicle_sec() ) {
+					// (otherwise there would have been flow delay)
+					
+					linkInfo.getFlowQueue().clear();
+//				}
 			}
 		}
 
