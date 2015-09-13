@@ -266,7 +266,7 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for amenity
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
-					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+					if ( !this.unmannedEntitiesList.contains(amenityType) ) {
 						createFacility(aff, entity, name, centroidCoord, "work");
 					}
 				}
@@ -300,7 +300,7 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for shop
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
-					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+					if ( !this.unmannedEntitiesList.contains(leisureType) ) {
 						createFacility(aff, entity, name, centroidCoord, "work");
 					}
 				}
@@ -330,7 +330,7 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for shop
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
-					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+					if ( !this.unmannedEntitiesList.contains(tourismType) ) {
 						createFacility(aff, entity, name, centroidCoord, "work");
 					}
 				}
@@ -341,6 +341,7 @@ public class CombinedOsmSink implements Sink {
 			// to user-specified mapping
 			// ... land use ...
 			// ...
+			// TODO solve problem when building is a relation
 			if(buildingType != null && !(entity instanceof Relation)) {
 				// Create feature for building
 				// do this step first to be able to "continue" in loop if feature for building cannot be created
