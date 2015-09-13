@@ -63,18 +63,24 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class CombinedOsmSink implements Sink {
 	private final Logger log = Logger.getLogger(CombinedOsmSink.class);
-	private final CoordinateTransformation ct;
+	
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;
 	private Map<Long, RelationContainer> relationMap;
+	
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
+	
 	private Map<String, String> landUseTypeMap = new HashMap<>();
 	private Map<String, String> buildingTypeMap = new HashMap<>();
-	
 	//
 	private Map<String, String> amenityTypeMap = new HashMap<>();
-	String toCRS = TransformationFactory.DHDN_GK4;
+	private Map<String, String> leisureTypeMap = new HashMap<>();
+	private Map<String, String> tourismTypeMap = new HashMap<>();
+	
+	//private final CoordinateTransformation ct;
+	//String outputCRS = TransformationFactory.DHDN_GK4;
+	private String outputCRS;
 	//
 	
 	private Map<String, Integer> typeCount = new HashMap<>();
@@ -82,7 +88,7 @@ public class CombinedOsmSink implements Sink {
 	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
 
 	private double buildingTypeFromVicinityRange;
-	private String[] tagsToIgnoreBuildings;
+//	private String[] tagsToIgnoreBuildings;
 
 	private int featureErrorCounter = 0;
 	private int buildingErrorCounter = 0;
@@ -90,19 +96,29 @@ public class CombinedOsmSink implements Sink {
 	private PolygonFeatureFactory polygonFeatureFactory;
 
 	
-	public CombinedOsmSink(CoordinateTransformation ct, Map<String, String> osmLandUseToMatsimType, 
+	public CombinedOsmSink(
+			//CoordinateTransformation ct, 
+			String outputCRS,
+			Map<String, String> osmLandUseToMatsimType, 
 			Map<String, String> osmBuildingToMatsimType, 
 			//
 			Map<String, String> osmAmenityToMatsimType,
+			Map<String, String> osmLeisureToMatsimType,
+			Map<String, String> osmTourismToMatsimType,
 			//
-			double buildingTypeFromVicinityRange,
-			String[] tagsToIgnoreBuildings) {
-		this.ct = ct;
+			double buildingTypeFromVicinityRange
+			//, String[] tagsToIgnoreBuildings
+			) {
+		
+		//this.ct = ct;
+		this.outputCRS = outputCRS;
+		
 		this.landUseTypeMap = osmLandUseToMatsimType;
 		this.buildingTypeMap = osmBuildingToMatsimType;
-		
 		//
 		this.amenityTypeMap = osmAmenityToMatsimType;
+		this.leisureTypeMap = osmLeisureToMatsimType;
+		this.tourismTypeMap = osmTourismToMatsimType;
 		//
 		
 		this.nodeMap = new HashMap<Long, NodeContainer>();
@@ -110,7 +126,7 @@ public class CombinedOsmSink implements Sink {
 		this.relationMap = new HashMap<Long, RelationContainer>();
 		
 		this.buildingTypeFromVicinityRange  = buildingTypeFromVicinityRange;
-		this.tagsToIgnoreBuildings = tagsToIgnoreBuildings;
+		// this.tagsToIgnoreBuildings = tagsToIgnoreBuildings;
 		
 		facilities = FacilitiesUtils.createActivityFacilities("Land Use");
 		facilityAttributes = new ObjectAttributes();
@@ -119,9 +135,9 @@ public class CombinedOsmSink implements Sink {
 	
 	@Override
 	public void complete() {
-		log.info("    nodes: " + nodeMap.size());
-		log.info("     ways: " + wayMap.size());
-		log.info("relations: " + relationMap.size());
+		log.info("Number of nodes: " + nodeMap.size());
+		log.info("Number of ways: " + wayMap.size());
+		log.info("Number of relations: " + relationMap.size());
 		
 		log.info("Creating facilities..");
 		
@@ -129,23 +145,23 @@ public class CombinedOsmSink implements Sink {
 		
 //		String landUseType = "type";
 //		initLandUseFeatureType(landUseType, this.toCRS);
-		initLandUseFeatureType(this.toCRS);
+		initFeatureType(this.outputCRS);
 
-		/* First check all the ways for land use. */
+		// Check the ways for land use
 		processLandUseAreas(aff, wayMap);
 		
-		/* Second, check all the ways for buildings. */
-		processBuildings(aff, wayMap);
+		// Check the ways for buildings
+//		processEntity(aff, wayMap);
 		
 		//
 		/* First check all the point features. */
-		processFacilities(aff, nodeMap);
+		processEntity(aff, nodeMap);
 		
 		/* Second, check for way features. */
-		processFacilities(aff, wayMap);
+		processEntity(aff, wayMap);
 
 		/* Thirdly, check for relation. */
-		processFacilities(aff, relationMap);
+		processEntity(aff, relationMap);
 		//
 		
 		log.info("featureErrorCounter = " + featureErrorCounter);
@@ -154,6 +170,8 @@ public class CombinedOsmSink implements Sink {
 
 
 	private void processLandUseAreas(ActivityFacilitiesFactory aff,	Map<Long,? extends EntityContainer> entityMap) {
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", this.outputCRS);
 		
 		// TODO process historic=memorial and leisure=park and amenity=xy and tourism=zoo the same way
 		
@@ -167,8 +185,8 @@ public class CombinedOsmSink implements Sink {
 				matsimActivityType = getActivityType(landuseType, this.landUseTypeMap);
 			}
 			if(matsimActivityType != null){
-				Coord[] coords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
-				SimpleFeature feature = createLandUseFeature(coords, matsimActivityType);
+				Coord[] coords = CoordUtils.getAllWayCoords((Way) entity, ct, this.nodeMap);
+				SimpleFeature feature = createFeature(coords, matsimActivityType);
 				
 				// TODO check if the following is needed
 				if (feature == null) {
@@ -183,23 +201,22 @@ public class CombinedOsmSink implements Sink {
 	
 	
 	// private void initLandUseFeatureType(String landUseType, String toCRS) {
-	private void initLandUseFeatureType(String toCRS) {
-		
-		// TODO make CRS adjustable
+	private void initFeatureType(String outputCRS) {
 		
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder().
 		//setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
-		setCrs(MGC.getCRS(toCRS)).
+		setCrs(MGC.getCRS(outputCRS)).
 		//setName("buildings").
-		setName("land_use").
+		// TODO change name
+		//setName("land_use").
 		addAttribute("type", String.class).
 		create();
 	}	
 	
 	
 	// creates a feature in form of a polygon that is defined by its vertices, which are defined by its coordinates
-	private SimpleFeature createLandUseFeature(Coord[] coords, String matsimActivityType) {
-		Object[] attributes = new Object[]{matsimActivityType};
+	private SimpleFeature createFeature(Coord[] coords, String type) {
+		Object[] attributes = new Object[]{type};
 
 		Coordinate[] vividCoordinates = new Coordinate[coords.length];
 		for (int i = 0; i < coords.length; i++) {
@@ -219,77 +236,160 @@ public class CombinedOsmSink implements Sink {
 	}	
 	
 	
-	private void processBuildings(ActivityFacilitiesFactory activityFacilityFactory,
+	private void processEntity(ActivityFacilitiesFactory aff,
 			Map<Long,? extends EntityContainer> entityMap) {
 		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", this.outputCRS);
+				
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
+		
+		// go over all entities
 		for(long entityKey : entityMap.keySet()){
-			boolean ignoreBecauseOfTag = false;
-			
+//			boolean ignoreBecauseOfTag = false;
+		
 			Entity entity = entityMap.get(entityKey).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
 			
-			String buildingType = tags.get("building");
-//			String amenityType = tags.get("amenity");
 			
-			for (String tag : tagsToIgnoreBuildings) {
-				String tagValue = tags.get(tag);
-				if (tagValue != null) {
-					ignoreBecauseOfTag = true; 
+			// handle and modify name
+			String name = tags.get("name");
+			if(name == null){
+//				log.warn("Building " + entityKey + " does not have a name.");
+			} else{
+//				log.warn("Building " + entityKey + " has the name " + name + ".");
+				// & and " need to be replaced to avoid problems with parsing the facilities file later
+				if (name.contains("&")) {							
+					name = name.replaceAll("&", "u");
+				}
+				if (name.contains("\"")) {							
+					name = name.replaceAll("\"", "");
+				}
+			}
+			
+			
+			String amenityType = tags.get("amenity");
+			String shopType = tags.get("shop");
+			String craftType = tags.get("craft");
+			String officeType = tags.get("office");
+			String leisureType = tags.get("leisure");
+			String sportType = tags.get("sport");
+			String tourismType = tags.get("tourism");
+			
+			String buildingType = tags.get("building");
+
+
+			Coord centroidCoord = CoordUtils.getCentroidCoord(entity, ct, this.nodeMap, this.wayMap, this.relationMap);
+			
+			
+			// amenities
+			if(amenityType != null) {
+				// Get facility type
+				String activityType = getActivityType(amenityType, this.buildingTypeMap);
+
+				if (activityType == "ignore") {
+					// System.out.println("activityType == ignore");
+					continue;
+				}
+
+				// Create facility for amenitiy
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
 				}
 			}
 
 			
-			// Entities that possess an "amenity" tag need to be excluded here, because they are already considered via the AmenityReader
-//			if(buildingType != null && amenityType == null) {
-			if(buildingType != null && ignoreBecauseOfTag == false) {
-				
-				
-				
-				String name = tags.get("name");
-				if(name == null){
-//					log.warn("Building " + entityKey + " does not have a name.");
-				} else{
-//					log.warn("Building " + entityKey + " has the name " + name + ".");
-					// & and " need to be replaced to avoid problems with parsing the facilities file later
-					if (name.contains("&")) {							
-						name = name.replaceAll("&", "u");
-					}
-					if (name.contains("\"")) {							
-						name = name.replaceAll("\"", "");
-					}
+			// shops
+			if(shopType != null){
+				// Get facility type
+				String activityType = "shopping";
+
+				// Create facility for shop
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
 				}
-								
-				Coord coord = CoordUtils.getCoord(entity, ct, nodeMap, wayMap, relationMap);
-				Coord[] buildingCoords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
-				SimpleFeature buildingAsFeature = createLandUseFeature(buildingCoords, null);
-				// TODO should not be called land use feature
+			}
+
+
+			// craft and office
+			if(craftType != null || officeType != null){
+				// Get facility type
+				String activityType = "work";
+
+				// Create facility for shop
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
+				}
+			}
+
+
+			// leisure
+			if(leisureType != null){
+				// Get facility type
+				String activityType = getActivityType(leisureType, this.leisureTypeMap);
+
+				// Create facility for shop
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
+				}
+			}
+
+			
+			// sport
+			if(sportType != null){
+				// Get facility type
+				String activityType = "leisure";
+
+				// Create facility for shop
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
+				}
+			}
+
+
+			// tourism
+			if(tourismType != null){
+				// Get facility type
+				String activityType = getActivityType(tourismType, this.tourismTypeMap);
+
+				// Create facility for shop
+				if (activityType != null) {
+					createFacility(aff, entity, name, centroidCoord, activityType);
+				}
+			}
+
+
+			// buildings
+			if(buildingType != null) {
+				// Create feature for building
+				// do this step first to be able to "continue" in loop if feature for building cannot be created
+				Coord[] allBuildingCoords = CoordUtils.getAllWayCoords((Way) entity, ct, this.nodeMap);
+				SimpleFeature buildingAsFeature = createFeature(allBuildingCoords, null);
 				
 				if (buildingAsFeature == null) {
 					log.error("The feature of building " + entityKey + " is null!");
 					this.buildingErrorCounter++;
 					continue;
 				}
-
+				
 				// Get facility type
 				String activityType = getActivityType(buildingType, this.buildingTypeMap);
 				
 				if (activityType == null) {
-					activityType = getActivityTypeFromLandUseArea(geometryFactory, buildingType, coord);
+					activityType = getActivityTypeFromLandUseArea(geometryFactory, buildingType, centroidCoord);
 				}
 				
 				if (activityType == "ignore") {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
-
+				
 				// Get number of levels/storeys
 				String buildingLevelsAsString = tags.get("building:levels");
 				Integer buildingLevels = getBuildingLevels(entityKey, buildingLevelsAsString);
 //				System.out.println("Number of building levels = " + buildingLevels);
 
-				// Get area of building under consideration
+				// Get area of building
 				Geometry buildingGeometry = (Geometry) buildingAsFeature.getDefaultGeometry();
 				double buildingArea = buildingGeometry.getArea();
 //				System.out.println("Building area = " + buildingArea);
@@ -300,100 +400,34 @@ public class CombinedOsmSink implements Sink {
 				}
 //				System.out.println("building floor space = " + buildingFloorSpace);
 
+				
 				// Create facility for building
 				if (activityType != null) {
-					Id<ActivityFacility> facilityId = Id.create(entity.getId(), ActivityFacility.class);
-					ActivityFacility activityFacility;
-
-					if(!facilities.getFacilities().containsKey(facilityId)){
-						activityFacility = activityFacilityFactory.createActivityFacility(facilityId, coord);
-						((ActivityFacilityImpl)activityFacility).setDesc(name);
-						facilities.addActivityFacility(activityFacility);
-					} else{
-						activityFacility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
-					}
-					ActivityOption aactivityOption = activityFacilityFactory.createActivityOption(activityType);
-
-					activityFacility.addActivityOption(aactivityOption);
+					createFacility(aff, entity, name, centroidCoord, activityType);
 				}
 			}
 		}
 	}
-	
-	
-	//////////////////////////////////////
-	private void processFacilities(ActivityFacilitiesFactory aff,
-			Map<Long,? extends EntityContainer> entityMap) {
-		for(long n : entityMap.keySet()){
-			Entity entity = entityMap.get(n).getEntity();
-			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
-			
-			/* Check amenities */
-			String amenity = tags.get("amenity");
-			String matsimType = null;
-			if(amenity != null) {
-				matsimType = getActivityType(amenity, this.amenityTypeMap);
-			}
-			if(matsimType != null){
-				String activityType = getActivityType(amenity, this.amenityTypeMap);
-				String name = tags.get("name");
-				if(name != null){
-					/* Check education level. */
-					if(activityType.equalsIgnoreCase("e")){
-//						getEducationLevel(name);
-					}					
-				} else{
-					log.warn("      ---> Amenity " + n + " without a name.");
-				}
 
-				/* Facility identified. Now get the centroid of all members. */ 
-				//Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);
-					((ActivityFacilityImpl)af).setDesc(name);
-					facilities.addActivityFacility(af);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption(activityType);
-				af.addActivityOption(ao);
-//				setFacilityDetails(ao);
-//				nodeFacilities++;
-			}
-			
-			/* Check shops */
-			String shops = tags.get("shop");
-			if(shops != null){
-				String name = tags.get("name");
-				if(name == null){
-					log.warn("      ---> Shop " + n + " without a name.");
-				}
 
-				/* Facility identified. Now get the centroid of all members. */ 
-//				Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
-					facilities.addActivityFacility(af);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption("s");
-				af.addActivityOption(ao);
-//				setFacilityDetails(ao);
-//				shoppingCounter++;
-//				nodeFacilities++;
-			}
+	private void createFacility(
+			ActivityFacilitiesFactory activityFacilityFactory, Entity entity,
+			String name, Coord coord, String activityType) {
+		Id<ActivityFacility> facilityId = Id.create(entity.getId(), ActivityFacility.class);
+		ActivityFacility activityFacility;
+
+		if(!facilities.getFacilities().containsKey(facilityId)){
+			activityFacility = activityFacilityFactory.createActivityFacility(facilityId, coord);
+			((ActivityFacilityImpl)activityFacility).setDesc(name);
+			facilities.addActivityFacility(activityFacility);
+		} else{
+			activityFacility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
 		}
-	}
-	//////////////////////////////////////////
+		ActivityOption activityOption = activityFacilityFactory.createActivityOption(activityType);
 
+		activityFacility.addActivityOption(activityOption);
+	}
+	
 	
 	private String getActivityTypeFromLandUseArea(GeometryFactory geometryFactory,	String buildingType, Coord coord) {
 		String activityType = null;
@@ -546,20 +580,6 @@ public class CombinedOsmSink implements Sink {
 		MapUtils.addToInteger(osmType, typeCount, 0, 1);
 		return matsimType;
 	}
-	
-	
-	
-	/////////////////////////////////////////////////
-//	private String getActivityType(String amenity){
-//		String type = typeMap.get(amenity);
-//		if(type == null){
-//			log.warn("Do not have an activity type mapping for " + amenity + "! Returning NULL.");
-//		} else{
-//		}
-//		MapUtils.addToInteger(type, typeCount, 0, 1);
-//		return type;
-//	}
-	//////////////////////////////////////
 
 
 	@Override
