@@ -21,6 +21,8 @@
 package playground.dziemke.accessibility;
 
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -63,9 +65,7 @@ public class RunCombinedOsmReaderForBe {
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
 		
-//		String facilityFile = outputBase + "facilities_buildings.xml";
 		String facilityFile = outputBase + "facilities.xml";
-//		String attributeFile = outputBase + "facilitiy_attributes_buildings.xml";
 		String attributeFile = outputBase + "facilitiy_attributes.xml";
 		
 		// Logging
@@ -80,7 +80,7 @@ public class RunCombinedOsmReaderForBe {
 		double buildingTypeFromVicinityRange = 0.;
 		
 		
-		// String[] tagsToIgnoreBuildings = {"amenity", "historic"};
+		
 //		highway
 		
 //		String osmFile = args[0];
@@ -94,17 +94,11 @@ public class RunCombinedOsmReaderForBe {
 //		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", outputCRS);
 		
 		// LandUseBuildingReader landUseBuildingReader = new LandUseBuildingReader(
-		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(
-				//ct,
-				outputCRS,
+		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
 				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
-				//
 				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
-				buildOsmTourismToMatsimTypeMap(),
-				//
-				buildingTypeFromVicinityRange
-				//, tagsToIgnoreBuildings
-				);
+				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
+				buildingTypeFromVicinityRange);
 		try {
 //			combinedOsmReader.parseLandUseAndBuildings(osmFile);
 			combinedOsmReader.parseFile(osmFile);
@@ -246,7 +240,6 @@ public class RunCombinedOsmReaderForBe {
 	}
 	
 	
-	//
 	// copied from "RunAmenityReaderForBe"
 	private static Map<String, String> buildOsmAmenityToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
@@ -272,6 +265,7 @@ public class RunCombinedOsmReaderForBe {
 		map.put("kindergarten", "education"); // used to be "e"
 
 		map.put("library", "other"); // used to be "t"
+		
 		map.put("public_bookcase", "ignore");
 
 		map.put("school", "education"); // used to be "e"
@@ -375,13 +369,14 @@ public class RunCombinedOsmReaderForBe {
 
 		map.put("place_of_worship", "other"); // used to be "t"
 
-		map.put("polic", "police"); // used to be "p"
+		map.put("police", "police"); // used to be "p"
 
 		map.put("post_box", "ignore");
 
 		map.put("post_office", "other"); // used to be "t"
 
-		map.put("prison", "ignore");
+		map.put("prison", "work");
+		
 		map.put("ranger_station", "ignore");
 		map.put("register_office", "ignore");
 		map.put("recycling", "ignore");
@@ -396,8 +391,7 @@ public class RunCombinedOsmReaderForBe {
 
 		map.put("townhall", "other"); // used to be "t"
 
-		map.put("vending_machine", "shopping");
-
+		map.put("vending_machine", "ignore");
 		map.put("waste_basket", "ignore");
 		map.put("waste_disposal", "ignore");
 		map.put("watering_place", "ignore");
@@ -425,6 +419,7 @@ public class RunCombinedOsmReaderForBe {
 		map.put("fishing", "ignore");
 		
 		map.put("garden", "leisure");
+		map.put("golf_course", "leisure");
 		map.put("hackerspace", "leisure");
 		map.put("ice_rink", "leisure");
 		
@@ -488,5 +483,29 @@ public class RunCombinedOsmReaderForBe {
 		map.put("zoo", "leisure");
 
 		return map;
+	}
+	
+	
+	private static List<String> buildUnmannedEntitiesList(){
+		List<String> list = new LinkedList<String>();
+		
+		list.add("bicycle_rental");
+		list.add("car_wash");
+		list.add("atm");
+		list.add("photo_booth");
+		//list.add("vending_machine"); // currently ignored
+		list.add("dance");
+		list.add("dog_park");
+		list.add("firepit");
+		list.add("garden");
+		list.add("pitch");
+		list.add("playground");
+		list.add("swimming_area");
+		list.add("track");
+		list.add("camp_site");
+		list.add("picnic_site");
+		list.add("wilderness_hut");
+		
+		return list;
 	}
 }

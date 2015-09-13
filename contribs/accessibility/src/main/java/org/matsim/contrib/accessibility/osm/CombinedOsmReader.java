@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -57,16 +58,14 @@ public class CombinedOsmReader {
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
 	
-	//private final CoordinateTransformation ct;
 	private final String outputCRS;
 	
 	private Map<String, String> osmLandUseToMatsimTypeMap;
 	private Map<String, String> osmBuildingToMatsimTypeMap;
-	//
 	private Map<String, String> osmAmenityToMatsimTypeMap;
 	private Map<String, String> osmLeisureToMatsimTypeMap;
 	private Map<String, String> osmTourismToMatsimTypeMap;
-	//
+	private List<String> unmannedEntitiesList;
 	
 	private double buildingTypeFromVicinityRange;
 	// private String[] tagsToIgnoreBuildings;
@@ -82,36 +81,25 @@ public class CombinedOsmReader {
 	 * 		  <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">Land Use</a>
 	 * 		  to MATSim activity types.
 	 */
-	public CombinedOsmReader(
-			//CoordinateTransformation ct, 
-			String outputCRS,
-			Map<String, String> osmLandUseToMatsimTypeMap,
-			Map<String, String> osmBuildingToMatsimTypeMap,
-			//
-			Map<String, String> osmAmenityToMatsimTypeMap,
-			Map<String, String> osmLeisureToMatsimTypeMap,
-			Map<String, String> osmTourismToMatsimTypeMap,
-			double buildingTypeFromVicinityRange
-			//, String[] tagsToIgnoreBuildings
-			)
+	public CombinedOsmReader(String outputCRS, Map<String, String> osmLandUseToMatsimTypeMap,
+			Map<String, String> osmBuildingToMatsimTypeMap,	Map<String, String> osmAmenityToMatsimTypeMap,
+			Map<String, String> osmLeisureToMatsimTypeMap, Map<String, String> osmTourismToMatsimTypeMap,
+			List<String> unmannedEntitiesList, double buildingTypeFromVicinityRange)
 			{
 		log.info("Creating CombinedOsmReader");
 		
-		// this.ct = ct;
 		this.outputCRS = outputCRS;
 		
 		this.osmLandUseToMatsimTypeMap = osmLandUseToMatsimTypeMap;
 		this.osmBuildingToMatsimTypeMap = osmBuildingToMatsimTypeMap;
-		//
 		this.osmAmenityToMatsimTypeMap = osmAmenityToMatsimTypeMap;
 		this.osmLeisureToMatsimTypeMap = osmLeisureToMatsimTypeMap;
 		this.osmTourismToMatsimTypeMap = osmTourismToMatsimTypeMap;
-		//
+		this.unmannedEntitiesList = unmannedEntitiesList;
 		
 		this.facilities = FacilitiesUtils.createActivityFacilities("OpenStreetMap landuse ???");
 		
 		this.buildingTypeFromVicinityRange = buildingTypeFromVicinityRange;
-		//this.tagsToIgnoreBuildings = tagsToIgnoreBuildings;
 	}
 	
 	
@@ -131,17 +119,11 @@ public class CombinedOsmReader {
 		if(!file.exists()){
 			throw new FileNotFoundException("Could not find OSM file " + osmFile);
 		}
-		//LandUseBuildingSink landUseBuildingSink = new LandUseBuildingSink(
-		CombinedOsmSink combinedOsmSink = new CombinedOsmSink(
-				//this.ct,
-				this.outputCRS,
+		CombinedOsmSink combinedOsmSink = new CombinedOsmSink(this.outputCRS,
 				this.osmLandUseToMatsimTypeMap, this.osmBuildingToMatsimTypeMap,
-				//
 				this.osmAmenityToMatsimTypeMap,	this.osmLeisureToMatsimTypeMap,
-				this.osmTourismToMatsimTypeMap,
-				this.buildingTypeFromVicinityRange
-				//, this.tagsToIgnoreBuildings
-				);
+				this.osmTourismToMatsimTypeMap, this.unmannedEntitiesList,
+				this.buildingTypeFromVicinityRange);
 		XmlReader xmlReader = new XmlReader(file, false, CompressionMethod.None);
 		xmlReader.setSink(combinedOsmSink);
 		xmlReader.run();		

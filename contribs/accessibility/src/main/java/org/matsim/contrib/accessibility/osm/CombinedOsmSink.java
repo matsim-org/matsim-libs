@@ -74,13 +74,13 @@ public class CombinedOsmSink implements Sink {
 	
 	private Map<String, String> landUseTypeMap = new HashMap<>();
 	private Map<String, String> buildingTypeMap = new HashMap<>();
-	//
 	private Map<String, String> amenityTypeMap = new HashMap<>();
 	private Map<String, String> leisureTypeMap = new HashMap<>();
 	private Map<String, String> tourismTypeMap = new HashMap<>();
+	private List<String> unmannedEntitiesList;
 	
-	//private final CoordinateTransformation ct;
-	//String outputCRS = TransformationFactory.DHDN_GK4;
+	private double buildingTypeFromVicinityRange;
+	
 	private String outputCRS;
 	//
 	
@@ -88,8 +88,7 @@ public class CombinedOsmSink implements Sink {
 	
 	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
 
-	private double buildingTypeFromVicinityRange;
-//	private String[] tagsToIgnoreBuildings;
+	
 
 	private int featureErrorCounter = 0;
 	private int buildingErrorCounter = 0;
@@ -97,37 +96,25 @@ public class CombinedOsmSink implements Sink {
 	private PolygonFeatureFactory polygonFeatureFactory;
 
 	
-	public CombinedOsmSink(
-			//CoordinateTransformation ct, 
-			String outputCRS,
-			Map<String, String> osmLandUseToMatsimType, 
-			Map<String, String> osmBuildingToMatsimType, 
-			//
-			Map<String, String> osmAmenityToMatsimType,
-			Map<String, String> osmLeisureToMatsimType,
-			Map<String, String> osmTourismToMatsimType,
-			//
-			double buildingTypeFromVicinityRange
-			//, String[] tagsToIgnoreBuildings
-			) {
+	public CombinedOsmSink(String outputCRS, Map<String, String> osmLandUseToMatsimType, 
+			Map<String, String> osmBuildingToMatsimType, Map<String, String> osmAmenityToMatsimType,
+			Map<String, String> osmLeisureToMatsimType, Map<String, String> osmTourismToMatsimType,
+			List<String> unmannedEntitiesList, double buildingTypeFromVicinityRange) {
 		
-		//this.ct = ct;
 		this.outputCRS = outputCRS;
 		
 		this.landUseTypeMap = osmLandUseToMatsimType;
 		this.buildingTypeMap = osmBuildingToMatsimType;
-		//
 		this.amenityTypeMap = osmAmenityToMatsimType;
 		this.leisureTypeMap = osmLeisureToMatsimType;
 		this.tourismTypeMap = osmTourismToMatsimType;
-		//
+		this.unmannedEntitiesList = unmannedEntitiesList;
+		
+		this.buildingTypeFromVicinityRange  = buildingTypeFromVicinityRange;
 		
 		this.nodeMap = new HashMap<Long, NodeContainer>();
 		this.wayMap = new HashMap<Long, WayContainer>();
 		this.relationMap = new HashMap<Long, RelationContainer>();
-		
-		this.buildingTypeFromVicinityRange  = buildingTypeFromVicinityRange;
-		// this.tagsToIgnoreBuildings = tagsToIgnoreBuildings;
 		
 		facilities = FacilitiesUtils.createActivityFacilities("Land Use");
 		facilityAttributes = new ObjectAttributes();
@@ -144,15 +131,10 @@ public class CombinedOsmSink implements Sink {
 		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		
-//		String landUseType = "type";
-//		initLandUseFeatureType(landUseType, this.toCRS);
 		initFeatureType(this.outputCRS);
 
 		// Check the ways for land use
 		processLandUseAreas(aff, wayMap);
-		
-		// Check the ways for buildings
-//		processEntity(aff, wayMap);
 		
 		//
 		/* First check all the point features. */
@@ -174,8 +156,6 @@ public class CombinedOsmSink implements Sink {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", this.outputCRS);
 		
-		// TODO process historic=memorial and leisure=park and amenity=xy and tourism=zoo the same way
-		
 		for(long entityKey : entityMap.keySet()){
 			Entity entity = entityMap.get(entityKey).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
@@ -188,28 +168,19 @@ public class CombinedOsmSink implements Sink {
 			if(matsimActivityType != null){
 				Coord[] coords = CoordUtils.getAllWayCoords((Way) entity, ct, this.nodeMap);
 				SimpleFeature feature = createFeature(coords, matsimActivityType);
-				
-				// TODO check if the following is needed
-				if (feature == null) {
-					continue;
+
+				if (feature != null) {
+					this.features.add(feature);
 				}
-				//
-				
-				this.features.add(feature);
 			}
 		}
 	}
 	
 	
-	// private void initLandUseFeatureType(String landUseType, String toCRS) {
 	private void initFeatureType(String outputCRS) {
 		
 		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder().
-		//setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
 		setCrs(MGC.getCRS(outputCRS)).
-		//setName("buildings").
-		// TODO change name
-		//setName("land_use").
 		addAttribute("type", String.class).
 		create();
 	}	
@@ -251,15 +222,16 @@ public class CombinedOsmSink implements Sink {
 		
 			Entity entity = entityMap.get(entityKey).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+
 			
+			// get coordinates of centroid of entity
+			Coord centroidCoord = CoordUtils.getCentroidCoord(entity, ct, this.nodeMap, this.wayMap, this.relationMap);
+
 			
-			// handle and modify name
+			// handle and possibly modify name
+			// & and " need to be replaced to avoid problems with parsing the facilities file later
 			String name = tags.get("name");
-			if(name == null){
-//				log.warn("Building " + entityKey + " does not have a name.");
-			} else{
-//				log.warn("Building " + entityKey + " has the name " + name + ".");
-				// & and " need to be replaced to avoid problems with parsing the facilities file later
+			if(name != null) {
 				if (name.contains("&")) {							
 					name = name.replaceAll("&", "u");
 				}
@@ -269,6 +241,7 @@ public class CombinedOsmSink implements Sink {
 			}
 			
 			
+			// get other relevant tags
 			String amenityType = tags.get("amenity");
 			String shopType = tags.get("shop");
 			String craftType = tags.get("craft");
@@ -276,14 +249,11 @@ public class CombinedOsmSink implements Sink {
 			String leisureType = tags.get("leisure");
 			String sportType = tags.get("sport");
 			String tourismType = tags.get("tourism");
-			
 			String buildingType = tags.get("building");
 
-
-			Coord centroidCoord = CoordUtils.getCentroidCoord(entity, ct, this.nodeMap, this.wayMap, this.relationMap);
 			
-			
-			// amenities
+			// entities with amenity tag are converted into a facility with activity option according
+			// to user-specified mapping and a work option unless they belong to "unmanned facilities"
 			if(amenityType != null) {
 				// Get facility type
 				String activityType = getActivityType(amenityType, this.amenityTypeMap);
@@ -296,35 +266,28 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for amenity
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
+					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+						createFacility(aff, entity, name, centroidCoord, "work");
+					}
 				}
 			}
 
 			
-			// shops
+			// entities with shop tag are converted into a facility with shopping and work activity options
 			if(shopType != null){
-				// Get facility type
-				String activityType = "shopping";
-
-				// Create facility for shop
-				if (activityType != null) {
-					createFacility(aff, entity, name, centroidCoord, activityType);
-				}
+				createFacility(aff, entity, name, centroidCoord, "shopping");
+				createFacility(aff, entity, name, centroidCoord, "work");
 			}
 
 
-			// craft and office
+			// entities with craft or office tag are converted into a facility with work activity option
 			if(craftType != null || officeType != null){
-				// Get facility type
-				String activityType = "work";
-
-				// Create facility for shop
-				if (activityType != null) {
-					createFacility(aff, entity, name, centroidCoord, activityType);
-				}
+				createFacility(aff, entity, name, centroidCoord, "work");
 			}
 
 
-			// leisure
+			// entities with leisure tag are converted into a facility with activity option according
+			// to user-specified mapping and a work option unless they belong to "unmanned facilities"
 			if(leisureType != null){
 				// Get facility type
 				String activityType = getActivityType(leisureType, this.leisureTypeMap);
@@ -337,23 +300,24 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for shop
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
+					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+						createFacility(aff, entity, name, centroidCoord, "work");
+					}
 				}
 			}
 
 			
-			// sport
+			// entities with sport tag are converted into a facility with leisure activity option. No work
+			// activity option is added, since most entities also have a leisure tag -- especially the manned facilities
 			if(sportType != null){
-				// Get facility type
-				String activityType = "leisure";
-
-				// Create facility for shop
-				if (activityType != null) {
-					createFacility(aff, entity, name, centroidCoord, activityType);
-				}
+				createFacility(aff, entity, name, centroidCoord, "leisure");
+				// not creating a work activity option for sport, since most entities with a "sport"
+				// tag have a "leisure" tag, too -- especially the manned facilities
 			}
 
 
-			// tourism
+			// entities with tourism tag are converted into a facility with activity option according
+			// to user-specified mapping and a work option unless they belong to "unmanned facilities"
 			if(tourismType != null){
 				// Get facility type
 				String activityType = getActivityType(tourismType, this.tourismTypeMap);
@@ -366,11 +330,17 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for shop
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
+					if ( !this.unmannedEntitiesList.contains(activityType) ) {
+						createFacility(aff, entity, name, centroidCoord, "work");
+					}
 				}
 			}
 
 
-			// buildings
+			// entities with building tag are converted into a facility with activity option according
+			// to user-specified mapping
+			// ... land use ...
+			// ...
 			if(buildingType != null && !(entity instanceof Relation)) {
 				// Create feature for building
 				// do this step first to be able to "continue" in loop if feature for building cannot be created
