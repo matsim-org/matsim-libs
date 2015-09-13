@@ -416,6 +416,7 @@ public class CombinedOsmSink implements Sink {
 		Id<ActivityFacility> facilityId = Id.create(entity.getId(), ActivityFacility.class);
 		ActivityFacility activityFacility;
 
+		// activity facility
 		if(!facilities.getFacilities().containsKey(facilityId)){
 			activityFacility = activityFacilityFactory.createActivityFacility(facilityId, coord);
 			((ActivityFacilityImpl)activityFacility).setDesc(name);
@@ -425,7 +426,10 @@ public class CombinedOsmSink implements Sink {
 		}
 		ActivityOption activityOption = activityFacilityFactory.createActivityOption(activityType);
 
-		activityFacility.addActivityOption(activityOption);
+		// activity option
+		if(!activityFacility.getActivityOptions().containsKey(activityType)) {
+			activityFacility.addActivityOption(activityOption);
+		}
 	}
 	
 	
