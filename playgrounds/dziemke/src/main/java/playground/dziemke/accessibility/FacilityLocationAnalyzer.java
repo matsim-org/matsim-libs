@@ -30,7 +30,7 @@ public class FacilityLocationAnalyzer {
 	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
 	
 //	private static String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml";
-	private static String facilitiesFile = inputOutputDirectory + "/facilities.xml";
+	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";
 //	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/08/facilities_buildings.xml";
 //	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/facilities_amenities_modified.xml";
 	

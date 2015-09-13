@@ -250,59 +250,167 @@ public class RunCombinedOsmReaderForBe {
 	// copied from "RunAmenityReaderForBe"
 	private static Map<String, String> buildOsmAmenityToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
-		
-		// used to be "e"
-		map.put("school", "education");
-		map.put("kindergarten", "education");
-		map.put("college", "education");
-		map.put("university", "education");
-		
-		// used to be "l"
-		map.put("bar", "leisure");
-		map.put("cafe", "leisure");
-		map.put("fast_food", "leisure");
-		map.put("food_court", "leisure");
-		map.put("ice_cream", "leisure");
-		map.put("pub", "leisure");
-		map.put("restaurant", "leisure");
-		map.put("arts_centre", "leisure");
-		map.put("cinema", "leisure");
-		map.put("nightclub", "leisure");
-		map.put("stripclub", "leisure");
-		map.put("theatre", "leisure");
-		map.put("brothel", "leisure");
-		
-		// used to be "m"
-		map.put("clinic", "medical");
-		map.put("dentist", "medical");
-		map.put("doctors", "medical");
-		map.put("hospital", "medical");
-		map.put("nursing_home", "medical");
-		map.put("pharmacy", "medical");
-		
-		// used to be "p"
-		map.put("polic", "police");
-		
-		// used to be "t"
-		map.put("library", "other");
-		map.put("car_wash", "other");
-		map.put("fuel", "other");
-		map.put("atm", "other");
-		map.put("bank", "other");
-		map.put("bureau_de_change", "other");
-		map.put("social_centre", "other");
-		map.put("marketplace", "other");
-		map.put("place_of_worship", "other");
-		map.put("post_office", "other");
-		map.put("townhall", "other");
+
+		// "subsistence" section in osm wiki
+		map.put("bar", "leisure"); // used to be "l"
+
+		map.put("bbq", "leisure");
+		map.put("biergarten", "leisure");
+
+		map.put("cafe", "leisure"); // used to be "l"
+
+		map.put("drinking_water", "ignore");
+
+		map.put("fast_food", "leisure"); // used to be "l"
+		map.put("food_court", "leisure"); // used to be "l"
+		map.put("ice_cream", "leisure"); // used to be "l"
+		map.put("pub", "leisure"); // used to be "l"
+		map.put("restaurant", "leisure"); // used to be "l"
+
+		// "education" section in osm wiki
+		map.put("college", "education"); // used to be "e"
+		map.put("kindergarten", "education"); // used to be "e"
+
+		map.put("library", "other"); // used to be "t"
+		map.put("public_bookcase", "ignore");
+
+		map.put("school", "education"); // used to be "e"
+		map.put("university", "education"); // used to be "e"
+
+		// "transportation" section in osm wiki
+		map.put("bicycle_parking", "ignore");
+		map.put("bicycle_repair_station", "ignore");
+
+		map.put("bicycle_rental", "other");
+
+		map.put("boat_sharing", "ignore");
+		map.put("bus_station", "ignore");
+
+		map.put("car_rental", "other");
+
+		map.put("car_sharing", "ignore");
+
+		map.put("car_wash", "other"); // used to be "t"
+
+		map.put("charging_station", "ignore");
+		map.put("ferry_terminal", "ignore");
+
+		map.put("fuel", "other"); // used to be "t"
+
+		map.put("grit_bin", "ignore");
+		map.put("motorcycle_parking", "ignore");
+		map.put("parking", "ignore");
+		map.put("parking_entrance", "ignore");
+		map.put("taxi", "ignore");
+
+		// "financial" section in osm wiki
+		map.put("atm", "other"); // used to be "t"
+		map.put("bank", "other"); // used to be "t"
+		map.put("bureau_de_change", "other"); // used to be "t"
+
+		// "healthcare" section in osm wiki
+		map.put("baby_hatch", "ignore");
+
+		map.put("clinic", "medical"); // used to be "m"
+		map.put("dentist", "medical"); // used to be "m"
+		map.put("doctors", "medical"); // used to be "m"
+		map.put("hospital", "medical"); // used to be "m"
+		map.put("nursing_home", "medical"); // used to be "m"
+		map.put("pharmacy", "medical"); // used to be "m"
+
+		map.put("social_facility", "ignore");
+		map.put("veterinary", "ignore");
+		map.put("blood_donation", "ignore");
+
+		// "entertainment, arts & culture" section in osm wiki
+		map.put("arts_centre", "leisure"); // used to be "l"
+		map.put("brothel", "leisure"); // used to be "l"
+		map.put("casino", "leisure");
+		map.put("cinema", "leisure"); // used to be "l"
+
+		map.put("community_centre", "ignore");
+		map.put("fountain", "ignore");
+
+		map.put("gambling", "leisure");
+		map.put("nightclub", "leisure"); // used to be "l"
+		map.put("planetarium", "leisure");
+
+		map.put("social_centre", "other"); // used to be "t"
+
+		map.put("stripclub", "leisure"); // used to be "l"
+		map.put("studio", "leisure");
+		map.put("swingerclub", "leisure");
+
+		map.put("theatre", "leisure"); // used to be "l"
+
+		// "other" section in osm wiki
+		map.put("animal_boarding", "ignore");
+		map.put("animal_shelter", "ignore");
+		map.put("bench", "ignore");
+		map.put("clock", "ignore");
+		map.put("courthouse", "ignore");
+
+		map.put("coworking_space", "work");
+
+		map.put("crematorium", "ignore");
+		map.put("crypt", "ignore");
+		map.put("dojo", "ignore");
+
+		map.put("embassy", "other");
+
+		map.put("fire_station", "work");
+
+		map.put("game_feeding", "leisure");
+
+		map.put("grave_yard", "ignore");
+
+		map.put("gym", "leisure");
+
+		map.put("hunting_stand", "ignore");
+		map.put("kneipp_water_cure", "ignore");
+
+		map.put("marketplace", "shopping"); // used to be "t" = other
+
+		map.put("photo_booth", "leisure");
+
+		map.put("place_of_worship", "other"); // used to be "t"
+
+		map.put("polic", "police"); // used to be "p"
+
+		map.put("post_box", "ignore");
+
+		map.put("post_office", "other"); // used to be "t"
+
+		map.put("prison", "ignore");
+		map.put("ranger_station", "ignore");
+		map.put("register_office", "ignore");
+		map.put("recycling", "ignore");
+		map.put("rescue_station", "ignore");
+
+		map.put("sauna", "leisure");
+
+		map.put("shelter", "ignore");
+		map.put("shower", "ignore");
+		map.put("telephone", "ignore");
+		map.put("toilets", "ignore");
+
+		map.put("townhall", "other"); // used to be "t"
+
+		map.put("vending_machine", "shopping");
+
+		map.put("waste_basket", "ignore");
+		map.put("waste_disposal", "ignore");
+		map.put("watering_place", "ignore");
+		map.put("water_point", "ignore");
+
 		return map;
 	}
 	//
-	
-	
+
+
 	private static Map<String, String> buildOsmLeisureToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
-		
+
 		map.put("adult_gaming_centre", "leisure");
 		map.put("amusement_arcade", "leisure");
 		map.put("beach_resort", "leisure");

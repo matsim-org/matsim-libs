@@ -49,6 +49,7 @@ import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
+import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
@@ -285,14 +286,14 @@ public class CombinedOsmSink implements Sink {
 			// amenities
 			if(amenityType != null) {
 				// Get facility type
-				String activityType = getActivityType(amenityType, this.buildingTypeMap);
+				String activityType = getActivityType(amenityType, this.amenityTypeMap);
 
 				if (activityType == "ignore") {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
 
-				// Create facility for amenitiy
+				// Create facility for amenity
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
 				}
@@ -327,6 +328,11 @@ public class CombinedOsmSink implements Sink {
 			if(leisureType != null){
 				// Get facility type
 				String activityType = getActivityType(leisureType, this.leisureTypeMap);
+				
+				if (activityType == "ignore") {
+					// System.out.println("activityType == ignore");
+					continue;
+				}
 
 				// Create facility for shop
 				if (activityType != null) {
@@ -351,6 +357,11 @@ public class CombinedOsmSink implements Sink {
 			if(tourismType != null){
 				// Get facility type
 				String activityType = getActivityType(tourismType, this.tourismTypeMap);
+				
+				if (activityType == "ignore") {
+					// System.out.println("activityType == ignore");
+					continue;
+				}
 
 				// Create facility for shop
 				if (activityType != null) {
@@ -360,7 +371,7 @@ public class CombinedOsmSink implements Sink {
 
 
 			// buildings
-			if(buildingType != null) {
+			if(buildingType != null && !(entity instanceof Relation)) {
 				// Create feature for building
 				// do this step first to be able to "continue" in loop if feature for building cannot be created
 				Coord[] allBuildingCoords = CoordUtils.getAllWayCoords((Way) entity, ct, this.nodeMap);
