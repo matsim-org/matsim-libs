@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -82,13 +83,10 @@ public class CombinedOsmSink implements Sink {
 	private double buildingTypeFromVicinityRange;
 	
 	private String outputCRS;
-	//
 	
 	private Map<String, Integer> typeCount = new HashMap<>();
 	
 	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
-
-	
 
 	private int featureErrorCounter = 0;
 	private int buildingErrorCounter = 0;
@@ -258,7 +256,7 @@ public class CombinedOsmSink implements Sink {
 				// Get facility type
 				String activityType = getActivityType(amenityType, this.amenityTypeMap);
 
-				if (activityType == "ignore") {
+				if (activityType == FacilityTypes.IGNORE) {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
@@ -267,7 +265,7 @@ public class CombinedOsmSink implements Sink {
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
 					if ( !this.unmannedEntitiesList.contains(amenityType) ) {
-						createFacility(aff, entity, name, centroidCoord, "work");
+						createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
 					}
 				}
 			}
@@ -275,14 +273,14 @@ public class CombinedOsmSink implements Sink {
 			
 			// entities with shop tag are converted into a facility with shopping and work activity options
 			if(shopType != null){
-				createFacility(aff, entity, name, centroidCoord, "shopping");
-				createFacility(aff, entity, name, centroidCoord, "work");
+				createFacility(aff, entity, name, centroidCoord, FacilityTypes.SHOPPING);
+				createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
 			}
 
 
 			// entities with craft or office tag are converted into a facility with work activity option
 			if(craftType != null || officeType != null){
-				createFacility(aff, entity, name, centroidCoord, "work");
+				createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
 			}
 
 
@@ -292,7 +290,7 @@ public class CombinedOsmSink implements Sink {
 				// Get facility type
 				String activityType = getActivityType(leisureType, this.leisureTypeMap);
 				
-				if (activityType == "ignore") {
+				if (activityType == FacilityTypes.IGNORE) {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
@@ -301,7 +299,7 @@ public class CombinedOsmSink implements Sink {
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
 					if ( !this.unmannedEntitiesList.contains(leisureType) ) {
-						createFacility(aff, entity, name, centroidCoord, "work");
+						createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
 					}
 				}
 			}
@@ -310,7 +308,7 @@ public class CombinedOsmSink implements Sink {
 			// entities with sport tag are converted into a facility with leisure activity option. No work
 			// activity option is added, since most entities also have a leisure tag -- especially the manned facilities
 			if(sportType != null){
-				createFacility(aff, entity, name, centroidCoord, "leisure");
+				createFacility(aff, entity, name, centroidCoord, FacilityTypes.LEISURE);
 				// not creating a work activity option for sport, since most entities with a "sport"
 				// tag have a "leisure" tag, too -- especially the manned facilities
 			}
@@ -322,7 +320,7 @@ public class CombinedOsmSink implements Sink {
 				// Get facility type
 				String activityType = getActivityType(tourismType, this.tourismTypeMap);
 				
-				if (activityType == "ignore") {
+				if (activityType == FacilityTypes.IGNORE) {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
@@ -331,7 +329,7 @@ public class CombinedOsmSink implements Sink {
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
 					if ( !this.unmannedEntitiesList.contains(tourismType) ) {
-						createFacility(aff, entity, name, centroidCoord, "work");
+						createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
 					}
 				}
 			}
@@ -361,7 +359,7 @@ public class CombinedOsmSink implements Sink {
 					activityType = getActivityTypeFromLandUseArea(geometryFactory, buildingType, centroidCoord);
 				}
 				
-				if (activityType == "ignore") {
+				if (activityType == FacilityTypes.IGNORE) {
 					// System.out.println("activityType == ignore");
 					continue;
 				}
@@ -435,7 +433,7 @@ public class CombinedOsmSink implements Sink {
 			}
 		}
 		
-		if (activityType == "ignore") {
+		if (activityType == FacilityTypes.IGNORE) {
 			return null;
 		}
 

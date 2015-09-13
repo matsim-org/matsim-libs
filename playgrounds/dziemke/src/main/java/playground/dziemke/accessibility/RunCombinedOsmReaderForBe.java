@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
 import org.matsim.contrib.accessibility.osm.LandUseBuildingReader;
 import org.matsim.facilities.Facility;
@@ -119,46 +120,46 @@ public class RunCombinedOsmReaderForBe {
 		// somebody lives occasionally or where only very few people
 		// per building area work are ignored
 		
-		map.put("allotments", "ignore");
-		map.put("basin", "ignore");
-		map.put("brownfield", "ignore");
-		map.put("cemetery", "ignore");
+		map.put("allotments", FacilityTypes.IGNORE);
+		map.put("basin", FacilityTypes.IGNORE);
+		map.put("brownfield", FacilityTypes.IGNORE);
+		map.put("cemetery", FacilityTypes.IGNORE);
 		
-		map.put("commercial", "work");
+		map.put("commercial", FacilityTypes.WORK);
 		
-		map.put("conservation", "ignore");
-		map.put("construction", "ignore");
-		map.put("farmland", "ignore");
-		map.put("farmyard", "ignore");
-		map.put("forest", "ignore");
-		map.put("garages", "ignore");
-		map.put("grass", "ignore");
-		map.put("greenfield", "ignore");
-		map.put("greenhouse_horticulture", "ignore");
+		map.put("conservation", FacilityTypes.IGNORE);
+		map.put("construction", FacilityTypes.IGNORE);
+		map.put("farmland", FacilityTypes.IGNORE);
+		map.put("farmyard", FacilityTypes.IGNORE);
+		map.put("forest", FacilityTypes.IGNORE);
+		map.put("garages", FacilityTypes.IGNORE);
+		map.put("grass", FacilityTypes.IGNORE);
+		map.put("greenfield", FacilityTypes.IGNORE);
+		map.put("greenhouse_horticulture", FacilityTypes.IGNORE);
 		
-		map.put("industrial", "work");
+		map.put("industrial", FacilityTypes.WORK);
 		
-		map.put("landfill", "ignore");
-		map.put("meadow", "ignore");
-		map.put("military", "ignore");
-		map.put("orchard", "ignore");
-		map.put("pasture", "ignore");
-		map.put("peat_cutting", "ignore");
-		map.put("plant_nursery", "ignore");
+		map.put("landfill", FacilityTypes.IGNORE);
+		map.put("meadow", FacilityTypes.IGNORE);
+		map.put("military", FacilityTypes.IGNORE);
+		map.put("orchard", FacilityTypes.IGNORE);
+		map.put("pasture", FacilityTypes.IGNORE);
+		map.put("peat_cutting", FacilityTypes.IGNORE);
+		map.put("plant_nursery", FacilityTypes.IGNORE);
 		
-		map.put("port", "work");
+		map.put("port", FacilityTypes.WORK);
 		
-		map.put("quarry", "ignore");
-		map.put("railway", "ignore");
-		map.put("recreation_ground", "ignore");
-		map.put("reservoir", "ignore");
+		map.put("quarry", FacilityTypes.IGNORE);
+		map.put("railway", FacilityTypes.IGNORE);
+		map.put("recreation_ground", FacilityTypes.IGNORE);
+		map.put("reservoir", FacilityTypes.IGNORE);
 		
-		map.put("residential", "home");
-		map.put("retail", "work");
+		map.put("residential", FacilityTypes.HOME);
+		map.put("retail", FacilityTypes.WORK);
 		
-		map.put("salt_pond", "ignore");
-		map.put("village_green", "ignore");
-		map.put("vineyard", "ignore");
+		map.put("salt_pond", FacilityTypes.IGNORE);
+		map.put("village_green", FacilityTypes.IGNORE);
+		map.put("vineyard", FacilityTypes.IGNORE);
 
 		return map;
 	}
@@ -173,68 +174,68 @@ public class RunCombinedOsmReaderForBe {
 		// somebody lives occasionally or where only very few people
 		// per building area work are ignored
 		
-		map.put("apartments", "home");
-		map.put("farm", "home");
+		map.put("apartments", FacilityTypes.HOME);
+		map.put("farm", FacilityTypes.HOME);
 		
-		map.put("hotel", "work");
+		map.put("hotel", FacilityTypes.WORK);
 		
-		map.put("house", "home");
-		map.put("detached", "home");
-		map.put("residential", "home");
-		map.put("dormitory", "home");
-		map.put("terrace", "home");
-		map.put("houseboat", "home");
-		map.put("static_caravan", "home");
+		map.put("house", FacilityTypes.HOME);
+		map.put("detached", FacilityTypes.HOME);
+		map.put("residential", FacilityTypes.HOME);
+		map.put("dormitory", FacilityTypes.HOME);
+		map.put("terrace", FacilityTypes.HOME);
+		map.put("houseboat", FacilityTypes.HOME);
+		map.put("static_caravan", FacilityTypes.HOME);
 		
-		map.put("commercial", "work");
-		map.put("office", "work");
-		map.put("industrial", "work");
-		map.put("retail", "work");
+		map.put("commercial", FacilityTypes.WORK);
+		map.put("office", FacilityTypes.WORK);
+		map.put("industrial", FacilityTypes.WORK);
+		map.put("retail", FacilityTypes.WORK);
 		
-		map.put("warehouse", "ignore");		
-		map.put("chapel", "ignore");
-		map.put("church", "ignore");
-		map.put("mosque", "ignore");
-		map.put("temple", "ignore");
-		map.put("synagoge", "ignore");
-		map.put("shrine", "ignore");
+		map.put("warehouse", FacilityTypes.IGNORE);		
+		map.put("chapel", FacilityTypes.IGNORE);
+		map.put("church", FacilityTypes.IGNORE);
+		map.put("mosque", FacilityTypes.IGNORE);
+		map.put("temple", FacilityTypes.IGNORE);
+		map.put("synagoge", FacilityTypes.IGNORE);
+		map.put("shrine", FacilityTypes.IGNORE);
 	
-		map.put("civic", "work");
-		map.put("hospital", "work");
-		map.put("school", "work");
+		map.put("civic", FacilityTypes.WORK);
+		map.put("hospital", FacilityTypes.WORK);
+		map.put("school", FacilityTypes.WORK);
 		
-		map.put("stadium", "ignore");
-		map.put("train_station", "ignore");
-		map.put("transportation", "ignore");
+		map.put("stadium", FacilityTypes.IGNORE);
+		map.put("train_station", FacilityTypes.IGNORE);
+		map.put("transportation", FacilityTypes.IGNORE);
 		
-		map.put("university", "work");
-		map.put("public", "work");
-		map.put("greenhouse", "work");
+		map.put("university", FacilityTypes.WORK);
+		map.put("public", FacilityTypes.WORK);
+		map.put("greenhouse", FacilityTypes.WORK);
 		
-		map.put("barn", "ignore");
-		map.put("bridge", "ignore");
-		map.put("bunker", "ignore");
-		map.put("cabin", "ignore");
-		map.put("construction", "ignore");
-		map.put("cowshed", "ignore");
-		map.put("farm_auxiliary", "ignore");
-		map.put("garage", "ignore");
-		map.put("garages", "ignore");
-		map.put("greenhouse", "ignore");
+		map.put("barn", FacilityTypes.IGNORE);
+		map.put("bridge", FacilityTypes.IGNORE);
+		map.put("bunker", FacilityTypes.IGNORE);
+		map.put("cabin", FacilityTypes.IGNORE);
+		map.put("construction", FacilityTypes.IGNORE);
+		map.put("cowshed", FacilityTypes.IGNORE);
+		map.put("farm_auxiliary", FacilityTypes.IGNORE);
+		map.put("garage", FacilityTypes.IGNORE);
+		map.put("garages", FacilityTypes.IGNORE);
+		map.put("greenhouse", FacilityTypes.IGNORE);
 		
-		map.put("hangar", "work");
+		map.put("hangar", FacilityTypes.WORK);
 		
-		map.put("hut", "ignore");
-		map.put("roof", "ignore");
-		map.put("shed", "ignore");
-		map.put("stable", "ignore");
-		map.put("sty", "ignore");
-		map.put("transformer_tower", "ignore");
-		map.put("service", "ignore");
+		map.put("hut", FacilityTypes.IGNORE);
+		map.put("roof", FacilityTypes.IGNORE);
+		map.put("shed", FacilityTypes.IGNORE);
+		map.put("stable", FacilityTypes.IGNORE);
+		map.put("sty", FacilityTypes.IGNORE);
+		map.put("transformer_tower", FacilityTypes.IGNORE);
+		map.put("service", FacilityTypes.IGNORE);
 		
-		map.put("kiosk", "work");
+		map.put("kiosk", FacilityTypes.WORK);
 		
-		map.put("ruins", "ignore");
+		map.put("ruins", FacilityTypes.IGNORE);
 
 		return map;
 	}
@@ -245,157 +246,157 @@ public class RunCombinedOsmReaderForBe {
 		Map<String, String> map = new TreeMap<String, String>();
 
 		// "subsistence" section in osm wiki
-		map.put("bar", "leisure"); // used to be "l"
+		map.put("bar", FacilityTypes.LEISURE); // used to be "l"
 
-		map.put("bbq", "leisure");
-		map.put("biergarten", "leisure");
+		map.put("bbq", FacilityTypes.LEISURE);
+		map.put("biergarten", FacilityTypes.LEISURE);
 
-		map.put("cafe", "leisure"); // used to be "l"
+		map.put("cafe", FacilityTypes.LEISURE); // used to be "l"
 
-		map.put("drinking_water", "ignore");
+		map.put("drinking_water", FacilityTypes.IGNORE);
 
-		map.put("fast_food", "leisure"); // used to be "l"
-		map.put("food_court", "leisure"); // used to be "l"
-		map.put("ice_cream", "leisure"); // used to be "l"
-		map.put("pub", "leisure"); // used to be "l"
-		map.put("restaurant", "leisure"); // used to be "l"
+		map.put("fast_food", FacilityTypes.LEISURE); // used to be "l"
+		map.put("food_court", FacilityTypes.LEISURE); // used to be "l"
+		map.put("ice_cream", FacilityTypes.LEISURE); // used to be "l"
+		map.put("pub", FacilityTypes.LEISURE); // used to be "l"
+		map.put("restaurant", FacilityTypes.LEISURE); // used to be "l"
 
-		// "education" section in osm wiki
-		map.put("college", "education"); // used to be "e"
-		map.put("kindergarten", "education"); // used to be "e"
+		// FaciiltyTypes.EDUCATION section in osm wiki
+		map.put("college", FacilityTypes.EDUCATION); // used to be "e"
+		map.put("kindergarten", FacilityTypes.EDUCATION); // used to be "e"
 
-		map.put("library", "other"); // used to be "t"
+		map.put("library", FacilityTypes.OTHER); // used to be "t"
 		
-		map.put("public_bookcase", "ignore");
+		map.put("public_bookcase", FacilityTypes.IGNORE);
 
-		map.put("school", "education"); // used to be "e"
-		map.put("university", "education"); // used to be "e"
+		map.put("school", FacilityTypes.EDUCATION); // used to be "e"
+		map.put("university", FacilityTypes.EDUCATION); // used to be "e"
 
 		// "transportation" section in osm wiki
-		map.put("bicycle_parking", "ignore");
-		map.put("bicycle_repair_station", "ignore");
+		map.put("bicycle_parking", FacilityTypes.IGNORE);
+		map.put("bicycle_repair_station", FacilityTypes.IGNORE);
 
-		map.put("bicycle_rental", "other");
+		map.put("bicycle_rental", FacilityTypes.OTHER);
 
-		map.put("boat_sharing", "ignore");
-		map.put("bus_station", "ignore");
+		map.put("boat_sharing", FacilityTypes.IGNORE);
+		map.put("bus_station", FacilityTypes.IGNORE);
 
-		map.put("car_rental", "other");
+		map.put("car_rental", FacilityTypes.OTHER);
 
-		map.put("car_sharing", "ignore");
+		map.put("car_sharing", FacilityTypes.IGNORE);
 
-		map.put("car_wash", "other"); // used to be "t"
+		map.put("car_wash", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("charging_station", "ignore");
-		map.put("ferry_terminal", "ignore");
+		map.put("charging_station", FacilityTypes.IGNORE);
+		map.put("ferry_terminal", FacilityTypes.IGNORE);
 
-		map.put("fuel", "other"); // used to be "t"
+		map.put("fuel", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("grit_bin", "ignore");
-		map.put("motorcycle_parking", "ignore");
-		map.put("parking", "ignore");
-		map.put("parking_entrance", "ignore");
-		map.put("taxi", "ignore");
+		map.put("grit_bin", FacilityTypes.IGNORE);
+		map.put("motorcycle_parking", FacilityTypes.IGNORE);
+		map.put("parking", FacilityTypes.IGNORE);
+		map.put("parking_entrance", FacilityTypes.IGNORE);
+		map.put("taxi", FacilityTypes.IGNORE);
 
 		// "financial" section in osm wiki
-		map.put("atm", "other"); // used to be "t"
-		map.put("bank", "other"); // used to be "t"
-		map.put("bureau_de_change", "other"); // used to be "t"
+		map.put("atm", FacilityTypes.OTHER); // used to be "t"
+		map.put("bank", FacilityTypes.OTHER); // used to be "t"
+		map.put("bureau_de_change", FacilityTypes.OTHER); // used to be "t"
 
 		// "healthcare" section in osm wiki
-		map.put("baby_hatch", "ignore");
+		map.put("baby_hatch", FacilityTypes.IGNORE);
 
-		map.put("clinic", "medical"); // used to be "m"
-		map.put("dentist", "medical"); // used to be "m"
-		map.put("doctors", "medical"); // used to be "m"
-		map.put("hospital", "medical"); // used to be "m"
-		map.put("nursing_home", "medical"); // used to be "m"
-		map.put("pharmacy", "medical"); // used to be "m"
+		map.put("clinic", FacilityTypes.MEDICAL); // used to be "m"
+		map.put("dentist", FacilityTypes.MEDICAL); // used to be "m"
+		map.put("doctors", FacilityTypes.MEDICAL); // used to be "m"
+		map.put("hospital", FacilityTypes.MEDICAL); // used to be "m"
+		map.put("nursing_home", FacilityTypes.MEDICAL); // used to be "m"
+		map.put("pharmacy", FacilityTypes.MEDICAL); // used to be "m"
 
-		map.put("social_facility", "ignore");
-		map.put("veterinary", "ignore");
-		map.put("blood_donation", "ignore");
+		map.put("social_facility", FacilityTypes.IGNORE);
+		map.put("veterinary", FacilityTypes.IGNORE);
+		map.put("blood_donation", FacilityTypes.IGNORE);
 
 		// "entertainment, arts & culture" section in osm wiki
-		map.put("arts_centre", "leisure"); // used to be "l"
-		map.put("brothel", "leisure"); // used to be "l"
-		map.put("casino", "leisure");
-		map.put("cinema", "leisure"); // used to be "l"
+		map.put("arts_centre", FacilityTypes.LEISURE); // used to be "l"
+		map.put("brothel", FacilityTypes.LEISURE); // used to be "l"
+		map.put("casino", FacilityTypes.LEISURE);
+		map.put("cinema", FacilityTypes.LEISURE); // used to be "l"
 
-		map.put("community_centre", "ignore");
-		map.put("fountain", "ignore");
+		map.put("community_centre", FacilityTypes.IGNORE);
+		map.put("fountain", FacilityTypes.IGNORE);
 
-		map.put("gambling", "leisure");
-		map.put("nightclub", "leisure"); // used to be "l"
-		map.put("planetarium", "leisure");
+		map.put("gambling", FacilityTypes.LEISURE);
+		map.put("nightclub", FacilityTypes.LEISURE); // used to be "l"
+		map.put("planetarium", FacilityTypes.LEISURE);
 
-		map.put("social_centre", "other"); // used to be "t"
+		map.put("social_centre", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("stripclub", "leisure"); // used to be "l"
-		map.put("studio", "leisure");
-		map.put("swingerclub", "leisure");
+		map.put("stripclub", FacilityTypes.LEISURE); // used to be "l"
+		map.put("studio", FacilityTypes.LEISURE);
+		map.put("swingerclub", FacilityTypes.LEISURE);
 
-		map.put("theatre", "leisure"); // used to be "l"
+		map.put("theatre", FacilityTypes.LEISURE); // used to be "l"
 
-		// "other" section in osm wiki
-		map.put("animal_boarding", "ignore");
-		map.put("animal_shelter", "ignore");
-		map.put("bench", "ignore");
-		map.put("clock", "ignore");
-		map.put("courthouse", "ignore");
+		// FaciiltyTypes.OTHER section in osm wiki
+		map.put("animal_boarding", FacilityTypes.IGNORE);
+		map.put("animal_shelter", FacilityTypes.IGNORE);
+		map.put("bench", FacilityTypes.IGNORE);
+		map.put("clock", FacilityTypes.IGNORE);
+		map.put("courthouse", FacilityTypes.IGNORE);
 
-		map.put("coworking_space", "work");
+		map.put("coworking_space", FacilityTypes.WORK);
 
-		map.put("crematorium", "ignore");
-		map.put("crypt", "ignore");
-		map.put("dojo", "ignore");
+		map.put("crematorium", FacilityTypes.IGNORE);
+		map.put("crypt", FacilityTypes.IGNORE);
+		map.put("dojo", FacilityTypes.IGNORE);
 
-		map.put("embassy", "other");
+		map.put("embassy", FacilityTypes.OTHER);
 
-		map.put("fire_station", "work");
+		map.put("fire_station", FacilityTypes.WORK);
 
-		map.put("game_feeding", "leisure");
+		map.put("game_feeding", FacilityTypes.LEISURE);
 
-		map.put("grave_yard", "ignore");
+		map.put("grave_yard", FacilityTypes.IGNORE);
 
-		map.put("gym", "leisure");
+		map.put("gym", FacilityTypes.LEISURE);
 
-		map.put("hunting_stand", "ignore");
-		map.put("kneipp_water_cure", "ignore");
+		map.put("hunting_stand", FacilityTypes.IGNORE);
+		map.put("kneipp_water_cure", FacilityTypes.IGNORE);
 
-		map.put("marketplace", "shopping"); // used to be "t" = other
+		map.put("marketplace", FacilityTypes.SHOPPING); // used to be "t" = other
 
-		map.put("photo_booth", "leisure");
+		map.put("photo_booth", FacilityTypes.LEISURE);
 
-		map.put("place_of_worship", "other"); // used to be "t"
+		map.put("place_of_worship", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("police", "police"); // used to be "p"
+		map.put(FacilityTypes.POLICE, FacilityTypes.POLICE); // used to be "p"
 
-		map.put("post_box", "ignore");
+		map.put("post_box", FacilityTypes.IGNORE);
 
-		map.put("post_office", "other"); // used to be "t"
+		map.put("post_office", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("prison", "work");
+		map.put("prison", FacilityTypes.WORK);
 		
-		map.put("ranger_station", "ignore");
-		map.put("register_office", "ignore");
-		map.put("recycling", "ignore");
-		map.put("rescue_station", "ignore");
+		map.put("ranger_station", FacilityTypes.IGNORE);
+		map.put("register_office", FacilityTypes.IGNORE);
+		map.put("recycling", FacilityTypes.IGNORE);
+		map.put("rescue_station", FacilityTypes.IGNORE);
 
-		map.put("sauna", "leisure");
+		map.put("sauna", FacilityTypes.LEISURE);
 
-		map.put("shelter", "ignore");
-		map.put("shower", "ignore");
-		map.put("telephone", "ignore");
-		map.put("toilets", "ignore");
+		map.put("shelter", FacilityTypes.IGNORE);
+		map.put("shower", FacilityTypes.IGNORE);
+		map.put("telephone", FacilityTypes.IGNORE);
+		map.put("toilets", FacilityTypes.IGNORE);
 
-		map.put("townhall", "other"); // used to be "t"
+		map.put("townhall", FacilityTypes.OTHER); // used to be "t"
 
-		map.put("vending_machine", "ignore");
-		map.put("waste_basket", "ignore");
-		map.put("waste_disposal", "ignore");
-		map.put("watering_place", "ignore");
-		map.put("water_point", "ignore");
+		map.put("vending_machine", FacilityTypes.IGNORE);
+		map.put("waste_basket", FacilityTypes.IGNORE);
+		map.put("waste_disposal", FacilityTypes.IGNORE);
+		map.put("watering_place", FacilityTypes.IGNORE);
+		map.put("water_point", FacilityTypes.IGNORE);
 
 		return map;
 	}
@@ -405,45 +406,45 @@ public class RunCombinedOsmReaderForBe {
 	private static Map<String, String> buildOsmLeisureToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
 
-		map.put("adult_gaming_centre", "leisure");
-		map.put("amusement_arcade", "leisure");
-		map.put("beach_resort", "leisure");
+		map.put("adult_gaming_centre", FacilityTypes.LEISURE);
+		map.put("amusement_arcade", FacilityTypes.LEISURE);
+		map.put("beach_resort", FacilityTypes.LEISURE);
 		
-		map.put("bandstand", "ignore");
-		map.put("bird_hide", "ignore");
+		map.put("bandstand", FacilityTypes.IGNORE);
+		map.put("bird_hide", FacilityTypes.IGNORE);
 		
-		map.put("dance", "leisure");
-		map.put("dog_park", "leisure");
-		map.put("firepit", "leisure");
+		map.put("dance", FacilityTypes.LEISURE);
+		map.put("dog_park", FacilityTypes.LEISURE);
+		map.put("firepit", FacilityTypes.LEISURE);
 		
-		map.put("fishing", "ignore");
+		map.put("fishing", FacilityTypes.IGNORE);
 		
-		map.put("garden", "leisure");
-		map.put("golf_course", "leisure");
-		map.put("hackerspace", "leisure");
-		map.put("ice_rink", "leisure");
+		map.put("garden", FacilityTypes.LEISURE);
+		map.put("golf_course", FacilityTypes.LEISURE);
+		map.put("hackerspace", FacilityTypes.LEISURE);
+		map.put("ice_rink", FacilityTypes.LEISURE);
 		
-		map.put("marina", "ignore");
+		map.put("marina", FacilityTypes.IGNORE);
 		
-		map.put("miniature_golf", "leisure");
+		map.put("miniature_golf", FacilityTypes.LEISURE);
 		
-		map.put("nature_reserve", "ignore");
-		map.put("park", "ignore");
+		map.put("nature_reserve", FacilityTypes.IGNORE);
+		map.put("park", FacilityTypes.IGNORE);
 		
-		map.put("pitch", "leisure");
-		map.put("playground", "leisure");
+		map.put("pitch", FacilityTypes.LEISURE);
+		map.put("playground", FacilityTypes.LEISURE);
 		
-		map.put("slipway", "ignore");
+		map.put("slipway", FacilityTypes.IGNORE);
 		
-		map.put("sports_centre", "leisure");
-		map.put("stadium", "leisure");
-		map.put("summer_camp", "leisure");
-		map.put("swimming_pool", "leisure");
-		map.put("swimming_area", "leisure");
-		map.put("track", "leisure");
-		map.put("water_park", "leisure");
+		map.put("sports_centre", FacilityTypes.LEISURE);
+		map.put("stadium", FacilityTypes.LEISURE);
+		map.put("summer_camp", FacilityTypes.LEISURE);
+		map.put("swimming_pool", FacilityTypes.LEISURE);
+		map.put("swimming_area", FacilityTypes.LEISURE);
+		map.put("track", FacilityTypes.LEISURE);
+		map.put("water_park", FacilityTypes.LEISURE);
 		
-		map.put("wildlife_hide", "ignore");
+		map.put("wildlife_hide", FacilityTypes.IGNORE);
 
 		return map;
 	}
@@ -452,35 +453,35 @@ public class RunCombinedOsmReaderForBe {
 	private static Map<String, String> buildOsmTourismToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
 		
-		map.put("alpine_hut", "leisure");
+		map.put("alpine_hut", FacilityTypes.LEISURE);
 		
-		map.put("apartment", "ignore");
-		map.put("attraction", "ignore");
-		map.put("artwork", "ignore");
+		map.put("apartment", FacilityTypes.IGNORE);
+		map.put("attraction", FacilityTypes.IGNORE);
+		map.put("artwork", FacilityTypes.IGNORE);
 		
-		map.put("camp_site", "leisure");
+		map.put("camp_site", FacilityTypes.LEISURE);
 		
-		map.put("chalet", "ignore");
+		map.put("chalet", FacilityTypes.IGNORE);
 		
-		map.put("gallery", "leisure");
+		map.put("gallery", FacilityTypes.LEISURE);
 		
-		map.put("guest_house", "ignore");
-		map.put("hostel", "ignore");
-		map.put("hotel", "ignore");
-		map.put("information", "ignore");
-		map.put("motel", "ignore");
+		map.put("guest_house", FacilityTypes.IGNORE);
+		map.put("hostel", FacilityTypes.IGNORE);
+		map.put("hotel", FacilityTypes.IGNORE);
+		map.put("information", FacilityTypes.IGNORE);
+		map.put("motel", FacilityTypes.IGNORE);
 		
-		map.put("museum", "leisure");
+		map.put("museum", FacilityTypes.LEISURE);
 		
-		map.put("picnic_site", "leisure");
+		map.put("picnic_site", FacilityTypes.LEISURE);
 		
-		map.put("theme_park", "leisure");
+		map.put("theme_park", FacilityTypes.LEISURE);
 		
-		map.put("viewpoint", "ignore");
+		map.put("viewpoint", FacilityTypes.IGNORE);
 		
-		map.put("wilderness_hut", "leisure");
+		map.put("wilderness_hut", FacilityTypes.LEISURE);
 		
-		map.put("zoo", "leisure");
+		map.put("zoo", FacilityTypes.LEISURE);
 
 		return map;
 	}
