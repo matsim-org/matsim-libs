@@ -562,8 +562,10 @@ public class VWRCreateDemand {
 			outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 			plan.addLeg(outboundTrip);
 
-			shift3.setEndTime(0);
-			plan.addActivity(shift3);
+			Activity shift32 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3",
+					calcVWWorkCoord());
+			
+			plan.addActivity(shift32);
 			break;
 		}
 
