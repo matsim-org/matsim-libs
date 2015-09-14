@@ -84,15 +84,15 @@ public class PersonTripAnalysisMain {
 			throw new RuntimeException("Aborting...");
 			
 		} else {			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_config.xml";
+			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_network.xml.gz";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_config.xml";
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_plans.xml.gz";
+			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
+			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/detailedAnalysis/";
+			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_plans.xml.gz";
 			
-			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
+			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
+			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
 		}
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
