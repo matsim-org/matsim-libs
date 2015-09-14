@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
-
-import java.util.Random;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class AgeMutator extends AttributeMutator {
+public interface Hamiltonian {
 
-	private final Random random;
-
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
-
-	@Override
-	protected Double newValue(PlainPerson person) {
-		return new Double(random.nextInt(100));
-	}
-
+	public double evaluate(Person person);
+	
 }

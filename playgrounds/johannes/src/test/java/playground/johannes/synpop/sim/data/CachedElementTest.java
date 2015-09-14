@@ -21,7 +21,6 @@ package playground.johannes.synpop.sim.data;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainSegment;
 import playground.johannes.synpop.data.Segment;
 
@@ -39,7 +38,7 @@ public class CachedElementTest extends TestCase {
 
         CachedElement cache = new CachedSegment(e);
         Object objKey = new Object();
-        Converters.register(plainKey, objKey, DoubleConverter.getInstance());
+        Converters.registerWithObjectKey(plainKey, objKey, DoubleConverter.getInstance());
 
         Assert.assertEquals(cache.getAttribute(plainKey), plainValue);
         Assert.assertEquals(cache.getData(objKey), 1.2);

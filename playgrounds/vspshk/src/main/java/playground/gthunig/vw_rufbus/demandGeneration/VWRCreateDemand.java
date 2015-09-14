@@ -53,6 +53,10 @@ public class VWRCreateDemand {
 	private Id<Link> vwGate2LinkID = Id.createLinkId(2611);
 	private Id<Link> vwGate3LinkID = Id.createLinkId(42267);
 	private Id<Link> vwGate4LinkID = Id.createLinkId(63449);
+	private Id<Link> vwSourceLinkID = Id.createLinkId(32575);
+	private Id<Link> vwDeliveryGateLinkID = Id.createLinkId(47900);
+	private Id<Link> a2TruckerEastLinkID = Id.createLinkId(41090);
+	private Id<Link> a2TruckerWestLinkID = Id.createLinkId(8511);
 	
 	private Random random = MatsimRandom.getRandom();
 	
@@ -307,6 +311,10 @@ public class VWRCreateDemand {
 //		Goslar - Gifhorn | work
 		createWorkers("GL", "GH", 101*config.getScalefactor(), 0.8, 0.0, 0.0, "03153", "03151");
 		
+		
+		createA2TransitTruckers(10000);
+		createVWTruckers(600);
+		
 		System.out.println("generated Agents: " + commuterCounter);
 		System.out.println("VW Workers: " + vwWorkerCounter);
 		System.out.println("Workers: " + workerCounter);
@@ -357,6 +365,36 @@ public class VWRCreateDemand {
 			}
 			workerCounter++;
 			commuterCounter++;
+		}
+	}
+	
+	private void createA2TransitTruckers(int commuters) {
+		
+		for (int i = 0; i <= commuters; i++){
+//			TODO mode="truck"?
+			String mode = "car";
+		
+			Coord origin = this.scenario.getNetwork().getLinks().get(this.a2TruckerEastLinkID).getCoord();
+			Coord destination = this.scenario.getNetwork().getLinks().get(this.a2TruckerWestLinkID).getCoord();
+			
+			if (random.nextBoolean()) {
+				createOneTransitTrucker(i, origin, destination, mode, "eastA2west");
+			} else {
+				createOneTransitTrucker(i, destination, origin, mode, "westA2east");
+			}
+		}
+	}
+	
+	private void createVWTruckers(int commuters) {
+		
+		for (int i = 0; i <= commuters; i++){
+//			TODO mode="truck"?
+			String mode = "car";
+		
+			Coord origin = this.scenario.getNetwork().getLinks().get(this.vwSourceLinkID).getCoord();
+			Coord destination = this.scenario.getNetwork().getLinks().get(this.vwDeliveryGateLinkID).getCoord();
+			
+			createOneVWTrucker(i, origin, destination, mode, "BS_VW");
 		}
 	}
 	
@@ -455,38 +493,65 @@ public class VWRCreateDemand {
  
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		
-		Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
-		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 		
-		int rand = random.nextInt(1)+1;
+		
+		int rand = random.nextInt(3)+1;
 		switch (rand) {
 			case 1:
+				Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 				home.setEndTime(5*60*60);
 				plan.addActivity(home);
 				
+				Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 				plan.addLeg(outboundTrip);
 				
 				Activity shift1 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift1", calcVWWorkCoord());
 				shift1.setEndTime(13*60*60+40*60);
 				plan.addActivity(shift1);
+				
+				Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
+				plan.addLeg(returnTrip);
+		 
+				Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
+				plan.addActivity(home2);
 				break;
 			case 2:
+				home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 				home.setEndTime(13*60*60);
 				plan.addActivity(home);
 				
+				outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
 				plan.addLeg(outboundTrip);
 				
 				Activity shift2 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift2", calcVWWorkCoord());
 				shift2.setEndTime(21*60*60+40*60);
 				plan.addActivity(shift2);
+				
+				returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
+				plan.addLeg(returnTrip);
+		 
+				home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
+				plan.addActivity(home2);
+				break;
+			case 3: 
+				Activity shift3 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3", calcVWWorkCoord());
+				shift3.setEndTime(5*60*60+40*60);
+				plan.addActivity(shift3);
+				
+				outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
+				plan.addLeg(outboundTrip);
+				
+				home = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
+				home.setEndTime(21*60*60);
+				plan.addActivity(home);
+				
+				outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
+				plan.addLeg(outboundTrip);
+				
+				shift3.setEndTime(0);
+				plan.addActivity(shift3);
 				break;
 		}
- 
-		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
-		plan.addLeg(returnTrip);
- 
-		Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
-		plan.addActivity(home2);
  
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
@@ -589,6 +654,49 @@ public class VWRCreateDemand {
 		Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
 		plan.addActivity(home2);
  
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+	}
+	
+	private void createOneVWTrucker(int i, Coord origin, Coord destination, String mode, String fromToPrefix) {
+		Id<Person> personId = Id.createPersonId(fromToPrefix+i);
+		Person person = scenario.getPopulation().getFactory().createPerson(personId);
+ 
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
+ 
+		Activity source = scenario.getPopulation().getFactory().createActivityFromCoord("source", origin);
+		double rand = random.nextDouble()*20*60*60;
+		source.setEndTime(rand);
+		plan.addActivity(source);
+ 
+		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
+		plan.addLeg(outboundTrip);
+ 
+		Activity delivery = scenario.getPopulation().getFactory().createActivityFromCoord("delivery", destination);
+		delivery.setEndTime(rand + 2*60*60);
+		plan.addActivity(delivery);
+		
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+	}
+	
+	private void createOneTransitTrucker(int i, Coord origin, Coord destination, String mode, String fromToPrefix) {
+		Id<Person> personId = Id.createPersonId(fromToPrefix+i);
+		Person person = scenario.getPopulation().getFactory().createPerson(personId);
+ 
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
+ 
+		Activity cargo = scenario.getPopulation().getFactory().createActivityFromCoord("cargo", origin);
+		int rand = random.nextInt(24*60*60)+1;
+		cargo.setEndTime(rand);
+		plan.addActivity(cargo);
+ 
+		Leg outboundTrip = scenario.getPopulation().getFactory().createLeg(mode);
+		plan.addLeg(outboundTrip);
+ 
+		cargo = scenario.getPopulation().getFactory().createActivityFromCoord("cargo", destination);
+		plan.addActivity(cargo);
+		
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 	}

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,69 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.sim.data.CachedEpisode;
 import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class PersonAttributeMutator implements Mutator {
-
-    private final Object dataKey;
-
-    private final AttributeChangeListener listener;
-
-    private final ValueGenerator generator;
-
-    private Object oldValue;
-
-    private final List<Person> mutations;
+public class RandomTripMutator implements Mutator<CachedSegment> {
 
     private final Random random;
 
-    public PersonAttributeMutator(Object dataKey, Random random, ValueGenerator generator, AttributeChangeListener
-            listener) {
-        this.dataKey = dataKey;
-        this.random = random;
-        this.listener = listener;
-        this.generator = generator;
+    private final List<CachedSegment> mutations;
 
+    public RandomTripMutator(Random random) {
+        this.random = random;
         mutations = new ArrayList<>(1);
         mutations.add(null);
     }
 
     @Override
-    public List<Person> select(List<Person> persons) {
-        mutations.set(0, persons.get(random.nextInt(persons.size())));
+    public List<CachedSegment> select(List<CachedPerson> population) {
+        CachedPerson p = population.get(random.nextInt(population.size()));
+        CachedEpisode e = (CachedEpisode)p.getEpisodes().get(random.nextInt(p.getEpisodes().size()));
+        CachedSegment leg = (CachedSegment)e.getLegs().get(random.nextInt(e.getLegs().size()));
+        mutations.set(0, leg);
         return mutations;
     }
 
     @Override
-    public boolean modify(List<Person> persons) {
-        CachedPerson person = (CachedPerson)persons.get(0);
-        oldValue = person.getData(dataKey);
-        Object newValue = generator.newValue(person);
-        person.setData(dataKey, newValue);
-
-        if(listener != null) listener.onChange(dataKey, oldValue, newValue, person);
-
-        return true;
+    public boolean modify(List<CachedSegment> elements) {
+        return false;
     }
 
     @Override
-    public void revert(List<Person> persons) {
-        CachedPerson person = (CachedPerson)persons.get(0);
-        Object newValue = person.getData(dataKey);
-        person.setData(dataKey, oldValue);
-
-        if(listener != null) listener.onChange(dataKey, newValue, oldValue, person);
+    public void revert(List<CachedSegment> elements) {
 
     }
 }

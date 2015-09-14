@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,39 +16,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.sim.data.ActivityFacilityConverter;
 import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.data.DoubleConverter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class AgeMutatorFactory implements MutatorFactory {
-
-    public static final Object AGE_DATA_KEY = new Object();
+public class FacilityMutatorBuilder implements MutatorBuilder {
 
     private final Random random;
 
-    private final RandomIntGenerator generator;
+    private final FacilityData facilityData;
 
-    private final AttributeChangeListener listener;
+    private final List<String> blacklist;
 
-    public AgeMutatorFactory(AttributeChangeListener listener, Random random) {
-        this.listener = listener;
+    private AttributeChangeListener listener;
+
+    public FacilityMutatorBuilder(DataPool dataPool, Random random) {
+        this.facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
         this.random = random;
-        generator = new RandomIntGenerator(random, 0, 100);
+        blacklist = new ArrayList<>();
+    }
 
-        Converters.register(CommonKeys.PERSON_AGE, AGE_DATA_KEY, DoubleConverter.getInstance());
+    public void addToBlacklist(String type) {
+        blacklist.add(type);
+    }
+
+    public void setListener(AttributeChangeListener listener) {
+        this.listener = listener;
     }
 
     @Override
-    public Mutator newInstance() {
-        return new PersonAttributeMutator(AGE_DATA_KEY, random, generator, listener);
+    public Mutator build() {
+        Object dataKey = Converters.register(CommonKeys.ACTIVITY_FACILITY, ActivityFacilityConverter.getInstance(facilityData));
+
+        RandomFacilityGenerator generator = new RandomFacilityGenerator(facilityData);
+        AttributeMutator attMutator = new AttributeMutator(dataKey, generator, listener);
+        RandomActMutator actMutator = new RandomActMutator(attMutator, random);
+
+        return actMutator;
     }
+
 }

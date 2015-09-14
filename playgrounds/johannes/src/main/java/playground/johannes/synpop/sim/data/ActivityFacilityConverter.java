@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim.data;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.sna.util.Composite;
-import playground.johannes.synpop.data.PlainPerson;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.gsv.synPop.data.FacilityData;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class HistoSyncComposite extends Composite<HistogramSync> implements HistogramSync {
-    @Override
-    public void notifyChange(Object attKey, double oldValue, double newValue, PlainPerson person) {
-        for(HistogramSync element : this.components) {
-            element.notifyChange(attKey, oldValue, newValue, person);
+public class ActivityFacilityConverter implements Converter {
+
+    private static ActivityFacilityConverter instance;
+
+    public static ActivityFacilityConverter getInstance(FacilityData data) {
+        if(instance == null) {
+            instance = new ActivityFacilityConverter(data);
         }
+
+        return instance;
+    }
+
+    private final FacilityData data;
+
+    public ActivityFacilityConverter(FacilityData data) {
+        this.data = data;
+    }
+
+    @Override
+    public Object toObject(String value) {
+        return data.getAll().getFacilities().get(value);
+    }
+
+    @Override
+    public String toString(Object value) {
+        return ((ActivityFacility)value).getId().toString();
     }
 }

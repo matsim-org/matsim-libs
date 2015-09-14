@@ -17,26 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.jbischoff.taxi.usability;
 
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.synpop.data.Person;
+import java.io.PrintWriter;
 
-import java.util.Collection;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 /**
- * @author johannes
+ * @author  jbischoff
  *
  */
-public class DistanceVectorLogger implements SamplerListener {
+public class TaxiStatsControlerListener implements IterationEndsListener {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim3.SamplerListener#afterStep(java.util.Collection, java.util.Collection, boolean)
-	 */
+	
+	
+	private final MatsimVrpContext context;
+	private final TaxiConfigGroup tcg;
+
+	public TaxiStatsControlerListener(MatsimVrpContext context, TaxiConfigGroup tcg) {
+		this.tcg = tcg;
+		this.context = context;
+	}
+	
 	@Override
-	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
-		// TODO Auto-generated method stub
+	public void notifyIterationEnds(IterationEndsEvent event) {
 
+		 PrintWriter pw = new PrintWriter(System.out);
+	        pw.println(tcg.getAlgorithmConfig());
+	        pw.println("m\t" + context.getVrpData().getVehicles().size());
+	        pw.println("n\t" + context.getVrpData().getRequests().size());
+	        pw.println(TaxiStats.HEADER);
+	        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
+	        pw.println(stats);
+	        pw.flush();
 	}
 
 }

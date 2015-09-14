@@ -21,11 +21,12 @@ package playground.johannes.synpop.sim;
 
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.sim.data.CachedElement;
+import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -49,7 +50,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private double hamiltonianValue;
 
-    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements,
+    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
         this.discretizer = discretizer;
         this.attrKey = attrKey;
@@ -114,7 +115,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     @Override
-    public double evaluate(Person person) {
+    public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
 }

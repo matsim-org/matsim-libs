@@ -26,7 +26,6 @@ import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.sim.Hamiltonian;
 
 import java.io.IOException;
 import java.util.Collection;

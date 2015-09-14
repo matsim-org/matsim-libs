@@ -1,9 +1,9 @@
-package playground.johannes.gsv.popsim;/* *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,10 +16,16 @@ package playground.johannes.gsv.popsim;/* **************************************
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.sim.data.CachedElement;
 
-public interface HistogramSync {
+/**
+ * @author jillenberger
+ */
+public interface RandomElementMutator {
 
-    void notifyChange(Object attKey, double oldValue, double newValue, PlainPerson person);
+    boolean modify(CachedElement element);
+
+    void revert(CachedElement element);
 }

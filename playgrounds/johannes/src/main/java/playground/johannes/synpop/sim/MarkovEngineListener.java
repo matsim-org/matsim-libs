@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.sim.AttributeChangeListener;
-import playground.johannes.synpop.sim.Mutator;
-import playground.johannes.synpop.sim.PersonAttributeMutator;
-import playground.johannes.synpop.sim.RandomIntGenerator;
-import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.data.DoubleConverter;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.util.Random;
+import java.util.Collection;
 
 /**
  * @author johannes
- *
  */
-public class IncomeMutatorFactory implements MutatorFactory {
+public interface MarkovEngineListener {
 
-	public static final Object INCOME_DATA_KEY = new Object();
-
-	private final Random random;
-
-	private final RandomIntGenerator generator;
-
-	private final AttributeChangeListener listener;
-
-	public IncomeMutatorFactory(AttributeChangeListener listener, Random random) {
-		this.random = random;
-		this.listener = listener;
-		generator = new RandomIntGenerator(random, 500, 8000);
-
-		Converters.register(CommonKeys.HH_INCOME, INCOME_DATA_KEY, DoubleConverter.getInstance());
-	}
-
-	@Override
-	public Mutator newInstance() {
-		return new PersonAttributeMutator(INCOME_DATA_KEY, random, generator, listener);
-	}
+    void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted);
 
 }

@@ -134,11 +134,11 @@ public class AmenitySink implements Sink {
 				matsimType = getActivityType(amenity);
 			}
 			if(matsimType != null){
-				String activityType = getActivityType(amenity);
+				//String activityType = getActivityType(amenity);
 				String name = tags.get("name");
 				if(name != null){
 					/* Check education level. */
-					if(activityType.equalsIgnoreCase("e")){
+					if(matsimType.equalsIgnoreCase("e")){
 						getEducationLevel(name);
 					}					
 				} else{
@@ -147,7 +147,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				//Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -157,7 +157,7 @@ public class AmenitySink implements Sink {
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
-				ActivityOption ao = aff.createActivityOption(activityType);
+				ActivityOption ao = aff.createActivityOption(matsimType);
 				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
@@ -173,7 +173,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 //				Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){

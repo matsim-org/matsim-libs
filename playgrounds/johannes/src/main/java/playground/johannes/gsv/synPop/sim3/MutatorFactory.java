@@ -19,8 +19,6 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.sim.Mutator;
-
 public interface MutatorFactory {
 
 	public Mutator newInstance();

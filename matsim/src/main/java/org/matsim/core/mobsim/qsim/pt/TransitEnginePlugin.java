@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.matsim.core.controler.AbstractModule;
+import com.google.inject.Module;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -11,12 +12,16 @@ import java.util.Collection;
 
 public class TransitEnginePlugin extends AbstractQSimPlugin {
 
+	public TransitEnginePlugin(Config config) {
+		super(config);
+	}
+
 	@Override
-	public Collection<? extends AbstractModule> modules() {
-		Collection<AbstractModule> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+	public Collection<? extends Module> modules() {
+		Collection<Module> result = new ArrayList<>();
+		result.add(new com.google.inject.AbstractModule() {
 			@Override
-			public void install() {
+			protected void configure() {
 				bind(TransitQSimEngine.class).asEagerSingleton();
 				bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
 			}

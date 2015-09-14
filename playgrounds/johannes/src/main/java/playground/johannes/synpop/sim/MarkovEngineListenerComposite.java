@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.util.Random;
+import java.util.Collection;
 
 /**
  * @author johannes
  *
  */
-public class IncomeMutator extends AttributeMutator {
-
-	private final Random random;
-
-	public IncomeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, histSync);
-		this.random = random;
-	}
+public class MarkovEngineListenerComposite extends Composite<MarkovEngineListener> implements MarkovEngineListener {
 
 	@Override
-	protected Double newValue(PlainPerson person) {
-		return new Double(random.nextInt(8000));
+	public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+		for(MarkovEngineListener listener : components) listener.afterStep(population, mutations, accepted);
 	}
-
 }
