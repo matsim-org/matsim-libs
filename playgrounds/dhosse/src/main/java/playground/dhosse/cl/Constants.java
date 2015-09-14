@@ -10,7 +10,8 @@ public final class Constants {
 							school_bus,
 							taxi,
 							motorcycle,
-							train
+							train,
+							truck
 						};
 						
 	public final static int N = 6651700;
