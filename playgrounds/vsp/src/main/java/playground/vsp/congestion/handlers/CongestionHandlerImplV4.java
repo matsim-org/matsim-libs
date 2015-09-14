@@ -64,7 +64,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 
 public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler,
-Wait2LinkEventHandler {
+Wait2LinkEventHandler, CongestionEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		super(events, scenario);
@@ -76,8 +76,9 @@ Wait2LinkEventHandler {
 	final void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-
-		double remainingDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		
+		double remainingDelay = event.getTime() - delayInfo.freeSpeedLeaveTime ;
+		
 		if(remainingDelay==0) return;
 
 		if( linkInfo.getFlowQueue().isEmpty()){
@@ -102,7 +103,7 @@ Wait2LinkEventHandler {
 			remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, event.getLinkId(), event);
 
 			if(remainingDelay > 0.) {
-				throw new RuntimeException(remainingDelay+" sec delay is not internalized. Aborting...");
+				throw new RuntimeException( "time=" + event.getTime() + "; " + remainingDelay+" sec delay is not internalized. Aborting...");
 			}
 
 		} else {
@@ -149,7 +150,7 @@ Wait2LinkEventHandler {
 			Id<Person> causingPersonId = agentInfo.getPersonId() ;
 			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "StorageCapacity", causingPersonId, affectedPersonId, 
+			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "storageCapacity", causingPersonId, affectedPersonId, 
 					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
 			this.getEventsManager().processEvent(congestionEvent); 
 
@@ -185,7 +186,7 @@ Wait2LinkEventHandler {
 		// this class, when I found it, started from the personId2freeSpeedLeaveTime data structure, and somehow reduced it, presumably
 		// by those who had not yet left he link, those who had in the meantime arrived, "self", etc.  I say "presumably" because
 		// I did not fully find out.  The tests, however, do not fail if one simply takes the "delay queue" as input. kai, sep'15
-		
+
 		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
 
 		double originalTimeGap = 0;
@@ -199,9 +200,11 @@ Wait2LinkEventHandler {
 
 			if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 				double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "FlowCapacity", causingAgentId, 
+				System.err.println("===begin===") ;
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowAndStorageCapacity", causingAgentId, 
 						event.getPersonId(), agentDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
 				this.getEventsManager().processEvent(congestionEvent); 
+				System.err.println("===end===") ;
 				this.addToTotalInternalizedDelay(agentDelay);
 
 				remainingDelay = remainingDelay - agentDelay;
@@ -231,6 +234,11 @@ Wait2LinkEventHandler {
 			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
 
 		}
+	}
+
+	@Override
+	public void handleEvent(CongestionEvent event) {
+		System.err.println( event );
 	}
 }
 

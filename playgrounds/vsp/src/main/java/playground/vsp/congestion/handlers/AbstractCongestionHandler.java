@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,7 +191,7 @@ PersonArrivalEventHandler {
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 
 			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() ).setLinkId( event.getLinkId() )
-					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
+					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
 		}
 		// ---
@@ -213,7 +212,7 @@ PersonArrivalEventHandler {
 			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
 			
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
-					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).build() ;
+					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
 			updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
@@ -260,11 +259,11 @@ PersonArrivalEventHandler {
 			if ( time > earliestLeaveTime + 1.) {
 				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
 				
-				// bottleneck no longer active. However, first check for combination of flow and storage delay:
+//				// bottleneck no longer active. However, first check for combination of flow and storage delay:
 //				DelayInfo causingAgentInfo = linkInfo.getFlowQueue().getLast() ;
 //				double timeGap = delayInfo.freeSpeedLeaveTime - causingAgentInfo.freeSpeedLeaveTime ; 
 //				if ( timeGap > linkInfo.getMarginalDelayPerLeavingVehicle_sec() ) {
-					// (otherwise there would have been flow delay)
+//					 // (otherwise there would have been flow delay)
 					
 					linkInfo.getFlowQueue().clear();
 //				}
@@ -298,7 +297,7 @@ PersonArrivalEventHandler {
 //				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
 				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
 				
-				CongestionEvent congestionEvent = new CongestionEvent(now, "flowStorageCapacity", causingPersonId, 
+				CongestionEvent congestionEvent = new CongestionEvent(now, "flowCapacity", causingPersonId, 
 						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
 				this.events.processEvent(congestionEvent);
 				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
