@@ -6,15 +6,33 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
+import playground.dhosse.cl.Constants;
 
 public class Freight {
 
@@ -35,26 +53,158 @@ public class Freight {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		File file = new File(outputDir);
-		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
+		createDir(new File(outputDir));
 
 		String crs = "EPSG:32719";
-//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
+		//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
 
 		createObservationPoints();
 		readZonas(workingDirInputFiles + "freight_Centroides.csv");
 		convertZonas2Shape(crs, outputDir + "shapes/");
 		readEODData(workingDirInputFiles + "freight_EODcam.csv");
-		//TODO: generatePlans();
-		
+		Population population = generatePlans();
+		write(population, outputDir);
 		log.info("### Done. ###");
 
 	}
 
-	
+	private static void write(Population population, String outputDir){
+		createDir(new File(outputDir));
+		new PopulationWriter(population).write(outputDir + "plans.xml.gz");
+		new PopulationWriter(population).write(outputDir + "plans.xml");
+
+	}
+
+	private static Population generatePlans() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		Population population = scenario.getPopulation();
+		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
+
+		List<FreightTrip> inboundTrips = new ArrayList<FreightTrip>();
+		List<FreightTrip> outboundTrips = new ArrayList<FreightTrip>();
+
+		for(FreightTrip freightTrip : tripId2FreightTrip.values()){
+			if (freightTrip.getOriginZone().startsWith("CE")){ //surveyed at arrival
+				inboundTrips.add(freightTrip);
+			} else
+				outboundTrips.add(freightTrip);
+		}
+
+		for (FreightTrip freightTrip : tripId2FreightTrip.values()){
+
+			Person person = popFactory.createPerson(Id.createPersonId("f_" + freightTrip.getId()));
+
+			Plan plan = popFactory.createPlan();
+			LinkedList<PlanElement> planElements = new LinkedList<PlanElement>();
+
+			Activity firstActivity = null;
+			Activity lastActivity = null;
+			
+			//TODO: coorect assignment of home and work to the activities... e.g. CE-location is "home".
+			String actTypeStart = "home";
+			String actTypeEnd = "work";
+
+			String originZone = freightTrip.getOriginZone() ;
+			String destinationZone = freightTrip.getDestinationZone();
+			String prefix = "CE";
+			
+			Coord originCoord = null;
+			Coord destinationCoord = null;
+			
+			//TODO: Implement check if zone can be resolved.
+//			System.out.println(freightTrip.getId()+ " OriginZone: "+ originZone + " "+ originZone.startsWith(prefix) );
+			if (originZone.startsWith(prefix)){ //surveyed at arriving 
+				originCoord = zonaId2Coord.get(originZone.concat("in"));
+//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
+			} else {
+//				System.out.println("OriginZone: "+ freightTrip.getOriginZone() + "doesn't start with CE");
+				originCoord = zonaId2Coord.get(freightTrip.getOriginZone());
+//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
+			}
+
+			System.out.println(freightTrip.getId()+ " DestZone: "+ destinationZone + " "+ destinationZone.startsWith(prefix) );
+			if (destinationZone.startsWith(prefix)){	//surveyed at leaving 
+				destinationCoord = zonaId2Coord.get(destinationZone.concat("out"));
+//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
+			} else {
+				destinationCoord = zonaId2Coord.get(destinationZone);
+//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
+			}						
+
+			//			if((origin == null || destination == null) || origin.getX() == 0 || origin.getY() == 0 || destination.getX() == 0 || destination.getY() == 0){
+			//
+			//				String comunaOrigin = etapa.getComunaOrigen();
+			//				String comunaDestino = etapa.getComunaDestino();
+			//
+			//				if((!comunaOrigin.equals("") && !comunaDestino.equals("")) || (!comunaOrigin.equals("0") && !comunaDestino.equalsIgnoreCase("0"))){
+			//
+			//				} else{
+			//
+			//					origin = origin == null ? new Coord(0.0, 0.0) : origin;
+			//					destination = destination == null ? new Coord(0.0, 0.0) : destination;
+			//
+			//				}
+			//
+			//			}
+
+
+			double reportedTravelTime = 3600 ;		//TODO: Use individual value (from survey or estimate one) 
+			firstActivity = popFactory.createActivityFromCoord(actTypeStart, originCoord);
+			if (inboundTrips.contains(freightTrip)){
+				firstActivity.setEndTime(freightTrip.getTimeOfSurvey());
+			} else if (outboundTrips.contains(freightTrip)){
+				firstActivity.setEndTime(freightTrip.getTimeOfSurvey() - reportedTravelTime);  
+			}
+
+
+			lastActivity = popFactory.createActivityFromCoord(actTypeEnd, destinationCoord);
+
+			if (inboundTrips.contains(freightTrip)){
+				lastActivity.setStartTime(freightTrip.getTimeOfSurvey() + reportedTravelTime);
+			} else if (outboundTrips.contains(freightTrip)){
+				lastActivity.setStartTime(freightTrip.getTimeOfSurvey() );  
+			}
+
+//			firstActivity.setMaximumDuration(0);
+//			lastActivity.setMaximumDuration(0);
+
+
+//			String legMode = Constants.Modes.truck.toString(); //TODO doesn't work by now in matsim.run()
+			String legMode = TransportMode.car; 
+
+			Leg leg = popFactory.createLeg(legMode);
+
+			planElements.add(firstActivity);
+			planElements.addLast(leg);
+			planElements.addLast(lastActivity);
+
+			for(PlanElement pe : planElements){
+				if(pe instanceof Activity){
+					plan.addActivity((Activity)pe);
+				}else{
+					plan.addLeg((Leg)pe);
+				}
+			}
+
+			person.addPlan(plan);
+			person.setSelectedPlan(plan);
+
+			//a plan needs at least 3 plan elements (act - leg - act)
+			if(plan.getPlanElements().size() > 2){
+				population.addPerson(person);
+			}
+
+
+		}
+		log.info("Created " + population.getPersons().size() + " persons ");
+		return scenario.getPopulation();
+
+	}
+
 
 	/**
-	 * Create locations for the ObservationPoints of the survey as origin oder destination of freight tour.
+	 * Create locations for the ObservationPoints of the survey as origin or destination of freight tour.
 	 * Origin and destination are separated so there the incoming traffic start on an inbound link to Santiago and 
 	 * outgoing traffic ends on an outbound link from Santigo
 	 */
@@ -66,7 +216,7 @@ public class Freight {
 		//CE02	AUTOPISTA DEL SOL
 		zonaId2Coord.put("CE02in", new Coord(296025.0, 6271935));
 		zonaId2Coord.put("CE02out", new Coord(296025.0, 6271905)); 
-		//CE03	RUTA 68 (A VALPARAISO) // TODO: how to make sure, that the right link will be used?
+		//CE03	RUTA 68 (A VALPARAISO) // TODO: (how to= make sure, that the right link will be used(?)
 		zonaId2Coord.put("CE03in", new Coord(323540.0, 6296520.0));
 		zonaId2Coord.put("CE03out", new Coord(323560.0, 6296520.0)); 
 		//CE04	RUTA 5 SUR (ANGOSTURA) ; out of box -> moved northbound on Ruta 5
@@ -77,7 +227,7 @@ public class Freight {
 		zonaId2Coord.put("CE05out", new Coord(336160.0 , 6321210.0)); 
 		//CE06	CAMINO PADRE HURTADO
 		zonaId2Coord.put("CE06in", new Coord(343990.0, 6266370.0));
-		zonaId2Coord.put("CE07out", new Coord(343955.0, 6266370.0)); 
+		zonaId2Coord.put("CE06out", new Coord(343955.0, 6266370.0)); 
 		//CE07	AUTOPISTA LOS LIBERTADORES; toll Station Chacabuco -> not found on google earth.
 		zonaId2Coord.put("CE07in", new Coord(346515.0, 6327220.0));
 		zonaId2Coord.put("CE07out", new Coord(346560.0, 6327220.0)); 
@@ -121,6 +271,7 @@ public class Freight {
 				String y = splittedLine[idxCoordY].replace("," , ".");
 				//				this.ZonaId2Coord.put(id, new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				zonaId2Coord.put(id, new Coord(Double.parseDouble(x), Double.parseDouble(y)));
+				System.out.println("coordinates of zone: "+ id + ": "+ zonaId2Coord.get(id));
 				counter++;
 
 			}
@@ -137,8 +288,7 @@ public class Freight {
 
 	private static void convertZonas2Shape(String crs, String outputDir){
 
-		File file = new File(outputDir);
-		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
+		createDir(new File(outputDir));
 
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
@@ -148,13 +298,13 @@ public class Freight {
 				create();
 
 		for (String zonaId : zonaId2Coord.keySet()) {
-//			SimpleFeature ft = nodeFactory.createPoint(zonaId2Coord.get(zonaId), null, zonaId);
+			//			SimpleFeature ft = nodeFactory.createPoint(zonaId2Coord.get(zonaId), null, zonaId);
 			SimpleFeature ft = nodeFactory.createPoint(zonaId2Coord.get(zonaId), new Object[] {zonaId}, null);
 			features.add(ft);
 		}
 		ShapeFileWriter.writeGeometries(features, outputDir + "Zonas_Points.shp");
 	}
-	
+
 	/**
 	 * Read trip data from EOD file.
 	 * @param string
@@ -170,7 +320,7 @@ public class Freight {
 		final int idxZOrig = 11;	//Zone of tour start
 		final int idxZDest = 12;	//Zone of tour destination
 		final int idxCarga = 13; //Type of goods loaded
-		
+
 		BufferedReader reader = IOUtils.getBufferedReader(EODFile);
 
 		int counter = 0;
@@ -183,24 +333,25 @@ public class Freight {
 				String[] splittedLine = line.split(";");
 
 				String id = splittedLine[idxTripId].split(",")[0];
-				String originZone = splittedLine[idxZOrig];
-				String destinationZone = splittedLine[idxZDest];
-				String pCon = splittedLine[idxPCon].split(",")[0]; //Point of survey
+				String originZone = splittedLine[idxZOrig].replace("\"", "");
+				String destinationZone = splittedLine[idxZDest].replace("\"", "");
+				String pCon = splittedLine[idxPCon].replace("\"", ""); //Point of survey
 				int numberOfAxis =  new Double(splittedLine[idxAxis].split(",")[0]).intValue();
 				double timeOfSurvey = new Double(splittedLine[idxHour].replace("," , "."))*3600 + new Double(splittedLine[idxMinute].replace("," , "."))*60;
 				String typeOfGoods = splittedLine[idxCarga].split(",")[0]; 
-				
+
 				//Vehicle was recorded on the way TO Santiago (inbound)
 				if ( originZone == pCon) {
 					originZone = originZone.concat("in");
 				}
-				
+
 				//Vehicle was recorded on the way FROM Santiago (outbound)
 				if ( destinationZone == pCon) {
 					destinationZone = destinationZone.concat("out");
 				}
-				
+
 				FreightTrip trip = new FreightTrip(id, originZone, destinationZone, pCon, numberOfAxis, timeOfSurvey, typeOfGoods);
+				System.out.println(trip.toString());
 				tripId2FreightTrip.put(id, trip);
 				counter++;
 			}
@@ -212,6 +363,10 @@ public class Freight {
 		}
 
 		log.info("Read data of " + counter + " trips...");
-		
+
+	}
+
+	private static void createDir(File file) {
+		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
 }
