@@ -53,6 +53,15 @@ public class FreightTrip {
 		return typeOfGoods;
 	}
 
+
+	@Override
+	public String toString() {
+		return "FreightTrip [id=" + id + ", originZone=" + originZone
+				+ ", destinationZone=" + destinationZone + ", pCon=" + pCon
+				+ ", numberOfAxis=" + numberOfAxis + ", timeOfSurvey="
+				+ timeOfSurvey + ", typeOfGoods=" + typeOfGoods + "]";
+	}
+
 //	public void setId(String id) {
 //		this.id = id;
 //	}
