@@ -85,10 +85,10 @@ CongestionInternalization {
 	private CongestionInfoHandler delegate;
 
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
-	private double delayNotInternalized_spillbackNoCausingAgent = 0.0;
-	private double delayNotInternalized_roundingErrors = 0.0;
-	private double totalInternalizedDelay = 0.0;
-	private double totalDelay = 0.0;
+	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
+	private double delayNotInternalized_roundingErrors = 0.;
+	private double totalInternalizedDelay = 0.;
+	private double totalDelay = 0.;
 	
 	private Scenario scenario;
 	private EventsManager events;
@@ -102,10 +102,14 @@ CongestionInternalization {
 
 	@Override
 	public final void reset(int iteration) {
+	
 		delegate.reset(iteration);
 
-		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		this.agentId2storageDelay.clear();
+		this.delayNotInternalized_spillbackNoCausingAgent = 0.;
+		this.delayNotInternalized_roundingErrors = 0.;
+		this.totalInternalizedDelay = 0.;
+		this.totalDelay = 0.;
 	}
 
 	@Override
