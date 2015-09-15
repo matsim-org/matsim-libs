@@ -20,6 +20,7 @@
 package playground.agarwalamit.analysis.legMode.distributions;
 
 import java.io.BufferedWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -58,14 +59,14 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 	}
 
 	public static void main(String[] args) {
-		String outDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/bau/";
+		String outDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/eci/";
 		String eventsFile = outDir+"/ITERS/it.1500/1500.events.xml.gz";
-		LegModeTimeOfDayDistribution lmtdd = new LegModeTimeOfDayDistribution(UserGroup.URBAN,eventsFile, 30*3600, 30);
+		LegModeTimeOfDayDistribution lmtdd = new LegModeTimeOfDayDistribution(eventsFile, 30*3600, 30);
 		lmtdd.preProcessData();
 		lmtdd.postProcessData();
 		lmtdd.writeResults(outDir+"/analysis/");
 	}
-	
+
 	private LegModeTimeOfDayHandler lmtdh;
 	private String eventsFile ; 
 	private String outFilePrefix= "";
@@ -109,17 +110,30 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 	}
 
 	public SortedMap<Double, SortedMap<String, Integer>> getLegModeToTimeOfDayCount (){
-		return this.lmtdh.timeBin2Mode2Count;
+		SortedMap<Double, SortedMap<String, Integer>> outMap = new TreeMap<Double, SortedMap<String,Integer>>();
+
+		SortedMap<Double, SortedMap<String, Integer>> timeBin2Mode2Count = this.lmtdh.timeBin2Mode2Count;
+
+		for (double d : timeBin2Mode2Count.keySet()){
+			SortedMap<String, Integer> mode2Count = new TreeMap<String, Integer>();
+
+			for(String mode : this.lmtdh.modes){
+				mode2Count.put(mode, timeBin2Mode2Count.get(d).containsKey(mode) ? timeBin2Mode2Count.get(d).get(mode) : 0 );
+			}
+			outMap.put(d, mode2Count);
+		}
+		return outMap;
 	}
 
 	private class LegModeTimeOfDayHandler implements PersonDepartureEventHandler {
 
 		private final Logger log = Logger.getLogger(LegModeTimeOfDayDistribution.class);
-		
+
 		private final double timeBinSize;
 		private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		private final SortedMap<Double, SortedMap<String, Integer>> timeBin2Mode2Count = new TreeMap<Double, SortedMap<String,Integer>>();
 		private final UserGroup ug;
+		private final List<String> modes = new ArrayList<String>();
 
 		private LegModeTimeOfDayHandler(double simulationEndTime, int noOfTimeBins) {
 			log.info("The output will contain data from whole population.");
@@ -163,6 +177,7 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 				mode2count.put(event.getLegMode(), 1);
 				timeBin2Mode2Count.put(endOfTimeInterval, mode2count);
 			}
+			if (! modes.contains(event.getLegMode()) ) modes.add(event.getLegMode());
 		}
 	}
 }
