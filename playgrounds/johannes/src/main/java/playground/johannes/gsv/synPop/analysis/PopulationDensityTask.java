@@ -28,13 +28,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.*;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.synpop.data.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -85,7 +84,7 @@ public class PopulationDensityTask extends AnalyzerTask {
 			
 			ActivityFacility home = null;
 			for(Attributable act : plan.getActivities()) {
-				if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				if(ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					String idStr = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 					Id<ActivityFacility> id = Id.create(idStr, ActivityFacility.class);
 					home = facilities.getFacilities().get(id);

@@ -21,11 +21,14 @@
 package org.matsim.pt.fakes;
 
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -34,7 +37,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -42,8 +44,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
 
 
 /**
@@ -67,8 +67,10 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		this.exitStop = exitStop;
 		this.dummyLeg = new LegImpl(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
-			GenericRoute route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
-			route.setRouteDescription(enterStop.getLinkId(), "PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString(), exitStop.getLinkId());
+			Route route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
+			route.setStartLinkId(enterStop.getLinkId());
+			route.setEndLinkId(exitStop.getLinkId());
+			route.setRouteDescription("PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString());
 			this.dummyLeg.setRoute(route);
 		}
 	}

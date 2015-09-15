@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.qsim;
 
-import org.matsim.core.controler.AbstractModule;
+import com.google.inject.Module;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
@@ -12,7 +13,16 @@ import java.util.Collections;
 
 public abstract class AbstractQSimPlugin {
 
-	public Collection<? extends AbstractModule> modules() {
+	private Config config;
+
+	public AbstractQSimPlugin(Config config) {
+		this.config = config;
+	}
+
+	public final Config getConfig() {
+		return config;
+	}
+	public Collection<? extends Module> modules() {
 		return Collections.emptyList();
 	}
 	public Collection<Class<? extends MobsimEngine>> engines() {

@@ -25,13 +25,13 @@ package org.matsim.core.mobsim;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.qsim.QSimProvider;
+import org.matsim.core.mobsim.qsim.QSimModule;
 
 public class DefaultMobsimModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.qsim.toString())) {
-            bindMobsim().toProvider(QSimProvider.class);
+            install(new QSimModule());
         } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
             bindMobsim().to(JDEQSimulation.class);
         }

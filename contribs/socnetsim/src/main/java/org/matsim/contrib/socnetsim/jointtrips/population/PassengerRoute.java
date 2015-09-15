@@ -22,14 +22,14 @@ package org.matsim.contrib.socnetsim.jointtrips.population;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * A route for passenger trips.
  * @author thibautd
  */
-public class PassengerRoute implements GenericRoute {
+public class PassengerRoute implements Route {
 	private double distance = Double.NaN;
 	private double travelTime = Time.UNDEFINED_TIME;
 	private Id<Link> startLink = null;
@@ -95,11 +95,8 @@ public class PassengerRoute implements GenericRoute {
 
 	@Override
 	public void setRouteDescription(
-			final Id<Link> startLinkId,
-			final String routeDescription,
-			final Id<Link> endLinkId) {
-		startLink = startLinkId;
-		endLink = endLinkId;
+			final String routeDescription
+			) {
 		driver = Id.create(routeDescription.trim(), Person.class);
 	}
 

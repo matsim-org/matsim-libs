@@ -9,9 +9,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -77,8 +77,11 @@ public class ShortestBusPathTree {
 					stopCoords[legs.size()].add(stop.getCoord());
 					numAccessStops++;
 					for(int j=0; j<legs.size(); j++) {
-						ExperimentalTransitRoute route = (ExperimentalTransitRoute) routesFactory.createRoute(legs.get(j).getRoute().getStartLinkId(), legs.get(j).getRoute().getEndLinkId());
-						route.setRouteDescription(legs.get(j).getRoute().getStartLinkId(), ((GenericRoute)legs.get(j).getRoute()).getRouteDescription(), legs.get(j).getRoute().getEndLinkId());
+						Route origRoute = legs.get(j).getRoute();
+						ExperimentalTransitRoute route = (ExperimentalTransitRoute) routesFactory.createRoute(origRoute.getStartLinkId(), origRoute.getEndLinkId());
+						route.setStartLinkId(origRoute.getStartLinkId());
+						route.setEndLinkId(origRoute.getEndLinkId());
+						route.setRouteDescription(origRoute.getRouteDescription());
 						NetworkRoute networkRoute = scenario.getTransitSchedule().getTransitLines().get(route.getLineId()).getRoutes().get(route.getRouteId()).getRoute();
 						Id<Link> startId = scenario.getTransitSchedule().getFacilities().get(route.getAccessStopId()).getLinkId();
 						Id<Link> endId = scenario.getTransitSchedule().getFacilities().get(route.getEgressStopId()).getLinkId();

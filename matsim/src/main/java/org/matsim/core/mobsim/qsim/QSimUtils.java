@@ -22,24 +22,14 @@
  */
 package org.matsim.core.mobsim.qsim;
 
+import com.google.inject.*;
+import com.google.inject.util.Modules;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioElementsModule;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -50,61 +40,39 @@ public class QSimUtils {
 	private QSimUtils() {}
 
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
-		final Collection<AbstractQSimPlugin> plugins = defaultQSimPlugins(scenario.getConfig());
-		return createQSim(scenario, eventsManager, plugins);
+		Injector injector = Guice.createInjector(new StandaloneQSimModule(scenario, eventsManager));
+		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
-	private static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
-		AbstractModule module = new AbstractModule() {
-			@Override
-			public void install() {
-				install(new ScenarioElementsModule());
-				for (AbstractQSimPlugin plugin : plugins) {
-					for (AbstractModule module : plugin.modules()) {
-						install(module);
+	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
+		Module module = Modules.override(new StandaloneQSimModule(scenario, eventsManager))
+				.with(new AbstractModule() {
+					@Override
+					protected void configure() {
+						bind(new TypeLiteral<Collection<AbstractQSimPlugin>>(){}).toInstance(plugins);
 					}
-				}
-				bind(Scenario.class).toInstance(scenario);
-				bind(EventsManager.class).toInstance(eventsManager);
-				bind(QSim.class).asEagerSingleton();
-				bind(Netsim.class).to(QSim.class);
-			}
-		};
-		Injector injector = Injector.createInjector(scenario.getConfig(), module);
-		QSim qSim = injector.getInstance(QSim.class);
-		for (AbstractQSimPlugin plugin : plugins) {
-			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {
-				qSim.addMobsimEngine(injector.getInstance(mobsimEngine));
-			}
-			for (Class<? extends ActivityHandler> activityHandler : plugin.activityHandlers()) {
-				qSim.addActivityHandler(injector.getInstance(activityHandler));
-			}
-			for (Class<? extends DepartureHandler> mobsimEngine : plugin.departureHandlers()) {
-				qSim.addDepartureHandler(injector.getInstance(mobsimEngine));
-			}
-			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
-				qSim.addQueueSimulationListeners(injector.getInstance(mobsimListener));
-			}
-			for (Class<? extends AgentSource> agentSource : plugin.agentSources()) {
-				qSim.addAgentSource(injector.getInstance(agentSource));
-			}
-		}
-		return qSim;
+				});
+		Injector injector = Guice.createInjector(module);
+		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
-	private static Collection<AbstractQSimPlugin> defaultQSimPlugins(Config config) {
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin());
-		plugins.add(new ActivityEnginePlugin());
-		plugins.add(new QNetsimEnginePlugin());
-		if (config.network().isTimeVariantNetwork()) {
-			plugins.add(new NetworkChangeEventsPlugin());
+	private static class StandaloneQSimModule extends AbstractModule {
+		private final Scenario scenario;
+		private final EventsManager eventsManager;
+
+		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager) {
+			this.scenario = scenario;
+			this.eventsManager = eventsManager;
 		}
-		if (config.transit().isUseTransit()) {
-			plugins.add(new TransitEnginePlugin());
+
+		@Override
+		protected void configure() {
+			binder().requireExplicitBindings();
+			bind(Config.class).toInstance(scenario.getConfig());
+			bind(Scenario.class).toInstance(scenario);
+			install(new ScenarioElementsModule(scenario.getConfig()));
+			bind(EventsManager.class).toInstance(eventsManager);
+			install(new QSimModule());
 		}
-		plugins.add(new TeleportationPlugin());
-		plugins.add(new PopulationPlugin());
-		return plugins;
 	}
 }

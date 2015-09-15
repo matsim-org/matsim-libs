@@ -46,6 +46,23 @@ public interface Route extends MatsimPopulationObject {
 
 	public void setEndLinkId(final Id<Link> linkId);
 
+	/**
+	 * @return a serialization of this routes state as a String. Used to write the route to files.
+	 */
+	public String getRouteDescription();
+	
+	/**
+	 * Sets the state of the route based on it's description
+	 * 
+	 * @param routeDescription
+	 */
+	public void setRouteDescription(final String routeDescription);
+
+	/**
+	 * @return an identifier describing the type of this route uniquely. Used when writing the route to files.
+	 */
+	public String getRouteType();
+	
 	/** make the clone method public, but do NOT implement Cloneable
 	 * so that implementations can decide on their own if they support
 	 * clone() or not.

@@ -20,6 +20,11 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -29,12 +34,27 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
@@ -53,8 +73,16 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.routes.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -65,11 +93,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public class QSimTest {
 
@@ -1163,9 +1186,9 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 3100, (double) 0));
-		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new Coord((double) 3200, (double) 0));
-		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new Coord((double) 3300, (double) 0));
+		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord(3100, 0));
+		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new Coord(3200, 0));
+		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new Coord(3300, 0));
 		f.network.createAndAddLink(Id.create("4", Link.class), f.node4, node5, 1000, 10, 6000, 2);
 		Link link5 = f.network.createAndAddLink(Id.create("5", Link.class), node5, node6, 100, 10, 60000, 9);
 		Link link6 = f.network.createAndAddLink(Id.create("6", Link.class), node6, node7, 100, 10, 60000, 9);
@@ -1223,7 +1246,7 @@ public class QSimTest {
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
 		act1.setEndTime(7.0*3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
-		GenericRoute route = new GenericRouteImpl(link.getId(), link.getId());
+		Route route = new GenericRouteImpl(link.getId(), link.getId());
         route.setTravelTime(5.0*3600);
         leg.setRoute(route);
 		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
@@ -1307,7 +1330,7 @@ public class QSimTest {
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
 		Leg leg2 = pb.createLeg(TransportMode.walk);
-		GenericRoute route2 = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route2 = new GenericRouteImpl(link1.getId(), link2.getId());
 		leg2.setRoute(route2);
 		leg2.setTravelTime(2000);
 		Activity act2_2 = pb.createActivityFromLinkId("w", link2.getId());
@@ -1322,7 +1345,7 @@ public class QSimTest {
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
-		GenericRoute route3 = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route3 = new GenericRouteImpl(link1.getId(), link2.getId());
 		leg3.setRoute(route3);
 		leg3.setTravelTime(1000);
 		Activity act3_2 = pb.createActivityFromLinkId("w", link2.getId());
@@ -1420,10 +1443,10 @@ public class QSimTest {
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1100, (double) 0));
-			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 1200, (double) 0));
+			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
+			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(100, 0));
+			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(1100, 0));
+			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(1200, 0));
 			this.link1 = this.network.createAndAddLink(Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9);
 			this.link2 = this.network.createAndAddLink(Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2);
 			this.link3 = this.network.createAndAddLink(Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9);

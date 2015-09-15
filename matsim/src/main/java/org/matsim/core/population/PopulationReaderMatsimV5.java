@@ -20,7 +20,6 @@
 package org.matsim.core.population;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
@@ -31,8 +30,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -241,9 +238,16 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		} else if (this.curract != null && this.curract.getLinkId() != null) {
 			endLinkId = this.curract.getLinkId();
 		}
-		if (this.currRoute instanceof GenericRoute) {
-			((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-			if (Double.isNaN(this.currRoute.getDistance())) {
+
+		this.currRoute.setStartLinkId(startLinkId);
+		this.currRoute.setEndLinkId(endLinkId);
+		this.currRoute.setRouteDescription(this.routeDescription.trim());
+		if (Double.isNaN(this.currRoute.getDistance())) {
+			if (this.currRoute instanceof NetworkRoute) {
+				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+				}
+			} else {
 				Coord fromCoord = getCoord(this.prevAct);
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
@@ -256,29 +260,11 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 					}
 				}
 			}
-			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-				this.currRoute.setTravelTime(this.currleg.getTravelTime());
-			}
-		} else if (this.currRoute instanceof NetworkRoute) {
-			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
-			if (linkIds.size() > 0) {
-				linkIds.remove(0);
-			}
-			if (linkIds.size() > 0) {
-				linkIds.remove(linkIds.size() - 1);
-			}
-			((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-			if (Double.isNaN(this.currRoute.getDistance())) {
-				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
-				}
-			}
-			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-				this.currRoute.setTravelTime(this.currleg.getTravelTime());
-			}
-		} else {
-			throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
 		}
+		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		}
+
 		this.routeDescription = null;
 		this.currRoute = null;
 
@@ -340,11 +326,18 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void endRoute(final String content) {
 		this.routeDescription = content;
 
-		if (this.currRoute instanceof GenericRoute) {
-			Id<Link> startLinkId = this.currRoute.getStartLinkId();
-			Id<Link> endLinkId = this.currRoute.getEndLinkId();
-			((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-			if (Double.isNaN(this.currRoute.getDistance())) {
+		Id<Link> startLinkId = this.currRoute.getStartLinkId();
+		Id<Link> endLinkId = this.currRoute.getEndLinkId();
+		this.currRoute.setStartLinkId(startLinkId);
+		this.currRoute.setEndLinkId(endLinkId);
+		this.currRoute.setRouteDescription(this.routeDescription.trim());
+		
+		if (Double.isNaN(this.currRoute.getDistance())) {
+			if (this.currRoute instanceof NetworkRoute) {
+				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+				}
+			} else {
 				Coord fromCoord = getCoord(this.prevAct);
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
@@ -357,29 +350,11 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 					}
 				}
 			}
-			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-				this.currRoute.setTravelTime(this.currleg.getTravelTime());
-			}
-		} else if (this.currRoute instanceof NetworkRoute) {
-			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
-			Id<Link> startLinkId = this.currRoute.getStartLinkId();
-			Id<Link> endLinkId = this.currRoute.getEndLinkId();
-			if (linkIds.size() > 0) {
-				startLinkId = linkIds.remove(0);
-			}
-			if (linkIds.size() > 0) {
-				endLinkId = linkIds.remove(linkIds.size() - 1);
-			}
-			((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-			if (Double.isNaN(this.currRoute.getDistance())) {
-				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
-				}
-			}
-			if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
-				this.currRoute.setTravelTime(this.currleg.getTravelTime());
-			}
 		}
+		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+		}
+
 		if (this.currRoute.getEndLinkId() != null) {
 			// this route is complete
 			this.currRoute = null;

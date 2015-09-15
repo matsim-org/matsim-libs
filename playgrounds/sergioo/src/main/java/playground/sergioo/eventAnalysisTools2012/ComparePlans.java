@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,11 +139,11 @@ public class ComparePlans {
 	private void writePlans(PrintWriter writer, Id<Person> personId, Plan plan1, Plan plan2) {
 		String plan = personId+"("+plan1.getScore()+"): ";
 		for(PlanElement planElement:plan1.getPlanElements())
-			plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
+			plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+(((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
 		writer.println(plan);
 		plan = personId+"("+plan2.getScore()+"): ";
 		for(PlanElement planElement:plan2.getPlanElements())
-			plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
+			plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+(((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
 		writer.println(plan);
 	}
 	private boolean sameChainDifferentMode(Plan plan1, Plan plan2) {

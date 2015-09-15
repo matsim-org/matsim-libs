@@ -20,11 +20,11 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
