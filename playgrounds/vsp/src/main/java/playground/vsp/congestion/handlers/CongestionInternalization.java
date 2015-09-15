@@ -21,6 +21,8 @@ package playground.vsp.congestion.handlers;
 
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 
+import playground.vsp.congestion.DelayInfo;
+
 /**
  * @author ikaddoura
  *
@@ -31,18 +33,22 @@ public interface CongestionInternalization {
 	 * <p> This is the core method which can be implemented in different ways
 	 * in order to change the logic how to internalize delays.
 	 */
-	public void calculateCongestion(LinkLeaveEvent event);
+	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo);
 
 	/**
 	 * <p> The total delay calculated as 'link leave time minus freespeed leave time'
 	 */
 	public double getTotalDelay();
 	
-	
 	/**
 	 * The total delay which is internalized, i.e. allocated to causing agents
 	 */
 	public double getTotalInternalizedDelay();
+	
+	/**
+	 * Total rounding error delay which is not internalized.
+	 */
+	public double getTotalRoundingErrorDelay();
 	
 	/**
 	 * Writes the basic information to a file

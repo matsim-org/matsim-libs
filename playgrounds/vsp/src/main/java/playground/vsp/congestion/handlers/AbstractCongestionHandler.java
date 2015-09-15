@@ -22,13 +22,8 @@
  */
 package playground.vsp.congestion.handlers;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,12 +47,10 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
-import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
@@ -70,7 +63,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-abstract class AbstractCongestionHandler implements
+public class AbstractCongestionHandler implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
@@ -81,30 +74,16 @@ PersonArrivalEventHandler {
 
 	private final static Logger log = Logger.getLogger(AbstractCongestionHandler.class);
 
-	// If the following parameter is false, a Runtime Exception is thrown in case an agent is delayed by the storage capacity.
-	private final boolean allowingForStorageCapacityConstraint = true;
-
-	// If the following parameter is false, the delays resulting from the storage capacity are not internalized.
-	private final boolean calculatingStorageCapacityConstraints = true;
-	private double delayNotInternalized_storageCapacity = 0.0;
-
 	private final Scenario scenario;
-	private final EventsManager events;
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
-
-	private double totalInternalizedDelay = 0.0;
-	private double totalDelay = 0.0;
-	private double delayNotInternalized_roundingErrors = 0.0;
-	private double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 
 	Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
-	Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
+	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
-	AbstractCongestionHandler(EventsManager events, Scenario scenario) {
-		this.events = events;
+	AbstractCongestionHandler(Scenario scenario) {
 		this.scenario = scenario;
 
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
@@ -131,11 +110,6 @@ PersonArrivalEventHandler {
 	public final void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
-		this.delayNotInternalized_storageCapacity = 0.0;
-		this.totalDelay = 0.0 ;
-		this.totalInternalizedDelay = 0.0;
-		this.delayNotInternalized_roundingErrors = 0.0;
-		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		
 		//--
 		this.personId2legNr.clear();
@@ -202,36 +176,8 @@ PersonArrivalEventHandler {
 
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
-		if (this.ptVehicleIDs.contains(event.getVehicleId())){
-			log.warn("Public transport mode. Mixed traffic is not tested.");
-		} else { // car!
-			Id<Person> personId = this.vehicleId2personId.get( event.getVehicleId() ) ;
-
-			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), linkId2congestionInfo, scenario);
-
-			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
-			
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
-					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
-
-			updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
-
-			calculateCongestion(event, delayInfo);
-			
-			
-			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.getDelayQueue().add( delayInfo ) ;
-
-			linkInfo.memorizeLastLinkLeaveEvent( event );
-			
-//			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
-			// in V4, it is removed at agent _arrival_ and then it seems to work. 
-			
-//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
-			// fails tests, dunno why. kai, sep'15
-			
-			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
-		}
+		throw new RuntimeException("Not implemented. Aborting...");
+		// the following should be moved to different versions
 	}
 	
 	@Override
@@ -239,11 +185,8 @@ PersonArrivalEventHandler {
 		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario) ;
 		linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 	}
-
-
-	// ############################################################################################################################################################
-
-	private final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
+	
+	final void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
@@ -272,130 +215,22 @@ PersonArrivalEventHandler {
 
 	}
 
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId);
-		
-		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
-			// "add" will, presumably, add at the end.  So the newest are latest.  So a descending
-			
-			DelayInfo delayInfo = it.next();
-			
-			Id<Person> causingPersonId = delayInfo.personId ;
-			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
-			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
-
-			if(delayAllocatedToThisCausingPerson==0.) {
-				return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
-			}
-			
-			if (affectedVehId.toString().equals(causingPersonId.toString())) {
-				// log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-			} else {
-				// using the time when the causing agent entered the link
-				// (one place where we need the link enter time way beyond the time when the vehicle is on the link)
-
-//				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
-				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
-				
-				CongestionEvent congestionEvent = new CongestionEvent(now, "flowCapacity", causingPersonId, 
-						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
-				this.events.processEvent(congestionEvent);
-				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
-			}
-			agentDelay = agentDelay - delayAllocatedToThisCausingPerson ; 
-		}
-
-		if (agentDelay <= 1.) {
-			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
-			// Setting the remaining delay to 0 sec.
-			this.delayNotInternalized_roundingErrors += agentDelay;
-			agentDelay = 0.;
-		}
-
-		return agentDelay;
-	}
-
-	public final void writeCongestionStats(String fileName) {
-		File file = new File(fileName);
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.totalDelay / 3600.);
-			bw.newLine();
-			bw.write("Total internalized delay [hours];" + this.totalInternalizedDelay / 3600.);
-			bw.newLine();
-			bw.write("Not internalized delay (rounding errors) [hours];" + this.delayNotInternalized_roundingErrors / 3600.);
-			bw.newLine();
-			bw.write("Not internalized delay (spill-back related delays without identifiying the causing agent) [hours];" + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
-			bw.newLine();
-			bw.write("Not internalized delay (in case delays resulting from the storage capacity are ignored) [hours];" + this.delayNotInternalized_storageCapacity / 3600.);
-			bw.newLine();
-
-			bw.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Congestion statistics written to " + fileName);		
-	}
-
-	public final double getTotalInternalizedDelay() {
-		return totalInternalizedDelay;
-	}
-
-	public final double getTotalDelay() {
-		return totalDelay;
-	}
-
-	public final double getDelayNotInternalizedRoundingErrors() {
-		return delayNotInternalized_roundingErrors;
-	}
-
-	public final double getDelayNotInternalizedSpillbackNoCausingAgent() {
-		return delayNotInternalized_spillbackNoCausingAgent;
-	}
-
-	abstract void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo);
-
-	final boolean isAllowingForStorageCapacityConstraint() {
-		return allowingForStorageCapacityConstraint;
-	}
-
-	final boolean isCalculatingStorageCapacityConstraints() {
-		return calculatingStorageCapacityConstraints;
-	}
-
-	final void addToTotalDelay(double val) {
-		this.totalDelay += val;
-	}
-
 	final Map<Id<Link>, LinkCongestionInfo> getLinkId2congestionInfo() {
 		return linkId2congestionInfo;
 	}
 
-	final void addToDelayNotInternalized_storageCapacity( double val ) {
-		this.delayNotInternalized_storageCapacity += val ;
-	}
-	final double getDelayNotInternalized_storageCapacity() {
-		return this.delayNotInternalized_storageCapacity ;
-	}
-	final void addToDelayNotInternalized_spillbackNoCausingAgent(double val) {
-		this.delayNotInternalized_spillbackNoCausingAgent += val ;
-	}
-	final void addToTotalInternalizedDelay(double val){
-		this.totalInternalizedDelay += val;
-	}
-
-	public void addToDelayNotInternalized_roundingErrors(double val) {
-		this.delayNotInternalized_roundingErrors += val;
-	}
-
-	final EventsManager getEventsManager(){
-		return this.events;
-	}
 	final Scenario getScenario() {
 		return this.scenario ;
 	}
 
+	public List<Id<Vehicle>> getPtVehicleIDs() {
+		return ptVehicleIDs;
+	}
 
+	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
+		return vehicleId2personId;
+	}
+	
+	
+	
 }
