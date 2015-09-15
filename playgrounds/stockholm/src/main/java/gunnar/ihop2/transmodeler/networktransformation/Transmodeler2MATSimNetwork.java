@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -33,6 +32,8 @@ import floetteroed.utilities.Units;
 public class Transmodeler2MATSimNetwork {
 
 	public static final String TMPATHID_ATTR = "TMPathID";
+	
+	public static final String TMPATHDIR_ATTR = "TMPathDir";
 
 	// -------------------- STATIC PACKAGE HELPERS --------------------
 
@@ -118,17 +119,17 @@ public class Transmodeler2MATSimNetwork {
 		for (TransmodelerNode transmodelerNode : nodesReader.getNodes()
 				.values()) {
 
-			// final Coord coord = new CoordImpl(
-			// 1e-6 * transmodelerNode.getLongitude(),
-			// 1e-6 * transmodelerNode.getLatitude());
-			final Coord coord = coordinateTransform.transform(new CoordImpl(
-					1e-6 * transmodelerNode.getLongitude(),
-					1e-6 * transmodelerNode.getLatitude()));
+//<<<<<<< HEAD
+//=======
+//			// final Coord coord = new CoordImpl(
+//			// 1e-6 * transmodelerNode.getLongitude(),
+//			// 1e-6 * transmodelerNode.getLatitude());
+//>>>>>>> branch 'master' of https://github.com/matsim-org/matsim.git
+	
+			final Coord coord = coordinateTransform.transform(new Coord(1e-6 * transmodelerNode.getLongitude(), 1e-6 * transmodelerNode.getLatitude()));
 
 			final Node matsimNode = matsimNetworkFactory.createNode(
 					Id.create(transmodelerNode.getId(), Node.class), coord);
-			// new CoordImpl(transmodelerNode.getLongitude(),
-			// transmodelerNode.getLatitude()));
 			matsimNetwork.addNode(matsimNode);
 		}
 
@@ -174,9 +175,13 @@ public class Transmodeler2MATSimNetwork {
 				unknownLinkTypes.add(transmodelerLink.getType());
 			}
 
-			// TODO create direction dependency
+			// TODO >>>>> New: memorize the underlying TM links >>>>>
+			
 			linkAttributes.putAttribute(matsimLink.getId().toString(),
 					TMPATHID_ATTR, transmodelerLink.getPathId());
+			
+			// TODO <<<<< New: memorize the underlying TM links <<<<<
+			
 		}
 		System.out.println("UNKNOWN LINK TYPES: " + unknownLinkTypes);
 

@@ -51,7 +51,6 @@ import org.matsim.contrib.evacuation.analysis.data.EventData;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
 
@@ -164,7 +163,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		for (double x = minX; x <= maxX; x += cellSize) {
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell cell = new Cell(new LinkedList<Event>());
-				cell.setCoord(new CoordImpl(x, y));
+				cell.setCoord(new Coord(x, y));
 				this.cellTree.put(x, y, cell);
 				cellCount++;
 			}

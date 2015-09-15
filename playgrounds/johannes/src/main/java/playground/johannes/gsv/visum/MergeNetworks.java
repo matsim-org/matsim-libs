@@ -52,8 +52,10 @@ public class MergeNetworks {
 		for (Link link : addNetwork.getLinks().values()) {
 			Id<Node> fromNodeId = Id.create(addPrefix + link.getFromNode().getId().toString(), Node.class);
 			Id<Node> toNodeId = Id.create(addPrefix + link.getToNode().getId().toString(), Node.class);
+			Node fromNode = baseNetwork.getNodes().get(fromNodeId);
+			Node toNode = baseNetwork.getNodes().get(toNodeId);
 			Link link2 = factory.createLink(Id.create(addPrefix + link.getId().toString(), Link.class),
-					fromNodeId, toNodeId);
+					fromNode, toNode);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
 			link2.setFreespeed(link.getFreespeed());
@@ -83,16 +85,18 @@ public class MergeNetworks {
 		for (Link link : networkA.getLinks().values()) {
 			Id<Node> fromNodeId = Id.create(prefixA + link.getFromNode().getId().toString(), Node.class);
 			Id<Node> toNodeId = Id.create(prefixA + link.getToNode().getId().toString(), Node.class);
+			Node fromNode = mergedNetwork.getNodes().get(fromNodeId);
+			Node toNode = mergedNetwork.getNodes().get(toNodeId);
 			Link link2 = factory.createLink(Id.create(prefixA + link.getId().toString(), Link.class),
-					fromNodeId, toNodeId);
+					fromNode, toNode);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
 			mergedNetwork.getLinks().put(link2.getId(), link2);
-			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
-			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
+			fromNode.addOutLink(link2);
+			toNode.addInLink(link2);
 		}
 		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
@@ -102,16 +106,17 @@ public class MergeNetworks {
 		for (Link link : networkB.getLinks().values()) {
 			Id<Node> fromNodeId = Id.create(prefixB + link.getFromNode().getId().toString(), Node.class);
 			Id<Node> toNodeId = Id.create(prefixB + link.getToNode().getId().toString(), Node.class);
-			Link link2 = factory.createLink(Id.create(prefixB + link.getId().toString(), Link.class),
-					fromNodeId, toNodeId);
+			Node fromNode = mergedNetwork.getNodes().get(fromNodeId);
+			Node toNode = mergedNetwork.getNodes().get(toNodeId);
+			Link link2 = factory.createLink(Id.create(prefixB + link.getId().toString(), Link.class), fromNode, toNode);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
 			link2.setFreespeed(link.getFreespeed());
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes());
 			mergedNetwork.getLinks().put(link2.getId(), link2);
-			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
-			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
+			fromNode.addOutLink(link2);
+			toNode.addInLink(link2);
 		}
 	}
 }

@@ -19,19 +19,16 @@
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.misc.Time;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -93,11 +90,11 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 	}
 
 	private int getAge(final Person decisionMaker) {
-		return ((PersonImpl) decisionMaker).getAge();
+		return PersonUtils.getAge(decisionMaker);
 	}
 
 	private short getGender(final Person decisionMaker) {
-		final String sex = ((PersonImpl) decisionMaker).getSex().toLowerCase().trim();
+		final String sex = PersonUtils.getSex(decisionMaker).toLowerCase().trim();
 
 		switch ( sex ) {
 			case "f":
@@ -110,7 +107,7 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 	}
 
 	private short getCarAvailability(final Person decisionMaker) {
-		final String avail = ((PersonImpl) decisionMaker).getCarAvail().toLowerCase().trim();
+		final String avail = PersonUtils.getCarAvail(decisionMaker).toLowerCase().trim();
 
 		switch ( avail ) {
 			case "sometimes":

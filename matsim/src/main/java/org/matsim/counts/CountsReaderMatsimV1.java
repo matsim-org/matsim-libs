@@ -23,9 +23,9 @@ package org.matsim.counts;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -82,7 +82,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 		String x = meta.getValue("x");
 		String y = meta.getValue("y");
 		if (x != null && y != null) {
-			this.currcount.setCoord(new CoordImpl(Double.parseDouble(x), Double.parseDouble(y)));
+			this.currcount.setCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 		}
 	}
 

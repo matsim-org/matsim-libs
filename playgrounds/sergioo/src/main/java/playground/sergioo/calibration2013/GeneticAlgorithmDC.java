@@ -115,7 +115,7 @@ public class GeneticAlgorithmDC {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = new PersonImpl(person.getId());
+				Person copyPerson = PersonImpl.createPerson(person.getId());
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);

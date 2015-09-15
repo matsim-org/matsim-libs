@@ -22,14 +22,13 @@ package playground.anhorni.locationchoice.analysis.mc;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MZTrip {
 	
 	private Id<Person> personId = null;
-	private CoordImpl home = null;
-	private CoordImpl coordEnd = null;
-	private CoordImpl coordStart = null;
+	private Coord home = null;
+	private Coord coordEnd = null;
+	private Coord coordStart = null;
 	
 	// F58
 	private double startTime = 0.0;
@@ -44,8 +43,8 @@ public class MZTrip {
 	public MZTrip(Id<Person> personId, Coord coordStart, Coord coordEnd, double startTime, double endTime) {
 		super();
 		this.personId = personId;
-		this.coordStart = new CoordImpl(coordStart.getX(), coordStart.getY());
-		this.coordEnd = new CoordImpl(coordEnd.getX(), coordEnd.getY());
+		this.coordStart = new Coord(coordStart.getX(), coordStart.getY());
+		this.coordEnd = new Coord(coordEnd.getX(), coordEnd.getY());
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
@@ -56,17 +55,17 @@ public class MZTrip {
 	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
-	public CoordImpl getCoordEnd() {
+	public Coord getCoordEnd() {
 		return coordEnd;
 	}
 	public void setCoordEnd(Coord coordEnd) {
-		this.coordEnd = new CoordImpl(coordEnd.getX(), coordEnd.getY());
+		this.coordEnd = new Coord(coordEnd.getX(), coordEnd.getY());
 	}
-	public CoordImpl getCoordStart() {
+	public Coord getCoordStart() {
 		return coordStart;
 	}
 	public void setCoordStart(Coord coordStart) {
-		this.coordStart = new CoordImpl(coordStart.getX(), coordStart.getY());
+		this.coordStart = new Coord(coordStart.getX(), coordStart.getY());
 	}
 	public double getStartTime() {
 		return startTime;
@@ -111,14 +110,14 @@ public class MZTrip {
 		this.wzweck2 = wzweck2;
 	}
 
-	public CoordImpl getHome() {
+	public Coord getHome() {
 		return home;
 	}
 	public double getDuration() {
 		return (this.endTime - this.startTime);
 	}
 
-	public void setHome(CoordImpl home) {
+	public void setHome(Coord home) {
 		this.home = home;
 	}
 	public String getMatsimMode() {

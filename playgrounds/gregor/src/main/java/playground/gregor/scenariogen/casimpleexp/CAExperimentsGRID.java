@@ -23,6 +23,7 @@ package playground.gregor.scenariogen.casimpleexp;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class CAExperimentsGRID {
@@ -215,14 +215,10 @@ public class CAExperimentsGRID {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(
-				minX, minY));
-		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(
-				minX, maxY));
-		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(
-				maxX, maxY));
-		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(
-				maxX, minY));
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new Coord(minX, minY));
+		Node n1 = fac.createNode(Id.create("n1", Node.class), new Coord(minX, maxY));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new Coord(maxX, maxY));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new Coord(maxX, minY));
 
 		net.addNode(n0);
 		net.addNode(n1);
@@ -242,7 +238,7 @@ public class CAExperimentsGRID {
 			double x = minX + (WIDTH - width) / 2;
 			for (int j = 0; j < NR_COLS; j++) {
 				Node n = fac.createNode(Id.create(i + "_" + j, Node.class),
-						new CoordImpl(x, y));
+						new Coord(x, y));
 				net.addNode(n);
 				nodes[i][j] = n;
 				x += dx;

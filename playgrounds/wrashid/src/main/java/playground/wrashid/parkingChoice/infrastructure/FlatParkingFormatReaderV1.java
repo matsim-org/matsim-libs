@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.facilities.ActivityFacility;
 import org.xml.sax.Attributes;
@@ -37,7 +36,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 		double x=new Double(atts.getValue("x"));
 		double y=new Double(atts.getValue("y"));
 		double capacity=new Double(atts.getValue("capacity"));
-		Coord coord=new CoordImpl(x, y);
+		Coord coord= new Coord(x, y);
 		
 		if (parkingType.equalsIgnoreCase("public")){
 			PublicParking publicParking=new PublicParking(coord);

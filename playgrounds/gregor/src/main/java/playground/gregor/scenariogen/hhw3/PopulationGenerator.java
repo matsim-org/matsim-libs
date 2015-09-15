@@ -25,6 +25,7 @@ import java.util.LinkedList;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,7 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -93,8 +94,8 @@ public class PopulationGenerator {
 		t2 = geofac.createPolygon(lr, null);
 	}
 	
-	private static final CoordImpl to1 = new CoordImpl(1113996.6644551097,7041531.017688233);
-	private static final CoordImpl to2 = new CoordImpl(1113968.4303997215,7041535.944105351);
+	private static final Coord to1 = new Coord(1113996.6644551097, 7041531.017688233);
+	private static final Coord to2 = new Coord(1113968.4303997215, 7041535.944105351);
 
 	private static String inputDir = "/Users/laemmel/devel/hhw3/input/";
 	public static void main (String [] args) {
@@ -126,7 +127,7 @@ public class PopulationGenerator {
 			MultiPolygon p = (MultiPolygon) ft.getDefaultGeometry();
 			Coordinate c = p.getCentroid().getCoordinate();
 
-			Link l = net.getNearestLinkExactly(new CoordImpl(c.x,c.y));
+			Link l = net.getNearestLinkExactly(new Coord(c.x, c.y));
 			double dist = c.distance(new Coordinate(l.getCoord().getX(),l.getCoord().getY()));
 			if (dist > CUTOFF_DIST) {
 				continue;
@@ -192,7 +193,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (to1.calcDistance(l.getToNode().getCoord()) < 0.1 ||to1.calcDistance(l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 						l.setFreespeed(1.34);
@@ -200,7 +201,7 @@ public class PopulationGenerator {
 						continue;
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
-						if (to1.calcDistance(ll.getToNode().getCoord()) < 0.1){
+						if (CoordUtils.calcDistance(to1, ll.getToNode().getCoord()) < 0.1){
 							l.setCapacity(0.5);
 							l.setNumberOfLanes(1);
 							l.setLength(.26);
@@ -233,7 +234,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time+ 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (to2.calcDistance(l.getToNode().getCoord()) < 0.1 ||to2.calcDistance(l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 					
@@ -262,13 +263,13 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (to1.calcDistance(l.getToNode().getCoord()) < 0.1 ||to1.calcDistance(l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 						continue;
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
-						if (to1.calcDistance(ll.getToNode().getCoord()) < 0.1){
+						if (CoordUtils.calcDistance(to1, ll.getToNode().getCoord()) < 0.1){
 							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
@@ -289,7 +290,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time + 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (to2.calcDistance(l.getToNode().getCoord()) < 0.1 ||to2.calcDistance(l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 					

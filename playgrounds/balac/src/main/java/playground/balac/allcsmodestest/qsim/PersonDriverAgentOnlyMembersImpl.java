@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -34,11 +35,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -479,11 +478,11 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
 		double travelTime = 0.0;
 
-		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
+		Coord coordStart = new Coord(startLink.getCoord().getX(), startLink.getCoord().getY());
 		
 		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, startLink.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
+
+		Coord coordEnd = new Coord(destinationLink.getCoord().getX(), destinationLink.getCoord().getY());
 
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, destinationLink.getId());
 		double distance = 0.0;
@@ -504,12 +503,14 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		route.setDistance(distance);
 		route.setTravelTime( travelTime);
 		
+		route.setStartLinkId(startLink.getId());
+		route.setEndLinkId(destinationLink.getId());
 		if (mode.equals("twowaycarsharing"))
-			route.setRouteDescription(startLink.getId(), "TW_" + (twVehId), destinationLink.getId());
+			route.setRouteDescription("TW_" + (twVehId));
 		else if (mode.equals("onewaycarsharing"))
-			route.setRouteDescription(startLink.getId(), "OW_" + (owVehId), destinationLink.getId());
+			route.setRouteDescription("OW_" + (owVehId));
 		else if (mode.equals("freefloating"))
-			route.setRouteDescription(startLink.getId(), "FF_" + (ffVehId), destinationLink.getId());
+			route.setRouteDescription("FF_" + (ffVehId));
 
 
 		carLeg.setRoute(route);
@@ -1058,7 +1059,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

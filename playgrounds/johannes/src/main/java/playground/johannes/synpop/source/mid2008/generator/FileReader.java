@@ -20,8 +20,6 @@
 package playground.johannes.synpop.source.mid2008.generator;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
@@ -156,7 +154,7 @@ public class FileReader {
 
             Segment leg = factory.newSegment();
             episode.addLeg(leg);
-            leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityType.HOME);
+            leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityTypes.HOME);
             for (LegAttributeHandler handler : journeyAttHandlers) {
                 handler.handle(leg, attributes);
             }

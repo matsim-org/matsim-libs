@@ -90,11 +90,9 @@ public class KtiPtRoute extends GenericRouteImpl {
 
 	@Override
 	public void setRouteDescription(
-			Id startLinkId,
-			String routeDescription,
-			Id endLinkId) {
+			String routeDescription) {
 
-		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
+		super.setRouteDescription(routeDescription);
 		if (routeDescription.startsWith(IDENTIFIER)) {
 			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
 			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[1]);

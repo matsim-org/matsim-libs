@@ -1,6 +1,7 @@
 package playground.artemc.heterogeneity.scoring;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,6 +16,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -24,7 +26,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	private double calcScore(final Fixture f) {
 		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
 		heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.setSimulationType("homo");
-		ScoringFunction testee = heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.createNewScoringFunction(new PersonImpl(Id.create("1", Person.class)));
+		ScoringFunction testee = heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.createNewScoringFunction(PersonImpl.createPerson(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
 				testee.handleActivity((Activity) planElement);
@@ -597,8 +598,8 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
-		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan1 = person1.createAndAddPlan(true);
+		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = plan1.createAndAddActivity("home", (Id<Link>) null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
@@ -644,7 +645,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 	private static class Fixture {
 		protected Config config = null;
-		private PersonImpl person = null;
+		private Person person = null;
 		private PlanImpl plan = null;
 		private Scenario scenario;
 		private NetworkImpl network;
@@ -707,16 +708,16 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(500.0, 0.0));
-			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(5500.0, 0.0));
-			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(6000.0, 0.0));
-			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(11000.0, 0.0));
-			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(11500.0, 0.0));
-			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(16500.0, 0.0));
-			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new CoordImpl(17000.0, 0.0));
-			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new CoordImpl(22000.0, 0.0));
-			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new CoordImpl(22500.0, 0.0));
+			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(500.0, 0.0));
+			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(5500.0, 0.0));
+			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(6000.0, 0.0));
+			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new Coord(11000.0, 0.0));
+			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new Coord(11500.0, 0.0));
+			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new Coord(16500.0, 0.0));
+			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new Coord(17000.0, 0.0));
+			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new Coord(22000.0, 0.0));
+			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new Coord(22500.0, 0.0));
 
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 500, 25, 3600, 1);
 			Link link2 = this.network.createAndAddLink(Id.create("2", Link.class), node2, node3, 25000, 50, 3600, 1);
@@ -728,8 +729,8 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			this.network.createAndAddLink(Id.create("8", Link.class), node8, node9, 5000, 50, 3600, 1);
 			Link link9 = this.network.createAndAddLink(Id.create("9", Link.class), node9, node10, 500, 25, 3600, 1);
 
-			this.person = new PersonImpl(Id.create("1", Person.class));
-			this.plan = this.person.createAndAddPlan(true);
+			this.person = PersonImpl.createPerson(Id.create("1", Person.class));
+			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			this.person.getCustomAttributes().put("incomeAlphaFactor",testee_incomeAlphaFactor);
 			this.person.getCustomAttributes().put("sdBetaFactor",testee_sdFactor);

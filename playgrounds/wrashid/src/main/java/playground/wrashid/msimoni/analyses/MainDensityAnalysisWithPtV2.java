@@ -64,7 +64,7 @@ public class MainDensityAnalysisWithPtV2 {
 		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		//center = scenario.getNetwork().getNodes().get(scenario.createId("17560000113841FT")).getCoord();
-		center = scenario.createCoord(682548.0, 247525.5);
+		center = new Coord(682548.0, 247525.5);
 		
 		Map<Id<Link>, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 		

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Stack;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -36,7 +37,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -90,8 +90,8 @@ public class TransitScheduleReaderV1Test {
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
@@ -120,8 +120,8 @@ public class TransitScheduleReaderV1Test {
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new ModeRouteFactory());
@@ -739,11 +739,11 @@ public class TransitScheduleReaderV1Test {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
 		/*Link link1 =*/ network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
 		/*Link link3 =*/network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
@@ -798,11 +798,11 @@ public class TransitScheduleReaderV1Test {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
 		/*Link link1 =*/network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 		/*Link link2 =*/network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
 		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
@@ -859,11 +859,11 @@ public class TransitScheduleReaderV1Test {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(10, 5));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(5, 11));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(5, 11));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(5, 11));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(5, 11));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
 		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
 		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);

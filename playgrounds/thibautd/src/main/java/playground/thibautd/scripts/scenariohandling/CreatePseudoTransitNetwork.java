@@ -38,7 +38,6 @@ public class CreatePseudoTransitNetwork {
 		final String outputNetwork = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((ScenarioImpl) sc).createTransitScheduleContainer();
 		new TransitScheduleReader( sc ).readFile( inputSchedule );
 		new CreatePseudoNetwork(sc.getTransitSchedule(), sc.getNetwork(), "tr_").createNetwork();
 		new NetworkWriter( sc.getNetwork() ).write( outputNetwork );

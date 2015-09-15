@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.Painter;
@@ -55,7 +55,7 @@ public class PointsPersonPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		double maxSize = 10;
 		for(PointPerson point:points)
-			paintCircle(g2, layersPanel, new CoordImpl(point.getElement(0),point.getElement(1)), (int)((point.getWeight()*Math.random())*maxSize/(maxWeight-minWeight)), color);
+			paintCircle(g2, layersPanel, new Coord(point.getElement(0), point.getElement(1)), (int)((point.getWeight()*Math.random())*maxSize/(maxWeight-minWeight)), color);
 	}
 
 }

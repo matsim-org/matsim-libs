@@ -42,7 +42,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -212,8 +211,7 @@ public class ComputationTimeCalculator {
 		config.qsim().setStorageCapFactor(0.01);
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		((ScenarioImpl)sc).createVehicleContainer();
-		
+
 //		NetworkImpl net = (NetworkImpl) sc.getNetwork();
 //		
 //		Node n1 =  net.createAndAddNode(Id.createNodeId(1), sc.createCoord(0, 0));

@@ -36,7 +36,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
@@ -458,12 +458,12 @@ public class MainPPSimZurich30km {
 
 		for (int i = 0; i < populationExpansionFactor; i++) {
 			for (Person origPerson : originalAgents) {
-				PersonImpl originPersonImpl = (PersonImpl) origPerson;
+				Person originPerson = origPerson;
 
-				PersonImpl newPerson = (PersonImpl) factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
-				newPerson.setAge(((PersonImpl) origPerson).getAge());
-				newPerson.setSex(((PersonImpl) origPerson).getSex());
-				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
+				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
+				PersonUtils.setAge(newPerson, PersonUtils.getAge(origPerson));
+				PersonUtils.setSex(newPerson, PersonUtils.getSex(origPerson));
+				newPerson.addPlan(originPerson.createCopyOfSelectedPlanAndMakeSelected());
 
 				scenario.getPopulation().addPerson(newPerson);
 			}

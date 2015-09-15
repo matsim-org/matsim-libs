@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
@@ -31,8 +31,8 @@ import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 public class ZHTripFilter {
 	
 	private double radius = 30.0 * 1000.0;
-	private CoordImpl center = new CoordImpl(683518.0,246836.0);	
-	
+	private Coord center = new Coord(683518.0, 246836.0);
+
 	public List<MZTrip> filterRegion(List<MZTrip> trips) {
 		List<MZTrip> filteredTrips = new Vector<MZTrip>();	
 		Iterator<MZTrip> trips_it = trips.iterator();
@@ -46,7 +46,7 @@ public class ZHTripFilter {
 		return filteredTrips;
 	}	
 	
-	private boolean intersect(MZTrip mzTrip, double radius, CoordImpl center) {
+	private boolean intersect(MZTrip mzTrip, double radius, Coord center) {
 		
 		double distance = CoordUtils.distancePointLinesegment(
 				mzTrip.getCoordStart(), mzTrip.getCoordEnd(), center);

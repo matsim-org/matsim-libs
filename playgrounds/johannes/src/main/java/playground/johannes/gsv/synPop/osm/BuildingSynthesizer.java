@@ -34,7 +34,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -213,7 +212,7 @@ public class BuildingSynthesizer {
 			hit = geometry.contains(p);
 		}
 
-		return new CoordImpl(x, y);
+		return new Coord(x, y);
 	}
 
 	public static void main(String args[]) {

@@ -20,6 +20,7 @@
 package playground.benjamin.spacetimegeo;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -302,15 +303,26 @@ public class SpaceTimeProbability {
 	private void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-26000.0,     0.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(-25000.0,     0.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord(-21000.0,     0.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( -1000.0,     0.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), scenario.createCoord(     0.0,     0.0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), scenario.createCoord( -6500.0, -5000.0));
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), scenario.createCoord(-19500.0, -5000.0));
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), scenario.createCoord(-11000.0,  2500.0));
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), scenario.createCoord(-11000.0, -2500.0));
+		double x7 = -26000.0;
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x7, 0.0));
+		double x6 = -25000.0;
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(x6, 0.0));
+		double x5 = -21000.0;
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(x5, 0.0));
+		double x4 = -1000.0;
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(x4, 0.0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(0.0, 0.0));
+		double x3 = -6500.0;
+		double y2 = -5000.0;
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(x3, y2));
+		double x2 = -19500.0;
+		double y1 = -5000.0;
+		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(x2, y1));
+		double x1 = -11000.0;
+		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(x1, 2500.0));
+		double x = -11000.0;
+		double y = -2500.0;
+		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(x, y));
 		
 		//base distance to work 5km; travel time 6min
 		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 4000, 13.89, 3600, 1, null, null);

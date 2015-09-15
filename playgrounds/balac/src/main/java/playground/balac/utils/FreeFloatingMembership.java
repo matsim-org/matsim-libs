@@ -5,7 +5,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,9 +43,9 @@ public class FreeFloatingMembership {
 		
 		while (number < goal) {
 			
-			PersonImpl p = (PersonImpl) arr[r.nextInt(size)];
+			Person p = (Person) arr[r.nextInt(size)];
 			
-			if (p.hasLicense()) {
+			if (PersonUtils.hasLicense(p)) {
 				x++;
 				if (bla.getAttribute(p.getId().toString(), "CS_CARD") == null) {
 					

@@ -23,13 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
  * Scoring function accumulator using {@link BvgLegScoringFunction} instead of {@link CharyparNagelLegScoring}
@@ -46,8 +47,8 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 	private final Double utilityOfLineSwitch;
 	private final Network network;
 
-	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroup bvgConfig, Network network) {
-		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig).create();
+	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final ScenarioConfigGroup scenarioConfig, final BvgScoringFunctionConfigGroup bvgConfig, Network network) {
+		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig, scenarioConfig).create();
 		this.bvgParameters = new BvgScoringFunctionParameters(bvgConfig);
 		this.utilityOfLineSwitch = charyparNagelConfig.getUtilityOfLineSwitch();
 		this.network = network;

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -74,7 +73,7 @@ public class ReadNce implements TabularFileHandler {
 				
 				double fromX = Double.parseDouble(row[1].trim());
 				double fromY = Double.parseDouble(row[2].trim());
-				Coord fromNodeCoord = new CoordImpl(fromX, fromY);
+				Coord fromNodeCoord = new Coord(fromX, fromY);
 				
 				String toNodeStringId = row[3].trim();
 				if (this.nceNodeStringNodeId2nodeId.get(toNodeStringId) == null) {
@@ -83,7 +82,7 @@ public class ReadNce implements TabularFileHandler {
 				
 				double toX = Double.parseDouble(row[4].trim());
 				double toY = Double.parseDouble(row[5].trim());
-				Coord toNodeCoord = new CoordImpl(toX, toY);
+				Coord toNodeCoord = new Coord(toX, toY);
 				
 				double diffPerLink = Double.parseDouble(row[6].trim());
 				

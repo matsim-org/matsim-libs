@@ -20,12 +20,12 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PositionInfoTest extends MatsimTestCase {
@@ -41,8 +41,8 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_shortLink() {
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 1000));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link
@@ -64,8 +64,8 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_longLink() {
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 1000));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 2000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link

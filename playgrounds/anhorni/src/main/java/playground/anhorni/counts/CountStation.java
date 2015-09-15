@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class CountStation {
 	
@@ -32,10 +32,10 @@ public class CountStation {
 	private String csId;
 	private LinkInfo link1;
 	private LinkInfo link2;
-	private CoordImpl coord;
+	private Coord coord;
 	private List<RawCount> counts = new Vector<RawCount>();
 	
-	public CountStation(String id, CoordImpl coord) {
+	public CountStation(String id, Coord coord) {
 		this.csId = id;
 		this.coord = coord;
 	}
@@ -81,10 +81,10 @@ public class CountStation {
 	public void setId(String id) {
 		this.csId = id;
 	}
-	public CoordImpl getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
-	public void setCoord(CoordImpl coord) {
+	public void setCoord(Coord coord) {
 		this.coord = coord;
 	}
 	public LinkInfo getLink1() {

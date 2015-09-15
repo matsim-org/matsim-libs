@@ -20,7 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * Exports the coordinates of the Links with counting stations.
+ * Exports the coordinates of the links with counting stations.
  * The output can be used for generation of new count-files, when linkIds of the network have changed.
  * @author kturner
  *

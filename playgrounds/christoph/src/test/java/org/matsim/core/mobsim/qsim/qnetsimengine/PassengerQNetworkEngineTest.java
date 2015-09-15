@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,7 +57,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -1230,13 +1230,13 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	}
 	
 	private static void makeNetwork(Network network) {
-		Node node0 = network.getFactory().createNode(Id.create("node0", Node.class), new CoordImpl(0.0, 0.0));
+		Node node0 = network.getFactory().createNode(Id.create("node0", Node.class), new Coord(0.0, 0.0));
 		network.addNode(node0);
-		Node node1 = network.getFactory().createNode(Id.create("node1", Node.class), new CoordImpl(100.0,0.0));
+		Node node1 = network.getFactory().createNode(Id.create("node1", Node.class), new Coord(100.0, 0.0));
 		network.addNode(node1);
-		Node node2 = network.getFactory().createNode(Id.create("node2", Node.class), new CoordImpl(200.0,0.0));
+		Node node2 = network.getFactory().createNode(Id.create("node2", Node.class), new Coord(200.0, 0.0));
 		network.addNode(node2);
-		Node node3 = network.getFactory().createNode(Id.create("node3", Node.class), new CoordImpl(300.0,0.0));
+		Node node3 = network.getFactory().createNode(Id.create("node3", Node.class), new Coord(300.0, 0.0));
 		network.addNode(node3);
 		
 		makeLink(network, Id.create("0to1", Link.class), node0, node1);

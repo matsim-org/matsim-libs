@@ -57,7 +57,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -251,9 +250,9 @@ public class CadytsFreightChainTest {
 	private static void createTestNetwork( Network net ) {
 		NetworkFactory nf = net.getFactory() ;
 
-		Node node1 = nf.createNode( Id.create(1, Node.class), new CoordImpl(0.,0.)) ;
+		Node node1 = nf.createNode( Id.create(1, Node.class), new Coord(0., 0.)) ;
 		net.addNode(node1) ;
-		Node node2 = nf.createNode( Id.create(2, Node.class), new CoordImpl(10.,0.)) ;
+		Node node2 = nf.createNode( Id.create(2, Node.class), new Coord(10., 0.)) ;
 		net.addNode(node2);
 		
 		Link link1 = nf.createLink( Id.create("1-2", Link.class) , node1, node2 ) ;
@@ -270,7 +269,7 @@ public class CadytsFreightChainTest {
 				int last = pp ;
 				Plan plan = pf.createPlan() ;
 				for ( int aa=0 ; aa<=last ; aa++ ) {
-					Coord coord = new CoordImpl(0.,0.) ;
+					Coord coord = new Coord(0., 0.);
 					Activity activity = pf.createActivityFromCoord("minor", coord) ;
 					activity.setEndTime( 8.*3600. ) ;
 					plan.addActivity( activity ) ;

@@ -161,9 +161,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.startTime = startTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStartTime()
-	 */
 	@Override
 	public double getStartTime() {
 		return this.startTime;
@@ -173,9 +170,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.endTime = endTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getEndTime()
-	 */
 	@Override
 	public double getEndTime() {
 		return this.endTime;
@@ -190,9 +184,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.timeStepSize = seconds;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getTimeStepSize()
-	 */
 	@Override
 	public double getTimeStepSize() {
 		return this.timeStepSize;
@@ -202,9 +193,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotPeriod()
-	 */
 	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
@@ -214,9 +202,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.flowCapFactor = flowCapFactor;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getFlowCapFactor()
-	 */
 	@Override
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
@@ -226,9 +211,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.stroageCapFactor = stroageCapFactor;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStorageCapFactor()
-	 */
 	@Override
 	public double getStorageCapFactor() {
 		return this.stroageCapFactor;
@@ -238,9 +220,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.stuckTime = stuckTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getStuckTime()
-	 */
 	@Override
 	public double getStuckTime() {
 		return this.stuckTime;
@@ -250,9 +229,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#isRemoveStuckVehicles()
-	 */
 	@Override
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
@@ -279,9 +255,6 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		this.snapshotStyle = style ;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotStyle()
-	 */
 	@Override
 	public SnapshotStyle getSnapshotStyle() {
 		return this.snapshotStyle;

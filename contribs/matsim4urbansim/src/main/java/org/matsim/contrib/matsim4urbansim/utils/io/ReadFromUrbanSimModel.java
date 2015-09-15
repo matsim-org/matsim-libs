@@ -32,10 +32,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -122,7 +122,7 @@ public class ReadFromUrbanSimModel {
 				zone_ID = Id.create( zoneIdAsLong , ActivityFacility.class) ;
 
 				// get the coordinates of that parcel
-				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
+				coord = new Coord(Double.parseDouble(parts[indexXCoodinate]), Double.parseDouble(parts[indexYCoodinate]));
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = zones.createAndAddFacility(zone_ID,coord);
@@ -188,7 +188,7 @@ public class ReadFromUrbanSimModel {
 				parcel_ID = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
 				// get the coordinates of that parcel
-				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
+				coord = new Coord(Double.parseDouble(parts[indexXCoodinate]), Double.parseDouble(parts[indexYCoodinate]));
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcel_ID,coord);
@@ -253,7 +253,7 @@ public class ReadFromUrbanSimModel {
 			zone_ID = entry.getKey();
 			pz = entry.getValue();
 			// compute the average center of a zone
-			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
+			coord = new Coord(pz.sumXCoordinate / pz.count, pz.sumYCoordinate / pz.count);
 			zones.createAndAddFacility(zone_ID, coord);
 		}
 		log.info( "Done with constructing urbansim zones. Constucted " + zones.getFacilities().size() + " zones.");
@@ -326,7 +326,7 @@ public class ReadFromUrbanSimModel {
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
 				
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -345,14 +345,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexZoneID_WORK ].equals("-1") )
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonUtils.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonUtils.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workZoneId = Id.create( parts[ indexZoneID_WORK ], ActivityFacility.class );
 					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
 					currentZoneLocations.setWorkZoneIDAndZoneCoordinate(workZoneId, jobLocation);
@@ -444,7 +444,7 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );
@@ -460,14 +460,14 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexParcelID_WORK ].equals("-1") )
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonUtils.setEmployed(newPerson, Boolean.FALSE);
 				else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonUtils.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workParcelId = Id.create( parts[ indexParcelID_WORK ], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
@@ -615,7 +615,7 @@ public class ReadFromUrbanSimModel {
 	 * @param rld TODO
 	 */
 	private void mergePopulation(final Population oldPop,
-			final Population newPop, PersonImpl newPerson,
+			final Population newPop, Person newPerson,
 			Population backupPop, final Network network, 
 			PopulationCounter cnt, boolean isParcel, 
 			ZoneLocations currentZoneLocations, RandomLocationDistributor rld) {
@@ -632,7 +632,7 @@ public class ReadFromUrbanSimModel {
 				backupPop.addPerson( newPerson );
 				cnt.newPersonCnt++;
 				break;
-			} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed. Accept new person:
+			} else if ( PersonUtils.isEmployed(oldPerson) != PersonUtils.isEmployed(newPerson) ) { // employment status changed. Accept new person:
 				newPop.addPerson(newPerson);
 				cnt.employmentChangedCnt++;
 				break;
@@ -682,7 +682,7 @@ public class ReadFromUrbanSimModel {
 			}
 
 			// check if new person works
-			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter. fix this when other activities are considered
+			if ( !PersonUtils.isEmployed(newPerson) ) { // person does not move; doesn't matter. fix this when other activities are considered
 				newPop.addPerson(newPerson);
 				cnt.unemployedCnt++;
 				break ;

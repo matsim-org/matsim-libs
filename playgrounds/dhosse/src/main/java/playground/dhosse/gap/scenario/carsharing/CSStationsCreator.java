@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -20,11 +19,11 @@ public class CSStationsCreator {
 	
 	private static final String HEADER = "Ort\tStandort\tPLZ\tStao-Nr.\tKanton\tGeoX\tGeoY\tNorth\tEast\tFahrzeuge";
 	
-	private static final Coord coordHBF = new CoordImpl(657864, 5261863);
-	private static final Coord coordKSK = new CoordImpl(657966, 5262218);
-	private static final Coord coordRAT = new CoordImpl(658520, 5262175);
-	private static final Coord coordKLINIK = new CoordImpl(660250, 5261035);
-	
+	private static final Coord coordHBF = new Coord((double) 657864, (double) 5261863);
+	private static final Coord coordKSK = new Coord((double) 657966, (double) 5262218);
+	private static final Coord coordRAT = new Coord((double) 658520, (double) 5262175);
+	private static final Coord coordKLINIK = new Coord((double) 660250, (double) 5261035);
+
 	private static final String GP_HBF = "1\tHBF-Elektro Hauptbahnhof\t"+coordHBF.getX() + "\t" + coordHBF.getY() + "\t47.491043\t11.095773\t2";
 	private static final String GP_KSK = "2\tKSK-GAP Kreissparkasse\t"+coordKSK.getX() + "\t" + coordKSK.getY() + "\t47.494208\t11.097258\t1";
 	private static final String GP_RAT = "2\tRAT-Elektro Rathaus-Elektro\t"+coordRAT.getX() + "\t" + coordRAT.getY() + "\t47.493692\t11.104595\t1";

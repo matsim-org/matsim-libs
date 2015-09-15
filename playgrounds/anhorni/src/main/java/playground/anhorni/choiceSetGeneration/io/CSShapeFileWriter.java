@@ -29,7 +29,6 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -73,8 +72,7 @@ public class CSShapeFileWriter extends CSWriter {
 			Iterator<ChoiceSetFacility> choiceSetFacilities_it = choiceSet.getFacilities().values().iterator();
 			while (choiceSetFacilities_it.hasNext()) {
 				ChoiceSetFacility choiceSetFacility = choiceSetFacilities_it.next();
-				Coord coord = new CoordImpl(choiceSetFacility.getFacility().getMappedPosition().getX(), 
-						choiceSetFacility.getFacility().getMappedPosition().getY());
+				Coord coord = new Coord(choiceSetFacility.getFacility().getMappedPosition().getX(), choiceSetFacility.getFacility().getMappedPosition().getY());
 				
 				SimpleFeature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);
@@ -106,23 +104,20 @@ public class CSShapeFileWriter extends CSWriter {
 			ChoiceSet choiceSet = choiceSets_it.next();
 			
 			ArrayList<SimpleFeature> singleFeatures = new ArrayList<SimpleFeature>();
-			
-			Coord coordBefore = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
-					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
+
+			Coord coordBefore = new Coord(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
 			SimpleFeature featureBefore = this.createFeature(coordBefore, choiceSet.getId());
 			featuresBefore.add(featureBefore);
 			singleFeatures.add(featureBefore);
-			
-			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
-					choiceSet.getTrip().getShoppingAct().getCoord().getY());
+
+			Coord coordShopping = new Coord(choiceSet.getTrip().getShoppingAct().getCoord().getX(), choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
 			SimpleFeature featureShopping = this.createFeature(coordShopping, choiceSet.getId());
 			featuresShop.add(featureShopping);
 			singleFeatures.add(featureShopping);
-			
-			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
-					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
+
+			Coord coordAfter = new Coord(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
 			SimpleFeature featureAfter = this.createFeature(coordAfter, choiceSet.getId());
 			featuresAfter.add(featureAfter);

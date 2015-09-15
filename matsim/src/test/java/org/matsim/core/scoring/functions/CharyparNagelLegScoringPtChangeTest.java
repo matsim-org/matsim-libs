@@ -23,6 +23,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -39,10 +40,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -120,17 +121,19 @@ public class CharyparNagelLegScoringPtChangeTest {
 		conf.setTravelingPt_utils_hr( random.nextDouble() * 1000 );
 		conf.setUtilityOfLineSwitch( random.nextDouble() * 1000 );
 
+		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
 		return new CharyparNagelLegScoring(
-				CharyparNagelScoringParameters.getBuilder(conf).create(),
+				CharyparNagelScoringParameters.getBuilder(conf, scenarioConfig).create(),
 				network);
 	}
 
 	private static Network createNetwork() {
 		final Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork();
 
-		final Node node1 = network.getFactory().createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
+		final Node node1 = network.getFactory().createNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
 		network.addNode( node1 );
-		final Node node2 = network.getFactory().createNode( Id.create( 2, Node.class ) , new CoordImpl( 1 , 1 ) );
+		final Node node2 = network.getFactory().createNode( Id.create( 2, Node.class ) , new Coord((double) 1, (double) 1));
 		network.addNode( node2 );
 		network.addLink( network.getFactory().createLink( Id.create( 1, Link.class ) , node1 , node2 ) );
 

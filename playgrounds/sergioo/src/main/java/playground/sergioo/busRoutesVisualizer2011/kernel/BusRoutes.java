@@ -8,11 +8,11 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.config.ConfigUtils;
 
 import playground.sergioo.busRoutesVisualizer2011.gui.Window;
@@ -88,7 +88,7 @@ public class BusRoutes {
 	 * @param indices
 	 */
 	public void processStop(String[] parts, int[] indices) {
-		stops.put(parts[indices[0]],new Stop(new CoordImpl(Double.parseDouble(parts[indices[1]]),Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
+		stops.put(parts[indices[0]],new Stop(new Coord(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
 	}
 	/**
 	 * Creates and shows the routes tree

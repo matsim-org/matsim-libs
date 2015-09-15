@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
@@ -62,8 +61,7 @@ public class VehicleGenerator {
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(populationFile);
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc) ;
-		sl.loadScenario() ;
+		ScenarioUtils.loadScenario(sc);
 		Population population = sc.getPopulation();
 		
 		Vehicles vehicles = generateVehicles(population);

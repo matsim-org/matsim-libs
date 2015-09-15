@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.HashMap;
 
@@ -66,7 +65,7 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 				tollDisutility = EVCVScoringFunction.cvCosts.getPaidTollCost();
 			}
 
-			Coord coordinatesQuaiBridgeZH = new CoordImpl(683423.0, 246819.0);
+			Coord coordinatesQuaiBridgeZH = new Coord(683423.0, 246819.0);
 			Link prevLink = network.getLinks().get(previousLinks.get(event.getPersonId()));
 			Link currentLink = network.getLinks().get(event.getLinkId());
 			double radiusInMeters = GlobalTESFParameters.tollAreaRadius;

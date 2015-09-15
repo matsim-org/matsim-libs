@@ -24,28 +24,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.opengis.kml._2.BoundaryType;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinearRingType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.PolygonType;
-import net.opengis.kml._2.ScreenOverlayType;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -56,9 +45,6 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
-import playground.dgrether.utils.DgNet2Shape;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -66,6 +52,19 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+
+import net.opengis.kml._2.BoundaryType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinearRingType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.PolygonType;
+import net.opengis.kml._2.ScreenOverlayType;
+import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
+import playground.dgrether.utils.DgNet2Shape;
 
 /**
  * @author dgrether
@@ -79,9 +78,9 @@ public class TollSchemeGenerator {
 
 	private static final String EQUILOUTFILE = "../testData/output/equil/moutArea.kmz";
 
-	private static final Coord[] equilPolyCoords = { new CoordImpl(-10000, -10000),
-			new CoordImpl(-10000, 10000), new CoordImpl(10000, 10000),
-			new CoordImpl(10000, -10000) };
+	private static final Coord[] equilPolyCoords = { new Coord(-10000, -10000),
+			new Coord(-10000, 10000), new Coord(10000, 10000),
+			new Coord(10000, -10000) };
 
 //	private static final String IVTCHCONF = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/baseCase/config.xml";
 
@@ -133,7 +132,7 @@ public class TollSchemeGenerator {
 	"8.468355740492342,47.39746691123316,0 8.470883682949605,47.39656743520219,0 8.471627920840675,47.39394790751316,0 8.466070295798161,47.39433939496237,0 8.468607322537721,47.39135729003962,0 " +
 	"8.467614108595754,47.39018181322238,0 8.464771613486562,47.39097562237137,0 8.44864283511221,47.37986637690101,0 ";
 
-	private static final Coord centerCoord = new CoordImpl(0, 0);
+	private static final Coord centerCoord = new Coord((double) 0, (double) 0);
 	//6 o'clock
 	private static final double START = 21600;
 	//9 o'clock
@@ -243,9 +242,8 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkImpl createTollScheme(Config config) {
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadNetwork();
-		this.network = loader.getScenario().getNetwork();
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		this.network = sc.getNetwork();
 
 		NetworkImpl net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "
@@ -283,7 +281,7 @@ public class TollSchemeGenerator {
 			singleCoords = s.split(",");
 			x = Double.parseDouble(singleCoords[0]);
 			y = Double.parseDouble(singleCoords[1]);
-			c = new CoordImpl(x, y);
+			c = new Coord(x, y);
 //			log.debug("read coordinate with x: " + x + " y: " + y);
 			coord = transform.transform(c);
 //			log.debug("transformed coordinate with x: " + coord.getX() + " y: "

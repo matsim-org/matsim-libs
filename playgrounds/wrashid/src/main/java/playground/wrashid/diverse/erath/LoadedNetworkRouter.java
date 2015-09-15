@@ -2,8 +2,12 @@ package playground.wrashid.diverse.erath;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -11,10 +15,10 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -84,14 +88,17 @@ public class LoadedNetworkRouter {
 		String outputPlansFile=rootPath + "outputPlanFile.xml";
 
 		parseArguments(args);
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(this.configfile);
-		sl.loadNetwork();
-		Network network = sl.getScenario().getNetwork();
-		this.config = sl.getScenario().getConfig();
+		
+		Config config = ConfigUtils.loadConfig(this.configfile);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		Network network = scenario.getNetwork();
+		this.config = scenario.getConfig();
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(outputPlansFile);
 
@@ -100,13 +107,13 @@ public class LoadedNetworkRouter {
 
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
-		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
+		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(scenario, eventsFile);
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 		plans.addAlgorithm(
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								sl.getScenario() ).instantiateAndConfigureTripRouter(
+								scenario ).instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
 												travelCostCalculator,
 												travelTimeCalculator.getLinkTravelTimes() ) ) ) );

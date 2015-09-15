@@ -21,6 +21,7 @@
 package playground.wrashid.msimoni.analyses;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,12 +69,13 @@ public class MiniScenario {
 	public static void createNetwork(Scenario scenario) {
 		
 		NetworkFactory factory = scenario.getNetwork().getFactory();
-		
-		Node n0 = factory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
-		Node n1 = factory.createNode(Id.create("n1", Node.class), scenario.createCoord(5000.0, 0.0));
-		Node n2 = factory.createNode(Id.create("n2", Node.class), scenario.createCoord(5000.0, 5000.0));
-		Node n3 = factory.createNode(Id.create("n3", Node.class), scenario.createCoord(0.0, 5000.0));
-		Node nEnterLeave = factory.createNode(Id.create("nEnterLeave", Node.class), scenario.createCoord(-5000.0, 0.0));
+
+		Node n0 = factory.createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
+		Node n1 = factory.createNode(Id.create("n1", Node.class), new Coord(5000.0, 0.0));
+		Node n2 = factory.createNode(Id.create("n2", Node.class), new Coord(5000.0, 5000.0));
+		Node n3 = factory.createNode(Id.create("n3", Node.class), new Coord(0.0, 5000.0));
+		double x = -5000.0;
+		Node nEnterLeave = factory.createNode(Id.create("nEnterLeave", Node.class), new Coord(x, 0.0));
 		
 		Link l0 = factory.createLink(Id.create("l0", Link.class), n0, n1);
 		Link l1 = factory.createLink(Id.create("l1", Link.class), n1, n2);

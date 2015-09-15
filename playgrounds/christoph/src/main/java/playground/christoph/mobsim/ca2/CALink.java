@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.christoph.mobsim.ca2.events.VXYEvent;
 
@@ -139,8 +138,8 @@ public class CALink {
 			// add half of the cell length. position is mid point of cell!
 			double x = fromCoord.getX() + (i - 0.5) * dx;
 			double y = fromCoord.getY() + (i - 0.5) * dy;
-			
-			this.cells[i] = new Cell(i, new CoordImpl(x, y), cellLength);
+
+			this.cells[i] = new Cell(i, new Coord(x, y), cellLength);
 		}
 
 		/*

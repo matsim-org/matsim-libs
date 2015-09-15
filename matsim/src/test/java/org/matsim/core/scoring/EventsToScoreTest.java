@@ -20,8 +20,6 @@
 
 package org.matsim.core.scoring;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -52,7 +50,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	public void testAddMoney() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
@@ -84,12 +82,12 @@ public class EventsToScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = new PlanImpl() ;
 		person.addPlan(plan);
 		
-		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), null);
+		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), null);
 		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);

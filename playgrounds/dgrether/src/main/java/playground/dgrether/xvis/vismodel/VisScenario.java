@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.contrib.signals.otfvis.VisSignalSystem;
@@ -86,8 +85,8 @@ public class VisScenario {
 		offsetX = (float) ( - minX + 100.0);
 		offsetY = (float) ( - minY - deltaY - 100.0);
 		log.debug("Offset X: " + offsetX + " Y: " + offsetY);
-		Point2D.Double min = this.calcVisPosition(new CoordImpl(minX, minY));
-		Point2D.Double max = this.calcVisPosition(new CoordImpl(maxX, maxY));
+		Point2D.Double min = this.calcVisPosition(new Coord(minX, minY));
+		Point2D.Double max = this.calcVisPosition(new Coord(maxX, maxY));
 		this.minXY = new Point2D.Float((float)min.x, (float)max.y);
 		this.maxXY = new Point2D.Float((float)max.x, (float)min.y); 
 		log.debug("Bounding box View Coords: ");
@@ -96,7 +95,8 @@ public class VisScenario {
 		this.visTransform = new CoordinateTransformation() {
 			@Override
 			public Coord transform(Coord c) {
-				return new CoordImpl(c.getX() + offsetX, -(c.getY() + offsetY));
+				final double y = -(c.getY() + offsetY);
+				return new Coord(c.getX() + offsetX, y);
 			}
 		};
 	}

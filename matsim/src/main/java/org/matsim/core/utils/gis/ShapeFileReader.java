@@ -189,6 +189,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 				featureSet.add(ft);
 			}
 			it.close();
+			store.dispose();
 			return featureSet;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

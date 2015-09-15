@@ -44,7 +44,6 @@ public class VehicleReader
     public VehicleReader(Scenario scenario, VrpData data)
     {
         this.data = data;
-
         links = scenario.getNetwork().getLinks();
     }
 

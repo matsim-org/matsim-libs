@@ -36,7 +36,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -138,9 +137,7 @@ public class IdentifySpotsAtPtRough {
 				final Stack<String> context) {
 			if ( !name.equals( "stopFacility" ) ) return;
 			boolean added = coords.add(
-					new CoordImpl( 
-						Double.parseDouble( atts.getValue( "x" ) ),
-						Double.parseDouble( atts.getValue( "y" ) )));
+					new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
 
 			if ( added ) accCount.incCounter();
 			else rejCount.incCounter();

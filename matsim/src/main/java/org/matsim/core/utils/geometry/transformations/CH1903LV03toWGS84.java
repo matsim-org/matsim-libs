@@ -21,7 +21,6 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
@@ -58,7 +57,7 @@ public class CH1903LV03toWGS84 implements CoordinateTransformation {
 			0.0447 * Math.pow(yNorm, 2) * xNorm - 
 			0.0140 * Math.pow(xNorm, 3);
 
-		return new CoordImpl(longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0);
+		return new Coord(longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0);
 	}
 
 }

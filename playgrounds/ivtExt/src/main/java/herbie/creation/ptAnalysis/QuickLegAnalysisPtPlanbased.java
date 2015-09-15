@@ -21,7 +21,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -181,9 +180,9 @@ public class QuickLegAnalysisPtPlanbased {
 				
 				if (pE instanceof Leg) {
 					LegImpl leg = (LegImpl) pE;
-					if(leg.getMode().equals("pt") && leg.getRoute() instanceof GenericRoute){
+					if(leg.getMode().equals("pt")){
 						
-						String routeDescription = ((GenericRoute)leg.getRoute()).getRouteDescription();
+						String routeDescription = leg.getRoute().getRouteDescription();
 						
 						
 						String[] description =  routeDescription.split(SEPARATOR);

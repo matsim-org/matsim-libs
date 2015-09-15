@@ -43,14 +43,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -209,10 +206,10 @@ public class NmbmQTBuilder {
 		for(Id<Household> householdId : inputHouseholds.getHouseholds().keySet()){
 			Household household = inputHouseholds.getHouseholds().get(householdId);
 			for(Id<Person> personId : inputHouseholds.getHouseholds().get(householdId).getMemberIds()){
-				PersonImpl person = (PersonImpl) inputPopulation.getPersons().get(personId);
+				Person person = inputPopulation.getPersons().get(personId);
 				if(person != null){
 					int householdSize = household.getMemberIds().size();
-					int age = person.getAge();
+					int age = PersonUtils.getAge(person);
 					Income surveyIncome = household.getIncome();
 					if(surveyIncome != null){
 						/* Check for working kids. */
@@ -224,7 +221,7 @@ public class NmbmQTBuilder {
 									SouthAfricaInflationCorrector.convert(surveyIncome.getIncome(), travelActivityYear, populationYear), 
 									surveyIncome.getIncomePeriod());
 							
-							Id<QuadTree> qtId = getQtId(person.isEmployed(), householdSize, age, currentIncome);
+							Id<QuadTree> qtId = getQtId(PersonUtils.isEmployed(person), householdSize, age, currentIncome);
 							/* Check that there is a viable QuadTree definition */
 							if(qtId != null){
 								/* Create the QuadTree if it doesn't exist yet */
@@ -325,9 +322,9 @@ public class NmbmQTBuilder {
 				/* Get the home location of the household. */
 				Point homePoint = this.zones.get(Id.create(sa[12], MyZone.class)).getInteriorPoint();
 				Point altHomePoint = getRandomInteriorPoint(this.zones.get(Id.create(sa[12], MyZone.class)));
-				Coord homeCoord = new CoordImpl(altHomePoint.getX(), altHomePoint.getY());
+				Coord homeCoord = new Coord(altHomePoint.getX(), altHomePoint.getY());
 				
-				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
+				Person p = sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
 				
 				
 				
@@ -366,13 +363,13 @@ public class NmbmQTBuilder {
 				/* Link individual to its household. */
 				p.getCustomAttributes().put("householdId", hhId.toString());
 				/* Set the person's age. */
-				p.setAge(Integer.parseInt(sa[7]));
+				PersonUtils.setAge(p, Integer.parseInt(sa[7]));
 				/* Set the person's gender. */
-				p.setSex(sa[8].equalsIgnoreCase("1") ? "m" : "f");
+				PersonUtils.setSex(p, sa[8].equalsIgnoreCase("1") ? "m" : "f");
 				/* Set the person's race. */
 				p.getCustomAttributes().put("race", Race.getDescription(Race.getRace(Integer.parseInt(sa[4]))));
 				/* Set person's employment status. */
-				p.setEmployed(Integer.parseInt(sa[10]) == 1 ? true : false);
+				PersonUtils.setEmployed(p, Integer.parseInt(sa[10]) == 1 ? true : false);
 				/* Set person's schooling status. */
 				p.getCustomAttributes().put("school", Schooling.getDescription(Schooling.getSchool(Integer.parseInt(sa[11]))));
 				
@@ -381,7 +378,7 @@ public class NmbmQTBuilder {
 								
 				/*===== Now pick a plan for the person =====*/
 				/* Get the QT id */
-				Id qtId = getQtId(p.isEmployed(), Integer.parseInt(sa[2]), p.getAge(), hh.getIncome());
+				Id qtId = getQtId(PersonUtils.isEmployed(p), Integer.parseInt(sa[2]), PersonUtils.getAge(p), hh.getIncome());
 				Id tryNewId = searchForQtId(qtId);
 				if(tryNewId == null){
 					if(!noQtMap.containsKey(qtId)){
@@ -486,7 +483,7 @@ public class NmbmQTBuilder {
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
 			Plan closestPlan = qt.get(c.getX(), c.getY());
-			double radius = ((CoordImpl)c).calcDistance( ((ActivityImpl)closestPlan.getPlanElements().get(0)).getCoord());
+			double radius = CoordUtils.calcDistance(c, ((ActivityImpl) closestPlan.getPlanElements().get(0)).getCoord());
 			Collection<Plan> plans = qt.get(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -502,7 +499,7 @@ public class NmbmQTBuilder {
 		
 		/* Rank the plans based on distance. */
 		for(Plan plan : plansToRank){
-			double d = ((CoordImpl)c).calcDistance( ((ActivityImpl)plan.getPlanElements().get(0)).getCoord() );
+			double d = CoordUtils.calcDistance(c, ((ActivityImpl) plan.getPlanElements().get(0)).getCoord());
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

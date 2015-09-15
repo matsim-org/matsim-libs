@@ -22,7 +22,6 @@ package playground.balmermi.world;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -105,35 +104,35 @@ public class Zone extends AbstractLocation {
 			return 0.0;
 		} else if ((x < minX) && (maxY < y)) {
 			// case 2
-			CoordImpl refPt = new CoordImpl(minX, maxY);
+			Coord refPt = new Coord(minX, maxY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (maxY < y)) {
 			// case 3
-			CoordImpl refPt = new CoordImpl(x, maxY);
+			Coord refPt = new Coord(x, maxY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (maxY < y)) {
 			// case 4
-			CoordImpl refPt = new CoordImpl(maxX, maxY);
+			Coord refPt = new Coord(maxX, maxY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((x < minX) && (minY <= y) && (y <= maxY)) {
 			// case 5
-			CoordImpl refPt = new CoordImpl(minX, y);
+			Coord refPt = new Coord(minX, y);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (minY <= y) && (y <= maxY)) {
 			// case 6
-			CoordImpl refPt = new CoordImpl(maxX, y);
+			Coord refPt = new Coord(maxX, y);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((x < minX) && (y < minY)) {
 			// case 7
-			CoordImpl refPt = new CoordImpl(minX, minY);
+			Coord refPt = new Coord(minX, minY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (y < minY)) {
 			// case 8
-			CoordImpl refPt = new CoordImpl(x, minY);
+			Coord refPt = new Coord(x, minY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else if ((maxX < x) && (y < maxY)) {
 			// case 9
-			CoordImpl refPt = new CoordImpl(maxX, minY);
+			Coord refPt = new Coord(maxX, minY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else {
 			throw new RuntimeException("This should never happen!");

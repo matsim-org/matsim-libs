@@ -21,12 +21,12 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -129,7 +129,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		Node node = this.network.getFactory().createNode(Id.create(atts.getValue("id"), Node.class), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		Node node = this.network.getFactory().createNode(Id.create(atts.getValue("id"), Node.class), new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
 		this.network.addNode(node);
 		if (node instanceof NodeImpl) {
 			((NodeImpl) node).setType(atts.getValue("type"));

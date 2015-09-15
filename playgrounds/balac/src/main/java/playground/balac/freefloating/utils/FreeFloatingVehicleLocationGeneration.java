@@ -15,7 +15,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class FreeFloatingVehicleLocationGeneration {
@@ -31,8 +30,8 @@ public class FreeFloatingVehicleLocationGeneration {
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
-	    
-	    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+			Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 			Link l = linkUtils.getClosestLink(coordStart);		    	
 	    	
 			output.write(l.getId() + "\t" + "20");

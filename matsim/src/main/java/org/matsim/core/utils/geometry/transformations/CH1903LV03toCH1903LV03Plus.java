@@ -22,7 +22,6 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
@@ -43,7 +42,7 @@ public class CH1903LV03toCH1903LV03Plus implements CoordinateTransformation {
 		double yNorm = (coord.getX() + 2000000.0);
 		double xNorm = (coord.getY() + 1000000.0);
 
-		return new CoordImpl(Math.round(yNorm), Math.round(xNorm));
+		return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm));
 	}
 
 }

@@ -2,13 +2,15 @@ package playground.singapore.typesPopulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -17,6 +19,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+
 import playground.singapore.typesPopulation.population.PersonImplPops;
 import playground.singapore.typesPopulation.population.PopulationWriter;
 
@@ -69,18 +72,21 @@ public class AssignTypePopulation {
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())
 			if(isRelatedWithLine(person, line))
-				population.addPerson(new PersonImplPops((PersonImpl)person, line.getId()));
+				population.addPerson(new PersonImplPops(person, line.getId()));
 			else
-				population.addPerson(new PersonImplPops((PersonImpl)person, PersonImplPops.DEFAULT_POP_ID));
+				population.addPerson(new PersonImplPops(person, PersonImplPops.DEFAULT_POP_ID));
 		return population;
 	}
 	private static boolean isRelatedWithLine(Person person, TransitLine line) {
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();
 		for(Plan plan:person.getPlans())
 			for(PlanElement planElement:plan.getPlanElements())
-				if(planElement instanceof Leg && ((Leg)planElement).getRoute() instanceof GenericRoute) {
-					ExperimentalTransitRoute route = (ExperimentalTransitRoute) factory.createRoute(((Leg)planElement).getRoute().getStartLinkId(), ((Leg)planElement).getRoute().getEndLinkId());
-					route.setRouteDescription(((Leg)planElement).getRoute().getStartLinkId(), ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription(), ((Leg)planElement).getRoute().getEndLinkId());
+				if(planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					ExperimentalTransitRoute route = (ExperimentalTransitRoute) factory.createRoute(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
+					route.setStartLinkId(leg.getRoute().getStartLinkId());
+					route.setEndLinkId(leg.getRoute().getEndLinkId());
+					route.setRouteDescription(leg.getRoute().getRouteDescription());
 					for(TransitRoute transitRoute:line.getRoutes().values())
 						for(TransitRouteStop stop:transitRoute.getStops())
 							if(stop.getStopFacility().getId().equals(route.getAccessStopId()) || stop.getStopFacility().getId().equals(route.getEgressStopId()))

@@ -65,7 +65,7 @@ public class shapeFileToNetworkDelhi {
 				// create from Node
 				Double fromNodeX=	(Double) sf.getAttribute("fromX");
 				Double fromNodeY = (Double) sf.getAttribute("fromY");
-				Coord fromCoord = scenario.createCoord(fromNodeX, fromNodeY);
+				Coord fromCoord = new Coord(fromNodeX, fromNodeY);
 				String fNodeIdStr;
 
 				if(coordId.containsKey(fromCoord)) {
@@ -87,7 +87,7 @@ public class shapeFileToNetworkDelhi {
 				// create to Node
 				Double toNodeX = (Double) sf.getAttribute("toX");
 				Double toNodeY = (Double) sf.getAttribute("toY");
-				Coord toCoord = scenario.createCoord(toNodeX, toNodeY);
+				Coord toCoord = new Coord(toNodeX, toNodeY);
 
 				String tNodeIdStr;
 

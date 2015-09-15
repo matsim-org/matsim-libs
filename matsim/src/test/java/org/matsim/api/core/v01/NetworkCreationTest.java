@@ -40,7 +40,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);
 		Id<Node> nodeId2 = Id.create("2", Node.class);
-		Coord coord = sc.createCoord(0.0, 0.0);
+		Coord coord = new Coord(0.0, 0.0);
 		Network network = sc.getNetwork();
 		//test default capacity period
 		assertEquals(3600.0, network.getCapacityPeriod());

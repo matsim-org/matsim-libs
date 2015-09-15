@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Tests for the spatial cutting strategies.
@@ -51,8 +50,8 @@ public class TestSpatialCuttingStrategies {
 		ScenarioImpl  scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		network = scenario.getNetwork();
 		// Coordinates Bellevue: 683518.0,246836.0
-		Node belNode = new DummyNode(new CoordImpl(683518.0,246836.0), Id.create("Bellevue", Node.class));
-		Node nulNode = new DummyNode(new CoordImpl(0,0), Id.create("Null", Node.class));
+		Node belNode = new DummyNode(new Coord(683518.0, 246836.0), Id.create("Bellevue", Node.class));
+		Node nulNode = new DummyNode(new Coord((double) 0, (double) 0), Id.create("Null", Node.class));
 		Link l1 = new DummyLink(Id.create(1, Link.class), nulNode, nulNode);
 		Link l2 = new DummyLink(Id.create(2, Link.class), belNode, belNode);
 		network.addNode(nulNode);
@@ -141,7 +140,7 @@ public class TestSpatialCuttingStrategies {
 			// as in org.matsim.core.network.LinkImpl
 			Coord from = getFromNode().getCoord();
 			Coord to = getToNode().getCoord();
-			return new CoordImpl((from.getX() + to.getX()) / 2.0, (from.getY() + to.getY()) / 2.0);
+			return new Coord((from.getX() + to.getX()) / 2.0, (from.getY() + to.getY()) / 2.0);
 		}
 
 		@Override

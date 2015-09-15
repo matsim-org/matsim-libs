@@ -21,6 +21,7 @@ package playground.kai.usecases.autosensingmarginalutilities;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
@@ -29,15 +30,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -90,8 +88,8 @@ public class AutosensingTest {
 	
 		Plan plan = pf.createPlan() ;
 		person.addPlan(plan) ;
-	
-		Activity act = pf.createActivityFromCoord("h", new CoordImpl(0.,0.) ) ;
+
+		Activity act = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 		plan.addActivity(act); 
 	
 		// === CONTROLER INFRASTRUCTURE (without actually running the controler): ===

@@ -21,7 +21,6 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
@@ -40,7 +39,7 @@ public class AtlantisToWGS84 implements CoordinateTransformation {
 	public Coord transform(Coord coord) {
 		double latitude = coord.getY() / 10000.0 + 10.0;
 		double longitude = coord.getX() / 10000.0 - 30.0;
-		return new CoordImpl(longitude, latitude);
+		return new Coord(longitude, latitude);
 	}
 
 }

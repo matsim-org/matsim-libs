@@ -27,7 +27,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -162,8 +161,8 @@ public class MapMatching {
 				//EMMEColumnNumber++;
 				
 				
-				Path P = null;			
-				Node fromNode = getNearestNode(new CoordImpl(stops.get(stopSequence.get(0))[0], stops.get(stopSequence.get(0))[1]) , subNetwork);
+				Path P = null;
+				Node fromNode = getNearestNode(new Coord(Double.parseDouble(stops.get(stopSequence.get(0))[0]), Double.parseDouble(stops.get(stopSequence.get(0))[1])), subNetwork);
 				EMMESequence += " " + fromNode.getId().toString(); EMMEColumnNumber++;
 				for (int i = 1; i < stopSequence.size(); i++){
 					
@@ -171,12 +170,12 @@ public class MapMatching {
 					
 					Node toNode = null;
 					try{
-						toNode = getNearestNode(new CoordImpl(stops.get(stopSequence.get(i))[0], stops.get(stopSequence.get(i))[1]) , subNetwork);
+						toNode = getNearestNode(new Coord(Double.parseDouble(stops.get(stopSequence.get(i))[0]), Double.parseDouble(stops.get(stopSequence.get(i))[1])), subNetwork);
 					} catch (java.lang.NullPointerException e) {
 						continue;
 					}
 					
-					PersonImpl person = new PersonImpl(Id.create("transit driver", Person.class));
+					Person person = PersonImpl.createPerson(Id.create("transit driver", Person.class));
 					VehicleImpl veh = new VehicleImpl(Id.create("test vehicle", Vehicle.class), new VehicleTypeImpl(Id.create("no type", VehicleType.class)));
 					
 					P = pather.calcLeastCostPath(fromNode, toNode, 0F, person, veh);

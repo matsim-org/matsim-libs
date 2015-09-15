@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,9 +39,6 @@ import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.operator.*;
 import org.matsim.contrib.minibus.replanning.CreateNewPlan;
 import org.matsim.contrib.minibus.replanning.PStrategy;
-import org.matsim.contrib.minibus.routeProvider.ComplexCircleScheduleProvider;
-import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
-import org.matsim.contrib.minibus.routeProvider.RandomStopProvider;
 import org.matsim.contrib.minibus.schedule.CreatePStops;
 import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
 import org.matsim.core.config.ConfigUtils;
@@ -100,29 +98,29 @@ public class PScenarioHelper {
 		NetworkFactory nf = network.getFactory();
 
 		// creates nodes
-		Node n1 = nf.createNode(Id.create("1", Node.class), scenario.createCoord(1050, 1050));
-		Node n2 = nf.createNode(Id.create("2", Node.class), scenario.createCoord(2050, 2950));
-		Node n3 = nf.createNode(Id.create("3", Node.class), scenario.createCoord(3950, 1050));
-		
-		Node n11 = nf.createNode(Id.create("11", Node.class), scenario.createCoord(1000, 1000));
-		Node n12 = nf.createNode(Id.create("12", Node.class), scenario.createCoord(1000, 2000));
-		Node n13 = nf.createNode(Id.create("13", Node.class), scenario.createCoord(1000, 3000));
-		Node n14 = nf.createNode(Id.create("14", Node.class), scenario.createCoord(1000, 4000));
-		
-		Node n21 = nf.createNode(Id.create("21", Node.class), scenario.createCoord(2000, 1000));
-		Node n22 = nf.createNode(Id.create("22", Node.class), scenario.createCoord(2000, 2000));
-		Node n23 = nf.createNode(Id.create("23", Node.class), scenario.createCoord(2000, 3000));
-		Node n24 = nf.createNode(Id.create("24", Node.class), scenario.createCoord(2000, 4000));
-		
-		Node n31 = nf.createNode(Id.create("31", Node.class), scenario.createCoord(3000, 1000));
-		Node n32 = nf.createNode(Id.create("32", Node.class), scenario.createCoord(3000, 2000));
-		Node n33 = nf.createNode(Id.create("33", Node.class), scenario.createCoord(3000, 3000));
-		Node n34 = nf.createNode(Id.create("34", Node.class), scenario.createCoord(3000, 4000));
-		
-		Node n41 = nf.createNode(Id.create("41", Node.class), scenario.createCoord(4000, 1000));
-		Node n42 = nf.createNode(Id.create("42", Node.class), scenario.createCoord(4000, 2000));
-		Node n43 = nf.createNode(Id.create("43", Node.class), scenario.createCoord(4000, 3000));
-		Node n44 = nf.createNode(Id.create("44", Node.class), scenario.createCoord(4000, 4000));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 1050, (double) 1050));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 2050, (double) 2950));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 3950, (double) 1050));
+
+		Node n11 = nf.createNode(Id.create("11", Node.class), new Coord((double) 1000, (double) 1000));
+		Node n12 = nf.createNode(Id.create("12", Node.class), new Coord((double) 1000, (double) 2000));
+		Node n13 = nf.createNode(Id.create("13", Node.class), new Coord((double) 1000, (double) 3000));
+		Node n14 = nf.createNode(Id.create("14", Node.class), new Coord((double) 1000, (double) 4000));
+
+		Node n21 = nf.createNode(Id.create("21", Node.class), new Coord((double) 2000, (double) 1000));
+		Node n22 = nf.createNode(Id.create("22", Node.class), new Coord((double) 2000, (double) 2000));
+		Node n23 = nf.createNode(Id.create("23", Node.class), new Coord((double) 2000, (double) 3000));
+		Node n24 = nf.createNode(Id.create("24", Node.class), new Coord((double) 2000, (double) 4000));
+
+		Node n31 = nf.createNode(Id.create("31", Node.class), new Coord((double) 3000, (double) 1000));
+		Node n32 = nf.createNode(Id.create("32", Node.class), new Coord((double) 3000, (double) 2000));
+		Node n33 = nf.createNode(Id.create("33", Node.class), new Coord((double) 3000, (double) 3000));
+		Node n34 = nf.createNode(Id.create("34", Node.class), new Coord((double) 3000, (double) 4000));
+
+		Node n41 = nf.createNode(Id.create("41", Node.class), new Coord((double) 4000, (double) 1000));
+		Node n42 = nf.createNode(Id.create("42", Node.class), new Coord((double) 4000, (double) 2000));
+		Node n43 = nf.createNode(Id.create("43", Node.class), new Coord((double) 4000, (double) 3000));
+		Node n44 = nf.createNode(Id.create("44", Node.class), new Coord((double) 4000, (double) 4000));
 		
 		network.addNode(n1);
 		network.addNode(n2);
@@ -271,10 +269,10 @@ public class PScenarioHelper {
 		
 		TransitScheduleFactory sf = schedule.getFactory();
 
-		TransitStopFacility s1 = sf.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(1000, 1000), false);
-		TransitStopFacility s2a = sf.createTransitStopFacility(Id.create("2a", TransitStopFacility.class), scenario.createCoord(2050, 2950), false);
-		TransitStopFacility s2b = sf.createTransitStopFacility(Id.create("2b", TransitStopFacility.class), scenario.createCoord(2050, 2950), false);
-		TransitStopFacility s3 = sf.createTransitStopFacility(Id.create("3", TransitStopFacility.class), scenario.createCoord(3950, 1050), false);
+		TransitStopFacility s1 = sf.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 1000), false);
+		TransitStopFacility s2a = sf.createTransitStopFacility(Id.create("2a", TransitStopFacility.class), new Coord((double) 2050, (double) 2950), false);
+		TransitStopFacility s2b = sf.createTransitStopFacility(Id.create("2b", TransitStopFacility.class), new Coord((double) 2050, (double) 2950), false);
+		TransitStopFacility s3 = sf.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 3950, (double) 1050), false);
 				
 		s1.setLinkId(Id.create("11", Link.class));
 		s2a.setLinkId(Id.create("12", Link.class));

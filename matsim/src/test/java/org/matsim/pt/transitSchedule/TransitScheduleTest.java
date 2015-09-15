@@ -26,8 +26,8 @@ import static org.junit.Assert.fail;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
@@ -94,8 +94,8 @@ public class TransitScheduleTest {
 	@Test
 	public void testAddStopFacility() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stop2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new CoordImpl(1, 1), false);
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 1, (double) 1), false);
 		assertEquals(0, schedule.getFacilities().size());
 		schedule.addStopFacility(stop1);
 		assertEquals(1, schedule.getFacilities().size());
@@ -109,8 +109,8 @@ public class TransitScheduleTest {
 	@Test
 	public void testAddStopFacilityException() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-		TransitStopFacility stop1a = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(2, 2), false);
-		TransitStopFacility stop1b = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(3, 3), false);
+		TransitStopFacility stop1a = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 2), false);
+		TransitStopFacility stop1b = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 3, (double) 3), false);
 		assertEquals(0, schedule.getFacilities().size());
 		schedule.addStopFacility(stop1a);
 		assertEquals(1, schedule.getFacilities().size());
@@ -151,7 +151,7 @@ public class TransitScheduleTest {
 	@Test
 	public void testGetFacilitiesImmutable() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		try {
 			schedule.getFacilities().put(stop1.getId(), stop1);
 			fail("missing exception.");
@@ -164,8 +164,8 @@ public class TransitScheduleTest {
 	@Test
 	public void testRemoveStopFacility() {
 		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
-		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
-		TransitStopFacility stop1b = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(10, 10), false);
+		TransitStopFacility stop1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop1b = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 10, (double) 10), false);
 		schedule.addStopFacility(stop1);
 		Assert.assertFalse(schedule.removeStopFacility(stop1b));
 		Assert.assertTrue(schedule.removeStopFacility(stop1));

@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -97,8 +98,8 @@ public class GenerateHomeWorkPlansForJointTrips {
 			final boolean isDriver = i % 2 == 0;
 			final String mode = isDriver ? TransportMode.car : TransportMode.pt;
 
-			PersonImpl person = new PersonImpl( ids.next() );
-			if (!isDriver) person.setCarAvail( "never" );
+			Person person = PersonImpl.createPerson(ids.next());
+			if (!isDriver) PersonUtils.setCarAvail(person, "never");
 			persons.add( person );
 
 			assert person.getPlans().size() == 0;

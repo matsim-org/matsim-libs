@@ -28,7 +28,6 @@ import java.util.ServiceConfigurationError;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
@@ -112,7 +111,7 @@ public class PtAccesShapeWriter {
 					
 					// go through all acts of this type
 					for(int i  = 0; i < type2LocationEntry.getValue().size(); i++){
-						Coord coord = new CoordImpl(type2LocationEntry.getValue().get(i).getCoord().x, type2LocationEntry.getValue().get(i).getCoord().y);
+						Coord coord = new Coord(type2LocationEntry.getValue().get(i).getCoord().x, type2LocationEntry.getValue().get(i).getCoord().y);
 						String gridNodeId = GridNode.getGridNodeIdForCoord(coord, gridSize);
 						
 						if (gridNodeId2GridNode.get(gridNodeId) == null) {

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,7 +46,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		assertTrue(carRoute instanceof LinkNetworkRouteImpl);
 
 		Route route = factory.createRoute(TransportMode.pt, null, null);
-		assertTrue(route instanceof GenericRoute);
+		assertTrue(route instanceof GenericRouteImpl);
 
 		// overwrite car-mode
 		factory.setRouteFactory(TransportMode.car, new CarRouteMockFactory());
@@ -66,7 +66,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test pt again
 		route = factory.createRoute(TransportMode.pt, null, null);
-		assertTrue(route instanceof GenericRoute);
+		assertTrue(route instanceof GenericRouteImpl);
 	}
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
@@ -77,6 +77,17 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		public CarRouteMock clone() {
 			return (CarRouteMock) super.clone();
 		}
+		@Override
+		public String getRouteDescription() {
+			return null;
+		}
+		@Override
+		public void setRouteDescription(String routeDescription) {
+		}
+		@Override
+		public String getRouteType() {
+			return null;
+		}
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
@@ -86,6 +97,17 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		@Override
 		public PtRouteMock clone() {
 			return (PtRouteMock) super.clone();
+		}
+		@Override
+		public String getRouteDescription() {
+			return null;
+		}
+		@Override
+		public void setRouteDescription(String routeDescription) {
+		}
+		@Override
+		public String getRouteType() {
+			return null;
 		}
 	}
 

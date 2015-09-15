@@ -23,7 +23,6 @@ package playground.dziemke.cemdapMatsimCadyts.cemdap2matsim;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -37,8 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -52,9 +49,15 @@ public class CemdapStopsParser {
 	private final static Logger log = Logger.getLogger(CemdapStopsParser.class);
 
 	//private final Random r = MatsimRandom.getRandom();
-	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
-	
-	
+	private final Coord DEFAULT_COORD;
+
+	{
+		final double x = -1.0;
+		final double y = -1.0;
+		DEFAULT_COORD = new Coord(x, y);
+	}
+
+
 	// cemdap stop file columns
 	private static final int HH_ID = 0;
 	private static final int P_ID = 1;

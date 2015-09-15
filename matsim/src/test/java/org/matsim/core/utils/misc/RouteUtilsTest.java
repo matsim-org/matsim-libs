@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -333,19 +334,19 @@ public class RouteUtilsTest {
 				this.nodeIds[i] = Id.create(i, Node.class);
 			}
 
-			this.network.addNode(nf.createNode(this.nodeIds[0], this.scenario.createCoord(0, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[1], this.scenario.createCoord(100, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[2], this.scenario.createCoord(200, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[3], this.scenario.createCoord(300, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[4], this.scenario.createCoord(400, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[5], this.scenario.createCoord(500, 0)));
-			this.network.addNode(nf.createNode(this.nodeIds[6], this.scenario.createCoord(600, 0)));
-			this.network.addLink(nf.createLink(this.linkIds[0], this.nodeIds[0], this.nodeIds[1]));
-			this.network.addLink(nf.createLink(this.linkIds[1], this.nodeIds[1], this.nodeIds[2]));
-			this.network.addLink(nf.createLink(this.linkIds[2], this.nodeIds[2], this.nodeIds[3]));
-			this.network.addLink(nf.createLink(this.linkIds[3], this.nodeIds[3], this.nodeIds[4]));
-			this.network.addLink(nf.createLink(this.linkIds[4], this.nodeIds[4], this.nodeIds[5]));
-			this.network.addLink(nf.createLink(this.linkIds[5], this.nodeIds[5], this.nodeIds[6]));
+			this.network.addNode(nf.createNode(this.nodeIds[0], new Coord((double) 0, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[1], new Coord((double) 100, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[2], new Coord((double) 200, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[3], new Coord((double) 300, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[4], new Coord((double) 400, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[5], new Coord((double) 500, (double) 0)));
+			this.network.addNode(nf.createNode(this.nodeIds[6], new Coord((double) 600, (double) 0)));
+			this.network.addLink(nf.createLink(this.linkIds[0], this.network.getNodes().get(this.nodeIds[0]), this.network.getNodes().get(this.nodeIds[1])));
+			this.network.addLink(nf.createLink(this.linkIds[1], this.network.getNodes().get(this.nodeIds[1]), this.network.getNodes().get(this.nodeIds[2])));
+			this.network.addLink(nf.createLink(this.linkIds[2], this.network.getNodes().get(this.nodeIds[2]), this.network.getNodes().get(this.nodeIds[3])));
+			this.network.addLink(nf.createLink(this.linkIds[3], this.network.getNodes().get(this.nodeIds[3]), this.network.getNodes().get(this.nodeIds[4])));
+			this.network.addLink(nf.createLink(this.linkIds[4], this.network.getNodes().get(this.nodeIds[4]), this.network.getNodes().get(this.nodeIds[5])));
+			this.network.addLink(nf.createLink(this.linkIds[5], this.network.getNodes().get(this.nodeIds[5]), this.network.getNodes().get(this.nodeIds[6])));
 		}
 	}
 

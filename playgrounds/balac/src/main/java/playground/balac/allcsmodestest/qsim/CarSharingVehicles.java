@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
@@ -74,8 +73,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-			    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				Link l = linkUtils.getClosestLink(coordStart);		    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -104,8 +103,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				Link l = linkUtils.getClosestLink(coordStart);		    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -132,8 +131,8 @@ public class CarSharingVehicles {
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	Coord coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 		    	Link l = linkUtils.getClosestLink(coordStart);			    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	

@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
@@ -59,7 +58,7 @@ public class SocialSparseVertexPool extends SocialSparseGraphFactory {
 			return null;
 		else {
 			Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			SocialPerson sPerson = new SocialPerson((PersonImpl) person);
+			SocialPerson sPerson = new SocialPerson(person);
 			return super.createVertex(sPerson, geoFactory.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY())));
 		}
 	}

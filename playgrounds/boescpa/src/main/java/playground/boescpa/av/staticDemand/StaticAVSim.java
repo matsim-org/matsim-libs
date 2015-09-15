@@ -22,7 +22,7 @@
 package playground.boescpa.av.staticDemand;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.misc.Counter;
 import playground.boescpa.lib.tools.tripReader.Trip;
 
@@ -126,7 +126,7 @@ public class StaticAVSim {
 			vehiclesInUse.add(usedVehicle);
 			vehiclesInUseChanged = true;
 			// 2. Move vehicle to agent:
-			double travelTime = usedVehicle.moveTo(new CoordImpl(requestToHandle.startXCoord, requestToHandle.startYCoord));
+			double travelTime = usedVehicle.moveTo(new Coord(requestToHandle.startXCoord, requestToHandle.startYCoord));
 			double waitingTime = (Constants.getLevelOfService() - (requestToHandle.startTime - time)) + travelTime;
 			stats.incWaitingTimeMetDemand(waitingTime);
 			stats.setMaxWaitingTimeMetDemand(waitingTime);
@@ -134,7 +134,7 @@ public class StaticAVSim {
 			travelTime += Constants.getBoardingTime();
 			// 4. Move vehicle with agent:
 			travelTime += requestToHandle.endTime - requestToHandle.startTime;
-			usedVehicle.moveTo(new CoordImpl(requestToHandle.endXCoord, requestToHandle.endYCoord));
+			usedVehicle.moveTo(new Coord(requestToHandle.endXCoord, requestToHandle.endYCoord));
 			// 5. Agents unboards vehicle and thus frees the vehicle:
 			travelTime += Constants.getUnboardingTime();
 			usedVehicle.setArrivalTime(time + (int)travelTime);

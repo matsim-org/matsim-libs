@@ -31,6 +31,8 @@ class TransmodelerLinksReader extends AbstractTabularFileHandler {
 
 	private Map<String, TransmodelerLink> id2link = new LinkedHashMap<String, TransmodelerLink>();
 
+//	static Long maxId = 0l;
+	
 	TransmodelerLinksReader(final String linksFileName,
 			final Map<String, TransmodelerNode> id2node) throws IOException {
 		this.id2node = id2node;
@@ -52,6 +54,10 @@ class TransmodelerLinksReader extends AbstractTabularFileHandler {
 	@Override
 	public void startDataRow(final String[] row) {
 		final String bidirectionalLinkId = row[this.index(this.idLabel)];
+		
+//		maxId = Math.max(maxId, Long.parseLong(bidirectionalLinkId));
+//		System.out.println("maxId = " + maxId);
+		
 		final TransmodelerNode aNode = this.id2node.get(row[this
 				.index(this.aNodeLabel)]);
 		final TransmodelerNode bNode = this.id2node.get(row[this

@@ -96,10 +96,10 @@ public class PRFacilityCreator {
 		Id<Node> pRnodeId1 = Id.create("PR1_"+id, Node.class);
 		Id<Node> pRnodeId2 = Id.create("PR2_"+id, Node.class);
 		Id<Node> pRnodeId3 = Id.create("PR3_"+id, Node.class);
-		
-		Coord coord1 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY() - this.length);
-		Coord coord2 = scenario.createCoord(node.getCoord().getX() + 10, node.getCoord().getY() - this.length);
-		Coord coord3 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY());
+
+		Coord coord1 = new Coord(node.getCoord().getX(), node.getCoord().getY() - this.length);
+		Coord coord2 = new Coord(node.getCoord().getX() + 10, node.getCoord().getY() - this.length);
+		Coord coord3 = new Coord(node.getCoord().getX(), node.getCoord().getY());
 
 		Node prNode1 = scenario.getNetwork().getFactory().createNode(pRnodeId1, coord1);
 		Node prNode2 = scenario.getNetwork().getFactory().createNode(pRnodeId2, coord2);

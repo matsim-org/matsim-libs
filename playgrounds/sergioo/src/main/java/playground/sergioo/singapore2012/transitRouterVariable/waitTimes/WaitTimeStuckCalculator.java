@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -82,8 +81,8 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				Map<Id<TransitStopFacility>, WaitTimeData> stopsMap = new HashMap<Id<TransitStopFacility>, WaitTimeData>(100);
 				Map<Id<TransitStopFacility>, double[]> stopsScheduledMap = new HashMap<Id<TransitStopFacility>, double[]>(100);
 				for(TransitRouteStop stop:route.getStops()) {
-					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
-					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
+					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray(totalTime/timeSlot+1));
+					double[] cacheWaitTimes = new double[totalTime/timeSlot+1];
 					for(int i=0; i<cacheWaitTimes.length; i++) {
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
@@ -159,7 +158,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						String[] leg = (((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(Id.create(leg[2], TransitLine.class), Id.create(leg[3], TransitRoute.class))).get(Id.create(leg[1], TransitStopFacility.class));
 						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
@@ -180,7 +179,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						String[] leg = (((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(Id.create(leg[2], TransitLine.class), Id.create(leg[3], TransitRoute.class))).get(Id.create(leg[1], TransitStopFacility.class));
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);

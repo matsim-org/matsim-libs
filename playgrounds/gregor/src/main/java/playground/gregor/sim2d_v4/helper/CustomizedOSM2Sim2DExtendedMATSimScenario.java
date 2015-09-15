@@ -44,7 +44,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.StringUtils;
 import org.opengis.referencing.FactoryException;
@@ -291,7 +291,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l0.setCapacity(capacity);
 			l0.setFreespeed(fs);
 			l0.setNumberOfLanes(nofLanes);
-			double l = ((CoordImpl)n1.getCoord()).calcDistance(n2.getCoord());
+			double l = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
 			l0.setLength(l);
 			l0.setAllowedModes(modes);
 			net.addLink(l0);

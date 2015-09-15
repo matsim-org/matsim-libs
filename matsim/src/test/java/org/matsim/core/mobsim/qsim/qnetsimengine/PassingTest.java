@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -51,7 +52,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -132,7 +132,6 @@ public class PassingTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		((ScenarioImpl)net.scenario).createVehicleContainer();
 		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
 
 		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
@@ -289,10 +288,11 @@ public class PassingTest {
 
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-100.0,0.0));
-			Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord( 0.0,  0.0));
-			Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord( 0.0,1000.0));
-			Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( 0.0,1100.0));
+			double x = -100.0;
+			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x, 0.0));
+			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0.0, 0.0));
+			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(0.0, 1000.0));
+			Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); 
 			allowedModes.addAll(Arrays.asList("pt","motorbike"));

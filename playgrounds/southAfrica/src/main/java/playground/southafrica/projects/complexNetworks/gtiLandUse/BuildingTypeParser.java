@@ -34,7 +34,6 @@ import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -113,7 +112,7 @@ public class BuildingTypeParser extends AbstractAnalysis{
 				
 				/* Transform the coordinate */
 				Coordinate coordinate = ps.getCoordinate();
-				Coord cOld = new CoordImpl(coordinate.x, coordinate.y);
+				Coord cOld = new Coord(coordinate.x, coordinate.y);
 				Coord cNew = ct.transform(cOld);
 				
 				String code = feature.getAttribute("S_LU_CODE").toString();

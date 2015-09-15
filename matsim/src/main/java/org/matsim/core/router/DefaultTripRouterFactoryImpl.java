@@ -1,26 +1,31 @@
 package org.matsim.core.router;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouter;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Collections;
-
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryImpl.class);
-
+    
     public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new TripRouterFactoryModule(),
@@ -32,6 +37,9 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                 })
                 .getInstance(TripRouterFactory.class);
 	}
+
+    // Use a cache for the single mode networks. Otherwise, a new network is created for each TripRouterFactory instance!
+    private final Map<String, Network> singleModeNetworksCache = new ConcurrentHashMap<>();
 
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private final Provider<TransitRouter> transitRouterFactory;
@@ -51,12 +59,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
         PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
-        LeastCostPathCalculator routeAlgo =
-                leastCostPathCalculatorFactory.createPathCalculator(
-                        scenario.getNetwork(),
-                        routingContext.getTravelDisutility(),
-                        routingContext.getTravelTime());
-
         FreespeedTravelTimeAndDisutility ptTimeCostCalc =
                 new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
         LeastCostPathCalculator routeAlgoPtFreeFlow =
@@ -66,24 +68,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ptTimeCostCalc);
 
         final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
-        if ( networkIsMultimodal ) {
-            // note: LinkImpl has a default allowed mode of "car" so that all links
-            // of a monomodal network are actually restricted to car, making the check
-            // of multimodality unecessary from a behavioral point of view.
-            // However, checking the mode restriction for each link is expensive,
-            // so it is not worth doing it if it is not necessary. (td, oct. 2012)
-            if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-                ((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
-                        Collections.singleton(TransportMode.car));
-                ((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
-                        Collections.singleton( TransportMode.car ));
-            }
-            else {
-                // this is impossible to reach when using the algorithms of org.matsim.*
-                // (all implement IntermodalLeastCostPathCalculator)
-                log.warn( "network is multimodal but least cost path algorithm is not an instance of IntermodalLeastCostPathCalculator!" );
-            }
-        }
 
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             final RoutingModule routingModule = DefaultRoutingModules.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 
@@ -105,8 +89,30 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
         }
 
         for ( String mode : routeConfigGroup.getNetworkModes() ) {
-            final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(), 
-			        scenario.getNetwork(), routeAlgo);
+        	
+        	Network filteredNetwork = null;
+        	
+        	// Ensure this is not performed concurrently by multiple threads!
+        	synchronized (this.singleModeNetworksCache) {
+        		filteredNetwork = this.singleModeNetworksCache.get(mode);
+        		if (filteredNetwork == null) {
+        			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+        			Set<String> modes = new HashSet<>();
+        			modes.add(mode);
+        			filteredNetwork = NetworkUtils.createNetwork();
+        			filter.filter(filteredNetwork, modes);
+        			this.singleModeNetworksCache.put(mode, filteredNetwork);
+        		}
+			}
+
+            LeastCostPathCalculator routeAlgo =
+            leastCostPathCalculatorFactory.createPathCalculator(
+                    filteredNetwork,
+                    routingContext.getTravelDisutility(),
+                    routingContext.getTravelTime());
+
+            final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
+                    filteredNetwork, routeAlgo);
 			final RoutingModule result = tripRouter.setRoutingModule( mode, routingModule);
 
 			if ( result != null ) {

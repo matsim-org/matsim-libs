@@ -1,7 +1,6 @@
 package playground.dziemke.other;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -14,11 +13,13 @@ public class TestCoordinateTransformation {
 	 */
 	public static void main(String[] args) {
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
-		
-		Coord coordinateMoabitDHDN_GK4 = new CoordImpl(4590918.313160132, 5822867.249212103);
-		
-		Coord lowerLeftCoordinateSAALbers = new CoordImpl(111583.944,-3714912.098);
-		Coord upperRightCoordinateSAALbers = new CoordImpl(171583.944,-3667912.098);
+
+		Coord coordinateMoabitDHDN_GK4 = new Coord(4590918.313160132, 5822867.249212103);
+
+		final double y1 = -3714912.098;
+		Coord lowerLeftCoordinateSAALbers = new Coord(111583.944, y1);
+		final double y = -3667912.098;
+		Coord upperRightCoordinateSAALbers = new Coord(171583.944, y);
 		
 		Coord coordinateMoabitWGS84 = transformation.transform(coordinateMoabitDHDN_GK4);
 		

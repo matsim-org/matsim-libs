@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,10 +46,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.HashMap;
@@ -108,10 +107,10 @@ public class MultiModalControlerListenerTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Node node0 = scenario.getNetwork().getFactory().createNode(Id.create("n0", Node.class), new CoordImpl(0.0, 0.0));
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(1.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(2.0, 0.0));
-		Node node3 = scenario.getNetwork().getFactory().createNode(Id.create("n3", Node.class), new CoordImpl(3.0, 0.0));
+		Node node0 = scenario.getNetwork().getFactory().createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(1.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(2.0, 0.0));
+		Node node3 = scenario.getNetwork().getFactory().createNode(Id.create("n3", Node.class), new Coord(3.0, 0.0));
 
 		Link link0 = scenario.getNetwork().getFactory().createLink(Id.create("l0", Link.class), node0, node1);
 		Link link1 = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
@@ -287,7 +286,7 @@ public class MultiModalControlerListenerTest {
 	}
 
 	private Person createPerson(Scenario scenario, String id, String mode) {
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);

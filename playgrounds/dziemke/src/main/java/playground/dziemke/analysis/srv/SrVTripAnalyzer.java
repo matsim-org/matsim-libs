@@ -301,7 +301,7 @@ public class SrVTripAnalyzer {
 	    		// TODO create coordinates
 	    		double x = 4590000;
 	    		double y = 5820000;
-	    		Coord departureCoordinates = scenario.createCoord(x, y);
+				Coord departureCoordinates = new Coord(x, y);
 	    		
 	    		// TODO add appropriate coordinate transformation
 	    		// TODO give activity proper name

@@ -780,8 +780,7 @@ public class HITSToMATSim {
 		while (rs.next()) {
 			this.zip2Coord.put(
 					rs.getInt("zip"),
-					scenario.createCoord(rs.getDouble("x_utm48n"),
-							rs.getDouble("y_utm48n")));
+					new Coord(rs.getDouble("x_utm48n"), rs.getDouble("y_utm48n")));
 		}
 	}
 

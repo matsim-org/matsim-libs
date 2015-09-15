@@ -25,7 +25,7 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
 	public AvignonScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
-        super(config.planCalcScore(), controler.getScenario().getNetwork());
+        super(config.planCalcScore(), config.scenario(), controler.getScenario().getNetwork());
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;
@@ -71,8 +71,8 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
                     lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), controler.getScenario().getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(), controler.getScenario().getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 		return scoringFunctionAccumulator;
 	}
 

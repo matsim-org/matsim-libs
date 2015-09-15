@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 

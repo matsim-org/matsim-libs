@@ -20,7 +20,9 @@
 
 package org.matsim.roadpricing;
 
-import junit.framework.TestCase;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -46,10 +48,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
-import java.util.List;
+import junit.framework.TestCase;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -73,12 +74,12 @@ import java.util.List;
 		 * to travel along one link.		 */
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(300, 0));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(400, 0));
-		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(500, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 300, (double) 0));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 400, (double) 0));
+		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 500, (double) 0));
 		// freespeed 18km/h = 5m/s --> 20s for 100m
 		network.createAndAddLink(Id.create(0, Link.class), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create(1, Link.class), node2, node3, 100, 5, 100, 1);
@@ -111,18 +112,24 @@ import java.util.List;
 		 */
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node0 = network.createAndAddNode(Id.create( "0", Node.class), new CoordImpl(  0,   10));
-		Node node1 = network.createAndAddNode(Id.create( "1", Node.class), new CoordImpl(  0,  100));
-		Node node2 = network.createAndAddNode(Id.create( "2", Node.class), new CoordImpl(100,  100));
-		Node node3 = network.createAndAddNode(Id.create( "3", Node.class), new CoordImpl(150,  150));
-		Node node4 = network.createAndAddNode(Id.create( "4", Node.class), new CoordImpl(200,  100));
-		Node node5 = network.createAndAddNode(Id.create( "5", Node.class), new CoordImpl(300,  100));
-		Node node6 = network.createAndAddNode(Id.create( "6", Node.class), new CoordImpl(300, -100));
-		Node node7 = network.createAndAddNode(Id.create( "7", Node.class), new CoordImpl(200, -100));
-		Node node8 = network.createAndAddNode(Id.create( "8", Node.class), new CoordImpl(150, -150));
-		Node node9 = network.createAndAddNode(Id.create( "9", Node.class), new CoordImpl(100, -100));
-		Node node10 =network.createAndAddNode(Id.create("10", Node.class), new CoordImpl(  0, -100));
-		Node node11 =network.createAndAddNode(Id.create("11", Node.class), new CoordImpl(  0,  -10));
+		Node node0 = network.createAndAddNode(Id.create( "0", Node.class), new Coord((double) 0, (double) 10));
+		Node node1 = network.createAndAddNode(Id.create( "1", Node.class), new Coord((double) 0, (double) 100));
+		Node node2 = network.createAndAddNode(Id.create( "2", Node.class), new Coord((double) 100, (double) 100));
+		Node node3 = network.createAndAddNode(Id.create( "3", Node.class), new Coord((double) 150, (double) 150));
+		Node node4 = network.createAndAddNode(Id.create( "4", Node.class), new Coord((double) 200, (double) 100));
+		Node node5 = network.createAndAddNode(Id.create( "5", Node.class), new Coord((double) 300, (double) 100));
+		final double y5 = -100;
+		Node node6 = network.createAndAddNode(Id.create( "6", Node.class), new Coord((double) 300, y5));
+		final double y4 = -100;
+		Node node7 = network.createAndAddNode(Id.create( "7", Node.class), new Coord((double) 200, y4));
+		final double y3 = -150;
+		Node node8 = network.createAndAddNode(Id.create( "8", Node.class), new Coord((double) 150, y3));
+		final double y2 = -100;
+		Node node9 = network.createAndAddNode(Id.create( "9", Node.class), new Coord((double) 100, y2));
+		final double y1 = -100;
+		Node node10 =network.createAndAddNode(Id.create("10", Node.class), new Coord((double) 0, y1));
+		final double y = -10;
+		Node node11 =network.createAndAddNode(Id.create("11", Node.class), new Coord((double) 0, y));
 		network.createAndAddLink(Id.create( "1", Link.class),  node0,  node1, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create( "2", Link.class),  node1,  node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create( "3", Link.class),  node2,  node3, 100, 5, 100, 1);
@@ -163,7 +170,7 @@ import java.util.List;
 		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2.getId(), NetworkUtils.getLinkIds(""), link3.getId()), population);
 	}
 
-	private static void addPersonToPopulation(final PersonImpl person, final Population population) {
+	private static void addPersonToPopulation(final Person person, final Population population) {
 		population.addPerson(person);
 	}
 
@@ -178,8 +185,8 @@ import java.util.List;
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(Id.create("1", Link.class)), network.getLinks().get(Id.create("7", Link.class)), network.getLinks().get(Id.create("13", Link.class))), population);
 	}
 
-	private static PersonImpl createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
-		PersonImpl person = new PersonImpl(Id.create(personId, Person.class));
+	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
+		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
@@ -191,8 +198,8 @@ import java.util.List;
 		return person;
 	}
 
-	private static PersonImpl createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		PersonImpl person = new PersonImpl(Id.create(personId, Person.class));
+	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
+		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		ActivityImpl act = plan.createAndAddActivity("h", homeLink.getId());
@@ -215,7 +222,7 @@ import java.util.List;
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
+		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getConfig().scenario(), scenario.getNetwork()));
 		events.addHandler(scoring);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();

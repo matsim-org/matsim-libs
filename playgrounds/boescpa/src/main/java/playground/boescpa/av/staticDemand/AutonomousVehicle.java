@@ -22,7 +22,6 @@
 package playground.boescpa.av.staticDemand;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -42,7 +41,7 @@ public class AutonomousVehicle {
 	}
 
 	public Coord getMyPosition() {
-		return new CoordImpl(myPosition.getX(), myPosition.getY());
+		return new Coord(myPosition.getX(), myPosition.getY());
 	}
 
 	/**

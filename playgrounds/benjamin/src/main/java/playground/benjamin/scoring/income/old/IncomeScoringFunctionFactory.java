@@ -50,11 +50,12 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 	public IncomeScoringFunctionFactory(Config config, PersonHouseholdMapping hhmapping, Network network) {
 		this.config = config;
 		this.configGroup = config.planCalcScore();
-		this.params = CharyparNagelScoringParameters.getBuilder(configGroup).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(configGroup, config.scenario()).create();
 		this.hhdb = hhmapping;
 		this.network = network;
 	}
 
+	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 
 		double householdIncomePerDay = getHouseholdIncomePerDay(person, hhdb);

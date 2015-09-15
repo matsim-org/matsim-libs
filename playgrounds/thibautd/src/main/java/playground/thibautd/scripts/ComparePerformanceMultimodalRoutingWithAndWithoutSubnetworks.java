@@ -32,8 +32,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -52,13 +52,13 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
 
         final FreespeedTravelTimeAndDisutility ptTimeCostCalc =
                 new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-        final IntermodalLeastCostPathCalculator routingAlgo = (IntermodalLeastCostPathCalculator)
+        final Dijkstra routingAlgo = (Dijkstra)
                 new DijkstraFactory().createPathCalculator(
 						sc.getNetwork(),
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-		final Person person = new PersonImpl( null );
+		final Person person = PersonImpl.createPerson(null);
 
 		final Timer timer = new Timer();
 		timer.startTimer();

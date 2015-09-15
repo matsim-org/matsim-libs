@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import herbie.running.config.HerbieConfigGroup;
-
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -36,6 +34,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 
+import herbie.running.config.HerbieConfigGroup;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointActivityScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
@@ -56,7 +55,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities, 
 			final Network network) {
-		this.params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;

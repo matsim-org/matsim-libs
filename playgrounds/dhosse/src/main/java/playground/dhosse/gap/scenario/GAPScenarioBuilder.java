@@ -3,45 +3,30 @@ package playground.dhosse.gap.scenario;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
-import playground.dhosse.gap.scenario.counts.CountsCreator;
-import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.network.NetworkCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
-import playground.dhosse.gap.scenario.population.PlansCreator;
-import playground.dhosse.gap.scenario.pt.TransitCreator;
 
 /**
  * 

@@ -35,7 +35,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
@@ -116,8 +115,8 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					PersonImpl agent = new PersonImpl(Id.create(agentId, Person.class));
-					agent.setEmployed(true);
+					Person agent = PersonImpl.createPerson(Id.create(agentId, Person.class));
+					PersonUtils.setEmployed(agent, true);
 
 					Plan plan = new PlanImpl(agent);
 					
@@ -132,7 +131,7 @@ public class MyDemandGenerator {
 						log.error("Agent Id: " + agentId + "; Null homezone (Id: " + homeId + ")");
 					}
 					Point pHome = homeZone.getInteriorPoint();
-					Coord cHome = new CoordImpl(pHome.getX(), pHome.getY());
+					Coord cHome = new Coord(pHome.getX(), pHome.getY());
 					Link lHome = NetworkUtils.getNearestRightEntryLink(ni, cHome);
 					Activity homeStart = new ActivityImpl("home", cHome, lHome.getId());
 					homeStart.setStartTime(0);
@@ -167,7 +166,7 @@ public class MyDemandGenerator {
 					String workId = entry[2];
 					MyZone workZone = zones.get(Id.create(workId, MyZone.class));
 					Point pWork = workZone.getInteriorPoint();
-					Coord cWork = new CoordImpl(pWork.getX(), pWork.getY());
+					Coord cWork = new Coord(pWork.getX(), pWork.getY());
 					Link lWork = NetworkUtils.getNearestRightEntryLink(ni, cWork);
 					Activity work = new ActivityImpl("work", cWork, lWork.getId());
 					work.setStartTime(25200);

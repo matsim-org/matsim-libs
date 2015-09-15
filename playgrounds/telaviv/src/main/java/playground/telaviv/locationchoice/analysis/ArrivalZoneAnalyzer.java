@@ -37,11 +37,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -86,7 +85,7 @@ public class ArrivalZoneAnalyzer implements PersonArrivalEventHandler {
 	private Map<Integer, Map<Integer, Integer>> educationArrivals;	// Map<ZoneId, Map<Hour, ArrivalCount>>
 		
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// load network
 		new MatsimNetworkReader(scenario).readFile(networkFile);
@@ -111,11 +110,11 @@ public class ArrivalZoneAnalyzer implements PersonArrivalEventHandler {
 		TravelTimeCalculator travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		if (eventsFile != null) {
 			// We use a new EventsManager where we only register the TravelTimeCalculator.
-			EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+			EventsManager eventsManager = EventsUtils.createEventsManager();
 			eventsManager.addHandler(this);
 			
 			log.info("Processing events file to get initial travel times...");
-			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
+			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(eventsFile);
 			
 			eventsManager.removeHandler(travelTime);

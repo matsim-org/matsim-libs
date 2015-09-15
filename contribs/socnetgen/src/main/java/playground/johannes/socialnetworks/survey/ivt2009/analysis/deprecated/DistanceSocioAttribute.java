@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.analysis.Degree;
@@ -74,7 +75,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			 */
 			Set<SocialVertex> vertices = new HashSet<SocialVertex>();
 			for (SocialVertex vertex : graph.getVertices()) {
-				if ("m".equalsIgnoreCase(vertex.getPerson().getPerson().getSex()))
+				if ("m".equalsIgnoreCase(PersonUtils.getSex(vertex.getPerson().getPerson())))
 					vertices.add(vertex);
 			}
 
@@ -103,7 +104,7 @@ public class DistanceSocioAttribute extends AnalyzerTask {
 			 */
 			vertices = new HashSet<SocialVertex>();
 			for (SocialVertex vertex : graph.getVertices()) {
-				if ("f".equalsIgnoreCase(vertex.getPerson().getPerson().getSex()))
+				if ("f".equalsIgnoreCase(PersonUtils.getSex(vertex.getPerson().getPerson())))
 					vertices.add(vertex);
 			}
 

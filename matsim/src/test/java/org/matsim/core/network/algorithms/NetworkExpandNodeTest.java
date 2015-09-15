@@ -109,7 +109,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
@@ -117,7 +117,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
@@ -125,7 +125,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
@@ -133,7 +133,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
@@ -141,7 +141,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
@@ -149,7 +149,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
@@ -228,7 +228,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
@@ -236,7 +236,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
@@ -244,7 +244,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
@@ -252,7 +252,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
@@ -260,7 +260,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
@@ -343,7 +343,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("2", Link.class));
 		c = l.getFromNode().getCoord();
@@ -351,7 +351,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 
 		l = n.getLinks().get(Id.create("3", Link.class));
 		c = l.getToNode().getCoord();
@@ -359,7 +359,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("4", Link.class));
 		c = l.getFromNode().getCoord();
@@ -367,7 +367,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("5", Link.class));
 		c = l.getToNode().getCoord();
@@ -375,7 +375,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 		
 		l = n.getLinks().get(Id.create("6", Link.class));
 		c = l.getFromNode().getCoord();
@@ -383,7 +383,7 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isNaN(c.getY()));
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
-		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		Assert.assertTrue(CoordUtils.calcDistance(c, new Coord((double) 1000, (double) 0)) < 30);
 	}
 
 	@Test
@@ -536,11 +536,11 @@ public class NetworkExpandNodeTest {
 		public void createNetwork_ThreeWayIntersection() {
 			Network n = this.scenario.getNetwork();
 			NetworkFactory nf = n.getFactory();
-			Node node1 = nf.createNode(Id.create("1", Node.class), this.scenario.createCoord(1000, 1000));
-			Node node2 = nf.createNode(Id.create("2", Node.class), this.scenario.createCoord(0, 0));
-			Node node3 = nf.createNode(Id.create("3", Node.class), this.scenario.createCoord(1000, 0));
-			Node node4 = nf.createNode(Id.create("4", Node.class), this.scenario.createCoord(2000, 0));
-			Node node5 = nf.createNode(Id.create("5", Node.class), this.scenario.createCoord(3000, 0));
+			Node node1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 1000, (double) 1000));
+			Node node2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 0, (double) 0));
+			Node node3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 0));
+			Node node4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 2000, (double) 0));
+			Node node5 = nf.createNode(Id.create("5", Node.class), new Coord((double) 3000, (double) 0));
 			n.addNode(node1);
 			n.addNode(node2);
 			n.addNode(node3);

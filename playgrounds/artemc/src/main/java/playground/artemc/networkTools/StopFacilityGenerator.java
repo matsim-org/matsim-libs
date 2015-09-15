@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -21,7 +22,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -300,7 +300,7 @@ public class StopFacilityGenerator {
 					
 					System.out.println("    Link length: "+linkToEdit.getLength()+"   Distance on Map: "+totalLinkLengthOnMap);
 					
-					CoordImpl newNodeXY = null;
+					Coord newNodeXY = null;
 					Id<Link> newLinkId = null;
 
 					nodes.add(linkToEdit.getFromNode());
@@ -363,7 +363,7 @@ public class StopFacilityGenerator {
 							double stopDistanceFromNodeOnMap = totalLinkLengthOnMap * (stopOffset/linkToEdit.getLength());
 							System.out.println("Stop Distance From Last Node On Map: "+stopDistanceFromNodeOnMap);
 
-							CoordImpl newStopXY = convertDistanceToCoordinates(linkToEdit,stopDistanceFromNodeOnMap);
+							Coord newStopXY = convertDistanceToCoordinates(linkToEdit,stopDistanceFromNodeOnMap);
 							TransitStopFacility stopFacility = createNewStop(newStopXY.getX(), newStopXY.getY(), links.get(links.size()-1).getId());
 							lastStopFacility = stopFacility;
 							
@@ -428,21 +428,21 @@ public class StopFacilityGenerator {
 
 	}
 
-	private CoordImpl convertDistanceToCoordinates(Link link, double distance) {
+	private Coord convertDistanceToCoordinates(Link link, double distance) {
 		double x_diff = (link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX());
 		double y_diff = (link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY());
 		double thetarad = Math.atan2(y_diff, x_diff);
 		//System.out.println("Theta: "+thetarad);
 		double x = distance * Math.cos(thetarad) + sideOffset*Math.sin(thetarad);
 		double y = distance * Math.sin(thetarad) + sideOffset*Math.cos(thetarad);
-	
-		CoordImpl pointXY = new CoordImpl(link.getFromNode().getCoord().getX() + x, link.getFromNode().getCoord().getY() + y);
+
+		Coord pointXY = new Coord(link.getFromNode().getCoord().getX() + x, link.getFromNode().getCoord().getY() + y);
 		//System.out.println("      x: "+(link.getFromNode().getCoord().getX() + x)+" y: "+(link.getFromNode().getCoord().getY() + y));
 		return pointXY;
 	}
 
 	private TransitStopFacility createNewStop(double x, double y,Id linkId) {
-		CoordImpl stopXY = new CoordImpl(x,y);
+		Coord stopXY = new Coord(x, y);
 		TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(linkId, stopXY, false);
 		transitStopFacility.setLinkId(linkId);
 		transitStopFacility.setName("stopOn"+linkId.toString());

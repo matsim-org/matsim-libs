@@ -25,6 +25,7 @@ package playground.ucsb.transit;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,7 +39,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.*;
@@ -122,19 +122,19 @@ public class UCSBTransitScheduleCreator {
 					
 					Id<TransitStopFacility> facilityId = Id.create(FAC_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, TransitStopFacility.class);
 					if (!schedule.getFacilities().containsKey(facilityId)) {
-						TransitStopFacility facility = factory.createTransitStopFacility(facilityId,new CoordImpl(ptPoint.coord),true);
+						TransitStopFacility facility = factory.createTransitStopFacility(facilityId, new Coord(ptPoint.coord.getX(), ptPoint.coord.getY()),true);
 						schedule.addStopFacility(facility);
 					}
 					
 					TransitRouteStop transitRouteStop = factory.createTransitRouteStop(schedule.getFacilities().get(facilityId), ptPoint.timeOffset, ptPoint.timeOffset);
 					transitRouteStop.setAwaitDepartureTime(true);
 					transitRouteStops.add(transitRouteStop);
-					
-					Node node = network.getFactory().createNode(Id.create(ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new CoordImpl(ptPoint.coord));
+
+					Node node = network.getFactory().createNode(Id.create(ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new Coord(ptPoint.coord.getX(), ptPoint.coord.getY()));
 					network.addNode(node);
 					Link link = null;
 					if (prevNode == null) { // first ptPoint
-						prevNode = network.getFactory().createNode(Id.create(PSEUDO_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new CoordImpl(ptPoint.coord));
+						prevNode = network.getFactory().createNode(Id.create(PSEUDO_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new Coord(ptPoint.coord.getX(), ptPoint.coord.getY()));
 						network.addNode(prevNode);
 						link = network.getFactory().createLink(Id.create(prevNode.getId().toString()+"-"+ptPoint.dist, Link.class),prevNode,node);
 						network.addLink(link);
@@ -232,7 +232,7 @@ public class UCSBTransitScheduleCreator {
 				ptRoute.modeType = ptModeType;
 				PtPoint ptPoint = ptRoute.ptPoints.get(distId);
 				if (ptPoint != null) {
-					ptPoint.coord = new CoordImpl(c.x,c.y);
+					ptPoint.coord = new Coord(c.x, c.y);
 					ptPoint.desc = desc;
 				}
 			}
@@ -472,7 +472,7 @@ public class UCSBTransitScheduleCreator {
 	static class PtPoint {
 		final int dist;
 		final int timeOffset;
-		CoordImpl coord = null;
+		Coord coord = null;
 		String desc = null;
 		PtPoint(int dist, int timeOffset) { this.dist = dist; this.timeOffset = timeOffset; }
 	}

@@ -24,8 +24,11 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -34,9 +37,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
 /**
@@ -67,7 +67,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}
@@ -93,7 +93,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
-		final Collection<String> travelCards = ((PersonImpl) person).getTravelcards();
+		final Collection<String> travelCards = PersonUtils.getTravelcards(person);
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
 				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :

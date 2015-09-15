@@ -7,7 +7,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouter;
@@ -52,24 +52,6 @@ public class PRTripRouterFactory implements TripRouterFactory {
                         ptTimeCostCalc);
 
         final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
-		if ( networkIsMultimodal ) {
-            // note: LinkImpl has a default allowed mode of "car" so that all links
-            // of a monomodal network are actually restricted to car, making the check
-            // of multimodality unecessary from a behavioral point of view.
-            // However, checking the mode restriction for each link is expensive,
-            // so it is not worth doing it if it is not necessary. (td, oct. 2012)
-            if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-                ((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
-                        Collections.singleton(TransportMode.car));
-                ((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
-                        Collections.singleton( TransportMode.car ));
-            }
-            else {
-                // this is impossible to reach when using the algorithms of org.matsim.*
-                // (all implement IntermodalLeastCostPathCalculator)
-                log.warn( "network is multimodal but least cost path algorithm is not an instance of IntermodalLeastCostPathCalculator!" );
-            }
-        }
 
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             final RoutingModule routingModule = DefaultRoutingModules.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 

@@ -20,6 +20,7 @@
 package herbie.creation;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
@@ -34,7 +35,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.population.algorithms.XY2Links;
@@ -227,7 +227,7 @@ public class CreateNewZHScenario {
 	private List<Id> dilutedZH(Population population) {
 		log.info("\tCutting scenario ...................................");
 		double aoiRadius = 30000.0;
-		final CoordImpl aoiCenter = new CoordImpl(683518.0,246836.0);
+		final Coord aoiCenter = new Coord(683518.0, 246836.0);
 		
 		List<Id> persons2remove = new Vector<Id>();
 		
@@ -254,8 +254,9 @@ public class CreateNewZHScenario {
 						
 						// activity is not first or last activity
 						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
-							double duration = ((PersonImpl)p).getDesires().getActivityDuration(act.getType());
-							act.setEndTime(act.getStartTime() + duration);
+							throw new RuntimeException( "desires do not exist anymore" );
+							//double duration = ((PersonImpl)p).getDesires().getActivityDuration(act.getType());
+							//act.setEndTime(act.getStartTime() + duration);
 						}
 						else if (cnt == 0) {
 							act.setStartTime(0.0);
@@ -288,8 +289,8 @@ public class CreateNewZHScenario {
 							duration = Double.parseDouble(act.getType().substring(1)) * 3600.0;
 						}
 						act.setType(v2Type);
-						((PersonImpl)p).createDesires(v2Type);
-						((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
+						//((PersonImpl)p).createDesires(v2Type);
+						//((PersonImpl)p).getDesires().putActivityDuration(v2Type, duration);
 					}
 					//reset route
 					if (pe instanceof Leg) {

@@ -200,7 +200,7 @@ public class AddExitLinksToNetwork {
 		 */
 //		Coord rescueCoord2 = scenario.createCoord(1.0, 1.0);
 //		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
-		Coord rescueCoord2 = scenario.createCoord(rescueCoord.getX() + 1.0, rescueCoord.getY() + 1.0);
+		Coord rescueCoord2 = new Coord(rescueCoord.getX() + 1.0, rescueCoord.getY() + 1.0);
 		Node rescueNode2 = network.getFactory().createNode(Id.create(AddExitLinksToNetwork.exitNode + "2", Node.class), rescueCoord2);
 		network.addNode(rescueNode2);
 		

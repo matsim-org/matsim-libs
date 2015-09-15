@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +43,7 @@ public class NetworkAngleUtils {
     private static Coord getVector(Link link) {
         double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
         double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
-        return new CoordImpl(x, y);
+        return new Coord(x, y);
     }
 
     private static Coord getUnityVector(Link link) {
@@ -52,7 +51,7 @@ public class NetworkAngleUtils {
         double x = vector.getX();
         double y = vector.getY();
         double m = sqrt(x * x + y * y);
-        return new CoordImpl(x / m, y / m);
+        return new Coord(x / m, y / m);
     }
 
     /**

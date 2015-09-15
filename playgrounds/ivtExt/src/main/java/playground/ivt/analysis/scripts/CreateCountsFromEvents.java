@@ -33,7 +33,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -92,9 +91,7 @@ public class CreateCountsFromEvents {
 
 		final String coordSystem = args.getValue( "-proj" );
 
-		final Coord center = new CoordImpl(
-				args.getDoubleValue( "-x" ),
-				args.getDoubleValue( "-y" ) );
+		final Coord center = new Coord(args.getDoubleValue("-x"), args.getDoubleValue("-y"));
 		final double radius = 1000 * args.getDoubleValue( "-r" );
 
 		final String htmlOutFile = args.getValue( "-html" );

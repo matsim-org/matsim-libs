@@ -13,7 +13,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -68,8 +67,7 @@ public class CopyOfBuslaneGenerator_fullPriority {
 						network.getLinks().get(link).setNumberOfLanes(1.0);
 						network.getLinks().get(link).setAllowedModes(allowedModesPT);
 						Id<Node> newNodeId = Id.create(network.getLinks().get(link).getToNode().getId().toString() + "c", Node.class);
-						Coord newBusNodeCoord = new CoordImpl(network.getLinks().get(link).getToNode().getCoord().getX() + 0.1,
-								network.getLinks().get(link).getToNode().getCoord().getY() + 0.1);
+						Coord newBusNodeCoord = new Coord(network.getLinks().get(link).getToNode().getCoord().getX() + 0.1, network.getLinks().get(link).getToNode().getCoord().getY() + 0.1);
 
 						if (link.toString().equals(lastLinkId.toString())) {
 							newNodeId = network.getLinks().get(link).getToNode().getId();

@@ -24,12 +24,12 @@ import gnu.trove.TObjectDoubleIterator;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.gsv.synPop.data.*;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.*;
@@ -78,7 +78,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 
 		FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		Map<Zone<?>, List<ActivityFacility>> zoneFacilities = new IdentityHashMap<>(zones.size());
-		List<ActivityFacility> homeFacils = facilityData.getFacilities(ActivityType.HOME);
+		List<ActivityFacility> homeFacils = facilityData.getFacilities(ActivityTypes.HOME);
 		ProgressLogger.init(homeFacils.size(), 2, 10);
 		for (ActivityFacility facility : homeFacils) {
 			Zone<?> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(facility.getCoord()));

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -148,8 +148,8 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 
 				if (facility != null) {
 					((ActivityImpl) activity).setFacilityId(facility.getId());
-					
-					if ( ((CoordImpl)facility.getCoord()).calcDistance(coord) > 500000 ) {
+
+					if ( CoordUtils.calcDistance(facility.getCoord(), coord) > 500000 ) {
 						log.warn("No Facility found within 500 km");
 					}
 				}

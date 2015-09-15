@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.andreas.subSetStrategyManager;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,11 +29,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -45,8 +42,6 @@ import org.matsim.pt.PtConstants;
 
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
-
-import java.util.Set;
 
 
 public class BvgControler extends Controler {
@@ -129,7 +124,7 @@ public class BvgControler extends Controler {
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		final BvgControler c = new BvgControler(sc);
-        c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
+        c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), config.scenario(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 
             @Override

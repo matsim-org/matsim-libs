@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +44,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles.InconsistentVehiculeSpecificationsException;
@@ -64,10 +64,10 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final Id<Link> link = Id.create( "the_link" , Link.class );
 
 		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node1 , new CoordImpl( 0 , 0 ) ));
+				scenario.getNetwork().getFactory().createNode( node1 , new Coord((double) 0, (double) 0)));
 
 		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node2 , new CoordImpl( 100 , 100 ) ));
+				scenario.getNetwork().getFactory().createNode( node2 , new Coord((double) 100, (double) 100)));
 
 		scenario.getNetwork().addLink(
 				scenario.getNetwork().getFactory().createLink(
@@ -138,10 +138,10 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final Id<Link> link = Id.create( "the_link" , Link.class );
 
 		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node1 , new CoordImpl( 0 , 0 ) ));
+				scenario.getNetwork().getFactory().createNode( node1 , new Coord((double) 0, (double) 0)));
 
 		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node2 , new CoordImpl( 100 , 100 ) ));
+				scenario.getNetwork().getFactory().createNode( node2 , new Coord((double) 100, (double) 100)));
 
 		scenario.getNetwork().addLink(
 				scenario.getNetwork().getFactory().createLink(

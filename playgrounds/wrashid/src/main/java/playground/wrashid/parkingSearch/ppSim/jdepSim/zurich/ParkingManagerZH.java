@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -174,9 +173,7 @@ public class ParkingManagerZH {
 	}
 
 	public void addParkings(Collection<PParking> parkingCollection) {
-		RectangularArea rectangularArea = new RectangularArea(new CoordImpl(nonFullPublicParkingFacilities.getMinEasting(),
-				nonFullPublicParkingFacilities.getMinNorthing()), new CoordImpl(nonFullPublicParkingFacilities.getMaxEasting(),
-				nonFullPublicParkingFacilities.getMaxNorthing()));
+		RectangularArea rectangularArea = new RectangularArea(new Coord(nonFullPublicParkingFacilities.getMinEasting(), nonFullPublicParkingFacilities.getMinNorthing()), new Coord(nonFullPublicParkingFacilities.getMaxEasting(), nonFullPublicParkingFacilities.getMaxNorthing()));
 
 		for (PParking parking : parkingCollection) {
 

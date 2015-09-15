@@ -23,12 +23,12 @@ package playground.pieter.singapore.utils;
 
 import junit.framework.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.HashSet;
@@ -53,15 +53,20 @@ public class NetworkAngleUtilsTest {
 //                |     v
 //                5<----4
 
-            Node n0 = network.createAndAddNode(Id.createNodeId(0), new CoordImpl(0, 0));
-            Node n1 = network.createAndAddNode(Id.createNodeId(1), new CoordImpl(0, 1));
-            Node n2 = network.createAndAddNode(Id.createNodeId(2), new CoordImpl(1, 1));
-            Node n3 = network.createAndAddNode(Id.createNodeId(3), new CoordImpl(1, 0));
-            Node n4 = network.createAndAddNode(Id.createNodeId(4), new CoordImpl(1, -1));
-            Node n5 = network.createAndAddNode(Id.createNodeId(5), new CoordImpl(0, -1));
-            Node n6 = network.createAndAddNode(Id.createNodeId(6), new CoordImpl(-1, 0));
-            Node n7 = network.createAndAddNode(Id.createNodeId(7), new CoordImpl(-2, 0));
-            Node n8 = network.createAndAddNode(Id.createNodeId(8), new CoordImpl(-1, 1));
+            Node n0 = network.createAndAddNode(Id.createNodeId(0), new Coord((double) 0, (double) 0));
+            Node n1 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 0, (double) 1));
+            Node n2 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 1, (double) 1));
+            Node n3 = network.createAndAddNode(Id.createNodeId(3), new Coord((double) 1, (double) 0));
+            final double y1 = -1;
+            Node n4 = network.createAndAddNode(Id.createNodeId(4), new Coord((double) 1, y1));
+            final double y = -1;
+            Node n5 = network.createAndAddNode(Id.createNodeId(5), new Coord((double) 0, y));
+            final double x2 = -1;
+            Node n6 = network.createAndAddNode(Id.createNodeId(6), new Coord(x2, (double) 0));
+            final double x1 = -2;
+            Node n7 = network.createAndAddNode(Id.createNodeId(7), new Coord(x1, (double) 0));
+            final double x = -1;
+            Node n8 = network.createAndAddNode(Id.createNodeId(8), new Coord(x, (double) 1));
 
             //organize creation by node outlinks
             network.createAndAddLink(Id.createLinkId(1), n0, n1, 1, 1, 1, 1);

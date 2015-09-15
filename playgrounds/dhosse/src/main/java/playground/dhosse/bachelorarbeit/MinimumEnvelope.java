@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -53,20 +52,20 @@ public class MinimumEnvelope {
 		
 		for(double x = bbox.getXMin(); x<=bbox.getXMax();x+=50){
 			//unterer rand
-			coordinates.add(new CoordImpl(x, bbox.getYMin()));
+			coordinates.add(new Coord(x, bbox.getYMin()));
 			
 		}
 		
 		for(double y = bbox.getYMin(); y<=bbox.getYMax();y+=50){
-			coordinates.add(new CoordImpl(bbox.getXMax(),y));
+			coordinates.add(new Coord(bbox.getXMax(), y));
 		}
 		
 		for(double xx = bbox.getXMax();xx>=bbox.getXMin();xx-=50){
-			coordinates.add(new CoordImpl(xx,bbox.getYMax()));
+			coordinates.add(new Coord(xx, bbox.getYMax()));
 		}
 		
 		for(double yy = bbox.getYMax();yy>=bbox.getYMin();yy-=50){
-			coordinates.add(new CoordImpl(bbox.getXMin(),yy));
+			coordinates.add(new Coord(bbox.getXMin(), yy));
 		}
 		
 		for(Coord coord : coordinates){

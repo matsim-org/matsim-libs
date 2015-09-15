@@ -29,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
@@ -77,7 +76,7 @@ public class ScheduleCutter {
         // Cut schedule
         ScheduleCutter cutter = new ScheduleCutter(
                 scenario.getTransitSchedule(),
-                new CoordImpl(Double.parseDouble(args[1]), Double.parseDouble(args[2])),
+                new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2])),
                 Integer.parseInt(args[3]));
         cutter.cutSchedule();
 

@@ -20,6 +20,7 @@
 
 package org.matsim.integration.timevariantnetworks;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -33,7 +34,6 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMapFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -54,10 +54,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
@@ -89,10 +89,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);

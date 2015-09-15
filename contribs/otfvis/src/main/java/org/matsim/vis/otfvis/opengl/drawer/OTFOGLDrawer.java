@@ -24,7 +24,6 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.GLReadBufferUtil;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -39,7 +38,6 @@ import org.matsim.core.config.groups.ZoomEntry;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -455,12 +453,12 @@ public class OTFOGLDrawer implements GLEventListener {
 			float north = (float)coord.getY() ;
 			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
 			float textY = north -(float)(north % yRaster) +80;
-			CoordImpl text = new CoordImpl(textX,textY);
+			Coord text = new Coord((double) textX, (double) textY);
 			int i = 1;
 			while (xymap.get(text) != null) {
-				text = new CoordImpl(textX,  i* (float)yRaster + textY);
+				text = new Coord((double) textX, (double) (i * (float) yRaster + textY));
 				if(xymap.get(text) == null) break;
-				text = new CoordImpl(textX + i* (float)xRaster, textY);
+				text = new Coord((double) (textX + i * (float) xRaster), (double) textY);
 				if(xymap.get(text) == null) break;
 				i++;
 			}
@@ -534,10 +532,10 @@ public class OTFOGLDrawer implements GLEventListener {
 		return new Point3f(posX, posY, 0);
 	}
 
-	private CoordImpl getPixelsize() {
+	private Coord getPixelsize() {
 		Point3f p1 = getOGLPos(300,300);
 		Point3f p2 = getOGLPos(301,301);
-		return new CoordImpl(Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
+		return new Coord((double) Math.abs(p2.x - p1.x), (double) Math.abs(p2.y - p1.y));
 	}
 
 	public OTFClientQuadTree getQuad() {
@@ -657,7 +655,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	private boolean isZoomBigEnoughForLabels() {
-		CoordImpl size = getPixelsize();
+		Coord size = getPixelsize();
 		final double cellWidth = otfVisConfig.getLinkWidth();
 		final double pixelsizeStreet = 5;
 		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);

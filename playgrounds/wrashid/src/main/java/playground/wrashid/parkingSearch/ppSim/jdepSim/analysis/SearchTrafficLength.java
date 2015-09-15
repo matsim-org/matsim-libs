@@ -18,10 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;

@@ -20,7 +20,6 @@
 package playground.singapore.typesPopulation.population;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -31,15 +30,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -178,15 +176,15 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			age = Integer.parseInt(ageString);
 		String popId = atts.getValue(ATTR_PERSON_POP_ID);
 		this.currperson = new PersonImplPops(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class), popId==null?PersonImplPops.DEFAULT_POP_ID:Id.create(popId, Population.class));
-		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
-		this.currperson.setCarAvail(atts.getValue(ATTR_PERSON_CARAVAIL));
+		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
 		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed(VALUE_YES.equals(employed));
+			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
 		}
 	}
 
@@ -204,7 +202,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);
 		if (scoreString != null) {
@@ -224,11 +222,11 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
@@ -249,22 +247,24 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}
-			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-			} else if (this.currRoute instanceof NetworkRoute) {
-				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
-				if (linkIds.size() > 0) {
-					linkIds.remove(0);
-				}
-				if (linkIds.size() > 0) {
-					linkIds.remove(linkIds.size() - 1);
-				}
-				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-			} else {
-				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
-			}
-			this.routeDescription = null;
-			this.currRoute = null;
+			throw new RuntimeException("This looks like an exact copy of the class in the core. Please use that class, I do not want to refactor a class multiple times."); // mrieser, 8sep2015
+
+//			if (this.currRoute instanceof GenericRoute) {
+//				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
+//			} else if (this.currRoute instanceof NetworkRoute) {
+//				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
+//				if (linkIds.size() > 0) {
+//					linkIds.remove(0);
+//				}
+//				if (linkIds.size() > 0) {
+//					linkIds.remove(linkIds.size() - 1);
+//				}
+//				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
+//			} else {
+//				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
+//			}
+//			this.routeDescription = null;
+//			this.currRoute = null;
 		}
 	}
 

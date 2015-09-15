@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -46,7 +46,7 @@ public class ReadXYPoints implements TabularFileHandler{
 			log.info("Ignoring: " + tempBuffer);
 		} else {
 			XYPointData xyPointData = new XYPointData();
-			xyPointData.setCoord(new CoordImpl(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
+			xyPointData.setCoord(new Coord(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
 			xyPointData.setHeadline(row[2]);
 			StringBuffer strB = new StringBuffer();
 			for (int i = 3; i < row.length; i++) {

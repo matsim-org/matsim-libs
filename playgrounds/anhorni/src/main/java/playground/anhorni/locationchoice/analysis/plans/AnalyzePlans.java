@@ -44,7 +44,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -383,11 +383,11 @@ public class AnalyzePlans {
 						cntAssigned++;
 					}
 					if (Utils.getActType(selectedPlan, act).startsWith(type)) {
-						dist += (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+						dist += (int)Math.round(CoordUtils.calcDistance(actPre.getCoord(), act.getCoord()));
 						cnt++;
 					}
 					if (act.getType().startsWith(type)) {
-						distWayThere += (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+						distWayThere += (int)Math.round(CoordUtils.calcDistance(actPre.getCoord(), act.getCoord()));
 						cntWayThere++;
 					}
 				}
@@ -445,7 +445,7 @@ public class AnalyzePlans {
 						final LegImpl leg = (LegImpl)actslegs.get(j+1);
 
 						if (!leg.getMode().equals(TransportMode.ride)) {
-							int dist = (int)Math.round(((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()));
+							int dist = (int)Math.round(CoordUtils.calcDistance(actPre.getCoord(), act.getCoord()));
 							distanceBins.get(leg.getMode()).addVal(dist, 1.0);
 						}
 					}

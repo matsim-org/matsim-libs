@@ -20,6 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -29,7 +30,6 @@ import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -82,7 +82,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
 			TransitStopFacility stop = new TransitStopFacilityImpl(
-					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
+					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class), new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
 				Id<Link> linkId = Id.create(atts.getValue(Constants.LINK_REF_ID), Link.class);
 				stop.setLinkId(linkId);

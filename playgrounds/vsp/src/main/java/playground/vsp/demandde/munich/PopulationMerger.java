@@ -31,7 +31,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -141,8 +140,7 @@ public class PopulationMerger {
 		config.plans().setInputFile(demandFile);
 
 		//loading scenario and getting the population
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc) ;
-		sl.loadScenario() ;
+		ScenarioUtils.loadScenario(sc);
 		Population population = sc.getPopulation();
 		return population;
 	}

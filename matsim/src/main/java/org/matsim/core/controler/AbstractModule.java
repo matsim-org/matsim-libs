@@ -59,7 +59,7 @@ import java.util.List;
  *
  * @author michaz
  */
-public abstract class AbstractModule {
+public abstract class AbstractModule implements Module {
 
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
@@ -71,17 +71,20 @@ public abstract class AbstractModule {
 
     @Inject
     com.google.inject.Injector bootstrapInjector;
+    private Config config;
 
-    static com.google.inject.Module toGuiceModule(final AbstractModule module) {
-        return new com.google.inject.Module() {
-            @Override
-            public void configure(Binder binder) {
-                module.configure(binder);
-            }
-        };
+    public AbstractModule() {
+        // config will be injected later
     }
 
-    final void configure(Binder binder) {
+    public AbstractModule(Config config) {
+        this.config = config;
+    }
+
+    public final void configure(Binder binder) {
+        if (this.config == null) {
+            this.config = bootstrapInjector.getInstance(Config.class);
+        }
         // Guice error messages should give the code location of the error in the user's module,
         // not in this class.
         this.binder = binder.skipSources(AbstractModule.class);
@@ -97,13 +100,12 @@ public abstract class AbstractModule {
     public abstract void install();
 
     protected final Config getConfig() {
-        return bootstrapInjector.getInstance(Config.class);
+        return config;
     }
 
-    protected final void install(AbstractModule module) {
+    protected final void install(Module module) {
         bootstrapInjector.injectMembers(module);
-        Module guiceModule = toGuiceModule(module);
-        binder.install(guiceModule);
+        binder.install(module);
     }
 
     protected LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
@@ -169,10 +171,10 @@ public abstract class AbstractModule {
                 final List<com.google.inject.Module> guiceModules = new ArrayList<>();
                 for (AbstractModule module : modules) {
                     bootstrapInjector.injectMembers(module);
-                    guiceModules.add(AbstractModule.toGuiceModule(module));
+                    guiceModules.add(module);
                 }
                 bootstrapInjector.injectMembers(abstractModule);
-                binder().install(Modules.override(guiceModules).with(AbstractModule.toGuiceModule(abstractModule)));
+                binder().install(Modules.override(guiceModules).with(abstractModule));
             }
         };
     }

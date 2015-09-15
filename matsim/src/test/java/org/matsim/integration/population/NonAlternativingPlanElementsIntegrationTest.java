@@ -22,6 +22,7 @@ package org.matsim.integration.population;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +35,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -115,7 +115,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Plan plan = pf.createPlan();
 		
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
+		final double x1 = -17000;
+		((ActivityImpl) home1).setCoord(new Coord(x1, (double) 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("transit_walk");
@@ -132,14 +133,16 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
-		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
+		final double y = -8000;
+		((ActivityImpl) work).setCoord(new Coord((double) 5000, y));
 
 		Leg leg4 = pf.createLeg("car");
 		leg4.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg4.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		final double x = -17000;
+		((ActivityImpl) home2).setCoord(new Coord(x, (double) 500));
 		
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
@@ -158,7 +161,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Plan plan = pf.createPlan();
 		
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
+		final double x3 = -17000;
+		((ActivityImpl) home1).setCoord(new Coord(x3, (double) 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("walk");
@@ -167,26 +171,31 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
-		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
+		final double y1 = -8000;
+		((ActivityImpl) work).setCoord(new Coord((double) 5000, y1));
 
 		Activity shop = pf.createActivityFromLinkId("h", Id.create(21, Link.class));
 		shop.setEndTime(17.5 * 3600);
-		((ActivityImpl) shop).setCoord(new CoordImpl(5000, -8000));
+		final double y = -8000;
+		((ActivityImpl) shop).setCoord(new Coord((double) 5000, y));
 
 		Leg leg2 = pf.createLeg("car");
 		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg2.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		final double x2 = -17000;
+		((ActivityImpl) home2).setCoord(new Coord(x2, (double) 500));
 		home2.setEndTime(21 * 3600);
 
 		Activity home3 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		final double x1 = -17000;
+		((ActivityImpl) home2).setCoord(new Coord(x1, (double) 500));
 		home2.setEndTime(22 * 3600);
 
 		Activity home4 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
-		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		final double x = -17000;
+		((ActivityImpl) home2).setCoord(new Coord(x, (double) 500));
 		
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
@@ -204,9 +213,11 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
-		TransitStopFacility stopFacility1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new CoordImpl(-6000, 1500), false);
+		final double x = -6000;
+		TransitStopFacility stopFacility1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(x, (double) 1500), false);
 		stopFacility1.setLinkId(Id.create(14, Link.class));
-		TransitStopFacility stopFacility2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new CoordImpl(5000, -4000), false);
+		final double y = -4000;
+		TransitStopFacility stopFacility2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 5000, y), false);
 		stopFacility2.setLinkId(Id.create(21, Link.class));
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);

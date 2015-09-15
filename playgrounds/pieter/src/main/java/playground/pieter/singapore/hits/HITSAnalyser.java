@@ -31,7 +31,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.router.PreparedTransitSchedule;
@@ -346,7 +345,7 @@ public class HITSAnalyser {
 			try {
 				zip2Coord.put(
 						rs.getInt("zip"),
-						new CoordImpl(rs.getDouble("x_utm48n"), rs
+						new Coord(rs.getDouble("x_utm48n"), rs
 								.getDouble("y_utm48n")));
 
 			} catch (NullPointerException e) {

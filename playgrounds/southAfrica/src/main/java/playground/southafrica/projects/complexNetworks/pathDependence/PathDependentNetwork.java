@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;

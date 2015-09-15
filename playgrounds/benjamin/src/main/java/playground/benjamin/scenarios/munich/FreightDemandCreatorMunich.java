@@ -44,7 +44,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -83,8 +82,7 @@ public class FreightDemandCreatorMunich {
 		cf.network().setInputFile(netFile);
 		cf.plans().setInputFile(plansFile);
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
-		sl.loadScenario();
+		ScenarioUtils.loadScenario(sc);
 		Population population = sc.getPopulation();
 		Network network = sc.getNetwork();
 		

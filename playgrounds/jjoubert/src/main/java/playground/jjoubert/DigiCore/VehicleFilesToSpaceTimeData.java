@@ -29,7 +29,6 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -73,8 +72,8 @@ public class VehicleFilesToSpaceTimeData {
 					String[] sa = line.split(",");
 					Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 					calendar.setTimeInMillis(Long.parseLong(sa[1])*1000);
-					Coord coord = new CoordImpl(Double.parseDouble(sa[2]), Double.parseDouble(sa[3]));
-					CoordImpl newCoord = (CoordImpl) ct.transform(coord);
+					Coord coord = new Coord(Double.parseDouble(sa[2]), Double.parseDouble(sa[3]));
+					Coord newCoord = ct.transform(coord);
 					Coordinate newCoordinate = new Coordinate(newCoord.getX(), newCoord.getY());				
 					
 					if(i++ == 1){

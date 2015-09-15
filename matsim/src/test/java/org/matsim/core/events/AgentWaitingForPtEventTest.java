@@ -38,7 +38,7 @@ public class AgentWaitingForPtEventTest {
 
 	@Test
 	public void testReadWriteXml() {
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
 		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
 		double time = 5.0 * 3600 + 11.0 + 60;

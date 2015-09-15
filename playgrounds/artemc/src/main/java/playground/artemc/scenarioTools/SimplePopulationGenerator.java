@@ -10,6 +10,7 @@ package playground.artemc.scenarioTools;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -18,7 +19,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.artemc.utils.Writer;
@@ -57,43 +57,43 @@ public class SimplePopulationGenerator {
 
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
+			Person person = pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 
 			//System.out.println("Agent: "+i+" from "+populationSize);
 
 			Double x=0.0;
 			Double y=0.0;
-			CoordImpl homeLocation;
-			CoordImpl workLocation;
+			Coord homeLocation;
+			Coord workLocation;
 			
 			do{
 				/*Home location*/
 				do{
 					x = (corridorLength/6*generator.nextGaussian() + corridorLength /3);
 				}while(x<0 || x>corridorLength );
-				y = (generator.nextDouble()-0.5)*1000 + 1000;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;
 
-				homeLocation = new CoordImpl(x,y);
+				homeLocation = new Coord(x, y);
 
 				/*Work location*/
 				do{
 					x = (corridorLength /6*generator.nextGaussian() + 2*corridorLength/3);
 				}while(x<0 || x>corridorLength);
-				y = (generator.nextDouble()-0.5)*1000 + 1000;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;
 
-				workLocation = new CoordImpl(x,y);
+				workLocation = new Coord(x, y);
 			}while(homeLocation.getX() > workLocation.getX());
 
 			//Add person attributes
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				person.setCarAvail("never");
+				PersonUtils.setCarAvail(person, "never");
 			}
 			else{
-				person.setCarAvail("always");
+				PersonUtils.setCarAvail(person, "always");
 			}
-			person.setEmployed(true);
+			PersonUtils.setEmployed(person, true);
 			simplePopulationGenerator.createIncome(person);
 
 			//Add home location to the plan
@@ -120,7 +120,7 @@ public class SimplePopulationGenerator {
 		simplePopulationGenerator.writeIncomes(outputPath);
 	}
 	
-	private void createIncome(PersonImpl person){
+	private void createIncome(Person person){
 //		Double mean=Math.log(19600.0);
 //		Double std=0.78;
 		//Values from working population of Sioux Falls Scenario

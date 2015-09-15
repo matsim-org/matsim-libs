@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -24,7 +24,7 @@ public class PersonAttributesMembers {
 		
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getTravelcards() != null && ((PersonImpl)p).getTravelcards().contains("ffProgram")) {
+			if (PersonUtils.getTravelcards(p) != null && PersonUtils.getTravelcards(p).contains("ffProgram")) {
 				
 				members.putAttribute(p.getId().toString(), "CS_CARD" , "freefloating");
 			}

@@ -38,13 +38,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -62,7 +57,7 @@ public class KMLPersonWriter {
 	protected String netFileName;
 	protected String kmzFileName;
 	protected String outputDirectory;
-	protected PersonImpl person;
+	protected Person person;
 	protected ArrayList<Link> activityLinks;
 	protected ArrayList<Node> routeNodes;
 	protected Network network;
@@ -81,7 +76,7 @@ public class KMLPersonWriter {
 	private StyleType networkNodeStyle;
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
 
-	public KMLPersonWriter(Network network, PersonImpl person) {
+	public KMLPersonWriter(Network network, Person person) {
 		setNetwork(network);
 		setPerson(person);
 		collectKnownNodes();
@@ -362,7 +357,7 @@ public class KMLPersonWriter {
 		return this.outputDirectory;
 	}
 
-	public void setPerson(PersonImpl person) {
+	public void setPerson(Person person) {
 		this.person = person;
 
 		if (person != null) {
@@ -375,7 +370,7 @@ public class KMLPersonWriter {
 		}
 	}
 
-	public PersonImpl getPerson() {
+	public Person getPerson() {
 		return this.person;
 	}
 

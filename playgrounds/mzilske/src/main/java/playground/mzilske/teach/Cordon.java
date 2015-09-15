@@ -10,9 +10,12 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -36,9 +39,12 @@ public class Cordon {
 
 	private void run() {
 		String fileName = "examples/munich-small/config.xml";
-		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(fileName);
-		scenarioLoader.loadScenario();
-		Scenario scenario = scenarioLoader.getScenario();
+		
+		Config config = ConfigUtils.loadConfig(fileName);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		final Network network = scenario.getNetwork();
 		getCordonLinks(network);
 

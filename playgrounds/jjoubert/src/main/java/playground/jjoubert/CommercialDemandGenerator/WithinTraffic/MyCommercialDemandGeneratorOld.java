@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -144,7 +144,7 @@ public class MyCommercialDemandGeneratorOld {
 
 				// Sample major location and add as first activity
 				Point major = majorPoints.get(MatsimRandom.getRandom().nextInt(majorPoints.size()));
-				Activity majorActivityStart = new ActivityImpl("major", sc.createCoord(major.getCoordinate().x, major.getCoordinate().y));
+				Activity majorActivityStart = new ActivityImpl("major", new Coord(major.getCoordinate().x, major.getCoordinate().y));
 				majorActivityStart.setEndTime(startTime);
 				plan.getPlanElements().add(majorActivityStart);
 
@@ -182,7 +182,7 @@ public class MyCommercialDemandGeneratorOld {
 					// Sample minor point
 					Point minor = minorPoints.get(MatsimRandom.getRandom().nextInt(minorPoints.size()));
 
-					Activity minorActivity = new ActivityImpl("minor", sc.createCoord(minor.getCoordinate().x, minor.getCoordinate().y));
+					Activity minorActivity = new ActivityImpl("minor", new Coord(minor.getCoordinate().x, minor.getCoordinate().y));
 					minorActivity.setEndTime(activityEndTime);
 
 					plan.getPlanElements().add(minorActivity);
@@ -199,7 +199,7 @@ public class MyCommercialDemandGeneratorOld {
 				for (Plan pp : planList) {
 					// Create a truck agent
 					Id<Person> id = Id.create(agentId, Person.class);
-					PersonImpl truck = (PersonImpl) pb.createPerson(id);
+					Person truck = pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
 //					pp.setSelected(true);

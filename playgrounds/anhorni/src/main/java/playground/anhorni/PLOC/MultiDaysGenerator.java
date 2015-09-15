@@ -85,10 +85,10 @@ public class MultiDaysGenerator {
 	private void generatePlan(List<Integer> keyList, double limit, int day) {
 		int cnt = 0;
 		for (Integer id : keyList) {
-			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(Id.create(id, Person.class));
+			Person p = staticPopulation.getPersons().get(Id.create(id, Person.class));
 
 			// copy person -------
-			PersonImpl pTmp = new PersonImpl(Id.create(id, Person.class));
+			Person pTmp = PersonImpl.createPerson(Id.create(id, Person.class));
 			// copy person -------
 			
 			boolean worker = false;

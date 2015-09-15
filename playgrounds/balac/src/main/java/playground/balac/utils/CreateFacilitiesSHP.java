@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -47,12 +47,12 @@ public class CreateFacilitiesSHP {
 				String[] arr = s.split("\t");
 			
 				afterMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
-				CoordImpl coord1 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+				Coord coord1 = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				s = readLinkNoRetailers.readLine();
 				arr = s.split("\t");
 			
 				beforeMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
-				CoordImpl coord2 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+				Coord coord2 = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				if (coord1.getX() == coord2.getX() && coord1.getY() == coord2.getY()) {
 					
 					moved.put(Id.create(arr[1], ActivityFacility.class), false);
@@ -67,13 +67,13 @@ public class CreateFacilitiesSHP {
 				String[] arr = s.split("\t");
 			
 				afterMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
-				CoordImpl coord1 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+				Coord coord1 = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 
 				s = readLinkNoRetailers.readLine();
 				arr = s.split("\t");
 			
 				beforeMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
-				CoordImpl coord2 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+				Coord coord2 = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				if (coord1.getX() == coord2.getX() && coord1.getY() == coord2.getY()) {
 					
 					moved.put(Id.create(arr[1], ActivityFacility.class), false);

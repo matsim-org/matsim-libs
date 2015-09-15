@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -230,7 +229,7 @@ public class FacilityMatcher {
 				String[] sa = line.split(",");
 				Coord cWgs = null;
 				try{
-					cWgs = new CoordImpl(Double.parseDouble(sa[xField]), Double.parseDouble(sa[yField]));
+					cWgs = new Coord(Double.parseDouble(sa[xField]), Double.parseDouble(sa[yField]));
 				} catch(NumberFormatException ee){
 					log.debug("Ooops!!");
 				} catch(ArrayIndexOutOfBoundsException eee){
@@ -319,7 +318,7 @@ public class FacilityMatcher {
 				String[] sa = line.split(",");
 				Coord cWgs = null;
 				try{
-					cWgs = new CoordImpl(Double.parseDouble(sa[xField]), Double.parseDouble(sa[yField]));
+					cWgs = new Coord(Double.parseDouble(sa[xField]), Double.parseDouble(sa[yField]));
 				} catch(NumberFormatException ee){
 					log.debug("Ooops!!");
 				} catch(ArrayIndexOutOfBoundsException eee){

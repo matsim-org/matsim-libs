@@ -41,7 +41,6 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -155,7 +154,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 		// transform coordinates incl. toggle easting and northing
 		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-		Coord northWestCH1903 = new CoordImpl(facility.getCoord().getX(), facility.getCoord().getY());
+		Coord northWestCH1903 = new Coord(facility.getCoord().getX(), facility.getCoord().getY());
 		Coord northWestWGS84 = trafo.transform(northWestCH1903);
 
 		// have to iterate this over opening times

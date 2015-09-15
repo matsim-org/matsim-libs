@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.run.Controler;
 
 /**
  * @author mrieser / Senozon AG
@@ -58,9 +59,11 @@ public class Gui extends JFrame {
 
 	private PopulationSampler popSampler = null;
 	private JTextArea textErrOut;
+	private final String mainClass;
 	
-	public Gui() {
-		setTitle("MATSim");
+	private Gui(final String title, final Class<?> mainClass) {
+		setTitle(title);
+		this.mainClass = mainClass.getCanonicalName();
 		
 		JLabel lblConfigurationFile = new JLabel("Configuration file:");
 		
@@ -357,7 +360,7 @@ public class Gui extends JFrame {
 						"-cp",
 						absoluteClasspath.toString(),
 						"-Xmx" + txtRam.getText() + "m",
-						"org.matsim.run.Controler",
+						Gui.this.mainClass,
 						txtConfigfilename.getText()
 				};
 				Gui.this.textStdOut.setText("");
@@ -406,13 +409,16 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	public static void main(String[] args) {
-		
+	public static void show(final String title, final Class<?> mainClass) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		
-		Gui gui = new Gui();
+
+		Gui gui = new Gui(title, mainClass);
 		gui.pack();
 		gui.setLocationByPlatform(true);
 		gui.setVisible(true);
+	}
+	
+	public static void main(String[] args) {
+		Gui.show("MATSim", Controler.class);
 	}
 }

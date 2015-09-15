@@ -1,19 +1,10 @@
 package playground.wrashid.tryouts.processing;
 
-import java.awt.Event;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import processing.core.*;
 
@@ -87,7 +78,7 @@ public class NetworkWithHeatMap extends MovableAndZoomable {
 		// program it, as you would think it is write -> need tranformation
 		// function.
 
-		CoordImpl zuerichCoord = new CoordImpl(683248, 248161);
+		Coord zuerichCoord = new Coord((double) 683248, (double) 248161);
 
 		float scalingFactor = width / (biggestX - smallestX);
 		// System.out.println(scalingFactor);

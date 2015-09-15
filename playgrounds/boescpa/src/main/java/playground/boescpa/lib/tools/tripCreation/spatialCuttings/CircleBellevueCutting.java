@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -37,8 +36,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class CircleBellevueCutting implements SpatialCuttingStrategy {
 	
 	private final int radius;
-	private final Coord center = new CoordImpl(683518.0,246836.0);
-	
+	private final Coord center = new Coord(683518.0, 246836.0);
+
 	/**
 	 * @param cuttingRadius [meters]
 	 */

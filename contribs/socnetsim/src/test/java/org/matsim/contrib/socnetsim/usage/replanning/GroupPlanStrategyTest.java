@@ -204,7 +204,7 @@ public class GroupPlanStrategyTest {
 			final boolean joint,
 			final Map<Id<Person>, Plan> jointPlan) {
 		Id<Person> id = Id.createPersonId( count );
-		Person person = new PersonImpl( id );
+		Person person = PersonImpl.createPerson(id);
 		PlanImpl plan = new PlanImpl( person );
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );

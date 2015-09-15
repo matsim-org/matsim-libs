@@ -66,8 +66,8 @@ public class BivariatMeanTest extends TestCase {
 
         Object dataKey1 = new Object();
         Object dataKey2 = new Object();
-        Converters.register("attribute1", dataKey1, DoubleConverter.getInstance());
-        Converters.register("attribute2", dataKey2, DoubleConverter.getInstance());
+        Converters.registerWithObjectKey("attribute1", dataKey1, DoubleConverter.getInstance());
+        Converters.registerWithObjectKey("attribute2", dataKey2, DoubleConverter.getInstance());
 
         BivariatMean mm = new BivariatMean(refPersons, simPersons, "attribute1", "attribute2", new
                 LinearDiscretizer(1));

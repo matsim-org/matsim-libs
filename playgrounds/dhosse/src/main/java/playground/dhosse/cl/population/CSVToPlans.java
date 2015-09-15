@@ -26,8 +26,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -39,7 +37,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dhosse.cl.Constants;
-import playground.dhosse.cl.Constants.Modes;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -155,7 +152,7 @@ public class CSVToPlans {
 				
 				String x = splittedLine[idxCoordX].replace("," , ".");
 				String y = splittedLine[idxCoordY].replace("," , ".");
-				this.hogarId2Coord.put(id, new CoordImpl(x, y));
+				this.hogarId2Coord.put(id, new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				counter++;
 				
 			}
@@ -211,7 +208,7 @@ public class CSVToPlans {
 				String x = splittedLine[idxCoordX].replace("," , ".");
 				String y = splittedLine[idxCoordY].replace("," , ".");
 				if(!x.equals("") && !y.equals("") && !x.equals("0") && !y.equals("0")){
-					persona.setWorkCoord(new CoordImpl(x, y));
+					persona.setWorkCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				}
 				
 				this.personas.put(id,persona);
@@ -430,9 +427,9 @@ public class CSVToPlans {
 							Geometry gDest = geometries.get(comunaDestino);
 							
 							if(gOrigin == null || gDest == null){
-								
-								origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
-								destination = etapa.getDestination() == null ? new CoordImpl(0.0, 0.0) : etapa.getDestination();
+
+								origin = origin == null ? new Coord(0.0, 0.0) : origin;
+								destination = etapa.getDestination() == null ? new Coord(0.0, 0.0) : etapa.getDestination();
 								
 							} else{
 							
@@ -452,9 +449,9 @@ public class CSVToPlans {
 							}
 							
 						} else{
-							
-							origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
-							destination = destination == null ? new CoordImpl(0.0, 0.0) : destination;
+
+							origin = origin == null ? new Coord(0.0, 0.0) : origin;
+							destination = destination == null ? new Coord(0.0, 0.0) : destination;
 
 						}
 						
@@ -684,7 +681,7 @@ public class CSVToPlans {
   	      y = comuna.getEnvelopeInternal().getMinY() + random.nextDouble() * (comuna.getEnvelopeInternal().getMaxY() - comuna.getEnvelopeInternal().getMinY());
   	      p = MGC.xy2Point(x, y);
   	   } while (!comuna.contains(p));
-  	   Coord coord = new CoordImpl(p.getX(), p.getY());
+		Coord coord = new Coord(p.getX(), p.getY());
 		
   	 if(!this.legMode2NumberOfShotLegs.containsKey(legMode + " w/ travel time")){
 			this.legMode2NumberOfShotLegs.put(legMode + " w/ travel time", 0);
@@ -741,9 +738,9 @@ public class CSVToPlans {
 		
 		double resX = origin.getX() + x;
 		double resY = origin.getY() + y;
-		
-		return new CoordImpl(resX, resY);
-		
+
+		return new Coord(resX, resY);
+
 	}
 	
 	private Coord shootLegDestination(String legMode, Coord origin, Geometry comuna, double reportedTravelTime){
@@ -780,8 +777,8 @@ public class CSVToPlans {
 			
 			double resX = origin.getX() + x;
 			double resY = origin.getY() + y;
-			
-			res = new CoordImpl(resX, resY);
+
+		res = new Coord(resX, resY);
 		
 //		} while(!comuna.contains(MGC.coord2Point(res)));
 			

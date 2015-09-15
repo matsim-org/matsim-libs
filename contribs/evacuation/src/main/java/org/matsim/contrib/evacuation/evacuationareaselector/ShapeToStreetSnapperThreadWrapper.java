@@ -35,7 +35,6 @@ import org.matsim.contrib.evacuation.control.algorithms.PolygonalCircleApproxima
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -96,7 +95,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		for (Node node : this.sc.getNetwork().getNodes().values()) {
 			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
 		}
-		Coord centerC = new CoordImpl((e.getMaxX()+e.getMinX())/2, (e.getMaxY()+e.getMinY())/2);
+		Coord centerC = new Coord((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
 		CoordinateTransformation ct2 =  new GeotoolsTransformation(c.global().getCoordinateSystem(),"EPSG:4326");
 		centerC = ct2.transform(centerC);
 		this.center = new GeoPosition(centerC.getY(),centerC.getX());

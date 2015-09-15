@@ -21,19 +21,21 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -79,11 +81,11 @@ public class Episodes2Matrix {
         modePreds.put("car", new LegKeyValuePredicate(CommonKeys.LEG_MODE, "car"));
 
         Map<String, LegPredicate> purposePreds = new LinkedHashMap<>();
-        purposePreds.put(ActivityType.BUSINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS));
-        purposePreds.put(ActivityType.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION));
+        purposePreds.put(ActivityTypes.BUSINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS));
+        purposePreds.put(ActivityTypes.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION));
 
         PredicateORComposite leisurePred = new PredicateORComposite();
-        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.LEISURE));
         leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "visit"));
         leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "gastro"));
         leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "culture"));
@@ -91,12 +93,12 @@ public class Episodes2Matrix {
         leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "pickdrop"));
         leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "sport"));
 
-        purposePreds.put(ActivityType.LEISURE, leisurePred);
-        purposePreds.put(ActivityType.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.SHOP));
-        purposePreds.put(ActivityType.WORK, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.WORK));
-        purposePreds.put(ActivityType.VACATIONS_SHORT, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType
+        purposePreds.put(ActivityTypes.LEISURE, leisurePred);
+        purposePreds.put(ActivityTypes.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.SHOP));
+        purposePreds.put(ActivityTypes.WORK, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.WORK));
+        purposePreds.put(ActivityTypes.VACATIONS_SHORT, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes
                 .VACATIONS_SHORT));
-        purposePreds.put(ActivityType.VACATIONS_LONG, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.VACATIONS_LONG));
+        purposePreds.put(ActivityTypes.VACATIONS_LONG, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_LONG));
         purposePreds.put(InfereWeCommuter.WECOMMUTER, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, InfereWeCommuter
                 .WECOMMUTER));
 

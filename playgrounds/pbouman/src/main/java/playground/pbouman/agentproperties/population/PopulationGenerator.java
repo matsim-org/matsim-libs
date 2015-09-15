@@ -1,5 +1,6 @@
 package playground.pbouman.agentproperties.population;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -71,7 +72,7 @@ public class PopulationGenerator
 					}
 					else
 					{
-						act = (ActivityImpl) factory.createActivityFromCoord("home", scen.createCoord(home.getX(), home.getY()));
+						act = (ActivityImpl) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
 						act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 					}
 			
@@ -96,7 +97,7 @@ public class PopulationGenerator
 				}
 				else
 				{
-					act = (ActivityImpl) factory.createActivityFromCoord(ap.getName(), scen.createCoord(loc.getX(), loc.getY()));
+					act = (ActivityImpl) factory.createActivityFromCoord(ap.getName(), new Coord(loc.getX(), loc.getY()));
 					act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 				}
 				
@@ -118,7 +119,7 @@ public class PopulationGenerator
 			}
 			else
 			{
-				act = (ActivityImpl) factory.createActivityFromCoord("home", scen.createCoord(home.getX(), home.getY()));
+				act = (ActivityImpl) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
 				act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 			}
 			plan.addActivity(act);

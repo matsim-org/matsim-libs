@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -34,6 +33,6 @@ public class ShapeUtils {
 					+ rnd.nextDouble() * deltaY;
 			p = MGC.xy2Point(x, y);
 		} while (!geom.contains(p));
-		return new CoordImpl(p.getX(), p.getY());
+		return new Coord(p.getX(), p.getY());
 	}
 }

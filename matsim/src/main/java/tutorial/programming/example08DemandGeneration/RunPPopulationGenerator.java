@@ -49,8 +49,8 @@ public class RunPPopulationGenerator implements Runnable {
 	private void fillZoneData() {
 		// Add the locations you want to use here.
 		// (with proper coordinates)
-		zoneGeometries.put("home1", scenario.createCoord(0, 1));
-		zoneGeometries.put("work1", scenario.createCoord(50, 0));
+		zoneGeometries.put("home1", new Coord((double) 0, (double) 1));
+		zoneGeometries.put("work1", new Coord((double) 50, (double) 0));
 	}
 
 	private void generatePopulation() {

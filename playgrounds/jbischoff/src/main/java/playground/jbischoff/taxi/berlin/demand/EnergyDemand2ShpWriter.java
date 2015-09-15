@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -108,8 +107,8 @@ public class EnergyDemand2ShpWriter
         		double yarrowoffset = -10.;
         		if (to.getX()-from.getX()<0) xarrowoffset = 10.0;
         		if (to.getY()-from.getY()<0) yarrowoffset = 10.0;
-        		
-        		Coord arrowend = new CoordImpl(to.getX()+xarrowoffset,to.getY()+yarrowoffset);
+
+            Coord arrowend = new Coord(to.getX() + xarrowoffset, to.getY() + yarrowoffset);
         		
                 LineString ls = this.geofac.createLineString(new Coordinate[] {
                         MGC.coord2Coordinate(from),

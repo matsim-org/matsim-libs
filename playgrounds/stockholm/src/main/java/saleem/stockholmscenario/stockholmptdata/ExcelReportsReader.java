@@ -10,7 +10,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ExcelReportsReader {
 	public void readVehicleTypes(TransitSchedule transit, String path){//Reads Stoppstallen.xls and adds data about transit Stops to TransitSchedule object
@@ -65,7 +64,7 @@ public class ExcelReportsReader {
 			for(int r = 9; r < rows; r++) {
 				row = sheet.getRow(r);
 				if(row != null) {
-					Coord coord = new CoordImpl(Double.parseDouble(row.getCell(8).getStringCellValue()), Double.parseDouble(row.getCell(10).getStringCellValue()));
+					Coord coord = new Coord(Double.parseDouble(row.getCell(8).getStringCellValue()), Double.parseDouble(row.getCell(10).getStringCellValue()));
 					//coord=DataConversion.deg2UTM(coord);
 					String name = row.getCell(4).getStringCellValue();
 					String id = Integer.toString((int)row.getCell(0).getNumericCellValue());

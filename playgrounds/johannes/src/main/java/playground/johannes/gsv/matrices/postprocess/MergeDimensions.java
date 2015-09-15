@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.DirectionPredicate;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
 import playground.johannes.gsv.matrices.episodes2matrix.InfereWeCommuter;
-import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonValues;
 
 import java.io.BufferedWriter;
@@ -53,13 +53,13 @@ public class MergeDimensions {
         modes.put("car", "M");
 
         Map<String, String> purposes = new HashMap<>();
-        purposes.put(ActivityType.EDUCATION, "A");
-        purposes.put(ActivityType.WORK, "B");
-        purposes.put(ActivityType.BUSINESS, "G");
-        purposes.put(ActivityType.SHOP, "E");
-        purposes.put(ActivityType.LEISURE, "F1");
-        purposes.put(ActivityType.VACATIONS_SHORT, "F2");
-        purposes.put(ActivityType.VACATIONS_LONG, "U");
+        purposes.put(ActivityTypes.EDUCATION, "A");
+        purposes.put(ActivityTypes.WORK, "B");
+        purposes.put(ActivityTypes.BUSINESS, "G");
+        purposes.put(ActivityTypes.SHOP, "E");
+        purposes.put(ActivityTypes.LEISURE, "F1");
+        purposes.put(ActivityTypes.VACATIONS_SHORT, "F2");
+        purposes.put(ActivityTypes.VACATIONS_LONG, "U");
         purposes.put(InfereWeCommuter.WECOMMUTER, "WE");
 
         Map<String, String> days = new HashMap<>();

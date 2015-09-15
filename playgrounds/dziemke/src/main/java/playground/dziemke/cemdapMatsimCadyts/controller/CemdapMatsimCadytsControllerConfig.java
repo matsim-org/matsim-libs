@@ -61,7 +61,7 @@ public class CemdapMatsimCadytsControllerConfig {
 //		});
 		
 		// scoring function
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
+		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 					@Override
 					public ScoringFunction createNewScoringFunction(Person person) {

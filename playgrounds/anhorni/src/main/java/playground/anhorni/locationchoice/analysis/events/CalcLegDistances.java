@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class CalcLegDistances implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
@@ -90,8 +90,7 @@ public class CalcLegDistances implements PersonDepartureEventHandler, PersonArri
 		if (depTime != null && agent != null) {
 			Plan plan = agent.getSelectedPlan();
 			Activity nextAct = getAgentsNextActivity(plan);
-			double travDistance = ((CoordImpl)getAgentsPreviousActivity(plan).getCoord()).calcDistance(
-					nextAct.getCoord());
+			double travDistance = CoordUtils.calcDistance(getAgentsPreviousActivity(plan).getCoord(), nextAct.getCoord());
 
 			String actType;
 

@@ -30,7 +30,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -52,7 +51,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";
 	private static final String BUSINESS = "business";
-	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
+	private static final Coord ZERO = new Coord(0.0, 0.0);
 
 	private final ActivityFacilities facilities;
 
@@ -266,7 +265,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		return this.getFacility(fs,act_type);
 	}
 
-	private final ActivityFacility getFacility(CoordImpl coord1, CoordImpl coord2, double radius, String act_type) {
+	private final ActivityFacility getFacility(Coord coord1, Coord coord2, double radius, String act_type) {
 		Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
@@ -332,8 +331,8 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 			double radius = Math.sqrt(dx*dx+dy*dy)/3.0;
 			dx = dx/6.0;
 			dy = dy/6.0;
-			CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
-			CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
+			Coord coord1 = new Coord(home_coord.getX() + dx, home_coord.getY() + dy);
+			Coord coord2 = new Coord(prim_coord.getX() - dx, prim_coord.getY() + dy);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;

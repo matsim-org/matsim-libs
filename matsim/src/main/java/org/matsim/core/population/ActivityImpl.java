@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
@@ -74,7 +73,7 @@ public class ActivityImpl implements Activity {
 	public ActivityImpl(final Activity act) {
 		this(act.getType());
 		// Act coord could be null according to first c'tor!
-		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
+		Coord c = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
 		this.setCoord(c);
 		this.linkId = act.getLinkId();
 		this.setStartTime(act.getStartTime());

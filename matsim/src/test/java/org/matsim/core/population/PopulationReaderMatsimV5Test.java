@@ -91,7 +91,7 @@ public class PopulationReaderMatsimV5Test {
 		tester.endTag();
 		tester.startTag("leg", new String[][]{{"mode", "car"}});
 		tester.startTag("route");
-		tester.endTag("1 5 14 20");
+		tester.endTag("2 5 14 20");
 		tester.endTag();
 		tester.startTag("act", new String[][]{{"type", "w"}, {"x", "10000"}, {"y", "0"}, {"link", "20"}, {"dur", "03:30"}});
 		tester.endTag();

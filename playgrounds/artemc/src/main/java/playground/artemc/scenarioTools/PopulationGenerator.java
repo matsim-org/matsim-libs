@@ -184,7 +184,7 @@ public class PopulationGenerator {
 		
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
+			Person person = pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 			
 			System.out.println("Agent: "+i+" from "+populationSize);
@@ -327,8 +327,8 @@ public class PopulationGenerator {
 			
 			
 			//Add person attributes
-			person.setCarAvail("always");
-			person.setEmployed(true);
+			PersonUtils.setCarAvail(person, "always");
+			PersonUtils.setEmployed(person, true);
 			person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan

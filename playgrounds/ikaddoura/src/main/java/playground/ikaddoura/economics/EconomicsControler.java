@@ -41,7 +41,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
@@ -202,6 +201,11 @@ public class EconomicsControler {
 		controler.run();
 	}
 
+	
+	// variiere die Flusskapazität von sehr hoch bis super viel Stau
+	// lass die Nachfrage reagieren
+	// lese Auto-Nachfrage ab (x)
+	// berechne mit diesem x und der Flusskapazität die Auto-Kosten (AC)
 	private void generateDemandAsFunctionOfCost() {
 		
 		String csvFile = path + "/economics_DemandAsFunctionOfCost.csv";
@@ -337,8 +341,8 @@ public class EconomicsControler {
 		
 		for (int personNr = 0; personNr < demand; personNr++) {
 			
-			Coord homeLocation = getHomeCoord();	
-			Coord workLocation = new CoordImpl(15000., 0.);	
+			Coord homeLocation = getHomeCoord();
+			Coord workLocation = new Coord(15000., 0.);
 			
 			Person person = population.getFactory().createPerson(Id.create("person_" + personNr, Person.class));
 			Plan plan = population.getFactory().createPlan();
@@ -365,7 +369,7 @@ public class EconomicsControler {
 		
 		double space = maxXCoord - minXCoord;
 		double randomXCoord = calculateRandomlyDistributedValue(maxXCoord - (space/2.0), (space/2.0));
-		Coord zoneCoord = new CoordImpl(randomXCoord, 0);
+		Coord zoneCoord = new Coord(randomXCoord, (double) 0);
 		return zoneCoord;
 	}
 	

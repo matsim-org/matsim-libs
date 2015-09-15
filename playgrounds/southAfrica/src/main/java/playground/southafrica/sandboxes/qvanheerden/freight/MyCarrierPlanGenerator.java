@@ -27,7 +27,6 @@ import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.Header;
@@ -86,7 +85,7 @@ public class MyCarrierPlanGenerator {
 //		MyCarrierPlanGenerator.getNetworkChangeEvents(scenario, 7, 10, 16, 19, speed, true);
 
 		/* Set coordinate and linkId of depot */
-		depotCoord = new CoordImpl(depotLong, depotLat);
+		depotCoord = new Coord(depotLong, depotLat);
 		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
 		depotLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), depotCoord).getId();
 
@@ -275,7 +274,7 @@ public class MyCarrierPlanGenerator {
 				double start = Double.parseDouble(array[7]);
 				double end = Double.parseDouble(array[8]);
 
-				Coord coord = new CoordImpl(longi, lati);
+				Coord coord = new Coord(longi, lati);
 				Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) network), coord).getId();
 
 				CarrierService serv = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), linkId).

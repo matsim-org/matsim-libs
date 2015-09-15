@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -296,10 +296,10 @@ public class Census2001SampleParser {
 			String modeToMain = sa[8];
 			Double income = Double.parseDouble(sa[9]);
 			
-			PersonImpl person = (PersonImpl) pf.createPerson(pid);
-			person.setAge(age);
-			person.setSex(gender);
-			person.setEmployed(employment);
+			Person person = pf.createPerson(pid);
+			PersonUtils.setAge(person, age);
+			PersonUtils.setSex(person, gender);
+			PersonUtils.setEmployed(person, employment);
 			personAttributes.putAttribute(pid.toString(), "quarterType", quarterType);
 			personAttributes.putAttribute(pid.toString(), "relationship", relationship);
 			personAttributes.putAttribute(pid.toString(), "race", race);

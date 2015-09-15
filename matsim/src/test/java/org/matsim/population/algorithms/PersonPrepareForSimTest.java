@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -54,9 +55,9 @@ public class PersonPrepareForSimTest {
 		{
 			NetworkFactory nf = net.getFactory();
 			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), sc.createCoord(1000, 0));
-			Node n3 = nf.createNode(Id.create("3", Node.class), sc.createCoord(2000, 0));
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
@@ -79,9 +80,11 @@ public class PersonPrepareForSimTest {
 			PopulationFactory pf = pop.getFactory();
 			person = pf.createPerson(Id.create("1", Person.class));
 			Plan p = pf.createPlan();
-			a1 = pf.createActivityFromCoord("h", sc.createCoord(10, -10));
+			double y1 = -10;
+			a1 = pf.createActivityFromCoord("h", new Coord((double) 10, y1));
 			Leg l = pf.createLeg(TransportMode.walk);
-			a2 = pf.createActivityFromCoord("w", sc.createCoord(1900, -10));
+			double y = -10;
+			a2 = pf.createActivityFromCoord("w", new Coord((double) 1900, y));
 			p.addActivity(a1);
 			p.addLeg(l);
 			p.addActivity(a2);
@@ -104,9 +107,9 @@ public class PersonPrepareForSimTest {
 		{
 			NetworkFactory nf = net.getFactory();
 			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), sc.createCoord(1000, 0));
-			Node n3 = nf.createNode(Id.create("3", Node.class), sc.createCoord(2000, 0));
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
@@ -129,9 +132,11 @@ public class PersonPrepareForSimTest {
 			PopulationFactory pf = pop.getFactory();
 			person = pf.createPerson(Id.create("1", Person.class));
 			Plan p = pf.createPlan();
-			a1 = pf.createActivityFromCoord("h", sc.createCoord(10, -10));
+			double y1 = -10;
+			a1 = pf.createActivityFromCoord("h", new Coord((double) 10, y1));
 			Leg l = pf.createLeg(TransportMode.walk);
-			a2 = pf.createActivityFromCoord("w", sc.createCoord(1900, -10));
+			double y = -10;
+			a2 = pf.createActivityFromCoord("w", new Coord((double) 1900, y));
 			p.addActivity(a1);
 			p.addLeg(l);
 			p.addActivity(a2);

@@ -9,7 +9,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -81,13 +80,12 @@ public class SimpleXY2Links {
 		scenario.getConfig().addCoreModules();
 		scenario.getConfig().network().setInputFile(this.networkfile);
 		scenario.getConfig().plans().setInputFile(this.plansfileIN);
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
-		sl.loadNetwork();
+		ScenarioUtils.loadScenario(scenario);
 		Network network = scenario.getNetwork();
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfileOUT);
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));

@@ -45,7 +45,7 @@ public class IterationResource {
 		Scenario scenario = getRun().getOutputScenario();
 		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
+		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
 		eventsManager.addHandler(events2Score);
 		new MatsimEventsReader(eventsManager).readFile(getEventsFileName());
 		events2Score.finish();
