@@ -63,7 +63,7 @@ import playground.vsp.congestion.DelayInfo;
  * @author ikaddoura
  *
  */
-public class AbstractCongestionHandler implements
+public class CongestionInfoHandler implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
@@ -72,7 +72,7 @@ PersonStuckEventHandler,
 Wait2LinkEventHandler,
 PersonArrivalEventHandler {
 
-	private final static Logger log = Logger.getLogger(AbstractCongestionHandler.class);
+	private final static Logger log = Logger.getLogger(CongestionInfoHandler.class);
 
 	private final Scenario scenario;
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
@@ -83,7 +83,7 @@ PersonArrivalEventHandler {
 
 	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
-	AbstractCongestionHandler(Scenario scenario) {
+	CongestionInfoHandler(Scenario scenario) {
 		this.scenario = scenario;
 
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {

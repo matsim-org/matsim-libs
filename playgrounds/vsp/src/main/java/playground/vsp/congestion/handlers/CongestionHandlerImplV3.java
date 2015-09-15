@@ -78,7 +78,7 @@ CongestionInternalization {
 
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
 
-	private AbstractCongestionHandler delegate;
+	private CongestionInfoHandler delegate;
 
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.0;
@@ -93,7 +93,7 @@ CongestionInternalization {
 		this.scenario = scenario;
 		this.events = events;
 		
-		this.delegate = new AbstractCongestionHandler(scenario);
+		this.delegate = new CongestionInfoHandler(scenario);
 	}
 
 	@Override

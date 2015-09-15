@@ -63,7 +63,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public final class CongestionHandlerImplV4  extends AbstractCongestionHandler implements PersonArrivalEventHandler,
+public final class CongestionHandlerImplV4  extends CongestionInfoHandler implements PersonArrivalEventHandler,
 Wait2LinkEventHandler, CongestionEventHandler {
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
