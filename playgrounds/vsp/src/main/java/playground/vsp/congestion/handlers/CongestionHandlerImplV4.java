@@ -36,8 +36,21 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -64,7 +77,15 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public final class CongestionHandlerImplV4 implements  LinkLeaveEventHandler, CongestionInternalization {
+public final class CongestionHandlerImplV4 implements  
+LinkEnterEventHandler,
+LinkLeaveEventHandler,
+TransitDriverStartsEventHandler,
+PersonDepartureEventHandler, 
+PersonStuckEventHandler,
+Wait2LinkEventHandler,
+PersonArrivalEventHandler,
+CongestionInternalization {
 
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV4.class);
 
@@ -94,6 +115,36 @@ public final class CongestionHandlerImplV4 implements  LinkLeaveEventHandler, Co
 		this.delayNotInternalized_roundingErrors = 0.;
 		
 		this.linkId2SpillBackCausingLinks.clear();
+	}
+	
+	@Override
+	public final void handleEvent(TransitDriverStartsEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public final void handleEvent(PersonStuckEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public final void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public final void handleEvent(PersonDepartureEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public final void handleEvent(LinkEnterEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+		delegate.handleEvent(event);
 	}
 
 	@Override
