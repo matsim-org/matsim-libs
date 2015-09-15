@@ -201,6 +201,11 @@ public class EconomicsControler {
 		controler.run();
 	}
 
+	
+	// variiere die Flusskapazität von sehr hoch bis super viel Stau
+	// lass die Nachfrage reagieren
+	// lese Auto-Nachfrage ab (x)
+	// berechne mit diesem x und der Flusskapazität die Auto-Kosten (AC)
 	private void generateDemandAsFunctionOfCost() {
 		
 		String csvFile = path + "/economics_DemandAsFunctionOfCost.csv";
