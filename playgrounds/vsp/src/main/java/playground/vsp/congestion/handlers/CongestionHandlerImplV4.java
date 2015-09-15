@@ -36,20 +36,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -76,29 +64,27 @@ import playground.vsp.congestion.events.CongestionEvent;
  *
  */
 
-public final class CongestionHandlerImplV4 implements 
-LinkEnterEventHandler,
-LinkLeaveEventHandler,
-TransitDriverStartsEventHandler,
-PersonDepartureEventHandler, 
-PersonStuckEventHandler,
-Wait2LinkEventHandler,
-PersonArrivalEventHandler,
-CongestionInternalization
-{
+public final class CongestionHandlerImplV4 implements  LinkLeaveEventHandler, CongestionInternalization {
 
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV4.class);
 
 	private CongestionInfoHandler delegate;
+	
+	private Scenario scenario;
+	private EventsManager events;
 
-	public Map<Id<Person>, Integer> getPersonId2legNr() {
-		return delegate.getPersonId2legNr();
+	private double delayNotInternalized_roundingErrors = 0.0;
+	private double totalInternalizedDelay = 0.0;
+	private double totalDelay = 0.0;
+	
+	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
+
+	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
+		this.scenario = scenario;
+		this.events = events;
+		this.delegate = new CongestionInfoHandler(scenario);
 	}
-
-	public Map<Id<Person>, Integer> getPersonId2linkNr() {
-		return delegate.getPersonId2linkNr();
-	}
-
+	
 	@Override
 	public final void reset(int iteration) {
 		delegate.reset(iteration);
@@ -106,31 +92,8 @@ CongestionInternalization
 		this.totalDelay = 0.0;
 		this.totalInternalizedDelay = 0.;
 		this.delayNotInternalized_roundingErrors = 0.;
-	}
-
-	@Override
-	public final void handleEvent(TransitDriverStartsEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public final void handleEvent(PersonStuckEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public final void handleEvent(Wait2LinkEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public final void handleEvent(PersonDepartureEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public final void handleEvent(LinkEnterEvent event) {
-		delegate.handleEvent(event);
+		
+		this.linkId2SpillBackCausingLinks.clear();
 	}
 
 	@Override
@@ -165,37 +128,7 @@ CongestionInternalization
 			
 			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 		}
-
 	}
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	public List<Id<Vehicle>> getPtVehicleIDs() {
-		return delegate.getPtVehicleIDs();
-	}
-
-	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
-		return delegate.getVehicleId2personId();
-	}
-
-	private Scenario scenario;
-	private EventsManager events;
-
-	private double delayNotInternalized_roundingErrors = 0.0;
-	private double totalInternalizedDelay = 0.0;
-	private double totalDelay = 0.0;
-
-	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
-		this.scenario = scenario;
-		this.events = events;
-
-		this.delegate = new CongestionInfoHandler(scenario);
-	}
-
-	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
 
 	@Override
 	public final void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
@@ -230,70 +163,9 @@ CongestionInternalization
 			if(remainingDelay > 0.) {
 				throw new RuntimeException( "time=" + event.getTime() + "; " + remainingDelay+" sec delay is not internalized. Aborting...");
 			}
-
 		} 
 	}
-
-	private double  allocateStorageDelayToDownstreamLinks(double remainingDelay, Id<Link> linkId, LinkLeaveEvent event){
-		final Deque<Id<Link>> spillBackCausingLinks = this.linkId2SpillBackCausingLinks.get(linkId);
-
-		// if linkId is not registered (by other vehicles) as having spill-back, we return:
-		if( spillBackCausingLinks==null || spillBackCausingLinks.isEmpty() ) {
-			return remainingDelay;
-		}
-
-		// Go through all those outgoing links that have (ever) reported a blockage ...
-		for ( Iterator<Id<Link>> it = spillBackCausingLinks.descendingIterator() ; it.hasNext() && remainingDelay > 0. ; ) {
-			Id<Link> spillBackCausingLink = it.next();
-
-			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
-
-			if(remainingDelay<=0) {
-				break;
-			} else {
-				// !! this is where the recursive call is !!
-				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
-				// yy this looks like depth-first allocation to me; should probably also try breadth-first allocation. kai, sep'15
-			}
-		}
-
-		return remainingDelay;
-	}
-
-	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
-		Id<Person> affectedPersonId = event.getPersonId();
-
-		// first charge for agents present on the link or in other words agents entered on the link
-		LinkCongestionInfo spillbackLinkCongestionInfo = this.delegate.getLinkId2congestionInfo().get(spillbackCausingLink);
-
-		final LinkedList<AgentOnLinkInfo> agentsOnLinksAsDeque = new LinkedList<AgentOnLinkInfo>( spillbackLinkCongestionInfo.getAgentsOnLink().values() );
-		for ( Iterator<AgentOnLinkInfo> it = agentsOnLinksAsDeque.descendingIterator() ; it.hasNext() ; ) {
-			// (didn't find an easier way both to be able to remove by Id and to iterate from back. sep'15, kai)
-			AgentOnLinkInfo agentInfo = it.next() ;
-			Id<Person> causingPersonId = agentInfo.getPersonId() ;
-			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
-
-			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "storageCapacity", causingPersonId, affectedPersonId, 
-					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
-			this.events.processEvent(congestionEvent); 
-
-			this.totalInternalizedDelay += agentDelay;
-
-			remainingDelay = remainingDelay - agentDelay;
-			if (remainingDelay <=0 ) {
-				break ;
-			}
-		}
-
-		if(remainingDelay>0){
-			// now charge agents that have already left:
-			// here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
-			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
-		}
-
-		return remainingDelay;
-	}
-
+	
 	/**
 	 * @param event
 	 * <p> This is a very special case (possible only at intersections), where agent is first delayed due to flow Capacity and then delayed due to storage capacity.
@@ -338,13 +210,7 @@ CongestionInternalization
 		}
 		return remainingDelay;
 	}
-
-	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
-		List<PlanElement> planElements = this.scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
-		Leg leg = TripStructureUtils.getLegs(planElements).get( this.delegate.getPersonId2legNr().get( personId ) ) ;
-		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.delegate.getPersonId2linkNr().get( personId ) ) ;
-	}
-
+	
 	private void memorizeSpillBackCausingLinkForCurrentLink(Id<Link> currentLink, Id<Link> spillBackCausingLink) {
 		if( this.linkId2SpillBackCausingLinks.containsKey( currentLink ) ) {
 			/* since multiple spillback causing links are possible, thus to maintain the order correctly, 
@@ -355,11 +221,10 @@ CongestionInternalization
 			this.linkId2SpillBackCausingLinks.get(currentLink).add(spillBackCausingLink);
 		} else {
 			this.linkId2SpillBackCausingLinks.put(currentLink, new LinkedList<Id<Link>>(Arrays.asList(spillBackCausingLink)));
-
 		}
 	}
-
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
+	
+	private final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId);
 
 		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
@@ -398,8 +263,71 @@ CongestionInternalization
 			this.delayNotInternalized_roundingErrors += agentDelay;
 			agentDelay = 0.;
 		}
-
 		return agentDelay;
+	}
+	
+	private double  allocateStorageDelayToDownstreamLinks(double remainingDelay, Id<Link> linkId, LinkLeaveEvent event){
+		final Deque<Id<Link>> spillBackCausingLinks = this.linkId2SpillBackCausingLinks.get(linkId);
+
+		// if linkId is not registered (by other vehicles) as having spill-back, we return:
+		if( spillBackCausingLinks==null || spillBackCausingLinks.isEmpty() ) {
+			return remainingDelay;
+		}
+
+		// Go through all those outgoing links that have (ever) reported a blockage ...
+		for ( Iterator<Id<Link>> it = spillBackCausingLinks.descendingIterator() ; it.hasNext() && remainingDelay > 0. ; ) {
+			Id<Link> spillBackCausingLink = it.next();
+
+			remainingDelay = processSpillbackDelays(remainingDelay, event, spillBackCausingLink);
+
+			if(remainingDelay<=0) {
+				break;
+			} else {
+				// !! this is where the recursive call is !!
+				remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, spillBackCausingLink, event);
+				// yy this looks like depth-first allocation to me; should probably also try breadth-first allocation. kai, sep'15
+			}
+		}
+		return remainingDelay;
+	}
+
+	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink){
+		Id<Person> affectedPersonId = event.getPersonId();
+
+		// first charge for agents present on the link or in other words agents entered on the link
+		LinkCongestionInfo spillbackLinkCongestionInfo = this.delegate.getLinkId2congestionInfo().get(spillbackCausingLink);
+
+		final LinkedList<AgentOnLinkInfo> agentsOnLinksAsDeque = new LinkedList<AgentOnLinkInfo>( spillbackLinkCongestionInfo.getAgentsOnLink().values() );
+		for ( Iterator<AgentOnLinkInfo> it = agentsOnLinksAsDeque.descendingIterator() ; it.hasNext() ; ) {
+			// (didn't find an easier way both to be able to remove by Id and to iterate from back. sep'15, kai)
+			AgentOnLinkInfo agentInfo = it.next() ;
+			Id<Person> causingPersonId = agentInfo.getPersonId() ;
+			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+
+			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "storageCapacity", causingPersonId, affectedPersonId, 
+					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
+			this.events.processEvent(congestionEvent); 
+
+			this.totalInternalizedDelay += agentDelay;
+
+			remainingDelay = remainingDelay - agentDelay;
+			if (remainingDelay <=0 ) {
+				break ;
+			}
+		}
+
+		if(remainingDelay>0){
+			// now charge agents that have already left:
+			// here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
+			remainingDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, event.getVehicleId(), remainingDelay);
+		}
+		return remainingDelay;
+	}
+
+	private Id<Link> getDownstreamLinkInRoute(Id<Person> personId){
+		List<PlanElement> planElements = this.scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
+		Leg leg = TripStructureUtils.getLegs(planElements).get( this.delegate.getPersonId2legNr().get( personId ) ) ;
+		return ((NetworkRoute) leg.getRoute()).getLinkIds().get( this.delegate.getPersonId2linkNr().get( personId ) ) ;
 	}
 
 	@Override
@@ -427,14 +355,10 @@ CongestionInternalization
 			bw.newLine();
 			bw.write("Not internalized delay (rounding errors) [hours];" + this.delayNotInternalized_roundingErrors / 3600.);
 			bw.newLine();
-
 			bw.close();
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		log.info("Congestion statistics written to " + file);	
-
 	}
 }
-
