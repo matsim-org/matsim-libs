@@ -76,6 +76,14 @@ PersonArrivalEventHandler {
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
 
 	Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
+	public Map<Id<Person>, Integer> getPersonId2legNr() {
+		return personId2legNr;
+	}
+
+	public Map<Id<Person>, Integer> getPersonId2linkNr() {
+		return personId2linkNr;
+	}
+
 	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
 
 	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
