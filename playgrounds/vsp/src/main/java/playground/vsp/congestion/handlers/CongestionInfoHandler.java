@@ -53,12 +53,9 @@ import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
 
 /**
- * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
- * Marginal congestion events can be used for internalization.
- * 1) For each agent leaving a link a total delay is calculated as the difference of actual leaving time and the leaving time according to freespeed.
- * 2) The delay due to the flow capacity of that link is computed and marginal congestion events are thrown, indicating the affected agent, the causing agent and the delay in sec.
- * 3) The proportion of flow delay is deducted.
- * 4) The remaining delay leads back to the storage capacity of downstream links. The marginal congestion event is thrown, indicating the affected agent, the causing agent and the delay in sec.
+ * This class provides the basic functionality to calculate congestion effects which may be used for internalization.
+ * One of the main tasks is to keep track of the queues on each link.
+ *
  * 
  * @author ikaddoura
  *
