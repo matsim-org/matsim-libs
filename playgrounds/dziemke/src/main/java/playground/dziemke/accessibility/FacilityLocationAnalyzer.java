@@ -12,10 +12,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
@@ -27,17 +25,16 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class FacilityLocationAnalyzer {
 	// Input file and output directory
-	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
+//	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
+//	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
+	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
 	
-//	private static String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml";
 	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";
-//	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/08/facilities_buildings.xml";
-//	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/facilities_amenities_modified.xml";
-	
-//	private static String outputFileName = "../../accessibility-sa/data/facilities.shp";
 	private static String outputFileName = inputOutputDirectory + "facilities.shp";
-//	private static String outputFileName = "../../shared-svn/projects/accessibility_berlin/osm/berlin/08/facilities_buildings.shp";
-//	private static String outputFileName = "../../projects/accessibility_berlin/osm/berlin/facilities_amenities.shp";
+		
+//	private static String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml";
+//	private static String outputFileName = "../../accessibility-sa/data/facilities.shp";
+	
 	
 	// Parameters
 //	private static String[] attributeLabel = {"FacilityId", "Type", "Name"};

@@ -50,6 +50,7 @@ import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
+import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
@@ -86,7 +87,7 @@ public class CombinedOsmSink implements Sink {
 	
 	private Map<String, Integer> typeCount = new HashMap<>();
 	
-	private List <SimpleFeature> features = new ArrayList <SimpleFeature>();
+	private List <SimpleFeature> landUseAreas = new ArrayList <SimpleFeature>();
 
 	private int featureErrorCounter = 0;
 	private int buildingErrorCounter = 0;
@@ -168,7 +169,7 @@ public class CombinedOsmSink implements Sink {
 				SimpleFeature feature = createFeature(coords, matsimActivityType);
 
 				if (feature != null) {
-					this.features.add(feature);
+					this.landUseAreas.add(feature);
 				}
 			}
 		}
@@ -340,7 +341,7 @@ public class CombinedOsmSink implements Sink {
 			// ... land use ...
 			// ...
 			// TODO solve problem when building is a relation
-			if(buildingType != null && !(entity instanceof Relation)) {
+			if(buildingType != null && !(entity instanceof Relation) && !(entity instanceof Node)) {
 				// Create feature for building
 				// do this step first to be able to "continue" in loop if feature for building cannot be created
 				Coord[] allBuildingCoords = CoordUtils.getAllWayCoords((Way) entity, ct, this.nodeMap);
@@ -355,14 +356,13 @@ public class CombinedOsmSink implements Sink {
 				// Get facility type
 				String activityType = getActivityType(buildingType, this.buildingTypeMap);
 				
-				if (activityType == null) {
-					activityType = getActivityTypeFromLandUseArea(geometryFactory, buildingType, centroidCoord);
-				}
-				
 				if (activityType == FacilityTypes.IGNORE) {
-					// System.out.println("activityType == ignore");
 					continue;
 				}
+				
+				if (activityType == null) {
+					activityType = getActivityTypeFromLandUseArea(geometryFactory, buildingType, centroidCoord);
+				}				
 				
 				// Get number of levels/storeys
 				String buildingLevelsAsString = tags.get("building:levels");
@@ -384,6 +384,9 @@ public class CombinedOsmSink implements Sink {
 				// Create facility for building
 				if (activityType != null) {
 					createFacility(aff, entity, name, centroidCoord, activityType);
+					if ( !this.unmannedEntitiesList.contains(buildingType) ) {
+						createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
+					}
 				}
 			}
 		}
@@ -413,21 +416,19 @@ public class CombinedOsmSink implements Sink {
 	}
 	
 	
-	private String getActivityTypeFromLandUseArea(GeometryFactory geometryFactory,	String buildingType, Coord coord) {
+	private String getActivityTypeFromLandUseArea(GeometryFactory geometryFactory,
+			String buildingType, Coord buildingCoord) {
 		String activityType = null;
-		Coordinate coordinate = new Coordinate(coord.getX(), coord.getY());
-		Geometry coordAsGeometry = geometryFactory.createPoint(coordinate);
+		Coordinate buildingCoordinate = new Coordinate(buildingCoord.getX(), buildingCoord.getY());
+		Geometry buildingCoordAsGeometry = geometryFactory.createPoint(buildingCoordinate);
 
 		boolean buildingContainedInLandUseArea = false;
-		Geometry geometry;
+		Geometry landUseGeometry;
 
-		for (SimpleFeature feature : this.features) {
-//			System.out.println("feature.toString()" + feature.toString());
-//			System.out.println(feature);
-//			System.out.println(feature.getAttribute("type"));
-			geometry = (Geometry) feature.getDefaultGeometry();
+		for (SimpleFeature feature : this.landUseAreas) {
+			landUseGeometry = (Geometry) feature.getDefaultGeometry();
 
-			if (geometry.contains(coordAsGeometry)) {
+			if (landUseGeometry.contains(buildingCoordAsGeometry)) {
 				activityType = (String) feature.getAttribute("type");
 				buildingContainedInLandUseArea = true;
 			}
@@ -440,10 +441,10 @@ public class CombinedOsmSink implements Sink {
 		if (buildingContainedInLandUseArea == false) {
 			double minDistanceToLandUseArea = Double.POSITIVE_INFINITY;
 
-			for (SimpleFeature feature : this.features) {
-				geometry = (Geometry) feature.getDefaultGeometry();
+			for (SimpleFeature feature : this.landUseAreas) {
+				landUseGeometry = (Geometry) feature.getDefaultGeometry();
 
-				double distanceToLandUseArea = coordAsGeometry.distance(geometry);
+				double distanceToLandUseArea = buildingCoordAsGeometry.distance(landUseGeometry);
 
 				if (distanceToLandUseArea < minDistanceToLandUseArea) {
 					minDistanceToLandUseArea = distanceToLandUseArea;
