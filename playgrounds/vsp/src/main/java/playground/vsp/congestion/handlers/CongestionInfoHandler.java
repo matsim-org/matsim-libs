@@ -24,6 +24,7 @@ package playground.vsp.congestion.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +48,12 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * This class provides the basic functionality to calculate congestion effects which may be used for internalization.
@@ -72,30 +75,26 @@ PersonArrivalEventHandler {
 	private final static Logger log = Logger.getLogger(CongestionInfoHandler.class);
 
 	private final Scenario scenario;
+	private final EventsManager events;
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
 
-	Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
-	public Map<Id<Person>, Integer> getPersonId2legNr() {
-		return personId2legNr;
-	}
-
-	public Map<Id<Person>, Integer> getPersonId2linkNr() {
-		return personId2linkNr;
-	}
-
-	Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
+	private double delayNotInternalized_roundingErrors = 0.;
+	private double totalInternalizedDelay = 0.;
 
 	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
-	CongestionInfoHandler(Scenario scenario) {
+	CongestionInfoHandler(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
+		this.events = events;
 
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
 			log.warn("Capacity period is other than 3600.");
 		}
 
-		// TODO: Runtime exception if parallel events handling.
+		if ( this.scenario.getConfig().parallelEventHandling().getNumberOfThreads()!= null) {
+			log.warn("Parallel event handling is not tested. It should not work properly.");
+		}
 
 		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
 			log.warn("Flow capacity factor unequal 1.0 is not tested.");
@@ -115,10 +114,9 @@ PersonArrivalEventHandler {
 	public final void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
-
-		//--
-		this.personId2legNr.clear();
-		this.personId2linkNr.clear();
+		
+		this.delayNotInternalized_roundingErrors = 0.;
+		this.totalInternalizedDelay = 0.;
 	}
 
 	@Override
@@ -149,15 +147,6 @@ PersonArrivalEventHandler {
 					.setLinkId( event.getLinkId() ).setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
 		}
-
-		//--
-		final Integer cnt = this.personId2legNr.get( event.getPersonId() );
-		if ( cnt == null ) {
-			this.personId2legNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
-		} else {
-			this.personId2legNr.put( event.getPersonId(), cnt + 1 ) ; 
-		}
-		this.personId2linkNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
 	}
 
 	@Override
@@ -173,10 +162,6 @@ PersonArrivalEventHandler {
 					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
 		}
-		// ---
-		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
-		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
-
 	}
 
 	@Override
@@ -226,6 +211,63 @@ PersonArrivalEventHandler {
 
 	}
 
+	/**
+	 * @param now time at which affected agent is delayed
+	 * @param linkId link at which affected agent is delayed
+	 * @param affectedAgentDelayInfo delayInfo of affected agent to get free speed link leave time and person id
+	 * @param remainingDelay at this step, it is delay of the affected agent
+	 * @return the remaining uncharged delay
+	 * <p>
+	 * Charging the agents that are in the flow queue.
+	 * Do this step-wise comparing the freespeed leave time of two subsequent agents (agent 'ahead' and agent 'behind').
+	 */
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {		
+
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get( linkId );
+
+		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; remainingDelay > 0.0 && it.hasNext() ; ) {
+			// Get the agent 'ahead' from the flow queue. The agents 'ahead' are considered as causing agents.
+			DelayInfo agentAheadDelayInfo = it.next() ;
+
+			double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+
+			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", agentAheadDelayInfo.personId, 
+					affectedAgentDelayInfo.personId, allocatedDelay, linkId, agentAheadDelayInfo.linkEnterTime );
+			this.events.processEvent(congestionEvent); 
+
+			this.totalInternalizedDelay += allocatedDelay ;
+
+			remainingDelay = remainingDelay - allocatedDelay;
+
+		}
+
+		if(remainingDelay > 0. && remainingDelay <=1 ){
+			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
+			// Setting the remaining delay to 0 sec.
+			this.delayNotInternalized_roundingErrors += remainingDelay;
+			remainingDelay = 0.;
+		}
+
+		return remainingDelay;
+	}
+	
+	public double getDelayNotInternalized_roundingErrors() {
+		return delayNotInternalized_roundingErrors;
+	}
+
+	public void addToDelayNotInternalized_roundingErrors(
+			double delayNotInternalized_roundingErrors) {
+		this.delayNotInternalized_roundingErrors += delayNotInternalized_roundingErrors;
+	}
+
+	public double getTotalInternalizedDelay() {
+		return totalInternalizedDelay;
+	}
+
+	public void addToTotalInternalizedDelay(double totalInternalizedDelay) {
+		this.totalInternalizedDelay += totalInternalizedDelay;
+	}
+
 	final Map<Id<Link>, LinkCongestionInfo> getLinkId2congestionInfo() {
 		return linkId2congestionInfo;
 	}
@@ -241,7 +283,6 @@ PersonArrivalEventHandler {
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
 		return vehicleId2personId;
 	}
-
-
-
+	
+	
 }
