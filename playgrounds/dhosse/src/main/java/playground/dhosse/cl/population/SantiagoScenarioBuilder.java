@@ -90,7 +90,7 @@ public class SantiagoScenarioBuilder {
 	
 	private static double n = 0.;
 	
-	private static final String pathForMatsim = "../../runs-svn/santiago/run11/";		//TODO: path within config file to in-/output files 
+	private static final String pathForMatsim = "../../runs-svn/santiago/run11b/";		//TODO: path within config file to in-/output files 
 	private static final String outPlans = "plans_final";								//name of plan file
 	
 	
@@ -128,16 +128,6 @@ public class SantiagoScenarioBuilder {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).readFile(outputDir + "plans/plans.xml.gz");
 		
-		//TODO: added Freight, use a switch or any other way to enable/disable KT: 2015-09-14
-		File freightPlansFile = new File(outputDir + "freight/plans.xml.gz");
-		if (freightPlansFile.exists()){
-			Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-			new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
-			for (Person person : scenarioFreight.getPopulation().getPersons().values()){
-				scenario.getPopulation().addPerson(person);
-			}
-		}
-		
 		removePersons(scenario.getPopulation());
 		
 		Map<String, Population> populationMap = getPlansBeforeMidnight(scenario.getPopulation());
@@ -161,6 +151,17 @@ public class SantiagoScenarioBuilder {
 		new MatsimPopulationReader(scenarioOut).readFile(outputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
 		
 		randomizeEndTime(populationOut);
+		
+		//freight traffic will only be added to population, if file exists. Otherwise do nothing.
+		//Added at this position, so the end times will not be randomized. (KT 2015-09-16)
+		File freightPlansFile = new File(outputDir + "freight/plans.xml.gz");
+		if (freightPlansFile.exists()){
+			Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+			new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
+			for (Person person : scenarioFreight.getPopulation().getPersons().values()){
+				scenarioOut.getPopulation().addPerson(person);
+			}
+		}
 		
 		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioOut);
 		aap.run();
