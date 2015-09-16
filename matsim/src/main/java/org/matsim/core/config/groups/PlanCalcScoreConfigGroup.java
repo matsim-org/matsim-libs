@@ -259,12 +259,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 
 	public ModeParams getOrCreateModeParams(String modeName) {
-		ModeParams modeParams = getModes().get(modeName);
-		if (modeParams == null) {
-			modeParams = new ModeParams( modeName );
-			addParameterSet(modeParams);
-		}
-		return modeParams;
+		return getScoringParameters( null ).getOrCreateModeParams( modeName );
 	}
 
 	@Override
@@ -306,43 +301,19 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public Collection<String> getActivityTypes() {
-		return this.getActivityParamsPerType().keySet();
+		return getScoringParameters( null ).getActivityParamsPerType().keySet();
 	}
 
 	public Collection<ActivityParams> getActivityParams() {
-			@SuppressWarnings("unchecked")
-			Collection<ActivityParams> collection = (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
-			for ( ActivityParams params : collection ) {
-				if ( this.isLocked() ) {
-					params.setLocked(); 
-				}
-			}
-			return collection ;
+		return getScoringParameters( null ).getActivityParams();
 	}
 
 	public Map<String, ActivityParams> getActivityParamsPerType() {
-		final Map<String, ActivityParams> map = new LinkedHashMap< >();
-
-		for ( ActivityParams pars : getActivityParams() ) {
-			map.put( pars.getActivityType() , pars );
-		}
-
-		return map;
+		return getScoringParameters( null ).getActivityParamsPerType();
 	}
 
 	public Map<String, ModeParams> getModes() {
-		@SuppressWarnings("unchecked")
-		final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets( ModeParams.SET_TYPE );
-		final Map<String, ModeParams> map = new LinkedHashMap< >();
-
-		for ( ModeParams pars : modes ) {
-			if ( this.isLocked() ) {
-				pars.setLocked();
-			}
-			map.put( pars.getMode() , pars );
-		}
-
-		return map;
+		return getScoringParameters( null ).getModes();
 	}
 
 	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
@@ -360,51 +331,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-
-
-	/** Checks whether all the settings make sense or if there are some problems with the parameters
-	 * currently set. Currently, this checks that for at least one activity type opening AND closing
-	 * times are defined. */
-	@Override
-	public void checkConsistency() {
-		super.checkConsistency();
-		boolean hasOpeningAndClosingTime = false;
-		boolean hasOpeningTimeAndLatePenalty = false ;
-
-		// This cannot be done in ActivityParams (where it would make more sense),
-		// because some global properties are also checked
-		for ( ActivityParams actType : this.getActivityParams() ) {
-			if ( actType.isScoringThisActivityAtAll() ) {
-				// (checking consistency only if activity is scored at all)
-
-				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
-					hasOpeningAndClosingTime = true;
-				}
-				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
-					hasOpeningTimeAndLatePenalty = true;
-				}
-				if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
-					log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
-							"time set to 24:00. This is most probably not the same as not setting them at all.  " +
-							"In particular, activities which extend past midnight may not accumulate scores.") ;
-				}
-			}
-		}
-		if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
-			log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
-					+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
-					+"This usually means that the activity chains can be shifted by an arbitrary\n"
-					+"number of hours without having an effect on the score of the plans, and thus\n"
-					+"resulting in wrong results / traffic patterns.\n"
-					+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
-		}
-		if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
-			log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
-					"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
-					"parameter waitingPt instead.");
-		}
-	}
-
 	/* direct access */
 
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
@@ -418,7 +344,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public ActivityParams getActivityParams(final String actType) {
-		return this.getActivityParamsPerType().get(actType);
+		return getScoringParameters( null ).getActivityParams( actType );
 	}
 
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
@@ -458,46 +384,165 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 
 	public void addModeParams(final ModeParams params) {
-		final ModeParams previous = this.getModes().get( params.getMode() );
-		
-		if ( previous != null ) {
-			log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
-			
-			final boolean removed = removeParameterSet( previous );
-			if ( !removed ) throw new RuntimeException( "problem replacing mode params " );
-		}
-		
-		super.addParameterSet( params );
+		getScoringParameters( null ).addModeParams( params );
 	}
 
 	public void addActivityParams(final ActivityParams params) {
-		final ActivityParams previous = this.getActivityParams( params.getActivityType() );
-		
-		if ( previous != null ) {
-			if ( previous.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-				log.error("ERROR: Activity parameters for activity type " + previous.getActivityType() + " were just overwritten. This happens most " +
-						"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
-						"round.  pt interaction has problems, but doing what you are doing here will just cause " +
-						"other (less visible) problem. Please take the effort to discuss with the core team " +
-						"what needs to be done.  kai, nov'12") ;
-			} else {
-				log.info("activity parameters for activity type " + previous.getActivityType() + " were just overwritten.") ;
-			}
-			
-			final boolean removed = removeParameterSet( previous );
-			if ( !removed ) throw new RuntimeException( "problem replacing activity params " );
-		}
-		
-		super.addParameterSet( params );
+		getScoringParameters( null ).addActivityParams( params );
 	}
 	
 	public enum TypicalDurationScoreComputation { uniform, relative } ;
 
-	/* complex classes */
+
+	/* parameter set handling */
+	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch ( type ) {
+			case ActivityParams.SET_TYPE:
+				return new ActivityParams();
+			case ModeParams.SET_TYPE:
+				return new ModeParams();
+			case ScoringParameterSet.SET_TYPE:
+				return new ScoringParameterSet();
+			default:
+				throw new IllegalArgumentException( type );
+		}
+	}
+
+	@Override
+	protected void checkParameterSet( final ConfigGroup module ) {
+		switch ( module.getName() ) {
+			case ScoringParameterSet.SET_TYPE:
+				if ( !(module instanceof ScoringParameterSet) ) {
+					throw new RuntimeException( "wrong class for "+module );
+				}
+				final String s = ((ScoringParameterSet) module).getSubpopulation();
+				if ( getScoringParameters( s ) != null ) {
+					throw new IllegalStateException( "already a parameter set for subpopulation "+s );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
+		}
+	}
+
+
+	public boolean isMemorizingExperiencedPlans() {
+		return this.memorizingExperiencedPlans ;
+	}
+
+	public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
+		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
+	}
+
+
+	public double getLearningRate() {
+		return delegate.getLearningRate();
+	}
+
+	public void setLearningRate(double learningRate) {
+		delegate.setLearningRate(learningRate);
+	}
+
+	public double getBrainExpBeta() {
+		return delegate.getBrainExpBeta();
+	}
+
+	public void setBrainExpBeta(double brainExpBeta) {
+		delegate.setBrainExpBeta(brainExpBeta);
+	}
+
+	public double getPathSizeLogitBeta() {
+		return delegate.getPathSizeLogitBeta();
+	}
+
+	public void setPathSizeLogitBeta(double beta) {
+		delegate.setPathSizeLogitBeta(beta);
+	}
+
+	public double getLateArrival_utils_hr() {
+		return getScoringParameters( null ).getLateArrival_utils_hr();
+	}
+
+	public void setLateArrival_utils_hr(double lateArrival) {
+		getScoringParameters( null ).setLateArrival_utils_hr(lateArrival);
+	}
+
+	public double getEarlyDeparture_utils_hr() {
+		return getScoringParameters( null ).getEarlyDeparture_utils_hr();
+	}
+
+	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+		getScoringParameters( null ).setEarlyDeparture_utils_hr(earlyDeparture);
+	}
+
+	public double getPerforming_utils_hr() {
+		return getScoringParameters( null ).getPerforming_utils_hr();
+	}
+
+	public void setPerforming_utils_hr(double performing) {
+		getScoringParameters( null ).setPerforming_utils_hr(performing);
+	}
+
+	public double getMarginalUtilityOfMoney() {
+		return getScoringParameters( null ).getMarginalUtilityOfMoney();
+	}
+
+	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		getScoringParameters( null ).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+	}
+
+	public double getUtilityOfLineSwitch() {
+		return getScoringParameters( null ).getUtilityOfLineSwitch();
+	}
+
+	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		getScoringParameters( null ).setUtilityOfLineSwitch(utilityOfLineSwitch);
+	}
+
+	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
+		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
+	}
+
+	public void setUsingOldScoringBelowZeroUtilityDuration(
+			boolean usingOldScoringBelowZeroUtilityDuration) {
+		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
+	}
+
+	public boolean isWriteExperiencedPlans() {
+		return delegate.isWriteExperiencedPlans();
+	}
+
+	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
+		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
+	}
+
+	public double getMarginalUtlOfWaiting_utils_hr() {
+		return getScoringParameters( null ).getMarginalUtlOfWaiting_utils_hr();
+	}
+	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
+		getScoringParameters( null ).setMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+	
+	public void setFractionOfIterationsToStartScoreMSA( Double val ) {
+		delegate.setFractionOfIterationsToStartScoreMSA(val);
+	}
+	public Double getFractionOfIterationsToStartScoreMSA() {
+		return delegate.getFractionOfIterationsToStartScoreMSA() ;
+	}
+	@Override
+	public final void setLocked() {
+		super.setLocked();
+		this.delegate.setLocked();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// CLASSES
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
 		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
 		// ActivityParams.  I will try to pass the locked setting through the getters. kai, jun'15
-		
+
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
 		final static String SET_TYPE = "activityParams";
 		private String type;
@@ -509,9 +554,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double earliestEndTime = Time.UNDEFINED_TIME;
 		private double closingTime = Time.UNDEFINED_TIME;
 		private boolean scoringThisActivityAtAll = true ;
-		
+
 		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.uniform ;
-		
+
 
 		public ActivityParams() {
 			super( SET_TYPE );
@@ -521,11 +566,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			super( SET_TYPE );
 			this.type = type;
 		}
-		
+
 		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
-			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  "method to compute score at typical duration.  Use " 
+			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  "method to compute score at typical duration.  Use "
 					+ TypicalDurationScoreComputation.uniform + " for backwards compatibility (all activities same score; higher proba to drop long acts).") ;
 			return map ;
 		}
@@ -539,7 +584,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			testForLocked() ;
 			this.typicalDurationScoreComputation = str ;
 		}
-		
+
 		@StringGetter( "activityType" )
 		public String getActivityType() {
 			return this.type;
@@ -784,65 +829,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	}
 
-	/* parameter set handling */
-	@Override
-	public ConfigGroup createParameterSet(final String type) {
-		switch ( type ) {
-			case ActivityParams.SET_TYPE:
-				return new ActivityParams();
-			case ModeParams.SET_TYPE:
-				return new ModeParams();
-			case ScoringParameterSet.SET_TYPE:
-				return new ScoringParameterSet();
-			default:
-				throw new IllegalArgumentException( type );
-		}
-	}
-
-	@Override
-	protected void checkParameterSet( final ConfigGroup module ) {
-		switch ( module.getName() ) {
-			case ActivityParams.SET_TYPE:
-				if ( !(module instanceof ActivityParams) ) {
-					throw new RuntimeException( "wrong class for "+module );
-				}
-				final String t = ((ActivityParams) module).getActivityType();
-				if ( getActivityParams( t  ) != null ) {
-					throw new IllegalStateException( "already a parameter set for activity type "+t );
-				}
-				break;
-			case ModeParams.SET_TYPE:
-				if ( !(module instanceof ModeParams) ) {
-					throw new RuntimeException( "wrong class for "+module );
-				}
-				final String m = ((ModeParams) module).getMode();
-				if ( getModes().get(m) != null ) {
-					throw new IllegalStateException( "already a parameter set for mode "+m );
-				}
-				break;
-			case ScoringParameterSet.SET_TYPE:
-				if ( !(module instanceof ScoringParameterSet) ) {
-					throw new RuntimeException( "wrong class for "+module );
-				}
-				final String s = ((ScoringParameterSet) module).getSubpopulation();
-				if ( getScoringParameters( s ) != null ) {
-					throw new IllegalStateException( "already a parameter set for subpopulation "+s );
-				}
-				break;
-			default:
-				throw new IllegalArgumentException( module.getName() );
-		}
-	}
-
-
-	public boolean isMemorizingExperiencedPlans() {
-		return this.memorizingExperiencedPlans ;
-	}
-
-	public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
-		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
-	}
-
 	public static class ScoringParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_TYPE = "scoringParameters";
 
@@ -941,7 +927,182 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "subpopulation" )
 		public void setSubpopulation(String subpopulation) {
+			//TODO: handle case of default subpopulation
+			if ( subpopulation != null ) {
+				throw new IllegalStateException( "cannot change subpopulation in a scoring parameter set, as it is used for indexing." );
+			}
+
 			this.subpopulation = subpopulation;
+		}
+
+		/* parameter set handling */
+		@Override
+		public ConfigGroup createParameterSet(final String type) {
+			switch ( type ) {
+				case ActivityParams.SET_TYPE:
+					return new ActivityParams();
+				case ModeParams.SET_TYPE:
+					return new ModeParams();
+				default:
+					throw new IllegalArgumentException( type );
+			}
+		}
+
+		@Override
+		protected void checkParameterSet( final ConfigGroup module ) {
+			switch ( module.getName() ) {
+				case ActivityParams.SET_TYPE:
+					if ( !(module instanceof ActivityParams) ) {
+						throw new RuntimeException( "wrong class for "+module );
+					}
+					final String t = ((ActivityParams) module).getActivityType();
+					if ( getActivityParams( t  ) != null ) {
+						throw new IllegalStateException( "already a parameter set for activity type "+t );
+					}
+					break;
+				case ModeParams.SET_TYPE:
+					if ( !(module instanceof ModeParams) ) {
+						throw new RuntimeException( "wrong class for "+module );
+					}
+					final String m = ((ModeParams) module).getMode();
+					if ( getModes().get(m) != null ) {
+						throw new IllegalStateException( "already a parameter set for mode "+m );
+					}
+					break;
+				default:
+					throw new IllegalArgumentException( module.getName() );
+			}
+		}
+
+		public Collection<String> getActivityTypes() {
+			return this.getActivityParamsPerType().keySet();
+		}
+
+		public Collection<ActivityParams> getActivityParams() {
+				@SuppressWarnings("unchecked")
+				Collection<ActivityParams> collection = (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
+				for ( ActivityParams params : collection ) {
+					if ( this.isLocked() ) {
+						params.setLocked();
+					}
+				}
+				return collection ;
+		}
+
+		public Map<String, ActivityParams> getActivityParamsPerType() {
+			final Map<String, ActivityParams> map = new LinkedHashMap< >();
+
+			for ( ActivityParams pars : getActivityParams() ) {
+				map.put( pars.getActivityType() , pars );
+			}
+
+			return map;
+		}
+
+		public ActivityParams getActivityParams(final String actType) {
+			return this.getActivityParamsPerType().get(actType);
+		}
+
+
+		public Map<String, ModeParams> getModes() {
+			@SuppressWarnings("unchecked")
+			final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets( ModeParams.SET_TYPE );
+			final Map<String, ModeParams> map = new LinkedHashMap< >();
+
+			for ( ModeParams pars : modes ) {
+				if ( this.isLocked() ) {
+					pars.setLocked();
+				}
+				map.put( pars.getMode() , pars );
+			}
+
+			return map;
+		}
+
+		public ModeParams getOrCreateModeParams(String modeName) {
+			ModeParams modeParams = getModes().get(modeName);
+			if (modeParams == null) {
+				modeParams = new ModeParams( modeName );
+				addParameterSet(modeParams);
+			}
+			return modeParams;
+		}
+
+		public void addModeParams(final ModeParams params) {
+			final ModeParams previous = this.getModes().get( params.getMode() );
+
+			if ( previous != null ) {
+				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
+
+				final boolean removed = removeParameterSet( previous );
+				if ( !removed ) throw new RuntimeException( "problem replacing mode params " );
+			}
+
+			super.addParameterSet( params );
+		}
+
+		public void addActivityParams(final ActivityParams params) {
+			final ActivityParams previous = this.getActivityParams( params.getActivityType() );
+
+			if ( previous != null ) {
+				if ( previous.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+					log.error("ERROR: Activity parameters for activity type " + previous.getActivityType() + " were just overwritten. This happens most " +
+							"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
+							"round.  pt interaction has problems, but doing what you are doing here will just cause " +
+							"other (less visible) problem. Please take the effort to discuss with the core team " +
+							"what needs to be done.  kai, nov'12") ;
+				} else {
+					log.info("activity parameters for activity type " + previous.getActivityType() + " were just overwritten.") ;
+				}
+
+				final boolean removed = removeParameterSet( previous );
+				if ( !removed ) throw new RuntimeException( "problem replacing activity params " );
+			}
+
+			super.addParameterSet( params );
+		}
+
+		/** Checks whether all the settings make sense or if there are some problems with the parameters
+		 * currently set. Currently, this checks that for at least one activity type opening AND closing
+		 * times are defined. */
+		@Override
+		public void checkConsistency() {
+			super.checkConsistency();
+			boolean hasOpeningAndClosingTime = false;
+			boolean hasOpeningTimeAndLatePenalty = false ;
+
+			// This cannot be done in ActivityParams (where it would make more sense),
+			// because some global properties are also checked
+			for ( ActivityParams actType : this.getActivityParams() ) {
+				if ( actType.isScoringThisActivityAtAll() ) {
+					// (checking consistency only if activity is scored at all)
+
+					if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+						hasOpeningAndClosingTime = true;
+					}
+					if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
+						hasOpeningTimeAndLatePenalty = true;
+					}
+					if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
+						log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
+								"time set to 24:00. This is most probably not the same as not setting them at all.  " +
+								"In particular, activities which extend past midnight may not accumulate scores.") ;
+					}
+				}
+			}
+			if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
+				log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
+						+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
+						+"This usually means that the activity chains can be shifted by an arbitrary\n"
+						+"number of hours without having an effect on the score of the plans, and thus\n"
+						+"resulting in wrong results / traffic patterns.\n"
+						+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
+			}
+			if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
+				log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
+						"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
+						"parameter waitingPt instead.");
+			}
 		}
 	}
 
@@ -1032,103 +1193,4 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	}
 
-	public double getLearningRate() {
-		return delegate.getLearningRate();
-	}
-
-	public void setLearningRate(double learningRate) {
-		delegate.setLearningRate(learningRate);
-	}
-
-	public double getBrainExpBeta() {
-		return delegate.getBrainExpBeta();
-	}
-
-	public void setBrainExpBeta(double brainExpBeta) {
-		delegate.setBrainExpBeta(brainExpBeta);
-	}
-
-	public double getPathSizeLogitBeta() {
-		return delegate.getPathSizeLogitBeta();
-	}
-
-	public void setPathSizeLogitBeta(double beta) {
-		delegate.setPathSizeLogitBeta(beta);
-	}
-
-	public double getLateArrival_utils_hr() {
-		return getScoringParameters( null ).getLateArrival_utils_hr();
-	}
-
-	public void setLateArrival_utils_hr(double lateArrival) {
-		getScoringParameters( null ).setLateArrival_utils_hr(lateArrival);
-	}
-
-	public double getEarlyDeparture_utils_hr() {
-		return getScoringParameters( null ).getEarlyDeparture_utils_hr();
-	}
-
-	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		getScoringParameters( null ).setEarlyDeparture_utils_hr(earlyDeparture);
-	}
-
-	public double getPerforming_utils_hr() {
-		return getScoringParameters( null ).getPerforming_utils_hr();
-	}
-
-	public void setPerforming_utils_hr(double performing) {
-		getScoringParameters( null ).setPerforming_utils_hr(performing);
-	}
-
-	public double getMarginalUtilityOfMoney() {
-		return getScoringParameters( null ).getMarginalUtilityOfMoney();
-	}
-
-	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		getScoringParameters( null ).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
-	}
-
-	public double getUtilityOfLineSwitch() {
-		return getScoringParameters( null ).getUtilityOfLineSwitch();
-	}
-
-	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		getScoringParameters( null ).setUtilityOfLineSwitch(utilityOfLineSwitch);
-	}
-
-	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
-		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
-	}
-
-	public void setUsingOldScoringBelowZeroUtilityDuration(
-			boolean usingOldScoringBelowZeroUtilityDuration) {
-		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
-	}
-
-	public boolean isWriteExperiencedPlans() {
-		return delegate.isWriteExperiencedPlans();
-	}
-
-	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
-		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
-	}
-
-	public double getMarginalUtlOfWaiting_utils_hr() {
-		return getScoringParameters( null ).getMarginalUtlOfWaiting_utils_hr();
-	}
-	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		getScoringParameters( null ).setMarginalUtlOfWaiting_utils_hr(waiting);
-	}
-	
-	public void setFractionOfIterationsToStartScoreMSA( Double val ) {
-		delegate.setFractionOfIterationsToStartScoreMSA(val);
-	}
-	public Double getFractionOfIterationsToStartScoreMSA() {
-		return delegate.getFractionOfIterationsToStartScoreMSA() ;
-	}
-	@Override
-	public final void setLocked() {
-		super.setLocked();
-		this.delegate.setLocked();
-	}
 }
