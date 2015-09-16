@@ -89,20 +89,20 @@ CongestionInternalization {
 	private double delayNotInternalized_roundingErrors = 0.;
 	private double totalInternalizedDelay = 0.;
 	private double totalDelay = 0.;
-	
+
 	private Scenario scenario;
 	private EventsManager events;
-	
+
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
 		this.events = events;
-		
+
 		this.delegate = new CongestionInfoHandler(scenario);
 	}
 
 	@Override
 	public final void reset(int iteration) {
-	
+
 		delegate.reset(iteration);
 
 		this.agentId2storageDelay.clear();
@@ -205,37 +205,37 @@ CongestionInternalization {
 
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
-		
+
 		} else { // car!
 			Id<Person> personId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), delegate.getLinkId2congestionInfo(), scenario);
 
 			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
-			
+
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
 			delegate.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
-					
+
 			linkInfo.getFlowQueue().add( delayInfo ) ;
 			linkInfo.getDelayQueue().add( delayInfo ) ;
 
 			linkInfo.memorizeLastLinkLeaveEvent( event );
-			
-//			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
+
+			//	linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
 			// in V4, it is removed at agent _arrival_ and then it seems to work. 
-			
-//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
+
+			//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			// fails tests, dunno why. kai, sep'15
-			
+
 			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 		}
 	}
 
-	
+
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
@@ -243,81 +243,137 @@ CongestionInternalization {
 
 		// global book-keeping:
 		this.totalDelay += delayOnThisLink;
-		
+
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
-		double agentDelayWithDelaysOnPreviousLinks = 0.;
-		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
-		} else {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
-		}
 
-		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
-			throw new RuntimeException("The total delay is below 0. Aborting...");
+		double agentDelayWithDelaysOnPreviousLinks = 0.;		
 
-		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
-			// The agent was leaving the link without a delay.  Nothing to do ...
+		if(this.agentId2storageDelay.containsKey(event.getPersonId())){
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getPersonId());	
+		} else agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 
-		} else {
-			// The agent was leaving the link with a delay.
+		//		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
+		//			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
+		//		} else {
+		//			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
+		//			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
+		//		}
 
-			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), agentDelayWithDelaysOnPreviousLinks);
+		//		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
+		//			throw new RuntimeException("The total delay is below 0. Aborting...");
+		//
+		//		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
+		//			// The agent was leaving the link without a delay.  Nothing to do ...
+		//
+		//		} else {
+		// The agent was leaving the link with a delay.
 
-			if (storageDelay < 0.) {
-				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
+		//			double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), event.getVehicleId(), agentDelayWithDelaysOnPreviousLinks);
+		double storageDelay = computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), delayInfo, agentDelayWithDelaysOnPreviousLinks);
 
-			} else if (storageDelay == 0.) {
-				// The delay resulting from the storage capacity is 0.
+		if (storageDelay < 0.) {
+			throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
 
-			} else if (storageDelay > 0.) {	
-				// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-				this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
-			} 
-		}
+		} else if (storageDelay == 0.) {
+			// The delay resulting from the storage capacity is 0.
+
+		} else if (storageDelay > 0.) {	
+			// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
+			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
+		} 
+		//		}
 	}
 
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
-		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId);
+	/**
+	 * @param now time at which affected agent is delayed
+	 * @param linkId link at which affected agent is delayed
+	 * @param affectedAgentDelayInfo delayInfo of affected agent to get free speed link leave time and person id
+	 * @param remainingDelay at this step, it is delay of the affected agent
+	 * @return the remaining uncharged delay
+	 * <p> Check for the time gap between subsequent vehicles and if it is less than marginal delay of link, agent is charged.
+	 */
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {
+		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId );
 
-		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
-			// "add" will, presumably, add at the end.  So the newest are latest.  So a descending
+		double originalTimeGap = 0.0;
+		DelayInfo delayInfo = affectedAgentDelayInfo;
+		for (Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ;  remainingDelay > 0.0 && !linkInfo.getFlowQueue().isEmpty() && it.hasNext() ; ) {
+			DelayInfo causingAgentDelayInfo = it.next() ;
+			Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
 
-			DelayInfo delayInfo = it.next();
+			originalTimeGap = delayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
+			// meaning that the original time gap would have been < 1/cap
 
-			Id<Person> causingPersonId = delayInfo.personId ;
-			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
-			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
+			if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec() + 1) {
+				double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-			if(delayAllocatedToThisCausingPerson==0.) {
-				return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
-			}
+				CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", causingAgentId, 
+						affectedAgentDelayInfo.personId, agentDelay, linkId, causingAgentDelayInfo.linkEnterTime );
+				this.events.processEvent(congestionEvent); 
 
-			if (affectedVehId.toString().equals(causingPersonId.toString())) {
-				// log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+				this.totalInternalizedDelay += agentDelay ;
+
+				remainingDelay = remainingDelay - agentDelay;
+				delayInfo = causingAgentDelayInfo;
 			} else {
-				// using the time when the causing agent entered the link
-				// (one place where we need the link enter time way beyond the time when the vehicle is on the link)
-
-				//				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
-				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
-
-				CongestionEvent congestionEvent = new CongestionEvent(now, "flowCapacity", causingPersonId, 
-						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
-				this.events.processEvent(congestionEvent);
-				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
+				// since timeGap is higher than marginalFlowDelay, no need for further look up.
+				linkInfo.getDelayQueue().remove(causingAgentDelayInfo);
+				break;
 			}
-			agentDelay = agentDelay - delayAllocatedToThisCausingPerson ; 
 		}
 
-		if (agentDelay <= 1.) {
+		if(remainingDelay > 0. && remainingDelay <=1 ){
 			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
 			// Setting the remaining delay to 0 sec.
-			this.delayNotInternalized_roundingErrors += agentDelay;
-			agentDelay = 0.;
+			this.delayNotInternalized_roundingErrors += remainingDelay;
+			remainingDelay = 0.;
+			//			}
 		}
 
-		return agentDelay;
+		return remainingDelay;
 	}
+
+	//	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
+	//		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId);
+	//
+	//		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
+	//			// "add" will, presumably, add at the end.  So the newest are latest.  So a descending
+	//
+	//			DelayInfo delayInfo = it.next();
+	//
+	//			Id<Person> causingPersonId = delayInfo.personId ;
+	//			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
+	//			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
+	//
+	//			if(delayAllocatedToThisCausingPerson==0.) {
+	//				return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
+	//			}
+	//
+	//			if (affectedVehId.toString().equals(causingPersonId.toString())) {
+	//				// log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+	//			} else {
+	//				// using the time when the causing agent entered the link
+	//				// (one place where we need the link enter time way beyond the time when the vehicle is on the link)
+	//
+	//				//				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
+	//				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
+	//
+	//				CongestionEvent congestionEvent = new CongestionEvent(now, "flowCapacity", causingPersonId, 
+	//						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
+	//				this.events.processEvent(congestionEvent);
+	//				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
+	//			}
+	//			agentDelay = agentDelay - delayAllocatedToThisCausingPerson ; 
+	//		}
+	//
+	//		if (agentDelay <= 1.) {
+	//			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
+	//			// Setting the remaining delay to 0 sec.
+	//			this.delayNotInternalized_roundingErrors += agentDelay;
+	//			agentDelay = 0.;
+	//		}
+	//
+	//		return agentDelay;
+	//	}
 
 }
