@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.costcalculators;
-
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-
 /**
- * @author dgrether
+ * @author nagel
  *
  */
-public final class TravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
-
-	private double sigma = 0. ;
-
-	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
-	}
-	
-	public final TravelTimeAndDistanceBasedTravelDisutilityFactory setSigma( double val ) {
-		this.sigma = val ;
-		return this ;
-	}
-
-}
+package tutorial.programming.randomizingRouter;
