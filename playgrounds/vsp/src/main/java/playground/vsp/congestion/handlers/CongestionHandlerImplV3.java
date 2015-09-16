@@ -216,7 +216,7 @@ CongestionInternalization {
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
-			//			delegate.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
+			delegate.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
 
@@ -296,41 +296,22 @@ CongestionInternalization {
 	 */
 	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {		
 
-		// Start with the affected agent and set him/her to the agent 'behind'
-		DelayInfo agentBehindDelayInfo = affectedAgentDelayInfo;
-
-		double freeSpeedLeaveTimeGap = 0.0;
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId );
 
-		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ;  it.hasNext() ; ) {
+		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; remainingDelay > 0.0 && it.hasNext() ; ) {
 			// Get the agent 'ahead' from the flow queue. The agents 'ahead' are considered as causing agents.
 			DelayInfo agentAheadDelayInfo = it.next() ;
 
-			freeSpeedLeaveTimeGap = agentBehindDelayInfo.freeSpeedLeaveTime - agentAheadDelayInfo.freeSpeedLeaveTime ;
-			// meaning that the original time gap would have been < 1/cap
+			double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-			if (freeSpeedLeaveTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec() ) {
-				if(remainingDelay == 0.0) {
-					return 0.0;
-				}else {
-							double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", agentAheadDelayInfo.personId, 
+					affectedAgentDelayInfo.personId, allocatedDelay, linkId, agentAheadDelayInfo.linkEnterTime );
+			this.events.processEvent(congestionEvent); 
 
-							CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", agentAheadDelayInfo.personId, 
-									affectedAgentDelayInfo.personId, allocatedDelay, linkId, agentAheadDelayInfo.linkEnterTime );
-							this.events.processEvent(congestionEvent); 
+			this.totalInternalizedDelay += allocatedDelay ;
 
-							this.totalInternalizedDelay += allocatedDelay ;
+			remainingDelay = remainingDelay - allocatedDelay;
 
-							remainingDelay = remainingDelay - allocatedDelay;
-
-							// Now, go to the subsequent pair of agents. The agent 'ahead' will be set to the agent 'behind'. 
-							agentBehindDelayInfo = agentAheadDelayInfo;
-						}
-			} else {
-				// since timeGap is higher than marginalFlowDelay, no need for further look up.
-				linkInfo.getFlowQueue().clear();
-				break;
-			}
 		}
 
 		if(remainingDelay > 0. && remainingDelay <=1 ){
@@ -338,53 +319,8 @@ CongestionInternalization {
 			// Setting the remaining delay to 0 sec.
 			this.delayNotInternalized_roundingErrors += remainingDelay;
 			remainingDelay = 0.;
-			//			}
 		}
 
 		return remainingDelay;
 	}
-
-	//	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, Id<Vehicle> affectedVehId, double agentDelay) {
-	//		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId);
-	//
-	//		for ( Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
-	//			// "add" will, presumably, add at the end.  So the newest are latest.  So a descending
-	//
-	//			DelayInfo delayInfo = it.next();
-	//
-	//			Id<Person> causingPersonId = delayInfo.personId ;
-	//			double delayAllocatedToThisCausingPerson = Math.min( linkInfo.getMarginalDelayPerLeavingVehicle_sec(), agentDelay ) ;
-	//			// (marginalDelay... is based on flow capacity of link, not time headway of vehicle)
-	//
-	//			if(delayAllocatedToThisCausingPerson==0.) {
-	//				return 0.; // no reason to throw a congestion event for zero delay. (AA sep'15)
-	//			}
-	//
-	//			if (affectedVehId.toString().equals(causingPersonId.toString())) {
-	//				// log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-	//			} else {
-	//				// using the time when the causing agent entered the link
-	//				// (one place where we need the link enter time way beyond the time when the vehicle is on the link)
-	//
-	//				//				final Double causingPersonLinkEnterTime = linkInfo.getPersonId2linkEnterTime().get(causingPersonId);
-	//				final double causingPersonLinkEnterTime = delayInfo.linkEnterTime ;
-	//
-	//				CongestionEvent congestionEvent = new CongestionEvent(now, "flowCapacity", causingPersonId, 
-	//						Id.createPersonId(affectedVehId), delayAllocatedToThisCausingPerson, linkId, causingPersonLinkEnterTime);
-	//				this.events.processEvent(congestionEvent);
-	//				this.totalInternalizedDelay += delayAllocatedToThisCausingPerson ;
-	//			}
-	//			agentDelay = agentDelay - delayAllocatedToThisCausingPerson ; 
-	//		}
-	//
-	//		if (agentDelay <= 1.) {
-	//			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
-	//			// Setting the remaining delay to 0 sec.
-	//			this.delayNotInternalized_roundingErrors += agentDelay;
-	//			agentDelay = 0.;
-	//		}
-	//
-	//		return agentDelay;
-	//	}
-
 }
