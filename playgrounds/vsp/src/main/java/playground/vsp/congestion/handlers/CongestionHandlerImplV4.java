@@ -174,7 +174,7 @@ CongestionInternalization {
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
-			delegate.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
+			CongestionInfoHandler.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
 

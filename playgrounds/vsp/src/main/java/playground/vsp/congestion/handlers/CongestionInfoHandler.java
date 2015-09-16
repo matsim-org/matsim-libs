@@ -176,7 +176,7 @@ PersonArrivalEventHandler {
 		linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 	}
 
-	final void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
+	final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
@@ -256,16 +256,16 @@ PersonArrivalEventHandler {
 	}
 
 	public void addToDelayNotInternalized_roundingErrors(
-			double delayNotInternalized_roundingErrors) {
-		this.delayNotInternalized_roundingErrors += delayNotInternalized_roundingErrors;
+			double val) {
+		this.delayNotInternalized_roundingErrors += val;
 	}
 
 	public double getTotalInternalizedDelay() {
 		return totalInternalizedDelay;
 	}
 
-	public void addToTotalInternalizedDelay(double totalInternalizedDelay) {
-		this.totalInternalizedDelay += totalInternalizedDelay;
+	public void addToTotalInternalizedDelay(double val) {
+		this.totalInternalizedDelay += val;
 	}
 
 	final Map<Id<Link>, LinkCongestionInfo> getLinkId2congestionInfo() {

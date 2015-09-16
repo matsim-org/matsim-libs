@@ -85,12 +85,8 @@ CongestionInternalization {
 	private double totalDelay = 0.;
 
 	private Scenario scenario;
-	private EventsManager events;
-
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
-		this.events = events;
-
 		this.delegate = new CongestionInfoHandler(events, scenario);
 	}
 
@@ -200,7 +196,7 @@ CongestionInternalization {
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
-			delegate.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
+			CongestionInfoHandler.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
 
