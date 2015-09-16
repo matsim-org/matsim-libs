@@ -38,7 +38,7 @@ public class SubpopulationsExampleTest {
 			RunSubpopulationsExample.main(null);
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
-			fail() ;
+			fail( "Got an exception while running subpopulation example: "+ee ) ;
 		}
 	}
 

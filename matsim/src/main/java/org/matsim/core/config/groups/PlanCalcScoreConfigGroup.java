@@ -20,9 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -117,18 +115,148 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			setMarginalUtlOfWaitingPt_utils_hr( Double.parseDouble( value ) );
 		}
 
+		// backward compatibility: underscored
+		else if (key.startsWith("activityType_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
+
+			actParams.setActivityType(value);
+			this.removeParameterSet( actParams );
+			addActivityParams( actParams );
+		}
+		else if (key.startsWith("activityPriority_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityPriority_".length()));
+			actParams.setPriority(Double.parseDouble(value));
+		}
+		else if (key.startsWith("activityTypicalDuration_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityTypicalDuration_".length()));
+			actParams.setTypicalDuration(Time.parseTime(value));
+		}
+		else if (key.startsWith("activityMinimalDuration_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityMinimalDuration_".length()));
+			actParams.setMinimalDuration(Time.parseTime(value));
+		}
+		else if (key.startsWith("activityOpeningTime_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityOpeningTime_".length()));
+			actParams.setOpeningTime(Time.parseTime(value));
+		}
+		else if (key.startsWith("activityLatestStartTime_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityLatestStartTime_".length()));
+			actParams.setLatestStartTime(Time.parseTime(value));
+		}
+		else if (key.startsWith("activityEarliestEndTime_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityEarliestEndTime_".length()));
+			actParams.setEarliestEndTime(Time.parseTime(value));
+		}
+		else if (key.startsWith("activityClosingTime_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityClosingTime_".length()));
+			actParams.setClosingTime(Time.parseTime(value));
+		}
+		else if (key.startsWith("scoringThisActivityAtAll_")) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring("scoringThisActivityAtAll_".length()));
+			actParams.setScoringThisActivityAtAll( Boolean.parseBoolean(value) );
+		}
+		else if (key.startsWith("traveling_")) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring("traveling_".length()));
+			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if (key.startsWith("marginalUtlOfDistance_")) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring("marginalUtlOfDistance_".length()));
+			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+		else if (key.startsWith("monetaryDistanceRate_")) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring("monetaryDistanceRate_".length()));
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
+		}
+		else if ( "monetaryDistanceRateCar".equals(key) ){
+			ModeParams modeParams = getOrCreateModeParams( TransportMode.car ) ;
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
+		}
+		else if ( "monetaryDistanceRatePt".equals(key) ){
+			ModeParams modeParams = getOrCreateModeParams( TransportMode.pt ) ;
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
+		}
+		else if (key.startsWith("constant_")) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring("constant_".length()));
+			modeParams.setConstant(Double.parseDouble(value));
+		}
+
+		// backward compatibility: "typed" traveling
+		else if ("traveling".equals(key)) {
+			this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if ("travelingPt".equals(key)) {
+			this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if ("travelingWalk".equals(key)) {
+			this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if ("travelingOther".equals(key)) {
+			this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if ("travelingBike".equals(key)) {
+			this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+
+		// backward compatibility: "typed" util of distance
+		else if ("marginalUtlOfDistanceCar".equals(key)){
+			this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+		else if ("marginalUtlOfDistancePt".equals(key)){
+			this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+		else if ("marginalUtlOfDistanceWalk".equals(key)){
+			this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+		else if ("marginalUtlOfDistanceOther".equals(key)){
+			this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+
+		// backward compatibility: "typed" constants
+		else if ( "constantCar".equals(key)) {
+			getModes().get(TransportMode.car).setConstant(Double.parseDouble(value));
+		}
+		else if ( "constantWalk".equals(key)) {
+			getModes().get(TransportMode.walk).setConstant(Double.parseDouble(value));
+		}
+		else if ( "constantOther".equals(key)) {
+			getModes().get(TransportMode.other).setConstant(Double.parseDouble(value));
+		}
+		else if ( "constantPt".equals(key)) {
+			getModes().get(TransportMode.pt).setConstant(Double.parseDouble(value));
+		}
+		else if ( "constantBike".equals(key)) {
+			getModes().get(TransportMode.bike).setConstant(Double.parseDouble(value));
+		}
+
+		// old-fashioned scoring parameters: default subpopulation
+		else if ( Arrays.asList( LATE_ARRIVAL ,
+						EARLY_DEPARTURE ,
+						PERFORMING ,
+						MARGINAL_UTL_OF_MONEY ,
+						UTL_OF_LINE_SWITCH ,
+						WAITING ).contains( key ) ) {
+			getScoringParameters( null ).addParam( key , value );
+		}
+
 		else {
-			try {
-				delegate.addParam(key, value);
-			}
-			catch ( IllegalArgumentException e ) {
-				throw new IllegalArgumentException(
-						"Got an exception adding parameters "+key+". "+
-								"Did you use an old config (with underscores)? "+
-								"If so, you can convert it using org.matsim.run.ConvertOldPlanCalcScoreConfigGroup oldCOnfig newConfig");
-			}
+			delegate.addParam(key, value);
 		}
 	}
+
+	/* for the backward compatibility nonsense */
+	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
+	private ActivityParams getActivityTypeByNumber(final String number) {
+		ActivityParams actType = this.activityTypesByNumber.get(number);
+		if ( (actType == null) ) {
+			// not sure what this means, but I found it so...
+			// TD, sep'14
+			actType = new ActivityParams(number);
+			this.activityTypesByNumber.put(number, actType);
+			addParameterSet( actType );
+		}
+		return actType;
+	}
+
 
 	public ModeParams getOrCreateModeParams(String modeName) {
 		ModeParams modeParams = getModes().get(modeName);
@@ -217,7 +345,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-	private Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
 		@SuppressWarnings("unchecked")
 		final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets( ScoringParameterSet.SET_TYPE );
 		final Map<String, ScoringParameterSet> map = new LinkedHashMap< >();
@@ -293,7 +421,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return this.getActivityParamsPerType().get(actType);
 	}
 
-	private ScoringParameterSet getScoringParameters(String subpopulation) {
+	public ScoringParameterSet getScoringParameters(String subpopulation) {
 		return getScoringParametersPerSubpopulation().get( subpopulation );
 	}
 
@@ -309,6 +437,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				break;
 			case ScoringParameterSet.SET_TYPE:
 				addScoringParameters( (ScoringParameterSet) set );
+				break;
 			default:
 				throw new IllegalArgumentException( set.getName() );
 		}
@@ -714,7 +843,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
 	}
 
-	private static class ScoringParameterSet extends ReflectiveConfigGroup {
+	public static class ScoringParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_TYPE = "scoringParameters";
 
 		private ScoringParameterSet() {

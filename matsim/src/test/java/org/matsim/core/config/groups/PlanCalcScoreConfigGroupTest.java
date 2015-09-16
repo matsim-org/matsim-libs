@@ -257,6 +257,11 @@ public class PlanCalcScoreConfigGroupTest {
 			module.addParam( "monetaryDistanceRate_"+mode , ""+settings.getMonetaryDistanceRate() );
 		}
 
+		for ( Map.Entry<String, String> params : initialGroup.getScoringParameters( null ).getParams().entrySet() ) {
+			if ( params.getKey().equals( "subpopulation" ) ) continue;
+			module.addParam( params.getKey() , params.getValue() );
+		}
+
 		return module;
 	}
 
