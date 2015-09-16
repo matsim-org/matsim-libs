@@ -1,5 +1,13 @@
 package org.matsim.core.router;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,16 +22,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouter;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryImpl.class);
-
+    
     public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new TripRouterFactoryModule(),
@@ -35,6 +37,9 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                 })
                 .getInstance(TripRouterFactory.class);
 	}
+
+    // Use a cache for the single mode networks. Otherwise, a new network is created for each TripRouterFactory instance!
+    private final Map<String, Network> singleModeNetworksCache = new ConcurrentHashMap<>();
 
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private final Provider<TransitRouter> transitRouterFactory;
@@ -84,11 +89,21 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
         }
 
         for ( String mode : routeConfigGroup.getNetworkModes() ) {
-            TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-            Set<String> modes = new HashSet<>();
-            modes.add(mode);
-            Network filteredNetwork = NetworkUtils.createNetwork();
-            filter.filter(filteredNetwork, modes);
+        	
+        	Network filteredNetwork = null;
+        	
+        	// Ensure this is not performed concurrently by multiple threads!
+        	synchronized (this.singleModeNetworksCache) {
+        		filteredNetwork = this.singleModeNetworksCache.get(mode);
+        		if (filteredNetwork == null) {
+        			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+        			Set<String> modes = new HashSet<>();
+        			modes.add(mode);
+        			filteredNetwork = NetworkUtils.createNetwork();
+        			filter.filter(filteredNetwork, modes);
+        			this.singleModeNetworksCache.put(mode, filteredNetwork);
+        		}
+			}
 
             LeastCostPathCalculator routeAlgo =
             leastCostPathCalculatorFactory.createPathCalculator(

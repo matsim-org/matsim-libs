@@ -74,7 +74,7 @@ public class DemandAnalyzer {
 
 	public static void main(String[] args) {
 
-		run("./data/synthetic_population/150615_trips.xml");
+		run("./data/synthetic_population/trips.xml");
 
 	}
 
