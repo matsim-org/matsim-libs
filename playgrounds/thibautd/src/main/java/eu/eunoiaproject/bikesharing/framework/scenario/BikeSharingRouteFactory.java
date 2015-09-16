@@ -40,5 +40,10 @@ public class BikeSharingRouteFactory implements RouteFactory {
 		if ( log.isTraceEnabled() ) log.trace( "creating bike sharing route between links "+startLinkId+" and "+endLinkId );
 		return new BikeSharingRoute( startLinkId , endLinkId );
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return "bikeSharing";
+	}
 }
 

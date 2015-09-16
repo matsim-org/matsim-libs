@@ -19,7 +19,6 @@
 
 package org.matsim.core.router;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,10 +31,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import junit.framework.Assert;
 
 /**
  * @author mrieser
@@ -46,11 +45,10 @@ public class TeleportationRoutingModuleTest {
 	public void testRouteLeg() {
 		PopulationFactory populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 		ModeRouteFactory routeFactory = new ModeRouteFactory();
-		routeFactory.setRouteFactory(TransportMode.walk, new GenericRouteFactory());
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.walk);
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 1000, (double) 0));
+		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
+		Activity toAct = new ActivityImpl("h", new Coord(1000, 0));
 
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
@@ -74,7 +72,7 @@ public class TeleportationRoutingModuleTest {
 		Assert.assertEquals(50.0, leg.getTravelTime(), 10e-7);
 		Assert.assertEquals(50.0, leg.getRoute().getTravelTime(), 10e-7);
 
-		Activity otherToAct = new ActivityImpl("h", new Coord((double) 1000, (double) 1000));
+		Activity otherToAct = new ActivityImpl("h", new Coord(1000, 1000));
 		double manhattanBeelineDistanceFactor = Math.sqrt(2.0);
 		router =
                 new TeleportationRoutingModule(

@@ -36,13 +36,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.sergioo.weeklySimulation.util.misc.Time;
@@ -312,21 +309,22 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 
-		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
-				this.currleg.getMode(), 
-				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
-						endLinkId == null ? null : Id.create(endLinkId, Link.class));
-		this.currleg.setRoute(this.currRoute);
-
-		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		}
-		if (atts.getValue("distance") != null) {
-			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
-		}
-		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
-		}
+		throw new RuntimeException("This looks like an exact copy of the class in the core. Please use that class, I do not want to refactor a class multiple times."); // mrieser, 13sep2015
+//		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
+//				this.currleg.getMode(), 
+//				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
+//						endLinkId == null ? null : Id.create(endLinkId, Link.class));
+//		this.currleg.setRoute(this.currRoute);
+//
+//		if (atts.getValue("trav_time") != null) {
+//			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+//		}
+//		if (atts.getValue("distance") != null) {
+//			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
+//		}
+//		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
+//			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
+//		}
 
 	}
 

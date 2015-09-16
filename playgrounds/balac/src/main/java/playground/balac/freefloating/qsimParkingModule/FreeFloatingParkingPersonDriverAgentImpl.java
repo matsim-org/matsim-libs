@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -368,7 +367,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl("freefloating");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, l.getId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
 		route.setVehicleId(Id.create("FF_" + (vehID), Vehicle.class));
@@ -427,7 +426,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl("freefloatingparking");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route1 = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", route.getEndLinkId(), parkingSpot.getLinkId());
+		NetworkRoute route1 = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, route.getEndLinkId(), parkingSpot.getLinkId());
 		route1.setLinkIds( route.getEndLinkId(), ids,  parkingSpot.getLinkId());
 		route1.setTravelTime( travelTime);
 		//route1.setVehicleId(new IdImpl("FF_" + (vehID)));

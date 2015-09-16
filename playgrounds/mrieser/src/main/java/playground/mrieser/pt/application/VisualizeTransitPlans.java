@@ -20,9 +20,20 @@
 
 package playground.mrieser.pt.application;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -34,26 +45,24 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class VisualizeTransitPlans {
@@ -76,7 +85,6 @@ public class VisualizeTransitPlans {
 			new MatsimNetworkReader(this.realScenario).readFile(NETWORK_FILE);
 		}
 		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
-		((PopulationFactoryImpl) this.realScenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
 //		this.realScenario.getPopulation().printPlansCount();
 	}
@@ -98,7 +106,7 @@ public class VisualizeTransitPlans {
 						visAct.setStartTime(act.getStartTime());
 						visAct.setMaximumDuration((act).getMaximumDuration());
 						visAct.setEndTime(act.getEndTime());
-						visAct.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.visScenario.getNetwork()), act.getCoord()).getId());
+						visAct.setLinkId(NetworkUtils.getNearestLink((this.visScenario.getNetwork()), act.getCoord()).getId());
 						visPlan.addActivity(visAct);
 					} else if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
@@ -196,7 +204,7 @@ public class VisualizeTransitPlans {
 
 	private void visualize() {
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(this.visScenario, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(this.visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.visScenario.getConfig(), this.visScenario, events, otfVisQSim);
 		OTFClientLive.run(this.visScenario.getConfig(), server);
 		otfVisQSim.run();

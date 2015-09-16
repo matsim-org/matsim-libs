@@ -106,7 +106,7 @@ public class MyRoutingModule implements RoutingModule {
 		teleportationLeg.setTravelTime( 0 );
 		final Route teleportationRoute =
 			modeRouteFactory.createRoute(
-					TELEPORTATION_LEG_MODE,
+					Route.class,
 					station.getLinkId(),
 					toFacility.getLinkId());
 		teleportationRoute.setTravelTime( 0 );

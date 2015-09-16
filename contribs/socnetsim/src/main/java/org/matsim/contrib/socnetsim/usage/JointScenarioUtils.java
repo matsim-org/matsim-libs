@@ -31,13 +31,14 @@ import org.matsim.contrib.socnetsim.framework.population.JointPlansXmlReader;
 import org.matsim.contrib.socnetsim.framework.scoring.InternalizationConfigGroup;
 import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
 import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRouteFactory;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRouteFactory;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -63,10 +64,10 @@ public class JointScenarioUtils {
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		final ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		rFactory.setRouteFactory(
-				JointActingTypes.DRIVER,
+				DriverRoute.class,//JointActingTypes.DRIVER,
 				new DriverRouteFactory());
 		rFactory.setRouteFactory(
-				JointActingTypes.PASSENGER,
+				PassengerRoute.class,//JointActingTypes.PASSENGER,
 				new PassengerRouteFactory());
 		return sc;
 	}

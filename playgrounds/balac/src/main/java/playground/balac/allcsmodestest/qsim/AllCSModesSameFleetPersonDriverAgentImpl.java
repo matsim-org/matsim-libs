@@ -40,7 +40,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -456,7 +455,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl(mode);
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", startLink.getId(), destinationLink.getId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);
 		if (mode.equals("twowaycarsharing"))
