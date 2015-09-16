@@ -115,7 +115,7 @@ PersonArrivalEventHandler {
 	public final void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
-		
+
 		//--
 		this.personId2legNr.clear();
 		this.personId2linkNr.clear();
@@ -137,14 +137,14 @@ PersonArrivalEventHandler {
 	public final void handleEvent( Wait2LinkEvent event ) {
 		this.vehicleId2personId.put( event.getVehicleId(), event.getPersonId() ) ;
 	}
-	
+
 	@Override
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
-			
+
 			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() )
 					.setLinkId( event.getLinkId() ).setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
@@ -176,7 +176,7 @@ PersonArrivalEventHandler {
 		// ---
 		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
 		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
-		
+
 	}
 
 	@Override
@@ -184,13 +184,13 @@ PersonArrivalEventHandler {
 		throw new RuntimeException("Not implemented. Aborting...");
 		// the following should be moved to different versions
 	}
-	
+
 	@Override
 	public /*final*/ void handleEvent( PersonArrivalEvent event ) {
 		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario) ;
 		linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 	}
-	
+
 	final void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
@@ -204,17 +204,23 @@ PersonArrivalEventHandler {
 			// queue is already empty; nothing to do
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-			if ( time > earliestLeaveTime + 1.) {
+			if ( time > earliestLeaveTime + 1.) { 
+				// bottleneck is not active anymore.
 				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
-				
-//				// bottleneck no longer active. However, first check for combination of flow and storage delay:
-//				DelayInfo causingAgentInfo = linkInfo.getFlowQueue().getLast() ;
-//				double timeGap = delayInfo.freeSpeedLeaveTime - causingAgentInfo.freeSpeedLeaveTime ; 
-//				if ( timeGap > linkInfo.getMarginalDelayPerLeavingVehicle_sec() ) {
-//					 // (otherwise there would have been flow delay)
-					
+
+				// bottleneck no longer active. However, first check for combination of flow and storage delay:
+				DelayInfo agentAheadDelayInfo = linkInfo.getFlowQueue().getLast() ;
+				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - agentAheadDelayInfo.freeSpeedLeaveTime ; 
+				// (otherwise there would have been flow delay)
+
+				/* The following is to catch the possibility of agent getting delayed due to flow capacity and storage
+				 * capacity respectively.
+				 */
+				if(freeSpeedLeaveTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()){
+					// Though bottleneck is not active, last leaving agent is causing delay.
+				} else {
 					linkInfo.getFlowQueue().clear();
-//				}
+				}
 			}
 		}
 
@@ -235,7 +241,7 @@ PersonArrivalEventHandler {
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
 		return vehicleId2personId;
 	}
-	
-	
-	
+
+
+
 }
