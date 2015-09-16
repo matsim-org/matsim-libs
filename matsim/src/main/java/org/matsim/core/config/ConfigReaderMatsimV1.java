@@ -77,17 +77,7 @@ import org.xml.sax.InputSource;
 	  this.currmodule = this.config.getModule(name);
 
 		if (this.currmodule == null) {
-		  //if there are type safe optional modules they have to be added here
-		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
-		    this.currmodule = this.config.qsim();
-		  } else if ( name.equals(SimulationConfigGroup.GROUP_NAME) ) {
-			  this.currmodule = new SimulationConfigGroup() ;
-			  this.config.addModule(this.currmodule);
-		  }
-		  //it must be a not type safe generic module
-		  else {
 		    this.currmodule = this.config.createModule(atts.getValue("name"));
-		  }
 		}
 	}
 
