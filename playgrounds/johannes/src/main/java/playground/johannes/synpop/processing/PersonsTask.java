@@ -17,9 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
 
@@ -27,8 +27,8 @@ import java.util.Collection;
  * @author johannes
  *
  */
-public interface ProxyPersonsTask {
+public interface PersonsTask {
 
-	public void apply(Collection<PlainPerson> persons);
+	void apply(Collection<? extends Person> persons);
 	
 }

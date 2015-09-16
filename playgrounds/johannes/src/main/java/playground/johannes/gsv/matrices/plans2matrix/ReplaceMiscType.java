@@ -22,9 +22,9 @@ package playground.johannes.gsv.matrices.plans2matrix;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.processing.PersonsTask;
 
 import java.util.Collection;
 
@@ -32,16 +32,16 @@ import java.util.Collection;
  * @author johannes
  *
  */
-public class ReplaceMiscType implements ProxyPersonsTask {
+public class ReplaceMiscType implements PersonsTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonsTask#apply(java.util.Collection)
+	 * @see playground.johannes.synpop.processing.PersonsTask#apply(java.util.Collection)
 	 */
 	@Override
-	public void apply(Collection<PlainPerson> persons) {
+	public void apply(Collection<? extends Person> persons) {
 		TObjectIntHashMap<String> typeCounts = new TObjectIntHashMap<>();
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
@@ -59,7 +59,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 			types.addChoice(it.key(), it.value());
 		}
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);

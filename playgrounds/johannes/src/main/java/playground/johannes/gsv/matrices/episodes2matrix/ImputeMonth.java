@@ -22,24 +22,23 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.synPop.ProxyPersonsTask;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.PersonsTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.util.Collection;
 
 /**
  * @author johannes
  */
-public class ImputeMonth implements ProxyPersonsTask {
+public class ImputeMonth implements PersonsTask {
 
     @Override
-    public void apply(Collection<PlainPerson> persons) {
+    public void apply(Collection<? extends Person> persons) {
         TObjectIntHashMap<String> monthCounts = new TObjectIntHashMap<>();
 
-        for(PlainPerson person : persons) {
+        for(Person person : persons) {
             String month = person.getAttribute(MiDKeys.PERSON_MONTH);
             if(month != null) {
                 monthCounts.adjustOrPutValue(month, 1, 1);
