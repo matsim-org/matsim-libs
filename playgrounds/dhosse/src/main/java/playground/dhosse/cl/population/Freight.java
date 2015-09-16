@@ -116,7 +116,7 @@ public class Freight {
 			Activity firstActivity = null;
 			Activity lastActivity = null;
 			
-			//TODO: coorect assignment of home and work to the activities... e.g. CE-location is "home".
+			//TODO: correct assignment of start /end to the activities... e.g. CE-location is "home".
 			String actTypeStart = "home";
 			String actTypeEnd = "work";
 
@@ -226,20 +226,20 @@ public class Freight {
 	private static void createObservationPoints() {
 
 		//CE01	CAMINO A MELIPILLA
-		zonaId2Coord.put("CE01in", new Coord(292630.0, 6271720.0));
-		zonaId2Coord.put("CE01out", new Coord(292650.0, 6271755.0)); 
+		zonaId2Coord.put("CE01in", new Coord(296025.0, 6271935.0));
+		zonaId2Coord.put("CE01out", new Coord(296025.0, 6271905.0)); 
 		//CE02	AUTOPISTA DEL SOL
-		zonaId2Coord.put("CE02in", new Coord(296025.0, 6271935));
-		zonaId2Coord.put("CE02out", new Coord(296025.0, 6271905)); 
+		zonaId2Coord.put("CE02in", new Coord(292517.0, 6271720.0));
+		zonaId2Coord.put("CE02out", new Coord(292615.0, 6271840.0)); 
 		//CE03	RUTA 68 (A VALPARAISO) // TODO: (how to= make sure, that the right link will be used(?)
 		zonaId2Coord.put("CE03in", new Coord(323540.0, 6296520.0));
 		zonaId2Coord.put("CE03out", new Coord(323560.0, 6296520.0)); 
 		//CE04	RUTA 5 SUR (ANGOSTURA) ; out of box -> moved northbound on Ruta 5
-		zonaId2Coord.put("CE04in", new Coord(338200.0, 6253060.0));
-		zonaId2Coord.put("CE04out", new Coord(338180.0, 6253060.0)); 
+		zonaId2Coord.put("CE04in", new Coord(338322.0, 6252325.0));
+		zonaId2Coord.put("CE04out", new Coord(338185.0, 6253060.0)); 
 		//CE05	RUTA 5 NORTE (LAMPA)
 		zonaId2Coord.put("CE05in", new Coord(336100.0 , 6321210.0));
-		zonaId2Coord.put("CE05out", new Coord(336160.0 , 6321210.0)); 
+		zonaId2Coord.put("CE05out", new Coord(336200.0 , 6321210.0)); 
 		//CE06	CAMINO PADRE HURTADO
 		zonaId2Coord.put("CE06in", new Coord(343990.0, 6266370.0));
 		zonaId2Coord.put("CE06out", new Coord(343955.0, 6266370.0)); 
@@ -247,7 +247,7 @@ public class Freight {
 		zonaId2Coord.put("CE07in", new Coord(346515.0, 6327220.0));
 		zonaId2Coord.put("CE07out", new Coord(346560.0, 6327220.0)); 
 		//CE08	CAMINO SAN JOSE DE MAIPO
-		zonaId2Coord.put("CE08in", new Coord(358240.0, 6281315.0));
+		zonaId2Coord.put("CE08in", new Coord(358240.0, 6281350.0));
 		zonaId2Coord.put("CE08out", new Coord(358240.0, 6281280.0)); 
 		//CE09	CAMINO A FARELLONES
 		zonaId2Coord.put("CE09in", new Coord(360730.0, 6307035.0));
