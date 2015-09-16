@@ -138,7 +138,7 @@ public class Freight {
 //				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
 			}
 
-			System.out.println(freightTrip.getId()+ " DestZone: "+ destinationZone + " "+ destinationZone.startsWith(prefix) );
+//			System.out.println(freightTrip.getId()+ " DestZone: "+ destinationZone + " "+ destinationZone.startsWith(prefix) );
 			if (destinationZone.startsWith(prefix)){	//surveyed at leaving 
 				destinationCoord = zonaId2Coord.get(destinationZone.concat("out"));
 //				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
