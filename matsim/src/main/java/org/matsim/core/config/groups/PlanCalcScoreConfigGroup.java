@@ -63,9 +63,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 
-	@Deprecated
-	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate";
-
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
@@ -111,7 +108,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParam(final String key, final String value) {
-        if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
+        if (key.startsWith("monetaryDistanceCostRate")) {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 					+ "mode-parameters (see output of any recent run), and mode-specific monetary "
 					+ "distance rate.") ;
@@ -365,7 +362,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		super.addParameterSet( params );
 	}
 	
-	public static enum TypicalDurationScoreComputation { uniform, relative } ;
+	public enum TypicalDurationScoreComputation { uniform, relative } ;
 
 	/* complex classes */
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
@@ -690,13 +687,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					throw new RuntimeException( "wrong class for "+module );
 				}
 				final String m = ((ModeParams) module).getMode();
-				if ( getModes().get( m ) != null ) {
+				if ( getModes().get(m) != null ) {
 					throw new IllegalStateException( "already a parameter set for mode "+m );
 				}
 				break;
-			default:
-				//throw new IllegalArgumentException( module.getName() );
+			case ScoringParameterSet.SET_TYPE:
+				if ( !(module instanceof ScoringParameterSet) ) {
+					throw new RuntimeException( "wrong class for "+module );
+				}
+				final String s = ((ScoringParameterSet) module).getSubpopulation();
+				if ( getScoringParameters( s ) != null ) {
+					throw new IllegalStateException( "already a parameter set for subpopulation "+s );
+				}
 				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
 		}
 	}
 
