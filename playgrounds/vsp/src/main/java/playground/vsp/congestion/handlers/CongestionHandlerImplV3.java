@@ -297,7 +297,7 @@ CongestionInternalization {
 
 		double originalTimeGap = 0.0;
 		DelayInfo delayInfo = affectedAgentDelayInfo;
-		for (Iterator<DelayInfo> it = linkInfo.getDelayQueue().descendingIterator() ;  remainingDelay > 0.0 && !linkInfo.getFlowQueue().isEmpty() && it.hasNext() ; ) {
+		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ;  remainingDelay > 0.0 &&  it.hasNext() ; ) {
 			DelayInfo causingAgentDelayInfo = it.next() ;
 			Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
 
@@ -317,7 +317,6 @@ CongestionInternalization {
 				delayInfo = causingAgentDelayInfo;
 			} else {
 				// since timeGap is higher than marginalFlowDelay, no need for further look up.
-				linkInfo.getDelayQueue().remove(causingAgentDelayInfo);
 				break;
 			}
 		}
