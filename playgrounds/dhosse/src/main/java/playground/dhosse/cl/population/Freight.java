@@ -2,6 +2,7 @@ package playground.dhosse.cl.population;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,6 +73,20 @@ public class Freight {
 		createDir(new File(outputDir));
 		new PopulationWriter(population).write(outputDir + "plans.xml.gz");
 		new PopulationWriter(population).write(outputDir + "plans.xml");
+		
+		//write list of all AgentIds to file. Can be used for selecting all freightVehicleAgents in visualization with Senozon Via   
+		try {
+			FileWriter writer = new FileWriter(outputDir + "freightAgentIds.txt");
+			for (Person person: population.getPersons().values()){
+				writer.write(person.getId().toString() + System.getProperty("line.separator"));
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
 	}
 
