@@ -290,31 +290,38 @@ CongestionInternalization {
 	 * @param affectedAgentDelayInfo delayInfo of affected agent to get free speed link leave time and person id
 	 * @param remainingDelay at this step, it is delay of the affected agent
 	 * @return the remaining uncharged delay
-	 * <p> Check for the time gap between subsequent vehicles and if it is less than marginal delay of link, agent is charged.
+	 * <p>
+	 * Charging the agents that are in the flow queue.
+	 * Do this step-wise comparing the freespeed leave time of two subsequent agents (agent 'ahead' and agent 'behind').
 	 */
-	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {
+	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {		
+		
+		// Start with the affected agent and set him/her to the agent 'behind'
+		DelayInfo agentBehindDelayInfo = affectedAgentDelayInfo;
+				
+		double freeSpeedLeaveTimeGap = 0.0;
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( linkId );
 
-		double originalTimeGap = 0.0;
-		DelayInfo delayInfo = affectedAgentDelayInfo;
 		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ;  remainingDelay > 0.0 &&  it.hasNext() ; ) {
-			DelayInfo causingAgentDelayInfo = it.next() ;
-			Id<Person> causingAgentId = causingAgentDelayInfo.personId ;
+			// Get the agent 'ahead' from the flow queue. The agents 'ahead' are considered as causing agents.
+			DelayInfo agentAheadDelayInfo = it.next() ;
 
-			originalTimeGap = delayInfo.freeSpeedLeaveTime - causingAgentDelayInfo.freeSpeedLeaveTime ;
+			freeSpeedLeaveTimeGap = agentBehindDelayInfo.freeSpeedLeaveTime - agentAheadDelayInfo.freeSpeedLeaveTime ;
 			// meaning that the original time gap would have been < 1/cap
 
-			if(originalTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec() + 1) {
-				double agentDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
+			if (freeSpeedLeaveTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec() + 1) {
+				double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-				CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", causingAgentId, 
-						affectedAgentDelayInfo.personId, agentDelay, linkId, causingAgentDelayInfo.linkEnterTime );
+				CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", agentAheadDelayInfo.personId, 
+						affectedAgentDelayInfo.personId, allocatedDelay, linkId, agentAheadDelayInfo.linkEnterTime );
 				this.events.processEvent(congestionEvent); 
 
-				this.totalInternalizedDelay += agentDelay ;
+				this.totalInternalizedDelay += allocatedDelay ;
 
-				remainingDelay = remainingDelay - agentDelay;
-				delayInfo = causingAgentDelayInfo;
+				remainingDelay = remainingDelay - allocatedDelay;
+				
+				// Now, go to the subsequent pair of agents. The agent 'ahead' will be set to the agent 'behind'. 
+				agentBehindDelayInfo = agentAheadDelayInfo;
 			} else {
 				// since timeGap is higher than marginalFlowDelay, no need for further look up.
 				break;
