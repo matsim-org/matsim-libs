@@ -69,10 +69,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
-	private final ScoringParameterSet scoringParametersDelegate = new ScoringParameterSet();
+
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
+
+		this.addScoringParameters( new ScoringParameterSet() );
 
 		this.addParameterSet( new ModeParams( TransportMode.car ) );
 		this.addParameterSet( new ModeParams( TransportMode.pt ) );
@@ -135,7 +137,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		ModeParams modeParams = getModes().get(modeName);
 		if (modeParams == null) {
 			modeParams = new ModeParams( modeName );
-			addParameterSet( modeParams );
+			addParameterSet(modeParams);
 		}
 		return modeParams;
 	}
@@ -144,7 +146,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public Map<String, String> getParams() {
 		final Map<String, String> params = delegate.getParams();
 		if ( waitingPt != null ) {
-			params.put( WAITING_PT , waitingPt.toString() );
+			params.put(WAITING_PT, waitingPt.toString());
 		}
 		return params;
 	}
@@ -218,6 +220,22 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return map;
 	}
 
+	private Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
+		@SuppressWarnings("unchecked")
+		final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets( ScoringParameterSet.SET_TYPE );
+		final Map<String, ScoringParameterSet> map = new LinkedHashMap< >();
+
+		for ( ScoringParameterSet pars : parameters ) {
+			if ( this.isLocked() ) {
+				pars.setLocked();
+			}
+			map.put( pars.getSubpopulation() , pars );
+		}
+
+		return map;
+	}
+
+
 
 	/** Checks whether all the settings make sense or if there are some problems with the parameters
 	 * currently set. Currently, this checks that for at least one activity type opening AND closing
@@ -278,6 +296,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return this.getActivityParamsPerType().get(actType);
 	}
 
+	private ScoringParameterSet getScoringParameters(String subpopulation) {
+		return getScoringParametersPerSubpopulation().get( subpopulation );
+	}
+
+
 	@Override
 	public void addParameterSet( final ConfigGroup set ) {
 		switch ( set.getName() ) {
@@ -287,10 +310,26 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			case ModeParams.SET_TYPE:
 				addModeParams( (ModeParams) set );
 				break;
+			case ScoringParameterSet.SET_TYPE:
+				addScoringParameters( (ScoringParameterSet) set );
 			default:
 				throw new IllegalArgumentException( set.getName() );
 		}
 	}
+
+	public void addScoringParameters(final ScoringParameterSet params) {
+		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
+
+		if ( previous != null ) {
+			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just overwritten.") ;
+
+			final boolean removed = removeParameterSet( previous );
+			if ( !removed ) throw new RuntimeException( "problem replacing scoring params " );
+		}
+
+		super.addParameterSet( params );
+	}
+
 
 	public void addModeParams(final ModeParams params) {
 		final ModeParams previous = this.getModes().get( params.getMode() );
@@ -627,6 +666,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				return new ActivityParams();
 			case ModeParams.SET_TYPE:
 				return new ModeParams();
+			case ScoringParameterSet.SET_TYPE:
+				return new ScoringParameterSet();
 			default:
 				throw new IllegalArgumentException( type );
 		}
@@ -654,7 +695,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				}
 				break;
 			default:
-				throw new IllegalArgumentException( module.getName() );
+				//throw new IllegalArgumentException( module.getName() );
+				break;
 		}
 	}
 
@@ -668,9 +710,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	private static class ScoringParameterSet extends ReflectiveConfigGroup {
+		public static final String SET_TYPE = "scoringParameters";
+
 		private ScoringParameterSet() {
-			super( "scoringParameters" );
+			super( SET_TYPE );
 		}
+
+		private String subpopulation = null;
 
 		private double lateArrival = -18.0;
 		private double earlyDeparture = -0.0;
@@ -752,6 +798,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
 			}
 			this.waiting = waiting;
+		}
+
+		@StringGetter( "subpopulation" )
+		public String getSubpopulation() {
+			return subpopulation;
+		}
+
+		@StringSetter( "subpopulation" )
+		public void setSubpopulation(String subpopulation) {
+			this.subpopulation = subpopulation;
 		}
 	}
 
@@ -867,43 +923,43 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public double getLateArrival_utils_hr() {
-		return scoringParametersDelegate.getLateArrival_utils_hr();
+		return getScoringParameters( null ).getLateArrival_utils_hr();
 	}
 
 	public void setLateArrival_utils_hr(double lateArrival) {
-		scoringParametersDelegate.setLateArrival_utils_hr(lateArrival);
+		getScoringParameters( null ).setLateArrival_utils_hr(lateArrival);
 	}
 
 	public double getEarlyDeparture_utils_hr() {
-		return scoringParametersDelegate.getEarlyDeparture_utils_hr();
+		return getScoringParameters( null ).getEarlyDeparture_utils_hr();
 	}
 
 	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		scoringParametersDelegate.setEarlyDeparture_utils_hr(earlyDeparture);
+		getScoringParameters( null ).setEarlyDeparture_utils_hr(earlyDeparture);
 	}
 
 	public double getPerforming_utils_hr() {
-		return scoringParametersDelegate.getPerforming_utils_hr();
+		return getScoringParameters( null ).getPerforming_utils_hr();
 	}
 
 	public void setPerforming_utils_hr(double performing) {
-		scoringParametersDelegate.setPerforming_utils_hr(performing);
+		getScoringParameters( null ).setPerforming_utils_hr(performing);
 	}
 
 	public double getMarginalUtilityOfMoney() {
-		return scoringParametersDelegate.getMarginalUtilityOfMoney();
+		return getScoringParameters( null ).getMarginalUtilityOfMoney();
 	}
 
 	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		scoringParametersDelegate.setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+		getScoringParameters( null ).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
 	}
 
 	public double getUtilityOfLineSwitch() {
-		return scoringParametersDelegate.getUtilityOfLineSwitch();
+		return getScoringParameters( null ).getUtilityOfLineSwitch();
 	}
 
 	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		scoringParametersDelegate.setUtilityOfLineSwitch(utilityOfLineSwitch);
+		getScoringParameters( null ).setUtilityOfLineSwitch(utilityOfLineSwitch);
 	}
 
 	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
@@ -924,10 +980,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public double getMarginalUtlOfWaiting_utils_hr() {
-		return scoringParametersDelegate.getMarginalUtlOfWaiting_utils_hr();
+		return getScoringParameters( null ).getMarginalUtlOfWaiting_utils_hr();
 	}
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		scoringParametersDelegate.setMarginalUtlOfWaiting_utils_hr(waiting);
+		getScoringParameters( null ).setMarginalUtlOfWaiting_utils_hr(waiting);
 	}
 	
 	public void setFractionOfIterationsToStartScoreMSA( Double val ) {
