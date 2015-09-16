@@ -39,13 +39,6 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -63,16 +56,9 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-public class CongestionInfoHandler implements
-LinkEnterEventHandler,
-LinkLeaveEventHandler,
-TransitDriverStartsEventHandler,
-PersonDepartureEventHandler, 
-PersonStuckEventHandler,
-Wait2LinkEventHandler,
-PersonArrivalEventHandler {
+public class CongestionHandlerBaseImpl implements CongestionHandler {
 
-	private final static Logger log = Logger.getLogger(CongestionInfoHandler.class);
+	private final static Logger log = Logger.getLogger(CongestionHandlerBaseImpl.class);
 
 	private final Scenario scenario;
 	private final EventsManager events;
@@ -84,7 +70,7 @@ PersonArrivalEventHandler {
 
 	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
 
-	CongestionInfoHandler(EventsManager events, Scenario scenario) {
+	CongestionHandlerBaseImpl(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
 		this.events = events;
 
@@ -114,7 +100,7 @@ PersonArrivalEventHandler {
 	public final void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
-		
+
 		this.delayNotInternalized_roundingErrors = 0.;
 		this.totalInternalizedDelay = 0.;
 	}
@@ -250,16 +236,16 @@ PersonArrivalEventHandler {
 
 		return remainingDelay;
 	}
-	
+
 	public double getDelayNotInternalized_roundingErrors() {
 		return delayNotInternalized_roundingErrors;
 	}
 
-	public void addToDelayNotInternalized_roundingErrors(
-			double val) {
+	public void addToDelayNotInternalized_roundingErrors( double val) {
 		this.delayNotInternalized_roundingErrors += val;
 	}
 
+	@Override
 	public double getTotalInternalizedDelay() {
 		return totalInternalizedDelay;
 	}
@@ -283,6 +269,30 @@ PersonArrivalEventHandler {
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
 		return vehicleId2personId;
 	}
-	
-	
+
+	@Override
+	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getTotalDelay() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getTotalRoundingErrorDelay() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void writeCongestionStats(String fileName) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
 }

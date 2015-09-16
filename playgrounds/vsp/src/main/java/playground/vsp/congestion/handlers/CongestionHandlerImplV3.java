@@ -41,13 +41,6 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -65,20 +58,11 @@ import playground.vsp.congestion.DelayInfo;
  * @author ikaddoura
  *
  */
-public final class CongestionHandlerImplV3 implements
-LinkEnterEventHandler,
-LinkLeaveEventHandler,
-TransitDriverStartsEventHandler,
-PersonDepartureEventHandler, 
-PersonStuckEventHandler,
-Wait2LinkEventHandler,
-PersonArrivalEventHandler,
-ActivityEndEventHandler,
-CongestionInternalization {
+public final class CongestionHandlerImplV3 implements CongestionHandler, ActivityEndEventHandler {
 
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
 
-	private CongestionInfoHandler delegate;
+	private CongestionHandlerBaseImpl delegate;
 
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
@@ -87,7 +71,7 @@ CongestionInternalization {
 	private Scenario scenario;
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
-		this.delegate = new CongestionInfoHandler(events, scenario);
+		this.delegate = new CongestionHandlerBaseImpl(events, scenario);
 	}
 
 	@Override
@@ -196,7 +180,7 @@ CongestionInternalization {
 			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
 					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
 
-			CongestionInfoHandler.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
+			CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
 
