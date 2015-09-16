@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim3;
+package playground.johannes.synpop.sim;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
@@ -28,9 +28,7 @@ import playground.johannes.gsv.synPop.data.*;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.ActivityTypes;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonsTask;
 
 import java.util.*;
@@ -39,15 +37,15 @@ import java.util.*;
  * @author johannes
  * 
  */
-public class InitHomeLocations implements PersonsTask {
+public class SetHomeFacilities implements PersonsTask {
 
-	private static final Logger logger = Logger.getLogger(InitHomeLocations.class);
+	private static final Logger logger = Logger.getLogger(SetHomeFacilities.class);
 
 	private final DataPool dataPool;
 
 	private final Random random;
 
-	public InitHomeLocations(DataPool dataPool, Random random) {
+	public SetHomeFacilities(DataPool dataPool, Random random) {
 		this.dataPool = dataPool;
 		this.random = random;
 	}
@@ -56,8 +54,6 @@ public class InitHomeLocations implements PersonsTask {
 	public void apply(Collection<? extends Person> persons) {
 		LandUseData landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
 
-		// ZoneLayer<Map<String, Object>> zoneLayer =
-		// landUseData.getNuts3Layer();
 		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getModenaLayer();
 		List<Zone<Map<String, Object>>> zones = new ArrayList<>(zoneLayer.getZones());
 		TObjectDoubleHashMap<Zone<?>> zoneProba = new TObjectDoubleHashMap<>();
@@ -116,7 +112,7 @@ public class InitHomeLocations implements PersonsTask {
 				}
 				for (int k = j; k < (j + n); k++) {
 					ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
-					((PlainPerson)shuffledPersons.get(k)).setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
+					setHomeFacility(shuffledPersons.get(k), f);
 
 					ProgressLogger.step();
 				}
@@ -128,17 +124,28 @@ public class InitHomeLocations implements PersonsTask {
 		logger.info("Checking for homeless persons...");
 		int cnt = 0;
 		for(Person person : shuffledPersons) {
-			if(((PlainPerson)person).getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
+			//if(((PlainPerson)person).getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
+			if(person.getAttribute(CommonKeys.ACTIVITY_FACILITY) == null) {
 				ActivityFacility f = homeFacils.get(random.nextInt(homeFacils.size()));
-				((PlainPerson)person).setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
+				setHomeFacility(person, f);
 				cnt++;
 			}
 		}
 		if(cnt > 0) {
-			logger.info(String.format("Assigend %s persons a random home.", cnt));
+			logger.info(String.format("Assigned %s persons a random home.", cnt));
 		}
 
 		ProgressLogger.termiante();
+	}
+
+	private void setHomeFacility(Person person, ActivityFacility facility) {
+		for(Episode e : person.getEpisodes()) {
+			for(Segment act : e.getActivities()) {
+				if(ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility.getId().toString());
+				}
+			}
+		}
 	}
 
 }

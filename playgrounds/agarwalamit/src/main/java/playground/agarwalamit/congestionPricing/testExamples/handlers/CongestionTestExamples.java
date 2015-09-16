@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing.testExamples.handlers;
 
-import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -60,7 +58,6 @@ import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -105,26 +102,26 @@ public class CongestionTestExamples {
 	public void getDelayDataForPricingImpls(Scenario sc, String networkExampleName){
 		List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
 		List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc); 
-		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc);
+//		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc);
 		
 		System.out.println("v3");
 		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
 		 System.out.println("v4");
 		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
-		 System.out.println("v6");
-		 SortedMap<String,Tuple<Double, Double>> tab_v6 = getId2CausedAndAffectedDelays(congestionEvents_v6, sc);
-		 
-		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/comparison_v3Vsv4_"+networkExampleName+".txt");
-		 try {
-			 writer.write("personId \t delayCaused_v6 \t delayAffected_v6 \t delayCaused_v3 \t delayAffected_v3 \t delayCaused_v4 \t delayAffected_v4  \n");
-			 for(String personId : tab_v3.keySet()){
-				 writer.write(personId+"\t"+tab_v6.get(personId).getFirst()+"\t"+tab_v6.get(personId).getSecond()+"\t"+tab_v3.get(personId).getFirst()+"\t"+tab_v3.get(personId).getSecond()+"\t"+
-						 tab_v4.get(personId).getFirst()+"\t"+tab_v4.get(personId).getSecond()+"\n");
-			 }
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "+ e);
-		}
+//		 System.out.println("v6");
+//		 SortedMap<String,Tuple<Double, Double>> tab_v6 = getId2CausedAndAffectedDelays(congestionEvents_v6, sc);
+//		 
+//		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/comparison_v3Vsv4_"+networkExampleName+".txt");
+//		 try {
+//			 writer.write("personId \t delayCaused_v6 \t delayAffected_v6 \t delayCaused_v3 \t delayAffected_v3 \t delayCaused_v4 \t delayAffected_v4  \n");
+//			 for(String personId : tab_v3.keySet()){
+//				 writer.write(personId+"\t"+tab_v6.get(personId).getFirst()+"\t"+tab_v6.get(personId).getSecond()+"\t"+tab_v3.get(personId).getFirst()+"\t"+tab_v3.get(personId).getSecond()+"\t"+
+//						 tab_v4.get(personId).getFirst()+"\t"+tab_v4.get(personId).getSecond()+"\n");
+//			 }
+//			writer.close();
+//		} catch (Exception e) {
+//			throw new RuntimeException("Data is not written in file. Reason: "+ e);
+//		}
 	}
 	
 	private SortedMap<String,Tuple<Double, Double>> getId2CausedAndAffectedDelays(List<CongestionEvent> events, Scenario sc){
@@ -173,7 +170,7 @@ public class CongestionTestExamples {
 			Logger.getLogger(CongestionTestExamples.class).warn("The analysis table is generated using events and thus there are some delays unaccounted in implV3.");
 		}
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
