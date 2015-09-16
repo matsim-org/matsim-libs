@@ -36,6 +36,8 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
+	/*package*/ final static String ROUTE_TYPE = "links";
+	
 	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>();
 	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
@@ -191,7 +193,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	
 	@Override
 	public String getRouteType() {
-		return "links";
+		return ROUTE_TYPE;
 	}
 	
 	@Override

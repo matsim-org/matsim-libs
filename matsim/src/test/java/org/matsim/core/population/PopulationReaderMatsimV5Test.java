@@ -149,7 +149,7 @@ public class PopulationReaderMatsimV5Test {
 		tester.startTag("act", new String[][]{{"type", "h"}, {"x", "-25000"}, {"y", "0"}, {"link", "1"}, {"end_time", "06:00"}});
 		tester.endTag();
 		tester.startTag("leg", new String[][]{{"mode", "car"}});
-		tester.startTag("route");
+		tester.startTag("route", new String[][]{{"type", "links"}});
 		tester.endTag("1");
 		tester.endTag();
 		tester.startTag("act", new String[][]{{"type", "w"}, {"x", "10000"}, {"y", "0"}, {"link", "1"}, {"dur", "00:10"}});
@@ -185,7 +185,7 @@ public class PopulationReaderMatsimV5Test {
 		tester.startTag("act", new String[][]{{"type", "h"}, {"x", "-25000"}, {"y", "0"}, {"link", "1"}, {"end_time", "06:00"}});
 		tester.endTag();
 		tester.startTag("leg", new String[][]{{"mode", "car"}});
-		tester.startTag("route");
+		tester.startTag("route", new String[][]{{"type", "links"}});
 		tester.endTag("1 2");
 		tester.endTag();
 		tester.startTag("act", new String[][]{{"type", "w"}, {"x", "10000"}, {"y", "0"}, {"link", "2"}, {"dur", "00:10"}});
@@ -345,7 +345,7 @@ public class PopulationReaderMatsimV5Test {
 		"	<plan>"+
 		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
 		"		<leg mode=\"car\" >"+
-		"          <route vehicleRefId=\"123\"/>" +
+		"          <route type=\"links\" vehicleRefId=\"123\"/>" +
 		"       </leg>" + 
 		"		<act type=\"w\" x=\"10000\" y=\"0\" end_time=\"12:00\" />"+
 		"	</plan>"+

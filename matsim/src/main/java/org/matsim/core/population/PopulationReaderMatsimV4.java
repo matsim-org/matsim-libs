@@ -42,6 +42,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.xml.sax.Attributes;
 
 /**
@@ -320,7 +321,11 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(this.currleg.getMode(), null, null);
+		Class<? extends Route> routeType = NetworkRoute.class;
+		if ("pt".equals(this.currleg.getMode())) {
+			routeType = ExperimentalTransitRoute.class;
+		}
+		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

@@ -43,4 +43,9 @@ public class KtiLinkNetworkRouteFactory implements RouteFactory {
 		return new KtiLinkNetworkRouteImpl(startLinkId, endLinkId, this.network, this.planomatConfigGroup.getSimLegInterpretation());
 	}
 
+	@Override
+	public String getCreatedRouteType() {
+		return "links";
+	}
+
 }

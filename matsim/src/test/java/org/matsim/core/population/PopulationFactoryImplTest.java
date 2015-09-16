@@ -19,19 +19,19 @@
 
 package org.matsim.core.population;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import junit.framework.Assert;
 
 /**
  * @author mrieser / senozon
@@ -45,8 +45,7 @@ public class PopulationFactoryImplTest {
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
         Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
 	}
 
 	@Test
@@ -57,7 +56,7 @@ public class PopulationFactoryImplTest {
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
         Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
 	}
 
 	@Test
@@ -68,7 +67,7 @@ public class PopulationFactoryImplTest {
         PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 
 		Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
+		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
 	}
 
 }

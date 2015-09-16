@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -305,9 +306,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startRoute(final Attributes atts) {
 		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
-
+		String routeType = atts.getValue("type");
+		
+		ModeRouteFactory factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
+		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
+		
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
-				"links".equals(atts.getValue("type")) ? "car" : this.currleg.getMode(), // ugly hack for now: if the route is of type "links", use "car" as this has highest probability to return a LinkNetworkRoute 
+				routeClass, 
 				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
 						endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);

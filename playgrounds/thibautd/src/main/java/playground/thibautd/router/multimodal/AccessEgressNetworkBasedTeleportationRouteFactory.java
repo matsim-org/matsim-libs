@@ -40,5 +40,10 @@ public class AccessEgressNetworkBasedTeleportationRouteFactory implements RouteF
 				startLinkId,
 				endLinkId );
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return "accessEgressNetworkBased";
+	}
 }
 
