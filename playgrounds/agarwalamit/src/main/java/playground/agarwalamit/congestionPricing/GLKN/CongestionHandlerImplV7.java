@@ -41,8 +41,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.congestion.LinkCongestionInfo;
+import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.events.CongestionEvent;
+import playground.vsp.congestion.handlers.CongestionUtils;
+import playground.vsp.congestion.handlers.LinkCongestionInfo;
 
 /**
  * Based on Laemmel2011Diss
@@ -71,11 +73,11 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 	private void storeLinkInfo(){
 		for(Link l : this.scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfo lci = new LinkCongestionInfo();
-			lci.setLinkId(l.getId());
-			double flowCapacity_CapPeriod = l.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-			lci.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+			LinkCongestionInfo lci = CongestionUtils.getOrCreateLinkInfo(l.getId(), link2LinkCongestionInfo, this.scenario ) ;
+//			lci.setLinkId(l.getId());
+//			double flowCapacity_CapPeriod = l.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+//			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
+//			lci.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 			link2LinkCongestionInfo.put(l.getId(), lci);
 		}
 	}
@@ -108,7 +110,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		double linkLeaveTime = event.getTime();
 
 		LinkCongestionInfo lci = link2LinkCongestionInfo.get(linkId);
-		lci.getPersonId2linkLeaveTime().put(pId, linkLeaveTime);
 		
 		double freeSpeedLeaveTime = lci.getPersonId2freeSpeedLeaveTime().get(pId);
 
@@ -116,9 +117,15 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 		if(delay > 0.){
 			totalDelay += delay;
-			lci.getLeavingAgents().add(pId);
 
-			boolean isThisLastAgentOnLink = lci.getEnteringAgents().size() - 1 == 0 ? true :false;
+			Double linkEnterTime = lci.getPersonId2linkEnterTime().get( pId ) ;
+			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId(pId).setLinkEnterTime( linkEnterTime )
+					.setFreeSpeedLeaveTime(freeSpeedLeaveTime).build() ;
+			lci.getFlowQueue().add( delayInfo );
+
+			List<Id<Person>> enteringAgentsList = new ArrayList<Id<Person>>(lci.getPersonId2linkEnterTime().keySet());
+			
+			boolean isThisLastAgentOnLink = enteringAgentsList.size() - 1 == 0 ? true :false;
 
 			if( isThisLastAgentOnLink ) { // last agent on the link is delayed, thus, queue will dissolve immediately.
 
@@ -126,7 +133,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 			} else { // check for the headway i.e. if more agents will be queued, continue
 				// nextFreeSpeedLinkLeaveTime - current leave time < timeHeadway ==> charge later.
-				Id<Person> nextAgent = lci.getEnteringAgents().get(1);
+				Id<Person> nextAgent = enteringAgentsList.get(1);
 				double nextFreeSpeedLinkLeaveTime = lci.getPersonId2freeSpeedLeaveTime().get(nextAgent); 
 
 				if( nextFreeSpeedLinkLeaveTime - linkLeaveTime >= lci.getMarginalDelayPerLeavingVehicle_sec() ){
@@ -141,7 +148,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 			lci.getPersonId2freeSpeedLeaveTime().remove(pId);
 		}
 
-		lci.getEnteringAgents().remove(pId);
+		lci.getPersonId2linkEnterTime().remove(pId);
 		
 	}
 
@@ -154,7 +161,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		double minLinkTravelTime = Math.floor(link.getLength()/link.getFreespeed());
 
 		lci.getPersonId2freeSpeedLeaveTime().put(personId, event.getTime()+ minLinkTravelTime + 1.0);
-		lci.getEnteringAgents().add(personId);
 		lci.getPersonId2linkEnterTime().put(personId, event.getTime());
 	}
 
@@ -165,7 +171,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		if(congestedModes.contains(travelMode)){
 			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
 			lci.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
-			lci.getEnteringAgents().add(event.getPersonId());
 			lci.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 		}
 
@@ -177,7 +182,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 		if(congestedModes.contains(travelMode)){
 			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-			lci.getEnteringAgents().remove(event.getPersonId());
+			lci.getPersonId2linkEnterTime().remove(event.getPersonId());
 			lci.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
 		}
 
@@ -185,7 +190,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 
 	private void throwCongestionEvents(LinkLeaveEvent event) {
 		LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getLeavingAgents());
+//		List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>(lci.getFlowQueue());
 		Id<Person> nullAffectedAgent = Id.createPersonId("NullAgent");
 
 		switch (congestionImpl) {
@@ -193,7 +198,13 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 		{
 			double queueDissolveTime = event.getTime() /*+ lci.getMarginalDelayPerLeavingVehicle_sec()*/; // not yet sure, if this is right.
 			
-			for(Id<Person> person : leavingAgents){
+//			for(Id<Person> person : leavingAgents){
+			for( DelayInfo delayInfo : lci.getFlowQueue() ) {
+				// yy this is what I found.  But (1) is the Laemmel approach using the flow queue (and not the delay queue), and
+				// (2) is it going through vehicles that are ahead (downstream) from the current vehicle, or those that are behind?
+				// kai, sep'15
+				
+				Id<Person> person = delayInfo.personId ;
 				double delayToPayFor = queueDissolveTime - lci.getPersonId2freeSpeedLeaveTime().get(person);
 				this.totalInternalizedDelay += delayToPayFor;
 				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "GL_Approach", person, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(person));
@@ -201,24 +212,42 @@ LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler, PersonArr
 				lci.getPersonId2freeSpeedLeaveTime().remove(person);
 			}
 
-			lci.getLeavingAgents().clear();
+			lci.getFlowQueue().clear();
 		}
 			break;
 		case KN:
 		{
-			int noOfDelayedAgents = leavingAgents.size();
+//			int noOfDelayedAgents = leavingAgents.size();
+			int noOfDelayedAgents = lci.getDelayQueue().size() ;
 			
 			if(noOfDelayedAgents < 2) return; // can't calculate headway from one agent only
+			// yy don't know in which sequence this is treated here, but std logic would have myself not yet in the queue
+			// so that "1" (instead of 2) would suffice.  kai, sep'15
+			
+			
 			int thisPesonDelayingOtherPersons = 0;
 			
 			for(int ii = noOfDelayedAgents-2; ii>=0;ii--){
-				Id<Person> thisPerson = leavingAgents.get(ii);
+				// yy this is what I found.  But (1) is the Laemmel approach using the flow queue (and not the delay queue), and
+				// (2) is it going through vehicles that are ahead (downstream) from the current vehicle, or those that are behind?
+				// kai, sep'15
+
+//				Id<Person> thisPerson = leavingAgents.get(ii);
+				// yyyy does not work (any more). Fixing other things first ... kai, sep'15
+				
 				thisPesonDelayingOtherPersons++;
-				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
+
+//				double headway =  lci.getPersonId2linkLeaveTime().get(leavingAgents.get(ii+1))  - lci.getPersonId2linkLeaveTime().get(thisPerson) ;
+				double headway = lci.getLastLeaveEvent().getTime() - event.getTime() ;
+				// ????
+				
+				
 				double delayToPayFor = thisPesonDelayingOtherPersons * headway;
 				
 				this.totalInternalizedDelay += delayToPayFor;
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "KN_Approach", thisPerson, nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(thisPerson));
+				Id<Person> thisPerson = null ; // yyyy a fix to make it compile. kai, sep'15
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "KN_Approach", thisPerson, 
+						nullAffectedAgent, delayToPayFor, event.getLinkId(), lci.getPersonId2linkEnterTime().get(thisPerson));
 				this.events.processEvent(congestionEvent);
 			}
 		}

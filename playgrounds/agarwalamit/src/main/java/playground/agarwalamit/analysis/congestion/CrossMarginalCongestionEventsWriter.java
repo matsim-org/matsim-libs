@@ -34,7 +34,6 @@ import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
 /**
@@ -71,7 +70,7 @@ public class CrossMarginalCongestionEventsWriter {
 		switch (congestionImpl){
 		case "implV3" : eh = new CongestionHandlerImplV3(manager, (ScenarioImpl) this.sc); break;
 		case "implV4" : eh = new CongestionHandlerImplV4(manager, sc); break;
-		case "implV6" : eh = new CongestionHandlerImplV6(manager, sc); break;
+//		case "implV6" : eh = new CongestionHandlerImplV6(manager, sc); break;
 		default : throw new RuntimeException(congestionImpl+ "is not supported. Available implementations are implV3, implV4, implV6. Aborting ...");
 		}
 		manager.addHandler(eh);
