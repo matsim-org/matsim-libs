@@ -308,10 +308,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return getScoringParameters( null ).getActivityParams();
 	}
 
-	public Map<String, ActivityParams> getActivityParamsPerType() {
-		return getScoringParameters( null ).getActivityParamsPerType();
-	}
-
 	public Map<String, ModeParams> getModes() {
 		return getScoringParameters( null ).getModes();
 	}
