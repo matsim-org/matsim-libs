@@ -42,7 +42,7 @@ public class OptimalWalkPlanFinderTest {
 	private static final double EPSILON = 1e-9;
 
 	private double calcScore(final Fixture f, Plan plan) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory( f.scenario );
 		EventsToScore eventsToScore = new EventsToScore(f.scenario, charyparNagelScoringFunctionFactory);
 		double scoreFromEvents = calcScoreFromEvents(eventsToScore, f);
 		return scoreFromEvents;

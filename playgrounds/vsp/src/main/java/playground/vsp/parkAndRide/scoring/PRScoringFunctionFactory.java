@@ -20,6 +20,7 @@
 package playground.vsp.parkAndRide.scoring;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -30,6 +31,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -41,29 +44,31 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private static final Logger log = Logger.getLogger(PRScoringFunctionFactory.class);
-	private final CharyparNagelScoringParameters charyparNagelConfigParameters;
+	private final ScoringParametersForPerson charyparNagelConfigParameters;
 	private final double interModalTransferPenalty;
 	private final Network network;
 
-	public PRScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final ScenarioConfigGroup scenarioConfig, Network network, double intermodalTransferPenalty) {
+	public PRScoringFunctionFactory(final Scenario scenario, double intermodalTransferPenalty) {
 		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig, scenarioConfig).create();
+		this.charyparNagelConfigParameters = new SubpopulationScoringParameters( scenario );
 		this.interModalTransferPenalty = intermodalTransferPenalty;
 		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
-		this.network = network;
+		this.network = scenario.getNetwork();
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+
+		final CharyparNagelScoringParameters parameters = charyparNagelConfigParameters.getScoringParameters( person );
 		
 		// Park-and-ride specific activity scoring extension
-		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction(this.charyparNagelConfigParameters, this.interModalTransferPenalty));
+		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction( parameters , this.interModalTransferPenalty));
 		
 		// standard scoring functions
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.charyparNagelConfigParameters, this.network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.charyparNagelConfigParameters));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
 		return scoringFunctionAccumulator;
 	}
 

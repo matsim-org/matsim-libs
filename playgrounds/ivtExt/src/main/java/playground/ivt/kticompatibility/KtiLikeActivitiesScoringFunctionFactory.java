@@ -35,6 +35,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ivt.scoring.LineChangeScoringFunction;
@@ -55,7 +57,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 
 	private final StageActivityTypes blackList;
 	private final KtiLikeScoringConfigGroup ktiConfig;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParametersForPerson parameters;
     private final Scenario scenario;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -64,10 +66,9 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
     public KtiLikeActivitiesScoringFunctionFactory(
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
-			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
+		this.parameters = new SubpopulationScoringParameters( scenario );
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}
@@ -75,6 +76,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(

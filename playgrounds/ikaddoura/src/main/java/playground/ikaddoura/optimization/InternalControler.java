@@ -154,9 +154,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(WAITING);
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
-				planCalcScoreConfigGroup,
-				scenario.getConfig().scenario(),
-				scenario.getNetwork(), 
+				scenario,
 				STUCK_SCORE);
 		
 		controler.setScoringFunctionFactory(scoringfactory);

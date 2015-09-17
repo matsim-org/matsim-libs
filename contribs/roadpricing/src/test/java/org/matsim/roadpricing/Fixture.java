@@ -147,7 +147,6 @@ import junit.framework.TestCase;
 
 	/**
 	 * Creates a population for network1
-	 * @param network the network returned by {@link #createNetwork1()}
 	 **/
 	static void createPopulation1(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
@@ -176,7 +175,6 @@ import junit.framework.TestCase;
 
 	/**
 	 * Creates a population for network2
-	 * @param network the network returned by {@link #createNetwork2()}
 	 **/
 	static void createPopulation2(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
@@ -222,7 +220,7 @@ import junit.framework.TestCase;
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
 		events.addHandler(scoring);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();

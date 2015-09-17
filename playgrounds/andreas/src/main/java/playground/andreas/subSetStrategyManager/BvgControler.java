@@ -124,7 +124,7 @@ public class BvgControler extends Controler {
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		final BvgControler c = new BvgControler(sc);
-        c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), config.scenario(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
+        c.setScoringFunctionFactory(new BvgScoringFunctionFactory( sc , new BvgScoringFunctionConfigGroup(config) ) );
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 
             @Override

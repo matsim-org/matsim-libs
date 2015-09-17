@@ -26,6 +26,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
 
 /**
  * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
@@ -34,30 +36,31 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringParameters params = null;
-    private Scenario scenario;
-	private PlanCalcScoreConfigGroup config;
+	private final ScoringParametersForPerson params;
+    private final Scenario scenario;
 
-    public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
-    	this.config = config;
+    public CharyparNagelOpenTimesScoringFunctionFactory(
+			final ScoringParametersForPerson params,
+			final Scenario scenario) {
+		this.params = params;
+		this.scenario = scenario;
+	}
+
+	public CharyparNagelOpenTimesScoringFunctionFactory(
+			final Scenario scenario) {
+		this.params = new SubpopulationScoringParameters( scenario );
 		this.scenario = scenario;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		if (this.params == null) {
-			/* lazy initialization of params. not strictly thread safe, as different threads could
-			 * end up with different params-object, although all objects will have the same
-			 * values in them due to using the same config. Still much better from a memory performance
-			 * point of view than giving each ScoringFunction its own copy of the params.
-			 */
-			this.params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenario.getConfig().scenario()).create();
-		}
+		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
+
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(parameters, scenario.getActivityFacilities()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, scenario.getNetwork()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
+		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
 
 		return sumScoringFunction;
 	}

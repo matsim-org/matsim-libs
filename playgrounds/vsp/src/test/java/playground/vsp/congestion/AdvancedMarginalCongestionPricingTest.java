@@ -81,7 +81,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -144,7 +144,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -197,7 +197,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, scenarioConfig).create();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

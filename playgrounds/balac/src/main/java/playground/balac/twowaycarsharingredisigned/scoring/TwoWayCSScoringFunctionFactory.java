@@ -16,26 +16,28 @@ public class TwoWayCSScoringFunctionFactory extends org.matsim.core.scoring.func
 	
 	private final Config config;
 	private final Network network;
-	  
+
 	public TwoWayCSScoringFunctionFactory(Config config, Network network)
 	  {
-	    super(config.planCalcScore(), config.scenario(), network);
-	    this.network = network;
-	    this.config = config;
-	  }   
-
-	  public ScoringFunction createNewScoringFunction(Plan plan) {
-		  
-		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-
-		  scoringFunctionAccumulator.addScoringFunction(
-	      new TwoWayCSLegScoringFunction((PlanImpl)plan,
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
-	      this.config, 
-	      network));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
-	    return scoringFunctionAccumulator;
+		  super( null );
+		  throw new RuntimeException( "this class does not do anything, so I did not refactor it. If you need to use it, talk with me. TD");
+	    //super(config.planCalcScore(), config.scenario(), network);
+	    //this.network = network;
+	    //this.config = config;
 	  }
+
+//	  public ScoringFunction createNewScoringFunction(Plan plan) {
+//
+//		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+//
+//		  scoringFunctionAccumulator.addScoringFunction(
+//	      new TwoWayCSLegScoringFunction((PlanImpl)plan,
+//				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
+//	      this.config,
+//	      network));
+//		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+//		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+//		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+//	    return scoringFunctionAccumulator;
+//	  }
 }

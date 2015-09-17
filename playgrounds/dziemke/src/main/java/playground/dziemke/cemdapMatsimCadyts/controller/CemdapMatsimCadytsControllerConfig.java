@@ -33,6 +33,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class CemdapMatsimCadytsControllerConfig {
@@ -61,24 +63,26 @@ public class CemdapMatsimCadytsControllerConfig {
 //		});
 		
 		// scoring function
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
-				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-					@Override
-					public ScoringFunction createNewScoringFunction(Person person) {
-						
-						SumScoringFunction sumScoringFunction = new SumScoringFunction();
-						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-						sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-						sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 
-						final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
-						final double cadytsScoringWeight = Double.parseDouble(args[1]);
-						scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-						sumScoringFunction.addScoringFunction(scoringFunction );
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
-						return sumScoringFunction;
-					}
-				}) ;
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
+				final double cadytsScoringWeight = Double.parseDouble(args[1]);
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				sumScoringFunction.addScoringFunction(scoringFunction );
+
+				return sumScoringFunction;
+			}
+		}) ;
 
 		controler.run();
 	}

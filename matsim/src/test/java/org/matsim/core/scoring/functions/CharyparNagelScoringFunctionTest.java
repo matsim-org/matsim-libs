@@ -79,12 +79,15 @@ public class CharyparNagelScoringFunctionTest {
 	private static final double EPSILON =1e-9;
 
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final Person person) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory =
+				new CharyparNagelScoringFunctionFactory( f.scenario );
 		return charyparNagelScoringFunctionFactory.createNewScoringFunction(person);
 	}
 
 	private double calcScore(final Fixture f) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.config.scenario(), f.scenario.getNetwork());
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory =
+				new CharyparNagelScoringFunctionFactory(
+						f.scenario );
 		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(PersonImpl.createPerson(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {

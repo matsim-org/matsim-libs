@@ -7,26 +7,30 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
 
 
-public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
+public class FreeFloatingScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private final Config config;
 	private final Network network;
+	private final ScoringParametersForPerson parametersForPerson;
 	  
 	private final Scenario scenario;
 	public FreeFloatingScoringFunctionFactory(Config config, Network network, Scenario scenario)
 	  {
-	    super(config.planCalcScore(), config.scenario(), network);
 	    this.scenario = scenario;
 	    this.network = network;
 	    this.config = config;
+		  this.parametersForPerson = new SubpopulationScoringParameters( scenario );
 	  }   
 
 	  @Override
@@ -34,15 +38,25 @@ public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
+		  final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 		  scoringFunctionAccumulator.addScoringFunction(
 	      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(),
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(),
-	      this.config, 
-	      network));
-		  scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create(), null, ((ScenarioImpl) scenario).getActivityFacilities()));
+				  params,
+				  this.config,
+				  network));
+		  scoringFunctionAccumulator.addScoringFunction(
+				  new KtiActivtyWithoutPenaltiesScoring(
+						  person.getSelectedPlan(),
+						  params,
+						  null,
+						  scenario.getActivityFacilities()));
 
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
+		  scoringFunctionAccumulator.addScoringFunction(
+				  new CharyparNagelMoneyScoring(
+						  params ) );
+		  scoringFunctionAccumulator.addScoringFunction(
+				  new CharyparNagelAgentStuckScoring(
+						  params ) );
 	   return scoringFunctionAccumulator;
 	  }
 }

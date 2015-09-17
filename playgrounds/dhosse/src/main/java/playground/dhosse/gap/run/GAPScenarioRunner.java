@@ -181,7 +181,7 @@ public class GAPScenarioRunner {
 		
 		controler.setTripRouterFactory(CarsharingUtils.createTripRouterFactory(scenario));
 		
-		controler.setScoringFunctionFactory(new CarsharingScoringFunctionFactory( config, scenario.getNetwork()));
+		controler.setScoringFunctionFactory(new CarsharingScoringFunctionFactory(  scenario ));
 
 		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) controler.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 		controler.addControlerListener(new CarsharingListener(controler,

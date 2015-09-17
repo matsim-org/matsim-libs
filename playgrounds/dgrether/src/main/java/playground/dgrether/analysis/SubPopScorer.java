@@ -79,7 +79,7 @@ public class SubPopScorer {
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario, new CharyparNagelScoringFunctionFactory(config.planCalcScore(), this.scenario.getConfig().scenario(), this.scenario.getNetwork()), config.planCalcScore().getLearningRate());
+  	EventsToScore scorer = new EventsToScore(this.scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);
