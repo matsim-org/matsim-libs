@@ -238,9 +238,11 @@ public class Freight {
 		//CE02	AUTOPISTA DEL SOL
 		zonaId2Coord.put("CE02in", new Coord(292517.0, 6271720.0));
 		zonaId2Coord.put("CE02out", new Coord(292615.0, 6271840.0)); 
-		//CE03	RUTA 68 (A VALPARAISO) 
-		zonaId2Coord.put("CE03in", new Coord(323540.0, 6296520.0));
-		zonaId2Coord.put("CE03out", new Coord(323560.0, 6296520.0)); 
+		//CE03	RUTA 68 (A VALPARAISO); moved more to city of Santiago (better link matching).
+		//		zonaId2Coord.put("CE03in", new Coord(323540.0, 6296520.0));
+		//		zonaId2Coord.put("CE03out", new Coord(323560.0, 6296520.0)); 
+		zonaId2Coord.put("CE03in", new Coord(327000.0, 6297700.0));
+		zonaId2Coord.put("CE03out", new Coord(327000.0, 6297620.0)); 
 		//CE04	RUTA 5 SUR (ANGOSTURA) ; out of box -> moved northbound on Ruta 5
 		zonaId2Coord.put("CE04in", new Coord(338322.0, 6252325.0));
 		zonaId2Coord.put("CE04out", new Coord(338185.0, 6253060.0)); 
