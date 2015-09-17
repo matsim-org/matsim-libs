@@ -189,8 +189,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 			linkInfo.getFlowQueue().add( delayInfo ) ;
 			linkInfo.memorizeLastLinkLeaveEvent( event );
 
-			linkInfo.getPersonId2freeSpeedLeaveTime().remove( personId ) ;
-			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			linkInfo.getAgentsOnLink().remove( personId ) ;
 		}
 	}
@@ -201,7 +199,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 		
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		double delayOnThisLink = event.getTime() - linkInfo.getAgentsOnLink().get(delayInfo.personId).getFreeSpeedLeaveTime();
 
 		// global book-keeping:
 		this.totalDelay += delayOnThisLink;

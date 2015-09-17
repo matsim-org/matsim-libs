@@ -77,8 +77,8 @@ public final class LinkCongestionInfo {
 	private final double marginalDelayPerLeavingVehicle_sec;
 	private final double storageCapacityCars;
 
-	private final Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<>();
-	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<>();
+//	private final Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<>();
+//	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<>();
 
 	private final Deque<DelayInfo> flowQueue = new LinkedList<>();
 	private final Deque<DelayInfo> delayQueue = new LinkedList<>() ;
@@ -95,9 +95,9 @@ public final class LinkCongestionInfo {
 	public double getFreeTravelTime() {
 		return freeTravelTime;
 	}
-	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
-		return personId2freeSpeedLeaveTime;
-	}
+//	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
+//		return personId2freeSpeedLeaveTime;
+//	}
 	public LinkLeaveEvent getLastLeaveEvent() {
 		return lastLeavingAgent;
 	}
@@ -105,9 +105,9 @@ public final class LinkCongestionInfo {
 		this.lastLeavingAgent = event;
 	}
 
-	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {
-		return personId2linkEnterTime;
-	}
+//	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {
+//		return personId2linkEnterTime;
+//	}
 
 	public double getStorageCapacityCars() {
 		return storageCapacityCars;
