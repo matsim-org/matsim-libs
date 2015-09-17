@@ -1,5 +1,6 @@
 package playground.dhosse.gap.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -15,12 +16,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.algorithms.XY2Links;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -38,70 +42,72 @@ public class GAPScenarioRunner {
 	 * @param args
 	 */
 	public static void main(String args[]){
-		
-		runBaseCaseRouteChoiceOnly();
+
+//		runBaseCaseRouteChoiceOnly();
+//		runBaseCaseRouteChoiceAndModeChoice();
+		runAnalysis();
+//		GeometryUtils.readPolygonFile(Global.dataDir + "Netzwerk/garmisch.poly");
 		
 	}
 
+	/**
+	 * Runs the base scenario with route choice as only innovative strategy.
+	 */
 	private static void runBaseCaseRouteChoiceOnly() {
 		
+		//basics: load config settings and scenario
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
+//		System.out.println(scenario.getNetwork().getLinks().containsKey(Id.createLinkId("21411")));
+		
+		//create a second scenario, containing only the road network (rail network will be removed by network cleaner)
+		Scenario s2 = ScenarioUtils.loadScenario(config);
+		new NetworkCleaner().run(s2.getNetwork());
+		
+		//this is done in order to set the agent population on links
+		//that is the reason why the rail network had to be removed since car agents can't move on rails...
+		XY2Links xy2Links = new XY2Links(s2);
+		
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			
+			xy2Links.run(person);
+			
+		}
+		
+		//after everything else is set up, start the simulation
 		final Controler controler = new Controler(scenario);
+		
+//		System.out.println(scenario.getNetwork().getLinks().containsKey(Id.createLinkId("21411")));
 		
 		controler.run();
 		
 	}
 	
+	/**
+	 * Runs the base scenario with route choice and mode choice as innovative strategies.
+	 */
 	private static void runBaseCaseRouteChoiceAndModeChoice(){
 		
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
+		Scenario s2 = ScenarioUtils.loadScenario(config);
+		new NetworkCleaner().run(s2.getNetwork());
+		
+		XY2Links xy2Links = new XY2Links(s2);
+		
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			
+			xy2Links.run(person);
+			
+		}
+		
 		final Controler controler = new Controler(scenario);
 		
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
-				
-			}
-		});
-		
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
-				
-			}
-		});
+		addModeChoiceStrategyModules(controler);
 		
 		controler.run();
 		
@@ -191,9 +197,59 @@ public class GAPScenarioRunner {
 		
 	}
 	
+	/**
+	 * Adds subtour mode choice strategy settings to the controler.
+	 * These strategies are configured for different types of subpopulations (persons with car and license, commuters, persons without license).
+	 * 
+	 * @param controler
+	 */
+	private static void addModeChoiceStrategyModules(final Controler controler) {
+
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
+				
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes = {TransportMode.car, TransportMode.pt};
+					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
+				
+			}
+		});
+		
+	}
+	
 	private static void runAnalysis() {
 		
-		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plans_mid.xml.gz", "/home/dhosse/Dokumente/01_eGAP/MATSim_input/pop2.shp");
+		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plansV2.xml.gz", "/home/danielhosse/Dokumente/eGAP/popV2.shp");
 	
 	}
 	
