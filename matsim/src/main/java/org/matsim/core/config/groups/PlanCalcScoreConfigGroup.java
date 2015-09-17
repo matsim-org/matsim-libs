@@ -336,7 +336,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
-		return getScoringParametersPerSubpopulation().get( subpopulation );
+		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get( subpopulation );
+		// If no config parameters defined for a specific subpopulation,
+		// use the ones of the "default" subpopulation
+		return params != null ? params : getScoringParametersPerSubpopulation().get( null );
 	}
 
 
