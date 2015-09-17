@@ -44,8 +44,7 @@ import java.util.Map;
  * 
  * @author rashid_waraich
  */
-public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
-	// yy should be final.
+public final class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
 	protected Network network;
 
