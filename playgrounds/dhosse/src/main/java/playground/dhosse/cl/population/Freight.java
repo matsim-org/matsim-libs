@@ -47,7 +47,7 @@ public class Freight {
 	private static final Logger log = Logger.getLogger(Freight.class);
 
 	//TODO: Pläne aus den Informationen erstellen (Haben nur 2 Aktivitäten: Start und Zielort. Muss aber getrennt erfolgen, 
-	// da für Outgoing Verkehr die Startzeit unbekannt ist.)
+	// da für Outgoing Verkehr die Startzeit unbekannt ist.) -> Alternativ: Rundtrip draus machen
 	//TODO: Hochrechnen auf andere Zeiten, die in der Umfrage nicht erfasst sind
 	//TODO: LKW-Verkehr innerhalb des Großraums Santiago erstellen.
 	/**
@@ -73,7 +73,7 @@ public class Freight {
 		createDir(new File(outputDir));
 		new PopulationWriter(population).write(outputDir + "plans.xml.gz");
 		new PopulationWriter(population).write(outputDir + "plans.xml");
-		
+
 		//write list of all AgentIds to file. Can be used for selecting all freightVehicleAgents in visualization with Senozon Via   
 		try {
 			FileWriter writer = new FileWriter(outputDir + "freightAgentIds.txt");
@@ -115,99 +115,105 @@ public class Freight {
 
 			Activity firstActivity = null;
 			Activity lastActivity = null;
-			
-			//TODO: correct assignment of start /end to the activities... e.g. CE-location is "home".
+
+			//TODO: correct assignment of start /end to the activities... or user "other" or anything else
 			String actTypeStart = "home";
 			String actTypeEnd = "work";
 
 			String originZone = freightTrip.getOriginZone() ;
 			String destinationZone = freightTrip.getDestinationZone();
 			String prefix = "CE";
-			
+
 			Coord originCoord = null;
 			Coord destinationCoord = null;
-			
-			//TODO: Implement check if zone can be resolved.
-//			System.out.println(freightTrip.getId()+ " OriginZone: "+ originZone + " "+ originZone.startsWith(prefix) );
+
+			//			System.out.println(freightTrip.getId()+ " OriginZone: "+ originZone + " "+ originZone.startsWith(prefix) );
 			if (originZone.startsWith(prefix)){ //surveyed at arriving 
-				originCoord = zonaId2Coord.get(originZone.concat("in"));
-//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
+				String zoneName = originZone.concat("in");
+				if (zonaId2Coord.containsKey(zoneName)){
+					originCoord = zonaId2Coord.get(zoneName);
+					//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
+				} else {
+					log.warn("Zone can not be resolved: " + originZone);
+				}
 			} else {
-//				System.out.println("OriginZone: "+ freightTrip.getOriginZone() + "doesn't start with CE");
-				originCoord = zonaId2Coord.get(freightTrip.getOriginZone());
-//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
-			}
+				String zoneName = originZone;
+				if (zonaId2Coord.containsKey(zoneName)){
+					originCoord = zonaId2Coord.get(zoneName);
+					//				System.out.println(freightTrip.getId()+ " origin: " + originCoord.toString());
+				} else {
+					log.warn("Zone can not be resolved: " + originZone);
 
-//			System.out.println(freightTrip.getId()+ " DestZone: "+ destinationZone + " "+ destinationZone.startsWith(prefix) );
-			if (destinationZone.startsWith(prefix)){	//surveyed at leaving 
-				destinationCoord = zonaId2Coord.get(destinationZone.concat("out"));
-//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
-			} else {
-				destinationCoord = zonaId2Coord.get(destinationZone);
-//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
-			}						
-
-			//			if((origin == null || destination == null) || origin.getX() == 0 || origin.getY() == 0 || destination.getX() == 0 || destination.getY() == 0){
-			//
-			//				String comunaOrigin = etapa.getComunaOrigen();
-			//				String comunaDestino = etapa.getComunaDestino();
-			//
-			//				if((!comunaOrigin.equals("") && !comunaDestino.equals("")) || (!comunaOrigin.equals("0") && !comunaDestino.equalsIgnoreCase("0"))){
-			//
-			//				} else{
-			//
-			//					origin = origin == null ? new Coord(0.0, 0.0) : origin;
-			//					destination = destination == null ? new Coord(0.0, 0.0) : destination;
-			//
-			//				}
-			//
-			//			}
-
-
-			double reportedTravelTime = 3600 ;		//TODO: Use individual value (from survey or estimate one) 
-			firstActivity = popFactory.createActivityFromCoord(actTypeStart, originCoord);
-			if (inboundTrips.contains(freightTrip)){
-				firstActivity.setEndTime(freightTrip.getTimeOfSurvey());
-			} else if (outboundTrips.contains(freightTrip)){
-				firstActivity.setEndTime(freightTrip.getTimeOfSurvey() - reportedTravelTime);  
-			}
-
-
-			lastActivity = popFactory.createActivityFromCoord(actTypeEnd, destinationCoord);
-
-			if (inboundTrips.contains(freightTrip)){
-				lastActivity.setStartTime(freightTrip.getTimeOfSurvey() + reportedTravelTime);
-			} else if (outboundTrips.contains(freightTrip)){
-				lastActivity.setStartTime(freightTrip.getTimeOfSurvey() );  
-			}
-
-//			firstActivity.setMaximumDuration(0);
-//			lastActivity.setMaximumDuration(0);
-
-
-//			String legMode = Constants.Modes.truck.toString(); //TODO doesn't work by now in matsim.run()
-			String legMode = TransportMode.car; 
-
-			Leg leg = popFactory.createLeg(legMode);
-
-			planElements.add(firstActivity);
-			planElements.addLast(leg);
-			planElements.addLast(lastActivity);
-
-			for(PlanElement pe : planElements){
-				if(pe instanceof Activity){
-					plan.addActivity((Activity)pe);
-				}else{
-					plan.addLeg((Leg)pe);
 				}
 			}
 
-			person.addPlan(plan);
-			person.setSelectedPlan(plan);
+			//			System.out.println(freightTrip.getId()+ " DestZone: "+ destinationZone + " "+ destinationZone.startsWith(prefix) );
+			if (destinationZone.startsWith(prefix)){	//surveyed at leaving 
+				String zoneName = destinationZone.concat("out");
+				if (zonaId2Coord.containsKey(zoneName)){
+					destinationCoord = zonaId2Coord.get(zoneName);
+					//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
+				}else {
+					log.warn("Zone can not be resolved: " + originZone);
+				}
+			} else {
+				String zoneName = destinationZone;
+				if (zonaId2Coord.containsKey(zoneName)){
+					destinationCoord = zonaId2Coord.get(zoneName);
+					//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
+				}else {
+					log.warn("Zone can not be resolved: " + originZone);
+				}
+				//				System.out.println(freightTrip.getId()+ " dest: " + destinationCoord.toString());
+			}						
 
-			//a plan needs at least 3 plan elements (act - leg - act)
-			if(plan.getPlanElements().size() > 2){
-				population.addPerson(person);
+
+			if ( originCoord != null && destinationCoord != null && actTypeStart != null && actTypeEnd != null) {
+				double reportedTravelTime = 3600 ;		//TODO: Use individual value (from survey or estimate one) 
+				firstActivity = popFactory.createActivityFromCoord(actTypeStart, originCoord);
+				if (inboundTrips.contains(freightTrip)){
+					firstActivity.setEndTime(freightTrip.getTimeOfSurvey());
+				} else if (outboundTrips.contains(freightTrip)){
+					firstActivity.setEndTime(freightTrip.getTimeOfSurvey() - reportedTravelTime);  
+				}
+
+
+				lastActivity = popFactory.createActivityFromCoord(actTypeEnd, destinationCoord);
+
+				if (inboundTrips.contains(freightTrip)){
+					lastActivity.setStartTime(freightTrip.getTimeOfSurvey() + reportedTravelTime);
+				} else if (outboundTrips.contains(freightTrip)){
+					lastActivity.setStartTime(freightTrip.getTimeOfSurvey() );  
+				}
+
+				//			firstActivity.setMaximumDuration(0);
+				//			lastActivity.setMaximumDuration(0);
+
+
+				//			String legMode = Constants.Modes.truck.toString(); //TODO doesn't work by now in matsim.run()
+				String legMode = TransportMode.car; 
+
+				Leg leg = popFactory.createLeg(legMode);
+
+				planElements.add(firstActivity);
+				planElements.addLast(leg);
+				planElements.addLast(lastActivity);
+
+				for(PlanElement pe : planElements){
+					if(pe instanceof Activity){
+						plan.addActivity((Activity)pe);
+					}else{
+						plan.addLeg((Leg)pe);
+					}
+				}
+
+				person.addPlan(plan);
+				person.setSelectedPlan(plan);
+
+				//a plan needs at least 3 plan elements (act - leg - act)
+				if(plan.getPlanElements().size() > 2){
+					population.addPerson(person);
+				}
 			}
 
 
@@ -222,6 +228,7 @@ public class Freight {
 	 * Create locations for the ObservationPoints of the survey as origin or destination of freight tour.
 	 * Origin and destination are separated so there the incoming traffic start on an inbound link to Santiago and 
 	 * outgoing traffic ends on an outbound link from Santigo
+	 *  TODO: (how to= make sure, that the right link will be used(?)
 	 */
 	private static void createObservationPoints() {
 
@@ -231,7 +238,7 @@ public class Freight {
 		//CE02	AUTOPISTA DEL SOL
 		zonaId2Coord.put("CE02in", new Coord(292517.0, 6271720.0));
 		zonaId2Coord.put("CE02out", new Coord(292615.0, 6271840.0)); 
-		//CE03	RUTA 68 (A VALPARAISO) // TODO: (how to= make sure, that the right link will be used(?)
+		//CE03	RUTA 68 (A VALPARAISO) 
 		zonaId2Coord.put("CE03in", new Coord(323540.0, 6296520.0));
 		zonaId2Coord.put("CE03out", new Coord(323560.0, 6296520.0)); 
 		//CE04	RUTA 5 SUR (ANGOSTURA) ; out of box -> moved northbound on Ruta 5
