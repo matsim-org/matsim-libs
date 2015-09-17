@@ -79,8 +79,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 
-	private Double waitingPt = null ;  // if not actively set by user, it will later be set to "travelingPt".
-
 	// ---
 	
 	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration" ;
@@ -120,7 +118,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
-			getScoringParameters( null ).removeParameterSet( actParams );
+			getScoringParameters( null ).removeParameterSet(actParams);
 			addActivityParams( actParams );
 		}
 		else if (key.startsWith("activityPriority_")) {
@@ -264,11 +262,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	@Override
 	public Map<String, String> getParams() {
-		final Map<String, String> params = delegate.getParams();
-		if ( waitingPt != null ) {
-			params.put(WAITING_PT, waitingPt.toString());
-		}
-		return params;
+		return delegate.getParams();
 	}
 
 	@Override
@@ -330,13 +324,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	/* direct access */
 
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
-	   return this.waitingPt == null ?
-		   this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() :
-		   this.waitingPt ;
+		return getScoringParameters( null ).getMarginalUtlOfWaitingPt_utils_hr( );
 	}
 
 	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
-		this.waitingPt = val ;
+		getScoringParameters( null ).setMarginalUtlOfWaitingPt_utils_hr( val );
 	}
 
 	public ActivityParams getActivityParams(final String actType) {
@@ -844,6 +836,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		private double utilityOfLineSwitch = - 1 ;
 
+		private Double waitingPt = null ;  // if not actively set by user, it will later be set to "travelingPt".
+
 		@StringGetter( LATE_ARRIVAL )
 		public double getLateArrival_utils_hr() {
 			return lateArrival;
@@ -929,6 +923,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			}
 
 			this.subpopulation = subpopulation;
+		}
+
+		@StringGetter( WAITING_PT )
+		public double getMarginalUtlOfWaitingPt_utils_hr() {
+			return waitingPt != null ? waitingPt :
+				this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		}
+
+		@StringSetter( WAITING_PT )
+		public void setMarginalUtlOfWaitingPt_utils_hr( final Double waitingPt ) {
+			this.waitingPt = waitingPt;
 		}
 
 		/* parameter set handling */
@@ -1100,6 +1105,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						"parameter waitingPt instead.");
 			}
 		}
+
 	}
 
 
