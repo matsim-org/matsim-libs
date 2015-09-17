@@ -37,7 +37,7 @@ TransitDriverStartsEventHandler,
 PersonDepartureEventHandler, 
 PersonStuckEventHandler,
 Wait2LinkEventHandler,
-PersonArrivalEventHandler, CongestionInternalization {
-
+PersonArrivalEventHandler,
+CongestionInternalization {
 
 }

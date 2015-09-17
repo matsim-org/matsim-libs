@@ -205,7 +205,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	 * @return the remaining uncharged delay
 	 * <p>
 	 * Charging the agents that are in the flow queue.
-	 * Do this step-wise comparing the freespeed leave time of two subsequent agents (agent 'ahead' and agent 'behind').
 	 */
 	final double computeFlowCongestionAndReturnStorageDelay(double now, Id<Link> linkId, DelayInfo affectedAgentDelayInfo, double remainingDelay) {		
 
@@ -213,12 +212,12 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; remainingDelay > 0.0 && it.hasNext() ; ) {
 			// Get the agent 'ahead' from the flow queue. The agents 'ahead' are considered as causing agents.
-			DelayInfo agentAheadDelayInfo = it.next() ;
+			DelayInfo causingAgentDelayInfo = it.next() ;
 
 			double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
-			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", agentAheadDelayInfo.personId, 
-					affectedAgentDelayInfo.personId, allocatedDelay, linkId, agentAheadDelayInfo.linkEnterTime );
+			CongestionEvent congestionEvent = new CongestionEvent(now, "flowAndStorageCapacity", causingAgentDelayInfo.personId, 
+					affectedAgentDelayInfo.personId, allocatedDelay, linkId, causingAgentDelayInfo.linkEnterTime );
 			this.events.processEvent(congestionEvent); 
 
 			this.totalInternalizedDelay += allocatedDelay ;
@@ -272,25 +271,21 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public double getTotalDelay() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public double getTotalRoundingErrorDelay() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void writeCongestionStats(String fileName) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
