@@ -184,7 +184,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double remainingDelay = event.getTime() - affectedAgentDelayInfo.freeSpeedLeaveTime ;
+		double remainingDelay = event.getTime() - linkInfo.getAgentsOnLink().get(affectedAgentDelayInfo.personId).getFreeSpeedLeaveTime() ;
 
 		// global book-keeping:
 		this.totalDelay += remainingDelay;
@@ -267,7 +267,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			double agentDelay = Math.min(spillbackLinkCongestionInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
 			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "storageCapacity", causingPersonId, affectedPersonId, 
-					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getPersonId2linkEnterTime().get(causingPersonId) );
+					agentDelay, spillbackCausingLink, spillbackLinkCongestionInfo.getAgentsOnLink().get(causingPersonId).getEnterTime() );
 			this.events.processEvent(congestionEvent); 
 
 			this.delegate.addToTotalInternalizedDelay(agentDelay);

@@ -24,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+
 /**
  * A simple helper class to store arbitrary attributes (identified by Strings) for
  * arbitrary objects (identified by String-Ids). Note that this implementation uses
@@ -36,7 +38,7 @@ import java.util.Map.Entry;
  *
  * @author mrieser
  */
-public class ObjectAttributes {
+public class ObjectAttributes implements MatsimExtensionPoint {
 
 	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
 	

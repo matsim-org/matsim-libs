@@ -42,7 +42,7 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.3</version>
 		</dependency>
-		<!--<dependency>
+		<dependency>
 			<groupId>org.basex</groupId>
 			<artifactId>basex</artifactId>
 			<version>7.6</version>
@@ -51,7 +51,7 @@
 			<groupId>org.basex</groupId>
 			<artifactId>basex-api</artifactId>
 			<version>7.6</version>
-		</dependency>-->
+		</dependency>
   	
   </dependencies>
 </project>

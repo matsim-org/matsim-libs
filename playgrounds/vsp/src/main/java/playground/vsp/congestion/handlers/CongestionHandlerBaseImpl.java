@@ -127,10 +127,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
-			// yy it should be possible to eventually get rid of the following two lines and only use agent(OnLink)Info. kai, sep'15
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
-			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
-
 			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() )
 					.setLinkId( event.getLinkId() ).setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
@@ -144,10 +140,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		} else { // car! 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
-			// yy it should be possible to eventually get rid of the following two lines and only use agent(OnLink)Info. kai, sep'15
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
-			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
-
 			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() ).setLinkId( event.getLinkId() )
 					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
 			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
@@ -157,7 +149,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		throw new RuntimeException("Not implemented. Aborting...");
-		// the following should be moved to different versions
 		
 		// yy My preference would be if we found a solution where the basic bookkeeping (e.g. update flow and
 		// delay queues) is done here.  However, delegation does not allow to have custom code in between 
