@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.congestionPricing.GLKN.CongestionHandlerImplV7.CongestionImpls;
 import playground.agarwalamit.congestionPricing.testExamples.handlers.CorridorNetworkAndPlans;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -73,14 +72,14 @@ class CorridorTestExample {
 		CongestionHandlerImplV3 v3 = new CongestionHandlerImplV3(events, (ScenarioImpl)sc);
 		CongestionHandlerImplV4 v4 = new CongestionHandlerImplV4(events, sc);
 //		CongestionHandlerImplV6 v6 = new CongestionHandlerImplV6(events, sc);
-		CongestionHandlerImplV7 v7_gl = new CongestionHandlerImplV7(events, sc, CongestionImpls.GL);
-		CongestionHandlerImplV7 v7_kn = new CongestionHandlerImplV7(events, sc, CongestionImpls.KN);
+//		CongestionHandlerImplV7 v7_gl = new CongestionHandlerImplV7(events, sc, CongestionImpls.GL);
+//		CongestionHandlerImplV7 v7_kn = new CongestionHandlerImplV7(events, sc, CongestionImpls.KN);
 		
 		events.addHandler(v3);
 		events.addHandler(v4);
 //		events.addHandler(v6);
-		events.addHandler(v7_gl);
-		events.addHandler(v7_kn);
+//		events.addHandler(v7_gl);
+//		events.addHandler(v7_kn);
 
 		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
@@ -88,8 +87,8 @@ class CorridorTestExample {
 		writeString("v3 \t"+v3.getTotalDelay()+"\t"+v3.getTotalInternalizedDelay()+"\n");
 		writeString("v4 \t"+v4.getTotalDelay()+"\t"+v4.getTotalInternalizedDelay()+"\n");
 //		writeString("v6 \t"+v6.getTotalDelay()+"\t"+v6.getTotalDelay()+"\n");
-		writeString("v7_gl \t"+v7_gl.getTotalDelay()+"\t"+v7_gl.getTotalInternalizedDelay()+"\n");
-		writeString("v7_kn \t"+v7_kn.getTotalDelay()+"\t"+v7_kn.getTotalInternalizedDelay()+"\n");
+//		writeString("v7_gl \t"+v7_gl.getTotalDelay()+"\t"+v7_gl.getTotalInternalizedDelay()+"\n");
+//		writeString("v7_kn \t"+v7_kn.getTotalDelay()+"\t"+v7_kn.getTotalInternalizedDelay()+"\n");
 	}
 	
 	private void writeString(String str){

@@ -46,7 +46,7 @@ import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 /** 
- * TODO
+ * In this implementation, the delay is allocated to all agents ahead that are in the queue.
  * 
  * @author ikaddoura
  *
