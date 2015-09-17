@@ -157,7 +157,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		throw new RuntimeException("Not implemented. Aborting...");
-		// the following should be moved to different versions
 		
 		// yy My preference would be if we found a solution where the basic bookkeeping (e.g. update flow and
 		// delay queues) is done here.  However, delegation does not allow to have custom code in between 
