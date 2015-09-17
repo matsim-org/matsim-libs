@@ -145,6 +145,8 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
+		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
+
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 
@@ -179,6 +181,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 
 	@Override
 	public final void calculateCongestion(LinkLeaveEvent event, DelayInfo affectedAgentDelayInfo) {
+		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 		double remainingDelay = event.getTime() - affectedAgentDelayInfo.freeSpeedLeaveTime ;

@@ -126,6 +126,8 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	public final void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){ // car!
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
+
+			// yy it should be possible to eventually get rid of the following two lines and only use agent(OnLink)Info. kai, sep'15
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 
@@ -141,6 +143,8 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 		} else { // car! 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
+
+			// yy it should be possible to eventually get rid of the following two lines and only use agent(OnLink)Info. kai, sep'15
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 
@@ -153,17 +157,31 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		throw new RuntimeException("Not implemented. Aborting...");
+		// the following should be moved to different versions
+		
+		// yy My preference would be if we found a solution where the basic bookkeeping (e.g. update flow and
+		// delay queues) is done here.  However, delegation does not allow to have custom code in between 
+		// standard code (as was the case before with calculateCongestion).  We need to consider if it is possible to 
+		// rather have the standard code in one go and embed it in the delegated class.  In the sense of
+		// class MyCongestionHandlerImpl {
+		//    ... handleEvent( LinkLeaveEvent event ) {
+		//             ... // custom code
+		//             delegate.handleEvent( event ) ;
+		//             ... // more custom code
+		//    ...
 	}
 
 	@Override
-	public /*final*/ void handleEvent( PersonArrivalEvent event ) {
+	public final void handleEvent( PersonArrivalEvent event ) {
 		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario) ;
 		linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
 	}
 
-	final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
-		
+	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		// TODO: Shift everything that is related to the delay queue to V4. I don't need this in V3. ihab, sep'15
+	        // yy I don't think that the delay queue is even needed by V4.  It is probably needed
+	        // for the "Nagel" approach only. kai, sep'15
+
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
@@ -179,13 +197,10 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTime + 1.) { 
 				// bottleneck is not active anymore.
-				// yyyy is this really the correct definition?  Or should we also look at delay? kai, sep'15
 
 				// bottleneck no longer active. However, first check for combination of flow and storage delay:
 				DelayInfo agentAheadDelayInfo = linkInfo.getFlowQueue().getLast() ;
 				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - agentAheadDelayInfo.freeSpeedLeaveTime ; 
-				// (otherwise there would have been flow delay)
-
 				/* The following is to catch the possibility of agent getting delayed due to flow capacity and storage
 				 * capacity respectively.
 				 */
@@ -194,6 +209,11 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 				} else {
 					linkInfo.getFlowQueue().clear();
 				}
+				// yy this is what I think we would have to accept if we wanted to bring V3 and V4 under the same umbrella.
+				// It would, as I discussed via skype with Ihab, probably change the old result, hopefully only slightly.
+				// On second thought, however, this is not so obvious.  The Amit case (first flow then storage delayed)
+				// is important, but the above condition would also move cases into the flow queue where the origin
+				// of the problem clearly is somewhere else. kai, sep'15
 			}
 		}
 
