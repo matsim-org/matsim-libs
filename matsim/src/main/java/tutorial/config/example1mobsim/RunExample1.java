@@ -20,7 +20,11 @@
 
 package tutorial.config.example1mobsim;
 
-import org.matsim.run.Controler;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
@@ -35,7 +39,11 @@ public class RunExample1 {
 		String configFile = "examples/tutorial/config/example1-config.xml" ;
 		// DO NOT CHANGE THE ABOVE PATH.  It is referenced from the book, and this here tests it.
 		
-		Controler controler = new Controler( configFile ) ;
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
+		
+		Controler controler = new Controler( scenario ) ;
 		controler.run() ;
 	}
 

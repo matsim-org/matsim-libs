@@ -21,6 +21,7 @@
 package org.matsim.core.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.*;
@@ -38,7 +39,7 @@ import java.util.TreeMap;
  *
  * @author mrieser
  */
-public class Config {
+public class Config implements MatsimExtensionPoint {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables

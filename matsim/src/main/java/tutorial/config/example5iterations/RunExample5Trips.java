@@ -23,7 +23,9 @@ package tutorial.config.example5iterations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.run.Controler;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
@@ -39,12 +41,15 @@ public class RunExample5Trips {
 	public static void main(final String[] args) {
 		String configFile = "examples/tutorial/config/example5trips-config.xml" ;
 		
-		Controler controler = new Controler( configFile ) ;
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		Controler controler = new Controler( scenario ) ;
+
 		controler.run() ;
 		
-		Scenario sc = controler.getScenario() ;
-		Config cf = sc.getConfig() ;
-		String dir = cf.controler().getOutputDirectory();
+		String dir = config.controler().getOutputDirectory();
 		log.warn("Output is in " + dir + "." ) ; 
 	}
 

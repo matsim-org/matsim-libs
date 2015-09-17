@@ -16,22 +16,16 @@ import playground.dhosse.utils.EgapHashGenerator;
 public class EgapPopulationUtils {
 	
 	//age distribution
-	private static final double thresholdAge0_9 = 0.1004;
-	private static final double thresholdAge10_19 = 0.1598;
-	private static final double thresholdAge20_29 = 0.089;
-	private static final double thresholdAge30_39 = 0.0955;
-	private static final double thresholdAge40_49 = 0.205;
-	private static final double thresholdAge50_59 = 0.1589;
-	private static final double thresholdAge60_69 = 0.1098;
-	private static final double thresholdAge70_79 = 0.0643;
+	private static final double thresholdAge0_9 = 0.1083;
+	private static final double thresholdAge10_19 = 0.1635;
+	private static final double thresholdAge20_29 = 0.0892;
+	private static final double thresholdAge30_39 = 0.098;
+	private static final double thresholdAge40_49 = 0.2113;
+	private static final double thresholdAge50_59 = 0.1566;
+	private static final double thresholdAge60_69 = 0.1053;
+	private static final double thresholdAge70_79 = 0.0559;
 	
-	private static final double thresholdsAge[] = {0.1004, 0.1598, 0.089, 0.0955, 0.205, 0.1589, 0.1098, 0.0643};
-	
-	//transport mode distribution
-	private static final double thresholdWalk = 0.2029384757;
-	private static final double thresholdBike = 0.269768391;
-	private static final double thresholdRide = 0.446587083;
-	private static final double thresholdCar = 0.9345985104;
+	private static final double thresholdsAge[] = {0.1083, 0.1635, 0.0892, 0.098, 0.2113, 0.1566, 0.1053, 0.0559, 0.0119};
 	
 	static Map<String, MiDPersonGroupData> personGroupData = new HashMap<>();
 	
@@ -507,7 +501,7 @@ public class EgapPopulationUtils {
 		
 		if(age < 10){
 			
-			if(rnd <= 0.4919){
+			if(rnd <= 0.4912){
 				
 				return 0;
 				
@@ -519,7 +513,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 10 && age < 20){
 			
-			if(rnd <= 0.4919){
+			if(rnd <= 0.4941){
 				
 				return 0;
 				
@@ -531,7 +525,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 20 && age < 30){
 			
-			if(rnd <= 0.5182){
+			if(rnd <= 0.5408){
 				
 				return 0;
 				
@@ -543,7 +537,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 30 && age < 40){
 			
-			if(rnd <= 0.4592){
+			if(rnd <= 0.4688){
 				
 				return 0;
 				
@@ -555,7 +549,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 40 && age < 50){
 			
-			if(rnd <= 0.4754){
+			if(rnd <= 0.4873){
 				
 				return 0;
 				
@@ -567,7 +561,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 50 && age < 60){
 			
-			if(rnd <= 0.5031){
+			if(rnd <= 0.5037){
 				
 				return 0;
 				
@@ -579,7 +573,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 60 && age < 70){
 			
-			if(rnd <= 0.5325){
+			if(rnd <= 0.5309){
 				
 				return 0;
 				
@@ -591,7 +585,7 @@ public class EgapPopulationUtils {
 			
 		} else if(age >= 70 && age < 80){
 			
-			if(rnd <= 0.5556){
+			if(rnd <= 0.5753){
 				
 				return 0;
 				
@@ -603,7 +597,7 @@ public class EgapPopulationUtils {
 			
 		} else{
 			
-			if(rnd <= 0.5094){
+			if(rnd <= 0.5806){
 				
 				return 0;
 				

@@ -143,7 +143,7 @@ public class FacilitiesCreator {
 			while((line = reader.readLine()) != null){
 				
 				String[] parts = line.split(",");
-
+				
 				Coord coord = Global.ct.transform(new Coord(Double.parseDouble(parts[idxX]), Double.parseDouble(parts[idxY])));
 				
 				ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(Global.ActType.work.name() + "_" + counter, ActivityFacility.class), coord);

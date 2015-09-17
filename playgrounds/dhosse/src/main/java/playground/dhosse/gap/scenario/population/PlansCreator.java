@@ -93,6 +93,144 @@ public class PlansCreator {
 		
 	}
 	
+	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
+		
+		MiDCSVReader reader = new MiDCSVReader();
+		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
+		Map<String, MiDSurveyPerson> persons = reader.getPersons();
+		
+		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
+		
+		int WA = 0;
+		int WB = 0;
+		int WE = 0;
+		int WF = 0;
+		int WS = 0;
+		int AW = 0;
+		int BW = 0;
+		int EW = 0;
+		int FW = 0;
+		int SW = 0;
+		int SA = 0;
+		int AS = 0;
+		int SS = 0;
+		
+		for(MiDSurveyPerson person : persons.values()){
+			
+			String lastActType = ((Activity)person.getPlan().getPlanElements().get(1)).getType().equals("home") ? "other" : "home";
+			
+			for(PlanElement pe : person.getPlan().getPlanElements()){
+				if(pe instanceof Activity){
+					String actType = ((Activity)pe).getType();
+					
+					if(lastActType.equals("home")){
+						
+						if(actType.equals("work")){
+							WA++;
+						} else if(actType.equals("education")){
+							WB++;
+						} else if(actType.equals("shop")){
+							WE++;
+						} else if(actType.equals("leisure")){
+							WF++;
+						}else{
+							WS++;
+						}
+						
+					} else if(lastActType.equals("work")){
+						if(actType.equals("home")){
+							AW++;
+						} else{
+							AS++;
+						}
+					} else if(lastActType.equals("education")){
+						if(actType.equals("home")){
+							BW++;
+						} else {
+							SS++;
+						}
+					} else if(lastActType.equals("shop")){
+						if(actType.equals("home")){
+							EW++;
+						} else if(actType.equals("work")){
+							SA++;
+						}
+						else{
+							SS++;
+						}
+					} else if(lastActType.equals("leisure")){
+						if(actType.equals("home")){
+							FW++;
+						} else if(actType.equals("work")){
+							SA++;
+						}
+						else{
+							SS++;
+						}
+					} else {
+						if(actType.equals("home")){
+							SW++;
+						} else if(actType.equals("work")){
+							SA++;
+						}
+						else{
+							SS++;
+						}
+					}
+					
+					lastActType = actType; 
+				}
+			}
+			
+			templates.handlePerson(person);
+			
+		}
+		
+		System.out.println("WA:" + WA + "\tWB:" + WB + "\tWE:" + WE + "\tWF:" + WF + "\tWS:" + WS + "\tAW:" + AW + "\tBW:" + BW + "\tEW:" + EW + "\tFW:" + FW + "\tSW:" + SW + "\tAS:" + AS + "\tSA:" + SA + "\tSS:" + SS);
+		
+		Map<String, MiDPersonGroupData> personGroupData = EgapPopulationUtils.createMiDPersonGroups();
+		
+		for(Entry<String, Municipality> entry : Municipalities.getMunicipalities().entrySet()){
+			
+			createPersonsFromPersonGroup(entry.getKey(), 10, 18, 19, entry.getValue().getnStudents(), scenario, personGroupData, templates);
+			
+			int nCommuters = 0;
+			List<String> keysToRemove = new ArrayList<>();
+			
+			for(String relation : relations.keySet()){
+				
+				String[] relationParts = relation.split("_");
+				
+				if(relation.startsWith(entry.getKey())){
+
+					nCommuters += relations.get(relation).getCommuters();
+					
+					if(relationParts[1].startsWith("09180")){
+						
+						createCommutersFromKey(scenario, relations.get(relation), personGroupData, templates);
+						keysToRemove.add(relation);
+						
+					}
+					
+				}
+				
+			}
+			
+			for(String s : keysToRemove){
+				
+				relations.remove(s);
+				
+			}
+			
+			createPersonsFromPersonGroup(entry.getKey(), 20, 65, 69, entry.getValue().getnAdults() - nCommuters, scenario, personGroupData, templates);
+			createPersonsFromPersonGroup(entry.getKey(), 65, 89, 89, entry.getValue().getnPensioners(), scenario, personGroupData, templates);
+			
+		}
+		
+		createCommuters(scenario.getPopulation(), relations.values(), personGroupData);
+		
+	}
+	
 	/**
 	 * This method creates an initial population of car commuters based on the survey by the Arbeitsagentur.
 	 * The commuter data elements are used as templates.
@@ -168,6 +306,8 @@ public class PlansCreator {
 					if(fromId.startsWith("09180") && toId.startsWith("09810")){
 						
 						if(hasLicense){
+							
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
 							
 							if(carAvail){
 								
@@ -261,7 +401,7 @@ public class PlansCreator {
 
 			endTime = 8*3600 + createRandomTimeShift();
 			
-		}while(endTime <= 0);
+		}while(endTime <= 0 && (endTime + 11 * 3600) > 24*3600);
 		
 		actHome.setEndTime(endTime);
 		plan.addActivity(actHome);
@@ -286,66 +426,11 @@ public class PlansCreator {
 		
 	}
 	
-	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
-		
-		MiDCSVReader reader = new MiDCSVReader();
-		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
-		Map<String, MiDSurveyPerson> persons = reader.getPersons();
-		
-		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
-		
-		for(MiDSurveyPerson person : persons.values()){
-			
-			templates.handlePerson(person);
-			
-		}
-		
-		Map<String, MiDPersonGroupData> personGroupData = EgapPopulationUtils.createMiDPersonGroups();
-		
-		for(Entry<String, Municipality> entry : Municipalities.getMunicipalities().entrySet()){
-			
-			createPersonsFromPersonGroup(entry.getKey(), 10, 18, 19, entry.getValue().getnStudents(), scenario, personGroupData, templates);
-			
-			int nCommuters = 0;
-			List<String> keysToRemove = new ArrayList<>();
-			
-			for(String relation : relations.keySet()){
-				
-				String[] relationParts = relation.split("_");
-				
-				if(relation.startsWith(entry.getKey())){
-
-					nCommuters += relations.get(relation).getCommuters();
-					
-					if(relationParts[1].startsWith("09180")){
-						
-						createCommutersFromKey(scenario, relations.get(relation), personGroupData, templates);
-						keysToRemove.add(relation);
-						
-					}
-					
-				}
-				
-			}
-			
-			for(String s : keysToRemove){
-				relations.remove(s);
-			}
-			
-			createPersonsFromPersonGroup(entry.getKey(), 20, 65, 69, entry.getValue().getnAdults() - nCommuters, scenario, personGroupData, templates);
-			createPersonsFromPersonGroup(entry.getKey(), 65, 89, 89, entry.getValue().getnPensioners(), scenario, personGroupData, templates);
-			
-		}
-		
-		createCommuters(scenario.getPopulation(), relations.values(), personGroupData);
-		
-	}
-	
 	private static void createCommutersFromKey(Scenario scenario, CommuterDataElement relation, Map<String, MiDPersonGroupData> personGroupData, MiDPersonGroupTemplates templates){
 		
 		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		
-		//parse over commuter relations
+			//parse over commuter relations
 			//this is just for the reason that the shape file does not contain any diphtongs
 			//therefore, they are removed from the relation names as well
 			String[] diphtong = {"ä", "ö", "ü", "ß"};
@@ -414,6 +499,8 @@ public class PlansCreator {
 					if(fromId.startsWith("09180") && toId.startsWith("09810")){
 					
 						if(hasLicense){
+							
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
 							
 							if(carAvail){
 								
@@ -535,6 +622,14 @@ public class PlansCreator {
 							
 							Coord c = null;
 							
+							double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
+							
+							if(!carAvail || !hasLicense){
+								
+								distance = Math.min(distance, 6000);
+								
+							}
+							
 							Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
 							
 							if(type.equals(Global.ActType.home.name())){
@@ -542,8 +637,6 @@ public class PlansCreator {
 								c = homeCoord;
 								
 							} else if(type.equals(Global.ActType.other.name())){ //if the act type equals "other" or "work", shoot a random coordinate
-								
-								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
 								
 //								do{
 //								
@@ -560,7 +653,7 @@ public class PlansCreator {
 								
 								double x = signX * Global.random.nextDouble() * distance;
 								double y = signY * Math.sqrt(distance * distance - x * x);
-
+								
 								c = new Coord(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 								
 								c = Global.UTM32NtoGK4.transform(c);
@@ -573,8 +666,6 @@ public class PlansCreator {
 								
 							}
 							else{ //for all activities apart from "other" and "home", shoot a random coordinate and get the nearest activity facility
-								
-								double distance = ((Leg)templatePerson.getPlan().getPlanElements().get(index - 2)).getRoute().getDistance();
 								
 								ActivityFacility facility = null;
 								
@@ -603,7 +694,7 @@ public class PlansCreator {
 									}
 									
 								}while(facility == null);
-
+								
 								c = new Coord(facility.getCoord().getX(), facility.getCoord().getY());
 								
 							}
@@ -716,6 +807,8 @@ public class PlansCreator {
 				
 				if(hasLicense){
 					
+					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+					
 					if(carAvail){
 						
 						GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
@@ -823,7 +916,7 @@ public class PlansCreator {
 								
 								double x = signX * Global.random.nextDouble() * distance;
 								double y = signY * Math.sqrt(distance * distance - x * x);
-
+								
 								c = new Coord(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 								
 								
