@@ -34,7 +34,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.Sub
  * 
  * @author meisterk
  */
-public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
+public final class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final ScoringParametersForPerson params;
     private final Scenario scenario;
