@@ -163,6 +163,8 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	}
 
 	final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
+		
+		// TODO: Shift everything that is related to the delay queue to V4. I don't need this in V3. ihab, sep'15
 		if ( linkInfo.getDelayQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
@@ -171,6 +173,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 				linkInfo.getDelayQueue().clear() ;
 			}
 		}
+		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {

@@ -26,13 +26,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -40,37 +38,33 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /** 
- * 
- * 1) For each agent leaving a link a total delay is calculated as the difference of actual leaving time and the leaving time according to freespeed.
- * 2) The delay due to the flow capacity of that link is computed and marginal congestion events are thrown, indicating the affected agent, the causing agent and the delay in sec.
- * 3) The proportion of flow delay is deducted.
- * 4) The remaining delay leads back to the storage capacity of downstream links. In this implementation the causing agent for a delay resulting from the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.
- * That is, the affected agent keeps the delay caused by the storage capacity constraint until he/she reaches the bottleneck link and (hopefully) identifies there the agent who is causing the spill-backs.
+ * TODO
  * 
  * @author ikaddoura
  *
  */
-public final class CongestionHandlerImplV3 implements CongestionHandler, ActivityEndEventHandler {
+public final class CongestionHandlerImplV7 implements CongestionHandler {
 
-	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
+	private final static Logger log = Logger.getLogger(CongestionHandlerImplV7.class);
 
 	private CongestionHandlerBaseImpl delegate;
 
-	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
-	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
 	private double totalDelay = 0.;
 
 	private Scenario scenario;
-	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
+	private EventsManager events;
+	
+	public CongestionHandlerImplV7(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
+		this.events = events;
 		this.delegate = new CongestionHandlerBaseImpl(events, scenario);
 	}
 
@@ -78,9 +72,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	public final void reset(int iteration) {
 
 		delegate.reset(iteration);
-
-		this.agentId2storageDelay.clear();
-		this.delayNotInternalized_spillbackNoCausingAgent = 0.;
 		this.totalDelay = 0.;
 	}
 
@@ -126,8 +117,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 			bw.newLine();
 			bw.write("Not internalized delay (rounding errors) [hours];" + this.delegate.getDelayNotInternalized_roundingErrors() / 3600.);
 			bw.newLine();
-			bw.write("Not internalized delay (spill-back related delays without identifiying the causing agent) [hours];" + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
-			bw.newLine();
 
 			bw.close();
 
@@ -140,28 +129,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	@Override
 	public final double getTotalDelay() {
 		return this.totalDelay;
-	}
-	
-	
-
-	public final double getDelayNotInternalizedSpillbackNoCausingAgent() {
-		return this.delayNotInternalized_spillbackNoCausingAgent;
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		// I read the following as: remove non-allocated delays from agents once they are no longer on a leg. kai, sep'15
-
-		if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
-			// skip that person
-
-		} else {
-			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
-				// log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
-				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
-			}
-			this.agentId2storageDelay.put(event.getPersonId(), 0.);
-		}
 	}
 
 	@Override
@@ -202,38 +169,28 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 		// global book-keeping:
 		this.totalDelay += delayOnThisLink;
 
-		// Check if this (affected) agent was previously delayed without internalizing the delay.
+		if (delayOnThisLink < 0.) {
+			throw new RuntimeException("The delay is below 0. Aborting...");
 
-		double agentDelayWithDelaysOnPreviousLinks = 0.;		
-
-		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
-		} else {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
-		}
-
-		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
-			throw new RuntimeException("The total delay is below 0. Aborting...");
-
-		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
+		} else if (delayOnThisLink == 0.) {
 			// The agent was leaving the link without a delay.  Nothing to do ...
 
 		} else {
 			// The agent was leaving the link with a delay.
 
-			double storageDelay = this.delegate.computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), delayInfo, agentDelayWithDelaysOnPreviousLinks);
+			// go throw the flow queue and charge all causing agents with the delay on this link
+			for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
+				DelayInfo causingAgentDelayInfo = it.next() ;
+	
+				// let each agent in the queue pay for the total delay
+				double allocatedDelay = delayOnThisLink;
 
-			if (storageDelay < 0.) {
-				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "version7", causingAgentDelayInfo.personId, 
+						delayInfo.personId, allocatedDelay, event.getLinkId(), causingAgentDelayInfo.linkEnterTime );
+				this.events.processEvent(congestionEvent); 
 
-			} else if (storageDelay == 0.) {
-				// The delay resulting from the storage capacity is 0.
-
-			} else if (storageDelay > 0.) {	
-				// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-				this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
-			} 
+				this.delegate.addToTotalInternalizedDelay(allocatedDelay);
+			}
 		}
 	}
 
