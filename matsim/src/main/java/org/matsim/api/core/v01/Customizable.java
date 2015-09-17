@@ -22,6 +22,8 @@ package org.matsim.api.core.v01;
 
 import java.util.Map;
 
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+
 /**
  * An interface to customize any class in <tt>org.matsim</tt> for
  * experiments only.
@@ -37,7 +39,7 @@ import java.util.Map;
  * 
  * @author balmermi
  */
-public interface Customizable {
+public interface Customizable extends MatsimExtensionPoint {
 
 	//////////////////////////////////////////////////////////////////////
 	// methods
