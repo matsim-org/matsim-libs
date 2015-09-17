@@ -30,6 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -87,7 +88,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 		private final ScenarioConfigGroup scConfig;
 		private final ObjectAttributes personAttributes;
 		private final String subpopulationAttributeName;
-		private Map<String, CharyparNagelScoringParameters> params = null;
+		private final Map<String, CharyparNagelScoringParameters> params = new HashMap<>();
 
 		public SubpopulationScoringParameters(Scenario scenario) {
 			this.config = scenario.getConfig().planCalcScore();
