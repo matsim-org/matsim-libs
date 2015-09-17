@@ -153,7 +153,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		throw new RuntimeException("Not implemented. Aborting...");
-		// the following should be moved to different versions
 	}
 
 	@Override
