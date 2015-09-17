@@ -166,6 +166,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
+		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
@@ -183,6 +184,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 			CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
 
 			calculateCongestion(event, delayInfo);
+			// und hier sieht man in der Tat, dass das mit der abstrakten Klasse gar nicht so falsch war. Hm ... kai, sep'15
 
 			linkInfo.getFlowQueue().add( delayInfo ) ;
 			linkInfo.getDelayQueue().add( delayInfo ) ;
@@ -200,6 +202,8 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
+		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
+		
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 
