@@ -120,7 +120,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
-			this.removeParameterSet( actParams );
+			getScoringParameters( null ).removeParameterSet( actParams );
 			addActivityParams( actParams );
 		}
 		else if (key.startsWith("activityPriority_")) {
