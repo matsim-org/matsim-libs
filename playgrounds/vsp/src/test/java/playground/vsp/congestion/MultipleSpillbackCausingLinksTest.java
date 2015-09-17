@@ -63,7 +63,7 @@ import java.util.Map;
  * @author amit
  */
 
-public class MultipleSpillbackCausingLinksTestV4 {
+public class MultipleSpillbackCausingLinksTest {
 
 	private final boolean isUsingOTFVis = false;
 

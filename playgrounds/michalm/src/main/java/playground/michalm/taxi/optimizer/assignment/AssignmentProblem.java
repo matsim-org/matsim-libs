@@ -99,7 +99,6 @@ public class AssignmentProblem
                     maxArrivalTimeForRMinRequests.increment(path.getArrivalTime());
                 }
             }
-
         }
 
         for (int r = rMin; r < rData.dimension; r++) {

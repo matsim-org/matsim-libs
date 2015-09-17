@@ -71,7 +71,7 @@ public class MiDSurveyPerson {
 		leg.getRoute().setDistance(d);
 		
 		plan.addLeg(leg);
-
+		
 		Activity act = new ActivityImpl(activityType, new Coord(0., 0.));
 		
 		if(plan.getPlanElements().size() > 1){

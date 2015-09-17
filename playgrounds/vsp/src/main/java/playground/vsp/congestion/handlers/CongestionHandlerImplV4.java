@@ -59,16 +59,16 @@ import playground.vsp.congestion.events.CongestionEvent;
  * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
  * Marginal congestion events can be used for internalization.
  * 1) At link Leave event, delay is calculated which is the difference of actual leaving time and the leaving time according to free speed.
- * 2) Persons leaving link are identified and these are charged until delay =0; if there is no leaving agents (=spill back delays), spill back causing link is stored
- * 3) Subsequently spill back delays are processed by identifying spill back causing link(s) and charging entering agents (i.e. persons currently on the link) and leaving agents alternatively until delay=0;
+ * 2) Persons leaving link are identified and these are charged until delay =0; if the time headway between free speed time of two subsequent
+ * vehicle is more than  minimum time headway (1/c_flow), then (=spill back delays), spill back causing link is stored
+ * 3) Subsequently spill back delays are processed by identifying spill back causing link(s) and by charging entering agents
+ *  (i.e. persons currently on the link) and leaving agents alternatively until delay=0;
  * 
  * @author amit
- * 
- * warnings and structure is kept same as in previous implementation of congestion pricing by ihab.
- *
  */
 
 public final class CongestionHandlerImplV4 implements  CongestionHandler {
+
 	private final static Logger log = Logger.getLogger(CongestionHandlerImplV4.class);
 
 	private CongestionHandlerBaseImpl delegate;
@@ -119,7 +119,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	public final void handleEvent(PersonDepartureEvent event) {
 		delegate.handleEvent(event);
 
-		//--
 		final Integer cnt = this.personId2legNr.get( event.getPersonId() );
 		if ( cnt == null ) {
 			this.personId2legNr.put( event.getPersonId(), 0 ) ; // start counting with zero!!
@@ -132,7 +131,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	@Override
 	public final void handleEvent(LinkEnterEvent event) {
 		delegate.handleEvent(event);
-		// ---
+
 		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
 		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
 
@@ -186,6 +185,8 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 		double remainingDelay = event.getTime() - linkInfo.getAgentsOnLink().get(affectedAgentDelayInfo.personId).getFreeSpeedLeaveTime() ;
 
+		if(remainingDelay == 0.) return;
+
 		// global book-keeping:
 		this.totalDelay += remainingDelay;
 
@@ -205,6 +206,12 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 		remainingDelay = this.delegate.computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(),affectedAgentDelayInfo, remainingDelay);
 
 		if( remainingDelay > 0){
+
+			// for combined delay due to flow and storage capacities on the same link, the spill back causing link it not captured 
+			// because flowQueue is not empty any more with new (updateFlowQueue in delegate, 16-sep-15) logic. amit sep'15
+			if(this.linkId2SpillBackCausingLinks.get(event.getLinkId()) == null){
+				memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), getDownstreamLinkInRoute(this.delegate.getVehicleId2personId().get(event.getVehicleId())));
+			}
 
 			// !! calling the following method is the big difference to V3 !!!
 			remainingDelay = allocateStorageDelayToDownstreamLinks(remainingDelay, event.getLinkId(), event, affectedAgentDelayInfo);
@@ -278,11 +285,10 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			}
 		}
 
-		if(remainingDelay>0){
-			// now charge agents that have already left:
-			// here one can argue that delay are due to storageCapacity but congestion event from this method will say delay due to flowStorageCapacity
+		if(remainingDelay > 0. ){
 			remainingDelay = this.delegate.computeFlowCongestionAndReturnStorageDelay(event.getTime(), spillbackCausingLink, affectedAgentDelayInfo, remainingDelay);
 		}
+
 		return remainingDelay;
 	}
 

@@ -20,6 +20,9 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory.Builder;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -91,6 +94,30 @@ public class SpatialAnalysis {
 			
 			features.add(factory.createPolyline(new Coordinate[]{MGC.coord2Coordinate(link.getFromNode().getCoord()),
 					MGC.coord2Coordinate(link.getToNode().getCoord())}, atts, link.getId().toString()));
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, outputShapefile);
+		
+	}
+	
+	public static void writeCountsToShape(String countsFile, String outputShapefile){
+		
+		Counts counts = new Counts();
+		
+		new CountsReaderMatsimV1(counts).parse(countsFile);
+		
+		Builder builder = new Builder();
+		builder.setCrs(MGC.getCRS(Global.toCrs));
+		builder.addAttribute("Id", String.class);
+		builder.addAttribute("Name", String.class);
+		PointFeatureFactory pff = builder.create();
+		
+		List<SimpleFeature> features = new ArrayList<>();
+		
+		for(Count count : counts.getCounts().values()){
+			
+			features.add(pff.createPoint(MGC.coord2Coordinate(count.getCoord())));
 			
 		}
 		
