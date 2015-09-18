@@ -35,7 +35,7 @@ public class CreateCommutersFromElsewhere {
 		//parse over commuter relations
 		for(CommuterDataElement relation : relations){
 			
-			//this is just for the reason that the shape file does not contain any diphtongs
+			//this is just for the reason that the shape file does not contain any diphthongs
 			//therefore, they are removed from the relation names as well
 			String[] diphtong = {"ä", "ö", "ü", "ß"};
 			
@@ -63,7 +63,7 @@ public class CreateCommutersFromElsewhere {
 			String fromTransf = "GK4";
 			String toTransf = "GK4";
 			
-			if(fromId.length() == 3 && !fromId.contains("AT")){
+			if(fromId.length() == 3){
 				fromTransf = "";
 			}
 			if(toId.length() == 3){
@@ -88,8 +88,6 @@ public class CreateCommutersFromElsewhere {
 					int sex = EgapPopulationUtils.setSex(age);
 //					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
 					
-					MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
-
 					boolean hasLicense = true;//setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 					boolean carAvail = true;//setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
 					
