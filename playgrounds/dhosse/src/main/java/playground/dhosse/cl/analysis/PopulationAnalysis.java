@@ -23,16 +23,22 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class PopulationAnalysis {
 
-	private static final String runPath = "../../runs-svn/santiago/run11b/output/";
+	private static final String runPath = "../../runs-svn/santiago/run11b/";
 	
-	private static final String analysisPath = runPath+ "../analysis/";
+	private static final String analysisPath = runPath+ "analysis/";
 	
 	public static void main(String[] args) {
 		
 		createDir(new File(analysisPath));
 
 		getPersonsWithNegativeScores();
-		getPersonsWithCarLegWOCarAvail();
+		
+		//Input
+		getPersonsWithCarLegWOCarAvail(runPath+ "input/plans_final.xml.gz", runPath + "input/agentAttributes.xml", analysisPath + "carUseWOCarAvailable_InputData.txt");
+		
+		//Output
+		getPersonsWithCarLegWOCarAvail(runPath + "output/output_plans.xml.gz", runPath + "output/output_personAttributes.xml.gz", analysisPath + "carUseWOCarAvailable_OutputData.txt");
+		
 		
 		System.out.println("### Done. ###");
 		
@@ -40,7 +46,7 @@ public class PopulationAnalysis {
 	
 	private static void getPersonsWithNegativeScores(){
 		
-		String plansFile = runPath + "output_plans.xml.gz";
+		String plansFile = runPath + "output/output_plans.xml.gz";
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).parse(plansFile);
@@ -79,10 +85,9 @@ public class PopulationAnalysis {
 		
 	}
 
-	private static void getPersonsWithCarLegWOCarAvail(){
+	private static void getPersonsWithCarLegWOCarAvail(String plansFile, String attributesFile, String outputFile){
 		
-		String plansFile = runPath + "output_plans.xml.gz";
-		String attributesFile = runPath + "output_personAttributes.xml.gz";
+
 		
 		Map<String, Boolean> agentIdString2CarAvail = new HashMap<String, Boolean>();
 		
@@ -107,7 +112,7 @@ public class PopulationAnalysis {
 		attrReader.parse(attributesFile);
 		
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
-			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
+//			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
 			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carAvail"));
 			agentIdString2CarAvail.put(agentIdString, carAvail);
 		}
@@ -120,7 +125,7 @@ public class PopulationAnalysis {
 		}
 		System.out.println(countCarUserswihtCarAvail + " of " + agentIdString2CarAvail.size() + " have a car available.");
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter(analysisPath + "carUseWOCarAvailable.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		
 		
 		try {
