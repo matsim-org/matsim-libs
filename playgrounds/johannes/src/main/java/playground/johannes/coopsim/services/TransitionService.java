@@ -25,7 +25,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -109,7 +108,7 @@ public class TransitionService implements SimService<Boolean> {
 		 */
 		for(int i = 0; i < remove.size(); i++) {
 			Plan plan = remove.get(i);
-			PersonImpl person = (PersonImpl) plan.getPerson();
+			Person person = plan.getPerson();
 			person.getPlans().remove(plan);
 			person.setSelectedPlan(person.getPlans().get(0));
 		}

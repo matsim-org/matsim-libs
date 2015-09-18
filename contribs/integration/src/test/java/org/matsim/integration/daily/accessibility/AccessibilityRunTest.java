@@ -220,9 +220,8 @@ public class AccessibilityRunTest {
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-
 			listener.writeToSubdirectoryWithName(actType);
-
+			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater());
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
 			controler.addControlerListener(listener);

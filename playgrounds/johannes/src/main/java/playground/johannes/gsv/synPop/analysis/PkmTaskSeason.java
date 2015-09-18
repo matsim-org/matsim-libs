@@ -20,11 +20,9 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,26 +42,26 @@ public class PkmTaskSeason extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> seasons = new HashSet<String>();
-		for (PlainPerson person : persons) {
-			String month = (String) person.getAttribute(MIDKeys.PERSON_MONTH);
+		for (Person person : persons) {
+			String month = (String) person.getAttribute(MiDKeys.PERSON_MONTH);
 			if(month != null) {
 				String season = "winter";
 			
-			if(month.equalsIgnoreCase(MIDKeys.APRIL)) {
+			if(month.equalsIgnoreCase(MiDValues.APRIL)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.MAY)) {
+			} else if(month.equalsIgnoreCase(MiDValues.MAY)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.JUNE)) {
+			} else if(month.equalsIgnoreCase(MiDValues.JUNE)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.JULY)) {
+			} else if(month.equalsIgnoreCase(MiDValues.JULY)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.AUGUST)) {
+			} else if(month.equalsIgnoreCase(MiDValues.AUGUST)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.SEPTEMBER)) {
+			} else if(month.equalsIgnoreCase(MiDValues.SEPTEMBER)) {
 				season = "summer";
-			} else if(month.equalsIgnoreCase(MIDKeys.OCTOBER)) {
+			} else if(month.equalsIgnoreCase(MiDValues.OCTOBER)) {
 				season = "summer";
 			}
 			seasons.add(season);
@@ -74,7 +72,7 @@ public class PkmTaskSeason extends AnalyzerTask {
 
 		for (String season : seasons) {
 			double pkm = 0;
-			for (PlainPerson person : persons) {
+			for (Person person : persons) {
 				String theSeason = person.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
 				Episode plan = person.getEpisodes().get(0);

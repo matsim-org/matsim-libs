@@ -39,7 +39,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -106,7 +105,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				else{
 					startLink = event.getLinkId();
 				}
-				GenericRoute genericRoute = new GenericRouteImpl(startLink, event.getLinkId());    
+				Route genericRoute = new GenericRouteImpl(startLink, event.getLinkId());    
 				genericRoute.setDistance(0.0);
 				currentLeg.setRoute(genericRoute);
 			}
@@ -300,7 +299,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		Person person = new PersonImpl(driverId);
+		Person person = PersonImpl.createPerson(driverId);
 		return person;
 	}
 

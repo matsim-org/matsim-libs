@@ -15,6 +15,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -72,8 +73,8 @@ public class GeneticAlgorithmMode {
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTraveling_utils_hr();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingPt_utils_hr();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceCostRateCar();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceCostRatePt();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRateCar();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRatePt();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getUtilityOfLineSwitch();
 			calculateScore(scenario);
 		}
@@ -92,15 +93,15 @@ public class GeneticAlgorithmMode {
 			scenario.getConfig().planCalcScore().setTraveling_utils_hr(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(this.parameters[k++]);
+			scenario.getConfig().planCalcScore().setMonetaryDistanceRateCar(this.parameters[k++]);
+			scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(this.parameters[k++]);
 		}
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				PersonImpl copyPerson = new PersonImpl(person.getId());
-				copyPerson.setCarAvail(((PersonImpl)person).getCarAvail());
+				Person copyPerson = PersonImpl.createPerson(person.getId());
+				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);
@@ -197,7 +198,7 @@ public class GeneticAlgorithmMode {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		scenario.getConfig().planCalcScore().setConstantCar(10);
 		scenario.getConfig().planCalcScore().setMarginalUtlOfDistanceWalk(10);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(10);
+		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(10);
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario).readFile(args[3]);

@@ -35,10 +35,17 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
+import javax.inject.Inject;
+
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	private EventsManager eventsManager;
 	private AgentCounter agentCounter;
+
+	@Inject
+	public ActivityEngine(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
+	}
 
 	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter) {
 		this.eventsManager = eventsManager;
@@ -148,7 +155,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
-			agentCounter.decLiving();
+			internalInterface.getMobsim().getAgentCounter().decLiving();
 		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay() && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
@@ -193,7 +200,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((org.matsim.core.mobsim.qsim.AgentCounter) agentCounter).incLiving();
+				((org.matsim.core.mobsim.qsim.AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*
@@ -201,7 +208,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			 * Therefore the agent is de-activated. cdobler, oct'11
 			 */
 			unregisterAgentAtActivityLocation(agent);
-			agentCounter.decLiving();
+			internalInterface.getMobsim().getAgentCounter().decLiving();
 		} else {
 			/*
 			 *  The activity is just rescheduled during the day, so we keep the agent active. cdobler, oct'11

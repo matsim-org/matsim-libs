@@ -2,7 +2,6 @@ package playground.andreas.fggeoinfo;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.andreas.utils.ana.filterActsPerShape.FilterActsPerShape;
 
@@ -32,16 +31,16 @@ public class FGGeoInfo {
 		String actTypeOne = "work";
 		String actTypeTwo = "home";
 		String resultsOutFile = "workHomeStats.txt";
-		
-		Coord coordBBI = new CoordImpl(4604545.48760, 5805194.68221);
-		Coord coordTXL = new CoordImpl(4588068.19422, 5824668.31998);
-		Coord coordSXF = new CoordImpl(4603377.91673, 5807538.81303);
-		
-		Coord minSXF = new CoordImpl(4602500.000, 5806200.000);
-		Coord maxSXF = new CoordImpl(4604000.000, 5807400.000);
-				
-		Coord minTXL = new CoordImpl(4586900.000, 5824500.000);
-		Coord maxTXL = new CoordImpl(4588800.000, 5826300.000);
+
+		Coord coordBBI = new Coord(4604545.48760, 5805194.68221);
+		Coord coordTXL = new Coord(4588068.19422, 5824668.31998);
+		Coord coordSXF = new Coord(4603377.91673, 5807538.81303);
+
+		Coord minSXF = new Coord(4602500.000, 5806200.000);
+		Coord maxSXF = new Coord(4604000.000, 5807400.000);
+
+		Coord minTXL = new Coord(4586900.000, 5824500.000);
+		Coord maxTXL = new Coord(4588800.000, 5826300.000);
 		
 		// Old coordinates
 //		Coord minSXF = new CoordImpl(4599269.481, 5801657.79);

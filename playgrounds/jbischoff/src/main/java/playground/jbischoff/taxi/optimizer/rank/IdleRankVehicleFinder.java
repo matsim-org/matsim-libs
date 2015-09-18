@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
+import org.matsim.contrib.util.DistanceUtils;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
@@ -116,7 +117,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestDistance = 1e9;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : vehicles) {
@@ -154,7 +155,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
@@ -178,7 +179,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
@@ -209,7 +210,7 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestFIFOVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;
@@ -244,7 +245,7 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestWillingVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;

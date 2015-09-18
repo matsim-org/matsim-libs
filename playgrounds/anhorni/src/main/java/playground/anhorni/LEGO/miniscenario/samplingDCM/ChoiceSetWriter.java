@@ -26,14 +26,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -97,8 +96,8 @@ public class ChoiceSetWriter {
 				int index = 0;
 				for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 					ActivityImpl actHome = (ActivityImpl) p.getSelectedPlan().getPlanElements().get(0);
-					
-					double distance = 2 * ((CoordImpl)actHome.getCoord()).calcDistance(facility.getCoord());
+
+					double distance = 2 * CoordUtils.calcDistance(actHome.getCoord(), facility.getCoord());
 					alternatives += facility.getId() + "\t" + "1" + "\t" + distance + "\t";
 					
 					ActivityImpl shopAct = (ActivityImpl) p.getSelectedPlan().getPlanElements().get(2);

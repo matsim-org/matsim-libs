@@ -11,7 +11,6 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -74,7 +73,7 @@ public class WorkersAreaPainter extends NetworkPainter {
 				double points[][] = new double[polygon.getNumPoints()][2];
 				for(int p=0; p<points.length; p++) {
 					Coordinate c = polygon.getCoordinates()[p];
-					Coord coord = coordinateTransformation.transform(new CoordImpl(c.x, c.y));
+					Coord coord = coordinateTransformation.transform(new Coord(c.x, c.y));
 					points[p][0] = coord.getX();
 					points[p][1] = coord.getY();
 				}

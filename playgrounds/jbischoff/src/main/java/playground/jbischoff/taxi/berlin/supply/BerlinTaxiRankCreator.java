@@ -11,7 +11,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -34,7 +33,7 @@ public class BerlinTaxiRankCreator
     private final static String RANKFILE = "C:/local_jb/data/network/taxiranks_greaterberlin-1.csv";
     private final static String OUTPUTFILE = "C:/local_jb/data/network/berlin_ranks.xml";
     private final static String OUTPUTFILETXT = "C:/local_jb/data/network/berlin_ranks.csv";
-
+    
 
     public static void main(String[] args)
     {
@@ -115,6 +114,7 @@ public class BerlinTaxiRankCreator
 class RankReader
     implements TabularFileHandler
 {
+    private final static int RANK_CAPACITY = 100;
 
     private NetworkImpl network;
     private List<TaxiRank> ranks = new ArrayList<TaxiRank>();
@@ -137,7 +137,7 @@ class RankReader
         if (id.equals("21"))
             link = network.getLinks().get(Id.create("-35954", Link.class));
         //Exception for Tegel Airport
-        TaxiRank rank = new TaxiRank(id, name, link);
+        TaxiRank rank = new TaxiRank(id, name, link, RANK_CAPACITY);
         ranks.add(rank);
     }
 
@@ -148,7 +148,7 @@ class RankReader
         double xc = 13. + Double.parseDouble("0." + xcoordString);
         String ycoordString = y.substring(2);
         double yc = 52. + Double.parseDouble("0." + ycoordString);
-        Coord coord = new CoordImpl(xc, yc);
+        Coord coord = new Coord(xc, yc);
         Coord trans = ct.transform(coord);
         //		System.out.println("Read x"+ x + " Read y "+ y + " coord read "+ coord + " transformed "+trans );
         return trans;

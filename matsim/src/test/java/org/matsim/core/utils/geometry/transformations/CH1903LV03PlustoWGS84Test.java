@@ -24,7 +24,6 @@ package org.matsim.core.utils.geometry.transformations;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author boescpa
@@ -42,7 +41,7 @@ public class CH1903LV03PlustoWGS84Test {
 		double epsilon = 1e-6;
 
 		CH1903LV03PlustoWGS84 converter = new CH1903LV03PlustoWGS84();
-		Coord n = converter.transform(new CoordImpl(2700000, 1100000));
+		Coord n = converter.transform(new Coord((double) 2700000, (double) 1100000));
 		Assert.assertEquals(xx, n.getX(), epsilon);
 		Assert.assertEquals(yy, n.getY(), epsilon);
 	}

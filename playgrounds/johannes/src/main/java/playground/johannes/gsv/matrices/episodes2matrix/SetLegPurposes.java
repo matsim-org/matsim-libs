@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  */
-public class SetLegPurposes implements ProxyPlanTask {
+public class SetLegPurposes implements EpisodeTask {
 
 
     @Override
@@ -40,7 +40,7 @@ public class SetLegPurposes implements ProxyPlanTask {
             If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use
             the next activity type.
              */
-            if(ActivityType.HOME.equalsIgnoreCase(nextType)) {
+            if(ActivityTypes.HOME.equalsIgnoreCase(nextType)) {
                 String prevType = episode.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
                 leg.setAttribute(CommonKeys.LEG_PURPOSE, prevType);
             } else {

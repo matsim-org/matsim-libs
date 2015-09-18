@@ -9,13 +9,13 @@ import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
 import matsimConnector.utility.IdUtility;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import pedCA.environment.network.CAEdge;
 import pedCA.environment.network.CANode;
@@ -47,7 +47,7 @@ public class HybridNetworkBuilder {
 			Id<Node> id = IdUtility.createNodeId(nodeCA.getId());
 			double x = nodeCA.getCoordinates().getX();
 			double y = nodeCA.getCoordinates().getY();
-			Node node = fac.createNode(id, new CoordImpl(x,y));		
+			Node node = fac.createNode(id, new Coord(x, y));
 			net.addNode(node);
 		}
 

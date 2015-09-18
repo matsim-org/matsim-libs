@@ -39,13 +39,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -65,7 +63,8 @@ public class FRAdaptZHScenario {
 	private String facilitiesFilePath;
 	private double sampleRate = 1.0;
 	
-	private Coord center = new CoordImpl(682756, 248732); // Letten
+	private Coord center = new Coord((double) 682756, (double) 248732); // Letten
+
 	private double radius = 5000.0;
 			
 	public static void main(final String[] args) {		
@@ -199,10 +198,10 @@ public class FRAdaptZHScenario {
 //	}
 	
 	private void removeBoderCrossers() {
-		List<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
+		List<Person> personsWithoutCB = new Vector<Person>();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
 			if (Integer.parseInt(p.getId().toString()) < 1000000000) {
-				personsWithoutCB.add((PersonImpl)p);
+				personsWithoutCB.add(p);
 			}
 		}
 		this.scenario.getPopulation().getPersons().clear();

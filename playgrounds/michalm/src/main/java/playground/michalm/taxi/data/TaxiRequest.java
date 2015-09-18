@@ -148,7 +148,7 @@ public class TaxiRequest
 
             case STARTED:
                 return TaxiRequestStatus.PICKUP;
-                
+
             case PERFORMED://continue
         }
 
@@ -162,7 +162,7 @@ public class TaxiRequest
 
             case PERFORMED:
                 return TaxiRequestStatus.PERFORMED;
-                
+
             case PLANNED://illegal
         }
 

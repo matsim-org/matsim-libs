@@ -52,7 +52,7 @@ public static void main(String args[]){
 		noiseLayer.setXField("x");
 		noiseLayer.setYField("y");
 		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
+		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, 100.);
 		renderer.setRenderingAttribute("Immission " + time);
 		
 		writer.addLayer(noiseLayer);

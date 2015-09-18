@@ -46,9 +46,7 @@ public class FreeFloatingWithParkingControler {
 		
 		
 		final Controler controler = new Controler( sc );
-					
-		final DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
-		
+
 		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
 				sc.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
 		
@@ -79,7 +77,7 @@ public class FreeFloatingWithParkingControler {
 		    	
 		    }
 		    
-		    parkingModule = new DummyParkingModuleWithFreeFloatingCarSharing(controler, freefloatingCars);
+		/*      final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -92,7 +90,7 @@ public class FreeFloatingWithParkingControler {
 						}
 					});
 				}
-			});
+			});*/
 		}
 		
 		controler.setTripRouterFactory(

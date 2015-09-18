@@ -79,7 +79,7 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
 		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
-		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 		
 		ModeParams params = cnScoringGroup.getModes().get( TransportMode.car ) ;
 		if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
@@ -88,7 +88,7 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 				
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
-			if ( cnScoringGroup.getMonetaryDistanceCostRateCar() > 0. ) {
+			if ( cnScoringGroup.getMonetaryDistanceRateCar() > 0. ) {
 				Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
 				"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
 			}

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -134,7 +133,7 @@ public class PaperPrepper {
 			String line = br.readLine(); // Header
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
-				Coord c = new CoordImpl(sa[1], sa[0]);
+				Coord c = new Coord(Double.parseDouble(sa[1]), Double.parseDouble(sa[0]));
 				list.add(ct.transform(c));
 			}
 		} catch (IOException e) {

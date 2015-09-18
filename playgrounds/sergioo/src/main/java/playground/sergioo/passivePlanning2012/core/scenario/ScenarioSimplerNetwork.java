@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -14,7 +13,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -72,10 +70,6 @@ public class ScenarioSimplerNetwork implements Scenario {
 	@Override
 	public Config getConfig() {
 		return delegate.getConfig();
-	}
-	@Override
-	public Coord createCoord(double x, double y) {
-		return delegate.createCoord(x, y);
 	}
 	@Override
 	public void addScenarioElement(String name, Object o) {

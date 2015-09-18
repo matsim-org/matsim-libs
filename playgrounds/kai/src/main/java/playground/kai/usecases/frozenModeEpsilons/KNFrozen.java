@@ -112,7 +112,7 @@ public class KNFrozen {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				
 				PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
-				CharyparNagelScoringParametersBuilder builder = CharyparNagelScoringParameters.getBuilder(pcsConfig) ;
+				CharyparNagelScoringParametersBuilder builder = CharyparNagelScoringParameters.getBuilder(pcsConfig, config.scenario()) ;
 				CharyparNagelScoringParameters params = builder.create() ;
 				
 				sum.addScoringFunction( new CharyparNagelActivityScoring(params));

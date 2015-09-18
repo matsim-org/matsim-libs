@@ -33,10 +33,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.Zone;
@@ -45,9 +44,7 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -178,15 +175,15 @@ public class ProxyPlans2Matrix {
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 
 		logger.info("Loading persons...");
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
 		logger.info("Restoring original activity types...");
-		ProxyTaskRunner.run(new RestoreActTypes(), persons, true);
+		TaskRunner.run(new RestoreActTypes(), persons, true);
 		
 		logger.info("Replaceing misc types...");
 		new ReplaceMiscType().apply(persons);
@@ -206,11 +203,11 @@ public class ProxyPlans2Matrix {
 		 * types
 		 */
 		PredicateORComposite wkDayPred = new PredicateORComposite();
-		wkDayPred.addComponent(new DayPredicate(CommonKeys.MONDAY));
-		wkDayPred.addComponent(new DayPredicate(CommonKeys.TUESDAY));
-		wkDayPred.addComponent(new DayPredicate(CommonKeys.WEDNESDAY));
-		wkDayPred.addComponent(new DayPredicate(CommonKeys.THURSDAY));
-		wkDayPred.addComponent(new DayPredicate(CommonKeys.FRIDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonValues.MONDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonValues.TUESDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonValues.WEDNESDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonValues.THURSDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonValues.FRIDAY));
 		
 		String[] types = new String[] { "work", "buisiness", "shop", "edu", "vacations_short", "vacations_long" };
 		for (String type : types) {
@@ -291,7 +288,7 @@ public class ProxyPlans2Matrix {
 		/*
 		 * days
 		 */
-		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY};
+		String[] days = new String[] {CommonValues.MONDAY, CommonValues.FRIDAY, CommonValues.SATURDAY, CommonValues.SUNDAY};
 		for(String day : days) {
 			logger.info(String.format("Extracting matrix %s...", day));
 			pred = new PredicateANDComposite();
@@ -306,9 +303,9 @@ public class ProxyPlans2Matrix {
 		logger.info("Extracting matrix di-mi-do...");
 		pred = new PredicateANDComposite();
 		predOR = new PredicateORComposite();
-		predOR.addComponent(new DayPredicate(CommonKeys.TUESDAY));
-		predOR.addComponent(new DayPredicate(CommonKeys.WEDNESDAY));
-		predOR.addComponent(new DayPredicate(CommonKeys.THURSDAY));
+		predOR.addComponent(new DayPredicate(CommonValues.TUESDAY));
+		predOR.addComponent(new DayPredicate(CommonValues.WEDNESDAY));
+		predOR.addComponent(new DayPredicate(CommonValues.THURSDAY));
 		pred.addComponent(modePred);
 		pred.addComponent(predOR);
 		p2m.setPredicate(pred);
@@ -327,7 +324,7 @@ public class ProxyPlans2Matrix {
 		 */
 		logger.info("Extracting summer matrix...");
 		predOR = new PredicateORComposite();
-		String[] months = new String[]{MIDKeys.APRIL, MIDKeys.MAY, MIDKeys.JUNE, MIDKeys.JULY, MIDKeys.AUGUST, MIDKeys.SEPTEMBER, MIDKeys.OCTOBER};
+		String[] months = new String[]{MiDValues.APRIL, MiDValues.MAY, MiDValues.JUNE, MiDValues.JULY, MiDValues.AUGUST, MiDValues.SEPTEMBER, MiDValues.OCTOBER};
 		for(String month : months) {
 			predOR.addComponent(new MonthPredicate(month));
 		}
@@ -340,7 +337,7 @@ public class ProxyPlans2Matrix {
 		
 		logger.info("Extracting winter matrix...");
 		predOR = new PredicateORComposite();
-		months = new String[]{MIDKeys.NOVEMBER, MIDKeys.DECEMBER, MIDKeys.JANUARY, MIDKeys.FEBRUARY, MIDKeys.MARCH};
+		months = new String[]{MiDValues.NOVEMBER, MiDValues.DECEMBER, MiDValues.JANUARY, MiDValues.FEBRUARY, MiDValues.MARCH};
 		for(String month : months) {
 			predOR.addComponent(new MonthPredicate(month));
 		}

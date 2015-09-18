@@ -274,7 +274,8 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.functions.C
 
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
+		if ( true ) throw new UnsupportedOperationException( "desires do not exist anymore. please talk to me. td." );
+		double typicalDuration = 0; // ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability,
 		// because we only need them here

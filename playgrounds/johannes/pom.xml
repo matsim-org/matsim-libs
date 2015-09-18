@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.8.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -27,11 +27,6 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>basex</id>
-			<name>BaseX Maven Repository</name>
-			<url>http://files.basex.org/maven</url>
-		</repository>
-		<repository>
 			<id>geotools</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
@@ -40,31 +35,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.google.code.geocoder-java</groupId>
-			<artifactId>geocoder-java</artifactId>
-			<version>0.16</version>
-		</dependency>
-
-		<dependency>
-			<groupId>trove</groupId>
-			<artifactId>trove</artifactId>
-			<version>2.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
 			<version>3.1-beta1</version>
@@ -72,7 +42,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -85,14 +55,9 @@
 			<version>0.4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.basex</groupId>
-			<artifactId>basex</artifactId>
-			<version>7.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.basex</groupId>
-			<artifactId>basex-api</artifactId>
-			<version>7.6</version>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>socnetgen</artifactId>
+			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

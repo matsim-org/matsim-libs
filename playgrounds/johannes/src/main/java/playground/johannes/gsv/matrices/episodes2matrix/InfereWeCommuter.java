@@ -19,16 +19,13 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  */
-public class InfereWeCommuter implements ProxyPlanTask {
+public class InfereWeCommuter implements EpisodeTask {
 
     public static final String WECOMMUTER = "wecommuter";
 
@@ -42,8 +39,8 @@ public class InfereWeCommuter implements ProxyPlanTask {
     public void apply(Episode plan) {
         String day = plan.getPerson().getAttribute(CommonKeys.DAY);
 
-        if(day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day
-                .equalsIgnoreCase(CommonKeys.SATURDAY) || day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
+        if(day.equalsIgnoreCase(CommonValues.THURSDAY) || day.equalsIgnoreCase(CommonValues.FRIDAY) || day
+                .equalsIgnoreCase(CommonValues.SATURDAY) || day.equalsIgnoreCase(CommonValues.SUNDAY)) {
 
             for(int i = 0; i < plan.getLegs().size(); i++) {
                 Attributable leg = plan.getLegs().get(i);
@@ -57,10 +54,10 @@ public class InfereWeCommuter implements ProxyPlanTask {
                         String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
                         String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
-                        if(ActivityType.WORK.equalsIgnoreCase(prevType) & ActivityType.HOME.equalsIgnoreCase
+                        if(ActivityTypes.WORK.equalsIgnoreCase(prevType) & ActivityTypes.HOME.equalsIgnoreCase
                                 (nextType)) {
                             leg.setAttribute(CommonKeys.LEG_PURPOSE, WECOMMUTER);
-                        } else if (ActivityType.WORK.equalsIgnoreCase(nextType) & ActivityType.HOME.equalsIgnoreCase
+                        } else if (ActivityTypes.WORK.equalsIgnoreCase(nextType) & ActivityTypes.HOME.equalsIgnoreCase
                                 (prevType)) {
                             leg.setAttribute(CommonKeys.LEG_PURPOSE, WECOMMUTER);
                         }

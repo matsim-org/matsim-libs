@@ -20,19 +20,33 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Provider;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -49,15 +63,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-
-import static org.junit.Assert.*;
+import com.google.inject.Provider;
 
 public class ControlerTest {
 
@@ -116,7 +124,7 @@ public class ControlerTest {
 		plan1.addActivity(a1);
 		Leg leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
-		NetworkRoute route1 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route1 = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(f.link2.getId());
@@ -132,7 +140,7 @@ public class ControlerTest {
 		plan2.addActivity(a2);
 		Leg leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
-		NetworkRoute route2 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route2 = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg2.setRoute(route2);
 		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
@@ -193,8 +201,8 @@ public class ControlerTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(100, 0));
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(100, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Link link = network.getFactory().createLink(Id.create(1, Link.class), node1, node2);
@@ -334,28 +342,32 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = new PersonImpl(Id.create(1, Person.class));
+		person1 = PersonImpl.createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
-		act1a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, 10.0));
+		double x1 = -50.0;
+		act1a = factory.createActivityFromCoord("h", new Coord(x1, 10.0));
 		act1a.setEndTime(7.0*3600);
 		plan1.addActivity(act1a);
 		leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = factory.createActivityFromCoord("h", f.scenario.createCoord(1075.0, -10.0));
+		double y1 = -10.0;
+		act1b = factory.createActivityFromCoord("h", new Coord(1075.0, y1));
 		plan1.addActivity(act1b);
 		// --- plan 2 ---
 		Plan plan2 = factory.createPlan();
 		person1.addPlan(plan2);
-		act2a = factory.createActivityFromCoord("h", f.scenario.createCoord(-50.0, -10.0));
+		double x = -50.0;
+		double y = -10.0;
+		act2a = factory.createActivityFromCoord("h", new Coord(x, y));
 		act2a.setEndTime(7.9*3600);
 		plan2.addActivity(act2a);
 		leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = factory.createActivityFromCoord("h", f.scenario.createCoord(1111.1, 10.0));
+		act2b = factory.createActivityFromCoord("h", new Coord(1111.1, 10.0));
 		plan2.addActivity(act2b);
 		population.addPerson(person1);
 
@@ -523,8 +535,6 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_TXT)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
 	}
@@ -564,38 +574,6 @@ public class ControlerTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testSetWriteEventsTxt() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
-
-		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setWriteEventsInterval(1);
-		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new FakeMobsim();
-					}
-				});
-			}
-		});
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
 	public void testSetWriteEventsXml() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
@@ -620,39 +598,6 @@ public class ControlerTest {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0,  Controler.FILENAME_EVENTS_TXT)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testSetWriteEventsTxtXml() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
-
-		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setWriteEventsInterval(1);
-		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new FakeMobsim();
-					}
-				});
-			}
-		});
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_TXT)).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
@@ -978,10 +923,11 @@ public class ControlerTest {
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
 //			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = this.network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(-100.0, 0.0));
-			this.node2 = this.network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(0.0, 0.0));
-			this.node3 = this.network.getFactory().createNode(Id.create(3, Node.class), new CoordImpl(1000.0, 0.0));
-			this.node4 = this.network.getFactory().createNode(Id.create(4, Node.class), new CoordImpl(1100.0, 0.0));
+			final double x = -100.0;
+			this.node1 = this.network.getFactory().createNode(Id.create(1, Node.class), new Coord(x, 0.0));
+			this.node2 = this.network.getFactory().createNode(Id.create(2, Node.class), new Coord(0.0, 0.0));
+			this.node3 = this.network.getFactory().createNode(Id.create(3, Node.class), new Coord(1000.0, 0.0));
+			this.node4 = this.network.getFactory().createNode(Id.create(4, Node.class), new Coord(1100.0, 0.0));
 			this.network.addNode(this.node1);
 			this.network.addNode(this.node2);
 			this.network.addNode(this.node3);

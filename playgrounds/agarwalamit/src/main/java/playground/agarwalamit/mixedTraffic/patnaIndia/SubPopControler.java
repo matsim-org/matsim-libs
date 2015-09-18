@@ -34,7 +34,6 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -59,7 +58,6 @@ public class SubPopControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType slum_car = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));

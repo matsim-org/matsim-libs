@@ -36,10 +36,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
@@ -104,7 +104,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			double distance = DistanceCalculations.getLegDistance(leg.getRoute(), network);
 			
 			double distanceCost = 0.0;
-			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
+			TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 			if (travelCards == null) {
 				distanceCost = this.ktiConfigGroup.getDistanceCostPtNoTravelCard();
 			} else if (travelCards.contains("unknown")) {

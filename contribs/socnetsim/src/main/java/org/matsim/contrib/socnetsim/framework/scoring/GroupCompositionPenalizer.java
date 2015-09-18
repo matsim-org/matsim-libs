@@ -99,7 +99,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			default:
 				throw new RuntimeException( event.getType()+"?" );
 		}
-		assert currentNCoparticipants >= 0;
+		assert currentNCoparticipants >= 0 : event +" -> "+ currentNCoparticipants;
 	}
 
 	private void endActivity( final ActivityEndEvent event ) {

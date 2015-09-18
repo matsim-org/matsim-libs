@@ -236,17 +236,17 @@ public class CreatePlansFromTrips {
 			
 			//Get the current person, create if necessary.
 			Id<Person> pid = Id.create(tr.current().get("hhid") + "-" + tr.current().get("pid"), Person.class);
-			PersonImpl P;
+			Person P;
 
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
-				P = new PersonImpl(pid);
+				P = PersonImpl.createPerson(pid);
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
 								
 				personTripsMap.put(pid, new HashSet<Id<Trip>>());
 			}
 			else{
-				P = (PersonImpl) scenario.getPopulation().getPersons().get(pid);
+				P = scenario.getPopulation().getPersons().get(pid);
 			}
 			
 			//Map trips to persons
@@ -453,7 +453,7 @@ public class CreatePlansFromTrips {
 					//Create the new person
 					Id newPid = Id.create(newHhId + "-" + pid.toString().split("-")[1], Person.class); //Assumes that person Ids are formatted as "[hhid]-[person#]"
 					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
-					Person P = new PersonImpl(newPid);
+					Person P = PersonImpl.createPerson(newPid);
 					scenario.getPopulation().addPerson(P);
 					personsAdded++;
 					
@@ -674,8 +674,8 @@ public class CreatePlansFromTrips {
 			p.addActivity(new ActivityImpl(act_d, c));
 			
 			if (!skipPerson) {
-				PersonImpl q = (PersonImpl) P;
-				q.setEmployed(isEmployed);
+				Person q = P;
+				PersonUtils.setEmployed(q, isEmployed);
 				P.addPlan(p);
 				completedPlans++;
 				int pct = completedPlans * 100 / (scenario.getPopulation().getPersons().size() - chainsWithNoZones.size() - unusableTripChains.size());
@@ -797,7 +797,7 @@ public class CreatePlansFromTrips {
 			Id nId = scrambler[e.getValue()];
 			
 			Person op = this.scenario.getPopulation().getPersons().remove(oId); //Removed from the population
-			Person np = new PersonImpl(nId);
+			Person np = PersonImpl.createPerson(nId);
 			np.addPlan(op.getSelectedPlan());
 			
 			this.scenario.getPopulation().addPerson(np);

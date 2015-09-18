@@ -20,10 +20,6 @@
 
 package playground.telaviv.population;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,17 +31,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.telaviv.config.TelAvivConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class ExternalTripsCreator {
 
@@ -182,11 +177,11 @@ public class ExternalTripsCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person) {
-		person.setAge(100);
-		person.setSex("m");
-		person.setLicence("yes");
-		person.setCarAvail("always");		
+	private void setBasicParameters(Person person) {
+		PersonUtils.setAge(person, 100);
+		PersonUtils.setSex(person, "m");
+		PersonUtils.setLicence(person, "yes");
+		PersonUtils.setCarAvail(person, "always");
 	}
 	
 	/*
@@ -206,7 +201,7 @@ public class ExternalTripsCreator {
 		Plan plan = populationFactory.createPlan();
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
-		Desires desires = person.createDesires("");
+		//Desires desires = person.createDesires("");
 		
 		LegImpl leg;
 		ActivityImpl activity;
@@ -253,7 +248,8 @@ public class ExternalTripsCreator {
 		/*
 		 * Finally add a tta desire that has a duration of 86400 - all other activities.
 		 */
-		desires.accumulateActivityDuration("tta", 86400);
+		//desires.accumulateActivityDuration("tta", 86400);
+		throw new RuntimeException( "desires do not exist anymore. Please do it another way or contact the core team." );
 	}
 	
 	/*

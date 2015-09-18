@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.visualizer2D2012.Camera;
@@ -105,7 +104,7 @@ public class DynamicNetworkPainterManager {
 		return network.getLinks().values();
 	}
 	protected Id<Link> getIdNearestLink(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Link link: network.getLinks().values()) {
@@ -125,7 +124,7 @@ public class DynamicNetworkPainterManager {
 		return null;
 	}
 	protected Id<Node> getIdNearestNode(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
+		Coord coord = new Coord(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
 		for(Node node:network.getNodes().values()) {

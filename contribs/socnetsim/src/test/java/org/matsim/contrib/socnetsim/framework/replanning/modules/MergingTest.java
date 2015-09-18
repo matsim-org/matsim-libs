@@ -62,7 +62,7 @@ public class MergingTest {
 		List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i<20; i++) {
-			plans.add( new PlanImpl( new PersonImpl( Id.create( i , Person.class ) ) ) );
+			plans.add( new PlanImpl(PersonImpl.createPerson(Id.create(i, Person.class))) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -78,7 +78,7 @@ public class MergingTest {
 				Id<Person> id = Id.create( i + j , Person.class );
 				indivPlans.put(
 						id,
-						new PlanImpl( new PersonImpl( id ) ) );
+						new PlanImpl(PersonImpl.createPerson(id)) );
 			}
 			plans.add( jointPlans.getFactory().createJointPlan( indivPlans ) );
 		}

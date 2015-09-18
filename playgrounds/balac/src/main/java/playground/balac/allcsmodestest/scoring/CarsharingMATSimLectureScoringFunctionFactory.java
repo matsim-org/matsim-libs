@@ -33,10 +33,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -51,9 +54,6 @@ import playground.balac.allcsmodestest.scoring.CarsharingMTATSimLectureLegScorin
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 
 /**
  * @author thibautd
@@ -110,7 +110,7 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
-		final Collection<String> travelCards = ((PersonImpl) person).getTravelcards();
+		final Collection<String> travelCards = PersonUtils.getTravelcards(person);
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
 				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :
@@ -247,7 +247,7 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 		}
 
 		final CharyparNagelScoringParameters params =
-				CharyparNagelScoringParameters.getBuilder(dummyGroup).create();
+				CharyparNagelScoringParameters.getBuilder(dummyGroup, scenario.getConfig().scenario()).create();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

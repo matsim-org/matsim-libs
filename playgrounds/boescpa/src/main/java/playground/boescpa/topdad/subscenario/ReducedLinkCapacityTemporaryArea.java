@@ -29,7 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -42,7 +41,8 @@ import java.io.IOException;
  */
 public class ReducedLinkCapacityTemporaryArea {
 
-	private static final Coord center = new CoordImpl(682952.0,247797.0); // A bit south of HB Zurich...)
+	private static final Coord center = new Coord(682952.0, 247797.0); // A bit south of HB Zurich...)
+
 	private static int radius;
 
 	public static void main(String[] args) {

@@ -34,11 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,9 +63,9 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
+		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", Id.create("1", Link.class));
 		a1.setEndTime(3600);
 		plan.createAndAddLeg(TransportMode.car);

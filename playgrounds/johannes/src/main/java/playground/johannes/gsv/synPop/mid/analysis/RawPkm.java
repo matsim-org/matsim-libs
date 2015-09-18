@@ -21,13 +21,12 @@ package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 import java.io.IOException;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.gsv.synPop.mid.RowHandler;
 
 /**
  * @author johannes
@@ -59,20 +58,20 @@ public class RawPkm {
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * playground.johannes.gsv.synPop.mid.RowHandler#handleRow(java.util
+		 * playground.johannes.synpop.source.mid2008.generator.RowHandler#handleRow(java.util
 		 * .Map)
 		 */
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			String mode = attributes.get(MIDKeys.LEG_MODE);
+			String mode = attributes.get(VariableNames.LEG_MODE);
 			if (mode.equalsIgnoreCase("MIV (Fahrer)") || mode.equalsIgnoreCase("MIV (Mitfahrer)")) {
-				String distStr = attributes.get(MIDKeys.LEG_DISTANCE);
+				String distStr = attributes.get(VariableNames.LEG_DISTANCE);
 				if (distStr != null) {
 					double d = Double.parseDouble(distStr);
 					if (d < 9994) {
 						d = d * 1000;
-						String type = attributes.get(MIDKeys.LEG_MAIN_TYPE);
-						String subtype = attributes.get(MIDKeys.LEG_SUB_TYPE);
+						String type = attributes.get(VariableNames.LEG_MAIN_TYPE);
+						String subtype = attributes.get(VariableNames.LEG_SUB_TYPE);
 						type = convertType(type, subtype);
 						
 						String gew = attributes.get("w_gew");
@@ -91,16 +90,16 @@ public class RawPkm {
 			}
 
 			if (typeId.equalsIgnoreCase("Erreichen des Arbeitsplatzes")) {
-				return ActivityType.WORK;
+				return ActivityTypes.WORK;
 
 			} else if (typeId.equalsIgnoreCase("dienstlich oder geschäftlich")) {
-				return ActivityType.BUISINESS;
+				return ActivityTypes.BUSINESS;
 
 			} else if (typeId.equalsIgnoreCase("Erreichen der Ausbildungsstätte oder Schule")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else if (typeId.equalsIgnoreCase("Einkauf")) {
-				return ActivityType.SHOP;
+				return ActivityTypes.SHOP;
 
 			} else if (typeId.equalsIgnoreCase("private Erledigungen")) {
 				return "private";
@@ -128,19 +127,19 @@ public class RawPkm {
 						return "vacations_long";
 					}
 				}
-				return ActivityType.LEISURE;
+				return ActivityTypes.LEISURE;
 
 			} else if (typeId.equalsIgnoreCase("nach Hause")) {
-				return ActivityType.HOME;
+				return ActivityTypes.HOME;
 
 			} else if (typeId.equalsIgnoreCase("zur Schule oder Vorschule")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else if (typeId.equalsIgnoreCase("Kindertagesstätte oder Kindergarten")) {
-				return ActivityType.EDUCATION;
+				return ActivityTypes.EDUCATION;
 
 			} else {
-				return ActivityType.MISC;
+				return ActivityTypes.MISC;
 			}
 
 		}

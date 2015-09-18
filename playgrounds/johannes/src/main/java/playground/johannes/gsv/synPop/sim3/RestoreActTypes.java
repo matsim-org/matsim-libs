@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -28,7 +28,7 @@ import playground.johannes.synpop.data.Episode;
  * @author johannes
  *
  */
-public class RestoreActTypes implements ProxyPlanTask {
+public class RestoreActTypes implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {

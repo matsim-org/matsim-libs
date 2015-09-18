@@ -27,7 +27,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -39,7 +38,7 @@ public class Zone {
 	private List<ActivityFacility> facilitiesInZone = new Vector<ActivityFacility>();
 	private final static Logger log = Logger.getLogger(Zone.class);	
 	
-	private CoordImpl center;
+	private Coord center;
 	private double radius = -1.0;
 	
 	public Zone(String name, Coord topleft, double height, double length) {
@@ -49,7 +48,7 @@ public class Zone {
 		this.length = length;
 	}
 	
-	public Zone(String name, CoordImpl center, double radius) {
+	public Zone(String name, Coord center, double radius) {
 		this.name = name;
 		this.center = center;
 		this.radius = radius;

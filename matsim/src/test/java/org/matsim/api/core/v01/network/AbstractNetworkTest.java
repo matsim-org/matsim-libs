@@ -22,8 +22,8 @@ package org.matsim.api.core.v01.network;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Contains several test-cases for API-compliant Networks.
@@ -132,14 +132,14 @@ public abstract class AbstractNetworkTest {
 
 			NetworkFactory f = this.network.getFactory();
 			Node[] nodes = new Node[9];
-			this.network.addNode(nodes[1] = f.createNode(this.nodeIds[1], new CoordImpl(100, 200)));
-			this.network.addNode(nodes[2] = f.createNode(this.nodeIds[2], new CoordImpl(200, 200)));
-			this.network.addNode(nodes[3] = f.createNode(this.nodeIds[3], new CoordImpl(  0,   0)));
-			this.network.addNode(nodes[4] = f.createNode(this.nodeIds[4], new CoordImpl(100, 100)));
-			this.network.addNode(nodes[5] = f.createNode(this.nodeIds[5], new CoordImpl(200, 100)));
-			this.network.addNode(nodes[6] = f.createNode(this.nodeIds[6], new CoordImpl(300, 100)));
-			this.network.addNode(nodes[7] = f.createNode(this.nodeIds[7], new CoordImpl(100,   0)));
-			this.network.addNode(nodes[8] = f.createNode(this.nodeIds[8], new CoordImpl(200,   0)));
+			this.network.addNode(nodes[1] = f.createNode(this.nodeIds[1], new Coord((double) 100, (double) 200)));
+			this.network.addNode(nodes[2] = f.createNode(this.nodeIds[2], new Coord((double) 200, (double) 200)));
+			this.network.addNode(nodes[3] = f.createNode(this.nodeIds[3], new Coord((double) 0, (double) 0)));
+			this.network.addNode(nodes[4] = f.createNode(this.nodeIds[4], new Coord((double) 100, (double) 100)));
+			this.network.addNode(nodes[5] = f.createNode(this.nodeIds[5], new Coord((double) 200, (double) 100)));
+			this.network.addNode(nodes[6] = f.createNode(this.nodeIds[6], new Coord((double) 300, (double) 100)));
+			this.network.addNode(nodes[7] = f.createNode(this.nodeIds[7], new Coord((double) 100, (double) 0)));
+			this.network.addNode(nodes[8] = f.createNode(this.nodeIds[8], new Coord((double) 200, (double) 0)));
 			this.network.addLink(f.createLink(this.linkIds[1], nodes[4], nodes[1]));
 			this.network.addLink(f.createLink(this.linkIds[2], nodes[1], nodes[2]));
 			this.network.addLink(f.createLink(this.linkIds[3], nodes[2], nodes[5]));

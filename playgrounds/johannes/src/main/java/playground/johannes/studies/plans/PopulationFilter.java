@@ -24,8 +24,11 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -35,9 +38,11 @@ import org.xml.sax.SAXException;
 public class PopulationFilter {
 
 	public static void main(String args[]) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
+		
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
 		
 //		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
 //		netReader.parse(args[0]);

@@ -71,37 +71,19 @@ public class ScenarioUtils {
 			return this ;
 		}
 		// households:
-		/**
-		 * This is here if you want to instantiate the empty container
-		 */
-		public ScenarioBuilder createHouseholdsContainer() { 
-			scenario.createHouseholdsContainer() ;
-			return this ;
-		}
+
 		public ScenarioBuilder setHouseholds( Households households ) {
 			scenario.setHouseholds(households);
 			return this ;
 		}
 		// transit schedule:
-		/**
-		 * This is here if you want to instantiate the empty container
-		 */
-		public ScenarioBuilder createTransitSchedule() {
-			scenario.createTransitScheduleContainer() ;
-			return this ;
-		}
+
 		public ScenarioBuilder setTransitSchedule( TransitSchedule schedule ) {
 			scenario.setTransitSchedule(schedule);
 			return this ;
 		}
 		// vehicles:
-		/**
-		 * This is here if you want to instantiate the empty container
-		 */
-		public ScenarioBuilder createVehiclesContainer() {
-			scenario.createTransitVehicleContainer() ;
-			return this ;
-		}
+
 		public ScenarioBuilder setVehicles( Vehicles vehicles ) {
 			scenario.setTransitVehicles(vehicles);
 			return this;

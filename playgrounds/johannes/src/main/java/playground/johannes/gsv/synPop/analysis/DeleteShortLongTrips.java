@@ -19,20 +19,18 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.EpisodeTask;
+
+import java.util.Set;
 
 /**
  * @author johannes
  * 
  */
-public class DeleteShortLongTrips implements ProxyPlanTask {
+public class DeleteShortLongTrips implements EpisodeTask {
 
 	private final double threshold;
 
@@ -68,17 +66,17 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 				Attributable prev = plan.getActivities().get(i);
 				Attributable next = plan.getActivities().get(i + 1);
 
-				if (ActivityType.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				if (ActivityTypes.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (plan.getActivities().size() > i + 2) {
 						Attributable act = plan.getActivities().get(i + 2);
-						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							next.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
-				} else if (ActivityType.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				} else if (ActivityTypes.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (i - 1 >= 0) {
 						Attributable act = plan.getActivities().get(i - 1);
-						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							prev.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
@@ -131,11 +129,11 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 			Attributable prevAct2 = plan.getActivities().get(candidate);
 			Attributable nextAct2 = plan.getActivities().get(candidate + 1);
 
-			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
-					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)
+					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)) {
 				return true;
-			} else if (nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
-					&& prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+			} else if (nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)
+					&& prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.HOME)) {
 				return true;
 			} else {
 				return false;
@@ -161,13 +159,13 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 	}
 
 	public static void main(String args[]) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		parser.parse("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
 
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
-		for (PlainPerson person : parser.getPersons()) {
+		for (PlainPerson person : (Set<PlainPerson>)parser.getPersons()) {
 			task.apply(person.getEpisodes().get(0));
 		}
 

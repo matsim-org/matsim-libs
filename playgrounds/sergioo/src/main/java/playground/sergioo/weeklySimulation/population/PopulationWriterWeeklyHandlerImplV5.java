@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriterHandler;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -86,22 +86,24 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 					// route
 					Route route = leg.getRoute();
 					if (route != null) {
-						if ( route instanceof GenericRoute ) {
-							this.startGenericRoute( (GenericRoute) route, out);
-							this.endRoute(out);
-						}
-						else if ( route instanceof NetworkRoute ) {
-							this.startNetworkRoute( (NetworkRoute) route, out);
-							this.endRoute(out);
-						}
-						else if ( countWarnUnkownRoute < MAX_WARN_UNKNOWN_ROUTE ) {
-							log.warn( getClass().getSimpleName()+" can only write routes implementing NetworkRoute or GenericRoute."
-									+" This is not the case for route type "+route.getClass().getName()
-									+". Such routes will not be written to file." );
-							if ( ++countWarnUnkownRoute == MAX_WARN_UNKNOWN_ROUTE ) {
-								log.warn( "Future occurences of this warning for this file will not be shown." );
-							}
-						}
+						throw new RuntimeException("This looks like an exact copy of the class in the core. Please use that class, I do not want to refactor a class multiple times."); // mrieser, 8sep2015
+
+//						if ( route instanceof GenericRoute ) {
+//							this.startGenericRoute( (GenericRoute) route, out);
+//							this.endRoute(out);
+//						}
+//						else if ( route instanceof NetworkRoute ) {
+//							this.startNetworkRoute( (NetworkRoute) route, out);
+//							this.endRoute(out);
+//						}
+//						else if ( countWarnUnkownRoute < MAX_WARN_UNKNOWN_ROUTE ) {
+//							log.warn( getClass().getSimpleName()+" can only write routes implementing NetworkRoute or GenericRoute."
+//									+" This is not the case for route type "+route.getClass().getName()
+//									+". Such routes will not be written to file." );
+//							if ( ++countWarnUnkownRoute == MAX_WARN_UNKNOWN_ROUTE ) {
+//								log.warn( "Future occurences of this warning for this file will not be shown." );
+//							}
+//						}
 					}
 					this.endLeg(out);
 				}
@@ -123,30 +125,30 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 		out.write(p.getId().toString());
 		out.write("\"");
 		if (p instanceof PersonImpl){
-			PersonImpl person = (PersonImpl)p;
-			if (person.getSex() != null) {
+			Person person = p;
+			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");
-				out.write(person.getSex());
+				out.write(PersonUtils.getSex(person));
 				out.write("\"");
 			}
-			if (person.getAge() != Integer.MIN_VALUE) {
+			if (PersonUtils.getAge(person) != Integer.MIN_VALUE) {
 				out.write(" age=\"");
-				out.write(Integer.toString(person.getAge()));
+				out.write(Integer.toString(PersonUtils.getAge(person)));
 				out.write("\"");
 			}
-			if (person.getLicense() != null) {
+			if (PersonUtils.getLicense(person) != null) {
 				out.write(" license=\"");
-				out.write(person.getLicense());
+				out.write(PersonUtils.getLicense(person));
 				out.write("\"");
 			}
-			if (person.getCarAvail() != null) {
+			if (PersonUtils.getCarAvail(person) != null) {
 				out.write(" car_avail=\"");
-				out.write(person.getCarAvail());
+				out.write(PersonUtils.getCarAvail(person));
 				out.write("\"");
 			}
-			if (person.isEmployed() != null) {
+			if (PersonUtils.isEmployed(person) != null) {
 				out.write(" employed=\"");
-				out.write((person.isEmployed() ? "yes" : "no"));
+				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
 				out.write("\"");
 			}
 		}
@@ -254,7 +256,7 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 		out.write("\t\t\t</leg>\n");
 	}
 
-	private void startGenericRoute(final GenericRoute route, final BufferedWriter out) throws IOException {
+	private void startGenericRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
 		out.write(route.getRouteType());

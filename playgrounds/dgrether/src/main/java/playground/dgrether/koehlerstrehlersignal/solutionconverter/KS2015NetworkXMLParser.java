@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -81,7 +81,7 @@ public class KS2015NetworkXMLParser extends MatsimXmlParser {
 		// sub tag "node" of crossing tag (not of commodity tag)
 		if (name.equals(NODE) && !(atts.getValue(XCOORD) == null)){
 			DgCrossingNode crossingNode = new DgCrossingNode(Id.create(atts.getValue(ID),DgCrossingNode.class));
-			crossingNode.setCoordinate(new CoordImpl(atts.getValue(XCOORD), atts.getValue(YCOORD)));
+			crossingNode.setCoordinate(new Coord(Double.parseDouble(atts.getValue(XCOORD)), Double.parseDouble(atts.getValue(YCOORD))));
 			this.currentCrossing.addNode(crossingNode);
 			this.allCrossingNodes.put(crossingNode.getId(),crossingNode);
 		}

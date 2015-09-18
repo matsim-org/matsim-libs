@@ -10,9 +10,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * 
@@ -42,15 +41,15 @@ public class CreateTestPopulation {
 		//create persons and add them to the population
 		for(int i=0;i<nPersons;i++){
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
-			((PersonImpl)person).setAge(30);
+			PersonUtils.setAge(person, 30);
 			Plan plan = population.getFactory().createPlan();
 			
 			//create home activities at (0,100) and work activities at (200,100), all modes are by car
-			Activity home = population.getFactory().createActivityFromCoord("home", new CoordImpl(0, 100));
+			Activity home = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 100));
 			home.setEndTime(8.*3600);
-			Activity work = population.getFactory().createActivityFromCoord("work", new CoordImpl(200,100));
+			Activity work = population.getFactory().createActivityFromCoord("work", new Coord((double) 200, (double) 100));
 			work.setEndTime(17.*3600);
-			Activity home2 = population.getFactory().createActivityFromCoord("home", new CoordImpl(0,100));
+			Activity home2 = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 100));
 			home2.setEndTime(24.*3600);
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			
@@ -86,7 +85,7 @@ public class CreateTestPopulation {
 		//create persons and add them to the population
 		for(int i=0;i<nPersons;i++){
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
-			((PersonImpl)person).setAge(30);
+			PersonUtils.setAge(person, 30);
 			Plan plan = population.getFactory().createPlan();
 			
 			//create home activities at homeCoord and work activities at workCoord, all modes are by car			

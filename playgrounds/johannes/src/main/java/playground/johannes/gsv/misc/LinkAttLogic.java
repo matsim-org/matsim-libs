@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.mid.RowHandler;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
 import playground.johannes.sna.math.DummyDiscretizer;
 import playground.johannes.sna.math.Histogram;
 

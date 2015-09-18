@@ -41,7 +41,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAveragingUtilsExtended;
+import playground.benjamin.scenarios.munich.analysis.spatial.old.SpatialAveragingUtilsExtended;
 
 /**
  * @author amit after Benjamin

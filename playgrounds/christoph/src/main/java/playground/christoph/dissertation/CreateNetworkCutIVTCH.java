@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class CreateNetworkCutIVTCH {
 
@@ -42,8 +42,8 @@ public class CreateNetworkCutIVTCH {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("/data/matsim/cdobler/Dissertation/InitialRoutes/input_Zurich_IVTCH/network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		reduceNetwork(scenario.getNetwork(), scenario.createCoord(683518.0, 246836.0), 30000.0);
+
+		reduceNetwork(scenario.getNetwork(), new Coord(683518.0, 246836.0), 30000.0);
 		
 		new NetworkWriter(scenario.getNetwork()).write("/data/matsim/cdobler/Dissertation/InitialRoutes/input_Zurich_IVTCH/network_cut.xml.gz");
 	}
@@ -52,10 +52,10 @@ public class CreateNetworkCutIVTCH {
 		System.out.println("removing links outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (Link l : network.getLinks().values()) {
-			CoordImpl fc = (CoordImpl)l.getFromNode().getCoord();
-			CoordImpl tc = (CoordImpl)l.getToNode().getCoord();
-			if (fc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
-			else if (tc.calcDistance(center) > radius) { toRemove.add(l.getId()); }
+			Coord fc = l.getFromNode().getCoord();
+			Coord tc = l.getToNode().getCoord();
+			if (CoordUtils.calcDistance(fc, center) > radius) { toRemove.add(l.getId()); }
+			else if (CoordUtils.calcDistance(tc, center) > radius) { toRemove.add(l.getId()); }
 		}
 		System.out.println("=> "+toRemove.size()+" links to remove.");
 		for (Id id : toRemove) { network.removeLink(id); }

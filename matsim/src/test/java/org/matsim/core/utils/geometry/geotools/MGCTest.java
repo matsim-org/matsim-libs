@@ -1,7 +1,6 @@
 package org.matsim.core.utils.geometry.geotools;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -18,7 +17,7 @@ public class MGCTest extends MatsimTestCase {
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
-		Coord coord1 = new CoordImpl(x,y);
+		Coord coord1 = new Coord(x, y);
 		Coordinate coord2 = MGC.coord2Coordinate(coord1);
 		Coord coord3 = MGC.coordinate2Coord(coord2);
 		double x1 = coord3.getX();
@@ -31,7 +30,7 @@ public class MGCTest extends MatsimTestCase {
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
-		Coord coord1 = new CoordImpl(x,y);
+		Coord coord1 = new Coord(x, y);
 		Point p = MGC.coord2Point(coord1);
 		Coord coord2 = MGC.point2Coord(p);
 		double x1 = coord2.getX();

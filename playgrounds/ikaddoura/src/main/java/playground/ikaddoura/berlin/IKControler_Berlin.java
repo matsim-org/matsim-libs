@@ -24,17 +24,17 @@
 package playground.ikaddoura.berlin;
 
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.pt.PtConstants;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
-
-import java.io.IOException;
 
 /**
  * @author ikaddoura
@@ -71,7 +71,7 @@ public class IKControler_Berlin {
 		transitActivityParams.setTypicalDuration(120.0);
 		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 
-        controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getScenario().getNetwork()));
+        controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getConfig().scenario(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getScenario().getNetwork()));
 		controler.run();
 	}
 }

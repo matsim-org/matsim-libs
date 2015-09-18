@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -145,7 +144,7 @@ public class VISUM2TransitScheduleConverter {
 				
 				Long bezirkNummer = Long.parseLong( parts[ bezirkNummerIDX ] );
 				// get the coordinates
-				coord = new CoordImpl( parts[ xCoordIDX ],parts[ yCoordIDX ] );
+				coord = new Coord(Double.parseDouble(parts[xCoordIDX]), Double.parseDouble(parts[yCoordIDX]));
 				
 				if( ! transitStop.containsKey( bezirkNummer ) )
 					transitStop.put(bezirkNummer, coord);

@@ -46,6 +46,8 @@ public class CongestionAnalysisHandler implements CongestionEventHandler {
 	
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2causedDelay = new HashMap<>();
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2affectedDelay = new HashMap<>();
+	
+	private double totalDelay = 0.;
 
 	public CongestionAnalysisHandler(BasicPersonTripAnalysisHandler basicHandler) {
 		this.basicHandler = basicHandler;
@@ -58,6 +60,7 @@ public class CongestionAnalysisHandler implements CongestionEventHandler {
 	public void reset(int iteration) {
 		personId2tripNumber2causedDelay.clear();
 		personId2tripNumber2affectedDelay.clear();
+		totalDelay = 0.;
 	}
 
 	@Override
@@ -68,55 +71,101 @@ public class CongestionAnalysisHandler implements CongestionEventHandler {
 			caughtCongestionEvent = true;
 		}
 		
+		totalDelay = totalDelay + event.getDelay();
+		
+		// caused delay
+
 		// get the right trip no. based on the emergence time
-		int tripNumber = 0;
-		double maxDepTime = 0.;
+		int tripNumberCausingAgent = 0;
+		double maxDepTimeCausingAgent = 0.;
 		
 		for (int tripNr : basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).keySet()) {
 			if (event.getEmergenceTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr)) {
-				if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr) >= maxDepTime) {
-					tripNumber = tripNr;
+				if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr) >= maxDepTimeCausingAgent) {
+					tripNumberCausingAgent = tripNr;
 				}
 			}
 		}
+		
+		if (tripNumberCausingAgent == 0.) {
+			throw new RuntimeException("trip number of the causing agent could not be identified!");
+		}
 			
-		// caused delay
-		
-		if (personId2tripNumber2causedDelay.containsKey(event.getCausingAgentId()) && personId2tripNumber2causedDelay.get(event.getCausingAgentId()).containsKey(tripNumber) ) {
-		
-			double causedDelayBefore = personId2tripNumber2causedDelay.get(event.getCausingAgentId()).get(tripNumber);
-			double causedDelayUpdated = causedDelayBefore + event.getDelay();
+		if (personId2tripNumber2causedDelay.containsKey(event.getCausingAgentId())) {
 			
-			Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedDelay.get(event.getCausingAgentId());
-			tripNumber2causedDelay.put(tripNumber, causedDelayUpdated);
-			personId2tripNumber2causedDelay.put(event.getCausingAgentId(), tripNumber2causedDelay);
-		
+			if (personId2tripNumber2causedDelay.get(event.getCausingAgentId()).containsKey(tripNumberCausingAgent)) {
+				
+				double causedDelayBefore = personId2tripNumber2causedDelay.get(event.getCausingAgentId()).get(tripNumberCausingAgent);
+				double causedDelayUpdated = causedDelayBefore + event.getDelay();
+				
+				Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedDelay.get(event.getCausingAgentId());
+				tripNumber2causedDelay.put(tripNumberCausingAgent, causedDelayUpdated);
+				personId2tripNumber2causedDelay.put(event.getCausingAgentId(), tripNumber2causedDelay);
+				
+			} else {
+				// trip number is not in map
+				
+				Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedDelay.get(event.getCausingAgentId());
+				tripNumber2causedDelay.put(tripNumberCausingAgent, event.getDelay());
+				personId2tripNumber2causedDelay.put(event.getCausingAgentId(), tripNumber2causedDelay);
+			}
+			
 		} else {
+			// person Id is not in map
 			
 			Map<Integer,Double> tripNumber2causedDelay = new HashMap<>();
-			tripNumber2causedDelay.put(tripNumber, event.getDelay());
+			tripNumber2causedDelay.put(tripNumberCausingAgent, event.getDelay());
 			personId2tripNumber2causedDelay.put(event.getCausingAgentId(), tripNumber2causedDelay);
-
 		}
 		
 		// affected delay
+
+		// get the right trip no. based on the event time
+
+		int tripNumberAffectedAgent = 0;
+		double maxDepTimeAffectedAgent = 0.;
 		
-		if (personId2tripNumber2affectedDelay.containsKey(event.getAffectedAgentId()) && personId2tripNumber2affectedDelay.get(event.getAffectedAgentId()).containsKey(tripNumber)) {
+		for (int tripNr : basicHandler.getPersonId2tripNumber2departureTime().get(event.getAffectedAgentId()).keySet()) {
+			if (event.getTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getAffectedAgentId()).get(tripNr)) {
+				if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getAffectedAgentId()).get(tripNr) >= maxDepTimeAffectedAgent) {
+					tripNumberAffectedAgent = tripNr;
+				}
+			}
+		}
 		
-			double affectedDelayBefore = personId2tripNumber2affectedDelay.get(event.getAffectedAgentId()).get(tripNumber);
-			double affectedDelayUpdated = affectedDelayBefore + event.getDelay();
+		if (tripNumberAffectedAgent == 0.) {
+			throw new RuntimeException("trip number of the affected agent could not be identified!");
+		}
+		
+		if (personId2tripNumber2affectedDelay.containsKey(event.getAffectedAgentId())) {
 			
-			Map<Integer,Double> tripNumber2affectedDelay = personId2tripNumber2affectedDelay.get(event.getAffectedAgentId());
-			tripNumber2affectedDelay.put(tripNumber, affectedDelayUpdated);
-			personId2tripNumber2affectedDelay.put(event.getAffectedAgentId(), tripNumber2affectedDelay);
-		
+			if (personId2tripNumber2affectedDelay.get(event.getAffectedAgentId()).containsKey(tripNumberAffectedAgent)) {
+				
+				double affectedDelayBefore = personId2tripNumber2affectedDelay.get(event.getAffectedAgentId()).get(tripNumberAffectedAgent);
+				double affectedDelayUpdated = affectedDelayBefore + event.getDelay();
+				
+				Map<Integer,Double> tripNumber2affectedDelay = personId2tripNumber2affectedDelay.get(event.getAffectedAgentId());
+				tripNumber2affectedDelay.put(tripNumberAffectedAgent, affectedDelayUpdated);
+				personId2tripNumber2affectedDelay.put(event.getAffectedAgentId(), tripNumber2affectedDelay);
+				
+			} else {
+				// trip number is not in map
+				
+				Map<Integer,Double> tripNumber2affectedDelay = personId2tripNumber2affectedDelay.get(event.getAffectedAgentId());
+				tripNumber2affectedDelay.put(tripNumberAffectedAgent, event.getDelay());
+				personId2tripNumber2affectedDelay.put(event.getAffectedAgentId(), tripNumber2affectedDelay);
+				
+			}
+			
 		} else {
+			// person Id is not in map
 			
 			Map<Integer,Double> tripNumber2affectedDelay = new HashMap<>();
-			tripNumber2affectedDelay.put(tripNumber, event.getDelay());
+			tripNumber2affectedDelay.put(tripNumberAffectedAgent, event.getDelay());
 			personId2tripNumber2affectedDelay.put(event.getAffectedAgentId(), tripNumber2affectedDelay);
 			
-		}	
+		}
+		
 	}
 
 	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2causedDelay() {
@@ -129,6 +178,10 @@ public class CongestionAnalysisHandler implements CongestionEventHandler {
 
 	public boolean isCaughtCongestionEvent() {
 		return caughtCongestionEvent;
+	}
+
+	public double getTotalDelay() {
+		return totalDelay;
 	}
 	
 }

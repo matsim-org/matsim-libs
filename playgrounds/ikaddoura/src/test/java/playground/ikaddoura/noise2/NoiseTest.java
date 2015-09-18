@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -46,11 +45,9 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -58,7 +55,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -108,13 +104,13 @@ public class NoiseTest {
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong coord for receiver point Id '10'", new CoordImpl(500, 100).toString(), noiseContext.getReceiverPoints().get(Id.create(10, ReceiverPoint.class)).getCoord().toString());
+		Assert.assertEquals("wrong coord for receiver point Id '10'", new Coord((double) 500, (double) 100).toString(), noiseContext.getReceiverPoints().get(Id.create(10, ReceiverPoint.class)).getCoord().toString());
 		
 		// test the allocation of activity coordinates to the nearest receiver point
-		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(300, 300)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(150, 150)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(100, 100)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(500, 500)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 300, (double) 300)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 150, (double) 150)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 100, (double) 100)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new Coord((double) 500, (double) 500)).toString());
 					
 		// test the allocation of relevant links to the receiver point
 		Assert.assertEquals("wrong relevant link for receiver point Id '15'", 3, noiseContext.getReceiverPoints().get(Id.create("15", Link.class)).getLinkId2distanceCorrection().size());
@@ -178,6 +174,7 @@ public class NoiseTest {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -935,6 +932,7 @@ public class NoiseTest {
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -1045,6 +1043,7 @@ public class NoiseTest {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);
+		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -1343,4 +1342,186 @@ public class NoiseTest {
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, costsNight, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);	
 	}	
+	
+	// tests the static methods within class "noiseEquations"
+	@Test
+	public final void test4(){
+		
+		double vCar = 0.0496757749985181;
+		double vHGV = 0.0478758773550055;
+		int nCar = 119;
+		int nHGV = 4;
+		
+		int n = (nCar + nHGV) * 10;
+		
+		double p = ( (double) nHGV / (double) (nCar + nHGV));	
+					
+		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+		Assert.assertEquals("Wrong mittelungspegel for n="+ n + " and p=" + p + "!", 69.22567453336540, mittelungspegel, MatsimTestUtils.EPSILON);
+		
+		double lCar = NoiseEquations.calculateLCar(vCar);
+		Assert.assertEquals("Wrong LCar for vCar="+ vCar + "!", 27.70000000425900, lCar, MatsimTestUtils.EPSILON);
+		
+		double lHGV = NoiseEquations.calculateLHdv(vHGV);
+		Assert.assertEquals("Wrong LHGV for vHGV="+ vHGV + "!", 6.60145932205085, lHGV, MatsimTestUtils.EPSILON);
+
+		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
+		Assert.assertEquals("Wrong Dv!", -10.772415234056300, dV, MatsimTestUtils.EPSILON);
+		
+		double emission = mittelungspegel + dV;
+		Assert.assertEquals("Wrong emission!", 58.453259299309124, emission, MatsimTestUtils.EPSILON);
+	
+		// plus one car
+		
+		int nPlusOneCar = (nCar+1 + nHGV) * 10;
+		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
+		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
+		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
+		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
+		Assert.assertEquals("Wrong emission!", 58.4896140186478, emissionPlusOneCar, MatsimTestUtils.EPSILON);
+		
+		// plus one HGV
+		
+		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
+		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
+		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
+		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
+		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
+		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
+		
+//		System.out.println("emission: " + emission);
+//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
+//		
+//		if (emission >= emissionPlusOneCar) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
+//		
+//		if (emission >= emissionPlusOneHGV) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+
+	}
+	
+	// tests the static methods within class "noiseEquations" - other speed levels
+	@Test
+	public final void test5(){
+		
+		double vCar = 30;
+		double vHGV = 30;
+		int nCar = 119;
+		int nHGV = 4;
+		
+		int n = (nCar + nHGV) * 10;
+		
+		double p = ( (double) nHGV / (double) (nCar + nHGV));	
+					
+		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+		Assert.assertEquals("Wrong mittelungspegel for n="+ n + " and p=" + p + "!", 69.22567453336540, mittelungspegel, MatsimTestUtils.EPSILON);
+		
+		double lCar = NoiseEquations.calculateLCar(vCar);
+		Assert.assertEquals("Wrong LCar for vCar="+ vCar + "!", 28.54933574936720, lCar, MatsimTestUtils.EPSILON);
+		
+		double lHGV = NoiseEquations.calculateLHdv(vHGV);
+		Assert.assertEquals("Wrong LHGV for vHGV="+ vHGV + "!", 41.56401568399580, lHGV, MatsimTestUtils.EPSILON);
+
+		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
+		Assert.assertEquals("Wrong Dv!", -7.689390421466860, dV, MatsimTestUtils.EPSILON);
+		
+		double emission = mittelungspegel + dV;
+		Assert.assertEquals("Wrong emission!", 61.5362841118986, emission, MatsimTestUtils.EPSILON);
+	
+		// plus one car
+		
+		int nPlusOneCar = (nCar+1 + nHGV) * 10;
+		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
+		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
+		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
+		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
+		Assert.assertEquals("Wrong emission!", 61.5580658162266, emissionPlusOneCar, MatsimTestUtils.EPSILON);
+		
+		// plus one HGV
+		
+		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
+		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
+		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
+		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
+		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
+		Assert.assertEquals("Wrong emission!", 61.9518310976080, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
+		
+//		System.out.println("emission: " + emission);
+//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
+//		
+//		if (emission >= emissionPlusOneCar) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
+//		
+//		if (emission >= emissionPlusOneHGV) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+		
+	}
+	
+//	// tests the static methods within class "noiseEquations" - other speed levels
+//	@Test
+//	public final void test6(){
+//		
+//		double vCar = 30.000001;
+//		double vHGV = 50.00001;
+//		int nCar = 119;
+//		int nHGV = 4;
+//		
+//		int n = (nCar + nHGV) * 10;
+//		
+//		double p = ( (double) nHGV / (double) (nCar + nHGV));			
+//		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+//		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
+//		double emission = mittelungspegel + dV;
+//	
+//		// plus one car
+//		
+//		int nPlusOneCar = (nCar+1 + nHGV) * 10;
+//		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
+//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
+//		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
+//		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
+//		
+//		// plus one HGV
+//		
+//		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
+//		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
+//		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
+//		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
+//		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
+//		
+//		System.out.println("emission: " + emission);
+//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
+//		
+//		if (emission >= emissionPlusOneCar) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
+//		
+//		if (emission >= emissionPlusOneHGV) {
+//			System.out.println(" :-(");
+//		} else {
+//			System.out.println(" :-)");
+//		}
+//		
+//	}
+		
 }

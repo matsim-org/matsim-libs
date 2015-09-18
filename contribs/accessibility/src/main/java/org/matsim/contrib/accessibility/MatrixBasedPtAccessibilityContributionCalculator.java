@@ -41,7 +41,7 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
 		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
 
 		betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt();
+		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceRatePt();
 
 		constPt			= planCalcScoreConfigGroup.getConstantPt();
 	}

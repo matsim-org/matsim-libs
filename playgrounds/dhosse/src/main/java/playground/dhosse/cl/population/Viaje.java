@@ -3,7 +3,6 @@ package playground.dhosse.cl.population;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class Viaje {
@@ -33,11 +32,11 @@ public class Viaje {
 		this.comunaDestino = comunaDestino;
 		
 		if(!originX.equals("") && !originY.equals("")){
-			this.origin = new CoordImpl(originX, originY);
+			this.origin = new Coord(Double.parseDouble(originX), Double.parseDouble(originY));
 		}
 		
 		if(!destinationX.equals("") && !destinationY.equals("")){
-			this.destination = new CoordImpl(destinationX, destinationY);
+			this.destination = new Coord(Double.parseDouble(destinationX), Double.parseDouble(destinationY));
 		}
 		
 		this.proposito = proposito;

@@ -98,7 +98,7 @@ public class SinglePassengerPickupActivity
         passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 
         if (!passengerAboard) {
-            throw new IllegalStateException("The passenger is not on the link!");
+            throw new IllegalStateException("The passenger is not on the link or not available for departure!");
         }
 
         endTime = now + pickupDuration;

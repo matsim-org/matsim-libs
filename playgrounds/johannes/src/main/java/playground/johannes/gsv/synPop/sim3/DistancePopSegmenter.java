@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,11 +44,11 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 	}
 	
 	@Override
-	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments) {
-		List<PlainPerson> shortDist = new ArrayList<>(persons.size());
-		List<PlainPerson> longDist = new ArrayList<>(persons.size());
+	public List<Person>[] split(Collection<Person> persons, int segments) {
+		List<Person> shortDist = new ArrayList<>(persons.size());
+		List<Person> longDist = new ArrayList<>(persons.size());
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			double max = 0;
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable leg : plan.getLegs()) {
@@ -67,10 +67,10 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 		}
 		
 		int n = (int) Math.ceil(segments/2.0);
-		List<PlainPerson>[] shortSegements = CollectionUtils.split(shortDist, n);
-		List<PlainPerson>[] longSegments = CollectionUtils.split(longDist, segments - n);
+		List<Person>[] shortSegements = CollectionUtils.split(shortDist, n);
+		List<Person>[] longSegments = CollectionUtils.split(longDist, segments - n);
 		
-		List<PlainPerson>[] list = new List[segments];
+		List<Person>[] list = new List[segments];
 		for(int i = 0; i < shortSegements.length; i++) {
 			list[i] = shortSegements[i];
 		}

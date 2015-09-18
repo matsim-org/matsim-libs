@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -44,9 +45,9 @@ public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	private final double interModalTransferPenalty;
 	private final Network network;
 
-	public PRScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, Network network, double intermodalTransferPenalty) {
+	public PRScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final ScenarioConfigGroup scenarioConfig, Network network, double intermodalTransferPenalty) {
 		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig).create();
+		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig, scenarioConfig).create();
 		this.interModalTransferPenalty = intermodalTransferPenalty;
 		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
 		this.network = network;

@@ -20,6 +20,9 @@
 
 package playground.mrieser.pt.demo;
 
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -37,21 +40,32 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.mrieser.pt.analysis.RouteTimeDiagram;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.mrieser.pt.analysis.VehicleTracker;
-
-import java.util.ArrayList;
 
 public class AccessEgressDemo {
 
@@ -80,7 +94,7 @@ public class AccessEgressDemo {
 //		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord(i * 500, 0));
 			network.addNode(nodes[i]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
@@ -99,7 +113,7 @@ public class AccessEgressDemo {
 		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((i + 1) * 500, 0), stopsBlockLane);
 			stops[i].setLinkId(Id.create(i, Link.class));
 			schedule.addStopFacility(stops[i]);
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
@@ -107,7 +121,7 @@ public class AccessEgressDemo {
 		}
 		Link startLink = this.scenario.getNetwork().getLinks().get(Id.create(0, Link.class));
 		Link endLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks - 1, Link.class));
-		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		NetworkRoute networkRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLink.getId(), endLink.getId());
 		ArrayList<Id<Link>> linkList = new ArrayList<Id<Link>>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(Id.create(i, Link.class));
@@ -154,7 +168,7 @@ public class AccessEgressDemo {
 				continue;
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
+				Person person = pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
 				PlanImpl plan = (PlanImpl) pb.createPlan();
 				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);
@@ -183,7 +197,7 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		final QSim sim = (QSim) QSimUtils.createDefaultQSim(this.scenario, events);
+		final QSim sim = QSimUtils.createDefaultQSim(this.scenario, events);
 		sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);

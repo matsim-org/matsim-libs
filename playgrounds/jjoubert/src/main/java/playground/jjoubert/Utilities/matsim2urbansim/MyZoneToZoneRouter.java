@@ -20,12 +20,16 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import nl.knaw.dans.common.dbflib.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +37,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -43,14 +47,26 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import nl.knaw.dans.common.dbflib.CorruptedTableException;
+import nl.knaw.dans.common.dbflib.DbfLibException;
+import nl.knaw.dans.common.dbflib.Field;
+import nl.knaw.dans.common.dbflib.IfNonExistent;
+import nl.knaw.dans.common.dbflib.InvalidFieldLengthException;
+import nl.knaw.dans.common.dbflib.InvalidFieldTypeException;
+import nl.knaw.dans.common.dbflib.NumberValue;
+import nl.knaw.dans.common.dbflib.Record;
+import nl.knaw.dans.common.dbflib.Table;
+import nl.knaw.dans.common.dbflib.Type;
+import nl.knaw.dans.common.dbflib.Value;
+import nl.knaw.dans.common.dbflib.Version;
 
 public class MyZoneToZoneRouter {
 	private final Logger log = Logger.getLogger(MyZoneToZoneRouter.class);
@@ -83,7 +99,7 @@ public class MyZoneToZoneRouter {
 		
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(travelTimeCalculator);
-		new EventsReaderTXTv1(em).readFile(eventsFilename);
+		new MatsimEventsReader(em).readFile(eventsFilename);
 		
 		log.info("Preprocessing the network for zone-to-zone travel time calculation.");
 		PreProcessDijkstra pp = new PreProcessDijkstra();
@@ -155,11 +171,11 @@ public class MyZoneToZoneRouter {
 						 */
 						
 						Point fp = zones.get(row).getCentroid();
-						Coord fc = new CoordImpl(fp.getX(), fp.getY());
+						Coord fc = new Coord(fp.getX(), fp.getY());
 						Node fn = ni.getNearestNode(fc);
 						
 						Point tp = zones.get(col).getCentroid();
-						Coord tc = new CoordImpl(tp.getX(), tp.getY());
+						Coord tc = new Coord(tp.getX(), tp.getY());
 						Node tn = ni.getNearestNode(tc); 
 						
 						Path p = router.calcLeastCostPath(fn, tn, 25200, null, null); /* Use 07:00:00 */

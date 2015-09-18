@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -34,8 +34,8 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a
- * hardcoded "instanceof ActivityEngine" check in QSim :-(
- * TODO introduce an ActivityEngine interface?
+ * hardcoded "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine
+ * interface?
  */
 public class DynActivityEngine
     extends ActivityEngine

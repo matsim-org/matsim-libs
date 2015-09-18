@@ -58,8 +58,8 @@ public class VisumDemandDataReader
 
         return hourlyShares;
     }
-    
-    
+
+
     public static Map<String, Tuple<String, String>> readActivityPairs(String activityFile)
     {
         Map<String, Tuple<String, String>> activityPairs = new LinkedHashMap<>();
@@ -71,7 +71,7 @@ public class VisumDemandDataReader
                 String key = scanner.next();
                 String fromActivity = scanner.next();
                 String toActivity = scanner.next();
-                
+
                 activityPairs.put(key, new Tuple<>(fromActivity, toActivity));
             }
         }
@@ -94,8 +94,8 @@ public class VisumDemandDataReader
                 String odMatrixFile = mainDir + scanner.next();
 
                 double[][] visumODMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
-                Matrix odMatrix = MatrixUtils
-                        .createSparseMatrix(key, zones.keySet(), visumODMatrix);
+                Matrix odMatrix = MatrixUtils.createSparseMatrix(key, zones.keySet(),
+                        visumODMatrix);
 
                 odMatrices.put(key, odMatrix);
             }

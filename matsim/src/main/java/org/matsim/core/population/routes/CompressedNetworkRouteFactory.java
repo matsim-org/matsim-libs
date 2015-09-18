@@ -52,5 +52,10 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 		}
 		return new CompressedNetworkRouteImpl(startLinkId, endLinkId, this.network, this.subsequentLinks);
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return "links";
+	}
 
 }

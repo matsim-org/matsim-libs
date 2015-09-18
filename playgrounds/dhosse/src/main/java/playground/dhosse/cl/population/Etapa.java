@@ -1,7 +1,6 @@
 package playground.dhosse.cl.population;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Etapa {
 	
@@ -20,11 +19,11 @@ public class Etapa {
 		this.comunaDestino = comunaDestino;
 		
 		if(!originX.equals("") && !originY.equals("")){
-			this.origin = new CoordImpl(originX.replace(",", "."), originY.replace(",", "."));
+			this.origin = new Coord(Double.parseDouble(originX.replace(",", ".")), Double.parseDouble(originY.replace(",", ".")));
 		}
 		
 		if(!destinationX.equals("") && !destinationY.equals("")){
-			this.destination = new CoordImpl(destinationX.replace(",", "."), destinationY.replace(",", "."));
+			this.destination = new Coord(Double.parseDouble(destinationX.replace(",", ".")), Double.parseDouble(destinationY.replace(",", ".")));
 		}
 		
 	}

@@ -22,7 +22,6 @@ package org.matsim.vis.otfvis.utils;
 
 import org.jdesktop.swingx.mapviewer.util.MercatorUtils;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class WGS84ToMercator {
@@ -39,7 +38,7 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-		    CoordImpl otherResult = new CoordImpl(MercatorUtils.longToX(coord.getX(), radius), MercatorUtils.latToY(coord.getY(), radius));
+			Coord otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
 			return otherResult;
 		}
 
@@ -64,7 +63,7 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-		    CoordImpl otherResult = new CoordImpl(MercatorUtils.xToLong( (int) coord.getX(), radius), MercatorUtils.yToLat( (int) coord.getY(), radius));
+			Coord otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
 			return otherResult;
 			
 		}

@@ -23,12 +23,12 @@ package org.matsim.core.network;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -52,8 +52,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
 		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
 
-		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		net.addNode(node1);
 		net.addNode(node2);
 		Link link = net.getFactory().createLink(Id.create(1, Link.class), node1, node2);
@@ -69,10 +69,11 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
-		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new CoordImpl(2000, 500));
-		NodeImpl node4 = new NodeImpl(Id.create(4, Node.class), new CoordImpl(2000, -500));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
+		final double y = -500;
+		NodeImpl node4 = new NodeImpl(Id.create(4, Node.class), new Coord((double) 2000, y));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -105,9 +106,9 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_noNodes(){
 		Network n = NetworkUtils.createNetwork();
-		Node a = n.getFactory().createNode(Id.create("a", Node.class), new CoordImpl(0.0, 0.0));
-		Node b = n.getFactory().createNode(Id.create("b", Node.class), new CoordImpl(1000.0, 0.0));
-		Node c = n.getFactory().createNode(Id.create("c", Node.class), new CoordImpl(0.0, 1000.0));
+		Node a = n.getFactory().createNode(Id.create("a", Node.class), new Coord(0.0, 0.0));
+		Node b = n.getFactory().createNode(Id.create("b", Node.class), new Coord(1000.0, 0.0));
+		Node c = n.getFactory().createNode(Id.create("c", Node.class), new Coord(0.0, 1000.0));
 		
 		Link ab = n.getFactory().createLink(Id.create("ab", Link.class), a, b);
 		try{
@@ -154,10 +155,10 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddNode_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
-		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new CoordImpl(2000, 500));
-		NodeImpl node1b = new NodeImpl(Id.create(1, Node.class), new CoordImpl(2000, 0));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
+		NodeImpl node1b = new NodeImpl(Id.create(1, Node.class), new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
@@ -183,18 +184,18 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddNode_singleNodeFirstOnly() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(500, 400));
-		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(600, 500));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
 		network.addNode(node1);
 		Assert.assertEquals(1, network.getNodes().size());
-		Node n = network.getNearestNode(new CoordImpl(550, 450));
+		Node n = network.getNearestNode(new Coord((double) 550, (double) 450));
 		Assert.assertEquals(node1, n);
 		
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
 
-		n = network.getNearestNode(new CoordImpl(590, 490));
+		n = network.getNearestNode(new Coord((double) 590, (double) 490));
 		Assert.assertEquals(node2, n);
 	}
 
@@ -206,21 +207,21 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddTwoNodes_initializedEmptyQuadtree() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(500, 400));
-		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(600, 500));
-		
-		Node n = network.getNearestNode(new CoordImpl(550, 450));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
+
+		Node n = network.getNearestNode(new Coord((double) 550, (double) 450));
 		Assert.assertNull(n);
 		
 		network.addNode(node1);
 		Assert.assertEquals(1, network.getNodes().size());
-		n = network.getNearestNode(new CoordImpl(550, 450));
+		n = network.getNearestNode(new Coord((double) 550, (double) 450));
 		Assert.assertEquals(node1, n);
 		
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
-		
-		n = network.getNearestNode(new CoordImpl(590, 490));
+
+		n = network.getNearestNode(new Coord((double) 590, (double) 490));
 		Assert.assertEquals(node2, n);
 	}
 

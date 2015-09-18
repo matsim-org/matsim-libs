@@ -33,14 +33,14 @@ public class MatricesTxtWriter
     private String keyHeader = "key";
     private Function<String, String> formatter = Functions.identity();
 
-    
+
     public static MatricesTxtWriter createForSingleMatrix(Matrix matrix)
     {
         MatricesTxtWriter writer = new MatricesTxtWriter(Collections.singletonMap("", matrix));
         writer.setKeyHeader(null);
         return writer;
     }
-    
+
 
     public MatricesTxtWriter(Map<String, Matrix> matrices)
     {
@@ -76,8 +76,7 @@ public class MatricesTxtWriter
 
                 for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
                     writeKey(pw, key);
-                    pw.printf("%s\t%s\t%f\n", e.getFromLocation(), e.getToLocation(),
-                            e.getValue());
+                    pw.printf("%s\t%s\t%f\n", e.getFromLocation(), e.getToLocation(), e.getValue());
                 }
             }
         }

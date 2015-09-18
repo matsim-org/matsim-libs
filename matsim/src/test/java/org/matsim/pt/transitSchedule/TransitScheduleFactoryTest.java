@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -85,7 +84,7 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateTransitRouteStop() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(5, TransitStopFacility.class), new CoordImpl(6, 6), false);
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(5, TransitStopFacility.class), new Coord((double) 6, (double) 6), false);
 		double arrivalOffset = 23;
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
@@ -98,9 +97,9 @@ public class TransitScheduleFactoryTest {
 	public void testCreateTransitStopFacility() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<TransitStopFacility> id1 = Id.create(6, TransitStopFacility.class);
-		Coord coord1 = new CoordImpl(511, 1980);
+		Coord coord1 = new Coord((double) 511, (double) 1980);
 		Id<TransitStopFacility> id2 = Id.create(7, TransitStopFacility.class);
-		Coord coord2 = new CoordImpl(105, 1979);
+		Coord coord2 = new Coord((double) 105, (double) 1979);
 		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(id1, coord1, false);
 		Assert.assertEquals(id1, stopFacility1.getId());
 		Assert.assertEquals(coord1.getX(), stopFacility1.getCoord().getX(), MatsimTestUtils.EPSILON);

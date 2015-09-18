@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -567,14 +566,14 @@ public class OsmNetworkReader {
 					Long id = Long.valueOf(atts.getValue("id"));
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(id, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
+					this.nodes.put(id, new OsmNode(id, this.transform.transform(new Coord(lon, lat))));
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
 					OsmNode node = this.nodes.get(Long.valueOf(atts.getValue("id")));
 					if (node != null) {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
-						Coord c = this.transform.transform(new CoordImpl(lon, lat));
+						Coord c = this.transform.transform(new Coord(lon, lat));
 						node.coord.setXY(c.getX(), c.getY());
 						this.nodeCounter.incCounter();
 					}
@@ -629,7 +628,7 @@ public class OsmNetworkReader {
 					if (used) {
 						if (this.collectNodes) {
 							for (long id : this.currentWay.nodes) {
-								this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
+								this.nodes.put(id, new OsmNode(id, new Coord((double) 0, (double) 0)));
 							}
 						} else if (this.loadWays) {
 							this.ways.put(this.currentWay.id, this.currentWay);

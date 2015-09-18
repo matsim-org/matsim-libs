@@ -143,10 +143,20 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 			assert departureTimes.size() == departurePersons.size();
 			for ( int i=0; i < departureTimes.size(); i++ ) {
+				// For several reasons, there might not (yet) be any subsequent trip:
+				// - some parts of the code ask for "partial" score, possibly before the trip is completed
+				// - an agent might fail to complete its plan
+				// In those cases, estimate the total travel time using 2x the access travel time
 				final double tt =
-						travelTimesRecord.getTravelTimeBefore(
+						travelTimesRecord.alreadyKnowsTravelTimeAfter(
 								departurePersons.get( i ),
-								departureTimes.get( i ) );
+								departureTimes.get( i ) ) ?
+							travelTimesRecord.getTravelTimeAfter(
+									departurePersons.get( i ),
+									departureTimes.get( i ) ) :
+							travelTimesRecord.getTravelTimeBefore(
+									departurePersons.get( i ),
+									departureTimes.get( i ) );
 
 				travelTimes.adjustOrPutValue(
 						departurePersons.get(i),

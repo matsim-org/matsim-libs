@@ -19,7 +19,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -46,7 +45,7 @@ public class LSANode2KML {
 			Node current = entry.getValue();
 			ampel.setLongName(current.getId().toString());
 			ampel.setShortName(current.getId().toString());
-			Coord kurt = new CoordImpl(current.getCoord());
+			Coord kurt = new Coord(current.getCoord().getX(), current.getCoord().getY());
 			kurt = ct.transform(kurt);
 			ampel.setXcord(kurt.getX());
 			ampel.setYcord(kurt.getY());

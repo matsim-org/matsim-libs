@@ -189,7 +189,7 @@ public class CorridorNetworkWriter_opt3 {
 		int nodeNr = 0;
 		for (int ii=0; ii<=linkNr; ii++){
 				Id<Node> nodeIdA = Id.create(nodeNr, Node.class);
-				Coord fromNodeCoord = scenario.createCoord(xCoord, 0);
+			Coord fromNodeCoord = new Coord(xCoord, (double) 0);
 				Node nodeA = network.getFactory().createNode(nodeIdA, fromNodeCoord);
 				network.addNode(nodeA);
 				xCoord = xCoord+length;

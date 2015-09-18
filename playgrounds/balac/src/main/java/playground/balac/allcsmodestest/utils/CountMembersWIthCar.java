@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -22,8 +22,8 @@ public class CountMembersWIthCar {
 		int count = 0;
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)person).getTravelcards() != null && ((PersonImpl)person).getTravelcards().contains("ch-HT-mobility")) 	
-				if (!((PersonImpl)person).getCarAvail().equals("never")) {
+			if (PersonUtils.getTravelcards(person) != null && PersonUtils.getTravelcards(person).contains("ch-HT-mobility"))
+				if (!PersonUtils.getCarAvail(person).equals("never")) {
 					
 					count++;
 				}

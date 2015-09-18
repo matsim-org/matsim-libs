@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
-public interface Mobsim {
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+
+public interface Mobsim extends MatsimExtensionPoint {
 
   /**
    * Start the mobility simulation

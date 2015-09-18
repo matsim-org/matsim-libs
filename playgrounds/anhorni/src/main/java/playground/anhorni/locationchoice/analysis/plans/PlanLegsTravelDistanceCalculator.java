@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
+import org.matsim.core.utils.geometry.CoordUtils;
 import playground.anhorni.utils.Utils;
 
 public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalculator {
@@ -67,7 +67,7 @@ public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalc
 							super.legTravelMeasures.add(dist);
 						}
 						else {
-							double dist = ((CoordImpl)actStartLeg.getCoord()).calcDistance(actEndLeg.getCoord());
+							double dist = CoordUtils.calcDistance(actStartLeg.getCoord(), actEndLeg.getCoord());
 							super.sumLegsTravelMeasure += dist;
 							super.legTravelMeasures.add(dist);
 						}

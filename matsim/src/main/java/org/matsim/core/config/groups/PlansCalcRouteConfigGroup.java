@@ -60,7 +60,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
+	private Collection<String> networkModes = Arrays.asList(TransportMode.car);
 
 	private boolean acceptModeParamsWithoutClearing = false;
 	
@@ -193,6 +193,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
 			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
 			addParameterSet( undefined );
+		}
+
+		{
+			final ModeRoutingParams ride = new ModeRoutingParams( TransportMode.ride );
+			ride.setTeleportedModeFreespeedFactor(1.0);
+			addParameterSet( ride );
 		}
 
 		{

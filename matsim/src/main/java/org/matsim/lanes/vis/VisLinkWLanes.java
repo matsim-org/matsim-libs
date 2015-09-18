@@ -20,7 +20,6 @@
 package org.matsim.lanes.vis;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.awt.geom.Point2D;
@@ -52,8 +51,8 @@ public class VisLinkWLanes implements Serializable{
 	private Map<String, VisSignal> signals = null;
 	private ArrayList<String> toLinkIds;
 	private transient List<VisLinkWLanes> toLinks = null;
-	private CoordImpl startCoord;
-	private CoordImpl endCoord;
+	private Coord startCoord;
+	private Coord endCoord;
 	private double euklideanDistance;
 	
 	public VisLinkWLanes(String id){
@@ -159,8 +158,8 @@ public class VisLinkWLanes implements Serializable{
 	}
 	
 	private void calcCoords(){
-		this.startCoord = new CoordImpl(linkStart.x, linkStart.y);
-		this.endCoord = new CoordImpl(linkEnd.x, linkEnd.y);
+		this.startCoord = new Coord(linkStart.x, linkStart.y);
+		this.endCoord = new Coord(linkEnd.x, linkEnd.y);
 		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
 	}
 	

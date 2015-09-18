@@ -21,10 +21,8 @@ package org.matsim.facilities;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.facilities.ActivityOption;
 
 /**
  * @author mrieser / Senozon AG
@@ -34,7 +32,7 @@ public class ActivityFacilitiesFactoryImplTest {
 	@Test
 	public void testCreateActivityFacility() {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
-		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new CoordImpl(5, 11));
+		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new Coord((double) 5, (double) 11));
 
 		Assert.assertEquals("1980", facility.getId().toString());
 		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);

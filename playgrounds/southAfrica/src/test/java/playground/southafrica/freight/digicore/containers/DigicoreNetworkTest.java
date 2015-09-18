@@ -27,9 +27,9 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -61,12 +61,12 @@ public class DigicoreNetworkTest{
 		Assert.assertEquals("Wrong number of weights.", 0, dn.getWeights().size());
 	
 		DigicoreActivity da1 = new DigicoreActivity("test_1", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		CoordImpl c1 = new CoordImpl(0.0, 0.0);
+		Coord c1 = new Coord(0.0, 0.0);
 		da1.setCoord(c1);	
 		Id<ActivityFacility> i1 = Id.create(1, ActivityFacility.class);
 		da1.setFacilityId(i1);	
 		DigicoreActivity da2 = new DigicoreActivity("test_2", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		CoordImpl c2 = new CoordImpl(1.0, 0.0);
+		Coord c2 = new Coord(1.0, 0.0);
 		da2.setCoord(c2);
 		Id<ActivityFacility> i2 = Id.create(2, ActivityFacility.class);
 		da2.setFacilityId(i2);
@@ -88,7 +88,7 @@ public class DigicoreNetworkTest{
 
 
 		DigicoreActivity da3 = new DigicoreActivity("test_3", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		CoordImpl c3 = new CoordImpl(1.0, 1.0);
+		Coord c3 = new Coord(1.0, 1.0);
 		da3.setCoord(c3);
 		Id<ActivityFacility> i3 = Id.create(3,  ActivityFacility.class);
 		da3.setFacilityId(i3);
@@ -126,7 +126,7 @@ public class DigicoreNetworkTest{
 		Assert.assertEquals("Wrong weight for arc 3 --> 1.", 1, dn.getWeights().get(tuple3).intValue());
 		
 		DigicoreActivity da4 = new DigicoreActivity("test_4", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		CoordImpl c4 = new CoordImpl(1.0, 0.0);
+		Coord c4 = new Coord(1.0, 0.0);
 		da4.setCoord(c4);
 		Id<ActivityFacility> i4 = Id.create(4,  ActivityFacility.class);
 		da4.setFacilityId(i4);
@@ -154,18 +154,18 @@ public class DigicoreNetworkTest{
 		
 		/* Create all location 1 activities. */
 		DigicoreActivity da1 = new DigicoreActivity("test1", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da1.setCoord(new CoordImpl(0, 0));
+		da1.setCoord(new Coord((double) 0, (double) 0));
 		da1.setFacilityId(Id.create(1,  ActivityFacility.class));
 		DigicoreActivity da2 = new DigicoreActivity("test1", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setCoord(new CoordImpl(0, 0));
+		da2.setCoord(new Coord((double) 0, (double) 0));
 		da2.setFacilityId(Id.create(3,  ActivityFacility.class));
 		
 		/* Create location 2 activities. */
 		DigicoreActivity da3 = new DigicoreActivity("test2", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da3.setCoord(new CoordImpl(1, 0));
+		da3.setCoord(new Coord((double) 1, (double) 0));
 		da3.setFacilityId(Id.create(2,  ActivityFacility.class));
 		DigicoreActivity da4 = new DigicoreActivity("test2", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da4.setCoord(new CoordImpl(1, 0));
+		da4.setCoord(new Coord((double) 1, (double) 0));
 		da4.setFacilityId(Id.create(2,  ActivityFacility.class));
 		
 		dn.addArc(da1, da3);
@@ -231,16 +231,16 @@ public class DigicoreNetworkTest{
 	private DigicoreNetwork buildMultiplexNetwork(){
 		DigicoreNetwork dn = new DigicoreNetwork();
 
-		DigicoreActivity da1a = new DigicoreActivity("1a", TimeZone.getTimeZone("GMT+2"), new Locale("en"));		
-		da1a.setCoord(new CoordImpl(0.0, 0.0));						
+		DigicoreActivity da1a = new DigicoreActivity("1a", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
+		da1a.setCoord(new Coord(0.0, 0.0));
 		da1a.setFacilityId(Id.create(1,  ActivityFacility.class));	
 		
 		DigicoreActivity da1b = new DigicoreActivity("1b", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da1b.setCoord(new CoordImpl(0.0, 0.0));
+		da1b.setCoord(new Coord(0.0, 0.0));
 		da1b.setFacilityId(Id.create(1,  ActivityFacility.class));
 
 		DigicoreActivity da2 = new DigicoreActivity("2", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setCoord(new CoordImpl(2.0, 0.0));
+		da2.setCoord(new Coord(2.0, 0.0));
 		da2.setFacilityId(Id.create(2,  ActivityFacility.class));
 		
 		dn.addArc(da1a, da2);
@@ -266,20 +266,20 @@ public class DigicoreNetworkTest{
 	private DigicoreNetwork buildSmallNetwork(){
 		DigicoreNetwork dn = new DigicoreNetwork();
 
-		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));		
-		da1.setCoord(new CoordImpl(0.0, 0.0));						
+		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
+		da1.setCoord(new Coord(0.0, 0.0));
 		da1.setFacilityId(Id.create(1,  ActivityFacility.class));	
 		
 		DigicoreActivity da2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setCoord(new CoordImpl(0.0, 1.0));
+		da2.setCoord(new Coord(0.0, 1.0));
 		da2.setFacilityId(Id.create(2,  ActivityFacility.class));
 		
 		DigicoreActivity da3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da3.setCoord(new CoordImpl(1.0, 1.0));
+		da3.setCoord(new Coord(1.0, 1.0));
 		da3.setFacilityId(Id.create(3,  ActivityFacility.class));
 		
 		DigicoreActivity da4 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da4.setCoord(new CoordImpl(1.0, 0.0));
+		da4.setCoord(new Coord(1.0, 0.0));
 		da4.setFacilityId(Id.create(4,  ActivityFacility.class));
 
 		dn.addArc(da1, da2);

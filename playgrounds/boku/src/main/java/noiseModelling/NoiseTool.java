@@ -2,7 +2,6 @@ package noiseModelling;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -12,7 +11,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -101,9 +99,7 @@ public class NoiseTool {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netfile);
 		// config.plans().setInputFile(plansfile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
-		scenarioLoader.loadScenario();
-
+		ScenarioUtils.loadScenario(scenario);
 	}
 
 }

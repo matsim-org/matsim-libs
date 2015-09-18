@@ -23,13 +23,14 @@ package playground.gregor.sim2d_v4.scenario;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
+import org.matsim.core.utils.geometry.CoordUtils;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 
 public abstract class Sim2DEnvironmentNetworkBuilder {
@@ -58,7 +59,7 @@ public abstract class Sim2DEnvironmentNetworkBuilder {
 					LineSegment seg = s.getOpeningSegments().get(i);
 					double x = (seg.x0+seg.x1)/2;
 					double y = (seg.y0+seg.y1)/2;
-					node = fac.createNode(id, new CoordImpl(x,y));
+					node = fac.createNode(id, new Coord(x, y));
 					net.addNode(node);;
 				}
 			}
@@ -76,7 +77,7 @@ public abstract class Sim2DEnvironmentNetworkBuilder {
 					Node to = net.getNodes().get(toId);
 					Id<Link> lId = Id.create(fromId.toString() + "-->"+toId.toString(), Link.class);
 					Link l = fac.createLink(lId, from, to);
-					double dist = ((CoordImpl)from.getCoord()).calcDistance(to.getCoord());
+					double dist = CoordUtils.calcDistance(from.getCoord(), to.getCoord());
 					l.setLength(dist);
 					l.setFreespeed(1.34);
 					LineSegment seg = s.getOpeningSegments().get(j);

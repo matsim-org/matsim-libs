@@ -34,16 +34,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.xml.sax.Attributes;
 
 /**
@@ -77,7 +76,7 @@ import org.xml.sax.Attributes;
 	private final Network network;
 	private final ActivityFacilities facilities;
 
-	/*package*/ PersonImpl currperson = null;
+	/*package*/ Person currperson = null;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
@@ -181,21 +180,21 @@ import org.xml.sax.Attributes;
 		String ageString = atts.getValue("age");
 		int age = Integer.MIN_VALUE;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(Id.create(atts.getValue("id"), Person.class));
-		this.currperson.setSex(atts.getValue("sex"));
-		this.currperson.setAge(age);
-		this.currperson.setLicence(atts.getValue("license"));
-		this.currperson.setCarAvail(atts.getValue("car_avail"));
+		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
+		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
+		PersonUtils.setAge(this.currperson, age);
+		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed("yes".equals(employed));
+			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 
 	private void startTravelcard(final Attributes atts) {
-		this.currperson.addTravelcard(atts.getValue(ATTR_TYPE));
+		PersonUtils.addTravelcard(this.currperson, atts.getValue(ATTR_TYPE));
 	}
 
 	private void startActivityFacility(final Attributes atts) {
@@ -248,7 +247,7 @@ import org.xml.sax.Attributes;
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {
@@ -267,11 +266,11 @@ import org.xml.sax.Attributes;
 			this.curract = this.currplan.createAndAddActivity(
 					atts.getValue(ATTR_TYPE), linkId);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
-				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+				coord = new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y")));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
-			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+			coord = new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y")));
 			this.curract = this.currplan.createAndAddActivity(
 					atts.getValue(ATTR_TYPE), coord);
 		} else {
@@ -294,18 +293,16 @@ import org.xml.sax.Attributes;
 			if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}
-			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(
-						startLinkId, this.routeDescription.trim(), endLinkId);
-			} else if (this.currRoute instanceof NetworkRoute) {
+			this.currRoute.setStartLinkId(startLinkId);
+			this.currRoute.setEndLinkId(endLinkId);
+			if (this.currRoute instanceof NetworkRoute) {
 				((NetworkRoute) this.currRoute).setLinkIds(startLinkId,
 						NetworkUtils.getLinkIds(RouteUtils
 								.getLinksFromNodes(NetworkUtils.getNodes(
 										this.network, this.routeDescription))),
 						endLinkId);
 			} else {
-				throw new RuntimeException("unknown route type: "
-						+ this.currRoute.getClass().getName());
+				this.currRoute.setRouteDescription(this.routeDescription.trim());
 			}
 			this.routeDescription = null;
 			this.currRoute = null;
@@ -324,7 +321,11 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(this.currleg.getMode(), null, null);
+		Class<? extends Route> routeType = NetworkRoute.class;
+		if ("pt".equals(this.currleg.getMode())) {
+			routeType = ExperimentalTransitRoute.class;
+		}
+		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

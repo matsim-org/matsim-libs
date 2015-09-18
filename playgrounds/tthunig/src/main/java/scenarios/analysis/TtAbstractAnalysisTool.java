@@ -73,8 +73,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
 
 	public TtAbstractAnalysisTool() {
 		super();
-		reset(0);
 		defineNumberOfRoutes();
+		reset(0);
 	}
 	
 	/**

@@ -30,6 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.StandardDeviationScorer;
 import playground.thibautd.socnetsimusages.traveltimeequity.TravelTimesRecord;
 
@@ -50,16 +51,18 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 				final Scenario scenario,
 				final TravelTimesRecord travelTimesRecords,
 				final Config config) {
-		this( new MATSim2010ScoringFunctionFactory(
-					scenario,
-					new StageActivityTypesImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE,
-							JointActingTypes.INTERACTION) ),
+		this(
+				new KtiScoringFunctionFactoryWithJointModes(
+						new MATSim2010ScoringFunctionFactory(
+							scenario,
+							new StageActivityTypesImpl(
+									PtConstants.TRANSIT_ACTIVITY_TYPE,
+									JointActingTypes.INTERACTION) ),
+						scenario ),
 				scenario,
 				travelTimesRecords,
 				((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME) ).getJoinableActivityTypes(),
-				// TODO make configurable
-				1 );
+				((EquityConfigGroup) config.getModule( EquityConfigGroup.GROUP_NAME) ).getBetaStandardDev() );
 	}
 
 	public KtiScoringFunctionFactoryWithJointModesAndEquity(

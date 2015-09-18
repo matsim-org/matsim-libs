@@ -82,7 +82,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	public VTTSHandler(Scenario scenario) {
 		
 		this.scenario = scenario;
-		this.marginaSumScoringFunction = new MarginalSumScoringFunction(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create());
+		this.marginaSumScoringFunction = new MarginalSumScoringFunction(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create());
 	}
 
 	@Override

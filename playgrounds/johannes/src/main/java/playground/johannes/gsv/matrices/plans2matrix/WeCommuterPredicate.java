@@ -19,11 +19,7 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 /**
  * @author johannes
@@ -43,8 +39,8 @@ public class WeCommuterPredicate implements Predicate {
 
 		String day = person.getAttribute(CommonKeys.DAY);
 		if (day != null) {
-			if (day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day.equalsIgnoreCase(CommonKeys.SATURDAY)
-					|| day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
+			if (day.equalsIgnoreCase(CommonValues.THURSDAY) || day.equalsIgnoreCase(CommonValues.FRIDAY) || day.equalsIgnoreCase(CommonValues.SATURDAY)
+					|| day.equalsIgnoreCase(CommonValues.SUNDAY)) {
 				
 				Episode plan = person.getEpisodes().get(0);
 				Attributable weLeg = null;
@@ -59,8 +55,8 @@ public class WeCommuterPredicate implements Predicate {
 					if (val != null) {
 						double d = Double.parseDouble(val);
 						if (d > threshold) {
-							if (ActivityType.WORK.equalsIgnoreCase(prev2.getAttribute(CommonKeys.ACTIVITY_TYPE))
-									|| ActivityType.WORK.equalsIgnoreCase(next2.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+							if (ActivityTypes.WORK.equalsIgnoreCase(prev2.getAttribute(CommonKeys.ACTIVITY_TYPE))
+									|| ActivityTypes.WORK.equalsIgnoreCase(next2.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 								cnt++;
 								weLeg = leg2;
 							}

@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
@@ -92,7 +91,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 				double y = coord.getY() + xor.nextDouble() - 1.0;	// +/- 0.5m
 				ActivityImpl switchActivity = (ActivityImpl) scenario.getPopulation().getFactory().createActivityFromLinkId("switchWalkMode", currentLinkId);
 				switchActivity.setMaximumDuration(0.0);
-				switchActivity.setCoord(scenario.createCoord(x, y));
+				switchActivity.setCoord(new Coord(x, y));
 				switchActivity.setEndTime(time);
 				Id<ActivityFacility> facilityId = Id.create("switchWalkModeFacility" + currentLinkId.toString(), ActivityFacility.class);
 				switchActivity.setFacilityId(facilityId);

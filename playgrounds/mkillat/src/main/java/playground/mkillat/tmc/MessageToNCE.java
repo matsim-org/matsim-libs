@@ -3,6 +3,7 @@ package playground.mkillat.tmc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -10,7 +11,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class MessageToNCE {
@@ -22,10 +22,10 @@ public class MessageToNCE {
 	Id<Node> idN2 = Id.create("7", Node.class);
 	Id<Node> idN3 = Id.create("12", Node.class);
 	
-	CoordImpl coord1 = new CoordImpl(13.0, 14.0);
-	CoordImpl coord2 = new CoordImpl(15.0, 16.0);
-	CoordImpl coord3 = new CoordImpl(17.0, 19.0);
-	
+	Coord coord1 = new Coord(13.0, 14.0);
+	Coord coord2 = new Coord(15.0, 16.0);
+	Coord coord3 = new Coord(17.0, 19.0);
+
 	Node node1 = net.createAndAddNode(idN1, coord1);
 	Node node2 = net.createAndAddNode(idN2, coord2);
 	Node node3 = net.createAndAddNode(idN3, coord3);

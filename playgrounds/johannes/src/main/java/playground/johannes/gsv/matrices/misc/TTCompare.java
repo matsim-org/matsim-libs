@@ -21,9 +21,7 @@ package playground.johannes.gsv.matrices.misc;
 
 import java.io.IOException;
 
-import org.apache.commons.math.linear.MatrixIndexException;
-
-import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
+import playground.johannes.gsv.zones.io.VisumOMatrixReader;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 
@@ -43,13 +41,16 @@ public class TTCompare {
 //		String zoneFile = args[2];
 //		String primKey = args[3];
 		
-		KeyMatrix tt2009 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/infra2030lkw2030.txt");
-		KeyMatrix tt2030 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/Kreis_025.txt");
+		KeyMatrix tt2009 = new KeyMatrix();
+		VisumOMatrixReader.read(tt2009, "/home/johannes/gsv/prognose-update/infra2030lkw2030.txt");
+		KeyMatrix tt2030 = new KeyMatrix();
+		VisumOMatrixReader.read(tt2030, "/home/johannes/gsv/prognose-update/Kreis_025.txt");
 //		System.out.println("Loading matrix 2009...");
 //		KeyMatrix tt2009 = VisumOMatrixReader.read(file2009);
 //		System.out.println("Loading matrix 2030...");
 //		KeyMatrix tt2030 = VisumOMatrixReader.read(file2030);
-		KeyMatrix dmd2030 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/iv-2030.txt");
+		KeyMatrix dmd2030 = new KeyMatrix();
+		VisumOMatrixReader.read(dmd2030, "/home/johannes/gsv/prognose-update/iv-2030.txt");
 		
 		
 		tt2009 = ExtractDE.extract(tt2009, "/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");

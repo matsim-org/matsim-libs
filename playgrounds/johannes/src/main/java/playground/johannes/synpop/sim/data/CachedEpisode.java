@@ -23,6 +23,7 @@ import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,32 +31,71 @@ import java.util.List;
  */
 public class CachedEpisode extends CachedElement implements Episode {
 
+    private final List<Segment> activities;
+
+    private final List<Segment> legs;
+
     public CachedEpisode(Episode delegate) {
         super(delegate);
+
+        activities = new ArrayList<>(delegate.getActivities().size());
+        for(Segment activity : delegate.getActivities()) {
+            activities.add(new CachedSegment(activity));
+        }
+
+        legs = new ArrayList<>(delegate.getLegs().size());
+        for(Segment leg : delegate.getLegs()) {
+            legs.add(new CachedSegment(leg));
+        }
     }
 
     @Override
     public List<Segment> getActivities() {
-        return ((Episode)getDelegate()).getActivities();
+        return activities;
+//        return ((Episode)getDelegate()).getActivities();
     }
 
     @Override
     public List<Segment> getLegs() {
-        return ((Episode)getDelegate()).getLegs();
+        return legs;
+//        return ((Episode)getDelegate()).getLegs();
     }
 
     @Override
     public void addActivity(Segment activity) {
-        ((Episode)getDelegate()).addActivity(activity);
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+//        ((Episode)getDelegate()).addActivity(activity);
     }
 
     @Override
     public void addLeg(Segment leg) {
-        ((Episode)getDelegate()).addLeg(leg);
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+//        ((Episode)getDelegate()).addLeg(leg);
+    }
+
+    @Override
+    public void insertActivity(Segment activity, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void insertLeg(Segment leg, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void removeActivity(Segment activity) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void removeLeg(Segment leg) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
     }
 
     @Override
     public Person getPerson() {
-        return ((Episode)getDelegate()).getPerson();
+        throw new UnsupportedOperationException("Navigation not supported.");
+//        return ((Episode)getDelegate()).getPerson();
     }
 }

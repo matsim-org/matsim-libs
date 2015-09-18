@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
@@ -82,8 +81,8 @@ public class ZHFacilitiesReader {
 				double hrs_week = Double.parseDouble(entries[6].trim());
 				
 				String name = entries[6].trim();
-				
-				Coord exactPosition = new CoordImpl(xCH, yCH);
+
+				Coord exactPosition = new Coord(xCH, yCH);
 				Link closestLink = NetworkUtils.getNearestLink(network, exactPosition);
 				
 				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(

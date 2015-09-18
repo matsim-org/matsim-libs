@@ -27,7 +27,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import playground.anhorni.locationchoice.preprocess.plans.modifications.DistanceBins;
 
 import java.util.List;
@@ -65,7 +65,7 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 						continue;
 					}
 
-					double dist = ((CoordImpl)act.getCoord()).calcDistance(((Activity)actslegs.get(j-1)).getCoord()) / 1000.0;
+					double dist = CoordUtils.calcDistance(act.getCoord(), ((Activity) actslegs.get(j - 1)).getCoord()) / 1000.0;
 
 					// act type
 					String actType = act.getType();

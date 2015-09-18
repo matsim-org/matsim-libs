@@ -1,7 +1,6 @@
 package playground.kai.urbansim;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Helper class for PseudoGravityModel; has never been really tested since the PseudoGravityModel has never been really tested;
@@ -30,7 +29,7 @@ public class PseudoCell {
 		return ySum/yCnt ;
 	}
 	public Coord getCoords() {
-		Coord coord = new CoordImpl( getX(), getY() ) ;
+		Coord coord = new Coord(getX(), getY());
 		return coord ;
 	}
 	

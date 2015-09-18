@@ -23,17 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -50,11 +47,11 @@ public class RemoveLongTrips {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<? extends Person> persons = parser.getPersons();
 		
 		double proba = Double.parseDouble(args[4]);
 		double threshold = Double.parseDouble(args[3]);
@@ -65,12 +62,12 @@ public class RemoveLongTrips {
 		dataPool.register(new FacilityDataLoader(args[2], random), FacilityDataLoader.KEY);
 		FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		
-		Set<PlainPerson> remove = new HashSet<>(persons.size());
+		Set<Person> remove = new HashSet<>(persons.size());
 		
 		logger.info("Processing persons...");
 		
 		ProgressLogger.init(persons.size(), 2, 10);
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			for(Episode plan : person.getEpisodes()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
 					Attributable origin = plan.getActivities().get(i);
@@ -103,7 +100,7 @@ public class RemoveLongTrips {
 		
 		logger.info(String.format("Removing %s persons.", remove.size()));
 		
-		for(PlainPerson person : remove) {
+		for(Person person : remove) {
 			persons.remove(person);
 		}
 		

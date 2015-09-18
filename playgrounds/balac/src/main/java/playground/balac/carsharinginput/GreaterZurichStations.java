@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -30,7 +29,7 @@ public class GreaterZurichStations {
 		double coordX = 683217.0;
 		double coordY = 247300.0;
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");
-		Coord center = new CoordImpl(coordX, coordY);
+		Coord center = new Coord(coordX, coordY);
 		Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<SimpleFeature>();
         featuresMovedIncrease = new ArrayList<SimpleFeature>();
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
@@ -51,7 +50,7 @@ public class GreaterZurichStations {
 			
 			String[] arr = s.split("\t");
 
-			Coord coord = new CoordImpl(Double.parseDouble(arr[5]), Double.parseDouble(arr[4]));
+			Coord coord = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[4]));
 			
 			WGS84toCH1903LV03 b = new WGS84toCH1903LV03();  //transforming coord from WGS84 to CH1903LV03
 			coord = b.transform(coord);
@@ -73,8 +72,8 @@ public class GreaterZurichStations {
 		while (s != null) {
 			
 			String[] arr = s.split("\t");
-			
-			Coord coord = new CoordImpl(Double.parseDouble(arr[8]), Double.parseDouble(arr[7]));
+
+			Coord coord = new Coord(Double.parseDouble(arr[8]), Double.parseDouble(arr[7]));
 			
 			WGS84toCH1903LV03 b = new WGS84toCH1903LV03();  //transforming coord from WGS84 to CH1903LV03
 			coord = b.transform(coord);

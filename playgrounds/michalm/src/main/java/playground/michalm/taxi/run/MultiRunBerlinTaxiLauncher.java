@@ -11,8 +11,8 @@ public class MultiRunBerlinTaxiLauncher
     public static void main(String... args)
     {
         int runs = 20;
-        String paramFile = "d:/PP-rad/berlin/Berlin_2014_11/params.in";
-        String specificParamFile = args[0];
+        String paramFile = args[0] + "/params.in";
+        String specificParamFile = args[0] + "/" + args[1] + "/params.in";
 
         Map<String, String> specificParams = ParameterFileReader
                 .readParametersToMap(specificParamFile);

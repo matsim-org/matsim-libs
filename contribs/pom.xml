@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.8.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -112,6 +112,7 @@
 		<module>matrixbasedptrouter</module>
 		<module>parking</module>
 		<module>socnetsim</module>
+		<module>socnetgen</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
 		<module>multimodal</module>
@@ -143,7 +144,12 @@
 		<repository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>
@@ -152,21 +158,21 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
+			<version>4.12</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

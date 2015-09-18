@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -89,11 +90,11 @@ public class SingleLineScenario
 		
 		Network net = scen.getNetwork();
 		NetworkFactory nw = net.getFactory();
-		
-		Node a = nw.createNode(Id.create("NodeA", Node.class), scen.createCoord(100, 100));
-		Node b = nw.createNode(Id.create("NodeB", Node.class), scen.createCoord(5000, 5000));
-		Node u = nw.createNode(Id.create("NodeU", Node.class), scen.createCoord(99, 99));
-		Node v = nw.createNode(Id.create("NodeV", Node.class), scen.createCoord(5001, 5001));
+
+		Node a = nw.createNode(Id.create("NodeA", Node.class), new Coord((double) 100, (double) 100));
+		Node b = nw.createNode(Id.create("NodeB", Node.class), new Coord((double) 5000, (double) 5000));
+		Node u = nw.createNode(Id.create("NodeU", Node.class), new Coord((double) 99, (double) 99));
+		Node v = nw.createNode(Id.create("NodeV", Node.class), new Coord((double) 5001, (double) 5001));
 		Link ab = nw.createLink(Id.create("LinkAB", Link.class),a,b);
 		Link ua = nw.createLink(Id.create("LinkUA", Link.class),u,a);
 		Link bv = nw.createLink(Id.create("LinkBV", Link.class),b,v);

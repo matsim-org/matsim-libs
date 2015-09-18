@@ -13,7 +13,6 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
@@ -54,7 +53,7 @@ public class RunBraessSimulation {
 	private final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used: ALL_GREEN, ONE_SECOND_Z, GREEN_WAVE_Z, GREEN_WAVE_SO
-	private final SignalControlType SIGNAL_TYPE = SignalControlType.ONE_SECOND_Z;
+	private final SignalControlType SIGNAL_TYPE = SignalControlType.GREEN_WAVE_SO;
 	
 	// defines which kind of lanes should be used: NONE, TRIVIAL or REALISTIC
 	private static final LaneType LANE_TYPE = LaneType.REALISTIC;
@@ -64,7 +63,7 @@ public class RunBraessSimulation {
 	private final double SIGMA = 0.0;	
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
-	private static String INIT_FILE_DIR = DgPaths.SHAREDSVN + "projects/cottbus/data/scenarios/braess_scenario/";
+	private static String INIT_FILE_DIR = DgPaths.SHAREDSVN + "projects/cottbus/data/scenarios/braess_scenario/testRun/";
 
 	/**
 	 * prepare, run and analyze the Braess simulation
@@ -122,7 +121,7 @@ public class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 0 );
+		config.controler().setLastIteration( 100 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
@@ -199,7 +198,7 @@ public class RunBraessSimulation {
 		// use -0.000015 to approximately balance the utility of travel time and
 		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
 		// use -0.0 to use only time.)
-		config.planCalcScore().setMonetaryDistanceCostRateCar( -0.0 );
+		config.planCalcScore().setMonetaryDistanceRateCar( -0.0 );
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
@@ -214,9 +213,10 @@ public class RunBraessSimulation {
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
 		
-		if (WRITE_INITIAL_FILES){
-			new ConfigWriter(config).write(INIT_FILE_DIR + "config.xml");
-		}
+		// TODO enable this if you need the conig file
+//		if (WRITE_INITIAL_FILES){
+//			new ConfigWriter(config).write(INIT_FILE_DIR + "config.xml");
+//		}
 		
 		return config;
 	}
@@ -230,7 +230,7 @@ public class RunBraessSimulation {
 		netCreator.setLaneType( LANE_TYPE );
 		netCreator.createNetworkAndLanes();
 		
-		if (WRITE_INITIAL_FILES) netCreator.writeNetworkAndLanes(INIT_FILE_DIR + "network.xml");
+		if (WRITE_INITIAL_FILES) netCreator.writeNetworkAndLanes(INIT_FILE_DIR);
 	}
 
 	private void createPopulation(Scenario scenario) {
@@ -267,7 +267,7 @@ public class RunBraessSimulation {
 		if (month < 10)
 			monthStr = "0" + month;
 		String date = cal.get(Calendar.YEAR) + "-" 
-				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);		
+				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		
 		String runName = date;
 
@@ -329,9 +329,9 @@ public class RunBraessSimulation {
 		
 		if (SIGMA != 0.0)
 			runName += "_sigma" + SIGMA;
-		if (config.planCalcScore().getMonetaryDistanceCostRateCar() != 0.0)
+		if (config.planCalcScore().getMonetaryDistanceRateCar() != 0.0)
 			runName += "_distCost"
-					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
+					+ config.planCalcScore().getMonetaryDistanceRateCar();
 
 		if (LANE_TYPE.equals(LaneType.TRIVIAL)) {
 			runName += "_trivialLanes";
@@ -350,7 +350,7 @@ public class RunBraessSimulation {
 			runName += "_" + SIGNAL_TYPE;
 		}
 
-		String outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
+		String outputDir = DgPaths.RUNSSVN + "braess/withSignals/" + runName + "/"; //TODO change this, e.g. when considering tolls
 //		outputDir = "/Users/nagel/kairuns/braess/output";
 
 		config.controler().setOutputDirectory(outputDir);

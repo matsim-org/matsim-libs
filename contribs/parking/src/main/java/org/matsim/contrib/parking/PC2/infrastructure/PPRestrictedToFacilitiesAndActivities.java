@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.PC2.infrastructure;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;

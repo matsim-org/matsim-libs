@@ -21,10 +21,10 @@ package org.matsim.contrib.dynagent;
 
 public interface DynAgentLogic
 {
-    DynActivity computeInitialActivity(DynAgent agent);
-
-
     DynAgent getDynAgent();
+
+
+    DynActivity computeInitialActivity(DynAgent dynAgent);
 
 
     DynAction computeNextAction(DynAction oldAction, double now);

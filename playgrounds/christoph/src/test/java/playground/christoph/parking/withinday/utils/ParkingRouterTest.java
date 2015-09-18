@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -468,17 +469,19 @@ public class ParkingRouterTest extends MatsimTestCase {
 	private void createNetwork(Scenario scenario) {
 		
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
-		
-		Node n0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
-		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1000.0, 0.0));
-		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2000.0, 0.0));
-		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3000.0, 0.0));
-		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(4000.0, 0.0));
-		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(5000.0, 0.0));
-		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(1000.0, -1000.0));
-		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), scenario.createCoord(1000.0, -2000.0));
-		Node n8 = networkFactory.createNode(Id.create("n8", Node.class), scenario.createCoord(4000.0, 1000.0));
-		Node n9 = networkFactory.createNode(Id.create("n9", Node.class), scenario.createCoord(4000.0, 2000.0));
+
+		Node n0 = networkFactory.createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), new Coord(1000.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), new Coord(2000.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord(3000.0, 0.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord(4000.0, 0.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord(5000.0, 0.0));
+		double y1 = -1000.0;
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), new Coord(1000.0, y1));
+		double y = -2000.0;
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), new Coord(1000.0, y));
+		Node n8 = networkFactory.createNode(Id.create("n8", Node.class), new Coord(4000.0, 1000.0));
+		Node n9 = networkFactory.createNode(Id.create("n9", Node.class), new Coord(4000.0, 2000.0));
 		
 		scenario.getNetwork().addNode(n0);
 		scenario.getNetwork().addNode(n1);

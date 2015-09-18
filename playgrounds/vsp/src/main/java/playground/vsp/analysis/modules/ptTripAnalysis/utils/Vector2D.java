@@ -20,7 +20,6 @@
 package playground.vsp.analysis.modules.ptTripAnalysis.utils;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -117,7 +116,7 @@ public class Vector2D {
 	}
 	
 	public Coord getCoord(){
-		return new CoordImpl(this.x, this.y);
+		return new Coord(this.x, this.y);
 	}
 	
 	public Coordinate getCoordinate(){

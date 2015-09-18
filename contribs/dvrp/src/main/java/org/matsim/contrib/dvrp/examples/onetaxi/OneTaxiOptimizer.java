@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -51,10 +52,10 @@ public class OneTaxiOptimizer
         this.context = context;
         this.pathCalculator = calculator;
 
-        vehicle = context.getVrpData().getVehicles().get(0);
+        vehicle = context.getVrpData().getVehicles().values().iterator().next();
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
-        schedule.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(),
-                "wait"));
+        schedule.addTask(
+                new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
     }
 
 

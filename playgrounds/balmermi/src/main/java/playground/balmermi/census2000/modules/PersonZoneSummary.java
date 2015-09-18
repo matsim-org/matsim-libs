@@ -31,10 +31,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -234,37 +233,37 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		Id zone_id = p.getHousehold().getMunicipality().getZone().getId();
 		int[] vals = this.zones.get(zone_id);
 
 		vals[0]++;
 
-		if (M.equals(person.getSex())) { vals[1]++; }
-		else if (F.equals(person.getSex())) { vals[2]++; }
+		if (M.equals(PersonUtils.getSex(person))) { vals[1]++; }
+		else if (F.equals(PersonUtils.getSex(person))) { vals[2]++; }
 		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'sex' is wrong!"); }
 
-		if (person.getAge() < 6) { vals[3]++; }
-		else if (person.getAge() < 8) { vals[4]++; }
-		else if (person.getAge() < 15) { vals[5]++; }
-		else if (person.getAge() < 18) { vals[6]++; }
-		else if (person.getAge() < 66) { vals[7]++; }
+		if (PersonUtils.getAge(person) < 6) { vals[3]++; }
+		else if (PersonUtils.getAge(person) < 8) { vals[4]++; }
+		else if (PersonUtils.getAge(person) < 15) { vals[5]++; }
+		else if (PersonUtils.getAge(person) < 18) { vals[6]++; }
+		else if (PersonUtils.getAge(person) < 66) { vals[7]++; }
 		else { vals[8]++; }
 
-		if (YES.equals(person.getLicense())) { vals[9]++; }
-		else if (NO.equals(person.getLicense())) { vals[10]++; }
+		if (YES.equals(PersonUtils.getLicense(person))) { vals[9]++; }
+		else if (NO.equals(PersonUtils.getLicense(person))) { vals[10]++; }
 		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'license' is wrong!"); }
 
-		if (NEVER.equals(person.getCarAvail())) { vals[11]++; }
-		else if (SOMETIMES.equals(person.getCarAvail())) { vals[12]++; }
-		else if (ALWAYS.equals(person.getCarAvail())) { vals[13]++; }
+		if (NEVER.equals(PersonUtils.getCarAvail(person))) { vals[11]++; }
+		else if (SOMETIMES.equals(PersonUtils.getCarAvail(person))) { vals[12]++; }
+		else if (ALWAYS.equals(PersonUtils.getCarAvail(person))) { vals[13]++; }
 		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'car_avail' is wrong!"); }
 
-		if (person.isEmployed()) { vals[14]++; }
+		if (PersonUtils.isEmployed(person)) { vals[14]++; }
 		else { vals[15]++; }
 
-		if (!person.getTravelcards().isEmpty()) { vals[16]++; }
+		if (!PersonUtils.getTravelcards(person).isEmpty()) { vals[16]++; }
 		else { vals[17]++; }
 
 		int index = this.calcChainIndex(person.getSelectedPlan(),18); // returns 18-33

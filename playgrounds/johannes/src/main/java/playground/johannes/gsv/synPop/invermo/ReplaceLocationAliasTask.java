@@ -19,22 +19,22 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
  *
  */
-public class ReplaceLocationAliasTask implements ProxyPersonTask {
+public class ReplaceLocationAliasTask implements PersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
+	 * @see playground.johannes.synpop.processing.PersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		for(Episode plan : person.getEpisodes()) {
 			for(Attributable act : plan.getActivities()) {
 				String desc = act.getAttribute(InvermoKeys.LOCATION);

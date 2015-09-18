@@ -32,7 +32,7 @@ import org.jfree.data.gantt.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -45,7 +45,7 @@ public class ScheduleChartUtils
     }
 
 
-    public static <T extends Task> JFreeChart chartSchedule(List<? extends Vehicle> vehicles,
+    public static <T extends Task> JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles,
             DescriptionCreator<T> descriptionCreator, PaintSelector<T> paintSelector)
     {
         // data
@@ -59,8 +59,9 @@ public class ScheduleChartUtils
 
         // Y axis
         String[] series = new String[vehicles.size()];
-        for (int i = 0; i < series.length; i++) {
-            series[i] = vehicles.get(i).getId().toString();
+        int i = 0;
+        for (Vehicle v : vehicles) {
+            series[i++] = v.getId().toString();
         }
 
         SymbolAxis symbolAxis = new SymbolAxis("Vehicles", series);
@@ -178,7 +179,7 @@ public class ScheduleChartUtils
 
 
     private static <T extends Task> TaskSeriesCollection createScheduleDataset(
-            List<? extends Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
+            Collection<? extends Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
@@ -199,7 +200,7 @@ public class ScheduleChartUtils
                 String description = descriptionCreator.create(t);
 
                 TimePeriod duration = new SimpleTimePeriod(//
-                        new Date((int)Math.floor(t.getBeginTime() * 1000)),//
+                        new Date((int)Math.floor(t.getBeginTime() * 1000)), //
                         new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
                 scheduleTaskSeries.add(new ChartTask<T>(description, duration, t));

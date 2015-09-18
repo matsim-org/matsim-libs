@@ -122,12 +122,12 @@ public class PlanCalcScoreConfigGroupTest {
 				inputConfigGroup.getMarginalUtlOfWaitingPt_utils_hr() );
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRateCar "+msg,
-				initialGroup.getMonetaryDistanceCostRateCar(),
-				inputConfigGroup.getMonetaryDistanceCostRateCar() );
+				initialGroup.getMonetaryDistanceRateCar(),
+				inputConfigGroup.getMonetaryDistanceRateCar() );
 		Assert.assertEquals(
 				"wrong monetaryDistanceCostRatePt "+msg,
-				initialGroup.getMonetaryDistanceCostRatePt(),
-				inputConfigGroup.getMonetaryDistanceCostRatePt() );
+				initialGroup.getMonetaryDistanceRatePt(),
+				inputConfigGroup.getMonetaryDistanceRatePt() );
 		Assert.assertEquals(
 				"wrong pathSizeLogitBeta "+msg,
 				initialGroup.getPathSizeLogitBeta(),
@@ -215,15 +215,15 @@ public class PlanCalcScoreConfigGroupTest {
 					initialSettings.getMarginalUtilityOfTraveling(),
 					inputSettings.getMarginalUtilityOfTraveling() );
 			Assert.assertEquals(
-					"wrong monetaryDistanceCostRate "+msg,
-					initialSettings.getMonetaryDistanceCostRate(),
-					inputSettings.getMonetaryDistanceCostRate() );
+					"wrong monetaryDistanceRate "+msg,
+					initialSettings.getMonetaryDistanceRate(),
+					inputSettings.getMonetaryDistanceRate() );
 		}
 
 
 	}
 
-	private ConfigGroup toUnderscoredModule(final PlanCalcScoreConfigGroup initialGroup) {
+	private static ConfigGroup toUnderscoredModule(final PlanCalcScoreConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
@@ -253,7 +253,7 @@ public class PlanCalcScoreConfigGroupTest {
 			module.addParam( "constant_"+mode , ""+settings.getConstant() );
 			module.addParam( "marginalUtlOfDistance_"+mode , ""+settings.getMarginalUtilityOfDistance() );
 			module.addParam( "traveling_"+mode , ""+settings.getMarginalUtilityOfTraveling() );
-			module.addParam( "monetaryDistanceCostRate_"+mode , ""+settings.getMonetaryDistanceCostRate() );
+			module.addParam( "monetaryDistanceRate_"+mode , ""+settings.getMonetaryDistanceRate() );
 		}
 
 		return module;
@@ -276,8 +276,8 @@ public class PlanCalcScoreConfigGroupTest {
 		group.setMarginalUtlOfDistanceWalk( 8675 );
 		group.setMarginalUtlOfWaiting_utils_hr( 65798 );
 		group.setMarginalUtlOfWaitingPt_utils_hr( 9867 );
-		group.setMonetaryDistanceCostRateCar( 240358 );
-		group.setMonetaryDistanceCostRatePt( 9835 );
+		group.setMonetaryDistanceRateCar( 240358 );
+		group.setMonetaryDistanceRatePt( 9835 );
 		group.setPathSizeLogitBeta( 8 );
 		group.setPerforming_utils_hr( 678 );
 		group.setTraveling_utils_hr( 246 );
@@ -308,7 +308,7 @@ public class PlanCalcScoreConfigGroupTest {
 			settings.setConstant( random.nextDouble() );
 			settings.setMarginalUtilityOfDistance( random.nextDouble() );
 			settings.setMarginalUtilityOfTraveling( random.nextDouble() );
-			settings.setMonetaryDistanceCostRate( random.nextDouble() );
+			settings.setMonetaryDistanceRate( random.nextDouble() );
 
 			group.addParameterSet( settings );
 		}

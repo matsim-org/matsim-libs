@@ -34,7 +34,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -87,7 +86,7 @@ public class ShuffleCoords extends NewPopulation {
 
 			Plan plan = person.getPlans().get(0);
 
-			CoordImpl coordOfHomeAct = null;
+			Coord coordOfHomeAct = null;
 
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof ActivityImpl){
@@ -99,8 +98,8 @@ public class ShuffleCoords extends NewPopulation {
 					double scale = Math.sqrt((this.radius * this.radius)/(x * x + y * y)) * MatsimRandom.getRandom().nextDouble();
 
 					Coord oldCoord = this.coordTransform.transform(act.getCoord());
-					
-					CoordImpl shuffledCoords = new CoordImpl(oldCoord.getX() + x * scale, oldCoord.getY() + y * scale);
+
+					Coord shuffledCoords = new Coord(oldCoord.getX() + x * scale, oldCoord.getY() + y * scale);
 
 					if(this.homeActString != null){
 						if(act.getType().equalsIgnoreCase(this.homeActString)){

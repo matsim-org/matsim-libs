@@ -21,9 +21,9 @@ package playground.southafrica.projects.complexNetworks.pathDependence;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -88,7 +88,7 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 			currentNodeId = Id.create(atts.getValue(ATTR_NODE_ID), Node.class);
 			String x = atts.getValue(ATTR_X);
 			String y = atts.getValue(ATTR_Y);
-			network.addNewPathDependentNode(currentNodeId, new CoordImpl(x, y));
+			network.addNewPathDependentNode(currentNodeId, new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 		} else if(PRECEDING.equals(name)){
 			currentPrecedingId = Id.create(atts.getValue(ATTR_PRECEDING_ID), Node.class);
 		} else if (FOLLOWING.equals(name)){

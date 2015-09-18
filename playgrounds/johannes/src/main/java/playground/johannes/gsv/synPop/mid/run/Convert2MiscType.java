@@ -19,35 +19,35 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MiscType implements ProxyPlanTask {
+public class Convert2MiscType implements EpisodeTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
+	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {
 		for(Attributable act : plan.getActivities()) {
 			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 			if("pickdrop".equalsIgnoreCase(type)) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.MISC);
 			} else if("private".equalsIgnoreCase(type)) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.MISC);
 			} else if("intown".equalsIgnoreCase(type)) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.MISC);
 			} else if("outoftown".equalsIgnoreCase(type)) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.MISC);
 			} else if("unknown".equalsIgnoreCase(type)) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.MISC);
 			}
 			
 		}

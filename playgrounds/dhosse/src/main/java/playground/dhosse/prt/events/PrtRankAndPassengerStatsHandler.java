@@ -67,15 +67,15 @@ public class PrtRankAndPassengerStatsHandler implements ActivityStartEventHandle
 		
 		if(!vehicleId.toString().equals(event.getPersonId().toString())){
 			//it's not the driver
-			int indexOfVehicle = 0;
-			for(Vehicle v : this.context.getVrpData().getVehicles()){
+		    Vehicle vehicle = null;
+			for(Vehicle v : this.context.getVrpData().getVehicles().values()){
 				if(v.getId().equals(vehicleId)){
-					indexOfVehicle = this.context.getVrpData().getVehicles().indexOf(v);
+				    vehicle = v;
 					break;
 				}
 			}
 			
-			Link link = this.context.getScenario().getNetwork().getLinks().get(this.context.getVrpData().getVehicles().get(indexOfVehicle).getAgentLogic().getDynAgent().getCurrentLinkId());
+			Link link = this.context.getScenario().getNetwork().getLinks().get(vehicle.getAgentLogic().getDynAgent().getCurrentLinkId());
 			TaxiRank rank = this.data.getNearestRank(link);
 			
 			if(!this.rankIds2NumberOfBoardingPassengers.containsKey(rank.getId())){
@@ -124,15 +124,15 @@ public class PrtRankAndPassengerStatsHandler implements ActivityStartEventHandle
 		
 		if(!vehicleId.toString().equals(event.getPersonId().toString())){
 			//it's not the driver
-			int indexOfVehicle = 0;
-			for(Vehicle v : this.context.getVrpData().getVehicles()){
+			Vehicle vehicle = null;
+			for(Vehicle v : this.context.getVrpData().getVehicles().values()){
 				if(v.getId().equals(vehicleId)){
-					indexOfVehicle = this.context.getVrpData().getVehicles().indexOf(v);
+				    vehicle = v;
 					break;
 				}
 			}
 			
-			Link link = this.context.getScenario().getNetwork().getLinks().get(this.context.getVrpData().getVehicles().get(indexOfVehicle).getAgentLogic().getDynAgent().getCurrentLinkId());
+			Link link = this.context.getScenario().getNetwork().getLinks().get(vehicle.getAgentLogic().getDynAgent().getCurrentLinkId());
 			TaxiRank rank = this.data.getNearestRank(link);
 			
 			if(!this.rankIds2NumberOfAlightingPassengers.containsKey(rank.getId())){

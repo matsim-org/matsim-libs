@@ -24,25 +24,24 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.socnetsim.framework.scoring.GroupCompositionPenalizer;
+import org.matsim.contrib.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-import org.matsim.contrib.socnetsim.framework.scoring.GroupCompositionPenalizer;
-import org.matsim.contrib.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 
 /**
  * @author thibautd
@@ -64,7 +63,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
 		this.group = group;
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
 			typesNotToScore,
@@ -88,7 +87,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
+		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
 		this.group = group;
 		this.delegate = delegate;
 	}

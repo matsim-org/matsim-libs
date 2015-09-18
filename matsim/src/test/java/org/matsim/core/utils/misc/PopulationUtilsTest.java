@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,7 +39,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -82,19 +82,19 @@ public class PopulationUtilsTest {
 			{
 				Plan plan = pf.createPlan() ;
 
-				Activity act1 = pf.createActivityFromCoord("h", new CoordImpl(0.,0.) ) ;
+				Activity act1 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act1);
 				
 				Leg leg1 = pf.createLeg( TransportMode.car ) ;
 				plan.addLeg( leg1 ) ;
-				
-				Activity act2 = pf.createActivityFromCoord("w", new CoordImpl( 1000., 0. ) ) ;
+
+				Activity act2 = pf.createActivityFromCoord("w", new Coord(1000., 0.)) ;
 				plan.addActivity(act2) ;
 
 				Leg leg2 = pf.createLeg( TransportMode.car ) ;
 				plan.addLeg( leg2 ) ;
-				
-				Activity act3 = pf.createActivityFromCoord("h", new CoordImpl( 0., 0. ) ) ;
+
+				Activity act3 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act3) ;
 				
 				plan1 = plan ;
@@ -102,19 +102,19 @@ public class PopulationUtilsTest {
 			{
 				Plan plan = pf.createPlan() ;
 
-				Activity act1 = pf.createActivityFromCoord("h", new CoordImpl(0.,0.) ) ;
+				Activity act1 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act1);
 				
 				Leg leg1 = pf.createLeg( TransportMode.car ) ;
 				plan.addLeg( leg1 ) ;
-				
-				Activity act2 = pf.createActivityFromCoord("w", new CoordImpl( 1000., 0. ) ) ;
+
+				Activity act2 = pf.createActivityFromCoord("w", new Coord(1000., 0.)) ;
 				plan.addActivity(act2) ;
 
 				Leg leg2 = pf.createLeg( TransportMode.car ) ;
 				plan.addLeg( leg2 ) ;
-				
-				Activity act3 = pf.createActivityFromCoord("h", new CoordImpl( 0., 0. ) ) ;
+
+				Activity act3 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act3) ;
 				
 				plan2 = plan ;
@@ -122,19 +122,19 @@ public class PopulationUtilsTest {
 			{
 				Plan plan = pf.createPlan() ;
 
-				Activity act1 = pf.createActivityFromCoord("h", new CoordImpl(0.,0.) ) ;
+				Activity act1 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act1);
 				
 				Leg leg1 = pf.createLeg( TransportMode.car ) ;
 				plan.addLeg( leg1 ) ;
-				
-				Activity act2 = pf.createActivityFromCoord("s", new CoordImpl( 1000., 0. ) ) ;
+
+				Activity act2 = pf.createActivityFromCoord("s", new Coord(1000., 0.)) ;
 				plan.addActivity(act2) ;
 
 				Leg leg2 = pf.createLeg( TransportMode.bike ) ;
 				plan.addLeg( leg2 ) ;
-				
-				Activity act3 = pf.createActivityFromCoord("h", new CoordImpl( 0., 0. ) ) ;
+
+				Activity act3 = pf.createActivityFromCoord("h", new Coord(0., 0.)) ;
 				plan.addActivity(act3) ;
 				
 				plan3 = plan ;

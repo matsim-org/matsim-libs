@@ -22,7 +22,6 @@
 package playground.boescpa.av.staticDemand;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.boescpa.lib.tools.tripReader.Trip;
 
@@ -45,7 +44,7 @@ public class AVAssignment {
 	 * 			OR -1 if no AV currently satisfies all search conditions.
 	 */
 	public static int assignVehicleToRequest(Trip requestToHandle, List<AutonomousVehicle> availableAVs) {
-		final Coord requestStartLocation = new CoordImpl(requestToHandle.startXCoord, requestToHandle.startYCoord);
+		final Coord requestStartLocation = new Coord(requestToHandle.startXCoord, requestToHandle.startYCoord);
 
 		// --- Different search approaches: ---
 		//return getAbsoluteClosest(requestStartLocation, availableAVs);

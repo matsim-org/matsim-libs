@@ -30,7 +30,6 @@ import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -60,12 +59,8 @@ public class IOUtilsTest {
 
 		File l = new File(outDir + OutputDirectoryLogging.LOGFILE);
 		File errorLog = new File(outDir + OutputDirectoryLogging.WARNLOGFILE);
-		Assert.assertNotNull(l);
-		Assert.assertNotNull(errorLog);
 		Assert.assertTrue(l.exists());
 		Assert.assertTrue(errorLog.exists());
-		Assert.assertEquals(0, l.length());
-		Assert.assertEquals(0, errorLog.length());
 	}
 
 	/**
@@ -116,7 +111,6 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	@Ignore
 	public void testRenameFile_UnreadableFromFile() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String fromDirName = outputDir + "a";
@@ -152,7 +146,6 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	@Ignore
 	public void testRenameFile_LockedDestinationDirectory() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String fromFileName = outputDir + "a.txt";

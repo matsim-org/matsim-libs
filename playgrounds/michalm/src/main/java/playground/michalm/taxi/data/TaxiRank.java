@@ -32,20 +32,9 @@ public class TaxiRank
     private final Id<TaxiRank> id;
     private final String name;
     private final Link link;
-    private final static int STANDARDCAPACITY = 5000;
-    private int capacity;
+    private final int capacity;
 
-    private Queue<Vehicle> taxisInRank;
-
-
-    public TaxiRank(Id<TaxiRank> id, String name, Link link)
-    {
-        this.id = id;
-        this.name = name;
-        this.link = link;
-        this.capacity = STANDARDCAPACITY;
-        this.taxisInRank = new LinkedList<>();
-    }
+    private final Map<Id<Vehicle>, Vehicle> taxis = new HashMap<>();
 
 
     public TaxiRank(Id<TaxiRank> id, String name, Link link, int capacity)
@@ -54,8 +43,6 @@ public class TaxiRank
         this.name = name;
         this.link = link;
         this.capacity = capacity;
-        this.taxisInRank = new LinkedList<>();
-
     }
 
 
@@ -87,30 +74,23 @@ public class TaxiRank
 
     public boolean addTaxi(Vehicle veh)
     {
-        if (taxisInRank.size() < this.capacity) {
-            taxisInRank.add(veh);
-            return true;
+        if (taxis.size() == this.capacity) {
+            throw new IllegalStateException();
         }
-        else
-            return false;
+
+        taxis.put(veh.getId(), veh);
+        return true;
     }
 
 
     public void removeTaxi(Vehicle veh)
     {
-        this.taxisInRank.remove(veh);
-    }
-
-
-    public Vehicle getFirstTaxiFromRank()
-    {
-        return this.taxisInRank.poll();
+        taxis.remove(veh.getId());
     }
 
 
     public boolean hasCapacity()
     {
-        return (taxisInRank.size() < this.capacity);
+        return taxis.size() < this.capacity;
     }
-
 }

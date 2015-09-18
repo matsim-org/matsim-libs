@@ -20,12 +20,12 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -53,13 +53,13 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		if(iter.get() % logInterval == 0) {
 			long iterNow = iter.get();
 			double[] err = new double[population.size()];
 			double[] dist = new double[population.size()];
 			int i = 0;
-			for(PlainPerson person : population) {
+			for(Person person : population) {
 				err[i] = h.evaluate(person);
 				double sum = 0;
 				for(Attributable leg : person.getEpisodes().get(0).getLegs()) {

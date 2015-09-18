@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
@@ -73,7 +74,7 @@ public class CDREquilTest {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindMobsim().toProvider(QSimProvider.class);
+                        install(new QSimModule());
                     }
                 });
         controler.run();
@@ -102,7 +103,7 @@ public class CDREquilTest {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindMobsim().toProvider(QSimProvider.class);
+                        install(new QSimModule());
                     }
                 });
         controler.run();

@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -294,7 +294,7 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 		/*if (travelCards == null || travelCards.contains("ch-HT-mobility"))
 			distanceCost = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m;
 		else if (travelCards.contains("unknown"))

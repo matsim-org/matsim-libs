@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -84,13 +84,13 @@ public class ApplyCapacities {
 				Id<Node> idFromNode = Id.createNodeId((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {
-					fromNode = networkFactory.createNode(idFromNode, new CoordImpl(coords[0].x, coords[0].y));
+					fromNode = networkFactory.createNode(idFromNode, new Coord(coords[0].x, coords[0].y));
 					network.addNode(fromNode);
 				}
 				Id<Node> idToNode = Id.createNodeId((Long)feature.getAttribute("JNODE"));
 				Node toNode = network.getNodes().get(idToNode);
 				if(toNode==null) {
-					toNode = networkFactory.createNode(idToNode, new CoordImpl(coords[coords.length-1].x, coords[coords.length-1].y));
+					toNode = networkFactory.createNode(idToNode, new Coord(coords[coords.length - 1].x, coords[coords.length - 1].y));
 					network.addNode(toNode);
 				}
 				Link link = network.getFactory().createLink(Id.createLinkId(idFromNode+"-->"+idToNode), fromNode, toNode);

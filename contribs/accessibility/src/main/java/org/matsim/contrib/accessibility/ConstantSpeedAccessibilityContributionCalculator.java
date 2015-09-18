@@ -56,7 +56,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceCostRate() != 0. ) {
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceRate() != 0. ) {
 			log.error( "monetary distance cost rate for "+mode+" different from zero but not used in accessibility computations");
 		}
 
@@ -84,10 +84,10 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
 		// get the nearest link:
-        Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 
-        // captures the distance (as walk time) between the origin via the link to the node:
-        Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		// captures the distance (as walk time) between the origin via the link to the node:
+		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();
@@ -96,7 +96,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 		// distance to road, and then to node:
-        double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);

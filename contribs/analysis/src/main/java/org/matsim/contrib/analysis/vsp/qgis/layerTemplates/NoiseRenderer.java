@@ -11,11 +11,12 @@ import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 public class NoiseRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
+	private int size;
 	
-	public NoiseRenderer(VectorLayer layer) {
+	public NoiseRenderer(VectorLayer layer, double receiverPointGap) {
 
 		super(layer.getHeader(),layer);
-		
+		this.size = (int) receiverPointGap; // map units
 		this.init();
 		
 	}
@@ -34,7 +35,6 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		this.ranges[7] = new Range(75, 999, "> 75");
 
 		double sizeMapUnitScale[] = {0,0};
-		int size = 35;
 		
 		QGisPointSymbolLayer psl = new QGisPointSymbolLayer();
 		psl.setId(0);

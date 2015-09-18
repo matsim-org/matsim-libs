@@ -20,8 +20,9 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
@@ -33,7 +34,7 @@ public class MergePopulations {
 	private static final Logger logger = Logger.getLogger(MergePopulations.class);
 
 	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
 		parser.addToBlacklist("workLoc");
@@ -51,12 +52,12 @@ public class MergePopulations {
 		
 		logger.info("Loading persons...");
 		parser.parse(args[0]);
-		Set<PlainPerson> persons1 = parser.getPersons();
+		Set<PlainPerson> persons1 = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons1.size()));
 
 		logger.info("Loading persons...");
 		parser.parse(args[1]);
-		Set<PlainPerson> persons2 = parser.getPersons();
+		Set<PlainPerson> persons2 = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 
 //		logger.info("Loading persons...");

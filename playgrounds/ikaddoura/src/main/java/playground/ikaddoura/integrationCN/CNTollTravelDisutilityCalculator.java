@@ -60,7 +60,7 @@ public class CNTollTravelDisutilityCalculator implements TravelDisutility{
 	public CNTollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseContext noiseContext, TollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
+		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceRateCar();
 		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0); // TODO: make this dependent on the agent-specific time pressure...
 		this.noiseContext = noiseContext;		
 		this.tollHandler = tollHandler;

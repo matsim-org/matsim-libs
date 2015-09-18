@@ -19,7 +19,6 @@
 
 package playground.mrieser.svi.controller;
 
-import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -30,6 +29,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Provider;
 
 import playground.mrieser.svi.converters.DynusTNetworkReader;
 import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
@@ -92,9 +93,9 @@ public abstract class DynusTUtils {
 				}
 			});
 			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
-			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 		} else {
-			controler.setScoringFunctionFactory(new MixedScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+			controler.setScoringFunctionFactory(new MixedScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create()));
 		}
 	}
 }

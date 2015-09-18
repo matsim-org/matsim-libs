@@ -66,7 +66,7 @@ public class Injector {
         List<com.google.inject.Module> guiceModules = new ArrayList<>();
         for (AbstractModule module : modules) {
             bootstrapInjector.injectMembers(module);
-            guiceModules.add(AbstractModule.toGuiceModule(module));
+            guiceModules.add(module);
         }
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
         System.out.flush() ; System.err.flush(); 

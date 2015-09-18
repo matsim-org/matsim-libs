@@ -23,7 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -32,10 +36,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.contrib.signals.model.SignalSystem;
 
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
@@ -69,8 +72,11 @@ public class DaganzoRunner {
 		else {
 			conf = configFile;
 		}
-		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
-		ScenarioImpl scenario = (ScenarioImpl) scenarioLoader.loadScenario();
+		
+		Config config = ConfigUtils.loadConfig(conf);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
 		
 //		if (scenario.getConfig().signalSystems().getSignalSystemConfigFile() == null){
 //			DaganzoScenarioGenerator scgenerator = new DaganzoScenarioGenerator();

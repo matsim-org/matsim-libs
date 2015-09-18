@@ -38,6 +38,7 @@ import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
+import playground.ikaddoura.noise2.utils.ProcessNoiseImmissions;
 
 /**
  * 
@@ -49,8 +50,6 @@ public class NoiseOnlineControler {
 	private static final Logger log = Logger.getLogger(NoiseOnlineControler.class);
 
 	private static String configFile;
-	private static String setup;
-	private static String approach;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -59,64 +58,40 @@ public class NoiseOnlineControler {
 			configFile = args[0];
 			log.info("Config file: " + configFile);
 			
-			setup = args[1];		
-			log.info("Setup: " + setup);
-			
-			approach = args[2];		
-			log.info("Approach: " + approach);
-			
 		} else {
 			
 			configFile = "/Users/ihab/Desktop/test/config.xml";
-			setup = "berlin1";
-			approach = "averageCost";
 		}
 				
 		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
 		noiseImmissionControler.run(configFile);
 	}
 
-	private void run(String configFile) {
+	public void run(String configFile) {
 		
 		// grid parameters
 		
 		GridParameters gridParameters = new GridParameters();
 		
+		// modify the default grid parameters
+		
+		gridParameters.setReceiverPointGap(100.);
+		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
-				
-		if (setup.equals("berlin1")) {
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);			
 			
-			gridParameters.setReceiverPointGap(100.);
-			
-			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-			gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
-		} else if (setup.equals("berlin2")) {
-		
-			gridParameters.setReceiverPointGap(100.);
-	
-			String[] consideredActivitiesForDamages = {"home"};
-			gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
-			
-		} else {
-			throw new RuntimeException("Unknown parameter setup. Aborting...");
-		}
+		// ...
 		
 		// noise parameters
-		
+
 		NoiseParameters noiseParameters = new NoiseParameters();
 		
-		if (approach.equals("averageCost")) {
-			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.AverageCost);
+		// modify the default noise parameters
 		
-		} else if (approach.equals("marginalCost")) {
-			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
-		
-		} else {
-			throw new RuntimeException("Unknown noise allocation approach. Aborting...");
-		}
-		
+		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
@@ -164,6 +139,8 @@ public class NoiseOnlineControler {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
 				
+		// ...
+		
 		// controler
 		
 		Controler controler = new Controler(configFile);
@@ -181,6 +158,15 @@ public class NoiseOnlineControler {
 		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
+		
+		log.info("Processing the noise immissions...");
+		
+		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immisions/";
+		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+
+		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, gridParameters.getReceiverPointGap());
+		readNoiseFile.run();
+		
 	}
 	
 }

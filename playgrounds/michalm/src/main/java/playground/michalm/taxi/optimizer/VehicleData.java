@@ -57,7 +57,7 @@ public class VehicleData
     {
         TaxiScheduler scheduler = optimConfig.scheduler;
         int idleCounter = 0;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+        for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
             LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(v);
 
             if (departure != null) {

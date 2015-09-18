@@ -25,9 +25,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -35,12 +37,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -99,8 +98,7 @@ public class TravelTimeFourWaysTest {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
 		
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
@@ -119,8 +117,7 @@ public class TravelTimeFourWaysTest {
 	public void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans_uturn.xml.gz");
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventsManager events = EventsUtils.createEventsManager();

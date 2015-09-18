@@ -27,9 +27,9 @@ import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.michalm.zone.*;
-
 import com.vividsolutions.jts.geom.*;
+
+import playground.michalm.zone.*;
 
 
 public class PoznanTaxiZoneReader
@@ -78,9 +78,9 @@ public class PoznanTaxiZoneReader
 
             StringTokenizer st = new StringTokenizer(line, ",xy=");
             String id = st.nextToken();
-            String x = st.nextToken();
-            String y = st.nextToken();
-            coords.put(id, ct.transform(new CoordImpl(x, y)));
+            double x = Double.parseDouble(st.nextToken());
+            double y = Double.parseDouble(st.nextToken());
+            coords.put(id, ct.transform(new Coord(x, y)));
         }
     }
 

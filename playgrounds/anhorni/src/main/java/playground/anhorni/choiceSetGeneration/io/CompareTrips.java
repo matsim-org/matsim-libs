@@ -31,7 +31,6 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
@@ -167,9 +166,8 @@ public class CompareTrips {
 				String tripNr = entries[3].trim();
 				
 				Id<Person> id = Id.create(HHNR + ZIELPNR + tripNr, Person.class);
-				
-				Coord coord = new CoordImpl(
-						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
+
+				Coord coord = new Coord(Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
 				
 				double startTime = 60* Double.parseDouble(entries[5].trim());
 				

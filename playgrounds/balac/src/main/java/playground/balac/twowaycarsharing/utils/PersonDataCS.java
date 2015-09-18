@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -33,7 +33,7 @@ public class PersonDataCS {
 		for(Person p: scenario.getPopulation().getPersons().values()){
 			boolean rb = false;
 			boolean ff = false;
-			PersonImpl pImpl = (PersonImpl) p;
+			Person pImpl = p;
 			Plan plan = p.getSelectedPlan();
 			
 			for (PlanElement pe: plan.getPlanElements()) {
@@ -42,18 +42,18 @@ public class PersonDataCS {
 					
 					if (((Leg) pe).getMode().equals("cs_fix_gas") && !rb) {
 						outLinkrb.write(p.getId().toString() + " ");
-						outLinkrb.write(Integer.toString(pImpl.getAge()) + " ");
-						outLinkrb.write(pImpl.getSex() + " ");
-						outLinkrb.write(pImpl.getCarAvail());
+						outLinkrb.write(Integer.toString(PersonUtils.getAge(pImpl)) + " ");
+						outLinkrb.write(PersonUtils.getSex(pImpl) + " ");
+						outLinkrb.write(PersonUtils.getCarAvail(pImpl));
 						outLinkrb.newLine();
 						rb = true;
 						
 					}
 					else if (((Leg) pe).getMode().equals("cs_flex_gas") && !ff) {
 						outLinkff.write(p.getId().toString() + " ");
-						outLinkff.write(Integer.toString(pImpl.getAge()) + " ");
-						outLinkff.write(pImpl.getSex() + " ");
-						outLinkff.write(pImpl.getCarAvail());
+						outLinkff.write(Integer.toString(PersonUtils.getAge(pImpl)) + " ");
+						outLinkff.write(PersonUtils.getSex(pImpl) + " ");
+						outLinkff.write(PersonUtils.getCarAvail(pImpl));
 						outLinkff.newLine();
 						ff = true;
 					}

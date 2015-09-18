@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -64,7 +63,7 @@ public class MaximumNumberOfWorkers {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_TM);
 		GeometryFactory factory = new GeometryFactory();
 		while(buildingsR.next()) {
-			Coord buildingCoord = coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			Coord buildingCoord = coordinateTransformation.transform(new Coord(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			Point p = factory.createPoint(new Coordinate(buildingCoord.getX(), buildingCoord.getY()));
 			for(Entry<Id<ActivityFacility>, Polygon> polygon:masterAreas.entrySet())
 				if(p.within(polygon.getValue())) {

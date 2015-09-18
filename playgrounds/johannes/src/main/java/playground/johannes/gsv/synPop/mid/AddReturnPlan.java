@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainEpisode;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,17 +32,17 @@ import java.util.Set;
  * @author johannes
  * 
  */
-public class AddReturnPlan implements ProxyPersonTask {
+public class AddReturnPlan implements PersonTask {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.PersonTask#apply(playground.johannes
 	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		Set<Episode> journeys = new HashSet<>();
 		for (Episode p : person.getEpisodes()) {
 			if ("midjourneys".equalsIgnoreCase(p.getAttribute("datasource"))) {

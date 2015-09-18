@@ -19,27 +19,31 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import org.apache.commons.lang.StringUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
+import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * @author johannes
  */
 public class Episodes2Matrix {
+
+    private static final Logger logger = Logger.getLogger(Episodes2Matrix.class);
 
     public static final String DIMIDO = "dimido";
 
@@ -49,61 +53,91 @@ public class Episodes2Matrix {
 
     private static final String DIM_SEPARATOR = ".";
 
-    public static void main(String[] args) throws IOException {
-        String in = null;
-        String rootDir = null;
+    private static final String DBG_TOUCHED = "dbg_touched";
 
-        XMLParser reader = new XMLParser();
+    public static void main(String[] args) throws IOException {
+        String in = args[0];
+        String rootDir = args[1];
+
+        logger.info("Loading persons...");
+        XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
         reader.parse(in);
+        Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
+        logger.info(String.format("Loaded %s persons.", persons.size()));
 
-        Collection<PlainPerson> persons = reader.getPersons();
+        logger.info("Restoring original activity types...");
+        TaskRunner.run(new RestoreActTypes(), persons, true);
+        logger.info("Replacing misc types...");
+        new ReplaceMiscType().apply(persons);
+        logger.info("Imputing month attributes...");
+        new ImputeMonth().apply(persons);
+        logger.info("Assigning leg purposes...");
+        TaskRunner.run(new SetLegPurposes(), persons);
+        logger.info("Inferring wecommuter purpose...");
+        TaskRunner.run(new InfereWeCommuter(100000), persons);
 
         Map<String, LegPredicate> modePreds = new LinkedHashMap<>();
         modePreds.put("car", new LegKeyValuePredicate(CommonKeys.LEG_MODE, "car"));
 
         Map<String, LegPredicate> purposePreds = new LinkedHashMap<>();
-        purposePreds.put(ActivityType.BUISINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.BUISINESS));
-        purposePreds.put(ActivityType.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION));
-        purposePreds.put(ActivityType.LEISURE, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE));
-        purposePreds.put(ActivityType.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.SHOP));
-        purposePreds.put(ActivityType.WORK, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.WORK));
-        purposePreds.put(ActivityType.VACATIONS_SHORT, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType
+        purposePreds.put(ActivityTypes.BUSINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS));
+        purposePreds.put(ActivityTypes.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION));
+
+        PredicateORComposite leisurePred = new PredicateORComposite();
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.LEISURE));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "visit"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "gastro"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "culture"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "private"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "pickdrop"));
+        leisurePred.addComponent(new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, "sport"));
+
+        purposePreds.put(ActivityTypes.LEISURE, leisurePred);
+        purposePreds.put(ActivityTypes.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.SHOP));
+        purposePreds.put(ActivityTypes.WORK, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.WORK));
+        purposePreds.put(ActivityTypes.VACATIONS_SHORT, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes
                 .VACATIONS_SHORT));
-        purposePreds.put(ActivityType.VACATIONS_LONG, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.VACATIONS_LONG));
+        purposePreds.put(ActivityTypes.VACATIONS_LONG, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_LONG));
         purposePreds.put(InfereWeCommuter.WECOMMUTER, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, InfereWeCommuter
                 .WECOMMUTER));
 
         Map<String, LegPredicate> dayPreds = new LinkedHashMap<>();
-        dayPreds.put(CommonKeys.MONDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.MONDAY));
-        dayPreds.put(CommonKeys.FRIDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.FRIDAY));
-        dayPreds.put(CommonKeys.SATURDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.SATURDAY));
-        dayPreds.put(CommonKeys.SUNDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.SUNDAY));
+        dayPreds.put(CommonValues.MONDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.MONDAY));
+        dayPreds.put(CommonValues.FRIDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.FRIDAY));
+        dayPreds.put(CommonValues.SATURDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.SATURDAY));
+        dayPreds.put(CommonValues.SUNDAY, new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.SUNDAY));
         PredicateORComposite dimidoPred = new PredicateORComposite();
-        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.TUESDAY));
-        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.WEDNESDAY));
-        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonKeys.THURSDAY));
+        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.TUESDAY));
+        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.WEDNESDAY));
+        dimidoPred.addComponent(new PersonKeyValuePredicate(CommonKeys.DAY, CommonValues.THURSDAY));
         dayPreds.put(DIMIDO, dimidoPred);
 
         Map<String, LegPredicate> seasonPreds = new LinkedHashMap<>();
         PredicateORComposite summerPred = new PredicateORComposite();
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.APRIL));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.MAY));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.JUNE));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.JULY));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.AUGUST));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.SEPTEMBER));
-        summerPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.OCTOBER));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.APRIL));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.MAY));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.JUNE));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.JULY));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.AUGUST));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.SEPTEMBER));
+        summerPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.OCTOBER));
         seasonPreds.put(SUMMER, summerPred);
         PredicateORComposite winterPred = new PredicateORComposite();
-        winterPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.NOVEMBER));
-        winterPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.DECEMBER));
-        winterPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.JANUARY));
-        winterPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.FEBRUARY));
-        winterPred.addComponent(new PersonKeyValuePredicate(MIDKeys.PERSON_MONTH, MIDKeys.MARCH));
+        winterPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.NOVEMBER));
+        winterPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.DECEMBER));
+        winterPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.JANUARY));
+        winterPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.FEBRUARY));
+        winterPred.addComponent(new PersonKeyValuePredicate(MiDKeys.PERSON_MONTH, MiDValues.MARCH));
         seasonPreds.put(WINTER, winterPred);
 
         Map<String, LegPredicate> directionPreds = new LinkedHashMap<>();
+        directionPreds.put(DirectionPredicate.OUTWARD, new DirectionPredicate(DirectionPredicate.OUTWARD));
+        directionPreds.put(DirectionPredicate.RETURN, new DirectionPredicate(DirectionPredicate.RETURN));
+        directionPreds.put(DirectionPredicate.INTERMEDIATE, new DirectionPredicate(DirectionPredicate.INTERMEDIATE));
+
+        logger.info("Extracting full matrix...");
+        KeyMatrixTxtIO.write(getMatrix(persons, modePreds.get("car")), String.format("%s/car.txt.gz", rootDir));
 
         for (Map.Entry<String, LegPredicate> mode : modePreds.entrySet()) {
             for (Map.Entry<String, LegPredicate> purpose : purposePreds.entrySet()) {
@@ -118,8 +152,6 @@ public class Episodes2Matrix {
                             comp.addComponent(season.getValue());
                             comp.addComponent(direction.getValue());
 
-                            KeyMatrix m = getMatrix(persons, comp);
-
                             StringBuilder builder = new StringBuilder();
                             builder.append(mode.getKey());
                             builder.append(DIM_SEPARATOR);
@@ -131,13 +163,34 @@ public class Episodes2Matrix {
                             builder.append(DIM_SEPARATOR);
                             builder.append(direction.getKey());
 
-                            String out = String.format("%s/%s.txt", rootDir, builder.toString());
+                            logger.info(String.format("Extracting matrix %s...", builder.toString()));
+                            KeyMatrix m = getMatrix(persons, comp);
+
+                            String out = String.format("%s/%s.txt.gz", rootDir, builder.toString());
                             KeyMatrixTxtIO.write(m, out);
                         }
                     }
                 }
             }
         }
+
+        int cnt = 0;
+        for(Person person : persons) {
+            for(Episode episode : person.getEpisodes()) {
+                for(Segment leg : episode.getLegs()) {
+                    String touched = leg.getAttribute(DBG_TOUCHED);
+                    if(touched == null) {
+                        leg.setAttribute(DBG_TOUCHED, "0");
+                        cnt++;
+                    }
+                }
+            }
+        }
+        logger.info(String.format("%s trips are untouched.", cnt));
+
+        XMLWriter writer = new XMLWriter();
+        writer.write(rootDir + "/plans.xml.gz", persons);
+        logger.info("Done.");
     }
 
     private static KeyMatrix getMatrix(Collection<PlainPerson> persons, LegPredicate pred) {
@@ -154,12 +207,14 @@ public class Episodes2Matrix {
                         String origin = prev.getAttribute(SetZones.ZONE_KEY);
                         String dest = next.getAttribute(SetZones.ZONE_KEY);
 
-                        Double volume = m.get(origin, dest);
-                        if (volume == null) volume = 0.0;
+                        if(origin != null && dest != null) {
+                            m.add(origin, dest, 1);
 
-                        volume++;
-
-                        m.set(origin, dest, volume);
+                            String touched = leg.getAttribute(DBG_TOUCHED);
+                            int cnt = 0;
+                            if(touched != null) cnt = Integer.parseInt(touched);
+                            leg.setAttribute(DBG_TOUCHED, String.valueOf(cnt + 1));
+                        }
                     }
                 }
             }

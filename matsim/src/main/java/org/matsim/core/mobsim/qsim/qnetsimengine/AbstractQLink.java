@@ -112,6 +112,8 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 * Links are active while (see checkForActivity()): () vehicles move on it; () vehicles wait to enter; () vehicles wait at the transit stop.
 	 * Once all of those have left the link, the link is no longer active.  It then needs to be activated from the outside, which is done by
 	 * this method.
+	 * <br>
+	 * seems ok as public interface function. kai, aug'15
 	 */
 	void activateLink() {
 		if (!this.active) {
@@ -143,7 +145,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
-	/*package*/ final void addDepartingVehicle(MobsimVehicle mvehicle) {
+	private final void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle;
 		this.waitingList.add(vehicle);
 		vehicle.setCurrentLink(this.getLink());

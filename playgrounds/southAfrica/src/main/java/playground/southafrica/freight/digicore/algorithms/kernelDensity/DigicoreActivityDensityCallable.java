@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -73,7 +72,7 @@ public class DigicoreActivityDensityCallable implements Callable<String> {
 				Point p = gf.createPoint(new Coordinate(activity.getCoord().getX(), activity.getCoord().getY()));
 				if(envelope.contains(p)){
 					if(polygon.contains(p)){
-						list.add(new CoordImpl(p.getX(), p.getY()));
+						list.add(new Coord(p.getX(), p.getY()));
 					}
 				}
 			}

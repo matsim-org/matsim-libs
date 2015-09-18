@@ -36,11 +36,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -94,7 +92,6 @@ public class NmbmSurveyParser {
 
 	public NmbmSurveyParser() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
 		this.locationlessPersons = new HashMap<>();
 		this.locationlessType = new HashMap<String, Integer>();
 	}
@@ -184,7 +181,7 @@ public class NmbmSurveyParser {
 		population.setName("Nelson Mandela 2004 travel survey population");
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
-		PersonImpl person = null;
+		Person person = null;
 		PlanImpl plan = null;
 		try{
 			String line = br.readLine(); /* Header */
@@ -258,13 +255,13 @@ public class NmbmSurveyParser {
 						}
 						
 						/* Create new person. */
-						person = (PersonImpl) population.getFactory().createPerson(personId);
-						person.setSex(gender);
+						person = population.getFactory().createPerson(personId);
+						PersonUtils.setSex(person, gender);
 						if(age > 0){
-							person.setAge(age);
+							PersonUtils.setAge(person, age);
 						}
-						person.setEmployed(isEmployed);
-						person.setCarAvail(hasCar);
+						PersonUtils.setEmployed(person, isEmployed);
+						PersonUtils.setCarAvail(person, hasCar);
 						plan = (PlanImpl) population.getFactory().createPlan();
 						
 						/* Add the first activity. */
@@ -395,8 +392,8 @@ public class NmbmSurveyParser {
 		double radius = Math.random()*randomRadius;
 		double newX = coord.getX() + radius*Math.cos(angle);
 		double newY = coord.getY() + radius*Math.sin(angle);
-		
-		return new CoordImpl(newX, newY);
+
+		return new Coord(newX, newY);
 	}
 	
 	
@@ -415,8 +412,8 @@ public class NmbmSurveyParser {
 		double radius = Math.random()*randomRadius;
 		double newX = coord.getX() + radius*Math.cos(angle);
 		double newY = coord.getY() + radius*Math.sin(angle);
-		
-		return new CoordImpl(newX, newY);
+
+		return new Coord(newX, newY);
 	}
 
 
@@ -579,7 +576,7 @@ public class NmbmSurveyParser {
 		}
 		double x = mz.getInteriorPoint().getX();
 		double y = mz.getInteriorPoint().getY();
-		return new CoordImpl(x, y);
+		return new Coord(x, y);
 	}
 
 	

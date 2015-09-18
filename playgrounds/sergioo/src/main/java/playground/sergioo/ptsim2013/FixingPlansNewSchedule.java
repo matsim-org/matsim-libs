@@ -5,10 +5,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -30,12 +30,14 @@ public class FixingPlansNewSchedule {
 				for(PlanElement planElement:plan.getPlanElements())
 					if(planElement instanceof Leg && ((Leg)planElement).getMode().equals("pt")) {
 						total++;
-						GenericRoute route = (GenericRoute) ((Leg)planElement).getRoute();
+						Route route = ((Leg)planElement).getRoute();
 						if(route==null)
 							numNull++;
 						else {
 							ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) factory.createRoute(route.getStartLinkId(), route.getEndLinkId());
-							eRoute.setRouteDescription(route.getStartLinkId(), route.getRouteDescription(), route.getEndLinkId());
+							eRoute.setStartLinkId(route.getStartLinkId());
+							eRoute.setEndLinkId(route.getEndLinkId());
+							eRoute.setRouteDescription(route.getRouteDescription());
 							if(scenario2.getTransitSchedule().getTransitLines().get(eRoute.getLineId())==null) {
 								noLine++;
 								System.out.println(eRoute.getLineId());
@@ -43,7 +45,7 @@ public class FixingPlansNewSchedule {
 							}
 							else if(scenario2.getTransitSchedule().getTransitLines().get(eRoute.getLineId()).getRoutes().get(eRoute.getRouteId())==null) {
 								if(eRoute.getRouteId().toString().contains("-p")) {
-									route.setRouteDescription(route.getStartLinkId(), route.getRouteDescription().replaceFirst("-p===", "==="), route.getEndLinkId());
+									route.setRouteDescription(route.getRouteDescription().replaceFirst("-p===", "==="));
 									noRouteWithP++;
 								}
 								noRoute++;

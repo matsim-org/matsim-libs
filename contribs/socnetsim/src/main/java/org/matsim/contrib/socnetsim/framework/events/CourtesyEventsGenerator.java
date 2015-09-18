@@ -94,6 +94,21 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 			final double time) {
 		// TODO: handle wraparound (done improperly because we track people from their second act...)
 		final Set< Id<Person> > alters = socialNetwork.getAlters( ego );
+
+		switch ( type ) {
+			case sayGoodbyeEvent:
+				// avoid problems with wrap-around: do not say goodbye before being tracked.
+				// this caused problems with agents having leisure at home.
+				// solution would be to track the agents from the start of the simulation
+				if ( !MapUtils.getSet( facility , personsAtFacility ).remove( ego ) ) return;
+				break;
+			case sayHelloEvent:
+				MapUtils.getSet( facility , personsAtFacility ).add( ego );
+				break;
+			default:
+				throw new RuntimeException( type+"?" );
+		}
+
 		for ( Id<Person> present : MapUtils.getSet( facility , personsAtFacility ) ) {
 			if ( alters.contains( present ) ) {
 				events.processEvent(
@@ -109,17 +124,6 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 							ego,
 							type ) );
 			}
-		}
-
-		switch ( type ) {
-			case sayGoodbyeEvent:
-				MapUtils.getSet( facility , personsAtFacility ).remove( ego );
-				break;
-			case sayHelloEvent:
-				MapUtils.getSet( facility , personsAtFacility ).add( ego );
-				break;
-			default:
-				throw new RuntimeException( type+"?" );
 		}
 	}
 }

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -67,8 +66,8 @@ public class DigicoreCluster implements Identifiable<DigicoreCluster>{
 				}			
 				double xCenter = xTotal / (double) activities.size();
 				double yCenter = yTotal / (double) activities.size();
-				
-				centerOfGravity = new CoordImpl(xCenter, yCenter);			
+
+				centerOfGravity = new Coord(xCenter, yCenter);
 			} else{
 				throw new IllegalArgumentException("Not enough points in cluster " + clusterId + " to calculate a center of gravity!");
 			}			
@@ -77,7 +76,7 @@ public class DigicoreCluster implements Identifiable<DigicoreCluster>{
 			 * FIXME There is a chance that the hull is an empty geometry. */
 			Point centroid = this.concaveHull.getCentroid();
 			if(!centroid.isEmpty()){
-				centerOfGravity = new CoordImpl(centroid.getX(), centroid.getY());				
+				centerOfGravity = new Coord(centroid.getX(), centroid.getY());
 			} else{
 				log.warn("Cannot set centre of gravity for an empty point!!");
 				log.debug("   --> Unique facility identifier: " + this.getId().toString());

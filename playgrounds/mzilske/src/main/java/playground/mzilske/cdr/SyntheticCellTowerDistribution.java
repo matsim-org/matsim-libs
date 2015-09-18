@@ -1,8 +1,8 @@
 package playground.mzilske.cdr;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ class SyntheticCellTowerDistribution {
 			int idY = 0;
 			for (double y=minY; y<maxY; y+=GRID_SIZE) {
 				String id = idX + "_" + idY;
-				cellTowerMap.put(id, new CellTower(id, new CoordImpl(x + Math.random()*GRID_SIZE/10,y + Math.random()*GRID_SIZE/10)));
+				cellTowerMap.put(id, new CellTower(id, new Coord(x + Math.random() * GRID_SIZE / 10, y + Math.random() * GRID_SIZE / 10)));
 				++idY;
 			}
 			++idX;

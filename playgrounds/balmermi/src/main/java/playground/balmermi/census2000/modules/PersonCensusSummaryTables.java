@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -88,7 +88,7 @@ public class PersonCensusSummaryTables extends AbstractPersonAlgorithm implement
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 		playground.balmermi.census2000.data.MyPerson p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
@@ -97,12 +97,12 @@ public class PersonCensusSummaryTables extends AbstractPersonAlgorithm implement
 			out.write(hh.getId() + "\t");
 			out.write(hh.getCoord().getX() + "\t");
 			out.write(hh.getCoord().getY() + "\t");
-			out.write(person.getAge() + "\t");
-			out.write(person.getSex() + "\t");
+			out.write(PersonUtils.getAge(person) + "\t");
+			out.write(PersonUtils.getSex(person) + "\t");
 			out.write(p.isSwiss() + "\t");
-			out.write(person.isEmployed() + "\t");
-			out.write(person.getCarAvail() + "\t");
-			out.write(person.getLicense() + "\t");
+			out.write(PersonUtils.isEmployed(person) + "\t");
+			out.write(PersonUtils.getCarAvail(person) + "\t");
+			out.write(PersonUtils.getLicense(person) + "\t");
 			out.write(hh.getCategory() + "\t");
 			out.write(hh.getPersonCount() + "\t");
 			out.write(hh.getKidCount() + "\t");

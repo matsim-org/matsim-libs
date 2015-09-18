@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -51,7 +50,7 @@ public class RoutesPopulation implements PersonAlgorithm {
 				}
 			}
 			else if(((Leg)planElement).getMode().equals("pt")) {
-				String[] parts = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split("===");
+				String[] parts = (((Leg)planElement).getRoute()).getRouteDescription().split("===");
 				Coord startCoord = MainRoutes.transformation.transform(scenario.getTransitSchedule().getFacilities().get(Id.create(parts[1], TransitStopFacility.class)).getCoord());
 				Coord endCoord = MainRoutes.transformation.transform(scenario.getTransitSchedule().getFacilities().get(Id.create(parts[4], TransitStopFacility.class)).getCoord());
 				journey.trips.add(new Trip((float)((Leg)planElement).getTravelTime(), MainRoutes.getDistance(scenario.getNetwork(), scenario.getTransitSchedule(), parts), parts[1], parts[4], new Time((long)(((Leg)planElement).getDepartureTime()*1000)), startCoord.getY(), startCoord.getX(), endCoord.getY(), endCoord.getX()));

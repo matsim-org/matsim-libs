@@ -49,7 +49,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -77,7 +76,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private static final String COUNTVALUE = "Count Value: ";
 	private static final String MATSIMVALUE = "MATSim Value: ";
 	private static final String RELERROR = "Relative Error: ";
-	private static final String IMG = "<img src=\"./";
+	private static final String IMG = "<img src=\"../";
 	private static final String IMGEND = "\">";
 	private static final String H24OVERVIEW = "24 h overview";
 	private static final String DETAILSFROM = "Details from ";
@@ -434,7 +433,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		double length = Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 		double scale = 0.4;
 		scale = l.getLength() * scale;
-		Coord vec = new CoordImpl(coordFrom.getX() + (xDiff * scale/length), coordFrom.getY() + (yDiff * scale/length));
+		Coord vec = new Coord(coordFrom.getX() + (xDiff * scale / length), coordFrom.getY() + (yDiff * scale / length));
 		return vec;
 	}
 	/**

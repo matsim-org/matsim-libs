@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import playground.boescpa.lib.tools.tripReader.Trip;
 
@@ -57,7 +56,7 @@ public class InitialSupplyCreator {
 		Counter counter = new Counter(" AV ");
 		for (int i = 0; i < Math.round(share*agents.size()); i++) {
 			Trip referenceTrip = demand.get(agents.get(random.nextInt(agents.size())));
-			Coord initialPosition = new CoordImpl(referenceTrip.startXCoord, referenceTrip.startYCoord);
+			Coord initialPosition = new Coord(referenceTrip.startXCoord, referenceTrip.startYCoord);
 			autonomousVehicles.add(new AutonomousVehicle(initialPosition));
 			counter.incCounter();
 		}

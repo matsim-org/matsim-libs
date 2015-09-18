@@ -27,7 +27,6 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +34,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -63,7 +61,7 @@ import org.xml.sax.Attributes;
 	private final Population plans;
 	private final Network network;
 
-	private PersonImpl currperson = null;
+	private Person currperson = null;
 
 	private PlanImpl currplan = null;
 
@@ -142,16 +140,16 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new PersonImpl(Id.create(atts.getValue("id"), Person.class));
-		this.currperson.setSex(atts.getValue("sex"));
-		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
-		this.currperson.setLicence(atts.getValue("license"));
-		this.currperson.setCarAvail(atts.getValue("car_avail"));
+		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
+		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
+		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
+		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
+		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
 		String employed = atts.getValue("employed");
 		if (employed == null) {
-			this.currperson.setEmployed(null);
+			PersonUtils.setEmployed(this.currperson, null);
 		} else {
-			this.currperson.setEmployed("yes".equals(employed));
+			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
 		}
 	}
 
@@ -168,7 +166,7 @@ import org.xml.sax.Attributes;
 			throw new NumberFormatException(
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");
@@ -187,11 +185,11 @@ import org.xml.sax.Attributes;
 			linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-				coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
+				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-			coord = new CoordImpl(atts.getValue(ATTR_X100), atts.getValue(ATTR_Y100));
+			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
@@ -216,7 +214,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = (NetworkRoute) ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+		this.currroute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));

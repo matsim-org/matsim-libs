@@ -20,6 +20,9 @@
 
 package org.matsim.integration;
 
+import java.util.Arrays;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -27,7 +30,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +45,11 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.router.*;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,15 +59,18 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.Arrays;
 
 public class SimulateAndScoreTest extends MatsimTestCase {
 
@@ -75,8 +89,8 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		config.planCalcScore().setTraveling_utils_hr(0);
 		config.planCalcScore().setTravelingPt_utils_hr(0);
 		config.planCalcScore().setTravelingWalk_utils_hr(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(10);
-		config.planCalcScore().setMonetaryDistanceCostRatePt(0);
+		config.planCalcScore().setMonetaryDistanceRateCar(10);
+		config.planCalcScore().setMonetaryDistanceRatePt(0);
 		config.planCalcScore().addActivityParams(h);
 		config.planCalcScore().addActivityParams(w);
 		config.planCalcScore().addActivityParams(transitActivityParams);
@@ -85,10 +99,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(100, 0));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(1100, 0));
-		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(1200, 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -115,11 +129,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(100, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(100, 0), false);
 		stop1.setLinkId(link1.getId());
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(1100, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(1100, 0), false);
 		stop2.setLinkId(link2.getId());
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), scenario.createCoord(1200, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(1200, 0), false);
 		stop3.setLinkId(link3.getId());
 
 
@@ -204,7 +218,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
+		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
@@ -222,10 +236,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 	public void testTeleportationScore() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(100, 0));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(1100, 0));
-		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(1200, 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -244,7 +258,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		plan.addActivity(a1);
 
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
-		Route ptRoute = populationFactory.createRoute(TransportMode.pt, link1.getId(), link3.getId());
+		Route ptRoute = populationFactory.createRoute(Route.class, link1.getId(), link3.getId());
 		ptRoute.setTravelTime(3600);
         ptRoute.setDistance(1000);
 		leg.setRoute(ptRoute);
@@ -263,10 +277,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
 		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(-1.00);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(-0.001);
+		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(-0.001);
 		scenario.getConfig().planCalcScore().addActivityParams(h);
 		scenario.getConfig().planCalcScore().addActivityParams(w);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
+		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

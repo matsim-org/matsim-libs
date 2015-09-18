@@ -39,7 +39,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
@@ -86,10 +85,10 @@ public class TripRouterFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
-		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class ) , new CoordImpl( 0 , 0 ) );
-		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class ) , new CoordImpl( 0 , 0 ) );
-		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class ) , new CoordImpl( 0 , 0 ) );
+		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
+		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class ) , new Coord((double) 0, (double) 0));
+		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class ) , new Coord((double) 0, (double) 0));
+		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class ) , new Coord((double) 0, (double) 0));
 
 		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
 		Link l2c = net.getFactory().createLink( Id.create( "l2c", Link.class ) , n2 , n3 );
@@ -133,7 +132,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( Id.create( "toto", Person.class ) ));
+				PersonImpl.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 
@@ -160,10 +159,10 @@ public class TripRouterFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class) , new CoordImpl( 0 , 0 ) );
-		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class) , new CoordImpl( 0 , 0 ) );
-		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class) , new CoordImpl( 0 , 0 ) );
-		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class) , new CoordImpl( 0 , 0 ) );
+		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class) , new Coord((double) 0, (double) 0));
+		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class) , new Coord((double) 0, (double) 0));
+		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class) , new Coord((double) 0, (double) 0));
+		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class) , new Coord((double) 0, (double) 0));
 
 		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
 		Link l2long = net.getFactory().createLink( Id.create( "l2long", Link.class ) , n2 , n3 );
@@ -205,7 +204,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( Id.create( "toto", Person.class ) ));
+				PersonImpl.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 

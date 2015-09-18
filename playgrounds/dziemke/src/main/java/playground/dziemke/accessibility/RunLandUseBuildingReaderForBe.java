@@ -61,7 +61,7 @@ public class RunLandUseBuildingReaderForBe {
 //		String facilityFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.xml";
 //		String attributeFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilitiy_attributes_landuse6.xml";
 		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-05-26_berlin.osm";
-		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/08/";
+		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
 		String facilityFile = outputBase + "facilities_buildings.xml";
 		String attributeFile = outputBase + "facilitiy_attributes_buildings.xml";
 		

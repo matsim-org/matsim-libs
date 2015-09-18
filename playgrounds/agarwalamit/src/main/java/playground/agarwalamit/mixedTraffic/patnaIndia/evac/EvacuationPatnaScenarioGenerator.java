@@ -38,30 +38,27 @@ import org.matsim.contrib.evacuation.scenariogenerator.EvacuationNetworkGenerato
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.agarwalamit.utils.LoadMyScenarios;
-
 import com.vividsolutions.jts.geom.Geometry;
+
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -230,9 +227,6 @@ public class EvacuationPatnaScenarioGenerator {
 			planOut.addActivity(evacAct);
 
 			if(mainModes.contains(leg.getMode())){
-				ModeRouteFactory routeFactory = new ModeRouteFactory();
-				routeFactory.setRouteFactory(leg.getMode(), new LinkNetworkRouteFactory());
-
 				TripRouter router = new TripRouter();
 				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
 				List<? extends PlanElement> routeInfo = router.calcRoute(leg.getMode(), new ActivityWrapperFacility(home), new ActivityWrapperFacility(evacAct), home.getEndTime(), pOut);

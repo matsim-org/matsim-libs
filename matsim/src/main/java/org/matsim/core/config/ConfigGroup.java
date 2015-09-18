@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
  * Implements a generic config-group that stores all parameters in a simple Map.
@@ -35,7 +36,7 @@ import org.apache.log4j.Logger;
  * @author mrieser
  * @author balmermi
  */
-public class ConfigGroup {
+public class ConfigGroup implements MatsimExtensionPoint {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

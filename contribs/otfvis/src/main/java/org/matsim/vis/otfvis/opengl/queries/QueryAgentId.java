@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -80,7 +80,7 @@ public class QueryAgentId extends AbstractQuery {
 		positions = simulationView.getNonNetwokAgentSnapshots().addAgentSnapshotInfo(positions);
 		for(AgentSnapshotInfo info : positions) {
 			if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
-			java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new CoordImpl(info.getEasting(), info.getNorthing()));
+			java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new Coord(info.getEasting(), info.getNorthing()));
 			double xDist = xy.getX() - this.x;
 			double yDist = xy.getY() - this.y;
 			if (this.width == 0) {

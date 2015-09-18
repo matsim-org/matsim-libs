@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -76,8 +76,8 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
 		NetworkImpl network1 = NetworkImpl.createNetwork();
-		Node n1 = network1.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node n2 = network1.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
+		Node n1 = network1.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = network1.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		Link l1 = network1.createAndAddLink(Id.create("1", Link.class), n1, n2, 1000.0, 10.0, 3600.0, 1.0);
 		l1.setAllowedModes(modes);
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/vehicles_v1.dtd">
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
 
 <vehicles>
 	<vehicle id="taxi_1_1" start_link="385" t_0="21600" t_1="104400"/>

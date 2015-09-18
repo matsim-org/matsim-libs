@@ -3,6 +3,7 @@ package org.matsim.contrib.matsim4urbansim.utils.io;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.UrbanSimZoneCSVWriterV2;
@@ -30,7 +31,7 @@ public class BackupMATSimOutput {
 	public static final String OUTPUT_TRAVELDISTANCESTATS_PNG = "traveldistancestats.png";
 	public static final String OUTPUT_STOPWATCH = "stopwatch.txt";
 	
-	public static void runBackup(ScenarioImpl scenario){
+	public static void runBackup(Scenario scenario){
 		
 		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
 		
@@ -46,7 +47,7 @@ public class BackupMATSimOutput {
 	/**
 	 * Saving UrbanSim and MATSim results for current run in a backup directory ...
 	 */
-	private static void saveRunOutputs(ScenarioImpl scenario) {
+	private static void saveRunOutputs(Scenario scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 
 		M4UControlerConfigModuleV3 m4ucModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(scenario.getConfig()) ;
@@ -118,7 +119,7 @@ public class BackupMATSimOutput {
 	 * Preparing hot start: Copying recent matsim plans file to a specified location (Matsim config).
 	 * 						Matsim will check this location for plans file on run and activates hot start if the plans file is there
 	 */
-	public static void prepareHotStart(ScenarioImpl scenario){
+	public static void prepareHotStart(Scenario scenario){
 		
 		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;

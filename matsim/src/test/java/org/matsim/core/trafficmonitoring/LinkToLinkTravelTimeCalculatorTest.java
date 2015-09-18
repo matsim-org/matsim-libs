@@ -20,6 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -30,7 +31,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -44,10 +44,10 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(2000, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(1000, 1000));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 1000, (double) 1000));
 		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node2, node4, 1000.0, 100.0, 3600.0, 1.0);
@@ -55,9 +55,9 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class)); // person 1 travels link1 + link2
-		PersonImpl person2 = new PersonImpl(Id.create(2, Person.class)); // person 2 travels link1 + link2
-		PersonImpl person3 = new PersonImpl(Id.create(3, Person.class)); // person 3 travels link1 + link3
+		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class)); // person 1 travels link1 + link2
+		Person person2 = PersonImpl.createPerson(Id.create(2, Person.class)); // person 2 travels link1 + link2
+		Person person3 = PersonImpl.createPerson(Id.create(3, Person.class)); // person 3 travels link1 + link3
 		
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = Time.parseTime("07:00:10");

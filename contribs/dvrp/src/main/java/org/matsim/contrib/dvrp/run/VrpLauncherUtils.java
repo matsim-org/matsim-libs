@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
@@ -45,7 +45,7 @@ public class VrpLauncherUtils
 {
     public static final int MAX_TIME = 36 * 60 * 60;
 
-    //only the free-flow speed should decide on the movement of vehicles
+    //to avoid congestion; only the free-flow speed should decide on the movement of vehicles
     public static final double VARIANT_NETWORK_FLOW_CAP_FACTOR = 100;
 
 
@@ -67,8 +67,7 @@ public class VrpLauncherUtils
     }
 
 
-    public static Scenario initScenario(String netFile, String plansFile,
-            String changeEventsFile)
+    public static Scenario initScenario(String netFile, String plansFile, String changeEventsFile)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
@@ -99,10 +98,10 @@ public class VrpLauncherUtils
                 .travelTimeCalculator();
         ttCalcConfigGroup.setTraveltimeBinSize(timeInterval);
 
-        TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(), ttCalcConfigGroup);
+        TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
+                ttCalcConfigGroup);
 
-        return TravelTimeCalculators.initTravelTimeCalculatorFromEvents(eventsFile,
-                ttCalculator);
+        return TravelTimeCalculators.initTravelTimeCalculatorFromEvents(eventsFile, ttCalculator);
     }
 
 
@@ -134,16 +133,16 @@ public class VrpLauncherUtils
             PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
             MatsimVrpContext context, QSim qSim)
     {
-        PassengerEngine passengerEngine = new PassengerEngine(mode, qSim.getEventsManager(), requestCreator, optimizer,
-                context);
+        PassengerEngine passengerEngine = new PassengerEngine(mode, qSim.getEventsManager(),
+                requestCreator, optimizer, context);
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
         return passengerEngine;
     }
 
 
-    public static void initAgentSources(QSim qSim, MatsimVrpContext context,
-            VrpOptimizer optimizer, DynActionCreator actionCreator)
+    public static void initAgentSources(QSim qSim, MatsimVrpContext context, VrpOptimizer optimizer,
+            DynActionCreator actionCreator)
     {
         qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
         qSim.addAgentSource(new PopulationAgentSource(context.getScenario().getPopulation(),
@@ -157,8 +156,8 @@ public class VrpLauncherUtils
         legHistogram.write(histogramOutDir + "legHistogram_all.txt");
         LegHistogramChart.writeGraphic(legHistogram, histogramOutDir + "legHistogram_all.png");
         for (String legMode : legHistogram.getLegModes()) {
-            LegHistogramChart.writeGraphic(legHistogram, histogramOutDir + "legHistogram_"
-                    + legMode + ".png", legMode);
+            LegHistogramChart.writeGraphic(legHistogram,
+                    histogramOutDir + "legHistogram_" + legMode + ".png", legMode);
         }
     }
 }

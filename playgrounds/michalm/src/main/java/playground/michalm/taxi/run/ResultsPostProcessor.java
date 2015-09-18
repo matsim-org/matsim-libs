@@ -156,7 +156,7 @@ public class ResultsPostProcessor
                     lineId.append('\t').append(e.id);
                     lineN.append('\t').append(s.n);
                     lineM.append('\t').append(s.m);
-                    lineRatio.append('\t').append(ratio);
+                    lineRatio.append('\t').append(String.format("%.2f", ratio));
                 }
             }
 
@@ -203,20 +203,20 @@ public class ResultsPostProcessor
         String subDirPrefix = "mielec-2-peaks-new-";
 
         new ResultsPostProcessor(//
-                "10-50",//
-                "15-50",//
-                "20-50",//
-                "25-50",//
-                "30-50",//
-                "35-50",//
-                "40-50",//
-                null,// empty column
-                "10-25",//
-                "15-25",//
-                "20-25",//
-                "25-25",//
-                "30-25",//
-                "35-25",//
+                "10-50", //
+                "15-50", //
+                "20-50", //
+                "25-50", //
+                "30-50", //
+                "35-50", //
+                "40-50", //
+                null, // empty column
+                "10-25", //
+                "15-25", //
+                "20-25", //
+                "25-25", //
+                "30-25", //
+                "35-25", //
                 "40-25"//
         ).process(dir, subDirPrefix, "stats");
     }
@@ -224,26 +224,46 @@ public class ResultsPostProcessor
 
     public static void processBerlin()
     {
-        String dir = "d:/michalm/Berlin_2014_11/";
+        String dir = "d:/PP-rad/berlin/Berlin_2014_11/";
         String subDirPrefix = "demand_";
 
         new ResultsPostProcessor(//
-                "1.0",//
-                "1.5",//
-                "2.0",//
-                "2.5",//
-                "3.0",//
-                "3.5",//
-                "4.0",//
-                "4.5",//
+                "1.0", //
+                "1.5", //
+                "2.0", //
+                "2.5", //
+                "3.0", //
+                "3.5", //
+                "4.0", //
+                "4.5", //
                 "5.0"//
+        ).process(dir, subDirPrefix, "stats");
+    }
+
+
+    public static void processBarcelona()
+    {
+        String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
+        String subDirPrefix = "demand_";
+
+        new ResultsPostProcessor(//
+                "0.2", //
+                "0.3", //
+                "0.4", //
+                "0.5", //
+                "0.6", //
+                "0.7", //
+                "0.8", //
+                "0.9" //
+                //"1.0"//
         ).process(dir, subDirPrefix, "stats");
     }
 
 
     public static void main(String[] args)
     {
-        processMielec();
+        //processMielec();
         //processBerlin();
+        processBarcelona();
     }
 }

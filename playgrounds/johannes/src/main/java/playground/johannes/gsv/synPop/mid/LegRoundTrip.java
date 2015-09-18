@@ -21,21 +21,24 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+import playground.johannes.synpop.source.mid2008.generator.VariableNames;
 
 /**
  * @author johannes
+ * @deprecated
  *
  */
 public class LegRoundTrip implements LegAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
+	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyLeg, java.util.Map)
 	 */
 	@Override
-	public void handle(PlainElement leg, Map<String, String> attributes) {
-		String val = attributes.get(MIDKeys.LEG_DESTINATION);
+	public void handle(Segment leg, Map<String, String> attributes) {
+		String val = attributes.get(VariableNames.LEG_DESTINATION);
 
 		if(val.equalsIgnoreCase("Rundweg")) {
 			leg.setAttribute(CommonKeys.LEG_ROUNDTRIP, "true");

@@ -9,8 +9,8 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -127,19 +127,19 @@ public class GeographicClassifierTest{
 		DigicoreChain chain = new DigicoreChain();
 		
 		DigicoreActivity da1 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da1.setCoord(new CoordImpl(7,7));
+		da1.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da2 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da2.setCoord(new CoordImpl(8,7));
+		da2.setCoord(new Coord((double) 8, (double) 7));
 		DigicoreActivity da3 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da3.setCoord(new CoordImpl(12,7));
+		da3.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da4 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da4.setCoord(new CoordImpl(7,7));
+		da4.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da5 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da5.setCoord(new CoordImpl(7,7));
+		da5.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da6 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da6.setCoord(new CoordImpl(7,7));
+		da6.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da7 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da7.setCoord(new CoordImpl(7,7));
+		da7.setCoord(new Coord((double) 7, (double) 7));
 
 		/* Add the activities to the chain. */
 		chain.add(da1);
@@ -170,19 +170,19 @@ public class GeographicClassifierTest{
 		DigicoreChain chain = new DigicoreChain();
 		
 		DigicoreActivity da1 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da1.setCoord(new CoordImpl(7,7));
+		da1.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da2 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da2.setCoord(new CoordImpl(12,7));
+		da2.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da3 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da3.setCoord(new CoordImpl(12,7));
+		da3.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da4 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da4.setCoord(new CoordImpl(7,7));
+		da4.setCoord(new Coord((double) 7, (double) 7));
 		DigicoreActivity da5 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da5.setCoord(new CoordImpl(12,7));
+		da5.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da6 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da6.setCoord(new CoordImpl(12,7));
+		da6.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da7 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da7.setCoord(new CoordImpl(7,7));
+		da7.setCoord(new Coord((double) 7, (double) 7));
 
 		/* Add the activities to the chain. */
 		chain.add(da1);
@@ -208,19 +208,19 @@ public class GeographicClassifierTest{
 		DigicoreChain chain = new DigicoreChain();
 		
 		DigicoreActivity da1 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da1.setCoord(new CoordImpl(12,7));
+		da1.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da2 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da2.setCoord(new CoordImpl(12,7));
+		da2.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da3 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da3.setCoord(new CoordImpl(12,7));
+		da3.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da4 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da4.setCoord(new CoordImpl(12,7));
+		da4.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da5 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da5.setCoord(new CoordImpl(12,7));
+		da5.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da6 = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da6.setCoord(new CoordImpl(12,7));
+		da6.setCoord(new Coord((double) 12, (double) 7));
 		DigicoreActivity da7 = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-		da7.setCoord(new CoordImpl(12,7));
+		da7.setCoord(new Coord((double) 12, (double) 7));
 
 		/* Add the activities to the chain. */
 		chain.add(da1);

@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.sna.gis.CRSUtils;
@@ -35,7 +35,7 @@ import playground.johannes.synpop.data.Segment;
 /**
  * @author johannes
  */
-public class SetZones implements ProxyPlanTask {
+public class SetZones implements EpisodeTask {
 
     public static final String ZONE_KEY = "zone";
 

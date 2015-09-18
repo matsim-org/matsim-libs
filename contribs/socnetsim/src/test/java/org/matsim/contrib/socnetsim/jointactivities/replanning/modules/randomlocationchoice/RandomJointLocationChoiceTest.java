@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -57,25 +56,25 @@ public class RandomJointLocationChoiceTest {
 				facilities,
 				"type",
 				Id.create( random.nextLong() , ActivityFacility.class ),
-				new CoordImpl( 0 , 0 ) );
+				new Coord((double) 0, (double) 0));
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				Id.create( random.nextLong() , ActivityFacility.class ),
-				new CoordImpl( 1 , 0 ) );
+				new Coord((double) 1, (double) 0));
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				Id.create( random.nextLong() , ActivityFacility.class ),
-				new CoordImpl( 0 , 1 ) );
+				new Coord((double) 0, (double) 1));
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				Id.create( random.nextLong() , ActivityFacility.class ),
-				new CoordImpl( 1 , 1 ) );
+				new Coord((double) 1, (double) 1));
 
 		final RandomJointLocationChoiceConfigGroup config =
 			new RandomJointLocationChoiceConfigGroup();
@@ -87,7 +86,7 @@ public class RandomJointLocationChoiceTest {
 
 		assertEquals(
 				"wrong barycenter",
-				new CoordImpl( 0.5 , 0.5 ),
+				new Coord(0.5, 0.5),
 				bar );
 	}
 
@@ -114,28 +113,32 @@ public class RandomJointLocationChoiceTest {
 
 
 		final Id<ActivityFacility> sw = Id.create( "sw" , ActivityFacility.class );
+		final double x1 = -1;
+		final double y1 = -1;
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				sw,
-				new CoordImpl( -1 , -1 ) );
+				new Coord(x1, y1));
 
 		final Id<ActivityFacility> se = Id.create( "se" , ActivityFacility.class );
+		final double y = -1;
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				se,
-				new CoordImpl( 1 , -1 ) );
+				new Coord((double) 1, y));
 
 		final Id<ActivityFacility> nw = Id.create( "nw" , ActivityFacility.class );
+		final double x = -1;
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
 				nw,
-				new CoordImpl( -1 , 1 ) );
+				new Coord(x, (double) 1));
 
 		final Id<ActivityFacility> ne = Id.create( "ne" , ActivityFacility.class );
 		addActivityAndFacility(
@@ -143,7 +146,7 @@ public class RandomJointLocationChoiceTest {
 				facilities,
 				"type",
 				ne,
-				new CoordImpl( 1 , 1 ) );
+				new Coord((double) 1, (double) 1));
 
 		final Id<ActivityFacility> other_ne = Id.create( "other_ne" , ActivityFacility.class );
 		addActivityAndFacility(
@@ -151,9 +154,9 @@ public class RandomJointLocationChoiceTest {
 				facilities,
 				"other_type",
 				other_ne,
-				new CoordImpl( 2 , 2 ) );
+				new Coord((double) 2, (double) 2));
 
-		final Coord center = new CoordImpl( 0 , 0 );
+		final Coord center = new Coord((double) 0, (double) 0);
 
 		final RandomJointLocationChoiceConfigGroup config =
 			new RandomJointLocationChoiceConfigGroup();

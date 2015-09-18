@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import org.joda.time.DateTime;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -29,13 +29,13 @@ import playground.johannes.synpop.data.Episode;
  * @author johannes
  * 
  */
-public class InfereVacationsType implements ProxyPlanTask {
+public class InfereVacationsType implements EpisodeTask {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes
+	 * playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes
 	 * .gsv.synPop.PlainEpisode)
 	 */
 	@Override

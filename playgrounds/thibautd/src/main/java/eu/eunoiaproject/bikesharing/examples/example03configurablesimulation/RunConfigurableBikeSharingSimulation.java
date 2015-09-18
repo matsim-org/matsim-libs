@@ -84,7 +84,7 @@ public class RunConfigurableBikeSharingSimulation {
 			bikesharing.setConstant( bike.getConstant() );
 			bikesharing.setMarginalUtilityOfDistance( bike.getMarginalUtilityOfDistance() );
 			bikesharing.setMarginalUtilityOfTraveling( bike.getMarginalUtilityOfTraveling() );
-			bikesharing.setMonetaryDistanceCostRate( bike.getMonetaryDistanceCostRate() );
+			bikesharing.setMonetaryDistanceRate( bike.getMonetaryDistanceRate() );
 		}
 
 		final RelocationConfigGroup relocationGroup = new RelocationConfigGroup();
@@ -173,7 +173,6 @@ public class RunConfigurableBikeSharingSimulation {
 				return;
 			}
 
-			((ScenarioImpl) scenario).createTransitScheduleContainer();
 			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
 			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
 

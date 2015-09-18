@@ -10,9 +10,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.sergioo.visualizer2D2012.LayersPanel;
-import playground.sergioo.visualizer2D2012.Painter;
-
 public class LinesPainter extends Painter {
 
 	//Attributes

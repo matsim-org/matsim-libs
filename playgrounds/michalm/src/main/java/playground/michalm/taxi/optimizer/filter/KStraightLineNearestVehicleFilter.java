@@ -21,7 +21,7 @@ package playground.michalm.taxi.optimizer.filter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.DistanceUtils;
+import org.matsim.contrib.util.DistanceUtils;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.scheduler.TaxiScheduler;

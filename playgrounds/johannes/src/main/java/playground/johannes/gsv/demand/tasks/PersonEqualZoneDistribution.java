@@ -27,10 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.gsv.demand.ActivityTypes;
 import playground.johannes.gsv.demand.PopulationTask;
@@ -109,7 +109,7 @@ public class PersonEqualZoneDistribution implements PopulationTask {
 				 */
 				Person person = persons.get(processed);
 				Plan p = person.getPlans().get(0);
-				p.addActivity(pop.getFactory().createActivityFromCoord(ActivityTypes.HOME, new CoordImpl(x, y)));
+				p.addActivity(pop.getFactory().createActivityFromCoord(ActivityTypes.HOME, new Coord(x, y)));
 				
 				processed++;
 			}

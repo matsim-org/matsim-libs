@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.text.DecimalFormat;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.Painter;
@@ -33,7 +32,7 @@ public class CircleLegendPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(int i=0; i<values.length; i++) {
-			paintCircle(g2, layersPanel, new CoordImpl(coord.getX()+Math.pow(i,0.9)*2*distance, coord.getY()), (int)(Math.sqrt(values[i]*scale)), color);
+			paintCircle(g2, layersPanel, new Coord(coord.getX() + Math.pow(i, 0.9) * 2 * distance, coord.getY()), (int)(Math.sqrt(values[i]*scale)), color);
 			int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX()+Math.pow(i,0.9)*2*distance, coord.getY()-distance});
 			g2.setFont(new Font("Times New Roman", Font.PLAIN, 32));
 			g2.drawString(DecimalFormat.getIntegerInstance().format(values[i]), screenPoint[0]-10, screenPoint[1]+20);

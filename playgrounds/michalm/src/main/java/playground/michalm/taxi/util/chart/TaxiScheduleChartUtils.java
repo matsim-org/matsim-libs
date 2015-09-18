@@ -1,20 +1,19 @@
 package playground.michalm.taxi.util.chart;
 
 import java.awt.*;
-import java.util.List;
+import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.chart.*;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils.DescriptionCreator;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils.PaintSelector;
+import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
+import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils.*;
 
 import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiScheduleChartUtils
 {
-    public static JFreeChart chartSchedule(List<? extends Vehicle> vehicles)
+    public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles)
     {
         return ScheduleChartUtils.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR,
                 TAXI_PAINT_SELECTOR);

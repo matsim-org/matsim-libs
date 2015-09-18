@@ -46,7 +46,7 @@ public class RunSingleLineScenario
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		controler.setScoringFunctionFactory(new CrowdedScoringFunctionFactory(
-			new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()),
+			new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()),
 				controler.getEvents()
 		));
 		

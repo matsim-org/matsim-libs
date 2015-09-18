@@ -51,7 +51,7 @@ public class KtiToSimiliKtiConfig {
 		planCalcScore.setConstantCar( 0 );
 		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
 		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
-		planCalcScore.setMonetaryDistanceCostRatePt(
+		planCalcScore.setMonetaryDistanceRatePt(
 				// yes, that's really it. In KTI, the (monetary) cost of distance
 				// is *multiplied* by the marginal utility of distance.
 				// This makes it completely meaningless, but we need to reproduce it
@@ -59,10 +59,10 @@ public class KtiToSimiliKtiConfig {
 				// In particular, as the MonetaryDistanceCostRateCar is null
 				// in the calibrated config, this makes the "fuel cost"
 				// parameter unused...
-				(planCalcScore.getMonetaryDistanceCostRatePt() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
+				(planCalcScore.getMonetaryDistanceRatePt() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
 				planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceCostRateCar(
-				(planCalcScore.getMonetaryDistanceCostRateCar() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
+		planCalcScore.setMonetaryDistanceRateCar(
+				(planCalcScore.getMonetaryDistanceRateCar() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
 				planCalcScore.getMarginalUtilityOfMoney() );
 
 		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();

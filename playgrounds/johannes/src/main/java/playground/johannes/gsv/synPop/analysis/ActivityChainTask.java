@@ -23,9 +23,10 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
@@ -41,15 +42,15 @@ public class ActivityChainTask extends AnalyzerTask {
 	public static final String KEY = "n.act";
 	
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
 		
 		TObjectIntHashMap<String> typeCount = new TObjectIntHashMap<String>();
 		
 		TDoubleDoubleHashMap tripCounts = new TDoubleDoubleHashMap();
 		
-		for(PlainPerson person : persons) {
-			Episode plan = person.getPlan();
+		for(Person person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 			
 			StringBuilder builder = new StringBuilder();
 			for(int i = 0; i < plan.getActivities().size(); i++) {

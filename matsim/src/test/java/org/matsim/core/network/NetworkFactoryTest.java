@@ -21,14 +21,14 @@
 package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -42,31 +42,31 @@ public class NetworkFactoryTest extends MatsimTestCase {
         PopulationFactoryImpl factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
 		// test default
-		Route carRoute = factory.createRoute(TransportMode.car, null, null);
+		Route carRoute = factory.createRoute(NetworkRoute.class, null, null);
 		assertTrue(carRoute instanceof LinkNetworkRouteImpl);
 
-		Route route = factory.createRoute(TransportMode.pt, null, null);
-		assertTrue(route instanceof GenericRoute);
+		Route route = factory.createRoute(Route.class, null, null);
+		assertTrue(route instanceof GenericRouteImpl);
 
 		// overwrite car-mode
-		factory.setRouteFactory(TransportMode.car, new CarRouteMockFactory());
+		factory.setRouteFactory(CarRouteMock.class, new CarRouteMockFactory());
 		// add pt-mode
-		factory.setRouteFactory(TransportMode.pt, new PtRouteMockFactory());
+		factory.setRouteFactory(PtRouteMock.class, new PtRouteMockFactory());
 
 		// test car-mode
-		carRoute = factory.createRoute(TransportMode.car, null, null);
+		carRoute = factory.createRoute(CarRouteMock.class, null, null);
 		assertTrue(carRoute instanceof CarRouteMock);
 
 		// add pt-mode
-		Route ptRoute = factory.createRoute(TransportMode.pt, null, null);
+		Route ptRoute = factory.createRoute(PtRouteMock.class, null, null);
 		assertTrue(ptRoute instanceof PtRouteMock);
 
 		// remove pt-mode
-		factory.setRouteFactory(TransportMode.pt, null);
+		factory.setRouteFactory(PtRouteMock.class, null);
 
 		// test pt again
-		route = factory.createRoute(TransportMode.pt, null, null);
-		assertTrue(route instanceof GenericRoute);
+		route = factory.createRoute(PtRouteMock.class, null, null);
+		assertTrue(route instanceof GenericRouteImpl);
 	}
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
@@ -76,6 +76,17 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		@Override
 		public CarRouteMock clone() {
 			return (CarRouteMock) super.clone();
+		}
+		@Override
+		public String getRouteDescription() {
+			return null;
+		}
+		@Override
+		public void setRouteDescription(String routeDescription) {
+		}
+		@Override
+		public String getRouteType() {
+			return null;
 		}
 	}
 
@@ -87,12 +98,28 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		public PtRouteMock clone() {
 			return (PtRouteMock) super.clone();
 		}
+		@Override
+		public String getRouteDescription() {
+			return null;
+		}
+		@Override
+		public void setRouteDescription(String routeDescription) {
+		}
+		@Override
+		public String getRouteType() {
+			return null;
+		}
 	}
 
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
 		@Override
 		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new CarRouteMock(startLinkId, endLinkId);
+		}
+		
+		@Override
+		public String getCreatedRouteType() {
+			return "carMock";
 		}
 
 	}
@@ -101,6 +128,11 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		@Override
 		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new PtRouteMock(startLinkId, endLinkId);
+		}
+		
+		@Override
+		public String getCreatedRouteType() {
+			return "ptMock";
 		}
 
 	}

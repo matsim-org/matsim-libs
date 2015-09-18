@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -47,7 +47,7 @@ public class SamplerLogger implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> person, boolean accpeted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> person, boolean accpeted) {
 		task.afterStep(population, person, accpeted);
 
 	}
@@ -78,7 +78,7 @@ public class SamplerLogger implements SamplerListener {
 		}
 
 		@Override
-		public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> original, boolean accepted) {
+		public void afterStep(Collection<? extends Person> population, Collection<? extends Person> original, boolean accepted) {
 			iter.incrementAndGet();
 			iters2.incrementAndGet();
 			if (accepted)

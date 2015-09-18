@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -37,7 +38,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -92,7 +92,7 @@ public class RunM2U {
 		GeometryFactory gf = new GeometryFactory();
 		for(MyZone z : zones){
 			NodeImpl c = new NodeImpl(Id.create("dummy", Node.class));
-			c.setCoord(new CoordImpl(z.getCentroid().getX(), z.getCentroid().getY()));
+			c.setCoord(new Coord(z.getCentroid().getX(), z.getCentroid().getY()));
 			Node n = nPt.getNearestNode(c.getCoord());
 			if(n != null){
 				Point p1 = gf.createPoint(new Coordinate(c.getCoord().getX(), c.getCoord().getY()));

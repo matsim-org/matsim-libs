@@ -30,7 +30,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * I <i>think</i> that this tests if the centrally provided quad tree provides expected results.  kai, dec'14
@@ -67,15 +66,15 @@ public class TestQuadTree {
 	 */
 	private void init(){
 
-		home = new CoordImpl(150., 500.);
-		work = new CoordImpl(900., 100.);
+		home = new Coord(150., 500.);
+		work = new Coord(900., 100.);
 
-		pt1a = new CoordImpl(200., 550.);
-		pt1b = new CoordImpl(200., 900.);
-		pt2a = new CoordImpl(100., 450.);
-		pt2b = new CoordImpl(900., 450.);
-		pt3a = new CoordImpl(150., 420.);
-		pt3b = new CoordImpl(880., 100.);
+		pt1a = new Coord(200., 550.);
+		pt1b = new Coord(200., 900.);
+		pt2a = new Coord(100., 450.);
+		pt2b = new Coord(900., 450.);
+		pt3a = new Coord(150., 420.);
+		pt3b = new Coord(880., 100.);
 
 		double minX = 0.;
 		double maxX = 1000.;

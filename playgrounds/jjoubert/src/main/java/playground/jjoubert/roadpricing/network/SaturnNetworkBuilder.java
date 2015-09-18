@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +35,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
@@ -124,7 +124,7 @@ public class SaturnNetworkBuilder {
 				String line = null;
 				while((line = br.readLine()) != null){
 					String [] entries = line.split("\t");
-					Node n = nf.createNode(Id.create(entries[0], Node.class), new CoordImpl(entries[1], entries[2]));
+					Node n = nf.createNode(Id.create(entries[0], Node.class), new Coord(Double.parseDouble(entries[1]), Double.parseDouble(entries[2])));
 					sc.getNetwork().addNode(n);
 					
 					/* Report progress */

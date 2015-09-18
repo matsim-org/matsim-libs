@@ -21,6 +21,7 @@ package playground.anhorni.surprice.preprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -32,7 +33,6 @@ import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -194,7 +194,7 @@ public class CreateScenario {
 			else {
 				personWeeksThurgau = this.chooseWeek(nonworkersNormalized);
 			}
-			PersonImpl person = (PersonImpl)p;			
+			Person person = p;
 			this.createPlansForPerson(person, personWeeksThurgau, secLocationAssigner);
 		}				
 	}
@@ -252,13 +252,13 @@ public class CreateScenario {
 		return personWeeks;
 	}
 
-	private void createPlansForPerson(PersonImpl person, PersonWeeks personWeeksThurgau, PersonSetSecondaryLocation secLocationAssigner) {	
+	private void createPlansForPerson(Person person, PersonWeeks personWeeksThurgau, PersonSetSecondaryLocation secLocationAssigner) {
 		// only one week to begin with
 		int week = 0;		
 		for (int dow = 0; dow < 7; dow++) {
 			person.getPlans().clear();
 			Plan plan = personWeeksThurgau.getDay(dow, week);
-			PersonImpl thurgauPerson = (PersonImpl)personWeeksThurgau.getPerson();
+			Person thurgauPerson = (Person)personWeeksThurgau.getPerson();
 						
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
@@ -382,7 +382,7 @@ public class CreateScenario {
 				person.getPlans().clear();
 				Plan plan = this.personWeeksMZ.get(person.getId()).getDay(dow, 0);
 				person.addPlan(plan);
-				((PersonImpl)person).setSelectedPlan(plan);				
+				person.setSelectedPlan(plan);
 			}
 			new Analyzer().run(this.scenario.getPopulation(), outPath, Surprice.days.get(dow));
 			
@@ -500,12 +500,12 @@ public class CreateScenario {
 					NetworkUtils.getNearestLink(network, facility.getCoord()).getId()
 					);
 		}
-		
-		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+
+		Coord bellevue = new Coord(683518.0, 246836.0);
 		Zone tollZone =  new Zone("tollZone", bellevue, 2000.0); 
 		
-		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
-			if (bellevue.calcDistance(facility.getCoord()) < radius) {
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+			if (CoordUtils.calcDistance(bellevue, facility.getCoord()) < radius) {
 				tollZone.addFacility(facility);
 			}
 		}

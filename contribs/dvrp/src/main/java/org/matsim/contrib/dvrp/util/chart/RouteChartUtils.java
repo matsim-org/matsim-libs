@@ -32,6 +32,8 @@ import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.util.chart.CoordDataset;
+import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 
 
 /**
@@ -39,13 +41,14 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
  */
 public class RouteChartUtils
 {
-    public static JFreeChart chartRoutes(List<? extends Vehicle> vehicles)
+    public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles)
     {
         CoordDataset lData = new CoordDataset();
-
-        for (int i = 0; i < vehicles.size(); i++) {
-            Schedule<?> schedule = vehicles.get(i).getSchedule();
-            lData.addSeries(Integer.toString(i), LinkSources.createLinkSource(schedule));
+        int i = 0;
+        for (Vehicle v : vehicles) {
+            Schedule<?> schedule = v.getSchedule();
+            lData.addSeries(Integer.toString(i++),
+                    ScheduleCoordSources.createCoordSource(schedule));
         }
 
         JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData,
@@ -71,10 +74,10 @@ public class RouteChartUtils
             }
         });
 
-        for (int i = 1; i <= vehicles.size(); i++) {
-            renderer.setSeriesShapesVisible(i, true);
-            renderer.setSeriesLinesVisible(i, true);
-            renderer.setSeriesItemLabelsVisible(i, true);
+        for (int j = 1; j <= vehicles.size(); j++) {
+            renderer.setSeriesShapesVisible(j, true);
+            renderer.setSeriesLinesVisible(j, true);
+            renderer.setSeriesItemLabelsVisible(j, true);
         }
 
         return chart;
@@ -166,7 +169,8 @@ public class RouteChartUtils
         Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {
-            linkSourceByStatus.put(ts, LinkSources.createFromDriveTasks(taskListByStatus.get(ts)));
+            linkSourceByStatus.put(ts,
+                    ScheduleCoordSources.createCoordSource(taskListByStatus.get(ts)));
         }
 
         return linkSourceByStatus;

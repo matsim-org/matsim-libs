@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -112,7 +111,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				if (Integer.parseInt(f_id.toString()) >= min_id_given) { throw new RuntimeException("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
 
 				// home facility creation
-				Coord coord = new CoordImpl(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
+				Coord coord = new Coord(Double.parseDouble(entries[CAtts.I_XACH]), Double.parseDouble(entries[CAtts.I_YACH]));
 				ActivityFacilityImpl f = (ActivityFacilityImpl) facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id

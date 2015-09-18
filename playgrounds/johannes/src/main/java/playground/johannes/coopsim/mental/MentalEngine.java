@@ -28,7 +28,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
@@ -182,7 +181,7 @@ public class MentalEngine {
 		 */
 		for(int i = 0; i < remove.size(); i++) {
 			Plan plan = remove.get(i);
-			PersonImpl person = (PersonImpl) plan.getPerson();
+			Person person = plan.getPerson();
 			person.getPlans().remove(plan);
 			person.setSelectedPlan(person.getPlans().get(0));
 		}

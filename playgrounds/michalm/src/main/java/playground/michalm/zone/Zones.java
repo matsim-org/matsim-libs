@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -35,14 +35,13 @@ import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 public class Zones
 {
-    public static Map<Id<Zone>, Zone> readZones(Scenario scenario, String zonesXmlFile,
-            String zonesShpFile)
+    public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile)
     {
         ZoneXmlReader xmlReader = new ZoneXmlReader();
         xmlReader.parse(zonesXmlFile);
         Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
-        ZoneShpReader shpReader = new ZoneShpReader(scenario, zones);
+        ZoneShpReader shpReader = new ZoneShpReader(zones);
         shpReader.readZones(zonesShpFile);
         return zones;
     }

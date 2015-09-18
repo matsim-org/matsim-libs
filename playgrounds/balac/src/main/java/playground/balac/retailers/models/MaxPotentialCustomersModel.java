@@ -18,9 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -42,7 +40,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 	    this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
           for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-	      PersonImpl pi = (PersonImpl)p;
+	      Person pi = p;
 	      this.persons.put(pi.getId(), pi);
 	    }
 	  }
@@ -93,8 +91,8 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 			double time = System.currentTimeMillis();
 			 // log.info(System.currentTimeMillis());
 	      for (PersonPrimaryActivity ppa : primaryActivities) {
-	      
-			  Coord c = new CoordImpl(netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord());
+
+			  Coord c = new Coord(netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord().getX(), netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord().getY());
 			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), c, ppa.getActivityLinkId());
 			  ActivityFacility af1 = Utils.getInsideShopsQuadTree().get(c.getX(), c.getY());
 			  ActivityFacility af2 = Utils.getOutsideShopsQuadTree().get(c.getX(), c.getY());
@@ -161,7 +159,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 		  ArrayList<FacilityRetailersImpl> temp = new ArrayList<FacilityRetailersImpl>();
 		  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 			  String linkId = this.first.get(solution.get(s));
-			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), new CoordImpl(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY()), Id.create(linkId, Link.class));
+			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), new Coord(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY()), Id.create(linkId, Link.class));
 			  temp.add(af);
 			  
 			  Utils.addShopToShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);

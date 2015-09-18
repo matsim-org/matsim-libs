@@ -1,12 +1,19 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class TestDESStarter_equilPlans100 extends AbstractJDEQSimTest {
 	
 	public void test_equilPlans100_TestHandlerDetailedEventChecker() {
-		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml").loadScenario();
+		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		this.runJDEQSim(scenario);
 		
 		assertEquals(scenario.getPopulation().getPersons().size(), super.eventsByPerson.size());

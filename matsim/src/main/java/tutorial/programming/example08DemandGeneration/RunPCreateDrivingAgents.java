@@ -50,8 +50,8 @@ public class RunPCreateDrivingAgents {
 		Population population = scenario.getPopulation();
 
 		for (int i = 0; i < 1000; i++) {
-			Coord coord = scenario.createCoord(454941 + i*10, 5737814+i*10);
-			Coord coordWork = scenario.createCoord(454941-i*10, 5737814-i*10);
+			Coord coord = new Coord((double) (454941 + i * 10), (double) (5737814 + i * 10));
+			Coord coordWork = new Coord((double) (454941 - i * 10), (double) (5737814 - i * 10));
 			createOnePerson(scenario, population, i, coord, coordWork);
 		}
 

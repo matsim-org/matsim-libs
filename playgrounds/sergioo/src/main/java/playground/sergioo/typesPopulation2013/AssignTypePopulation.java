@@ -7,12 +7,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -74,18 +73,21 @@ public class AssignTypePopulation {
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())
 			if(isRelatedWithLine(person, line))
-				population.addPerson(new PersonImplPops((PersonImpl)person, Id.create(line.getId(), Population.class)));
+				population.addPerson(new PersonImplPops(person, Id.create(line.getId(), Population.class)));
 			else
-				population.addPerson(new PersonImplPops((PersonImpl)person, PersonImplPops.DEFAULT_POP_ID));
+				population.addPerson(new PersonImplPops(person, PersonImplPops.DEFAULT_POP_ID));
 		return population;
 	}
 	private static boolean isRelatedWithLine(Person person, TransitLine line) {
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();
 		for(Plan plan:person.getPlans())
 			for(PlanElement planElement:plan.getPlanElements())
-				if(planElement instanceof Leg && ((Leg)planElement).getRoute() instanceof GenericRoute) {
-					ExperimentalTransitRoute route = (ExperimentalTransitRoute) factory.createRoute(((Leg)planElement).getRoute().getStartLinkId(), ((Leg)planElement).getRoute().getEndLinkId());
-					route.setRouteDescription(((Leg)planElement).getRoute().getStartLinkId(), ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription(), ((Leg)planElement).getRoute().getEndLinkId());
+				if(planElement instanceof Leg && ((Leg)planElement).getRoute() instanceof Route) {
+					Route origRoute = ((Leg) planElement).getRoute();
+					ExperimentalTransitRoute route = (ExperimentalTransitRoute) factory.createRoute(origRoute.getStartLinkId(), origRoute.getEndLinkId());
+					route.setStartLinkId(origRoute.getStartLinkId());
+					route.setEndLinkId(origRoute.getEndLinkId());
+					route.setRouteDescription(origRoute.getRouteDescription());
 					for(TransitRoute transitRoute:line.getRoutes().values())
 						for(TransitRouteStop stop:transitRoute.getStops())
 							if(stop.getStopFacility().getId().equals(route.getAccessStopId()) || stop.getStopFacility().getId().equals(route.getEgressStopId()))

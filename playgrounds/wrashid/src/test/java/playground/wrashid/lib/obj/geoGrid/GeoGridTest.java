@@ -21,26 +21,26 @@ package playground.wrashid.lib.obj.geoGrid;
 
 import junit.framework.TestCase;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class GeoGridTest extends TestCase{
 
 	public void testSingleDataItem(){
 		GeoGrid geoGrid=new GeoGrid(10);
-		CoordImpl sampleCoord = new CoordImpl(55,55);
+		Coord sampleCoord = new Coord((double) 55, (double) 55);
 		GridDataItem gridDataItem=new GridDataItem(5.0, 1.0, sampleCoord);
 		geoGrid.addGridInformation(gridDataItem);
 		geoGrid.markDataCollectionPhaseAsFishished();
 		
 		assertEquals(5.0, geoGrid.getValue(sampleCoord));
-		assertEquals(5.0, geoGrid.getValue(new CoordImpl(50.0,50.0)));
-		assertEquals(5.0, geoGrid.getValue(new CoordImpl(100.0,100.0)));
+		assertEquals(5.0, geoGrid.getValue(new Coord(50.0, 50.0)));
+		assertEquals(5.0, geoGrid.getValue(new Coord(100.0, 100.0)));
 	}
 	
 	public void testTwoDataItemsAndWeights(){
 		GeoGrid geoGrid=new GeoGrid(10);
-		CoordImpl firstCoord = new CoordImpl(55,55);
-		CoordImpl secondCoord = new CoordImpl(56,56);
+		Coord firstCoord = new Coord((double) 55, (double) 55);
+		Coord secondCoord = new Coord((double) 56, (double) 56);
 		geoGrid.addGridInformation(new GridDataItem(2.0, 1.0, firstCoord));
 		geoGrid.addGridInformation(new GridDataItem(10.0, 3.0, secondCoord));
 		geoGrid.markDataCollectionPhaseAsFishished();

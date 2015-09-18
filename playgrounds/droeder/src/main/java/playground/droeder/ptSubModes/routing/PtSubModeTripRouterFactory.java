@@ -36,7 +36,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.util.*;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;

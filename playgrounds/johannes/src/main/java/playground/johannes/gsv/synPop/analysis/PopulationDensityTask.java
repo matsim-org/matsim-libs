@@ -28,16 +28,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -78,17 +74,17 @@ public class PopulationDensityTask extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		ProgressLogger.init(persons.size(), 1, 10);
 
 		int nozone = 0;
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			Episode plan = person.getEpisodes().get(0);
 			
 			ActivityFacility home = null;
 			for(Attributable act : plan.getActivities()) {
-				if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				if(ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					String idStr = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 					Id<ActivityFacility> id = Id.create(idStr, ActivityFacility.class);
 					home = facilities.getFacilities().get(id);

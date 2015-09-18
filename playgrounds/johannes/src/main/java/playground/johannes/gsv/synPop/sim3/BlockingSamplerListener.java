@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -54,7 +55,7 @@ public class BlockingSamplerListener implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accept) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accept) {
 		if(iters.get() >= next) {
 			phaser.setState(population, mutations, accept);
 			logger.debug(String.format("Thread %s: Arrived at barrier.", Thread.currentThread().getName()));
@@ -68,13 +69,15 @@ public class BlockingSamplerListener implements SamplerListener {
 	
 	private class ThePhaser extends Phaser {
 
-		private Collection<PlainPerson> tmpPopulation;
+		private Collection<? extends Person> tmpPopulation;
 		
-		private Collection<PlainPerson> tmpMutations;
+		private Collection<? extends Person> tmpMutations;
 		
 		private boolean tmpAccept;
 
-		private synchronized void setState(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accept) {
+		private synchronized void setState(Collection<? extends Person> population, Collection<? extends Person>
+				mutations,
+										   boolean	accept) {
 			this.tmpPopulation = population;
 			this.tmpMutations = mutations;
 			this.tmpAccept = accept;

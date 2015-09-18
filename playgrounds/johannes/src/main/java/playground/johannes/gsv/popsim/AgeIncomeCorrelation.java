@@ -22,14 +22,14 @@ package playground.johannes.gsv.popsim;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.sna.math.DummyDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -45,11 +45,11 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TDoubleArrayList ages = new TDoubleArrayList();
 		TDoubleArrayList incomes = new TDoubleArrayList();
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			String aStr = person.getAttribute(CommonKeys.PERSON_AGE);
 			String iStr = person.getAttribute(CommonKeys.HH_INCOME);
 //			String mStr = person.getAttribute(CommonKeys.HH_MEMBERS);
@@ -72,6 +72,7 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 			TXTWriter.writeMap(hist, "age", "n", getOutputDirectory() + "/age.txt");
 			
 			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(500), false);
+//			hist = Histogram.createHistogram(incomes.toNativeArray(), new InterpolatingDiscretizer(incomes.toNativeArray()), false);
 			TXTWriter.writeMap(hist, "income", "n", getOutputDirectory() +  "/income.txt");
 			
 			TXTWriter.writeScatterPlot(ages, incomes, "age", "income", getOutputDirectory() + "/age.income.txt");

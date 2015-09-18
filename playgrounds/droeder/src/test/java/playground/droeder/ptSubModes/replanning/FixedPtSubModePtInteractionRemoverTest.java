@@ -21,6 +21,7 @@ package playground.droeder.ptSubModes.replanning;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -47,8 +48,8 @@ public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 		
 		Plan plan = factory.createPlan();
 		Activity home, work;
-		home = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
-		work = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
+		home = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+		work = factory.createActivityFromCoord("work", new Coord((double) 0, (double) 0));
 		Leg leg = factory.createLeg("bus");
 		
 		plan.addActivity(home);
@@ -73,13 +74,13 @@ public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 		
 		Plan plan = factory.createPlan();
 		Activity one, two, three, four, five, six, seven;
-		one = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
-		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		three = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		four = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
-		five = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		six = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		seven = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
+		one = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		three = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		four = factory.createActivityFromCoord("work", new Coord((double) 0, (double) 0));
+		five = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		six = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		seven = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
 		Leg bus = factory.createLeg("bus");
 		Leg walk = factory.createLeg(TransportMode.transit_walk); 
 		
@@ -116,8 +117,8 @@ public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 		
 		Plan plan = factory.createPlan();
 		Activity home, work;
-		home = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
-		work = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
+		home = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+		work = factory.createActivityFromCoord("work", new Coord((double) 0, (double) 0));
 		Leg leg = factory.createLeg(TransportMode.transit_walk);
 		
 		plan.addActivity(home);
@@ -141,9 +142,9 @@ public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 		
 		Plan plan = factory.createPlan();
 		Activity one, two, three;
-		one = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
-		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		three = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
+		one = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		three = factory.createActivityFromCoord("work", new Coord((double) 0, (double) 0));
 		Leg bus = factory.createLeg("bus");
 		
 		plan.addActivity(one);
@@ -169,9 +170,9 @@ public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 		
 		Plan plan = factory.createPlan();
 		Activity one, two, three;
-		one = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
-		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
-		three = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
+		one = factory.createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 0));
+		three = factory.createActivityFromCoord("work", new Coord((double) 0, (double) 0));
 		Leg bus = factory.createLeg("bus");
 		Leg train = factory.createLeg("train");
 		

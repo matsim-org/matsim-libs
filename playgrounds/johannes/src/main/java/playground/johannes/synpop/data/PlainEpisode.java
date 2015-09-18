@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 /**
  * @author johannes
  */
-public class PlainEpisode extends PlainElement implements playground.johannes.synpop.data.Episode {
+public class PlainEpisode extends PlainElement implements Episode {
 
     private List<Segment> activities = new ArrayList<Segment>();
 
@@ -35,8 +35,23 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
     private Person person;
 
     public void addLeg(Segment leg) {
+        if (legs.contains(leg)) throw new IllegalArgumentException("You cannot add the same segment twice.");
         legs.add(leg);
-        ((PlainSegment)leg).setEpisode(this);
+        ((PlainSegment) leg).setEpisode(this, true);
+    }
+
+    @Override
+    public void insertActivity(Segment activity, int index) {
+        if (activities.contains(activity)) throw new IllegalArgumentException("You cannot add the same segment twice.");
+        activities.add(index, activity);
+        ((PlainSegment) activity).setEpisode(this, false);
+    }
+
+    @Override
+    public void insertLeg(Segment leg, int index) {
+        if (legs.contains(leg)) throw new IllegalArgumentException("You cannot add the same segment twice.");
+        legs.add(index, leg);
+        ((PlainSegment) leg).setEpisode(this, true);
     }
 
     @Override
@@ -44,17 +59,32 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
         return person;
     }
 
+    void setPerson(Person person) {
+        this.person = person;
+    }
+
     public List<Segment> getLegs() {
         return legs;
     }
 
     public void addActivity(Segment activity) {
+        if (activities.contains(activity)) throw new IllegalArgumentException("You cannot add the same segment twice.");
         activities.add(activity);
-        ((PlainSegment)activity).setEpisode(this);
+        ((PlainSegment) activity).setEpisode(this, false);
     }
 
     public List<Segment> getActivities() {
         return activities;
+    }
+
+    public void removeActivity(Segment activity) {
+        activities.remove(activity);
+        ((PlainSegment) activity).setEpisode(null, false);
+    }
+
+    public void removeLeg(Segment leg) {
+        legs.remove(leg);
+        ((PlainSegment) leg).setEpisode(null, true);
     }
 
     public PlainEpisode clone() {
@@ -74,9 +104,5 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
         }
 
         return clone;
-    }
-
-    void setPerson(Person person) {
-        this.person = person;
     }
 }

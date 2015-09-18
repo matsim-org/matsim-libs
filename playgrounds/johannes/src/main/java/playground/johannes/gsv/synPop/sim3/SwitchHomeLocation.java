@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -31,14 +32,14 @@ public class SwitchHomeLocation implements SwitchMutator {
 	public static final Object USER_FACILITY_KEY = new Object();
 	
 	@Override
-	public boolean mutate(PlainPerson person1, PlainPerson person2) {
-		switchFacilities(person1, person2);
+	public boolean mutate(Person person1, Person person2) {
+		switchFacilities((PlainPerson)person1, (PlainPerson)person2);
 		return true;
 	}
 
 	@Override
-	public void revert(PlainPerson person1, PlainPerson person2) {
-		switchFacilities(person1, person2);
+	public void revert(Person person1, Person person2) {
+		switchFacilities((PlainPerson)person1, (PlainPerson)person2);
 	}
 	
 	private void switchFacilities(PlainPerson person1, PlainPerson person2) {

@@ -47,7 +47,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 	private static final String UNKNOWN = "unknown";
 	private static final String W = "w";
 	private static final String H = "h";
-	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
+	private static final Coord ZERO = new Coord(0.0, 0.0);
 
 	private final ModelMobilityTools model = new ModelMobilityTools();
 	private final Persons persons;
@@ -68,7 +68,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 		playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(person.getId());
 		Coord home_coord = null;
 		Coord work_coord = null;
@@ -93,7 +93,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		model.setHHDimension(p.getHousehold().getPersonCount());
 		model.setHHKids(p.getHousehold().getKidCount());
 		model.setIncome(p.getHousehold().getMunicipality().getIncome()/1000.0);
-		model.setLicenseOwnership(person.hasLicense());
+		model.setLicenseOwnership(PersonUtils.hasLicense(person));
 		model.setNationality(p.isSwiss());
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
@@ -105,11 +105,11 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		if ((22 <= c_id) && (c_id <= 26) || (c_id == 10)) {model.setLanguage(2);}
 		if (c_id == 21) {model.setLanguage(3);}
 		int mobtype = model.calcMobilityTools();
-		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
-		person.setCarAvail(null);
-		if ((0 == mobtype) || (mobtype == 3)) { person.setCarAvail(NEVER); }
-		if ((1 == mobtype) || (mobtype == 4)) { person.setCarAvail(SOMETIMES); }
-		if ((2 == mobtype) || (mobtype == 5)) { person.setCarAvail(ALWAYS); }
+		if ((3 <= mobtype) && (mobtype <= 5)) { PersonUtils.addTravelcard(person, UNKNOWN); }
+		PersonUtils.setCarAvail(person, null);
+		if ((0 == mobtype) || (mobtype == 3)) { PersonUtils.setCarAvail(person, NEVER); }
+		if ((1 == mobtype) || (mobtype == 4)) { PersonUtils.setCarAvail(person, SOMETIMES); }
+		if ((2 == mobtype) || (mobtype == 5)) { PersonUtils.setCarAvail(person, ALWAYS); }
 	}
 
 	public void run(Plan plan) {

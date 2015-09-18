@@ -156,11 +156,11 @@ public class TaxiStatusDataAnalyser
 
     public static void main(String[] args) throws ParseException, IOException
     {
-//        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
 //        String dir = "c:/local_jb/data/taxi_berlin/2014/status/";
     	
 //        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
-    	String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
+        //String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
+        String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/taxi_berlin/2013/status/";
         String statusMatricesFile = dir + "statusMatrix.xml.gz";
 
         String averagesFile = dir + "averages.csv";
@@ -181,8 +181,14 @@ public class TaxiStatusDataAnalyser
 
 //      dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile, taxisOverTimeFile);
 
-        String start = 	"20140407000000";
-        String end = 	"20140414000000";
+        
+        //2013
+        String start =  "20130415000000";
+        String end =    "20130422000000";
+        
+        //2014
+//        String start = 	"20140407000000";
+//        String end = 	"20140414000000";
         
         writeStatusByZone(statusMatrices, zonalStatuses, start, end);
         Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);

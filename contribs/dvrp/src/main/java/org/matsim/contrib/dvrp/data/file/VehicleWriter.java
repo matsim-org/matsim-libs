@@ -10,10 +10,10 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class VehicleWriter
     extends MatsimXmlWriter
 {
-    private List<Vehicle> vehicles;
+    private Iterable<Vehicle> vehicles;
 
 
-    public VehicleWriter(List<Vehicle> vehicles)
+    public VehicleWriter(Iterable<Vehicle> vehicles)
     {
         this.vehicles = vehicles;
     }
@@ -22,7 +22,7 @@ public class VehicleWriter
     public void write(String file)
     {
         openFile(file);
-        writeDoctype("vehicles", "http://matsim.org/files/dtd/vehicles_v1.dtd");
+        writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd");
         writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
         writeVehicles();
         writeEndTag("vehicles");
@@ -35,7 +35,8 @@ public class VehicleWriter
         for (Vehicle veh : vehicles) {
             List<Tuple<String, String>> atts = new ArrayList<>();
             atts.add(new Tuple<String, String>("id", veh.getId().toString()));
-            atts.add(new Tuple<String, String>("start_link", veh.getStartLink().getId().toString()));
+            atts.add(
+                    new Tuple<String, String>("start_link", veh.getStartLink().getId().toString()));
             atts.add(new Tuple<String, String>("t_0", veh.getT0() + ""));
             atts.add(new Tuple<String, String>("t_1", veh.getT1() + ""));
             writeStartTag("vehicle", atts, true);

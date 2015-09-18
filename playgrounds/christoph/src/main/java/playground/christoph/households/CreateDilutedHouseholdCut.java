@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -37,10 +38,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdsWriterV10;
@@ -80,7 +81,7 @@ public class CreateDilutedHouseholdCut {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  calculate area of interest... ");
-		final CoordImpl center = new CoordImpl(xCoord, yCoord);
+		final Coord center = new Coord(xCoord, yCoord);
 		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
@@ -137,7 +138,7 @@ public class CreateDilutedHouseholdCut {
 
 		log.info("  removing not selected plans...");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 		log.info("  done.");
 		

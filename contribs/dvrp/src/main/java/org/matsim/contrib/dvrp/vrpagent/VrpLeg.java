@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
@@ -90,7 +91,7 @@ public class VrpLeg
         if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
             throw new IllegalStateException();
         }
-        
+
         //divertedPath must be derived from the original one 
         if (divertedPath.getOriginalPath() != path) {
             throw new IllegalArgumentException();

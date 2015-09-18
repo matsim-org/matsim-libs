@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -150,12 +151,12 @@ public class TtTotalDelayTest {
 	static void createNetwork(Scenario scenario){
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
-		
-		Node node1 = factory.createNode(Id.createNodeId("1"), scenario.createCoord(0, 0));
-		Node node2 = factory.createNode(Id.createNodeId("2"), scenario.createCoord(0, 1000));
-		Node node3 = factory.createNode(Id.createNodeId("3"), scenario.createCoord(0, 2000));
-		Node node4 = factory.createNode(Id.createNodeId("4"), scenario.createCoord(0, 3000));
-		Node node5 = factory.createNode(Id.createNodeId("5"), scenario.createCoord(0, 4000));
+
+		Node node1 = factory.createNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+		Node node2 = factory.createNode(Id.createNodeId("2"), new Coord((double) 0, (double) 1000));
+		Node node3 = factory.createNode(Id.createNodeId("3"), new Coord((double) 0, (double) 2000));
+		Node node4 = factory.createNode(Id.createNodeId("4"), new Coord((double) 0, (double) 3000));
+		Node node5 = factory.createNode(Id.createNodeId("5"), new Coord((double) 0, (double) 4000));
 
 		network.addNode(node1);
 		network.addNode(node2);

@@ -43,6 +43,9 @@ pickupDuration         120
 #duration of a dropoff
 dropoffDuration        60
 
+#simulate battery charging and discharging
+#batteryChargingDischarging
+
 #(on/off) visualization
 #otfVis
 

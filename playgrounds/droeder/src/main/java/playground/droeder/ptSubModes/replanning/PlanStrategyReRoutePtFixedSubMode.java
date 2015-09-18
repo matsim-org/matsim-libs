@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
@@ -93,8 +92,8 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 			return;
 		}
 		//make the chosen Plan selected and create a deep copy. The copied plan will be selected automatically.
-		((PersonImpl)person).setSelectedPlan(p);
-		this.plans.add(((PersonImpl)person).createCopyOfSelectedPlanAndMakeSelected());
+		((Person)person).setSelectedPlan(p);
+		this.plans.add(((Person)person).createCopyOfSelectedPlanAndMakeSelected());
 	}
 
 	@Override

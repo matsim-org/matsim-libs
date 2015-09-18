@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.NetworkFeatureFactory;
@@ -65,7 +64,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 			p.setName(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 		}
 
-		Coord centerCoord = this.coordTransform.transform((new CoordImpl(from.getX() + (to.getX() - from.getX())/2, from.getY() + (to.getY() - from.getY())/2)));
+		Coord centerCoord = this.coordTransform.transform((new Coord(from.getX() + (to.getX() - from.getX()) / 2, from.getY() + (to.getY() - from.getY()) / 2)));
 
 		Coord fromCoord = this.coordTransform.transform(from);
 		Coord toCoord = this.coordTransform.transform(to);

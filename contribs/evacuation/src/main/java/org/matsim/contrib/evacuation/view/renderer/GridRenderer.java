@@ -50,7 +50,6 @@ import org.matsim.contrib.evacuation.model.config.ToolConfig;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class GridRenderer extends AbstractRenderLayer {
@@ -127,14 +126,13 @@ public class GridRenderer extends AbstractRenderLayer {
 					&& (leaveTimes != null)) {
 
 				Coord fromCoord = this.controller.getCtTarget2Osm().transform(
-						new CoordImpl(link.getFromNode().getCoord().getX(),
-								link.getFromNode().getCoord().getY()));
+						new Coord(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
 				Point2D fromP2D = this.controller
 						.geoToPixel(new Point2D.Double(fromCoord.getY(),
 								fromCoord.getX()));
 
 				Coord toCoord = this.controller.getCtTarget2Osm().transform(
-						new CoordImpl(link.getToNode().getCoord().getX(), link
+						new Coord(link.getToNode().getCoord().getX(), link
 								.getToNode().getCoord().getY()));
 				Point2D toP2D = this.controller.geoToPixel(new Point2D.Double(
 						toCoord.getY(), toCoord.getX()));
@@ -192,15 +190,15 @@ public class GridRenderer extends AbstractRenderLayer {
 
 				// get cell coordinate (+ gridsize) and transform into pixel
 				// coordinates
-				CoordImpl cellCoord = cell.getCoord();
+				Coord cellCoord = cell.getCoord();
 				Coord transformedCoord = this.ctInverse
-						.transform(new CoordImpl(cellCoord.getX() - gridSize
+						.transform(new Coord(cellCoord.getX() - gridSize
 								/ 2, cellCoord.getY() - gridSize / 2));
 				Point2D cellCoordP2D = this.controller
 						.geoToPixel(new Point2D.Double(transformedCoord.getY(),
 								transformedCoord.getX()));
 				Coord cellPlusGridCoord = this.ctInverse
-						.transform(new CoordImpl(cellCoord.getX() + gridSize
+						.transform(new Coord(cellCoord.getX() + gridSize
 								/ 2, cellCoord.getY() + gridSize / 2));
 				Point2D cellPlusGridCoordP2D = this.controller
 						.geoToPixel(new Point2D.Double(
@@ -343,12 +341,12 @@ public class GridRenderer extends AbstractRenderLayer {
 		double gridSize = this.data.getCellSize();
 
 		Coord gridFromCoord = this.controller.getCtTarget2Osm().transform(
-				new CoordImpl(minX - gridSize / 2, minY - gridSize / 2));
+				new Coord(minX - gridSize / 2, minY - gridSize / 2));
 		Point2D fromGridPoint = this.controller.geoToPixel(new Point2D.Double(
 				gridFromCoord.getY(), gridFromCoord.getX()));
 
 		Coord gridToCoord = this.controller.getCtTarget2Osm().transform(
-				new CoordImpl(maxX + gridSize / 2, maxY + gridSize / 2));
+				new Coord(maxX + gridSize / 2, maxY + gridSize / 2));
 		Point2D toGridPoint = this.controller.geoToPixel(new Point2D.Double(
 				gridToCoord.getY(), gridToCoord.getX()));
 

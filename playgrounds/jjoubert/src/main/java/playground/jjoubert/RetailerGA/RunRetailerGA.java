@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import playground.jjoubert.Utilities.MyPermutator;
+import playground.southafrica.utilities.MyPermutator;
 
 public class RunRetailerGA {
 	private final static Logger log = Logger.getLogger(RunRetailerGA.class);

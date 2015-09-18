@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.obj.GenericResult;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -121,7 +120,7 @@ public class GenerateTableHubLinkMapping {
 		
 		
 		for (int i=0;i<matrix.getNumberOfRows();i++){
-			Coord currentHubManagerCoord=new CoordImpl(matrix.getDouble(i, 1), matrix.getDouble(i, 2)); 
+			Coord currentHubManagerCoord= new Coord(matrix.getDouble(i, 1), matrix.getDouble(i, 2));
 			double distance=GeneralLib.getDistance(link.getCoord(), currentHubManagerCoord);
 			
 			if (distance<maxDistance && distance<closestHubDistance){
@@ -148,8 +147,8 @@ public class GenerateTableHubLinkMapping {
 	private static GenericResult getCornerCoordinates(Matrix matrix) {
 		GenericResult genericResult;
 
-		Coord bottomLeft = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
-		Coord topRight = new CoordImpl(Double.MIN_VALUE, Double.MIN_VALUE);
+		Coord bottomLeft = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+		Coord topRight = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
 
 		for (int i = 0; i < matrix.getNumberOfRows(); i++) {
 			double x = matrix.getDouble(i, 1);

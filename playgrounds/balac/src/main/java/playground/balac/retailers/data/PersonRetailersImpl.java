@@ -1,17 +1,21 @@
 package playground.balac.retailers.data;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 
 import playground.balac.retailers.RetailersLocationListener;
 
-public class PersonRetailersImpl extends PersonImpl
+public class PersonRetailersImpl implements Person
 {
+	private final Person delegate ;
+	
   private static final Logger log = Logger.getLogger(RetailersLocationListener.class);
   private Customizable customizableDelegate;
   private Id workRetailZone;
@@ -22,17 +26,10 @@ public class PersonRetailersImpl extends PersonImpl
 
   public PersonRetailersImpl(PersonImpl p)
   {
-    super(p.getId());
+	  delegate = PersonImpl.createPerson(p.getId());
     this.plans = p.getPlans();
     addPlan(p.getSelectedPlan());
     setSelectedPlan(p.getSelectedPlan());
-    this.desires = new MyDesires(p.getDesires());
-    createDesires(p.getDesires().toString());
-    
-    for (String actType:p.getDesires().getActivityDurations().keySet()) {
-    	Double actDur = p.getDesires().getActivityDuration(actType);
-    	this.desires.putActivityDuration(actType, actDur);
-    }
   }
    
 
@@ -45,7 +42,43 @@ public class PersonRetailersImpl extends PersonImpl
     return this.globalShopsUtility;
   }
 
-  public void modifyDesires(String actType, Double durs) {
-    desires.putActivityDuration(actType, durs);
-  }
+
+public List<? extends Plan> getPlans() {
+		return delegate.getPlans();
+}
+
+
+public boolean addPlan(Plan p) {
+		return delegate.addPlan(p);
+}
+
+
+public boolean removePlan(Plan p) {
+		return delegate.removePlan(p);
+}
+
+
+public Plan getSelectedPlan() {
+		return delegate.getSelectedPlan();
+}
+
+
+public void setSelectedPlan(Plan selectedPlan) {
+		delegate.setSelectedPlan(selectedPlan);
+}
+
+
+public Plan createCopyOfSelectedPlanAndMakeSelected() {
+		return delegate.createCopyOfSelectedPlanAndMakeSelected();
+}
+
+
+public Id<Person> getId() {
+		return delegate.getId();
+}
+
+
+public Map<String, Object> getCustomAttributes() {
+		return delegate.getCustomAttributes();
+}
 }

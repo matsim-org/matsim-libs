@@ -40,8 +40,8 @@ public class OTFVisNet
             netFile = args[1];
         }
         else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+            throw new IllegalArgumentException(
+                    "Incorrect program arguments: " + Arrays.toString(args));
         }
 
         OTFVis.playNetwork(dir + netFile);

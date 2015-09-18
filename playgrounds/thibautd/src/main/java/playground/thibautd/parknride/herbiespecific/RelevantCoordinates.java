@@ -20,7 +20,6 @@
 package playground.thibautd.parknride.herbiespecific;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Defines coordinates of some landmarks in Zurich. Taken from the PT stop facilities.
@@ -30,9 +29,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class RelevantCoordinates {
 	private RelevantCoordinates() {}
 
-	public final static Coord HAUPTBAHNHOF = new CoordImpl( 683146.0 , 247872.0 );
-	public final static Coord HARDBRUECKE = new CoordImpl( 681436.3 , 248826.4 );
-	public final static Coord STADELHOFEN = new CoordImpl( 683841.6 , 246706.6 );
-	public final static Coord SEEBACH = new CoordImpl( 683867.8  , 252911.3 );
-	public final static Coord OERLIKON = new CoordImpl( 683446.7 , 251749.7 );
+	public final static Coord HAUPTBAHNHOF = new Coord(683146.0, 247872.0);
+	public final static Coord HARDBRUECKE = new Coord(681436.3, 248826.4);
+	public final static Coord STADELHOFEN = new Coord(683841.6, 246706.6);
+	public final static Coord SEEBACH = new Coord(683867.8, 252911.3);
+	public final static Coord OERLIKON = new Coord(683446.7, 251749.7);
 }

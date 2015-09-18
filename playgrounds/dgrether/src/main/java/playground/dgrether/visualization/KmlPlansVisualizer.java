@@ -24,12 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.ScreenOverlayType;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,7 +33,6 @@ import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -47,6 +40,11 @@ import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
 import playground.dgrether.matsimkml.KmlPlansWriter;
 
 
@@ -77,8 +75,7 @@ public class KmlPlansVisualizer {
 		Config conf = new Config();
 		ConfigReader reader = new ConfigReader(conf);
 		reader.readFile(config);
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
-		new ScenarioLoaderImpl(conf).loadScenario();
+		scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
 		this.linkTuples = linkTuples;
 	}
 

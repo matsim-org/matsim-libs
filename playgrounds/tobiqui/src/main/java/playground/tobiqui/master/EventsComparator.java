@@ -111,11 +111,22 @@ public class EventsComparator {
 		}
 //		
 		//average travel-time difference
-		avgTravelTimeDif = Math.round(avgTravelTimeDif/travelTimeDif.size());
-		avgTravelTimeDifCar = Math.round(avgTravelTimeDifCar/travelTimeDifCar.size());
-		avgTravelTimeDifBus = Math.round(avgTravelTimeDifBus/travelTimeDifBus.size());
-		avgTravelTimeDifWalk = Math.round(avgTravelTimeDifWalk/travelTimeDifWalk.size());
-		//average leg distance
+		if (travelTimeDif.size() != 0)
+			avgTravelTimeDif = Math.round(avgTravelTimeDif/travelTimeDif.size());
+		else
+			avgTravelTimeDif = 0;
+		if (travelTimeDifCar.size() != 0)
+			avgTravelTimeDifCar = Math.round(avgTravelTimeDifCar/travelTimeDifCar.size());
+		else
+			avgTravelTimeDifCar = 0;
+		if (travelTimeDifBus.size() != 0)
+			avgTravelTimeDifBus = Math.round(avgTravelTimeDifBus/travelTimeDifBus.size());
+		else
+			avgTravelTimeDifBus = 0;
+		if (travelTimeDifWalk.size() != 0)
+			avgTravelTimeDifWalk = Math.round(avgTravelTimeDifWalk/travelTimeDifWalk.size());
+		else
+			avgTravelTimeDifWalk = 0;
 
 //		//gets the 10% of agents with the biggest difference of travel-time on average 
 //		ValueSortedMap <Id, Integer> travelTimeDifSorted = new ValueSortedMap<Id, Integer>();	

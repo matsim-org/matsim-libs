@@ -32,9 +32,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author illenberger
@@ -45,11 +47,12 @@ public class PopulationClipping {
 	private static final String MODULE_NAME = "populationClipping";
 
 	public static void main(String[] args) {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		loader.loadScenario();
-		Scenario data = loader.getScenario();
-		Config config = data.getConfig();
-
+		
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		String outputDir = config.getParam(MODULE_NAME, "output");
 		double x = Double.parseDouble(config.getParam(MODULE_NAME, "x"));
 		double y = Double.parseDouble(config.getParam(MODULE_NAME, "y"));
@@ -71,7 +74,7 @@ public class PopulationClipping {
 		double minY = y;
 		double maxY = y + height;
 
-		Population pop = data.getPopulation();
+		Population pop = scenario.getPopulation();
 		List<Person> remove = new LinkedList<Person>();
 		for(Person p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)
@@ -97,16 +100,16 @@ public class PopulationClipping {
 		for(Person p : remove)
 			pop.getPersons().remove(p.getId());
 
-		new PopulationWriter(pop, data.getNetwork()).write(outputDir + "plans.xml");
+		new PopulationWriter(pop, scenario.getNetwork()).write(outputDir + "plans.xml");
 
 		for(double f = 0.001; f < 0.01; f += 0.001) {
 			String file = String.format("%1$splans.%2$.3f.xml", outputDir, f);
-			new PopulationWriter(pop, data.getNetwork(), f).write(file);
+			new PopulationWriter(pop, scenario.getNetwork(), f).write(file);
 		}
 
 		for(double f = 0.01; f <= 0.1; f += 0.01) {
 			String file = String.format("%1$splans.%2$.2f.xml", outputDir, f);
-			new PopulationWriter(pop, data.getNetwork(), f).write(file);
+			new PopulationWriter(pop, scenario.getNetwork(), f).write(file);
 		}
 	}
 

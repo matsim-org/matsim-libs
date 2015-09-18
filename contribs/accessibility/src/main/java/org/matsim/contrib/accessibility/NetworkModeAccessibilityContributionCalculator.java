@@ -67,7 +67,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 						travelDisutilityFactory.createTravelDisutility(
 								ttc,
 								planCalcScoreConfigGroup ),
-						this.scheme ) ;
+								this.scheme ) ;
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
 			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
@@ -76,7 +76,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 
 		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
+		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceRateCar();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 
 		constCar		= planCalcScoreConfigGroup.getConstantCar();
@@ -97,10 +97,10 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
 		// get the nearest link:
-        Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 
-        // captures the distance (as walk time) between the origin via the link to the node:
-        Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		// captures the distance (as walk time) between the origin via the link to the node:
+		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();
@@ -109,7 +109,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 		// distance to road, and then to node:
-        double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
@@ -121,13 +121,13 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		double road2NodeToll_money = getToll(nearestLink, scheme, departureTime); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
 		double toll_money 							= 0.;
 		if ( scheme != null ) {
-            if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType()))
-                toll_money = road2NodeToll_money;
-            else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()))
-                toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
-            else
-                throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
-        }
+			if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType()))
+				toll_money = road2NodeToll_money;
+			else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()))
+				toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
+			else
+				throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
+		}
 
 		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
 		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, departureTime, null, null);
@@ -137,18 +137,17 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
 		// paper to check it is correct...)
+		// yy who is "I" in the above statement?  kai, aug'15
 		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
 				expVhiWalk * sumExpVjkWalk;
 	}
 
-	private static double getToll(
-			final Link nearestLink,
-			final RoadPricingScheme scheme,
-			final double departureTime) {
+	private static double getToll( final Link nearestLink, final RoadPricingScheme scheme, final double departureTime) {
 		if(scheme != null){
 			RoadPricingSchemeImpl.Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null);
-			if(cost != null)
+			if(cost != null) {
 				return cost.amount;
+			}
 		}
 		return 0.;
 	}

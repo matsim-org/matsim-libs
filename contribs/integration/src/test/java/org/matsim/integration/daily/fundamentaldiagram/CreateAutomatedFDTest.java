@@ -48,6 +48,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -87,20 +88,28 @@ public class CreateAutomatedFDTest {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
+		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private static final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
+		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
+		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
 			this.actEndTime = actEndTime;
+			this.plannedVehicleId = Id.create(agentId, Vehicle.class);
 		}
 
 		private final Id<Person> personId;
+		private final Id<Vehicle> plannedVehicleId;
 		private final String mode;
 		private final double actEndTime;
 
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
 
-		private Id<Link> currentLinkId = Id.createLinkId("home");
+		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
 		private State agentState= MobsimAgent.State.ACTIVITY;;
 
 		@Override
@@ -110,7 +119,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return Id.createLinkId("work");
+			return DESTINATION_LINK_ID;
 		}
 
 		@Override
@@ -124,18 +133,18 @@ public class CreateAutomatedFDTest {
 				isArriving = true; 
 			}
 
-			if(this.getCurrentLinkId().equals(Id.createLinkId("home"))){
-				return Id.createLinkId(0);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(0))){
+			if( ORIGIN_LINK_ID.equals(this.currentLinkId ) ){
+				return BASE_LINK_ID;
+			} else if( BASE_LINK_ID.equals( this.currentLinkId ) ) {
 				if ( isArriving) {
-					return Id.createLinkId("work") ;
+					return DESTINATION_LINK_ID ;
 				} else {
-					return Id.createLinkId(1) ;
+					return MIDDEL_LINK_ID_OF_TRACK ;
 				}
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(1))){
-				return Id.createLinkId(2);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(2))){
-				return Id.createLinkId(0);
+			} else if(MIDDEL_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
+				return LAST_LINK_ID_OF_TRACK;
+			} else if(LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
+				return BASE_LINK_ID;
 			} else return null; // returning null so that agent will arrive.
 
 		}
@@ -166,7 +175,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
-			return Id.create(this.getId(), Vehicle.class);
+			return this.plannedVehicleId;
 		}
 
 		@Override
@@ -213,7 +222,6 @@ public class CreateAutomatedFDTest {
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			throw new RuntimeException("not implemented");
 		}
-
 	}
 
 	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
@@ -436,11 +444,12 @@ public class CreateAutomatedFDTest {
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), scenario.createCoord(-50, 0));
-		Node node1 = network.createAndAddNode(Id.createNodeId(0), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.createNodeId(1), scenario.createCoord(1000, 0));
-		Node node3 = network.createAndAddNode(Id.createNodeId(2), scenario.createCoord(500, 866.0));
-		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), scenario.createCoord(1050,0));
+		double x = -50;
+		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), new Coord(x, (double) 0));
+		Node node1 = network.createAndAddNode(Id.createNodeId(0), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 1000, (double) 0));
+		Node node3 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 500, 866.0));
+		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
 		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, 60, 27000, 1);
 		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, 60, 2700, 1);

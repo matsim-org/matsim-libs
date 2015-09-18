@@ -39,7 +39,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -390,6 +389,21 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Override
+		public void setRouteDescription(String routeDescription) {
+			throw new UnsupportedOperationException("read only route.");
+		}
+		
+		@Override
+		public String getRouteDescription() {
+			return this.delegate.getRouteDescription();
+		}
+		
+		@Override
+		public String getRouteType() {
+			return this.delegate.getRouteType();
+		}
+		
 		@Override
 		@Deprecated
 		public double getDistance() {

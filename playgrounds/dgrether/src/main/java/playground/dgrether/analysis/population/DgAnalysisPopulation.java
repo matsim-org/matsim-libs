@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Envelope;
 /**
@@ -140,8 +139,8 @@ public class DgAnalysisPopulation {
 	
 	
 	private void calculateBoundingBox(){
-		Coord minNW = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
-		Coord maxSE = new CoordImpl(Double.MIN_VALUE, Double.MIN_VALUE);
+		Coord minNW = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+		Coord maxSE = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
 		for (DgPersonData pers : this.getPersonData().values()){
 			Coord current = pers.getFirstActivity().getCoord();
 			if (current == null) {

@@ -84,9 +84,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney" ;
 
-	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate_";
-	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar" ;
-	private static final String MONETARY_DISTANCE_COST_RATE_PT  = "monetaryDistanceCostRatePt" ;
+	@Deprecated
+	private static final String MONETARY_DISTANCE_COST_RATE = "monetaryDistanceCostRate";
+
+	private static final String MONETARY_DISTANCE_RATE_ = "monetaryDistanceRate_" ;
+	private static final Object MONETARY_DISTANCE_RATE_CAR = "monetaryDistanceRateCar";
+	private static final Object MONETARY_DISTANCE_RATE_PT = "monetaryDistanceRatePt";
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch" ;
 
@@ -191,8 +194,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 		else if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_COST_RATE.length()));
-			modeParams.setMonetaryDistanceCostRate(Double.parseDouble(value));
+			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
+					+ "mode-parameters (see output of any recent run), and mode-specific monetary "
+					+ "distance rate.") ;
+		}
+		else if (key.startsWith(MONETARY_DISTANCE_RATE_)) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_RATE_.length()));
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
+		}
+		else if ( MONETARY_DISTANCE_RATE_CAR.equals(key) ){
+			ModeParams modeParams = getOrCreateModeParams( TransportMode.car ) ;
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
+		}
+		else if ( MONETARY_DISTANCE_RATE_PT.equals(key) ){
+			ModeParams modeParams = getOrCreateModeParams( TransportMode.pt ) ;
+			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		}
 		else if (key.startsWith(CONSTANT)) {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
@@ -245,13 +261,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		else if ( CONSTANT_BIKE.equals(key)) {
 			this.setConstantBike(Double.parseDouble(value)) ;
-		}
-
-		// backward compatibility: "typed" monetary cost rate
-		else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
-			setMonetaryDistanceCostRateCar( Double.parseDouble(value) );
-		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
-			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		}
 
 		else if ( WAITING_PT.equals( key ) ) {
@@ -740,7 +749,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
-		private double monetaryDistanceCostRate = 0.0;
+		private double monetaryDistanceRate = 0.0;
 		private double constant = 0.0;
 
 		public ModeParams(final String mode) {
@@ -809,15 +818,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.constant = constant;
 		}
 
-		@StringGetter( "monetaryDistanceCostRate" )
-		public double getMonetaryDistanceCostRate() {
-			return this.monetaryDistanceCostRate;
+		@StringGetter( "monetaryDistanceRate" )
+		public double getMonetaryDistanceRate() {
+			return this.monetaryDistanceRate;
 		}
 
-		@StringSetter( "monetaryDistanceCostRate" )
-		public void setMonetaryDistanceCostRate(double monetaryDistanceCostRateCar) {
+		@StringSetter( "monetaryDistanceRate" )
+		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked() ;
-			this.monetaryDistanceCostRate = monetaryDistanceCostRateCar;
+			this.monetaryDistanceRate = monetaryDistanceRate;
 		}
 
 	}
@@ -861,74 +870,104 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public double getMonetaryDistanceCostRateCar() {
-		return this.getModes().get(TransportMode.car).getMonetaryDistanceCostRate();
+	@Deprecated // use ModeParams (getModes().get...) directly
+	public double getMonetaryDistanceRateCar() {
+		return this.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+	}
+	@Deprecated // use ModeParams (getModes().get...) directly
+	public void setMonetaryDistanceRateCar(double monetaryDistanceRateCar) {
+		this.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+	}
+	@Deprecated // use ModeParams (getModes().get...) directly
+	public double getMonetaryDistanceRatePt() {
+		return this.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 	}
 
-	public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
-		this.getModes().get(TransportMode.car).setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
+	@Deprecated // use ModeParams (getModes().get...) directly
+	public void setMonetaryDistanceRatePt(double monetaryDistanceRatePt) {
+		this.getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 	}
 
-	public double getMonetaryDistanceCostRatePt() {
-		return this.getModes().get(TransportMode.pt).getMonetaryDistanceCostRate();
-	}
 
-	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
-		this.getModes().get(TransportMode.pt).setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
-	}
-
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getConstantCar() {
 		return getModes().get(TransportMode.car).getConstant();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setConstantCar(double constantCar) {
 		getModes().get(TransportMode.car).setConstant(constantCar);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getConstantWalk() {
 		return getModes().get(TransportMode.walk).getConstant();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setConstantWalk(double constantWalk) {
 		getModes().get(TransportMode.walk).setConstant(constantWalk);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getConstantPt() {
 		return getModes().get(TransportMode.pt).getConstant();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setConstantPt(double constantPt) {
 		getModes().get(TransportMode.pt).setConstant(constantPt);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getConstantBike() {
 		return getModes().get(TransportMode.bike).getConstant();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setConstantBike(double constantBike) {
 		getModes().get(TransportMode.bike).setConstant(constantBike);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getTravelingOther_utils_hr() {
 		return getModes().get(TransportMode.other).getMarginalUtilityOfTraveling();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getConstantOther() {
 		return getModes().get(TransportMode.other).getConstant();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public double getMarginalUtlOfDistanceOther() {
 		return getModes().get(TransportMode.other).getMarginalUtilityOfDistance();
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setMarginalUtlOfDistanceOther(double marginalUtlOfDistanceOther) {
 		this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(marginalUtlOfDistanceOther);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setConstantOther(double constantOther) {
 		getModes().get(TransportMode.other).setConstant(constantOther);
 	}
 
+
+	@Deprecated // use ModeParams (getModes().get...) directly
 	public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
 		this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(travelingOtherUtilsHr);
 	}

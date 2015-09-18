@@ -37,8 +37,9 @@ public final class TravelTimeAndDistanceBasedTravelDisutilityFactory implements 
 		return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
 	}
 	
-	public final void setSigma( double val ) {
+	public final TravelTimeAndDistanceBasedTravelDisutilityFactory setSigma( double val ) {
 		this.sigma = val ;
+		return this ;
 	}
 
 }
