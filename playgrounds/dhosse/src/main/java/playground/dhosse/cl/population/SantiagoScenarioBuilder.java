@@ -866,10 +866,10 @@ public class SantiagoScenarioBuilder {
 	private static void setPlanParameters(PlansConfigGroup plans){
 		
 		plans.setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		plans.setInputPersonAttributeFile(null); //TODO
+		plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml"); //TODO
 		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName(null); //TODO
+		plans.setSubpopulationAttributeName("carAvail"); //TODO
 		plans.setRemovingUnneccessaryPlanAttributes(true);
 		
 	}
@@ -976,7 +976,7 @@ public class SantiagoScenarioBuilder {
 		
 		StrategySettings changeExpBeta = new StrategySettings();
 		changeExpBeta.setStrategyName("ChangeExpBeta");
-		changeExpBeta.setWeight(0.7);
+		changeExpBeta.setWeight(0.6);
 		strategy.addStrategySettings(changeExpBeta);
 		
 		StrategySettings reRoute = new StrategySettings();
@@ -984,12 +984,20 @@ public class SantiagoScenarioBuilder {
 		reRoute.setWeight(0.3);
 		strategy.addStrategySettings(reRoute);
 		
+		//TODO: add subTourModeChoice
+		StrategySettings subTourModeChoice = new StrategySettings();
+		subTourModeChoice.setStrategyName("SubtourModeChoice");
+		subTourModeChoice.setSubpopulation("carAvail");
+		subTourModeChoice.setWeight(0.1);
+		strategy.addStrategySettings(subTourModeChoice);
+	
+		
 	}
 	
 	private static void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
 		
 		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
-		smc.setConsiderCarAvailability(false);
+		smc.setConsiderCarAvailability(true); //TODO true or false (KT 2015-09-18
 		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
 		
 	}
