@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.xqj.basex.bin.K;
+import net.xqj.basex.bin.V;
+
 /**
  * @author illenberger
  *
