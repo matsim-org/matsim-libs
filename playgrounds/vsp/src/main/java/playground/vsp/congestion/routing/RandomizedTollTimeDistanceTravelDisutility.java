@@ -51,13 +51,13 @@ public class RandomizedTollTimeDistanceTravelDisutility implements TravelDisutil
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 				
+		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+		
 		double logNormalRnd = 1. ;
 		if ( sigma != 0. ) {
 			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
 		}
-		
-		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-		
+				
 		double tollCostsForLink = -1. * this.tollHandler.getAvgToll(link.getId(), time);
 		double randomizedTollDisutilityForLink = tollCostsForLink * this.marginalUtilityOfMoney * logNormalRnd;
 		
