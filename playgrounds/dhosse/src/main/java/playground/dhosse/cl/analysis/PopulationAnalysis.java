@@ -23,7 +23,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class PopulationAnalysis {
 
-	private static final String runPath = "../../runs-svn/santiago/run10/output/";
+	private static final String runPath = "../../runs-svn/santiago/run11b/output/";
 	
 	private static final String analysisPath = runPath+ "../analysis/";
 	
@@ -31,7 +31,7 @@ public class PopulationAnalysis {
 		
 		createDir(new File(analysisPath));
 
-//		getPersonsWithNegativeScores();
+		getPersonsWithNegativeScores();
 		getPersonsWithCarLegWOCarAvail();
 		
 		System.out.println("### Done. ###");
@@ -107,7 +107,7 @@ public class PopulationAnalysis {
 		attrReader.parse(attributesFile);
 		
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
-			System.out.println(attributes.getAttribute(agentIdString , "carAvail"));
+			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
 			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carAvail"));
 			agentIdString2CarAvail.put(agentIdString, carAvail);
 		}
