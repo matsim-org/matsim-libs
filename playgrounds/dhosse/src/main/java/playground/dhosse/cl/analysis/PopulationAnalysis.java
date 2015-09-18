@@ -7,23 +7,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.TreeMap;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+
 public class PopulationAnalysis {
 
-	private static final String runPath = "../../runs-svn/santiago/run11b/";
+	private static final String runPath = "../../runs-svn/santiago/run10/";
 	
 	private static final String analysisPath = runPath+ "analysis/";
 	
@@ -34,11 +36,15 @@ public class PopulationAnalysis {
 		getPersonsWithNegativeScores();
 		
 		//Input
-		getPersonsWithCarLegWOCarAvail(runPath+ "input/plans_final.xml.gz", runPath + "input/agentAttributes.xml", analysisPath + "carUseWOCarAvailable_InputData.txt");
+		Population pop1 = getPopulationWithCarLegWOCarAvail(runPath+ "input/plans_final.xml.gz", runPath + "input/agentAttributes.xml", 
+				analysisPath + "carUseWOCarAvailable_InputData.txt");
 		
 		//Output
-		getPersonsWithCarLegWOCarAvail(runPath + "output/output_plans.xml.gz", runPath + "output/output_personAttributes.xml.gz", analysisPath + "carUseWOCarAvailable_OutputData.txt");
+		Population pop2 = getPopulationWithCarLegWOCarAvail(runPath + "output/output_plans.xml.gz", runPath + "output/output_personAttributes.xml.gz", 
+				analysisPath + "carUseWOCarAvailable_OutputData.txt");
 		
+		new PopulationWriter(pop1).write(analysisPath + "carUseWOCarAvailable_InputPopulation.xml");
+		new PopulationWriter(pop2).write(analysisPath + "carUseWOCarAvailable_OutputPopulation.xml");
 		
 		System.out.println("### Done. ###");
 		
@@ -85,11 +91,11 @@ public class PopulationAnalysis {
 		
 	}
 
-	private static void getPersonsWithCarLegWOCarAvail(String plansFile, String attributesFile, String outputFile){
-		
-
-		
-		Map<String, Boolean> agentIdString2CarAvail = new HashMap<String, Boolean>();
+	private static Population getPopulationWithCarLegWOCarAvail(String plansFile, String attributesFile, String outputFile){
+				
+		Map<String, Boolean> agentIdString2CarAvail = new HashMap<String, Boolean>(); //car availability of all car users in selected plan
+		Map<Id<Person>, Person> carUsersId2Person = new TreeMap<Id<Person>, Person>(); 
+		Map<Id<Person>, Person> carUsersWoCarAvailable = new TreeMap<Id<Person>, Person>();
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).parse(plansFile);
@@ -101,52 +107,67 @@ public class PopulationAnalysis {
 						Leg leg = (Leg) pe;
 						if (leg.getMode() == "car"){ 
 							agentIdString2CarAvail.put(person.getId().toString(), false); // Assumption, that carAvail is false; carAvail will be checked later.
+							carUsersId2Person.put(person.getId(), person);
 						}
 					}
 			}
 		}
 		System.out.println("Number of agents using car: " + agentIdString2CarAvail.size());
 		
+		//read attributes -- carAvail?
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader attrReader = new ObjectAttributesXmlReader(attributes);
 		attrReader.parse(attributesFile);
 		
+		//write car availability to car users.
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
-//			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
+			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
 			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carAvail"));
 			agentIdString2CarAvail.put(agentIdString, carAvail);
 		}
 		
-		int countCarUserswihtCarAvail = 0;
+		//Count car users with car avail
+		int countCarUserswithCarAvail = 0;
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
 			if (agentIdString2CarAvail.get(agentIdString) == true) {
-				countCarUserswihtCarAvail ++;
+				countCarUserswithCarAvail ++;
 			}
 		}
-		System.out.println(countCarUserswihtCarAvail + " of " + agentIdString2CarAvail.size() + " have a car available.");
+		System.out.println(countCarUserswithCarAvail + " of " + agentIdString2CarAvail.size() + " car users have a car available.");
+		System.out.println("car user set size: " + carUsersId2Person.size());
 		
+		//separate all car users without car available
+		for (Id<Person> carUserId : carUsersId2Person.keySet()) {
+			if (agentIdString2CarAvail.get(carUserId.toString()) == false) {
+				carUsersWoCarAvailable.put(carUserId, carUsersId2Person.get(carUserId));
+			}
+		}
+		
+		//write list of car users without car available
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
-		
-		
 		try {
-			writer.write("There are " + (agentIdString2CarAvail.size() - countCarUserswihtCarAvail) + " agents using a car, but having no car available: ");
+			writer.write("There are " + carUsersWoCarAvailable.size() + " agents using a car, but having no car available: ");
 			writer.newLine();
 			
-			for (String agentIdString : agentIdString2CarAvail.keySet()) {
-				if (agentIdString2CarAvail.get(agentIdString) == false) {
-					writer.write(agentIdString);
+			for (Id<Person> carUserWoCarAvailId : carUsersWoCarAvailable.keySet()) {
+					writer.write(carUserWoCarAvailId.toString());
 					writer.newLine();
-				}
 			}
-			
 			writer.flush();
 			writer.close();
 			
 		} catch (IOException e) {
-			
 			e.printStackTrace();
-			
 		}
+		
+		//write population of car users without car available
+		Population carUsersWoCarPop = scenario.getPopulation() ;
+		carUsersWoCarPop.getPersons().clear();
+		for (Person carUserWoCarAvail : carUsersWoCarAvailable.values()){
+			carUsersWoCarPop.addPerson(carUserWoCarAvail);
+		}
+		
+		return carUsersWoCarPop;
 		
 	}
 	
