@@ -23,6 +23,7 @@ import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 import java.io.*;
 
@@ -33,7 +34,7 @@ public class GenerateODAttributes {
 
     public static final void main(String args[]) throws IOException {
         ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[1], "NO");
-        DistanceCalculator dCalc = null;
+        DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
 
         KeyMatrix m = new KeyMatrix();
         int idCounter = 0;
@@ -42,8 +43,16 @@ public class GenerateODAttributes {
         writer.write("from;to;id;distance");
         writer.newLine();
 
+        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
+
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
         String line = reader.readLine();
+        writer2.write(line);
+        writer2.write(";\"odId\";\"distance\"");
+        writer2.newLine();
+
+        double d = 0.0;
+
         while((line = reader.readLine()) != null) {
             String tokens[] = line.split(";");
             String i = tokens[0];
@@ -59,19 +68,25 @@ public class GenerateODAttributes {
                 writer.write(";");
                 writer.write(j);
                 writer.write(";");
-                writer.write(String.valueOf(id));
+                writer.write(String.valueOf(id.intValue()));
                 writer.write(";");
 
                 Zone zi = zones.get(i);
                 Zone zj = zones.get(j);
 
                 if(zi != null && zj != null) {
-                    double d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                    d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
                     writer.write(String.valueOf(d));
+                } else {
+                    d = 0.0;
                 }
 
                 writer.newLine();
             }
+
+            writer2.write(line);
+            writer2.write(String.format(";%s;%s", id.intValue(), d));
+            writer2.newLine();
         }
     }
 }
