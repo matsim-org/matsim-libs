@@ -342,6 +342,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		return params != null ? params : getScoringParametersPerSubpopulation().get( null );
 	}
 
+	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
+		ScoringParameterSet params = getScoringParametersPerSubpopulation().get( subpopulation );
+
+		if ( params ==null ) {
+			params = new ScoringParameterSet( subpopulation );
+			this.addScoringParameters( params );
+		}
+
+		return params;
+	}
 
 	@Override
 	public void addParameterSet( final ConfigGroup set ) {
@@ -823,6 +833,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ScoringParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_TYPE = "scoringParameters";
 
+		private ScoringParameterSet( final String subpopulation ) {
+			this();
+			this.subpopulation = subpopulation;
+		}
+
 		private ScoringParameterSet() {
 			super( SET_TYPE );
 		}
@@ -1007,6 +1022,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return this.getActivityParamsPerType().get(actType);
 		}
 
+		public ActivityParams getOrCreateActivityParams(final String actType) {
+			ActivityParams params = this.getActivityParamsPerType().get(actType);
+
+			if ( params == null ) {
+				params = new ActivityParams( actType );
+				addActivityParams( params );
+			}
+
+			return  params;
+		}
 
 		public Map<String, ModeParams> getModes() {
 			@SuppressWarnings("unchecked")
