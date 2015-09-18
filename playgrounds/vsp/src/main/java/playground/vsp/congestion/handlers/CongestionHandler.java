@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,19 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.congestion.handlers;
 
-package playground.johannes.gsv.synPop;
-
-import playground.johannes.synpop.data.PlainPerson;
-
-import java.util.Collection;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 
 /**
- * @author johannes
+ * @author nagel
  *
  */
-public interface ProxyPersonsTask {
+public interface CongestionHandler extends
+LinkEnterEventHandler,
+LinkLeaveEventHandler,
+TransitDriverStartsEventHandler,
+PersonDepartureEventHandler, 
+PersonStuckEventHandler,
+Wait2LinkEventHandler,
+PersonArrivalEventHandler,
+CongestionInternalization {
 
-	public void apply(Collection<PlainPerson> persons);
-	
 }

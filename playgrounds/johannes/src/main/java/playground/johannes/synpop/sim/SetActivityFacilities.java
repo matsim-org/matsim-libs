@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.johannes.synpop.sim;
 
-import playground.johannes.synpop.sim.data.CachedEpisode;
-import playground.johannes.synpop.sim.data.CachedPerson;
-import playground.johannes.synpop.sim.data.CachedSegment;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class RandomTripMutator implements Mutator<CachedSegment> {
+public class SetActivityFacilities implements EpisodeTask {
 
-    private final Random random;
+    private final FacilityData data;
 
-    private final List<CachedSegment> mutations;
-
-    public RandomTripMutator(Random random) {
-        this.random = random;
-        mutations = new ArrayList<>(1);
-        mutations.add(null);
+    public SetActivityFacilities(FacilityData data) {
+        this.data = data;
     }
 
     @Override
-    public List<CachedSegment> select(List<CachedPerson> population) {
-        CachedPerson p = population.get(random.nextInt(population.size()));
-        CachedEpisode e = (CachedEpisode)p.getEpisodes().get(random.nextInt(p.getEpisodes().size()));
-        CachedSegment leg = (CachedSegment)e.getLegs().get(random.nextInt(e.getLegs().size()));
-        mutations.set(0, leg);
-        return mutations;
-    }
-
-    @Override
-    public boolean modify(List<CachedSegment> elements) {
-        return false;
-    }
-
-    @Override
-    public void revert(List<CachedSegment> elements) {
-
+    public void apply(Episode episode) {
+        for(Segment act : episode.getActivities()) {
+            if(act.getAttribute(CommonKeys.ACTIVITY_FACILITY) == null) {
+                String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+                if(type == null) type = ActivityTypes.MISC;//FIXME
+                ActivityFacility f = data.randomFacility(type);
+                act.setAttribute(CommonKeys.ACTIVITY_FACILITY, f.getId().toString());
+            }
+        }
     }
 }

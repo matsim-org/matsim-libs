@@ -68,26 +68,26 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	/**
-	 * @param transportMode the transport mode the route should be for
+	 * @param routeType the type of the requested route
 	 * @param startLinkId the link where the route starts
 	 * @param endLinkId the link where the route ends
 	 * @return a new Route for the specified mode
 	 *
-	 * @see #setRouteFactory(String, RouteFactory)
+	 * @see #setRouteFactory(Class, RouteFactory)
 	 */
 	@Override
-	public Route createRoute(final String transportMode, final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return this.routeFactory.createRoute(transportMode, startLinkId, endLinkId);
+	public <R extends Route> R createRoute(final Class<R> routeType, final Id<Link> startLinkId, final Id<Link> endLinkId) {
+		return this.routeFactory.createRoute(routeType, startLinkId, endLinkId);
 	}
 
 	/**
-	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
-	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
-	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
+	 * Registers a {@link RouteFactory} for the specified route type. If <code>factory</code> is <code>null</code>,
+	 * the existing entry for this <code>routeType</code> will be deleted. If <code>routeType</code> is <code>null</code>,
+	 * then the default factory is set that is used if no specific RouteFactory for a routeType is set.
 	 *
 	 */
-	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
-		this.routeFactory.setRouteFactory(transportMode, factory);
+	public void setRouteFactory(final Class<? extends Route> routeType, final RouteFactory factory) {
+		this.routeFactory.setRouteFactory(routeType, factory);
 	}
 
 	public ModeRouteFactory getModeRouteFactory() {

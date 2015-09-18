@@ -34,4 +34,9 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface RouteFactory extends MatsimFactory {
 	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId);
+	
+	/**
+	 * @return the type of the {@link Route}s created by this factory.
+	 */
+	public String getCreatedRouteType();
 }

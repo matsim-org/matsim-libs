@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run6b";
+	public static final String runID = "run8";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -49,8 +49,6 @@ public class Global {
 	//subpopulation classes
 	public static final String USER_GROUP = "usrGroup";
 	public static final String GP_CAR = "GP_CAR";
-	public static final String GP_LICENSE = "GP_LICENSE";
-	public static final String GP_NO_CAR = "GP_NO_CAR";
 	public static final String COMMUTER = "COMMUTER";
 	
 	//age classes
@@ -82,7 +80,8 @@ public class Global {
 	//status of residence
 	public static final String RESIDENCE = "RESIDENCE";
 	public static final String INHABITANT = "INHABITANT";
-	
+
+	public static final String CARSHARING = "CARSHARING";
 	public static final String CAR_OPTION = "CAR_OPTION";
 
 	public static double getN() {

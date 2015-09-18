@@ -20,28 +20,44 @@
 
 package org.matsim.core.population;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.routes.*;
+import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.*;
 
 /**
  * @author nagel, ikaddoura
@@ -85,14 +101,7 @@ public final class PopulationUtils {
         } else {
             throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
         }
-        for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
-            routeFactory.setRouteFactory(transportMode, factory);
-        }
-        if (config.transit().isUseTransit()) {
-            for (String transportMode : config.transit().getTransitModes()) {
-                routeFactory.setRouteFactory(transportMode, new ExperimentalTransitRouteFactory());
-            }
-        }
+        routeFactory.setRouteFactory(NetworkRoute.class, factory);
         return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
 	

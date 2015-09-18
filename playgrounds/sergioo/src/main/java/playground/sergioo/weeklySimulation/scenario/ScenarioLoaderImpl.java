@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -31,16 +30,14 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -175,9 +172,6 @@ public class ScenarioLoaderImpl {
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
-			}
-			if (this.config.transit().isUseTransit()) {
-				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
 			new MatsimNetworkReader(this.scenario).parse(networkFileName);
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {

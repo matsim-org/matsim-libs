@@ -31,4 +31,9 @@ public class DriverRouteFactory implements RouteFactory {
 		final Id e) {
 		return new DriverRoute( s , e );
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return "driver";
+	}
 }

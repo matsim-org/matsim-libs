@@ -23,7 +23,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,10 +31,8 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -87,9 +84,7 @@ public class TestMain {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().getModule("scenario").addParam("useTransit", "true");
-		sc.getConfig().getModule("scenario").addParam("useVehicles", "true");
-		((PopulationFactoryImpl) sc.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		sc.getConfig().transit().setUseTransit(true);
 
 		new MatsimNetworkReader(sc).readFile(netFile);
 		final Population plans = sc.getPopulation();

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -101,7 +102,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
 		
-		String idExclusion = super.scenario.getConfig().findParam("locationchoice", "idExclusion");
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) super.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		String idExclusion = dccg.getIdExclusion();
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > Long.parseLong(idExclusion)) return;
 
 		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13

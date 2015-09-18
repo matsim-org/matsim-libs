@@ -21,7 +21,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -44,9 +43,10 @@ import org.matsim.vehicles.VehicleUtils;
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
+
+import com.google.inject.Provider;
 
 /**
  * @author amit
@@ -155,7 +155,7 @@ public class EvacPatnaControler {
 					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
+//			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));

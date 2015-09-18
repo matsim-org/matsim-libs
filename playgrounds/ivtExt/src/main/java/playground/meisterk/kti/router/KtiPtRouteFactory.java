@@ -38,4 +38,9 @@ public class KtiPtRouteFactory implements RouteFactory {
 		return new KtiPtRoute(startLinkId, endLinkId, this.plansCalcRouteKtiInfo);
 	}
 
+	@Override
+	public String getCreatedRouteType() {
+		return "ktiPtRoute";
+	}
+
 }

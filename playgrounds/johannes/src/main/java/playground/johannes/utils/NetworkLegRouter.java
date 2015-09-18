@@ -20,7 +20,6 @@
 package playground.johannes.utils;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -76,7 +75,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
@@ -85,7 +84,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
