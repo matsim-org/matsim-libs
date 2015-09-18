@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -213,9 +214,9 @@ import junit.framework.TestCase;
 		return person;
 	}
 
-	protected static Population createReferencePopulation1(final PlanCalcScoreConfigGroup config) {
+	protected static Population createReferencePopulation1(final Config config) {
 		// run mobsim once without toll and get score for network1/population1
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork1(scenario);
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
