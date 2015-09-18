@@ -683,7 +683,7 @@ public class GenerateFundamentalDiagramData {
 			if( LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId) || ORIGIN_LINK_ID.equals(this.currentLinkId)){
 				//person departing from home OR last link of the track
 				return FIRST_LINK_LINK_ID_OF_BASE;
-			} else if(LAST_LINK_ID_OF_BASE.equals(LAST_LINK_ID_OF_BASE)){
+			} else if(LAST_LINK_ID_OF_BASE.equals(this.currentLinkId)){
 				if ( isArriving) {
 					return DESTINATION_LINK_ID ;
 				} else {
