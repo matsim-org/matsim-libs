@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -187,9 +187,9 @@ public class PopulationBuilder2011 {
 					/* Set the hard coded attributes. This will, however, be 
 					 * duplicated in the person attributes to be more 
 					 * consistent with the direction of future MATSim work. */
-					((PersonImpl)person).setAge(age);
-					((PersonImpl)person).setSex(Gender2011.getMatsimGender(Gender2011.getGender(gender)));
-					((PersonImpl)person).setEmployed(employment == 1 ? true : false);
+					PersonUtils.setAge(person, age);
+					PersonUtils.setSex(person, Gender2011.getMatsimGender(Gender2011.getGender(gender)));
+					PersonUtils.setEmployed(person, employment == 1 ? true : false);
 					
 					/* Set person attributes. */
 					personAttributes.putAttribute(person.getId().toString(), "population", PopulationGroup2011.getType(population).toString());

@@ -15,6 +15,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -99,8 +100,8 @@ public class GeneticAlgorithmMode {
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				PersonImpl copyPerson = new PersonImpl(person.getId());
-				copyPerson.setCarAvail(((PersonImpl)person).getCarAvail());
+				Person copyPerson = PersonImpl.createPerson(person.getId());
+				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);

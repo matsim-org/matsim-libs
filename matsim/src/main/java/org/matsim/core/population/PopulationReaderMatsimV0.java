@@ -65,7 +65,7 @@ import org.xml.sax.Attributes;
 
 	private final Population plans;
 	private final Network network;
-	private PersonImpl currperson = null;
+	private Person currperson = null;
 	private PlanImpl currplan = null;
 	private LegImpl currleg = null;
 	private NetworkRoute currroute = null;
@@ -129,7 +129,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = (PersonImpl) this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
+		this.currperson = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -144,7 +144,7 @@ import org.xml.sax.Attributes;
 		else {
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.currplan = this.currperson.createAndAddPlan(selected);
+		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");

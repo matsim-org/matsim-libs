@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -89,11 +89,11 @@ public class CreatePopulation {
 				 * Create a person and add it to the population
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
-				((PersonImpl)person).setAge(Integer.parseInt(parts[index_age]));
+				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;
 				if (parts[index_workLocation].equals("-1")) employed = false; 
-				((PersonImpl)person).setEmployed(employed);
+				PersonUtils.setEmployed(person, employed);
 				population.addPerson(person);
 
 				/* 

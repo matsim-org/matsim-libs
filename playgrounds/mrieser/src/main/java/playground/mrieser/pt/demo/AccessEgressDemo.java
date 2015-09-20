@@ -155,7 +155,7 @@ public class AccessEgressDemo {
 				continue;
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
+				Person person = pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
 				PlanImpl plan = (PlanImpl) pb.createPlan();
 				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);

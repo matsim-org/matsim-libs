@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
@@ -105,12 +104,12 @@ public class GroupPlanStrategy {
 	private static void select(final GroupPlans plans) {
 		for (JointPlan jp : plans.getJointPlans()) {
 			for (Plan p : jp.getIndividualPlans().values()) {
-				((PersonImpl) p.getPerson()).setSelectedPlan( p );
+				p.getPerson().setSelectedPlan(p);
 			}
 		}
 
 		for (Plan p : plans.getIndividualPlans()) {
-			((PersonImpl) p.getPerson()).setSelectedPlan( p );
+			p.getPerson().setSelectedPlan(p);
 		}
 	}
 

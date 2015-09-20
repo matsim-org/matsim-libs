@@ -30,7 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -421,7 +421,7 @@ public class AccessibilityCalculator {
 		try{
 			for(Person person : this.sc.getPopulation().getPersons().values()){
 				/* Calculate the individual's accessibility score. */
-				double accessibility = calculateAccessibility((PersonImpl)person);
+				double accessibility = calculateAccessibility(person);
 				
 				/* Add the individual's score to that of the household. */
 				Id<Household> householdId = Id.create(person.getCustomAttributes().get("householdId").toString(), Household.class);
@@ -499,7 +499,7 @@ public class AccessibilityCalculator {
 	 * @param person
 	 * @return
 	 */
-	public double calculateAccessibility(PersonImpl person){
+	public double calculateAccessibility(Person person){
 	
 		double mobility = getMobilityScore(person);
 		double transportOptions = getTransportOptionsScore(person);
@@ -510,7 +510,7 @@ public class AccessibilityCalculator {
 	}
 	
 	
-	private double getMobilityScore(PersonImpl person){
+	private double getMobilityScore(Person person){
 		int accessibilityClass = getAccessibilityClass(person);
 		
 		/*TODO Remove after validation */
@@ -1046,7 +1046,7 @@ public class AccessibilityCalculator {
 
 	
 	
-	private int getAccessibilityClass(PersonImpl person){
+	private int getAccessibilityClass(Person person){
 	
 		/* If the person has a custom attribute for school with value "School" or
 		 * "PreSchool", s/he is school-going. 
@@ -1056,12 +1056,12 @@ public class AccessibilityCalculator {
 //		boolean attendSchool = ((String)person.getCustomAttributes().get("school")).contains("School")  ||
 //				person.getAge() < 16 ? true : false;
 		boolean attendSchool = activityChainContainsEducation(person.getSelectedPlan())  ||
-				(person.getAge() >= 6 && person.getAge() < 16) ? true : false;
+				(PersonUtils.getAge(person) >= 6 && PersonUtils.getAge(person) < 16) ? true : false;
 		if(attendSchool){
 			return 1;
 		}
 		
-		boolean isWorking = person.isEmployed() || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
+		boolean isWorking = PersonUtils.isEmployed(person) || activityChainContainsWork(person.getSelectedPlan()) ? true : false;
 		boolean isAccompanyingScholar = activityChainContainsDroppingScholar(person.getSelectedPlan());
 		
 		if(isWorking){

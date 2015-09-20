@@ -43,7 +43,7 @@ public class DgCottbusSubPopAverageTravelTimeHandler implements PersonArrivalEve
 	private Double travelTimeFootball = 0.0;
 	private Double travelTimeCommuter = 0.0;
 	
-	private Map<Id<Person>, Double> departureTimeByPerson = new HashMap<>();
+	private Map<Id<Person>, Double> departureTimePerPerson = new HashMap<>();
 	
 	private Set<Id<Person>> footballPersonIds = new HashSet<>();
 	private Set<Id<Person>> commuterPersonIds = new HashSet<>();
@@ -65,7 +65,7 @@ public class DgCottbusSubPopAverageTravelTimeHandler implements PersonArrivalEve
 
 	@Override
 	public void reset(int iteration) {
-		this.departureTimeByPerson.clear();
+		this.departureTimePerPerson.clear();
 		this.footballPersonIds.clear();
 		this.commuterPersonIds.clear();
 	}
@@ -79,7 +79,7 @@ public class DgCottbusSubPopAverageTravelTimeHandler implements PersonArrivalEve
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		double personTT = event.getTime() - this.departureTimeByPerson.get(event.getPersonId());
+		double personTT = event.getTime() - this.departureTimePerPerson.get(event.getPersonId());
 		if (isFootballId(event.getPersonId())){
 			this.travelTimeFootball += personTT;
 		}
@@ -90,7 +90,7 @@ public class DgCottbusSubPopAverageTravelTimeHandler implements PersonArrivalEve
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		this.departureTimeByPerson.put(event.getPersonId(), event.getTime());
+		this.departureTimePerPerson.put(event.getPersonId(), event.getTime());
 		
 		if (isFootballId(event.getPersonId())){
 			if (! footballPersonIds.contains(event.getPersonId())){

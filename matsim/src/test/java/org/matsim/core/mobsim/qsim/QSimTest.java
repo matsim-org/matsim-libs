@@ -117,8 +117,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -155,8 +155,8 @@ public class QSimTest {
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -194,8 +194,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg("other");
@@ -240,8 +240,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(0);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -284,8 +284,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link1
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -309,16 +309,17 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 7, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 8, allEvents.size());
 
 
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of 3rd event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
 		Assert.assertEquals("wrong type of 4th event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of 5th event.", PersonLeavesVehicleEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of 6th event.", PersonArrivalEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of 7th event.", ActivityStartEvent.class, allEvents.get(6).getClass());
+		Assert.assertEquals("wrong type of 5th event.", VehicleLeavesTrafficEvent.class, allEvents.get(4).getClass());
+		Assert.assertEquals("wrong type of 6th event.", PersonLeavesVehicleEvent.class, allEvents.get(5).getClass());
+		Assert.assertEquals("wrong type of 7th event.", PersonArrivalEvent.class, allEvents.get(6).getClass());
+		Assert.assertEquals("wrong type of 8th event.", ActivityStartEvent.class, allEvents.get(7).getClass());
 
 
 		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
@@ -329,13 +330,15 @@ public class QSimTest {
 		Assert.assertEquals("wrong time in 5th event.", 6.0*3600 + 1, allEvents.get(4).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 6th event.", 6.0*3600 + 1, allEvents.get(5).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 7th event.", 6.0*3600 + 1, allEvents.get(6).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 8th event.", 6.0*3600 + 1, allEvents.get(7).getTime(), MatsimTestCase.EPSILON);
 
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
 		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId() );
 		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((Wait2LinkEvent) allEvents.get(3)).getLinkId() );
-		Assert.assertEquals("wrong link in 6th event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(5)).getLinkId() );
-		Assert.assertEquals("wrong link in 7th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(6)).getLinkId() );
+		Assert.assertEquals("wrong link in 5th event.", f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId() );
+		Assert.assertEquals("wrong link in 7th event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId() );
+		Assert.assertEquals("wrong link in 8th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId() );
 	}
 
 	/**
@@ -350,8 +353,8 @@ public class QSimTest {
 		Link loopLink = f.network.createAndAddLink(Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
 
 		// add a single person with leg from link1 to loop-link
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -379,7 +382,7 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 14, allEvents.size());
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -390,9 +393,10 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link 3
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // loop link
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of 11th event.", PersonArrivalEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of 12th event.", ActivityStartEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(10).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(11).getClass());
+		Assert.assertEquals("wrong type of 11th event.", PersonArrivalEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of 12th event.", ActivityStartEvent.class, allEvents.get(13).getClass());
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
@@ -416,8 +420,8 @@ public class QSimTest {
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture();
 
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("home", f.link1.getId());
 		f.plans.addPerson(person);
 
@@ -443,8 +447,8 @@ public class QSimTest {
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture();
 
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		f.plans.addPerson(person);
@@ -471,8 +475,8 @@ public class QSimTest {
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture();
 
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.walk);
@@ -507,8 +511,8 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
@@ -563,8 +567,8 @@ public class QSimTest {
 		
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 3; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
@@ -616,8 +620,8 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -661,8 +665,8 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -674,8 +678,8 @@ public class QSimTest {
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
@@ -714,8 +718,8 @@ public class QSimTest {
 	@Test
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -740,7 +744,7 @@ public class QSimTest {
 		sim.run();
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 14, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 15, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
         Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
@@ -752,9 +756,10 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(8).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(13).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(11).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(13).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(14).getClass());
 	}
 
 	
@@ -768,8 +773,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -784,8 +789,8 @@ public class QSimTest {
 		plan.createAndAddActivity("l", f.link3.getId());
 		f.plans.addPerson(person);
 
-		PersonImpl personWhoBringsTheCar = new PersonImpl(Id.create(2, Person.class));
-		PlanImpl planWhichBringsTheCar = personWhoBringsTheCar.createAndAddPlan(true);
+		Person personWhoBringsTheCar = PersonImpl.createPerson(Id.create(2, Person.class));
+		PlanImpl planWhichBringsTheCar = PersonUtils.createAndAddPlan(personWhoBringsTheCar, true);
 		ActivityImpl aa1 = planWhichBringsTheCar.createAndAddActivity("h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
 		LegImpl ll1 = planWhichBringsTheCar.createAndAddLeg(TransportMode.car);
@@ -816,7 +821,7 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 28, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 30, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
         Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
@@ -830,21 +835,23 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(18).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(19).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(20).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(21).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(22).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(23).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(24).getClass());
-        Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(25).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(26).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(27).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(13).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(14).getClass());
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(15).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
+		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(17).getClass());
+		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(18).getClass());
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(19).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(20).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(21).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(22).getClass());
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(23).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(24).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(25).getClass());
+		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(26).getClass());
+        Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(27).getClass());
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(28).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(29).getClass());
 	}
 	
 	/**
@@ -856,8 +863,8 @@ public class QSimTest {
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
@@ -906,8 +913,8 @@ public class QSimTest {
 	@Test
 	public void testAssignedVehicles() {
 		Fixture f = new Fixture();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -962,8 +969,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -988,7 +995,7 @@ public class QSimTest {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 15, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 16, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -1001,9 +1008,10 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(12).getClass());	
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(14).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());	
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());	
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(14).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
 	}
 
 	/**
@@ -1018,8 +1026,8 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
@@ -1044,7 +1052,7 @@ public class QSimTest {
 
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 19, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 20, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -1061,9 +1069,10 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(13).getClass()); // link2 again
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(14).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(15).getClass()); // link3 again
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(18).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(16).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(17).getClass());
+		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(18).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(19).getClass());
 	}
 
 	/**
@@ -1173,8 +1182,8 @@ public class QSimTest {
 		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
-		PersonImpl person = new PersonImpl(Id.create(0, Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);

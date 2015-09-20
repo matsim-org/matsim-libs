@@ -103,7 +103,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i = 0; i < groupSize; i++ ) {
-			group.addPerson( new PersonImpl( Id.create( i , Person.class ) ) );
+			group.addPerson(PersonImpl.createPerson(Id.create(i, Person.class)));
 		}
 
 		for ( Person person : group.getPersons() ) {

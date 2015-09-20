@@ -89,7 +89,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getCarPlan() {
-		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
+		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -126,7 +126,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanNoTransfer() {
-		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
+		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -161,10 +161,10 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanTransfer() {
-		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class) );
+		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
-		//desires.putActivityDuration( "h" , 12 * 3600 );
-		//desires.putActivityDuration( "w" , 12 * 3600 );
+//		desires.putActivityDuration( "h" , 12 * 3600 );
+//		desires.putActivityDuration( "w" , 12 * 3600 );
 		PlanImpl plan = new PlanImpl( person );
 
 		Activity act = plan.createAndAddActivity( "h" );
@@ -211,7 +211,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getWalkPlan() {
-		PersonImpl person = new PersonImpl( Id.create( "jojo" , Person.class ) );
+		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );

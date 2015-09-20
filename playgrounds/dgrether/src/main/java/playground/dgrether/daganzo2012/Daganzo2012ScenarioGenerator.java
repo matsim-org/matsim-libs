@@ -35,7 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -95,7 +94,7 @@ public class Daganzo2012ScenarioGenerator {
 		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <=  agents; i++) {
-			PersonImpl p = (PersonImpl) factory.createPerson(Id.create(i, Person.class));
+			Person p = factory.createPerson(Id.create(i, Person.class));
 			if ((i +1) % 2 == 0){
 				homeEndTime += 1;
 			}

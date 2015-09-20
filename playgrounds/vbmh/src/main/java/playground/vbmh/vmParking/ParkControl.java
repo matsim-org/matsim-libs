@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -843,7 +842,7 @@ public class ParkControl {
 		//[1]: Estimated distance to travel during rest of day
 
 
-        PersonImpl person = (PersonImpl) controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
+        Person person = controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		double endTime=0;
 		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");

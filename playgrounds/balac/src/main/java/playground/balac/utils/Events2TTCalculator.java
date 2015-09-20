@@ -2,9 +2,8 @@ package playground.balac.utils;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class Events2TTCalculator {
@@ -19,13 +18,13 @@ public class Events2TTCalculator {
 		//TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		//events.addHandler(ttmc);
 		events.addHandler(ttc);
 		
 		// reading events.  Will do all the processing as side effect.
 		System.out.println("processing events file...");
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		System.out.println("done.");
 		

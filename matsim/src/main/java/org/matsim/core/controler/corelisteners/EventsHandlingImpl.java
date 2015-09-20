@@ -39,7 +39,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
@@ -77,10 +76,6 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		if ((this.writeEventsInterval > 0) && (event.getIteration() % writeEventsInterval == 0)) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
-				case txt:
-					this.eventWriters.add(new EventWriterTXT(controlerIO.getIterationFilename(event.getIteration(), 
-							Controler.FILENAME_EVENTS_TXT)));
-					break;
 				case xml:
 					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
 							Controler.FILENAME_EVENTS_XML)));

@@ -40,14 +40,14 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
-import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -63,7 +63,7 @@ import playground.dgrether.events.GeospatialEventTools;
  *  based on implementation of mrieser in the org.matsim project
  *
  */
-public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, Link2WaitEventHandler, VehicleAbortEventHandler{
+public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
 
 	private Map<Id<Vehicle>, LinkEnterEvent> firstTimeSeenMap;
 	private Map<Id<Vehicle>, LinkLeaveEvent> lastTimeSeenMap;
@@ -123,7 +123,7 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 	}
 
 	@Override
-	public void handleEvent(VehicleAbortEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		this.handleArrivalOrStuck(event, event.getVehicleId());		
 	}
 	

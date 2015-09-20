@@ -5,7 +5,6 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 class PlansSubsampler {
@@ -26,7 +25,7 @@ class PlansSubsampler {
 			if (Math.random() > samplingProbability) {
 				continue;
 			}
-			PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 				countPlans++;
 				pw.writePerson(person);

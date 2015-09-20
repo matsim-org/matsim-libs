@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -47,7 +46,7 @@ public class GravityModel extends RetailerModelImpl
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
       for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-      PersonImpl pi = (PersonImpl)p;
+      Person pi = p;
       this.persons.put(pi.getId(), pi);
     }
   }
@@ -66,7 +65,7 @@ public class GravityModel extends RetailerModelImpl
     Gbl.printMemoryUsage();
 
     for (Person pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
+      PersonRetailersImpl pr = new PersonRetailersImpl(pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
   }

@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
@@ -148,8 +148,8 @@ public class WalkBikeRouting {
 				
 				Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 				
-				((PersonImpl) person).setAge(Integer.parseInt(arr[12]));
-				((PersonImpl) person).setSex(arr[11]);
+				PersonUtils.setAge(person, Integer.parseInt(arr[12]));
+				PersonUtils.setSex(person, arr[11]);
 				
 				
 				double m = TimeConversion.convertTimeToDouble(arr[10]);

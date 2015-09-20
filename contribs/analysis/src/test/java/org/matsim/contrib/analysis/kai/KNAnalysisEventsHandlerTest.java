@@ -44,6 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -72,9 +73,9 @@ public class KNAnalysisEventsHandlerTest {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		this.population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
+		Person person = PersonImpl.createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("act1", new Coord(100.0, 100.0));
 		plan.createAndAddLeg("undefined");
 		plan.createAndAddActivity("act2", new Coord(200.0, 200.0));

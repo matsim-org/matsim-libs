@@ -32,7 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
@@ -168,7 +168,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 
 	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
-		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
+		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlanRouterAdapter router = new PlanRouterAdapter( controler );
 		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());

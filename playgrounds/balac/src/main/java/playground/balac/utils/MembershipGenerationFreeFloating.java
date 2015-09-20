@@ -8,10 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -49,7 +46,7 @@ public class MembershipGenerationFreeFloating {
 		
 		for (Person p: scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getSex().equals("m")) 
+			if (PersonUtils.getSex(p).equals("m"))
 				men.put(p.getId(), p);
 			else
 				women.put(p.getId(), p);
@@ -130,7 +127,7 @@ public class MembershipGenerationFreeFloating {
 		for (Person p: addedMembers.values()){
 			
 			
-			((PersonImpl)scenario.getPopulation().getPersons().get(p.getId())).addTravelcard("ffProgram");
+			PersonUtils.addTravelcard(scenario.getPopulation().getPersons().get(p.getId()), "ffProgram");
 		}
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_ff_members.xml.gz");		
@@ -151,27 +148,27 @@ public class MembershipGenerationFreeFloating {
 				
 				switch(index) {
 				
-					case 0: if (18 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 24) {
+					case 0: if (18 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 24) {
 					
 								addedMembers.put(p.getId(), p);
 								notFound = false;
 							}
-					case 1: if (25 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 34) {
+					case 1: if (25 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 34) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
-					case 2: if (35 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 44) {
+					case 2: if (35 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 44) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
-					case 3: if (45 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 54) {
+					case 3: if (45 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 54) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;
 					}
-					case 4: if (55 <= ((PersonImpl)p).getAge() && ((PersonImpl)p).getAge() <= 64) {
+					case 4: if (55 <= PersonUtils.getAge(p) && PersonUtils.getAge(p) <= 64) {
 						
 						addedMembers.put(p.getId(), p);
 						notFound = false;

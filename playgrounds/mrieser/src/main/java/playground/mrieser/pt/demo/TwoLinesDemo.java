@@ -39,7 +39,6 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -226,7 +225,7 @@ public class TwoLinesDemo {
 		TransitStopFacility stop6 = schedule.getFacilities().get(Id.create(6, TransitStopFacility.class));
 
 		{ // person 1
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
+			Person person = pb.createPerson(Id.create(1, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:01:00"));
@@ -249,7 +248,7 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 2
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(2, Person.class));
+			Person person = pb.createPerson(Id.create(2, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:06:00"));
@@ -272,7 +271,7 @@ public class TwoLinesDemo {
 		}
 
 		{ // person 3
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(3, Person.class));
+			Person person = pb.createPerson(Id.create(3, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:11:00"));

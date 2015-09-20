@@ -31,10 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -180,11 +177,11 @@ public class ExternalTripsCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person) {
-		person.setAge(100);
-		person.setSex("m");
-		person.setLicence("yes");
-		person.setCarAvail("always");		
+	private void setBasicParameters(Person person) {
+		PersonUtils.setAge(person, 100);
+		PersonUtils.setSex(person, "m");
+		PersonUtils.setLicence(person, "yes");
+		PersonUtils.setCarAvail(person, "always");
 	}
 	
 	/*

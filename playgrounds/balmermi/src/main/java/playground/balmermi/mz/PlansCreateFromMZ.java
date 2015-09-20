@@ -36,10 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -196,19 +193,19 @@ public class PlansCreateFromMZ {
 				person_string_new = person_string_new + str;
 
 				// creating/getting the matsim person
-				PersonImpl person = (PersonImpl) plans.getPersons().get(pid);
+				Person person = plans.getPersons().get(pid);
 				if (person == null) {
-					person = new PersonImpl(pid);
+					person = PersonImpl.createPerson(pid);
 					plans.addPerson(person);
-					person.setAge(age);
-					person.setLicence(licence);
-					person.setSex(gender);
+					PersonUtils.setAge(person, age);
+					PersonUtils.setLicence(person, licence);
+					PersonUtils.setSex(person, gender);
 				}
 
 				// creating/getting plan
 				Plan plan = person.getSelectedPlan();
 				if (plan == null) {
-					person.createAndAddPlan(true);
+					PersonUtils.createAndAddPlan(person, true);
 					plan = person.getSelectedPlan();
 					plan.setScore(weight); // used plans score as a storage for the person weight of the MZ2005
 				}
@@ -414,7 +411,7 @@ public class PlansCreateFromMZ {
 			if (has_changed) { cnt_p++; }
 			p.getPlans().clear();
 			p.addPlan(plan2);
-			((PersonImpl) p).setSelectedPlan(plan2);
+			p.setSelectedPlan(plan2);
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {

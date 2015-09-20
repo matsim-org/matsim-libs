@@ -113,7 +113,7 @@ public class EndLegMessage extends EventMessage {
 		// schedule VehicleLeavesTrafficEvent
 		Id<org.matsim.vehicles.Vehicle> vehicleId = Id.create( this.vehicle.getOwnerPerson().getId() , org.matsim.vehicles.Vehicle.class ) ;
 		event = new VehicleLeavesTrafficEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), 
-				vehicleId, this.vehicle.getCurrentLeg().getMode() );
+				vehicleId, this.vehicle.getCurrentLeg().getMode(), 1.0 );
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule AgentArrivalEvent

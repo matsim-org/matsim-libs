@@ -63,13 +63,16 @@ public class InvertertedNetworkLegRouterTest {
 		TravelDisutilityFactory tc = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
-		Person person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
 		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));
 
-		InvertedNetworkLegRouter router = new InvertedNetworkLegRouter(f.s, lcpFactory, 
-				tc, tt);
+		InvertedNetworkRoutingModule router =
+				new InvertedNetworkRoutingModule(
+						"mode",
+						f.s.getPopulation().getFactory(),
+						f.s, lcpFactory,tc, tt);
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		

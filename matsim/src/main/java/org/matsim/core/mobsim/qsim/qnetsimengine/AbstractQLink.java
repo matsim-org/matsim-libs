@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -141,7 +141,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/* package */ final void letVehicleArrive(QVehicle qveh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();;
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
-				this.link.getId(), qveh.getId(), qveh.getDriver().getMode() ) ) ;
+				this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
 		
 		this.network.simEngine.letVehicleArrive(qveh);
 	}
@@ -199,7 +199,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				else stuckAgents.add(veh.getDriver().getId());
 
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+						new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
@@ -262,7 +262,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 			else stuckAgents.add(veh.getDriver().getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));

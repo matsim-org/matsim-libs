@@ -208,12 +208,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	private PlanImpl createPlan(NetworkImpl network, String facString) {
-		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
+		Person person = PersonImpl.createPerson(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
 
 	private PlanImpl createPlan(ActivityFacilities facilities, String facString) {
-		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
+		Person person = PersonImpl.createPerson(Id.create("1000", Person.class));
 		return createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, TransportMode.car, facString);
 	}
 
@@ -226,7 +226,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		return l;
 	}
 
-	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, PersonImpl person, String mode, String facString) {
+	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
@@ -242,7 +242,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		return plan;
 	}
 
-	static PlanImpl createPlanFromLinks(NetworkImpl layer, PersonImpl person, String mode, String linkString) {
+	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {

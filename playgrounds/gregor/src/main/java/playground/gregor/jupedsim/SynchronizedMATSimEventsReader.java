@@ -125,7 +125,7 @@ public class SynchronizedMATSimEventsReader extends MatsimXmlParser {
 			String mode = legMode == null ? null : legMode.intern();
 			this.q.offer(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), mode));
 		} else if (Wait2LinkEvent.EVENT_TYPE.equals(eventType)) {
-			this.q.offer(new Wait2LinkEvent(time, Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_NETWORKMODE)));
+			this.q.offer(new Wait2LinkEvent(time, Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_NETWORKMODE), 1.0));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

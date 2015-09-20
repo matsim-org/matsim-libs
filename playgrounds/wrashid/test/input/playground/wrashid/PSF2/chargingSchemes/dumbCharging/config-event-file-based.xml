@@ -90,7 +90,7 @@
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 		<param name="main.chargingTimesOutputFilePath" value="&OUTBASE;/chargingLog.txt" />
 		<param name="main.energyUsageStatistics" value="&OUTBASE;/vehicleEnergyConsumption" />
-		<param name="main.inputEventsForSimulationPath" value="&TESTBASE;/0.events.txt.gz" />
+		<param name="main.inputEventsForSimulationPath" value="&TESTBASE;/0.events.xml" />
 		
 	
 		<param name="testingModeOn" value="false" /> <!-- this is the main switch for all testing values -->

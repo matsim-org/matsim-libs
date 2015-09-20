@@ -6,9 +6,9 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -39,7 +39,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 		boolean ffcard = false;
 		boolean owcard = false;
 		int cnt = t.size();
-		PersonImpl p = (PersonImpl) plan.getPerson();
+		Person p = plan.getPerson();
 		if (cnt == 0) {
 			return;
 		}

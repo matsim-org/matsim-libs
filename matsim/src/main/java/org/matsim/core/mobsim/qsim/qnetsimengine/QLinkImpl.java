@@ -176,7 +176,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode()));
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if ( this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
 				continue ;

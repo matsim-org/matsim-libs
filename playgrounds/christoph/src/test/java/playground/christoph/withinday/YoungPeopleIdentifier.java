@@ -12,7 +12,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 public class YoungPeopleIdentifier extends DuringLegAgentSelector {
@@ -39,7 +39,7 @@ public class YoungPeopleIdentifier extends DuringLegAgentSelector {
 				for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if (((PersonImpl) ((HasPerson)agent).getPerson()).getAge() == 18) {
+				if (PersonUtils.getAge(((HasPerson) agent).getPerson()) == 18) {
 					System.out.println("found agent");
 					set.add(agent);
 				}

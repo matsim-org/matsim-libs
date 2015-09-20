@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
@@ -53,7 +52,7 @@ public class BasePlanStrategy implements PlanStrategy {
 						plan.addLeg((Leg) planElement);
 				}
 				if(person.addPlan(plan))
-					((PersonImpl)person).setSelectedPlan(plan);
+					person.setSelectedPlan(plan);
 				counter.incCounter();
 			}
 		}

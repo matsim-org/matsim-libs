@@ -43,7 +43,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -184,7 +183,7 @@ public class CreateBackgroundPopulation {
 		 * at some stations.
 		 */
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			PersonImpl p = (PersonImpl) person;
+			Person p = person;
 			p.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(p));
 		}
 		

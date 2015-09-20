@@ -48,7 +48,7 @@ public class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		ALL_GREEN, ONE_SECOND_Z, GREEN_WAVE_Z, GREEN_WAVE_SO
+		ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO
 	}
 	
 	private static final int CYCLE_TIME = 60;
@@ -380,11 +380,11 @@ public class TtCreateBraessSignals {
 				
 				switch (this.signalType){
 				case GREEN_WAVE_Z:
-					// create signal control such that the middle route is prefered
+					// create signal control such that the middle route is preferred
 					createGreenWaveZSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
 				case GREEN_WAVE_SO:
-					// create signal control such that the outer routes are prefered
+					// create signal control such that the outer routes are preferred
 					createGreenWaveSOSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
 				case ALL_GREEN:
@@ -398,6 +398,13 @@ public class TtCreateBraessSignals {
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					changeAllGreenSignalControlTo1Z();
+					break;
+				case ONE_SECOND_SO:
+					// create all day green signal control and change it such that
+					// the outer routes get only green for one second a cycle
+					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
+							fac, signalGroup.getId(), 0, CYCLE_TIME));
+					changeAllGreenSignalControlTo1SO();
 					break;
 				}
 			}
@@ -559,6 +566,55 @@ public class TtCreateBraessSignals {
 		}
 	}
 
+	/**
+	 * Sets the signal for turning right at link 1_2 and the signal for going
+	 * straight on at link 2_3 green for only one second a cylce. (Green for no
+	 * seconds is not possible.)
+	 */
+	private void changeAllGreenSignalControlTo1SO() {
+		
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalControlData signalControl = signalsData.getSignalControlData();
+
+		SignalSystemControllerData signalSystem2Control = signalControl
+				.getSignalSystemControllerDataBySystemId().get(
+						Id.create("signalSystem2", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem2Control
+				.getSignalPlanData().values()) {
+			// note: every signal system has only one signal plan here
+
+			// pick the second signal at link 1_2 (turning right) from the
+			// signal plan
+			SignalGroupSettingsData signalGroupSOSetting;
+			signalGroupSOSetting = signalPlan
+						.getSignalGroupSettingsDataByGroupId().get(
+								Id.create("signal1_2.2", SignalGroup.class));
+
+			// set the signal green for only one second
+			signalGroupSOSetting.setOnset(0);
+			signalGroupSOSetting.setDropping(1);
+		}
+		
+		SignalSystemControllerData signalSystem3Control = signalControl
+				.getSignalSystemControllerDataBySystemId().get(
+						Id.create("signalSystem3", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem3Control
+				.getSignalPlanData().values()) {
+			// note: every signal system has only one signal plan here
+
+			// pick the second signal at link 2_3 (or 23_3 respectively) (going straight on) 
+			// from the signal plan
+			SignalGroupSettingsData signalGroupSOSetting;
+			signalGroupSOSetting = signalPlan
+						.getSignalGroupSettingsDataByGroupId().get(
+								Id.create("signal1_2.2", SignalGroup.class));
+
+			// set the signal green for only one second
+			signalGroupSOSetting.setOnset(0);
+			signalGroupSOSetting.setDropping(1);
+		}
+	}
 
 	public void setLaneType(LaneType laneType) {
 		this.laneType = laneType;

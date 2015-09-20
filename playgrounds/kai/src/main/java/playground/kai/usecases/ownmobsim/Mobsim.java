@@ -45,7 +45,7 @@ public class Mobsim {
 
 		PersonDepartureEvent ade = new PersonDepartureEvent(time, agentId, linkId, legMode) ;
 
-		Wait2LinkEvent aw2le = new Wait2LinkEvent(time, agentId, linkId, null, legMode) ;
+		Wait2LinkEvent aw2le = new Wait2LinkEvent(time, agentId, linkId, null, legMode, 1.0) ;
 
 		LinkLeaveEvent lle = new LinkLeaveEvent(time, agentId, linkId, null) ;
 

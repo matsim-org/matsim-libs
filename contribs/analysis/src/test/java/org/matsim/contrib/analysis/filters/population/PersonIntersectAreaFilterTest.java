@@ -30,10 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -63,8 +60,8 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Link link5 = network.createAndAddLink(Id.create("5", Link.class), node4, node5, 20, 20, 100, 1);
 
 		// create a test person
-		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
-		PlanImpl plan = person.createAndAddPlan(true);
+		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
 		ActivityImpl act1 = plan.createAndAddActivity("h", link0.getId());
 		act1.setEndTime(8.0*3600);

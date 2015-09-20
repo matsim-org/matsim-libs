@@ -24,9 +24,8 @@ package playground.boescpa.netcap.preparation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -92,13 +91,13 @@ public class NCPopulation {
 	}
 
 	private static Person resetPerson(final Person oldPerson) {
-		final PersonImpl oldPersonImpl = (PersonImpl) oldPerson;
+		final Person oldPerson = oldPerson;
 		final Person person = popFactory.createPerson(Id.create(oldPerson.getId().toString(), Person.class));
-		final PersonImpl personImpl = (PersonImpl) person;
-		personImpl.setSex(oldPersonImpl.getSex());
-		personImpl.setAge(oldPersonImpl.getAge());
-		personImpl.setLicence(oldPersonImpl.getLicense());
-		personImpl.setEmployed(oldPersonImpl.isEmployed());
+		final Person person = person;
+		PersonImpl.setSex(personImpl, PersonImpl.getSex(oldPersonImpl));
+		PersonImpl.setAge(personImpl, PersonImpl.getAge(oldPersonImpl));
+		PersonImpl.setLicence(personImpl, PersonImpl.getLicense(oldPersonImpl));
+		PersonImpl.setEmployed(personImpl, PersonImpl.isEmployed(oldPersonImpl));
 		final Plan plan = popFactory.createPlan();
 		person.addPlan(plan);
 		boolean lastWasLeg = false;

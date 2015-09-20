@@ -32,7 +32,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -198,7 +198,7 @@ public class GenerateScenarioForDetours {
 						final Person driver =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) driver).setCarAvail( "always" );
+						PersonUtils.setCarAvail(driver, "always");
 						driver.addPlan(
 								createPlan(
 									random,
@@ -213,7 +213,7 @@ public class GenerateScenarioForDetours {
 						final Person passenger =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) passenger).setCarAvail( "never" );
+						PersonUtils.setCarAvail(passenger, "never");
 						passenger.addPlan(
 								createPlan(
 									random,

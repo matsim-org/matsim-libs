@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.Link2WaitEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +48,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author dgrether
  */
-public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Link2WaitEventHandler, VehicleAbortEventHandler, Wait2LinkEventHandler {
+public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler, Wait2LinkEventHandler {
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
@@ -118,7 +118,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Link
 	}
 	
 	@Override
-	public void handleEvent(VehicleAbortEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		log.warn("got VehicleAbortEvent, the code might not be correct if removeStuckVehicles config switch is set to true");
 	}
 	

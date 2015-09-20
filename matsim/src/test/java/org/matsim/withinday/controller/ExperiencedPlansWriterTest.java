@@ -45,7 +45,6 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
@@ -308,7 +307,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private Person createPerson(Scenario scenario, String id) {
 		
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);

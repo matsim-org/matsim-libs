@@ -69,12 +69,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -758,13 +753,13 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		PersonImpl newPerson = new PersonImpl(person.getId());
+		Person newPerson = PersonImpl.createPerson(person.getId());
 		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		newPerson.removeUnselectedPlans();
+		PersonUtils.removeUnselectedPlans(newPerson);
 		return newPerson;
 	}
 

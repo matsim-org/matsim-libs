@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -211,7 +210,7 @@ import java.util.List;
 	}
 	
 	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String mode) {
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
 		((ActivityImpl) from).setCoord(this.nodes[0].getCoord());

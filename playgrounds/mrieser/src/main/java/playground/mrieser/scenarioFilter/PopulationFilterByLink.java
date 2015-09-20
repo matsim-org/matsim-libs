@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -61,7 +60,7 @@ public class PopulationFilterByLink implements PersonAlgorithm {
 			}
 		}
 		if (!containsLink) {
-			((PersonImpl) person).removePlan(plan);
+			person.removePlan(plan);
 		}
 	}
 

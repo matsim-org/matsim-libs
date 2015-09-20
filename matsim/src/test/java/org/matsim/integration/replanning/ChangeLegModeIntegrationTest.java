@@ -36,10 +36,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerModule;
@@ -80,10 +77,10 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
-        ActivityImpl act = plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+		ActivityImpl act = plan.createAndAddActivity("home", new Coord(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);

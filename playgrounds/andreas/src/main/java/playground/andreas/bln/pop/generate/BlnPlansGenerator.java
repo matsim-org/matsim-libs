@@ -16,10 +16,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -47,7 +44,7 @@ public class BlnPlansGenerator {
 		try {
 			BlnPlansGenerator myBlnPlanGenerator = new BlnPlansGenerator();
 
-			HashMap<Id<Person>, PersonImpl> personMap;
+			HashMap<Id<Person>, Person> personMap;
 			// Create a person for everyone in file and store them in a map
 			personMap = myBlnPlanGenerator.generatePersons("Z:/population/input/PERSONEN.csv");
 
@@ -84,9 +81,9 @@ public class BlnPlansGenerator {
 		}
 	}
 
-	private HashMap<Id<Person>,PersonImpl> generatePersons(String personsFileName) throws IOException{
+	private HashMap<Id<Person>,Person> generatePersons(String personsFileName) throws IOException{
 
-		HashMap<Id<Person>, PersonImpl> personList = new HashMap<>();
+		HashMap<Id<Person>, Person> personList = new HashMap<>();
 
 		log.info("setAllLegsToCar is set to " + setAllLegsToCar);
 
@@ -97,40 +94,40 @@ public class BlnPlansGenerator {
 //			log.info("Start generating persons...");
 		for (String[] data : personData) {
 
-			PersonImpl person = new PersonImpl(Id.create(data[0], Person.class));
+			Person person = PersonImpl.createPerson(Id.create(data[0], Person.class));
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth
-			person.setAge(98 - Integer.parseInt(data[2]));
+			PersonUtils.setAge(person, 98 - Integer.parseInt(data[2]));
 
 			// 1 = no, 2 occasionally, 3 yes
 			// TODO [an] any string can be written to file, but PersonReader expects
 			// "a value from the list always never sometimes"
 			if (data[19].equalsIgnoreCase("1")){
-				person.setCarAvail("never");
+				PersonUtils.setCarAvail(person, "never");
 			} else {
-				person.setCarAvail("always");
+				PersonUtils.setCarAvail(person, "always");
 			}
 
 			// filter unemployed persons and data without entry
 			if (Integer.parseInt(data[12]) != 6 && Integer.parseInt(data[12]) != 0){
-				person.setEmployed(Boolean.TRUE);
+				PersonUtils.setEmployed(person, Boolean.TRUE);
 			}
 
 			// person.setHousehold(hh)(Id.create(data[1]));
 
 			if(Integer.parseInt(data[18]) == 2){
-				person.setLicence("yes");
+				PersonUtils.setLicence(person, "yes");
 			} else if(Integer.parseInt(data[18]) == 1){
-				person.setLicence("no");
+				PersonUtils.setLicence(person, "no");
 			} // else don't know
 
 			// TODO [an] same as setCarAvail. Any string can be written to file, but PersonReader expects
 			// "a value from the list "f m "."
 			if (Integer.parseInt(data[3]) == 2 ) {
-				person.setSex("f");
+				PersonUtils.setSex(person, "f");
 			} else if (Integer.parseInt(data[3]) == 1){
-				person.setSex("m");
+				PersonUtils.setSex(person, "m");
 			}
 
 		}
@@ -161,7 +158,7 @@ public class BlnPlansGenerator {
 		return tripData;
 	}
 
-	private void countPersonsPlans(HashMap<Id<Person>,PersonImpl> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData){
+	private void countPersonsPlans(HashMap<Id<Person>,Person> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData){
 
 		int numberOfPersonsWithoutTrip = 0;
 		int numberOfTripsWithoutPerson = 0;
@@ -279,7 +276,7 @@ public class BlnPlansGenerator {
 		return filteredTripData;
 	}
 
-	private void addPlansToPersons(HashMap<Id<Person>,PersonImpl> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData) {
+	private void addPlansToPersons(HashMap<Id<Person>,Person> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData) {
 
 		double numberOfPlansFound = 0;
 
@@ -291,7 +288,7 @@ public class BlnPlansGenerator {
 			Plan curPlan;
 
 			if(curPerson.getSelectedPlan() == null){
-				curPlan = ((PersonImpl) curPerson).createAndAddPlan(true);
+				curPlan = PersonUtils.createAndAddPlan(curPerson, true);
 			} else {
 				curPlan = curPerson.getSelectedPlan();
 			}
@@ -356,9 +353,9 @@ public class BlnPlansGenerator {
 		}
 	}
 
-	private HashMap<Id<Person>, PersonImpl> removePersonsWithoutPlan(HashMap<Id<Person>, PersonImpl> personMap, HashMap<Id<Person>, ArrayList<String[]>> tripMap) {
+	private HashMap<Id<Person>, Person> removePersonsWithoutPlan(HashMap<Id<Person>, Person> personMap, HashMap<Id<Person>, ArrayList<String[]>> tripMap) {
 
-		HashMap<Id<Person>, PersonImpl> filteredPersonMap = new HashMap<Id<Person>, PersonImpl>();
+		HashMap<Id<Person>, Person> filteredPersonMap = new HashMap<Id<Person>, Person>();
 		for (Id<Person> personId : tripMap.keySet()) {
 			filteredPersonMap.put(personId, personMap.get(personId));
 		}
@@ -366,10 +363,10 @@ public class BlnPlansGenerator {
 		return filteredPersonMap;
 	}
 
-	private void writePopulationToFile(Collection<PersonImpl> personList, String filename){
+	private void writePopulationToFile(Collection<Person> personList, String filename){
 		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		int numberOfPersonWithPlans = 0;
-		for (PersonImpl person : personList) {
+		for (Person person : personList) {
 			pop.addPerson(person);
 			numberOfPersonWithPlans++;
 		}

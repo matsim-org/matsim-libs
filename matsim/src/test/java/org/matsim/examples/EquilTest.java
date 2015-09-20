@@ -23,7 +23,7 @@ package org.matsim.examples;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -42,8 +42,8 @@ public class EquilTest extends MatsimTestCase {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
-		String eventsFileName = getOutputDirectory() + "events.txt";
-		String referenceFileName = getInputDirectory() + "events.txt.gz";
+		String referenceFileName = getInputDirectory() + "events.xml.gz";
+		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(c);
 
@@ -53,7 +53,7 @@ public class EquilTest extends MatsimTestCase {
 		plansReader.readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
+		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
 //		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10

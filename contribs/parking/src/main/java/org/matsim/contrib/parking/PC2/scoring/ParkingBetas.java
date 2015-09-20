@@ -26,7 +26,7 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.utils.expr.Parser;
 import org.matsim.contrib.parking.lib.utils.expr.SyntaxException;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 
 public class ParkingBetas  extends AbstractParkingBetas{
 
@@ -63,16 +63,16 @@ public class ParkingBetas  extends AbstractParkingBetas{
 		Parser parser = null;
 		if (!parkingWalkBetaCache.containsKey(personId)) {
 			Parser pTmp = new Parser(parkingWalkBeta);
-			PersonImpl persImpl = (PersonImpl) person;
+			Person persImpl = person;
 
 			int isMale = 1;
-			if (persImpl.getSex() != null) {
-				isMale = !persImpl.getSex().contains("f") ? 1 : 0;
+			if (PersonUtils.getSex(persImpl) != null) {
+				isMale = !PersonUtils.getSex(persImpl).contains("f") ? 1 : 0;
 			}
 
 			pTmp.setVariable("isMale", isMale);
 
-			int age = persImpl.getAge();
+			int age = PersonUtils.getAge(persImpl);
 
 			pTmp.setVariable("ageInYears", age);
 			parkingWalkBetaCache.put(personId, pTmp);

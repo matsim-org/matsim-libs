@@ -70,7 +70,7 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 
 		instance.setRoutingModule(
 				TransportMode.car,
-				InvertedNetworkLegRouter.createInvertedNetworkRouter(TransportMode.car, populationFactory,
+				InvertedNetworkRoutingModule.createInvertedNetworkRouter(TransportMode.car, populationFactory,
 						scenario,
 						leastCostAlgoFactory,
 						travelDisutilityFactory,

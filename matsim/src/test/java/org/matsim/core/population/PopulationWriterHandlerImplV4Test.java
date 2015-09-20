@@ -49,7 +49,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		tmpScenario.setNetwork(network);
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
+		Person person = pb.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = (PlanImpl) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));

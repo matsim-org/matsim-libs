@@ -38,11 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -126,8 +122,8 @@ public class RawDataToPopulation {
 		/*
 		 * create a person and a plan
 		 */
-		PersonImpl person = new PersonImpl(Id.create(trips.get(0).personId, Person.class));
-		person.setAge(container.age);
+		Person person = PersonImpl.createPerson(Id.create(trips.get(0).personId, Person.class));
+		PersonUtils.setAge(person, container.age);
 		Plan plan = new PlanImpl(person);
 		/*
 		 * create the first home activity

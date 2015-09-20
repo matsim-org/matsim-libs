@@ -47,7 +47,7 @@ public class OTFVisTest  {
 	@Test
 	public void testConvert() {
 		String networkFilename = "test/scenarios/equil/network.xml";
-		String eventsFilename = "test/scenarios/equil/events.txt.gz";
+		String eventsFilename = "test/scenarios/equil/events.xml";
 		String mviFilename = "test/scenarios/equil/events.mvi";
 
 		String[] args = {"-convert", eventsFilename, networkFilename, mviFilename, "300"};

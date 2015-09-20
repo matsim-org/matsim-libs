@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -200,7 +199,7 @@ public class MyCommercialDemandGeneratorOld {
 				for (Plan pp : planList) {
 					// Create a truck agent
 					Id<Person> id = Id.create(agentId, Person.class);
-					PersonImpl truck = (PersonImpl) pb.createPerson(id);
+					Person truck = pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
 //					pp.setSelected(true);

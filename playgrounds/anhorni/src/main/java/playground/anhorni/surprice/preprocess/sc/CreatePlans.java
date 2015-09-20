@@ -28,10 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -59,9 +56,9 @@ public class CreatePlans {
 	public void run(String outPath) {
 		int nbrPersons = 500;
 		for (int i = 0; i < nbrPersons; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
+			PersonImpl person = PersonImpl.createPerson(Id.create(i, Person.class));
 			this.scenario.getPopulation().addPerson(person);
-			person.createAndAddPlan(true);
+			PersonUtils.createAndAddPlan(person, true);
 			Plan plan = person.getSelectedPlan();
 			
 			int offset = 1; //rnd.nextInt(600);

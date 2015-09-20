@@ -41,6 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -192,8 +193,8 @@ public class RunInternalizationTest {
 	private void createPassiveAgents() {
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
-			PersonImpl person = new PersonImpl (Id.create(i, Person.class));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			
 			ActivityImpl home = plan.createAndAddActivity("home", Id.create("11", Link.class));
 			home.setEndTime(6 * 3600);

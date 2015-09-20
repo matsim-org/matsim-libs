@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 
+import org.matsim.core.population.PersonUtils;
 import playground.balmermi.census2000.data.Persons;
 
 public class PlansCreatePopulation {
@@ -66,12 +67,12 @@ public class PlansCreatePopulation {
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
 			playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(pid);
-			PersonImpl person = new PersonImpl(Id.create(pid.toString(), Person.class));
-			person.setSex(p.getSex());
-			person.setAge(p.getAge());
-			person.setLicence(p.getLicense());
-			person.setCarAvail(p.getCarAvail());
-			person.setCarAvail(p.getEmployed());
+			Person person = PersonImpl.createPerson(Id.create(pid.toString(), Person.class));
+			PersonUtils.setSex(person, p.getSex());
+			PersonUtils.setAge(person, p.getAge());
+			PersonUtils.setLicence(person, p.getLicense());
+			PersonUtils.setCarAvail(person, p.getCarAvail());
+			PersonUtils.setCarAvail(person, p.getEmployed());
 			try {
 				plans.addPerson(person);
 			} catch (Exception e) {
