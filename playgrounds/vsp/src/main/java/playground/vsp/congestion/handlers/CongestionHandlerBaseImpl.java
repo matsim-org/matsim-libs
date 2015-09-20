@@ -169,18 +169,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	}
 
 	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
-		// TODO: Shift everything that is related to the delay queue to V4. I don't need this in V3. ihab, sep'15
-	        // yy I don't think that the delay queue is even needed by V4.  It is probably needed
-	        // for the "Nagel" approach only. kai, sep'15
-
-		if ( linkInfo.getDelayQueue().isEmpty() ) {
-			// queue is already empty; nothing to do
-		} else {
-			double delay = time - delayInfo.freeSpeedLeaveTime ;
-			if ( delay < 0 ) {
-				linkInfo.getDelayQueue().clear() ;
-			}
-		}
 		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
