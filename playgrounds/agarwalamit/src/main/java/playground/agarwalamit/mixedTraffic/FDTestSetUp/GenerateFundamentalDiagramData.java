@@ -672,9 +672,6 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			if (globalFlowDynamicsUpdator.isPermanent()){ 
-				isArriving = true; 
-			}
 
 			if (GenerateFundamentalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
 				isArriving = true; 
@@ -733,6 +730,9 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public double getActivityEndTime() {
+			if(isArriving && this.agentState.equals(MobsimAgent.State.ACTIVITY)) {
+				return Double.POSITIVE_INFINITY; // let agent go to sleep.
+			}
 			return this.actEndTime;
 		}
 
