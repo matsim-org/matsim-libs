@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run8";
+	public static final String runID = "run8b";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	

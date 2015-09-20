@@ -1,7 +1,9 @@
 package playground.dhosse.gap.scenario;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -62,7 +64,7 @@ public class GAPScenarioBuilder {
 	
 	//this attributes object stores subpopulation attributes
 	private static ObjectAttributes subpopulationAttributes = new ObjectAttributes();
-	//this attributes object stores data about age, sex, car availability etc.
+	//this attributes object stores data about age, sex, car availability etc. (for later analysis of person groups)
 	private static ObjectAttributes demographicAttributes = new ObjectAttributes();
 	
 	public static void main(String args[]){
@@ -138,9 +140,17 @@ public class GAPScenarioBuilder {
 		
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
+		//write population to file
 		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
+		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
+		
+		//write object attributes to file
+		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
+		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
+		
+		log.info("Done!");
 		
 	}
 
@@ -235,16 +245,27 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-//		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/germany/DEU_adm/DEU_adm2.shp");
-//		
-//		for(SimpleFeature f : regBez){
-//			
-//			Geometry geometry = (Geometry) f.getDefaultGeometry();
-//			Long identifier = (Long) f.getAttribute("ID_2");
-//			
-//			getMunId2Geometry().put("0" + Long.toString(identifier), geometry);
-//			
-//		}
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		
+		for(SimpleFeature f : regBez){
+			
+			Geometry geometry = (Geometry) f.getDefaultGeometry();
+			String identifier = (String) f.getAttribute("REGION_KEY");
+			
+			getMunId2Geometry().put(identifier, geometry);
+			
+		}
+		
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		
+		for(SimpleFeature f : rp){
+			
+			Geometry geometry = (Geometry) f.getDefaultGeometry();
+			String identifier = (String) f.getAttribute("NOTE");
+			
+			getMunId2Geometry().put(identifier, geometry);
+			
+		}
 		
 		Collection<SimpleFeature> c = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "bundeslaender.shp");
 		
@@ -267,6 +288,24 @@ public class GAPScenarioBuilder {
 			getMunId2Geometry().put("0" + identifier, geometry);
 			
 		}
+		
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
+		
+		Geometry result = null;
+		
+		for(SimpleFeature f : austria){
+			
+			Geometry geometry = (Geometry) f.getDefaultGeometry();
+
+			if(result == null){
+				result = geometry;
+			} else{
+				result = result.union(geometry);
+			}
+			
+		}
+		
+		getMunId2Geometry().put("0AT", result);
 		
 	}
 
