@@ -12,8 +12,10 @@ import java.util.Map;
 
 public class VolumeDifferenceAnalyzer implements Runnable{
   
-	private String runId = "57";
-	private String fileBase = "D:/Workspace/container/examples/equil/output/" + runId + "/";
+//	private String runId = "57";
+	private String runId = "60b";
+//	private String fileBase = "D:/Workspace/container/examples/equil/output/" + runId + "/";
+	private String fileBase = "/Users/dominik/Workspace/data/examples/equil/output/" + runId + "/";
 	private int numberOfIterations = 200;
 	
 	private Map <Integer, Map<Integer, Double>> counts = new HashMap <Integer, Map<Integer, Double>>();
