@@ -25,7 +25,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class PopulationAnalysis {
 
-	private static final String runPath = "../../runs-svn/santiago/run10/";
+	private static final String runPath = "../../runs-svn/santiago/run11c/";
 	
 	private static final String analysisPath = runPath+ "analysis/";
 	
@@ -121,8 +121,8 @@ public class PopulationAnalysis {
 		
 		//write car availability to car users.
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
-			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carAvail"));
-			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carAvail"));
+			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carUsers"));
+			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carUsers"));
 			agentIdString2CarAvail.put(agentIdString, carAvail);
 		}
 		

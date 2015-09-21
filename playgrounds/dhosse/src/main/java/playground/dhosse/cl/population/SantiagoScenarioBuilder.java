@@ -90,7 +90,7 @@ public class SantiagoScenarioBuilder {
 	
 	private static double n = 0.;
 	
-	private static final String pathForMatsim = "../../runs-svn/santiago/run11b/";		//TODO: path within config file to in-/output files 
+	private static final String pathForMatsim = "../../runs-svn/santiago/run11c/";		//TODO: path within config file to in-/output files 
 	private static final String outPlans = "plans_final";								//name of plan file
 	
 	
@@ -197,6 +197,9 @@ public class SantiagoScenarioBuilder {
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform); //TODO: Set to "uniform" or "relative"
+			if (act.equals("pt iNaNH")){			//do not score pt transit activity
+				params.setScoringThisActivityAtAll(false);
+			}
 			config.planCalcScore().addActivityParams(params);
 		}
 		
@@ -869,7 +872,7 @@ public class SantiagoScenarioBuilder {
 		plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml"); //TODO
 		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName("carAvail"); //TODO
+		plans.setSubpopulationAttributeName("carUsers"); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
 		
 	}
@@ -997,7 +1000,7 @@ public class SantiagoScenarioBuilder {
 	private static void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
 		
 		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
-		smc.setConsiderCarAvailability(true); //TODO true or false (KT 2015-09-18
+		smc.setConsiderCarAvailability(true); //TODO true or false ? (KT 2015-09-18)
 		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
 		
 	}
