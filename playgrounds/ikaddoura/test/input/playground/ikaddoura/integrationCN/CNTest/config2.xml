@@ -64,7 +64,7 @@
 		<param name="waiting" value="0.0" />
 
 		<param name="marginalUtilityOfMoney" value="100000" />
-		<param name="monetaryDistanceCostRateCar" value="0.0" />
+		<param name="monetaryDistanceRateCar" value="0.0" />
 
 		<param name="constantCar" value="-0.0" />
 	
