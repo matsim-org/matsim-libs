@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run8b";
+	public static final String runID = "run9";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -45,6 +45,29 @@ public class Global {
 		leisure,
 		other
 	};
+
+	public static final String idBadBayersoien = "09180113";
+	public static final String idBadKohlgrub = "09180112";
+	public static final String idEschenlohe = "09180114";
+	public static final String idEttal = "09180115";
+	public static final String idFarchant = "09180116";
+	public static final String idGarmischPartenkirchen = "09180117";
+	public static final String idGrainau = "09180118";
+	public static final String idGroßweil = "09180119";
+	public static final String idKrün = "09180122";
+	public static final String idMittenwald = "09180123";
+	public static final String idMurnau = "09180124";
+	public static final String idOberammergau = "09180125";
+	public static final String idOberau = "09180126";
+	public static final String idOhlstadt = "09180127";
+	public static final String idRiegsee = "09180128";
+	public static final String idSaulgrub = "09180129";
+	public static final String idSchwaigen = "09180131";
+	public static final String idSeehausen = "09180132";
+	public static final String idSpatzenhausen = "09180133";
+	public static final String idUffing = "09180134";
+	public static final String idUnterammergau = "09180135";
+	public static final String idWallgau = "09180136";
 	
 	//subpopulation classes
 	public static final String USER_GROUP = "usrGroup";

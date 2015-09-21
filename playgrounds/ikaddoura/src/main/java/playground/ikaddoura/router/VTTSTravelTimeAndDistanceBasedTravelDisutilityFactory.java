@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DefaultTravelCostCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.ikaddoura.router;
 
-package playground.juliakern.distribution.withScoringFast;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import playground.ikaddoura.analysis.vtts.VTTSHandler;
 
-public class ResponsibilityScoringFunctionFactory implements
-		ScoringFunctionFactory {
 
-	private CharyparNagelScoringFunctionFactory delegate;
-	private EmissionControlerListener ecl;
+/**
+ * @author ikaddoura
+ *
+ */
+public final class VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
+
+	private double sigma = 0. ;
+	private VTTSHandler vttsHandler;
 	
-	public ResponsibilityScoringFunctionFactory(Config config, Network network, EmissionControlerListener ecl) {
-		this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), network);
-		this.ecl = ecl;
-		// TODO Auto-generated constructor stub
+	public VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(VTTSHandler vttsHandler) {
+		this.vttsHandler = vttsHandler ;
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		// TODO Auto-generated method stub
-		return new ResponsiblityScoringFunction(person.getSelectedPlan(), delegate.createNewScoringFunction(person), ecl);
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		return new VTTSRandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, vttsHandler);
+	}
+	
+	public void setSigma ( double val ) {
+		this.sigma = val;
 	}
 
 }

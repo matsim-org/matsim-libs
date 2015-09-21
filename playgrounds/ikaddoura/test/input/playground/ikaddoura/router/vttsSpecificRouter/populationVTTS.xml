@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+<person id="person_highVTTS" employed="no">
+		<plan selected="yes">
+			<act type="home" x="-500.0" y="2000.0" end_time="08:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="work" x="10500.0" y="2000.0" end_time="16:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="home" x="-500.0" y="2000.0" end_time="08:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="person_lowVTTS" employed="no">
+		<plan selected="yes">
+			<act type="home" x="-500.0" y="2000.0" end_time="08:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="work2" x="10500.0" y="2000.0" end_time="20:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="home" x="-500.0" y="2000.0" end_time="08:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</population>

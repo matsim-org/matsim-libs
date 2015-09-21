@@ -49,6 +49,7 @@ public class MiDCSVReader {
 		String acts = null;
 		String legs = null;
 		String times = null;
+		String distance = null;
 		
 		String pHash = null;
 		
@@ -68,7 +69,7 @@ public class MiDCSVReader {
 						
 						if(!times.contains("NULL")){
 							
-							MiDTravelChain tChain = new MiDTravelChain(previousPId, legs.split("_"), acts.split("_"), times.split("_"));
+							MiDTravelChain tChain = new MiDTravelChain(previousPId, legs.split("_"), acts.split("_"), times.split("_"), distance.split("_"));
 							templates.addTravelChainToPattern(pHash, acts, tChain);
 							
 						}
@@ -101,6 +102,7 @@ public class MiDCSVReader {
 				String mode = parts[idxMode];
 				String departure = parts[idxStart];
 				String arrival = parts[idxEnd];
+				String d = parts[idxDistance];
 				
 				if(acts == null){
 					
@@ -134,6 +136,16 @@ public class MiDCSVReader {
 				} else{
 					
 					times += "_" + departure + "-" + arrival;
+					
+				}
+				
+				if(distance == null){
+					
+					distance = d;
+					
+				} else{
+					
+					distance += "_" + d;
 					
 				}
 				

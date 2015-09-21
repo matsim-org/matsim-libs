@@ -78,13 +78,13 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	}
 	public void plotStats(){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotCapacities(times, capacitieslink2, capacitieslink4);
-		plot.PlotDelays(times, avgdelayslink2, avgdelayslink4);
-		plot.PlotDelaysandCapacities(times, capacitieslink2, capacitieslink4, avgdelayslink2, avgdelayslink4);
+		//plot.PlotCapacities(times, capacitieslink2, capacitieslink4);
+		//plot.PlotDelays(times, avgdelayslink2, avgdelayslink4);
+		//plot.PlotDelaysandCapacities(times, capacitieslink2, capacitieslink4, avgdelayslink2, avgdelayslink4);
 	}
 	public void plotAbsoultePressureDifference(ArrayList<Double> iters, ArrayList<Double> avgabsolutepressuredifference){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotAbsolutePressureDiff(iters, avgabsolutepressuredifference);
+		//plot.PlotAbsolutePressureDiff(iters, avgabsolutepressuredifference);
 	}
 	public double getAvgPressDiffOverIter(){
 		double totalpressdiff=0;
