@@ -68,8 +68,7 @@ public class GeneralLogObject {
 		if (!fileClosed) {
 			ArrayList<String> outputList = new ArrayList<String>();
 
-			String outputFileName= controler.getControlerIO()
-			.getIterationFilename(iteration, this.outputFile);
+			String outputFileName= controler.getControlerIO().getIterationFilename(iteration, this.outputFile);
 			
 			try (
 				FileOutputStream fos = new FileOutputStream(outputFileName);
@@ -93,6 +92,8 @@ public class GeneralLogObject {
 				outputStreamWriter.close();
 			} catch (Exception e) {
 				e.printStackTrace();
+				throw new RuntimeException("file IO did not work") ;
+				// need to throw exception here since otherwise it just keeps going, e.g. in tests. kai, sep'15
 			}
 		}
 		fileClosed = true;
