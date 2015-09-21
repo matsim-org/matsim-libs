@@ -1,6 +1,7 @@
 package playground.artemc.psim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
@@ -9,6 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -30,6 +32,12 @@ public class ChoiceSetGenerator implements ShutdownListener {
 	static private String inputDirectory;
 	static private String outputDirectory;
 	static private String eventFilePath;
+
+	private static String simType = "10min";
+	private static String schema = "corridor_10min";
+
+	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it/";
+	private static String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
 
 	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
 
@@ -63,7 +71,8 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			choiceSetGenerator.choiceGenerationControler.run();
 		} else if (args.length == 2) {
-			String dataFolder = args[0];
+			//String dataFolder = args[0];
+			String dataFolder = dataPath;
 			Integer lastIteration = Integer.valueOf(args[1]);
 			File directory = new File(dataFolder);
 			File[] fList = directory.listFiles();
@@ -102,24 +111,38 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			population.getPersons().get(personId).addPlan(planTmp);
 		}
 
-			/*Clean routes*/
-			PlanRouteStripper planRouteStripper = new PlanRouteStripper();
-			planRouteStripper.run(population);
+		/*Clean routes*/
+		PlanRouteStripper planRouteStripper = new PlanRouteStripper();
+		planRouteStripper.run(population);
+
+		/*Create optimal walk plan and substitute it in the planMap*/
+		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(controler.getConfig());
 
 		for (Id<Person> personId : population.getPersons().keySet()) {
 
 			/* Plan cloning for each mode*/
 			HashMap<String, Plan> planMap = new HashMap<>();
-			String[] modes = controler.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
 
 			Leg firstLeg = (Leg) population.getPersons().get(personId).getSelectedPlan().getPlanElements().get(1);
-			planMap.put(firstLeg.getMode(), population.getPersons().get(personId).getSelectedPlan());
 			String initialMode = firstLeg.getMode();
 
-			for (String mode : modes) {
-				if (!firstLeg.getMode().equals(mode)) {
-					population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
+			//If "No PT"
+			if(initialMode=="pt" && simType.equals("noPT"))
+				initialMode="walk";
 
+			planMap.put(initialMode, population.getPersons().get(personId).getSelectedPlan());
+
+			//String[] modes = controler.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
+			//String[] modes = {"car","walk"};
+
+			ArrayList<String> relevantModes = new ArrayList<String>();
+			relevantModes.add("car");
+			if(!simType.equals("carOnly") && !simType.equals("noPT"))
+				relevantModes.add("pt");
+
+			for (String mode : relevantModes) {
+				if (!initialMode.equals(mode) && !mode.equals("walk")){
+					population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
 					Plan planForModeChange = population.getPersons().get(personId).getSelectedPlan();
 
 					for (int j = 1; j < planForModeChange.getPlanElements().size(); j += 2) {
@@ -131,15 +154,32 @@ public class ChoiceSetGenerator implements ShutdownListener {
 				}
 			}
 
-			String[] relevantModes = {"car","pt"};
+			/*Check if walk is a viable alternative and if so, add it to the choice set*/
+			if(!initialMode.equals("walk") && optimalWalkPlanFinder.getWalkTravelTime(planMap.get(initialMode))<=3600.0 && !simType.equals("carOnly")) {
+				population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
+				Plan planForModeChange = population.getPersons().get(personId).getSelectedPlan();
+				planForModeChange = optimalWalkPlanFinder.findOptimalWalkPlan(planForModeChange);
+				for (int j = 1; j < planForModeChange.getPlanElements().size(); j += 2) {
+					LegImpl leg = (LegImpl) planForModeChange.getPlanElements().get(j);
+					leg.setMode("walk");
+				}
+
+				planMap.put("walk", planForModeChange);
+			}
+			;
+
+			//String[] relevantModes = {"car","pt"};
+
 			/* Departure time modification for each mode*/
 			for (String mode :relevantModes) {
 				Plan basePlan = planMap.get(mode);
 				population.getPersons().get(personId).setSelectedPlan(basePlan);
 
-				for (int i = 0; i < (departureTimeChoices * departureTimeChoices  - 1); i++) {
+				for (int i = 0; i < 6; i++) {
 					population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
 				}
+
+				population.getPersons().get(personId).setSelectedPlan(basePlan);
 
 				int planModCounter = 0;
 				/* Departure time modification */
@@ -189,23 +229,25 @@ public class ChoiceSetGenerator implements ShutdownListener {
 							act2.setEndTime(act2.getEndTime() - 3600.0);
 						}
 
-						//Home departure time +1h, Work departure time -1h
-						if (planModCounter == 6) {
-							Activity act = (Activity) planToModify.getPlanElements().get(0);
-							act.setEndTime(act.getEndTime() + 3600.0);
 
-							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-							act2.setEndTime(act2.getEndTime() - 3600.0);
-						}
-
-						//Home departure time - 1h, Work departure time +1h
-						if (planModCounter == 7) {
-							Activity act = (Activity) planToModify.getPlanElements().get(0);
-							act.setEndTime(act.getEndTime() - 3600.0);
-
-							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-							act2.setEndTime(act2.getEndTime() + 3600.0);
-						}
+//                      NOT REALISTIC
+//						//Home departure time +1h, Work departure time -1h
+//						if (planModCounter == 6) {
+//							Activity act = (Activity) planToModify.getPlanElements().get(0);
+//							act.setEndTime(act.getEndTime() + 3600.0);
+//
+//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+//							act2.setEndTime(act2.getEndTime() - 3600.0);
+//						}
+//
+//						//Home departure time - 1h, Work departure time +1h
+//						if (planModCounter == 7) {
+//							Activity act = (Activity) planToModify.getPlanElements().get(0);
+//							act.setEndTime(act.getEndTime() - 3600.0);
+//
+//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+//							act2.setEndTime(act2.getEndTime() + 3600.0);
+//						}
 
 						planModCounter++;
 					}
@@ -283,9 +325,6 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		}
 
 		/*Write score table to SQL*/
-		String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
-		String schema = "corridor";
-
 		Integer relativeOutputDirectory = event.getControler().getConfig().controler().getOutputDirectory().split("/").length;
 
 		String tableName = schema + ".scores_";
@@ -293,6 +332,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		tableSuffix = tableSuffix.replaceAll("\\.0x", "x");
 		tableSuffix = tableSuffix.replaceAll("-", "_");
 		tableSuffix = tableSuffix.replaceAll("\\.5", "5");
+		tableSuffix = tableSuffix.replaceAll("\\.1", "1");
 		tableName = tableName + tableSuffix;
 
 		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getControler().getConfig(), newPopulation);
