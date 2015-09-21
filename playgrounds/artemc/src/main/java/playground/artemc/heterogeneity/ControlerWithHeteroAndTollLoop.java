@@ -50,9 +50,14 @@ public class ControlerWithHeteroAndTollLoop {
 
 		ArrayList<String> simulationTypes = new ArrayList<String>();
 
-		simulationTypes.add("hetero");
-		simulationTypes.add("heteroAlpha");
-		simulationTypes.add("heteroGamma");
+//		simulationTypes.add("hetero");
+//		simulationTypes.add("heteroAlpha");
+//		simulationTypes.add("heteroGamma");
+//		simulationTypes.add("heteroAlphaRatio");
+
+		simulationTypes.add("heteroAlphaOnly");
+		simulationTypes.add("heteroGammaOnly");
+
 
 		input = args[0];
 		if(args.length>1){
@@ -73,7 +78,7 @@ public class ControlerWithHeteroAndTollLoop {
 			}
 
 			log.info("Simulation type: " + simulationType);
-			if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma")) {
+			if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma") || simulationType.equals("heteroAlphaRatio") || simulationType.equals("heteroAlphaOnly") || simulationType.equals("heteroGammaOnly")) {
 				log.info("Heterogeneityfactor: " + heterogeneityFactor);
 			}else if(!simulationType.equals("homo")){
 				throw new RuntimeException("Unknown income heterogeneity type");
@@ -94,15 +99,11 @@ public class ControlerWithHeteroAndTollLoop {
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
 
-		log.info("Adding Simple Annealer...");
-		controler.addControlerListener(new SimpleAnnealer());
-
 		//Adjust heterogeneity parameters from input arguments
 		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
 		Double adjustedIncomeOnTravelCostLambda = Double.valueOf(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostLambda"))*heterogeneityFactor;
 		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostLambda", adjustedIncomeOnTravelCostLambda.toString());
 		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
-
 
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());

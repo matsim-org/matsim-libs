@@ -64,7 +64,7 @@ public class ControlerWithHeteroAndToll {
 		}
 
 		log.info("Simulation type: " + simulationType);
-		if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma")) {
+		if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma") || simulationType.equals("heteroAlphaRatio") ||simulationType.equals("heteroPropSymmetric") || simulationType.equals("heteroAlphaUniform") || simulationType.equals("heteroGammaUniform")){
 			log.info("Heterogeneityfactor: " + heterogeneityFactor);
 		}else if(!simulationType.equals("homo")){
 			throw new RuntimeException("Unknown income heterogeneity type");
