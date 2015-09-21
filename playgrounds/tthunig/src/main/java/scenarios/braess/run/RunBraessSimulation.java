@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
@@ -34,8 +35,8 @@ import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
- * Class to run a simulation of the braess scenario without signals. It also
- * analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * Class to run a simulation of the braess scenario with or without signals. 
+ * It analyzes the simulation with help of AnalyseBraessSimulation.java.
  * 
  * @author tthunig
  * 
@@ -52,7 +53,7 @@ public class RunBraessSimulation {
 	// initial score for all initial plans
 	private final Double INIT_PLAN_SCORE = 110.;
 
-	/// defines which kind of signals should be used: ALL_GREEN, ONE_SECOND_Z, GREEN_WAVE_Z, GREEN_WAVE_SO
+	/// defines which kind of signals should be used: ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO
 	private final SignalControlType SIGNAL_TYPE = SignalControlType.GREEN_WAVE_SO;
 	
 	// defines which kind of lanes should be used: NONE, TRIVIAL or REALISTIC
@@ -191,14 +192,14 @@ public class RunBraessSimulation {
 		
 		// set end time to 12 am (4 hours after simulation start) to
 		// shorten simulation run time
-		config.qsim().setEndTime(3600 * 12);
+//		config.qsim().setEndTime(3600 * 12);
 		
 		// adapt monetary distance cost rate
 		// (should be negative. use -12.0 to balance time [h] and distance [m].
 		// use -0.000015 to approximately balance the utility of travel time and
 		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
 		// use -0.0 to use only time.)
-		config.planCalcScore().setMonetaryDistanceRateCar( -0.0 );
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done

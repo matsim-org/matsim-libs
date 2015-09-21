@@ -90,8 +90,8 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	private void initNetworkParams() {
 		if (btuRun){
-			capFirstLast = 9000; 
-			capMain = 9000; 
+			capFirstLast = 7200;
+			capMain = 7200;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 200;
 			linkTTMid = 1;
