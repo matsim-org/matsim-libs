@@ -68,6 +68,8 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.dhosse.cl.Constants;
+import playground.dhosse.cl.Constants.SubpopulationName;
+import playground.dhosse.cl.Constants.SubpopulationValues;
 
 public class SantiagoScenarioBuilder {
 
@@ -687,8 +689,12 @@ public class SantiagoScenarioBuilder {
 		setPlansCalcRouteParameters(config.plansCalcRoute());
 //		setQSimParameters(config.qsim());
 		setScenarioParameters(config.scenario());
-		setStrategyParameters(config.strategy());
-		setSubtourModeChoiceParameters(config.subtourModeChoice());
+		setStrategyParameters(config.strategy());	
+		
+		//creation of more than one subpopulation in config not possible yet ->removed Module, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+//		setSubtourModeChoiceParameters(config.subtourModeChoice());	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+		config.removeModule("subtourModeChoice");
+		
 		setTimeAllocationMutatorParameters(config.timeAllocationMutator());
 		setTravelTimeCalculatorParameters(config.travelTimeCalculator());
 		setVspExperimentalParameters(config.vspExperimental());
@@ -872,7 +878,7 @@ public class SantiagoScenarioBuilder {
 		plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml"); //TODO
 		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName("carUsers"); 
+		plans.setSubpopulationAttributeName(SubpopulationName.carUsers); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
 		
 	}
@@ -987,16 +993,18 @@ public class SantiagoScenarioBuilder {
 		reRoute.setWeight(0.3);
 		strategy.addStrategySettings(reRoute);
 		
-		//TODO: add subTourModeChoice
-		StrategySettings subTourModeChoice = new StrategySettings();
-		subTourModeChoice.setStrategyName("SubtourModeChoice");
-		subTourModeChoice.setSubpopulation("carAvail");
-		subTourModeChoice.setWeight(0.1);
-		strategy.addStrategySettings(subTourModeChoice);
-	
+		//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+//		//TODO: add subTourModeChoice
+//		StrategySettings subTourModeChoice = new StrategySettings();
+//		subTourModeChoice.setStrategyName("SubtourModeChoice");
+//		subTourModeChoice.setSubpopulation(SubpopulationValues.carAvail);
+//		subTourModeChoice.setWeight(0.1);
+//		strategy.addStrategySettings(subTourModeChoice);
+//	
 		
 	}
 	
+	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
 	private static void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
 		
 		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});

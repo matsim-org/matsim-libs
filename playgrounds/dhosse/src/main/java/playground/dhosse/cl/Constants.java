@@ -18,4 +18,12 @@ public final class Constants {
 	
 	public final static String toCRS = "EPSG:32719";
 	
+	public final class SubpopulationName {
+		public final static String carUsers = "carUsers";
+	}
+	
+	public final class SubpopulationValues {
+		public final static String carAvail = "carAvail";
+	}
+	
 }

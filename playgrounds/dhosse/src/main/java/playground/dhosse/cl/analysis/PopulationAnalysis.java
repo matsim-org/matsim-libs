@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -21,6 +22,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import playground.dhosse.cl.Constants.SubpopulationName;
+import playground.dhosse.cl.Constants.SubpopulationValues;
 
 
 public class PopulationAnalysis {
@@ -105,7 +109,7 @@ public class PopulationAnalysis {
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
 					if (pe instanceof Leg){
 						Leg leg = (Leg) pe;
-						if (leg.getMode() == "car"){ 
+						if (leg.getMode() == TransportMode.car){ 
 							agentIdString2CarAvail.put(person.getId().toString(), false); // Assumption, that carAvail is false; carAvail will be checked later.
 							carUsersId2Person.put(person.getId(), person);
 						}
@@ -121,8 +125,8 @@ public class PopulationAnalysis {
 		
 		//write car availability to car users.
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {
-			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , "carUsers"));
-			boolean carAvail = "carAvail".equals(attributes.getAttribute(agentIdString , "carUsers"));
+			System.out.println(agentIdString + ": " +  attributes.getAttribute(agentIdString , SubpopulationName.carUsers));
+			boolean carAvail = SubpopulationValues.carAvail.equals(attributes.getAttribute(agentIdString , SubpopulationName.carUsers));
 			agentIdString2CarAvail.put(agentIdString, carAvail);
 		}
 		
