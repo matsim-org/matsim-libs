@@ -34,6 +34,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -53,7 +55,7 @@ public class CongestionPricingControler {
 	static String configFile;
 	static String VTTSapproach; // different, equal
 	static String implementation; // V3, V7
-	static String router; // standard, randomized
+	static String router; // standard, randomized, VTTSspecific
 
 	public static void main(String[] args) throws IOException {
 		
@@ -87,6 +89,7 @@ public class CongestionPricingControler {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 		
 		if (router.equals("standard")) {
 			
@@ -112,7 +115,19 @@ public class CongestionPricingControler {
 				public void install() {
 					this.bindTravelDisutilityFactory().toInstance( factory );
 				}
-			}); 		
+			}); 
+			
+		} else if (router.equals("VTTSspecific")) {
+			
+			final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler);
+			factory.setSigma(0.); // for now no randomness
+			
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindTravelDisutilityFactory().toInstance( factory );
+				}
+			}); 
 			
 		} else {
 			throw new RuntimeException("Not implemented. Aborting...");
