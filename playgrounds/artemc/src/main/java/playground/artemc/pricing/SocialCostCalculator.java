@@ -589,7 +589,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValue;
-				if (iteration == 0) oldValue = socialCost;
+				if (iteration == 0) oldValue = socialCost * blendFactor;
 				else oldValue = data.socialCosts[k];
 				double blendedOldValue = (1 - blendFactor) * oldValue;
 				double blendedNewValue = blendFactor * socialCost;
