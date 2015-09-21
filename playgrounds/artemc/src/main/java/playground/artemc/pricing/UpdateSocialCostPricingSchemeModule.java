@@ -39,7 +39,7 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 		RoadPricingSchemeImpl roadPricingScheme;
 		SocialCostCalculator scc;
 
-		/*time bin size for calculation of social cost and toll setting*/
+		/*Time bin size for calculation of social cost and toll setting. Should be the same as for the router.*/
 		private final int timeslice = 5 * 60;
 
 		/*Smoothing factor of toll changes: New toll = OldToll * (1-blendFactor) + NewToll * blendFactor
