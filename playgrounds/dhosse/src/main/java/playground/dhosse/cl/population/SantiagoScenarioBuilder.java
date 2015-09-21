@@ -156,7 +156,7 @@ public class SantiagoScenarioBuilder {
 		
 		//freight traffic will only be added to population, if file exists. Otherwise do nothing.
 		//Added at this position, so the end times will not be randomized. (KT 2015-09-16)
-		File freightPlansFile = new File(outputDir + "freight/plans.xml.gz");
+		File freightPlansFile = new File(outputDir + "freight/freight_plans.xml.gz");
 		if (freightPlansFile.exists()){
 			Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 			new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());

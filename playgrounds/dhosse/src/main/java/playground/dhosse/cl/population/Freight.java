@@ -71,8 +71,7 @@ public class Freight {
 
 	private static void write(Population population, String outputDir){
 		createDir(new File(outputDir));
-		new PopulationWriter(population).write(outputDir + "plans.xml.gz");
-		new PopulationWriter(population).write(outputDir + "plans.xml");
+		new PopulationWriter(population).write(outputDir + "freight_plans.xml.gz");
 
 		//write list of all AgentIds to file. Can be used for selecting all freightVehicleAgents in visualization with Senozon Via   
 		try {
