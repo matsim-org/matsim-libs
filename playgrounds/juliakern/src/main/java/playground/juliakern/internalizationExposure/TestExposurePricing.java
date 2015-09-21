@@ -175,7 +175,7 @@ public class TestExposurePricing {
 			pcs.addActivityParams(params);
 		}
 		
-		pcs.setMonetaryDistanceCostRateCar(new Double("-3.0E-4"));
+		pcs.setMonetaryDistanceRateCar(new Double("-3.0E-4"));
 		
 		pcs.setMarginalUtilityOfMoney(0.0789942);
 		pcs.setTraveling_utils_hr(0.0);

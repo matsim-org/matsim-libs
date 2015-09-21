@@ -1,6 +1,5 @@
 package playground.dhosse.gap.run;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -16,7 +15,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
@@ -44,8 +42,8 @@ public class GAPScenarioRunner {
 	public static void main(String args[]){
 
 //		runBaseCaseRouteChoiceOnly();
-//		runBaseCaseRouteChoiceAndModeChoice();
-		runAnalysis();
+		runBaseCaseRouteChoiceAndModeChoice();
+//		runAnalysis();
 //		GeometryUtils.readPolygonFile(Global.dataDir + "Netzwerk/garmisch.poly");
 		
 	}

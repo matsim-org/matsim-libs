@@ -167,29 +167,16 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
+		
+		// coming here ...
+		this.delegate.handleEvent( event ) ;
 
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
-
 		} else { // car!
-			Id<Person> personId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
-
-			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), delegate.getLinkId2congestionInfo(), scenario);
-
-			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
-
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
-					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
-
-			CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
-
+			LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( event.getLinkId() ) ;
+			DelayInfo delayInfo = linkInfo.getFlowQueue().getLast();
 			calculateCongestion(event, delayInfo);
-			// und hier sieht man in der Tat, dass das mit der abstrakten Klasse gar nicht so falsch war. Hm ... kai, sep'15
-
-			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.memorizeLastLinkLeaveEvent( event );
-
-			linkInfo.getAgentsOnLink().remove( personId ) ;
 		}
 	}
 
@@ -198,8 +185,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 		
-		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getAgentsOnLink().get(delayInfo.personId).getFreeSpeedLeaveTime();
+		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
 
 		// global book-keeping:
 		this.totalDelay += delayOnThisLink;

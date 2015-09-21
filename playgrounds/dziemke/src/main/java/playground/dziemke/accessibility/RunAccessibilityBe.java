@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -25,7 +26,9 @@ import org.matsim.facilities.FacilitiesUtils;
 public class RunAccessibilityBe {
 	public static final Logger log = Logger.getLogger( RunAccessibilityBe.class ) ;
 	
-	private static final double cellSize = 1000.;
+//	private static final double cellSize = 1000.;
+//	private static final double cellSize = 200.;
+	private static final double cellSize = 500.;
 
 	public static void main(String[] args) {
 		// Input and output
@@ -33,21 +36,31 @@ public class RunAccessibilityBe {
 //		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		// same network at alternate location
 		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+		
 //		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
 		// now using work facilities
-		String facilitiesFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/08/facilities_buildings.xml";
-		String outputDirectory = "../../../../Workspace/shared-svn/projects/accessibility_berlin/output/02/";
+		String facilitiesFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
+		
+		String outputDirectory = "../../../../Workspace/shared-svn/projects/accessibility_berlin/output/07/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
 
 		// Parameters
-		boolean includeDensityLayer = true;
+//		boolean includeDensityLayer = true;
+		boolean includeDensityLayer = false;
 		String crs = TransformationFactory.DHDN_GK4;
-		Double lowerBound = 1.75;
-		Double upperBound = 7.;
+//		String crs = "EPSG:31468"; // = DHDN GK4
+//		Double lowerBound = 1.75;
+//		Double upperBound = 7.;
+//		Double lowerBound = 0.;
+//		Double upperBound = 9.;
+		Double lowerBound = 2.25;
+		Double upperBound = 7.5;
 		Integer range = 9;
-		int symbolSize = 1010;
+//		int symbolSize = 1010;
+//		int symbolSize = 210;
+		int symbolSize = 510;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 				
 				
@@ -161,7 +174,8 @@ public class RunAccessibilityBe {
 					activityTypes.add( option.getType() ) ;
 				}
 				// figure out where the homes are
-				if ( option.getType().equals("h") ) {
+//				if ( option.getType().equals("h") ) {
+				if ( option.getType().equals(FacilityTypes.HOME) ) {
 					homes.addActivityFacility(fac);
 				}
 			}

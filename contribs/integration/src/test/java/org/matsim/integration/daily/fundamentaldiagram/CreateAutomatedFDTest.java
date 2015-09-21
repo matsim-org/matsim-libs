@@ -185,6 +185,9 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public double getActivityEndTime() {
+			if(isArriving  && agentState.equals(MobsimAgent.State.ACTIVITY)){
+				return Double.POSITIVE_INFINITY;
+			}
 			return this.actEndTime;
 		}
 

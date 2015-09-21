@@ -164,7 +164,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			calculateCongestion(event, delayInfo);
 
 			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.getDelayQueue().add( delayInfo ) ;
 
 			linkInfo.memorizeLastLinkLeaveEvent( event );
 

@@ -43,8 +43,16 @@ public class P0ControlListener implements IterationStartsListener,IterationEndsL
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		//handler.printEvents();
 		//network.setNetworkChangeEvents(P0QueueDelayControl.events);
+		
 		avgabsolutepressuredifference.add(handler.getAvgPressDiffOverIter());
 		iters.add(Double.parseDouble(Integer.toString(event.getIteration())));
+		handler.populatelastCapacities();
+		handler.printDelayStats();
+		handler.printCapacityStats();
+		handler.plotStats();
+		handler.plotAbsolutePressures();
+		handler.plotAbsoultePressureDifference(iters, avgabsolutepressuredifference);
+		handler.printDelayStats();
 		// TODO Auto-generated method stub
 		
 	}
