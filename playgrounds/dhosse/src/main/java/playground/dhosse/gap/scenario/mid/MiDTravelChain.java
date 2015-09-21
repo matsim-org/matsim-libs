@@ -8,12 +8,12 @@ public class MiDTravelChain {
 	
 	private LinkedList<MiDTravelStage> stages = new LinkedList<>();
 	
-	public MiDTravelChain(String pId,String[] legs, String[] acts, String[] times){
+	public MiDTravelChain(String pId,String[] legs, String[] acts, String[] times, String[] lengths){
 		
 		//acts.length() = legs.length + 1 (because of first activity: home / other)
 		for(int i = 0; i < legs.length; i++){
 			
-			this.stages.addLast(new MiDTravelStage(legs[i], acts[i], acts[i+1], Time.parseTime(times[i].split("-")[0]), Time.parseTime(times[i].split("-")[1])));
+			this.stages.addLast(new MiDTravelStage(legs[i], acts[i], acts[i+1], Time.parseTime(times[i].split("-")[0]), Time.parseTime(times[i].split("-")[1]),lengths[i]));
 			
 		}
 		
@@ -30,8 +30,9 @@ public class MiDTravelChain {
 		private String nextActType;
 		private double departureTime;
 		private double arrivalTime;
+		private double distance;
 		
-		public MiDTravelStage(String legMode, String previousActType, String nextActType, double departureTime, double arrivalTime){
+		public MiDTravelStage(String legMode, String previousActType, String nextActType, double departureTime, double arrivalTime, String distance){
 			
 			this.legMode = legMode;
 			this.previousActType = previousActType;
@@ -40,6 +41,9 @@ public class MiDTravelChain {
 			this.arrivalTime = arrivalTime;
 			if(this.arrivalTime < this.departureTime){
 				this.arrivalTime += 24 * 3600;
+			}
+			if(!distance.equals("NULL")){
+				this.distance = Double.parseDouble(distance.replace(",", "."));
 			}
 			
 		}
@@ -82,6 +86,14 @@ public class MiDTravelChain {
 
 		public void setArrivalTime(double arrivalTime) {
 			this.arrivalTime = arrivalTime;
+		}
+
+		public double getDistance() {
+			return distance;
+		}
+
+		public void setDistance(double distance) {
+			this.distance = distance;
 		}
 		
 	}

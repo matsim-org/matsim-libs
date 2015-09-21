@@ -21,6 +21,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.matrices.Matrix;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,7 +43,7 @@ public class PlansCreatorV2 {
 	
 	private static final Logger log = Logger.getLogger(PlansCreatorV2.class);
 	
-	public static Population createPlans(Scenario scenario, String commuterFilename, String reverseCommuterFilename){
+	public static Population createPlans(Scenario scenario, String commuterFilename, String reverseCommuterFilename, Map<String,Matrix> matrices){
 		
 		//create a commuter reader and add municipalities to the filter in order to create commuter relations
 		//that start or end in these municipalities
@@ -75,13 +76,13 @@ public class PlansCreatorV2 {
 		cdr.read(commuterFilename, false);
 		
 		//the actual demand generation
-		createPersonsWithDemographicData(scenario, cdr.getCommuterRelations());
+		createPersonsWithDemographicData(scenario, cdr.getCommuterRelations(), matrices);
 		
 		return scenario.getPopulation();
 		
 	}
 	
-	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
+	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations, Map<String,Matrix> matrices){
 		
 		Map<String,MiDPersonGroupData> personGroupData = EgapPopulationUtilsV2.createMiDPersonGroups();
 		
@@ -98,7 +99,7 @@ public class PlansCreatorV2 {
 		
 		for(Entry<String, Municipality> entry : Municipalities.getMunicipalities().entrySet()){
 			
-			CreateDemand.run(entry.getKey(), 6, 17, entry.getValue().getnStudents(), scenario, templates);
+			CreateDemand.runTryout(entry.getKey(), 6, 17, entry.getValue().getnStudents(), scenario, templates, matrices);
 //			createPersonsFromPersonGroup(entry.getKey(), 6, 17, entry.getValue().getnStudents(), scenario, personGroupData.get("0_17"));
 			
 			int nCommuters = 0;
@@ -114,7 +115,7 @@ public class PlansCreatorV2 {
 					
 					if(relationParts[1].startsWith("09180")){
 						
-						CreateDemand.createCommuters(relationParts[0], relationParts[1], 18, 65, relations.get(relation), scenario, templates);
+						CreateDemand.createCommuters(relationParts[0], relationParts[1], 18, 65, relations.get(relation), scenario, templates, matrices);
 //						createCommutersFromKey(scenario, relations.get(relation), personGroupData, templates);
 						keysToRemove.add(relation);
 						
@@ -130,8 +131,8 @@ public class PlansCreatorV2 {
 				
 			}
 			
-			CreateDemand.run(entry.getKey(), 18, 65, entry.getValue().getnAdults() - nCommuters, scenario, templates);
-			CreateDemand.run(entry.getKey(), 66, 100, entry.getValue().getnPensioners(), scenario, templates);
+			CreateDemand.runTryout(entry.getKey(), 18, 65, entry.getValue().getnAdults() - nCommuters, scenario, templates, matrices);
+			CreateDemand.runTryout(entry.getKey(), 66, 100, entry.getValue().getnPensioners(), scenario, templates, matrices);
 			
 		}
 		

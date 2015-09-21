@@ -41,7 +41,7 @@ public class GAPScenarioRunner {
 	 */
 	public static void main(String args[]){
 
-//		runBaseCaseRouteChoiceOnly();
+//		runBaseCaseRouteChoice();
 		runBaseCaseRouteChoiceAndModeChoice();
 //		runAnalysis();
 //		GeometryUtils.readPolygonFile(Global.dataDir + "Netzwerk/garmisch.poly");
@@ -51,33 +51,15 @@ public class GAPScenarioRunner {
 	/**
 	 * Runs the base scenario with route choice as only innovative strategy.
 	 */
-	private static void runBaseCaseRouteChoiceOnly() {
+	private static void runBaseCaseRouteChoice() {
 		
 		//basics: load config settings and scenario
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-//		System.out.println(scenario.getNetwork().getLinks().containsKey(Id.createLinkId("21411")));
-		
-		//create a second scenario, containing only the road network (rail network will be removed by network cleaner)
-		Scenario s2 = ScenarioUtils.loadScenario(config);
-		new NetworkCleaner().run(s2.getNetwork());
-		
-		//this is done in order to set the agent population on links
-		//that is the reason why the rail network had to be removed since car agents can't move on rails...
-		XY2Links xy2Links = new XY2Links(s2);
-		
-		for(Person person : scenario.getPopulation().getPersons().values()){
-			
-			xy2Links.run(person);
-			
-		}
-		
 		//after everything else is set up, start the simulation
 		final Controler controler = new Controler(scenario);
-		
-//		System.out.println(scenario.getNetwork().getLinks().containsKey(Id.createLinkId("21411")));
 		
 		controler.run();
 		
@@ -247,7 +229,7 @@ public class GAPScenarioRunner {
 	
 	private static void runAnalysis() {
 		
-		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plansV2.xml.gz", "/home/danielhosse/Dokumente/eGAP/popV2.shp");
+		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plansV3.xml.gz", "/home/danielhosse/Dokumente/eGAP/popV3.shp");
 	
 	}
 	
