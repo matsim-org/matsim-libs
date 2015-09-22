@@ -73,7 +73,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		Config config = new Config();
 		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFilePath);
-		String tempStringValue = config.findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
+		String tempStringValue = config.findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
 			// ATTENTION, this does not work at the moment, because the read
 			// link from the
