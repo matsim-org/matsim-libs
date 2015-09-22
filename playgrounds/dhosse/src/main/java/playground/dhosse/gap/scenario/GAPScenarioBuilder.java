@@ -1,9 +1,7 @@
 package playground.dhosse.gap.scenario;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -27,12 +25,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.matrices.Matrix;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.dhosse.gap.GAPMatrices;
@@ -41,6 +36,8 @@ import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -191,9 +188,6 @@ public class GAPScenarioBuilder {
 	 */
 	private static void initMunicipalities(Scenario scenario){
 		
-		Matrix wb = new Matrix("gp_od_matrix", "OD matrix for Garmisch-Partenkirchen");
-		wb.createEntry(Global.idBadBayersoien, Global.idBadBayersoien, 0.);
-		
 		Municipalities.addEntry("09180112", (int) (446), 1559, 526);						//Bad Kohlgrub
 		Municipalities.addEntry("09180113", (int) (169), 772, 223);						//Bad Bayersoien
 		Municipalities.addEntry("09180114", (int) (269), 908, 368);						//Eschenlohe
@@ -250,7 +244,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
 			
@@ -261,7 +255,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
 			
@@ -294,7 +288,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;
 		

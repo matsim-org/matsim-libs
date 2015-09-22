@@ -1,6 +1,8 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -429,7 +431,17 @@ public class CreateDemand {
 				
 			}
 			
-			Coord homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+			Coord homeCoord = null;
+			
+			if(munId.length() == 3){
+				
+				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+				
+			} else {
+
+				homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+				
+			}
 			
 			Activity homeAct = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 			
@@ -454,7 +466,16 @@ public class CreateDemand {
 						
 					} else{
 						
-						Coord coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+						Coord coord = null;
+						if(munId.length() == 3){
+							
+							coord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+								
+						} else {
+							
+							Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+							
+						}
 						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
 //						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
 						
@@ -494,6 +515,12 @@ public class CreateDemand {
 					String toId = distributeTrip(nextActType, odMatrices.get(pattern));
 					lastMunId = toId;
 					Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
+					
+					if(toId.length() == 3){
+						coord2 = Global.ct.transform(coord2);
+					} else{
+						coord2 = Global.gk4ToUTM32N.transform(coord2);
+					}
 						
 //						c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
 //						c = Global.UTM32NtoGK4.transform(PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d));
@@ -637,6 +664,14 @@ public class CreateDemand {
 		
 	}
 
+	static Comparator<org.matsim.matrices.Entry> matrixEntryComparator = new Comparator<org.matsim.matrices.Entry>() {
+
+		@Override
+		public int compare(org.matsim.matrices.Entry o1, org.matsim.matrices.Entry o2) {
+			return Double.compare(o1.getValue(), o2.getValue());
+		}
+	};
+	
 	private static String distributeTrip(String actType, Matrix od){
 		
 		ArrayList<org.matsim.matrices.Entry> entries = od.getToLocations().get(lastMunId);
@@ -647,6 +682,9 @@ public class CreateDemand {
 		for(org.matsim.matrices.Entry entry : entries){
 			accumulatedWeights += entry.getValue();
 		}
+		
+		Collections.sort(entries, matrixEntryComparator);
+		
 		
 		random *= accumulatedWeights;
 		double weight = 0.;
@@ -1430,10 +1468,18 @@ public class CreateDemand {
 				
 			}
 			
-			Coord homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
-			Activity homeAct = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
+			Coord homeCoord = null;
+			Coord workCoord = null;
 			
-			Coord workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+			if(munId.length() == 3){
+				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+				workCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+			} else{
+				Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+			}
+			
+			Activity homeAct = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 			
 			Activity currentAct = null;
 			
@@ -1458,7 +1504,12 @@ public class CreateDemand {
 						
 					} else{
 						
-						Coord coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+						Coord coord = null;
+						if(munId.length() == 3){
+							coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+						} else{
+							coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+						}
 						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
 //						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
 						

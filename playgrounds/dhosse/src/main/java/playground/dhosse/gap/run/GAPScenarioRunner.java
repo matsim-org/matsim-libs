@@ -26,12 +26,13 @@ import org.matsim.population.algorithms.XY2Links;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 public class GAPScenarioRunner {
 
 	private static final String inputPath = Global.matsimDir + "INPUT/";
 	private static final String simInputPath = Global.matsimDir + "OUTPUT/" + Global.runID +"/input/";
-	private static final String outputPath = "/run/user/1007/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
+	private static final String outputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
 	
 	/**
 	 * edit the static method executed in the main method
@@ -42,8 +43,8 @@ public class GAPScenarioRunner {
 	public static void main(String args[]){
 
 //		runBaseCaseRouteChoice();
-		runBaseCaseRouteChoiceAndModeChoice();
-//		runAnalysis();
+//		runBaseCaseRouteChoiceAndModeChoice();
+		runAnalysis();
 //		GeometryUtils.readPolygonFile(Global.dataDir + "Netzwerk/garmisch.poly");
 		
 	}
@@ -58,10 +59,16 @@ public class GAPScenarioRunner {
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		//after everything else is set up, start the simulation
-		final Controler controler = new Controler(scenario);
+		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+		lmdd.init(scenario);
+		lmdd.preProcessData();
+		lmdd.postProcessData();
+		lmdd.writeResults("/home/dhosse/Dokumente/lmdd/");
 		
-		controler.run();
+		//after everything else is set up, start the simulation
+//		final Controler controler = new Controler(scenario);
+//		
+//		controler.run();
 		
 	}
 	
@@ -74,22 +81,17 @@ public class GAPScenarioRunner {
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		Scenario s2 = ScenarioUtils.loadScenario(config);
-		new NetworkCleaner().run(s2.getNetwork());
+		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+		lmdd.init(scenario);
+		lmdd.preProcessData();
+		lmdd.postProcessData();
+		lmdd.writeResults("/home/dhosse/Dokumente/lmdd/");
 		
-		XY2Links xy2Links = new XY2Links(s2);
-		
-		for(Person person : scenario.getPopulation().getPersons().values()){
-			
-			xy2Links.run(person);
-			
-		}
-		
-		final Controler controler = new Controler(scenario);
-		
-		addModeChoiceStrategyModules(controler);
-		
-		controler.run();
+//		final Controler controler = new Controler(scenario);
+//		
+//		addModeChoiceStrategyModules(controler);
+//		
+//		controler.run();
 		
 	}
 	
@@ -229,7 +231,7 @@ public class GAPScenarioRunner {
 	
 	private static void runAnalysis() {
 		
-		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plansV3.xml.gz", "/home/danielhosse/Dokumente/eGAP/popV3.shp");
+		SpatialAnalysis.writePopulationToShape(inputPath + "Pläne/plansV3.xml.gz", "/home/dhosse/Dokumente/01_eGAP/popV3.shp");
 	
 	}
 	
