@@ -178,11 +178,11 @@ public class QuadTree<T> implements Serializable {
 	 * boundary are not included.
 	 *
 	 * @param bounds The bounds of the area of interest.
-	 * @param values A collection to store the found objects in.
+	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final Rect bounds, final Collection<T> values) {
-		return this.top.get(bounds, values);
+	public Collection<T> get(final Rect bounds, final Collection<T> values1) {
+		return this.top.get(bounds, values1);
 	}
 
 	/**
@@ -193,11 +193,11 @@ public class QuadTree<T> implements Serializable {
 	 * @param minY The minimum up-down location, latitude
 	 * @param maxX The maximum left-right location, longitude
 	 * @param maxY The maximum up-down location, latitude
-	 * @param values A collection to store the found objects in.
+	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values) {
-		return get(new Rect(minX, minY, maxX, maxY), values);
+	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values1) {
+		return get(new Rect(minX, minY, maxX, maxY), values1);
 	}
 
 	/**
