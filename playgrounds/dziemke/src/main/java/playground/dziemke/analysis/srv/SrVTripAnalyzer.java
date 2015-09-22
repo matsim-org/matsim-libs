@@ -22,8 +22,7 @@ package playground.dziemke.analysis.srv;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,6 +31,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,6 +46,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -92,21 +97,13 @@ public class SrVTripAnalyzer {
 	    
 	    
 		// Input and output files
-//		String inputFileTrips = "../../data/srv/input/W2008_Berlin_Weekday.dat";
-//		String inputFilePersons = "../../data/srv/input/P2008_Berlin2.dat";
-//		
-//		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-//		String shapeFile = "../../data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
-//				
-//		String outputDirectory = "../../data/srv/output/wd_neu2";
-		
-		String inputFileTrips = "/Users/dominik/Workspace/data/srv/input/W2008_Berlin_Weekday.dat";
+	    String inputFileTrips = "/Users/dominik/Workspace/data/srv/input/W2008_Berlin_Weekday.dat";
 		String inputFilePersons = "/Users/dominik/Workspace/data/srv/input/P2008_Berlin2.dat";
 		
 		String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
+//		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 				
-		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_4";
+		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_5";
 		
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
@@ -158,6 +155,7 @@ public class SrVTripAnalyzer {
 		// for writing plans files (newer ones...)
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
+		
 		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
 		
 		Population population = scenario.getPopulation();
@@ -165,6 +163,8 @@ public class SrVTripAnalyzer {
 		
 		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
 		networkReader.parse(networkFile);
+		
+		List<Event> events = new ArrayList<Event>();
 		
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
@@ -468,6 +468,7 @@ public class SrVTripAnalyzer {
 	    	
 	    	// TODO exclude trip if first activity is not "home"
 	    	for (double departureTime : tripsMap.keySet()) {
+	    		// plans
 	    		Plan plan = person.getPlans().get(0);
 	    		
 	    		Trip trip = tripsMap.get(departureTime);
@@ -482,38 +483,73 @@ public class SrVTripAnalyzer {
 	    		
 
 				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
+				
+				String activityTypeEndingActivity = trip.getActivityEndActType();	
 				if (personId == idToBeChecked) {
-					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "
-							+ trip.getActivityEndActType());
+					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "	+ activityTypeEndingActivity);
 				}
 				
-				Activity activity = populationFactory.createActivityFromCoord(trip.getActivityEndActType(), ct.transform(departureCoordinates));
+				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
 	    		double departureTimeInMinutes = trip.getDepartureTime();
 	    		double departureTimeInSeconds = departureTimeInMinutes * 60;
-				activity.setEndTime(departureTimeInSeconds);
-
-	    		plan.addActivity(activity);
-	    			    		
+				endingActivity.setEndTime(departureTimeInSeconds);
+				
+				plan.addActivity(endingActivity);
+	    		
 	    		// TODO make mode adjustable; right now its okay since non-car trips are excluded anyways
 	    		Leg leg = populationFactory.createLeg("car");
-	    		plan.addLeg(leg);	    		
+	    		plan.addLeg(leg);
+	    		
+	    		// last activity
+	    		String activityTypeStartingActivity = trip.getActivityStartActType();
+	    		
+	    		if (departureTime == tripsMap.lastKey()) {
+		    		double x2 = Double.parseDouble(trip.getArrivalZoneId().toString());
+		    		double y2 = x2;
+		    		Coord arrivalCoordinates = new Coord(x2, y2);
+		    		Activity startingActivity = populationFactory.createActivityFromCoord(activityTypeStartingActivity, ct.transform(arrivalCoordinates));
+		    		plan.addActivity(startingActivity);
+	    		}
+				
+	    		
+				// events
+				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTimeInSeconds, personId, null, null, activityTypeEndingActivity);
+				events.add(activityEndEvent);
+				// TODO make mode adjustable
+				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTimeInSeconds, personId, null, "car");
+				events.add(personDepartureEvent);
+				
+				double arrivalTimeInMinutes = trip.getArrivalTime();
+				double arrivalTimeInSeconds = arrivalTimeInMinutes * 60;
+				// TODO make mode adjustable
+				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTimeInSeconds, personId, null, "car");
+				events.add(personArrivalEvent);
+				ActivityStartEvent activityStartEvent = new ActivityStartEvent(departureTime, personId, null, null, activityTypeStartingActivity);
+				events.add(activityStartEvent);	
 	    	}
 	    	
 //    		System.out.println("person.getPlans().size() = " + person.getPlans().size());
-    		Plan plan = person.getPlans().get(0);
+//    		Plan plan = person.getPlans().get(0);
     		
     		// add last actvity of the day
-	    	Activity firstActivity = (Activity) plan.getPlanElements().get(0);
-	    	Coord homeCoord = firstActivity.getCoord();
-	    	// TODO Is it ok here to assume that last activity is always "home"? probably goes together with above comment that first act always need to be "home"
-	    	Activity lastActivity = populationFactory.createActivityFromCoord("home", ct.transform(homeCoord));
-	    	plan.addActivity(lastActivity);	    	
+    		// now handled above without the assumption that last activity is always home
+//	    	Activity firstActivity = (Activity) plan.getPlanElements().get(0);
+//	    	Coord homeCoord = firstActivity.getCoord();
+//	    	// TODO Is it ok here to assume that last activity is always "home"? probably goes together with above comment that first act always need to be "home"
+//	    	Activity lastActivity = populationFactory.createActivityFromCoord("home", ct.transform(homeCoord));
+//	    	plan.addActivity(lastActivity);	    	
 	    }	    
 	    
 	    // write population
 	    MatsimWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 	    popWriter.write(outputDirectory + "plans.xml");
-
+	    
+	    //  write events
+	    EventWriterXML eventWriter = new EventWriterXML(outputDirectory + "events.xml");
+	    for (Event event : events) {
+	    	eventWriter.handleEvent(event);
+	    }
+	    eventWriter.closeFile();
 	}
 
 
