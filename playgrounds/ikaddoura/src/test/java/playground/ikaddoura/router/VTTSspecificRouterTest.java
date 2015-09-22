@@ -45,6 +45,7 @@ import org.matsim.vehicles.Vehicle;
 import com.vividsolutions.jts.util.Assert;
 
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.analysis.vtts.VTTScomputation;
 
 /**
  * 
@@ -87,11 +88,12 @@ public class VTTSspecificRouterTest {
 		
 		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
 
+		controler.addControlerListener(new VTTScomputation(vttsHandler));
+		
 		controler.addControlerListener( new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(vttsHandler);
 				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
