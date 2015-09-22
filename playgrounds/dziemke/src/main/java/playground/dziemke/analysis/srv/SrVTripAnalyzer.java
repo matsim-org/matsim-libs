@@ -22,6 +22,9 @@ package playground.dziemke.analysis.srv;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -89,13 +92,21 @@ public class SrVTripAnalyzer {
 	    
 	    
 		// Input and output files
-		String inputFileTrips = "../../data/srv/input/W2008_Berlin_Weekday.dat";
-		String inputFilePersons = "../../data/srv/input/P2008_Berlin2.dat";
+//		String inputFileTrips = "../../data/srv/input/W2008_Berlin_Weekday.dat";
+//		String inputFilePersons = "../../data/srv/input/P2008_Berlin2.dat";
+//		
+//		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//		String shapeFile = "../../data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
+//				
+//		String outputDirectory = "../../data/srv/output/wd_neu2";
 		
-		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		String shapeFile = "../../data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
+		String inputFileTrips = "/Users/dominik/Workspace/data/srv/input/W2008_Berlin_Weekday.dat";
+		String inputFilePersons = "/Users/dominik/Workspace/data/srv/input/P2008_Berlin2.dat";
+		
+		String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 				
-		String outputDirectory = "../../data/srv/output/wd_neu";
+		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_4";
 		
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
@@ -144,9 +155,10 @@ public class SrVTripAnalyzer {
 		
 		// create objects
 		
-		// new ones...
+		// for writing plans files (newer ones...)
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
 		
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
@@ -159,10 +171,7 @@ public class SrVTripAnalyzer {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCRS, toCRS);
 		
 		
-		
-		
-		
-		// existing ones...
+		// for calculations and storage of these calculation to files (older ones...)
     	int tripCounter = 0;
     	
     	Map <Integer, Double> tripDurationMap = new TreeMap <Integer, Double>();
@@ -281,45 +290,24 @@ public class SrVTripAnalyzer {
 	    	// use all filtered trips to construct plans and do calculations 
 	    	if (considerTrip == true) {		    		
 	    		
-	    		// create plans
+	    		
+	    		// collect and store information to create plans later
 	    		Id<Person> id = Id.create(personId, Person.class);
-	    		
-	    		if (!population.getPersons().containsKey(id)) {
-	    			Person person = populationFactory.createPerson(id);
-	    			Plan plan = populationFactory.createPlan();
-	    			person.addPlan(plan);
-	    			population.addPerson(person);
-	    		}
-	    	
-	    		Person person = population.getPersons().get(id);
-	    		System.out.println(person.getPlans().size());
-	    		Plan plan = person.getPlans().get(0);
-	    		
-	    		// TODO substitute zone by something better
-	    		// Id<Zone> departureZoneId = trip.getDepartureZoneId();
-	    				    		
-	    		// TODO create coordinates
-	    		double x = 4590000;
-	    		double y = 5820000;
-				Coord departureCoordinates = new Coord(x, y);
-	    		
-	    		// TODO add appropriate coordinate transformation
-	    		// TODO give activity proper name
-	    		Activity activity = populationFactory.createActivityFromCoord("", ct.transform(departureCoordinates));
 	    		double departureTimeInMinutes = trip.getDepartureTime();
-	    		activity.setEndTime(departureTimeInMinutes * 60);
-	    		plan.addActivity(activity);
 	    		
-	    		// TODO make mode adjustable
-	    		Leg leg = populationFactory.createLeg("car");
-	    		plan.addLeg(leg);
+		    	if (!personTripsMap.containsKey(id)) {
+		    		TreeMap<Double, Trip> tripsMap = new TreeMap<Double, Trip>();
+		    		personTripsMap.put(id, tripsMap);
+		    	}
+
+	    		double departureTimeInSeconds = 60 * departureTimeInMinutes;
+	    		if (personTripsMap.get(id).containsKey(departureTimeInSeconds)) {
+	    			new RuntimeException("Person may not have to activites ending at the exact same time.");
+	    		} else {
+	    			personTripsMap.get(id).put(departureTimeInSeconds, trip);
+	    		}
 	    		
-	    		// TODO add last activity
-	    		
-	    		
-	    		
-	    		
-	    		
+
 	    		// do calculations
 	    		tripCounter++;
 
@@ -464,12 +452,61 @@ public class SrVTripAnalyzer {
 	    log.warn("Number of trips that have no calculable speed is: " + numberOfTripsWithNoCalculableSpeed);
 	    
 	    
-	    // add final activity to plans
-	    for (Person person : population.getPersons().values()) {
-	    	Plan plan = person.getPlans().get(0);
+	    // add activities from map to plans
+	    for (Id<Person> personId : personTripsMap.keySet()) {
+	    	
+	    	// add person to population
+	    	if (!population.getPersons().containsKey(personId)) {
+	    		Person person = populationFactory.createPerson(personId);
+	    		Plan plan = populationFactory.createPlan();
+    			person.addPlan(plan);
+    			population.addPerson(person);
+    		}
+	    	
+	    	TreeMap<Double, Trip> tripsMap = personTripsMap.get(personId);
+	    	Person person = population.getPersons().get(personId);
+	    	
+	    	// TODO exclude trip if first activity is not "home"
+	    	for (double departureTime : tripsMap.keySet()) {
+	    		Plan plan = person.getPlans().get(0);
+	    		
+	    		Trip trip = tripsMap.get(departureTime);
+	    		
+//	    		double x = 4590000;
+//	    		double y = 5820000;
+	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
+	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
+	    		double y = x;
+	    		// TODO add appropriate coordinate transformation
+				Coord departureCoordinates = new Coord(x, y);
+	    		
+
+				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
+				if (personId == idToBeChecked) {
+					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "
+							+ trip.getActivityEndActType());
+				}
+				
+				Activity activity = populationFactory.createActivityFromCoord(trip.getActivityEndActType(), ct.transform(departureCoordinates));
+	    		double departureTimeInMinutes = trip.getDepartureTime();
+	    		double departureTimeInSeconds = departureTimeInMinutes * 60;
+				activity.setEndTime(departureTimeInSeconds);
+
+	    		plan.addActivity(activity);
+	    			    		
+	    		// TODO make mode adjustable; right now its okay since non-car trips are excluded anyways
+	    		Leg leg = populationFactory.createLeg("car");
+	    		plan.addLeg(leg);	    		
+	    	}
+	    	
+//    		System.out.println("person.getPlans().size() = " + person.getPlans().size());
+    		Plan plan = person.getPlans().get(0);
+    		
+    		// add last actvity of the day
 	    	Activity firstActivity = (Activity) plan.getPlanElements().get(0);
 	    	Coord homeCoord = firstActivity.getCoord();
-	    	Activity lastActivity = populationFactory.createActivityFromCoord("", ct.transform(homeCoord));
+	    	// TODO Is it ok here to assume that last activity is always "home"? probably goes together with above comment that first act always need to be "home"
+	    	Activity lastActivity = populationFactory.createActivityFromCoord("home", ct.transform(homeCoord));
 	    	plan.addActivity(lastActivity);	    	
 	    }	    
 	    
