@@ -31,10 +31,13 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.router.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -53,9 +56,10 @@ public class CongestionPricingControler {
 	private static final Logger log = Logger.getLogger(CongestionPricingControler.class);
 
 	static String configFile;
+	
+	static String router; // standard, randomized, VTTSspecific	
+	static String implementation; // V3, V7, noPricing
 	static String VTTSapproach; // different, equal
-	static String implementation; // V3, V7
-	static String router; // standard, randomized, VTTSspecific
 
 	public static void main(String[] args) throws IOException {
 		
@@ -88,70 +92,121 @@ public class CongestionPricingControler {
 
 		Controler controler = new Controler(configFile);
 
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		
-		if (router.equals("standard")) {
+		if (implementation.equals("noPricing")) {
 			
-			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
+
+			if (router.equals("standard")) {
+				// nothing to do here
+				
+			} else if (router.equals("randomized")) {
+				
+				throw new RuntimeException("Not implemented. Aborting...");
+				
+			} else if (router.equals("VTTSspecific")) {
+
+				final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler);
+				factory.setSigma(0.); // for now no randomness
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						this.bindTravelDisutilityFactory().toInstance( factory );
+					}
+				}); 
+				
+				controler.addControlerListener( new StartupListener() {
+					@Override
+					public void notifyStartup(StartupEvent event) {
+						event.getControler().getEvents().addHandler(vttsHandler);	
+					}		
+				});
+				
+			} else {
+				throw new RuntimeException("Not implemented. Aborting...");
+			}
 			
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-				}
-			});
-			
-		} else if (router.equals("randomized")) {
-			
-			final RandomizedTollTimeDistanceTravelDisutilityFactory factory = new RandomizedTollTimeDistanceTravelDisutilityFactory(
-					new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
-					tollHandler
-				) ;
-			factory.setSigma(3.);
-			
-			controler.addOverridingModule(new AbstractModule(){
-				@Override
-				public void install() {
-					this.bindTravelDisutilityFactory().toInstance( factory );
-				}
-			}); 
-			
-		} else if (router.equals("VTTSspecific")) {
-			
-			final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler);
-			factory.setSigma(0.); // for now no randomness
-			
-			controler.addOverridingModule(new AbstractModule(){
-				@Override
-				public void install() {
-					this.bindTravelDisutilityFactory().toInstance( factory );
-				}
-			}); 
+			controler.addOverridingModule(new OTFVisModule());
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			controler.run();
 			
 		} else {
-			throw new RuntimeException("Not implemented. Aborting...");
-		}
+			
+			final TollHandler tollHandler = new TollHandler(controler.getScenario());
+			final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
+			
+			if (router.equals("standard")) {
+				
+				final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+				
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					}
+				});
+				
+			} else if (router.equals("randomized")) {
+				
+				final RandomizedTollTimeDistanceTravelDisutilityFactory factory = new RandomizedTollTimeDistanceTravelDisutilityFactory(
+						new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+						tollHandler
+					) ;
+				factory.setSigma(3.);
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						this.bindTravelDisutilityFactory().toInstance( factory );
+					}
+				}); 
+				
+			} else if (router.equals("VTTSspecific")) {
+				
+				final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
+						new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+						tollHandler
+					);
+				factory.setSigma(0.); // for now no randomness
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						this.bindTravelDisutilityFactory().toInstance( factory );
+					}
+				}); 
+				
+				controler.addControlerListener( new StartupListener() {
+					@Override
+					public void notifyStartup(StartupEvent event) {
+						event.getControler().getEvents().addHandler(vttsHandler);	
+					}		
+				});
+				
+			} else {
+				throw new RuntimeException("Not implemented. Aborting...");
+			}
 
-		if (VTTSapproach.equals("different") && implementation.equals("V3")) {
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
-		
-		} else if (VTTSapproach.equals("equal") && implementation.equals("V3")) {
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
-		
-		} else if (VTTSapproach.equals("different") && implementation.equals("V7")) {
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV7(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
-		
-		} else if (VTTSapproach.equals("equal") && implementation.equals("V7")) {
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV7(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
-		
-		} else {
-			throw new RuntimeException("Not implemented. Aborting...");
-		}
+			if (VTTSapproach.equals("different") && implementation.equals("V3")) {
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+			} else if (VTTSapproach.equals("equal") && implementation.equals("V3")) {
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+			} else if (VTTSapproach.equals("different") && implementation.equals("V7")) {
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV7(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+			} else if (VTTSapproach.equals("equal") && implementation.equals("V7")) {
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV7(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+			} else {
+				throw new RuntimeException("Not implemented. Aborting...");
+			}
 
-		controler.addOverridingModule(new OTFVisModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();
+			controler.addOverridingModule(new OTFVisModule());
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			controler.run();
+		}
 
 	}
 }
