@@ -433,7 +433,7 @@ public class CreateDemand {
 			
 			Coord homeCoord = null;
 			
-			if(munId.length() == 3){
+			if(munId.length() <= 4 || munId.contains("AT")){
 				
 				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 				
@@ -467,13 +467,13 @@ public class CreateDemand {
 					} else{
 						
 						Coord coord = null;
-						if(munId.length() == 3){
+						if(munId.length() <= 4 || munId.contains("AT")){
 							
 							coord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 								
 						} else {
 							
-							Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+							coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 							
 						}
 						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
@@ -516,7 +516,7 @@ public class CreateDemand {
 					lastMunId = toId;
 					Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
 					
-					if(toId.length() == 3){
+					if(toId.length() <= 4 || toId.contains("AT")){
 						coord2 = Global.ct.transform(coord2);
 					} else{
 						coord2 = Global.gk4ToUTM32N.transform(coord2);
@@ -524,7 +524,8 @@ public class CreateDemand {
 						
 //						c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
 //						c = Global.UTM32NtoGK4.transform(PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d));
-					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().get(coord2.getX(), coord2.getY());
+					Coord temp = Global.UTM32NtoGK4.transform(coord2);
+					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().get(temp.getX(), temp.getY());
 					c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
 						
 //					} while(CoordUtils.calcDistance(currentAct.getCoord(), c) > d);
@@ -541,6 +542,7 @@ public class CreateDemand {
 				nextAct.setStartTime(arrival + timeShift);
 				
 				if(nextAct.getStartTime() > 24 * 3600){
+					currentAct.setEndTime(24*3600);
 					plan.addActivity(currentAct);
 					break;
 				}
@@ -560,6 +562,7 @@ public class CreateDemand {
 			}
 			
 			person.addPlan(plan);
+			person.setSelectedPlan(plan);
 			population.addPerson(person);
 			
 		}
@@ -1471,11 +1474,15 @@ public class CreateDemand {
 			Coord homeCoord = null;
 			Coord workCoord = null;
 			
-			if(munId.length() == 3){
+			if(munId.length() <= 4){
 				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+			} else{
+				homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+			}
+			
+			if(workId.length() <= 4 || workId.contains("AT")){
 				workCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
 			} else{
-				Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
 			}
 			
@@ -1505,8 +1512,8 @@ public class CreateDemand {
 					} else{
 						
 						Coord coord = null;
-						if(munId.length() == 3){
-							coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+						if(munId.length() <= 4 || munId.contains("AT")){
+							coord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 						} else{
 							coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 						}
@@ -1550,6 +1557,11 @@ public class CreateDemand {
 					String pattern = getActPattern(prevActType, nextActType);
 					String toId = distributeTrip(nextActType, odMatrices.get(pattern));
 					c = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
+					if(toId.length() <= 4 || toId.contains("AT")){
+						c = Global.ct.transform(c);
+					} else{
+						c = Global.gk4ToUTM32N.transform(c);
+					}
 					lastMunId = toId;
 					
 //					do{
@@ -1573,6 +1585,7 @@ public class CreateDemand {
 				nextAct.setStartTime(arrival + timeShift);
 				
 				if(nextAct.getStartTime() > 24 * 3600){
+					currentAct.setEndTime(24*3600);
 					plan.addActivity(currentAct);
 					break;
 				}
@@ -1592,6 +1605,7 @@ public class CreateDemand {
 			}
 			
 			person.addPlan(plan);
+			person.setSelectedPlan(plan);
 			population.addPerson(person);
 			
 		}

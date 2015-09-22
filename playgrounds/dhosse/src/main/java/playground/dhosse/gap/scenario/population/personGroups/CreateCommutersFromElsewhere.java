@@ -63,10 +63,10 @@ public class CreateCommutersFromElsewhere {
 			String fromTransf = "GK4";
 			String toTransf = "GK4";
 			
-			if(fromId.length() == 3){
+			if(fromId.length() <= 4 && fromId.length() > 2){
 				fromTransf = "";
 			}
-			if(toId.length() == 3){
+			if(toId.length() <= 4 && toId.length() > 2){
 				toTransf = "";
 			}
 			

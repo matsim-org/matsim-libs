@@ -145,6 +145,7 @@ public class GAPScenarioBuilder {
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
 		
+		log.info("Dumping agent attributes...");
 		//write object attributes to file
 		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
 		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
@@ -244,7 +245,8 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		//WGS84
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
 			
@@ -255,7 +257,8 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		//WGS84
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
 			
@@ -277,18 +280,19 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> countries = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "europa_staaten.shp");
+//		Collection<SimpleFeature> countries = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "europa_staaten.shp");
+//		
+//		for(SimpleFeature f : countries){
+//			
+//			Geometry geometry = (Geometry) f.getDefaultGeometry();
+//			String identifier = (String) f.getAttribute("NUTS0");
+//			
+//			getMunId2Geometry().put("0" + identifier, geometry);
+//			
+//		}
 		
-		for(SimpleFeature f : countries){
-			
-			Geometry geometry = (Geometry) f.getDefaultGeometry();
-			String identifier = (String) f.getAttribute("NUTS0");
-			
-			getMunId2Geometry().put("0" + identifier, geometry);
-			
-		}
-		
-		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/austria/austria.shp");
+		//WGS84
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;
 		

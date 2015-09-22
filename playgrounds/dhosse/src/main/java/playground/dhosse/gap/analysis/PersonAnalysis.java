@@ -13,12 +13,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-public class LegAnalysis {
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+
+public class PersonAnalysis {
 
 	public static void main(String args[]){
 		
-		getPersonsWithNegativeScores("/home/danielhosse/run9/output/ITERS/it.0/0.plans.xml.gz");
+		getPersonsWithNegativeScores("/home/danielhosse/run9/output/ITERS/it.10/10.plans.xml.gz");
 //		analyzeModeChoice("/home/danielhosse/run8b/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");
+		
+	}
+	
+	public static void createLegModeDistanceDistribution(String plansFile, String outputFolder){
+		
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		new MatsimPopulationReader(scenario).readFile(plansFile);
+		
+		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+		lmdd.init(scenario);
+		lmdd.preProcessData();
+		lmdd.postProcessData();
+		lmdd.writeResults(outputFolder);
 		
 	}
 	
@@ -29,21 +45,17 @@ public class LegAnalysis {
 		new MatsimPopulationReader(scenario).readFile(plansFile);
 		int cnt = 0;
 		
-//		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
-//		lmdd.init(scenario);
-//		lmdd.preProcessData();
-//		lmdd.postProcessData();
-//		lmdd.writeResults("/home/danielhosse/Dokumente/lmdd/");
-		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+			double score = person.getSelectedPlan().getScore();
+			
+			if(score < 0){
 				
-				if(pe instanceof Activity){
+				cnt++;
+				
+				if(score < -1000){
 					
-					Activity act = (Activity)pe;
-					if(act.getType().contains("48.0H"))
-						System.out.println(person.getId());
+					System.out.println(person.getId() + "\t" + score);
 					
 				}
 				
@@ -51,7 +63,7 @@ public class LegAnalysis {
 			
 		}
 		
-//		System.out.println(cnt + " persons with negative scores...");
+		System.out.println(cnt + " persons with negative scores...");
 		
 	}
 	
