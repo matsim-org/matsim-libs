@@ -1,6 +1,7 @@
 package playground.artemc.heterogeneity;
 
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,12 +15,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.heterogeneity.eventsBasedPTRouter.TransitRouterEventsAndHeterogeneityBasedWSModule;
 import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
 import playground.artemc.heterogeneity.routing.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper;
@@ -50,13 +53,14 @@ public class ControlerWithHeteroAndTollLoop {
 
 		ArrayList<String> simulationTypes = new ArrayList<String>();
 
-//		simulationTypes.add("hetero");
-//		simulationTypes.add("heteroAlpha");
-//		simulationTypes.add("heteroGamma");
+		simulationTypes.add("hetero");
+		simulationTypes.add("heteroAlpha");
+		simulationTypes.add("heteroGamma");
+
 //		simulationTypes.add("heteroAlphaRatio");
 
-		simulationTypes.add("heteroAlphaOnly");
-		simulationTypes.add("heteroGammaOnly");
+//		simulationTypes.add("heteroAlphaOnly");
+//		simulationTypes.add("heteroGammaOnly");
 
 
 		input = args[0];
@@ -94,7 +98,7 @@ public class ControlerWithHeteroAndTollLoop {
 		Scenario scenario = initScenario();
 		//System.setProperty("matsim.preferLocalDtds", "true");
 
-		Controler controler = new Controler(scenario);
+		final Controler controler = new Controler(scenario);
 
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
@@ -149,6 +153,19 @@ public class ControlerWithHeteroAndTollLoop {
 		{
 			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}
+
+		//Sun's Dwell Time model
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new QSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());

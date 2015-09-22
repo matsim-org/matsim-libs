@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.dwellTimeModel.pt;
+/**
+ * 
+ */
+package playground.artemc.crowding.internalizationPt;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.events.handler.EventHandler;
 
-public class CrowdednessTransitStopHandlerFactory implements TransitStopHandlerFactory {
-
-	@Override
-	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
-		return new CrowdednessTransitStopHandler(vehicle);
-	}
-
+/**
+ * @author ikaddoura
+ *
+ */
+public interface TransferDelayInVehicleEventHandler extends EventHandler {
+	public void handleEvent(TransferDelayInVehicleEvent event);
 }
