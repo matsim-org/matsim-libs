@@ -31,12 +31,11 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.router.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -115,12 +114,7 @@ public class CongestionPricingControler {
 					}
 				}); 
 				
-				controler.addControlerListener( new StartupListener() {
-					@Override
-					public void notifyStartup(StartupEvent event) {
-						event.getControler().getEvents().addHandler(vttsHandler);	
-					}		
-				});
+				controler.addControlerListener(new VTTScomputation(vttsHandler));	
 				
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
@@ -176,13 +170,8 @@ public class CongestionPricingControler {
 					}
 				}); 
 				
-				controler.addControlerListener( new StartupListener() {
-					@Override
-					public void notifyStartup(StartupEvent event) {
-						event.getControler().getEvents().addHandler(vttsHandler);	
-					}		
-				});
-				
+				controler.addControlerListener(new VTTScomputation(vttsHandler));	
+			
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}
