@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.synPop.data;
 
-import playground.johannes.gsv.zones.ZoneCollection;
+package playground.johannes.synpop.processing;
 
-import java.util.HashMap;
-import java.util.Map;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class ZoneData {
+public class LegAttributeRemover implements EpisodeTask {
 
-    public static final String POPULATION_KEY = "population";
+    private Set<String> attributes;
 
-    public static final String NAME_KEY = "name";
-
-    private final Map<String, ZoneCollection> layers;
-
-    public ZoneData() {
-        layers = new HashMap<>();
+    public LegAttributeRemover(String ... attributes) {
+        this.attributes = new HashSet<>(attributes.length);
+        for(String att : attributes) this.attributes.add(att);
     }
 
-    public ZoneCollection getLayer(String name) {
-        return layers.get(name);
+    public LegAttributeRemover() {
+        this.attributes = new HashSet<>();
     }
 
-    ZoneCollection addLayer(ZoneCollection zones, String name) {
-        return layers.put(name, zones);
+    public void addAttribute(String att) {
+        attributes.add(att);
+    }
+
+    @Override
+    public void apply(Episode episode) {
+        for(Segment s : episode.getLegs()) {
+            for(String att : attributes)
+                s.removeAttribute(att);
+        }
     }
 }
