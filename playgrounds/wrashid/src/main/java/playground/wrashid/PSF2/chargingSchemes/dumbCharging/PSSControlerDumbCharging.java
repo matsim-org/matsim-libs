@@ -79,6 +79,8 @@ public class PSSControlerDumbCharging extends PSSControler {
 			// link from the
 			// event file is null and this causes some probelems in my
 			// handlers...
+			//
+			// (As far as I can tell, the above lines come from Rashid, in 2011. kai, sep'2015) 
 			controler = new EventReadControler(configFilePath, tempStringValue);
 			ParametersPSF2.isEventsFileBasedControler=true;
 			
@@ -88,10 +90,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 			controler = new Controler(configFilePath);
 		}
 
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		initializeParametersPSF2(controler);
 
@@ -102,7 +101,9 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.addControlerListener(new ShutdownListener() {
 			@Override
 			public void notifyShutdown(ShutdownEvent event) {
-				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() + 1);
+//				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() + 1);
+				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() );
+				// not clear to me how the "iteration + 1" can ever have worked. kai, sep'15
 			}
 		});
 	}

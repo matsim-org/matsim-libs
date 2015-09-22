@@ -27,6 +27,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.matrices.Matrix;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -34,6 +35,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Geometry;
 
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
+import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
@@ -111,7 +113,7 @@ public class GAPScenarioBuilder {
 		
 		initQuadTrees(scenario);
 		
-		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
+		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
 //		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
 //		//create plans
@@ -141,7 +143,7 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
+		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
@@ -188,6 +190,9 @@ public class GAPScenarioBuilder {
 	 * 
 	 */
 	private static void initMunicipalities(Scenario scenario){
+		
+		Matrix wb = new Matrix("gp_od_matrix", "OD matrix for Garmisch-Partenkirchen");
+		wb.createEntry(Global.idBadBayersoien, Global.idBadBayersoien, 0.);
 		
 		Municipalities.addEntry("09180112", (int) (446), 1559, 526);						//Bad Kohlgrub
 		Municipalities.addEntry("09180113", (int) (169), 772, 223);						//Bad Bayersoien
