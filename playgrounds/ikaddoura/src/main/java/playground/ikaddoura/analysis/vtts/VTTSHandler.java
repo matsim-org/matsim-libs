@@ -418,7 +418,6 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} else {
 			if (this.currentIteration == Integer.MIN_VALUE) {
 				// the initial iteration before handling any events
-				log.info("Using the default VTTS in the initial iteration.");
 				return this.defaultVTTS;
 			} else {
 				throw new RuntimeException("This is not the initial iteration and there is no information available from the previous iteration. Aborting...");
