@@ -196,7 +196,7 @@ public class VTTSspecificRouterTest {
 		controler.run();
 				
 		// high speed and costly route: 15 km; 50 km/h (travel time: 0.3h)
-		// for both persons: 12 EUR/km * 0.3 km + 15 km * 0.002 EUR/m --> 33.6 EUR
+		// for both persons: 12 EUR/h * 0.3 h + 15 km * 0.002 EUR/m --> 33.6 EUR
 		
 		// low speed and cheap route: 10 km; 10 km/h (travel time: 1h)
 		// for both person: 12 * 1 + 10 * 2 --> 32 EUR
@@ -225,5 +225,155 @@ public class VTTSspecificRouterTest {
 		}		
 	}
 	
+	/**
+	 * use the VTTS specific router but set any distance cost to zero, the outcome should be the same as for the standard router
+	 * 
+	 */
+	@Test
+	public final void test3(){
+		
+		// starts the VTTS-specific router
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
+		final Controler controler = new Controler(configFile);
+		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
+		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler) ;
+		factory.setSigma(0.); // no randomness
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindTravelDisutilityFactory().toInstance( factory );
+			}
+		}); 		
+		
+		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
+
+		controler.addControlerListener(new VTTScomputation(vttsHandler));
+		
+		controler.addControlerListener( new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+					
+					@Override
+					public void reset(int iteration) {
+						vehicleId2linkIds.clear();
+					}
+					
+					@Override
+					public void handleEvent(LinkLeaveEvent event) {
+						if (vehicleId2linkIds.containsKey(event.getVehicleId())) {
+							vehicleId2linkIds.get(event.getVehicleId()).add(event.getLinkId());
+						} else {
+							Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
+							linkIds.add(event.getLinkId());
+							vehicleId2linkIds.put(event.getVehicleId(), linkIds);
+						}
+					}
+				});		
+			}		
+		});
+		
+		
+		controler.addOverridingModule(new OTFVisModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
+		// high VTTS person's VTTS: 17.21 EUR/h (this is a value provided by the VTTSHandler)
+		// low VTTS person's VTTS: 10.37 EUR/h (this is a value provided by the VTTSHandler)
+		
+		// high speed and costly route: 15 km; 50 km/h (travel time: 0.3h)
+		// high VTTS person: 17.21 EUR/h * 0.3 h --> 5.163
+		// low VTTS person: 10.37 * 0.3	--> 3.111
+		
+		// low speed and cheap route: 10 km; 10 km/h (travel time: 1h)
+		// high VTTS person: 17.21 * 1 --> 17.21
+		// low VTTS person: 10.37 * 1 --> 10.37
+		
+		// ==> the high VTTS person will choose the high speed route
+		// ==> the low VTTS person will choose the high speed route
+		
+		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
+		
+		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
+
+			if (id.toString().contains("highVTTS")) {
+				
+				// both persons use the fast route
+				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+			
+			if (id.toString().contains("lowVTTS")) {
+
+				// both persons use the fast route
+				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+		}		
+	}
+	
+	/**
+	 * use the standard router but set any distance cost to zero, the outcome should be the same as for the VTTS specific router
+	 * 
+	 */
+	@Test
+	public final void test4(){
+		
+		// starts the VTTS-specific router
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
+		final Controler controler = new Controler(configFile);
+		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
+		
+		controler.addControlerListener( new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+					
+					@Override
+					public void reset(int iteration) {
+						vehicleId2linkIds.clear();
+					}
+					
+					@Override
+					public void handleEvent(LinkLeaveEvent event) {
+						if (vehicleId2linkIds.containsKey(event.getVehicleId())) {
+							vehicleId2linkIds.get(event.getVehicleId()).add(event.getLinkId());
+						} else {
+							Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
+							linkIds.add(event.getLinkId());
+							vehicleId2linkIds.put(event.getVehicleId(), linkIds);
+						}
+					}
+				});		
+			}		
+		});
+		
+		
+		controler.addOverridingModule(new OTFVisModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
+		// both persons use the fast route
+		
+		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
+		
+		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
+
+			if (id.toString().contains("highVTTS")) {
+				
+				// both persons use the fast route
+				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+			
+			if (id.toString().contains("lowVTTS")) {
+
+				// both persons use the fast route
+				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+		}		
+	}
 	
 }
