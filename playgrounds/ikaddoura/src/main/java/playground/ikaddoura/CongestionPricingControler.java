@@ -42,6 +42,7 @@ import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingCont
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
@@ -57,7 +58,7 @@ public class CongestionPricingControler {
 	static String configFile;
 	
 	static String router; // standard, randomized, VTTSspecific	
-	static String implementation; // V3, V7, noPricing
+	static String implementation; // V3, V7, V8, noPricing
 	static String VTTSapproach; // different, equal
 
 	public static void main(String[] args) throws IOException {
@@ -188,6 +189,9 @@ public class CongestionPricingControler {
 			} else if (VTTSapproach.equals("equal") && implementation.equals("V7")) {
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV7(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 			
+			} else if (VTTSapproach.equals("different") && implementation.equals("V8")) {
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV8(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+							
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}
