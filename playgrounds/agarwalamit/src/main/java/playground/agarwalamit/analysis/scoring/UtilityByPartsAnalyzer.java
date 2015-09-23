@@ -37,8 +37,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -109,7 +109,7 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 	private ScoringFunctionFactory getScoringFunctionFactory(final Scenario sc){
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
 
-			ScoringParametersForPerson parametersForPerson = new SubpopulationScoringParameters( sc );
+			CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( sc );
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

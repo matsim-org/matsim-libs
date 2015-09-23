@@ -34,8 +34,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -63,7 +63,7 @@ public class RunCadyts4CarExample {
 
 		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( scenario );
+			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 

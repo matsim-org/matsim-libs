@@ -29,8 +29,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -42,12 +42,12 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
-	private ScoringParametersForPerson parametersForPerson;
+	private CharyparNagelScoringParametersForPerson parametersForPerson;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
     	this.config = config;
 		this.scenario = scenario;
-		this.parametersForPerson = new SubpopulationScoringParameters( scenario );
+		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
 	}
 
 	@Override

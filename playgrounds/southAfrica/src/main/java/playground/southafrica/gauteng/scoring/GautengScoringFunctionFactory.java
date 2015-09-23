@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -31,8 +30,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -43,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final ScoringParametersForPerson parameters;
+	private final CharyparNagelScoringParametersForPerson parameters;
 	private final UtilityOfMoneyI utlOfMon ;
 	private final Scenario scenario ;
 	private final String subPopulationAttributeName;
@@ -51,7 +50,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public GautengScoringFunctionFactory(Scenario scenario, double baseValueOfTime, double valueOfTimeMultiplier) {
 		this.scenario = scenario ;
-		this.parameters = new SubpopulationScoringParameters( scenario );
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.utlOfMon = new GautengUtilityOfMoney( scenario, baseValueOfTime, valueOfTimeMultiplier) ;
 		this.subPopulationAttributeName = scenario.getConfig().plans().getSubpopulationAttributeName() ;
 		this.personAttributes = this.scenario.getPopulation().getPersonAttributes();

@@ -10,8 +10,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.balac.allcsmodestest.scoring.DesiresAndOpenTimesActivityScoring;
@@ -24,7 +24,7 @@ public class TestScoringFunctionFactory implements ScoringFunctionFactory {
 	private final Network network;
 	private final Scenario scenario;
 
-	private final ScoringParametersForPerson parameters;
+	private final CharyparNagelScoringParametersForPerson parameters;
 	
 	public TestScoringFunctionFactory(Config config, Network network,
 			Scenario sc) {
@@ -33,7 +33,7 @@ public class TestScoringFunctionFactory implements ScoringFunctionFactory {
 	    this.config = config;
 	    this.scenario = sc;
 
-		this.parameters = new SubpopulationScoringParameters( sc );
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( sc );
 	}
 	@Override
 	 public ScoringFunction createNewScoringFunction(Person person)

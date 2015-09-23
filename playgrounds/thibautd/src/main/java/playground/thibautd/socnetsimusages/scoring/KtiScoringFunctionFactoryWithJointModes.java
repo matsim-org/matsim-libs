@@ -35,8 +35,8 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 
@@ -46,7 +46,7 @@ import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionFactory {
     private final ScoringFunctionFactory delegate;
 
-	private final ScoringParametersForPerson parameters;
+	private final CharyparNagelScoringParametersForPerson parameters;
 	private final Scenario scenario;
 
 	private final ScoringFunctionConfigGroup group;
@@ -66,7 +66,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.parameters = new SubpopulationScoringParameters( scenario );
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.group = group;
 		this.delegate = delegate;
 	}

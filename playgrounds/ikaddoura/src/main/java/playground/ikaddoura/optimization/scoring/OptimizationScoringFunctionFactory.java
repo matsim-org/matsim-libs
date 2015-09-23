@@ -23,27 +23,24 @@ package playground.ikaddoura.optimization.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 
 
 public class OptimizationScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final ScoringParametersForPerson params;
+	private final CharyparNagelScoringParametersForPerson params;
 	private final double STUCKING_SCORE;
 	private Network network;
 	
 
 	public OptimizationScoringFunctionFactory( Scenario scenario, double stuckScore) {
-		this.params = new SubpopulationScoringParameters( scenario );
+		this.params = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.network = network;
 		this.STUCKING_SCORE = stuckScore;
 	}

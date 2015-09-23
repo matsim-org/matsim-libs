@@ -14,8 +14,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 /**
  * @author balacm
@@ -27,13 +27,13 @@ public class AvignonScoringFunctionFactory implements ScoringFunctionFactory {
 	private Config config;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
-	private final ScoringParametersForPerson parametersForPerson;
+	private final CharyparNagelScoringParametersForPerson parametersForPerson;
 
 	public AvignonScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;
-		this.parametersForPerson = new SubpopulationScoringParameters( controler.getScenario() );
+		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 		log.info("creating DCScoringFunctionFactory");
 	}
 		

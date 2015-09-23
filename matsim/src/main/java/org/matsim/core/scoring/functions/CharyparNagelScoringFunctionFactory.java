@@ -48,18 +48,18 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 
 	protected Network network;
 
-	private final ScoringParametersForPerson params;
+	private final CharyparNagelScoringParametersForPerson params;
 
-	public interface ScoringParametersForPerson {
+	public interface CharyparNagelScoringParametersForPerson {
 		CharyparNagelScoringParameters getScoringParameters( Person person );
 	}
 
-	public static class UniformScoringParameters implements ScoringParametersForPerson {
+	public static class UniformCharyparNagelScoringParameters implements CharyparNagelScoringParametersForPerson {
 		private final PlanCalcScoreConfigGroup config;
 		private final ScenarioConfigGroup scConfig;
 		private CharyparNagelScoringParameters params = null;
 
-		public UniformScoringParameters(PlanCalcScoreConfigGroup config, ScenarioConfigGroup scConfig) {
+		public UniformCharyparNagelScoringParameters(PlanCalcScoreConfigGroup config, ScenarioConfigGroup scConfig) {
 			this.config = config;
 			this.scConfig = scConfig;
 		}
@@ -82,14 +82,14 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 		}
 	}
 
-	public static class SubpopulationScoringParameters implements ScoringParametersForPerson {
+	public static class SubpopulationCharyparNagelScoringParameters implements CharyparNagelScoringParametersForPerson {
 		private final PlanCalcScoreConfigGroup config;
 		private final ScenarioConfigGroup scConfig;
 		private final ObjectAttributes personAttributes;
 		private final String subpopulationAttributeName;
 		private final Map<String, CharyparNagelScoringParameters> params = new HashMap<>();
 
-		public SubpopulationScoringParameters(Scenario scenario) {
+		public SubpopulationCharyparNagelScoringParameters(Scenario scenario) {
 			this.config = scenario.getConfig().planCalcScore();
 			this.scConfig = scenario.getConfig().scenario();
 			this.personAttributes = scenario.getPopulation().getPersonAttributes();
@@ -121,16 +121,16 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 	}
 
 	public CharyparNagelScoringFunctionFactory( final Scenario sc ) {
-		this( new SubpopulationScoringParameters( sc ) , sc.getNetwork() );
+		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() );
 	}
 
 	//public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, ScenarioConfigGroup scConfig, Network network) {
 	//	this(
-	//		new UniformScoringParameters( config, scConfig),
+	//		new UniformCharyparNagelScoringParameters( config, scConfig),
     //        network );
 	//}
 
-    public CharyparNagelScoringFunctionFactory(final ScoringParametersForPerson params, Network network) {
+    public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
 		this.params = params;
 		this.network = network;
 	}

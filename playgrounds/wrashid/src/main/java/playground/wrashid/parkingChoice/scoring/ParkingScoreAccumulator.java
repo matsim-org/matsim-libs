@@ -26,8 +26,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.wrashid.lib.obj.Collections;
@@ -63,7 +63,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		this.parkingManager = parkingManager;
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			ScoringParametersForPerson parametersForPerson = new SubpopulationScoringParameters( controler.getScenario() );
+			CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );

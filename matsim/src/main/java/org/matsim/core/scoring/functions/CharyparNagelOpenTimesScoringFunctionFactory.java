@@ -22,12 +22,11 @@ package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 
 /**
  * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
@@ -36,11 +35,11 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.Sub
  */
 public final class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final ScoringParametersForPerson params;
+	private final CharyparNagelScoringParametersForPerson params;
     private final Scenario scenario;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(
-			final ScoringParametersForPerson params,
+			final CharyparNagelScoringParametersForPerson params,
 			final Scenario scenario) {
 		this.params = params;
 		this.scenario = scenario;
@@ -48,7 +47,7 @@ public final class CharyparNagelOpenTimesScoringFunctionFactory implements Scori
 
 	public CharyparNagelOpenTimesScoringFunctionFactory(
 			final Scenario scenario) {
-		this.params = new SubpopulationScoringParameters( scenario );
+		this.params = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.scenario = scenario;
 	}
 

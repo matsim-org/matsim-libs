@@ -5,14 +5,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
@@ -22,7 +21,7 @@ public class FreeFloatingScoringFunctionFactory implements ScoringFunctionFactor
 	
 	private final Config config;
 	private final Network network;
-	private final ScoringParametersForPerson parametersForPerson;
+	private final CharyparNagelScoringParametersForPerson parametersForPerson;
 	  
 	private final Scenario scenario;
 	public FreeFloatingScoringFunctionFactory(Config config, Network network, Scenario scenario)
@@ -30,7 +29,7 @@ public class FreeFloatingScoringFunctionFactory implements ScoringFunctionFactor
 	    this.scenario = scenario;
 	    this.network = network;
 	    this.config = config;
-		  this.parametersForPerson = new SubpopulationScoringParameters( scenario );
+		  this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
 	  }   
 
 	  @Override

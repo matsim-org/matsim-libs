@@ -33,8 +33,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class CemdapMatsimCadytsControllerConfig {
@@ -64,7 +64,7 @@ public class CemdapMatsimCadytsControllerConfig {
 		
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
+			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

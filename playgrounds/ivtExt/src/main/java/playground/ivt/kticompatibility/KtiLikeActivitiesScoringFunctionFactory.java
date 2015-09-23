@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
@@ -35,8 +34,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ivt.scoring.LineChangeScoringFunction;
@@ -57,7 +56,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 
 	private final StageActivityTypes blackList;
 	private final KtiLikeScoringConfigGroup ktiConfig;
-	private final ScoringParametersForPerson parameters;
+	private final CharyparNagelScoringParametersForPerson parameters;
     private final Scenario scenario;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -68,7 +67,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.parameters = new SubpopulationScoringParameters( scenario );
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}

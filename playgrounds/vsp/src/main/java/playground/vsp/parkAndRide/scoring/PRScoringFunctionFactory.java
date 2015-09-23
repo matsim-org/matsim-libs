@@ -23,16 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -44,13 +42,13 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private static final Logger log = Logger.getLogger(PRScoringFunctionFactory.class);
-	private final ScoringParametersForPerson charyparNagelConfigParameters;
+	private final CharyparNagelScoringParametersForPerson charyparNagelConfigParameters;
 	private final double interModalTransferPenalty;
 	private final Network network;
 
 	public PRScoringFunctionFactory(final Scenario scenario, double intermodalTransferPenalty) {
 		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = new SubpopulationScoringParameters( scenario );
+		this.charyparNagelConfigParameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.interModalTransferPenalty = intermodalTransferPenalty;
 		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
 		this.network = scenario.getNetwork();
