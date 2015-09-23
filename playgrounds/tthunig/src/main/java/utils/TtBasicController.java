@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgScenarioUtils
+ * DgController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.utils;
+package utils;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
- * @author dgrether
+ * @author tthunig
  *
  */
-public class DgScenarioUtils {
+public class TtBasicController {
 
-	private static final boolean loadPopulation = true;
-	
-	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
-			String signalGroupsFilename, String signalControlFilename){
-		Config c2 = ConfigUtils.createConfig();
-		c2.qsim().setUseLanes(true);
+	/**
+	 * @param args the config file
+	 */
+	public static void main(String[] args) {
 		
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(c2,
+		Config config = ConfigUtils.loadConfig( args[0]) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalsConfigGroup.setUseSignalSystems(true);
 		
-		c2.network().setInputFile(net);
-		if (loadPopulation){
-			c2.plans().setInputFile(pop);
+		if (signalsConfigGroup.isUseSignalSystems()) {
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
 		}
-		c2.network().setLaneDefinitionsFile(lanesFilename);
-		signalsConfigGroup.setSignalSystemFile(signalsFilename);
-		signalsConfigGroup.setSignalGroupsFile(signalGroupsFilename);
-		signalsConfigGroup.setSignalControlFile(signalControlFilename);
 		
-		Scenario scenario = ScenarioUtils.loadScenario(c2);
+		Controler controler = new Controler( scenario );
+        
+		// add the signals module if signal systems are used
+		if (signalsConfigGroup.isUseSignalSystems()) {
+			controler.addOverridingModule(new SignalsModule());
+		}
+				
+		// add the module for link to link routing if enabled
+		if (config.controler().isLinkToLinkRoutingEnabled()){
+			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		}
 		
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
-		
-		return scenario;
+		controler.run();
 	}
 
 }

@@ -73,6 +73,7 @@ public class Cottbus2KS2010 {
 		 double matsimPopSampleSize = 1.0; // = default value
 		 double ksModelCommoditySampleSize = 1.0; // = default value
 		double minCommodityFlow = 50.0;
+		boolean simplifyNetwork = true;
 		int cellsX = 5; // = default value
 		int cellsY = 5; // = default value
 		/* other parameters */
@@ -86,7 +87,7 @@ public class Cottbus2KS2010 {
 				signalsBoundingBoxOffset, cuttingBoundingBoxOffset,
 				freeSpeedFilter, useFreeSpeedTravelTime, maximalLinkLength,
 				matsimPopSampleSize, ksModelCommoditySampleSize,
-				minCommodityFlow, cellsX, cellsY, scenarioDescription,
+				minCommodityFlow, simplifyNetwork, cellsX, cellsY, scenarioDescription,
 				dateFormat, outputDirectory);
 
 	}
