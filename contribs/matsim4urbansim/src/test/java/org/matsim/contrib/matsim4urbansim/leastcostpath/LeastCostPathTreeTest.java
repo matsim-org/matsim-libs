@@ -16,22 +16,18 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 
 import junit.framework.Assert;
 
-public class LeastCostPathTreeTest extends MatsimTestCase{
+public class LeastCostPathTreeTest {
 	
 	Scenario scenario;
 	
 	@Test
 	public void testRouteChoiceTestSpanningTree(){
-//		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		// createNetwork();
-//		this.scenario.setNetwork( CreateTestNetwork.createTriangularNetwork() );
-		this.scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(CreateTestNetwork.createTestNetwork()).build() ;
+		this.scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(CreateTestNetwork.createTriangularNetwork()).build() ;
 		compareRouteChoices();
 	}
 	
