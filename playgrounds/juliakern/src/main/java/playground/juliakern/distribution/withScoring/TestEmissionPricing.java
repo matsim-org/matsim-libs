@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -148,11 +149,10 @@ public class TestEmissionPricing {
 			}
 			pcs.addActivityParams(params);
 		}
-		
-		pcs.setMonetaryDistanceRateCar(new Double("-3.0E-4"));
-		
+				
 		pcs.setMarginalUtilityOfMoney(0.0789942);
 		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(new Double("-3.0E-4"));
 		pcs.setLateArrival_utils_hr(0.0);
 		pcs.setPerforming_utils_hr(0.96);
 		
@@ -197,7 +197,7 @@ public class TestEmissionPricing {
 		
 		EmissionControlerListener ecl = new EmissionControlerListener(controler);
 		controler.addControlerListener(ecl);
-        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getScenario().getNetwork(), ecl));
+        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, scenario));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
 		config.checkConsistency();
