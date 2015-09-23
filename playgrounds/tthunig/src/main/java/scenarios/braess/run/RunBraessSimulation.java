@@ -30,15 +30,13 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
 import scenarios.analysis.TtControlerListener;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
@@ -140,7 +138,7 @@ public class RunBraessSimulation {
 			
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
-							tollHandler, new CongestionHandlerImplV3(controler.getEvents(), 
+							tollHandler, new CongestionHandlerImplV8(controler.getEvents(), 
 									controler.getScenario())));
 		} else {
 			// adapt sigma for randomized routing
@@ -176,7 +174,7 @@ public class RunBraessSimulation {
 		signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
 
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 1 );
+		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
 		boolean link2linkRouting = false;
@@ -261,6 +259,8 @@ public class RunBraessSimulation {
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
 		
+		config.controler().setCreateGraphs( false );
+		
 		return config;
 	}
 
@@ -278,7 +278,7 @@ public class RunBraessSimulation {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons( 2000 );
+		popCreator.setNumberOfPersons( 3600 );
 		
 		popCreator.createPersons(INIT_WITH_ALL_ROUTES ? TtCreateBraessPopulation.InitRoutes.ALL
 				: TtCreateBraessPopulation.InitRoutes.NONE, INIT_PLAN_SCORE);
@@ -388,7 +388,7 @@ public class RunBraessSimulation {
 		}
 		
 		if (PRICING){
-			runName += "_princing";
+			runName += "_princingV8";
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)

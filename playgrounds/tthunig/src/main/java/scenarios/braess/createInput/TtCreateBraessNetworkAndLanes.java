@@ -99,8 +99,8 @@ public final class TtCreateBraessNetworkAndLanes {
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		}else{
-			capFirstLast = 2000; 
-			capMain = 1000; 
+			capFirstLast = 3600; 
+			capMain = 1800; 
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 10000;
 			linkTTMid = 1*60;
