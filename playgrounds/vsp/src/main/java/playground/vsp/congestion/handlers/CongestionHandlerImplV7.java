@@ -70,8 +70,8 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 	@Override
 	public final void reset(int iteration) {
-
 		delegate.reset(iteration);
+		
 		this.totalDelay = 0.;
 	}
 
@@ -133,28 +133,15 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
+		
+		this.delegate.handleEvent(event);
 
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
-
 		} else { // car!
-			Id<Person> personId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
-
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), delegate.getLinkId2congestionInfo(), scenario);
-
-			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
-
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
-					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
-
-			CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
-
+			DelayInfo delayInfo = linkInfo.getFlowQueue().getLast();
 			calculateCongestion(event, delayInfo);
-
-			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.memorizeLastLinkLeaveEvent( event );
-
-			linkInfo.getAgentsOnLink().remove( personId ) ;
 		}
 	}
 
@@ -162,7 +149,7 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getAgentsOnLink().get(delayInfo.personId).getFreeSpeedLeaveTime();
+		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
 
 		// global book-keeping:
 		this.totalDelay += delayOnThisLink;
@@ -179,6 +166,10 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 			// go throw the flow queue and charge all causing agents with the delay on this link
 			for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
 				DelayInfo causingAgentDelayInfo = it.next() ;
+				if ( causingAgentDelayInfo.personId.equals( delayInfo.personId ) ) {
+					// not charging to yourself:
+					continue ;
+				}
 	
 				// let each agent in the queue pay for the total delay
 				double allocatedDelay = delayOnThisLink;
