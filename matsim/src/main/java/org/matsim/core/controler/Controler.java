@@ -47,10 +47,8 @@ import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -399,7 +397,8 @@ public class Controler extends AbstractController {
 	// ******** --------- *******
 
 	public final TravelTime getLinkTravelTimes() {
-        return injector.getInstance(ReplanningContext.class).getTravelTime();
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
+				.get(TransportMode.car);
 	}
 
     /**
@@ -418,7 +417,7 @@ public class Controler extends AbstractController {
 	}
 	
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return this.injector.getInstance(TravelDisutilityFactory.class).createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
+        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
 	}
 
 	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {

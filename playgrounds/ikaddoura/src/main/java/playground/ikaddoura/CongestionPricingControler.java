@@ -191,7 +191,11 @@ public class CongestionPricingControler {
 			
 			} else if (VTTSapproach.equals("different") && implementation.equals("V8")) {
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV8(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
-							
+			
+			} else if (VTTSapproach.equals("equal") && implementation.equals("V8")) {
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV8(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+
+				
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}
