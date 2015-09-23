@@ -81,8 +81,7 @@ public class Testcontroller {
 		
 		
 		
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
-        ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getConfig().scenario(), controler.getScenario().getNetwork());
+        ParkScoringFactory factory = new ParkScoringFactory( controler.getScenario() );
 		controler.setScoringFunctionFactory(factory);
 	
 		//Spezialpreis Test:

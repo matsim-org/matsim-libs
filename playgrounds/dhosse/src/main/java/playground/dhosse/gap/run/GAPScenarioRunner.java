@@ -24,7 +24,6 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -32,13 +31,13 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.population.algorithms.XY2Links;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.PersonAnalysis;
-import playground.dhosse.gap.analysis.SpatialAnalysis;
-import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 public class GAPScenarioRunner {
 
@@ -109,11 +108,12 @@ public class GAPScenarioRunner {
 		controler.addControlerListener(cContext);
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -209,7 +209,7 @@ public class GAPScenarioRunner {
 		
 		controler.setTripRouterFactory(CarsharingUtils.createTripRouterFactory(scenario));
 		
-		controler.setScoringFunctionFactory(new CarsharingScoringFunctionFactory( config, scenario.getNetwork()));
+		controler.setScoringFunctionFactory(new CarsharingScoringFunctionFactory(  scenario ));
 
 		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) controler.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 		controler.addControlerListener(new CarsharingListener(controler,

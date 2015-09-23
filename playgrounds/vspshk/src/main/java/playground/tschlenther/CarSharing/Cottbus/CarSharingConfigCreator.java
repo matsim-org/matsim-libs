@@ -2,23 +2,20 @@ package playground.tschlenther.CarSharing.Cottbus;
 
 import java.util.Arrays;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.scenario.ScenarioUtils;
 
 public class CarSharingConfigCreator {
 	
@@ -45,7 +42,7 @@ public class CarSharingConfigCreator {
 		config.qsim().setStorageCapFactor(0.01);
 		
 		PlanCalcScoreConfigGroup planCalcScore = config.planCalcScore();
-		planCalcScore.setConstantOther(0);
+		planCalcScore.getModes().get(TransportMode.other).setConstant((double) 0);
 
 		ActivityParams home = new ActivityParams();
 		home.setActivityType("home");
@@ -104,7 +101,7 @@ public class CarSharingConfigCreator {
     	ffconfigGroup.setTimeFeeFreeFloating("-0.0052");
     	ffconfigGroup.setTimeParkingFeeFreeFloating("-0.0025");
     	ffconfigGroup.setUseFeeFreeFloating(true);
-    	ffconfigGroup.setUtilityOfTravelling(""+ planCalcScore.getTraveling_utils_hr());
+		ffconfigGroup.setUtilityOfTravelling(""+ planCalcScore.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
     	ffconfigGroup.setvehiclelocations(VEHICLELOCTAIONSINPUTFILE);
     	ffconfigGroup.setSpecialTimeStart("0");
     	ffconfigGroup.setSpecialTimeEnd("0");
@@ -118,7 +115,7 @@ public class CarSharingConfigCreator {
     	twconfigGroup.setsearchDistance("50000");
     	twconfigGroup.setDistanceFeeTwoWayCarsharing("0");
     	twconfigGroup.setTimeFeeTwoWayCarsharing("-0.0052");
-    	twconfigGroup.setUtilityOfTravelling("" + planCalcScore.getTraveling_utils_hr());
+		twconfigGroup.setUtilityOfTravelling("" + planCalcScore.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
     	twconfigGroup.setRentalPriceTimeTwoWayCarsharing("-0.0052");
     	config.addModule(twconfigGroup);
     	

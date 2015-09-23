@@ -64,7 +64,7 @@ public class ControlerWSV {
 				bind(TransitRouter.class).toProvider(new TransitRouterWSVImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 			}
 		});
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
+		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory( controler.getScenario()));
 		controler.run();
 	}
 	

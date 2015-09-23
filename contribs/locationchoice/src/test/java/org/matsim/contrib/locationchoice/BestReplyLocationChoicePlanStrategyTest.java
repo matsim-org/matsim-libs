@@ -77,7 +77,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
 			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
-			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork());
+			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( scenario );
 			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		}
 				

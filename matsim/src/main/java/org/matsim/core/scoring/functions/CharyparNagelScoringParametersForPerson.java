@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example18MultipleSubpopulations;
+package org.matsim.core.scoring.functions;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * @author nagel
- *
+ * @author thibautd
  */
-public class SubpopulationsExampleTest {
-
-	/**
-	 * Test method for {@link tutorial.programming.example18MultipleSubpopulations.RunSubpopulationsExample#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		try {
-			RunSubpopulationsExample.main(null);
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail( "Got an exception while running subpopulation example: "+ee ) ;
-		}
-	}
-
+public interface CharyparNagelScoringParametersForPerson {
+	CharyparNagelScoringParameters getScoringParameters(Person person);
 }

@@ -22,6 +22,7 @@ package org.matsim.core.config.consistency;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.pt.PtConstants;
@@ -55,7 +56,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().setTraveling_utils_hr(3.0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -73,7 +74,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().setTravelingPt_utils_hr(3.0);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -91,7 +92,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().setTravelingBike_utils_hr(3.0);
+		config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -109,7 +110,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().setTravelingWalk_utils_hr(3.0);
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {

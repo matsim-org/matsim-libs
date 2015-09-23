@@ -29,6 +29,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -38,25 +40,19 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  */
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringParameters params = null;
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
+	private CharyparNagelScoringParametersForPerson parametersForPerson;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
     	this.config = config;
 		this.scenario = scenario;
+		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		if (this.params == null) {
-			/* lazy initialization of params. not strictly thread safe, as different threads could
-			 * end up with different params-object, although all objects will have the same
-			 * values in them due to using the same config. Still much better from a memory performance
-			 * point of view than giving each ScoringFunction its own copy of the params.
-			 */
-			this.params = CharyparNagelScoringParameters.getBuilder(this.config, this.scenario.getConfig().scenario()).create();
-		}
+		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));

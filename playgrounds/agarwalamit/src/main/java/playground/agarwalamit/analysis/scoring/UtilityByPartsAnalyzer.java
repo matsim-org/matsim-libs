@@ -37,6 +37,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -107,19 +109,20 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 	private ScoringFunctionFactory getScoringFunctionFactory(final Scenario sc){
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
 
-			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(sc.getConfig().planCalcScore(), sc.getConfig().scenario()).create();
+			CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( sc );
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
+				final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				if(includeActivitScoring)
 					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 				if(includeLegScoring)
 					sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,sc.getNetwork()));
 				if(includeMoneyScongin)
-					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
+					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 				if(includeStuckAgentScoring)
-					sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
+					sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				return sumScoringFunction;
 			}
 		}; 

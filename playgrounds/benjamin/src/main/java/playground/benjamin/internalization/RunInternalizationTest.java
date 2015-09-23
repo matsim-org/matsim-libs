@@ -158,11 +158,13 @@ public class RunInternalizationTest {
 		pcs.addActivityParams(act2Params);
 		
 		pcs.setBrainExpBeta(1.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(0.6);
-		pcs.setMonetaryDistanceRateCar(-0.0001);
+		double monetaryDistanceRateCar = -0.0001;
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
-	// strategyConfigGroup
+		// strategyConfigGroup
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		
 		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));

@@ -26,8 +26,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -36,11 +34,12 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import com.google.inject.Inject;
@@ -58,7 +57,7 @@ public class KNScoringFunctionListener {
 		config.controler().setLastIteration(0);
 
 
-		Scenario scenario  = ScenarioUtils.loadScenario( config ) ;
+		final Scenario scenario  = ScenarioUtils.loadScenario( config ) ;
 
 		final PopulationFactory pf = scenario.getPopulation().getFactory();
 		Person person = pf.createPerson( Id.createPersonId("test") ) ;
@@ -69,66 +68,60 @@ public class KNScoringFunctionListener {
 
 		Controler controler = new Controler( scenario ) ;
 
-		controler.addControlerListener(new ScoringListener(){
+		controler.addControlerListener(new ScoringListener() {
 			@Override
 			public void notifyScoring(ScoringEvent event) {
-				throw new RuntimeException("not implemented") ;
+				throw new RuntimeException("not implemented");
 				// this needs to get the info from the scoringListener (below) and attach it to the agent plan somehow.
 			}
 		});
 
-		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
-			private CharyparNagelScoringParameters params;
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			private CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters(scenario);
 			private Network network;
 
 			@Inject
-			MyScoringFunctionListener listener ;
+			MyScoringFunctionListener listener;
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				if (this.params == null) {
-					/* lazy initialization of params. not strictly thread safe, as different threads could
-					 * end up with different params-object, although all objects will have the same
-					 * values in them due to using the same config. Still much better from a memory performance
-					 * point of view than giving each ScoringFunction its own copy of the params.
-					 */
-					this.params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario() ).create();
-				}
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
-				MySumScoringFunction sumScoringFunction = new MySumScoringFunction( person, listener );
-				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
+				MySumScoringFunction sumScoringFunction = new MySumScoringFunction(person, listener);
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, this.network));
 				sumScoringFunction.addScoringFunction(new MyMoneyScoring(person));
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				return sumScoringFunction;
 
 
 			}
+
 			class MyMoneyScoring implements BasicScoring {
 				private Person person;
 
 				public MyMoneyScoring(Person person) {
-					this.person = person ;
+					this.person = person;
 				}
 
 				@Override
 				public void finish() {
-					listener.reportMoney( 25., this.person.getId() ) ;
+					listener.reportMoney(25., this.person.getId());
 				}
 
 				@Override
 				public double getScore() {
-					return 25.*5 ;
+					return 25. * 5;
 				}
 
 			}
 
 		});
 
-		controler.addOverridingModule( new AbstractModule(){
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind( MyScoringFunctionListener.class ).asEagerSingleton();
+				this.bind(MyScoringFunctionListener.class).asEagerSingleton();
 			}
 		});
 

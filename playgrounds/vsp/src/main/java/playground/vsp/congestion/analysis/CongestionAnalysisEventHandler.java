@@ -94,7 +94,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		if (useMoneyEvents) {
 			log.warn("Money events may be thrown later than the congestion events... May result in a wrong interpretation of the results. Better use directly the congestion events for analysis.");
 		}
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("Anlayzing the congestion events during the simulation. Assuming the following VTTS (equal for all agents): " + vtts_car);
 	}
 

@@ -92,7 +92,7 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 				
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
-			if ( cnScoringGroup.getMonetaryDistanceRateCar() > 0. ) {
+			if ( cnScoringGroup.getModes().get( TransportMode.car ).getMonetaryDistanceRate() > 0. ) {
 				Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
 				"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
 			}
@@ -145,7 +145,7 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 		
 		double travelTime_sec = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		
-		double marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		double marginalCostOfDistance = - cnScoringGroup.getModes().get( TransportMode.car ).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 
 		double vtts_hour = this.vttsHandler.getVTTS(person.getId(), time);
 		
