@@ -193,6 +193,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 			// queue is already empty; nothing to do
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+//			earliestLeaveTime = delayInfo.freeSpeedLeaveTime ;
 			if ( time > earliestLeaveTime + 1.) { 
 				// bottleneck is not active anymore.
 
