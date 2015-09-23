@@ -91,10 +91,9 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	
 	public VTTSHandler(Scenario scenario) {
 		
-		if (this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() == 0.) {
-			throw new RuntimeException("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time. Aborting...");
+		if (scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() == 0.) {
+			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time. Aborting...");
 		}
-		
 		this.scenario = scenario;
 		this.currentIteration = Integer.MIN_VALUE;
 		this.defaultVTTS =
