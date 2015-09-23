@@ -77,7 +77,7 @@ public class ControlerWSPreCalcTimes {
 //        controler.addOverridingModule(new AbstractModule() {
 //            @Override
 //            public void install() {
-//                bindTravelDisutilityFactory().toInstance(disutilityFactory);
+//                bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
 //            }
 //        });
 //        disutilityFactory.setSigma(0.3);

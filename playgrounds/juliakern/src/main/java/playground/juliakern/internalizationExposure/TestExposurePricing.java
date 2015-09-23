@@ -255,7 +255,7 @@ public class TestExposurePricing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emfac);
+				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));

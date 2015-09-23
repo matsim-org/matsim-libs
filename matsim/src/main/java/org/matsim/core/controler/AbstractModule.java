@@ -28,7 +28,6 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -43,6 +42,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,11 +115,11 @@ public abstract class AbstractModule implements Module {
         binder.install(module);
     }
 
-    protected LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
+    protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
         return eventHandlerMultibinder.addBinding();
     }
 
-    protected LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
+    protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
         return controlerListenerMultibinder.addBinding();
     }
 
@@ -142,8 +143,12 @@ public abstract class AbstractModule implements Module {
         return snapshotWriterMultibinder.addBinding();
     }
 
-    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {
-        return addTravelDisutilityFactoryBinding(TransportMode.car);
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
+        return bind(carTravelDisutilityFactoryKey());
+    }
+
+    protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
+        return Key.get(TravelDisutilityFactory.class, ForCar.class);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
@@ -156,6 +161,14 @@ public abstract class AbstractModule implements Module {
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
         return travelTimeMultibinder.addBinding(mode);
+    }
+
+    protected final LinkedBindingBuilder<TravelTime> bindCarTravelTime() {
+        return bind(carTravelTimeKey());
+    }
+
+    protected final Key<TravelTime> carTravelTimeKey() {
+        return Key.get(TravelTime.class, ForCar.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -200,4 +213,8 @@ public abstract class AbstractModule implements Module {
         };
     }
 
+    @BindingAnnotation
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ForCar {
+    }
 }

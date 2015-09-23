@@ -175,7 +175,7 @@ public class RunEmissionPricing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 			}
 		});
 		controler.run();

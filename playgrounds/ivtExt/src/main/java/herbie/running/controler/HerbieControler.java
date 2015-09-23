@@ -105,7 +105,7 @@ public class HerbieControler extends Controler {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//				bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //			}
 //		});
 //

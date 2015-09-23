@@ -82,7 +82,7 @@ public class VTTSspecificRouterTest {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
 			}
 		}); 		
 		
@@ -243,7 +243,7 @@ public class VTTSspecificRouterTest {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
 			}
 		}); 		
 		

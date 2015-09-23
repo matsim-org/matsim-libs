@@ -107,7 +107,7 @@ public class RunInternalizationTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissionTdcf);
+				bindCarTravelDisutilityFactory().toInstance(emissionTdcf);
 			}
 		});
 	}

@@ -90,7 +90,7 @@ public class KTIControler extends Controler {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//				bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //			}
 //		});
 //
