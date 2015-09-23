@@ -20,8 +20,10 @@
 
 package playground.andreas.bln.net.simplex;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -34,19 +36,14 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 
 /**
@@ -95,9 +92,8 @@ public final class TransitControler extends Controler {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
-        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
         
-        this.loadMyControlerListeners();
+		this.loadMyControlerListeners();
 	}
 
 	private void loadMyControlerListeners() {

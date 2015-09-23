@@ -61,6 +61,10 @@ public class FacilityMutatorBuilder implements MutatorBuilder {
         Object dataKey = Converters.register(CommonKeys.ACTIVITY_FACILITY, ActivityFacilityConverter.getInstance(facilityData));
 
         RandomFacilityGenerator generator = new RandomFacilityGenerator(facilityData);
+        for(String type : blacklist) {
+            generator.addToBlacklist(type);
+        }
+
         AttributeMutator attMutator = new AttributeMutator(dataKey, generator, listener);
         RandomActMutator actMutator = new RandomActMutator(attMutator, random);
 

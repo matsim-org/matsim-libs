@@ -20,6 +20,9 @@
 
 package playground.mrieser.pt.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,23 +42,33 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.mrieser.pt.analysis.VehicleTracker;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockingStopDemo {
 
@@ -83,9 +96,9 @@ public class BlockingStopDemo {
 //		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord((double) (i * 500), (double) 0));
+			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord(i * 500, 0));
 			network.addNode(nodes[i]);
-			nodes[i+nOfLinks+1] = network.getFactory().createNode(Id.create(i+nOfLinks+1, Node.class), new Coord((double) (i * 500), (double) 500));
+			nodes[i+nOfLinks+1] = network.getFactory().createNode(Id.create(i+nOfLinks+1, Node.class), new Coord(i * 500, 500));
 			network.addNode(nodes[i+nOfLinks+1]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
@@ -113,7 +126,7 @@ public class BlockingStopDemo {
 
 		// line 1
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((double) (1000 + i * 500), (double) 0), false);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord(1000 + i * 500, 0), false);
 			stops[i].setLinkId(Id.create(i+1, Link.class));
 			schedule.addStopFacility(stops[i]);
 			stopList.add(builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
@@ -121,7 +134,7 @@ public class BlockingStopDemo {
 
 		Link startLink = this.scenario.getNetwork().getLinks().get(Id.create(0, Link.class));
 		Link endLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks-1, Link.class));
-		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		NetworkRoute networkRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLink.getId(), endLink.getId());
 		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkIdList.add(Id.create(i, Link.class));
@@ -140,7 +153,7 @@ public class BlockingStopDemo {
 		// line 2
 		stopList = new ArrayList<TransitRouteStop>(nOfStops);
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, TransitStopFacility.class), new Coord((double) (1000 + i * 500), (double) 500), true);
+			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, TransitStopFacility.class), new Coord(1000 + i * 500, 500), true);
 			stops[i+nOfStops].setLinkId(Id.create(i+1+nOfLinks, Link.class));
 			schedule.addStopFacility(stops[i+nOfStops]);
 			stopList.add(builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));
@@ -148,7 +161,7 @@ public class BlockingStopDemo {
 
 		startLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks, Link.class));
 		endLink = this.scenario.getNetwork().getLinks().get(Id.create(2*nOfLinks-1, Link.class));
-		networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		networkRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLink.getId(), endLink.getId());
 		linkIdList = new ArrayList<Id<Link>>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkIdList.add(Id.create(i, Link.class));
@@ -233,8 +246,8 @@ public class BlockingStopDemo {
 		}
 
 		// car-drivers
-		NetworkRoute carRoute1 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, Id.create(0, Link.class), Id.create(nOfLinks-1, Link.class));
-		NetworkRoute carRoute2 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, Id.create(nOfLinks, Link.class), Id.create(2*nOfLinks-1, Link.class));
+		NetworkRoute carRoute1 = ((PopulationFactoryImpl) population.getFactory()).createRoute(NetworkRoute.class, Id.create(0, Link.class), Id.create(nOfLinks-1, Link.class));
+		NetworkRoute carRoute2 = ((PopulationFactoryImpl) population.getFactory()).createRoute(NetworkRoute.class, Id.create(nOfLinks, Link.class), Id.create(2*nOfLinks-1, Link.class));
 		List<Id<Link>> linkIds1 = new ArrayList<Id<Link>>(nOfLinks-2);
 		List<Id<Link>> linkIds2 = new ArrayList<Id<Link>>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
@@ -288,7 +301,7 @@ public class BlockingStopDemo {
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), 120, 7*3600+1800, new TravelTimeCalculatorConfigGroup());
 		events.addHandler(ttc);
 
-		this.sim = (QSim) QSimUtils.createDefaultQSim(this.scenario, events);
+		this.sim = QSimUtils.createDefaultQSim(this.scenario, events);
 		this.sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);

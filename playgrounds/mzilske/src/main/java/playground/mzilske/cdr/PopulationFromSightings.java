@@ -208,7 +208,7 @@ public class PopulationFromSightings {
 
 
 
-    public static void preparePopulation(final ScenarioImpl scenario, final LinkToZoneResolver linkToZoneResolver2, final playground.mzilske.cdr.Sightings allSightings) {
+    public static void preparePopulation(final Scenario scenario, final LinkToZoneResolver linkToZoneResolver2, final playground.mzilske.cdr.Sightings allSightings) {
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new org.matsim.population.algorithms.XY2Links(scenario));
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithmProvider() {
 

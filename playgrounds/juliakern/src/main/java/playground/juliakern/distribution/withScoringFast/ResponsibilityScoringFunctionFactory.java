@@ -33,7 +33,7 @@ public class ResponsibilityScoringFunctionFactory implements
 	private EmissionControlerListener ecl;
 	
 	public ResponsibilityScoringFunctionFactory(Config config, Network network, EmissionControlerListener ecl) {
-		this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), network);
+		this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), network);
 		this.ecl = ecl;
 		// TODO Auto-generated constructor stub
 	}

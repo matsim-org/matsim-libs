@@ -40,12 +40,16 @@ public class CachedEpisode extends CachedElement implements Episode {
 
         activities = new ArrayList<>(delegate.getActivities().size());
         for(Segment activity : delegate.getActivities()) {
-            activities.add(new CachedSegment(activity));
+            CachedSegment s = new CachedSegment(activity);
+            s.setEpisode(this, false);
+            activities.add(s);
         }
 
         legs = new ArrayList<>(delegate.getLegs().size());
         for(Segment leg : delegate.getLegs()) {
-            legs.add(new CachedSegment(leg));
+            CachedSegment s = new CachedSegment(leg);
+            s.setEpisode(this, true);
+            legs.add(s);
         }
     }
 

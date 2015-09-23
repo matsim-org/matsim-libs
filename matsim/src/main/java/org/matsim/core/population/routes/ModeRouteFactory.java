@@ -19,61 +19,71 @@
 
 package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
 /**
  * @author mrieser / senozon
  */
 public class ModeRouteFactory {
-	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
+	private final Map<Class<? extends Route>, RouteFactory> routeFactories = new HashMap<>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
+	private final Map<String, Class<? extends Route>> type2class = new HashMap<>();
 
 	public ModeRouteFactory() {
-		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
-		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
-		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
+		this.routeFactories.put(NetworkRoute.class, new LinkNetworkRouteFactory());
+		this.routeFactories.put(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
 	}
 	
 	/**
-	 * @param transportMode the transport mode the route should be for
+	 * @param routeClass the requested class of the route
 	 * @param startLinkId the link where the route starts
 	 * @param endLinkId the link where the route ends
-	 * @return a new Route for the specified mode
+	 * @return a new Route of the specified route type
 	 *
-	 * @see #setRouteFactory(String, RouteFactory)
+	 * @see #setRouteFactory(Class, RouteFactory)
 	 */
-	public Route createRoute(final String transportMode, final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		RouteFactory factory = this.routeFactories.get(transportMode);
+	public <R extends Route> R createRoute(final Class<R> routeClass, final Id<Link> startLinkId, final Id<Link> endLinkId) {
+		RouteFactory factory = this.routeFactories.get(routeClass);
 		if (factory == null) {
 			factory = this.defaultFactory;
 		}
-		return factory.createRoute(startLinkId, endLinkId);
+		return (R) factory.createRoute(startLinkId, endLinkId);
 	}
 
 	/**
-	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
-	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
-	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
+	 * Registers a {@link RouteFactory} for the specified route type. If <code>factory</code> is <code>null</code>,
+	 * the existing entry for this <code>routeClass</code> will be deleted. If <code>routeClass</code> is <code>null</code>,
+	 * then the default factory is set that is used if no specific RouteFactory for a routeType is set.
 	 *
-	 * @param transportMode
+	 * @param routeClass
 	 * @param factory
 	 */
-	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
-		if (transportMode == null) {
+	public void setRouteFactory(final Class<? extends Route> routeClass, final RouteFactory factory) {
+		if (routeClass == null) {
 			this.defaultFactory = factory;
 		} else {
 			if (factory == null) {
-				this.routeFactories.remove(transportMode);
+				this.routeFactories.remove(routeClass);
 			} else {
-				this.routeFactories.put(transportMode, factory);
+				this.routeFactories.put(routeClass, factory);
+				this.type2class.put(factory.getCreatedRouteType(), routeClass);
 			}
 		}
+	}
+
+	public Class<? extends Route> getRouteClassForType(String routeType) {
+		Class<? extends Route> routeClass = this.type2class.get(routeType);
+		if (routeClass == null) {
+			routeClass = Route.class; // will result in a generic route
+		}
+		return routeClass;
 	}
 
 }

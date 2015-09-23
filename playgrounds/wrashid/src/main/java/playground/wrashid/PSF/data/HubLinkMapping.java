@@ -1,14 +1,16 @@
 package playground.wrashid.PSF.data;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
-import playground.wrashid.PSF.ParametersPSF;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.Matrix;
+
+import playground.wrashid.PSF.ParametersPSF;
 
 /**
  * File format (for example see test case data).
@@ -42,10 +44,10 @@ public class HubLinkMapping {
 		this.numberOfHubs=numberOfHubs;
 	}
 	
-	private void handleUnmappedLinksEnd(){
+	private void handleUnmappedLinksEnd(Network network){
 		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
 			// add unmapped links in "last column"
-            for (Link link: ParametersPSF.getMatsimControler().getScenario().getNetwork().getLinks().values()){
+            for (Link link: network.getLinks().values()){
 				String linkStringId=link.getId().toString();
 				if (!linkHubMapping.containsKey(linkStringId)){
 					linkHubMapping.put(linkStringId, this.numberOfHubs);
@@ -58,8 +60,9 @@ public class HubLinkMapping {
 	/**
 	 * reads the mappings from the file. The file has columns (first column for first hub and all the links corresponding to that hub below it) 
 	 * @param fileName
+	 * @param network TODO
 	 */
-	public HubLinkMapping(String fileName, int numberOfHubs){
+	public HubLinkMapping(String fileName, int numberOfHubs, Network network){
 		
 		this.numberOfHubs = numberOfHubs;
 		
@@ -112,7 +115,7 @@ public class HubLinkMapping {
 		// remove link id with number -1
 		linkHubMapping.remove("-1");
 		
-		handleUnmappedLinksEnd();
+		handleUnmappedLinksEnd(network);
 	}
 
 
@@ -151,7 +154,11 @@ public class HubLinkMapping {
 	}
 	
 	public static void main(String[] args) {
-		HubLinkMapping hlm= new HubLinkMapping("C:/Users/Admin/Desktop/psl-temp/linkHub.mappingTable.txt",819);
+//		HubLinkMapping hlm= new HubLinkMapping("C:/Users/Admin/Desktop/psl-temp/linkHub.mappingTable.txt",819, network);
+		// I found this without the "network" argument.  I fail to see, however, how this can have worked, since the network is
+		// needed later, and it needs to get is somehow.  Previous code took it from a public static field, but I fail to see 
+		// how that was ever filled in this execution path. kai, sep'15
+		
 		//System.out.println(hlm.getHubNumber("17560001380400FTs"));
 	}
 	

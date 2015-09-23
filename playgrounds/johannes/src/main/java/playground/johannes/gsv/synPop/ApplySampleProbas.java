@@ -20,7 +20,8 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.PersonsTask;
 
 import java.util.Collection;
 
@@ -28,7 +29,7 @@ import java.util.Collection;
  * @author johannes
  *
  */
-public class ApplySampleProbas implements ProxyPersonsTask {
+public class ApplySampleProbas implements PersonsTask {
 
 	private final int N;
 	
@@ -37,14 +38,14 @@ public class ApplySampleProbas implements ProxyPersonsTask {
 	}
 	
 	@Override
-	public void apply(Collection<PlainPerson> persons) {
+	public void apply(Collection<? extends Person> persons) {
 		double p = 1/(double)N;
 		double wsum = 0;
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			wsum += Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 		}
 		
-		for(PlainPerson person : persons) {
+		for(Person person : persons) {
 			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 			person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(p * w * persons.size()/wsum));
 		}

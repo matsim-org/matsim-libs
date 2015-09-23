@@ -28,7 +28,6 @@ import playground.johannes.synpop.data.PlainPerson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -61,7 +60,7 @@ public class AnalyzerListener implements SamplerListener {
 			File file = new File(output);
 			file.mkdirs();
 			try {
-				ProxyAnalyzer.analyze((Set<PlainPerson>)population, pTask, file.getAbsolutePath());
+				ProxyAnalyzer.analyze((Collection<PlainPerson>)population, pTask, file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

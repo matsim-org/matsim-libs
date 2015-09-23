@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.johannes.synpop.sim.data;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.data.FacilityData;
 
@@ -44,7 +45,7 @@ public class ActivityFacilityConverter implements Converter {
 
     @Override
     public Object toObject(String value) {
-        return data.getAll().getFacilities().get(value);
+        return data.getAll().getFacilities().get(Id.create(value, ActivityFacility.class));
     }
 
     @Override

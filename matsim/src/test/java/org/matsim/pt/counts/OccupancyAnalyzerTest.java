@@ -19,11 +19,16 @@
 
 package org.matsim.pt.counts;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -34,20 +39,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Set;
 
 /**
  * @author mrieser / senozon
@@ -115,7 +112,7 @@ public class OccupancyAnalyzerTest {
 		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 12*3600);
 		eventsManager.addHandler(oa);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		Set<Id<TransitStopFacility>> enterStops = oa.getBoardStopIds();
@@ -158,12 +155,12 @@ public class OccupancyAnalyzerTest {
 
 			// setup: network
 			Network network = this.scenario.getNetwork();
-			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
-			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
-			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000, 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(2000, 0));
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(3000, 0));
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new Coord(4000, 0));
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new Coord(5000, 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
@@ -185,8 +182,6 @@ public class OccupancyAnalyzerTest {
 			network.addLink(link3);
 			network.addLink(link4);
 			network.addLink(link5);
-
-			((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 			// setup: vehicles
 			String vehiclesXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

@@ -59,12 +59,14 @@ public class RunCombinedOsmReaderForBe {
 	 */
 	public static void main(String[] args) {
 		// Input and output
-		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-05-26_berlin.osm";
+//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
+//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/2015-09-13_kreuzberg.osm";
+		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-09-13_berlin.osm";
 		
-		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
+//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
+//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
+		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
 		
 		String facilityFile = outputBase + "facilities.xml";
 		String attributeFile = outputBase + "facilitiy_attributes.xml";
@@ -81,9 +83,6 @@ public class RunCombinedOsmReaderForBe {
 		double buildingTypeFromVicinityRange = 0.;
 		
 		
-		
-//		highway
-		
 //		String osmFile = args[0];
 //		String facilityFile = args[1];
 //		String attributeFile = args[2];
@@ -92,16 +91,13 @@ public class RunCombinedOsmReaderForBe {
 //			outputCRS = args[3];
 //		}
 		
-//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", outputCRS);
-		
-		// LandUseBuildingReader landUseBuildingReader = new LandUseBuildingReader(
+
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
 				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
 				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
 				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
 				buildingTypeFromVicinityRange);
 		try {
-//			combinedOsmReader.parseLandUseAndBuildings(osmFile);
 			combinedOsmReader.parseFile(osmFile);
 			combinedOsmReader.writeFacilities(facilityFile);
 			combinedOsmReader.writeFacilityAttributes(attributeFile);
@@ -190,25 +186,39 @@ public class RunCombinedOsmReaderForBe {
 		map.put("commercial", FacilityTypes.WORK);
 		map.put("office", FacilityTypes.WORK);
 		map.put("industrial", FacilityTypes.WORK);
-		map.put("retail", FacilityTypes.WORK);
+		
+		map.put("retail", FacilityTypes.SHOPPING);
 		
 		map.put("warehouse", FacilityTypes.IGNORE);		
 		map.put("chapel", FacilityTypes.IGNORE);
+		
+//		map.put("church", FacilityTypes.OTHER);
+//		map.put("mosque", FacilityTypes.OTHER);
+//		map.put("temple", FacilityTypes.OTHER);
+//		map.put("synagoge", FacilityTypes.OTHER);
 		map.put("church", FacilityTypes.IGNORE);
 		map.put("mosque", FacilityTypes.IGNORE);
 		map.put("temple", FacilityTypes.IGNORE);
 		map.put("synagoge", FacilityTypes.IGNORE);
+		
 		map.put("shrine", FacilityTypes.IGNORE);
 	
 		map.put("civic", FacilityTypes.WORK);
-		map.put("hospital", FacilityTypes.WORK);
-		map.put("school", FacilityTypes.WORK);
 		
+//		map.put("hospital", FacilityTypes.MEDICAL);
+//		map.put("school", FacilityTypes.EDUCATION);
+		map.put("hospital", FacilityTypes.IGNORE);
+		map.put("school", FacilityTypes.IGNORE);
+		
+//		map.put("stadium", FacilityTypes.LEISURE);
 		map.put("stadium", FacilityTypes.IGNORE);
+		
 		map.put("train_station", FacilityTypes.IGNORE);
 		map.put("transportation", FacilityTypes.IGNORE);
 		
-		map.put("university", FacilityTypes.WORK);
+//		map.put("university", FacilityTypes.EDUCATION);
+		map.put("university", FacilityTypes.IGNORE);
+		
 		map.put("public", FacilityTypes.WORK);
 		map.put("greenhouse", FacilityTypes.WORK);
 		

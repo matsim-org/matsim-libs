@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,6 +35,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
@@ -45,8 +47,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));
 		Link link2 = network.getLinks().get(Id.create(2, Link.class));
 
-		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		tmpScenario.setNetwork(network);
+		Scenario tmpScenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(network).build() ;
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));

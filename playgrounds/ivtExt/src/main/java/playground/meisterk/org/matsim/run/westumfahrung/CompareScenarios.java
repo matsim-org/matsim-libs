@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -52,6 +53,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
 
 import playground.balmermi.world.World;
@@ -417,8 +419,7 @@ public class CompareScenarios {
 			ArrayList<CaseStudyResult> results = new ArrayList<CaseStudyResult>();
 			for (String scenarioName : this.scenarioNames) {
 
-				ScenarioImpl subScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				subScenario.setNetwork(scenarioNetworks.get(scenarioName));
+				Scenario subScenario = new ScenarioBuilder( ConfigUtils.createConfig() ).setNetwork( scenarioNetworks.get( scenarioName) ).build() ;
 				Population plansSubPop = subScenario.getPopulation();
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:

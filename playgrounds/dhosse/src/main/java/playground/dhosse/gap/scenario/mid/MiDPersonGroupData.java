@@ -82,6 +82,28 @@ public class MiDPersonGroupData {
 		
 	}
 	
+	public MiDPersonGroupData(int a0, int aX){
+		
+		this.lowerBoundAge = a0;
+		this.upperBoundAge = aX;
+		this.sex = 0;
+		this.data = new ArrayList<>();
+		
+		this.activityOptions.put(Global.ActType.work.name(), new ActivityOption(Global.ActType.work.name(), 0.));
+		this.activityOptions.put(Global.ActType.education.name(), new ActivityOption(Global.ActType.education.name(), 0.));
+		this.activityOptions.put(Global.ActType.shop.name(), new ActivityOption(Global.ActType.shop.name(), 0.));
+		this.activityOptions.put(Global.ActType.leisure.name(), new ActivityOption(Global.ActType.leisure.name(), 0.));
+		this.activityOptions.put(Global.ActType.other.name(), new ActivityOption(Global.ActType.other.name(), 0.));
+		
+		this.home = new MiDStatsContainer();
+		this.work = new MiDStatsContainer();
+		this.education = new MiDStatsContainer();
+		this.shop = new MiDStatsContainer();
+		this.leisure = new MiDStatsContainer();
+		this.other = new MiDStatsContainer();
+		
+	}
+	
 	public void setLegsPerPersonAndDay(double d){
 		
 		this.legsPerPersonAndDay = d;
@@ -307,6 +329,15 @@ public class MiDPersonGroupData {
 		this.activityOptions.get(Global.ActType.other.name()).setWeight(pOtherLegs);
 	}
 	
+	/**
+	 * Creates a string of an activity type for a given person. 
+	 * 
+	 * @param p
+	 * @param age
+	 * @param isEmployed
+	 * @param rnd
+	 * @return
+	 */
 	public String getRandomPurpose(Person p, int age, boolean isEmployed, double rnd){
 		
 		double weight = this.totalWeight;

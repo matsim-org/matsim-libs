@@ -56,6 +56,11 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 		 satcapacity4 = link4.getCapacity();
 		 satcapacity5 = link5.getCapacity();
 		 events = new ArrayList<NetworkChangeEvent>() ;
+		 
+		 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+		 change.addLink(link2);
+		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE, 500.0/3600.0)));
+		 addNetworkChangeEvent(change);
 	}
 	public void printDelayStats(){
 		double delaylink2=0;
@@ -73,13 +78,13 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	}
 	public void plotStats(){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotCapacities(times, capacitieslink2, capacitieslink4);
-		plot.PlotDelays(times, avgdelayslink2, avgdelayslink4);
-		plot.PlotDelaysandCapacities(times, capacitieslink2, capacitieslink4, avgdelayslink2, avgdelayslink4);
+		//plot.PlotCapacities(times, capacitieslink2, capacitieslink4);
+		//plot.PlotDelays(times, avgdelayslink2, avgdelayslink4);
+		//plot.PlotDelaysandCapacities(times, capacitieslink2, capacitieslink4, avgdelayslink2, avgdelayslink4);
 	}
 	public void plotAbsoultePressureDifference(ArrayList<Double> iters, ArrayList<Double> avgabsolutepressuredifference){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotAbsolutePressureDiff(iters, avgabsolutepressuredifference);
+		//plot.PlotAbsolutePressureDiff(iters, avgabsolutepressuredifference);
 	}
 	public double getAvgPressDiffOverIter(){
 		double totalpressdiff=0;
@@ -102,8 +107,6 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 			deptimes.put(event.getVehicleId().toString(), event.getTime());
 			vehiclesandlinks.put(event.getVehicleId().toString(), event.getLinkId().toString());//Which vehicle uses which link
 			if(count==0){//Change the capacities to the ones imposed by the outgoing junction link as the process starts, done only in first iteration
-				
-				
 				count++;
 				 //network.setNetworkChangeEvents(new ArrayList<NetworkChangeEvent>());
 				 double combinedsatcapacity = satcapacity2 + satcapacity4;//So that the combined capacities are no more than the merged link capacity
@@ -121,12 +124,12 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 change.setFlowCapacityChange((new ChangeValue(ChangeType.FACTOR, capacity2/satcapacity5)));
 				 factor2=capacity2/satcapacity5;
 				 //network.addNetworkChangeEvent(change);
-				 addNetworkChangeEvent(change);
+				 //addNetworkChangeEvent(change);
 				 str = "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);
 				 change1.addLink(link4);
 				 change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacity4/satcapacity5));//Allowing due share
-				 addNetworkChangeEvent(change1);
+				 //addNetworkChangeEvent(change1);
 				 factor4=capacity4/satcapacity5;
 				 str += "Time: " + change1.getStartTime() + " Link: " + ((Link)change1.getLinks().toArray()[0]).getId() + " Factor: " + change1.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 // network.addNetworkChangeEvent(change1);

@@ -19,14 +19,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.router;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
@@ -38,12 +46,13 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
-
-import java.util.*;
 
 /**
  * This leg router takes travel times needed for turning moves into account. This is done by a routing on an inverted
@@ -113,7 +122,7 @@ public class InvertedNetworkRoutingModule implements RoutingModule {
 			throw new RuntimeException("toLink Id missing in Activity.");
 
 		if (fromLinkId.equals(toLinkId)) { // no route has to be calculated
-			route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, fromLinkId, toLinkId);
+			route = this.routeFactory.createRoute(NetworkRoute.class, fromLinkId, toLinkId);
 			route.setDistance(0.0);
 		}
 		else {
@@ -140,8 +149,8 @@ public class InvertedNetworkRoutingModule implements RoutingModule {
 	 * can be given to the plan. 
 	 */
 	private NetworkRoute invertPath2NetworkRoute(Path path, Id<Link> fromLinkId, Id<Link> toLinkId) {
-		NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car,
-				fromLinkId, toLinkId);
+		NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class,
+			fromLinkId, toLinkId);
 		List<Node> nodes = path.nodes;
 		// remove first and last as their ids are, due to inversion, from and to link id of the route
 		nodes.remove(0);

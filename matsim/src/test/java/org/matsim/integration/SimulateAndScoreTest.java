@@ -99,10 +99,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 1100, (double) 0));
-		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord((double) 1200, (double) 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -129,11 +129,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 100, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(100, 0), false);
 		stop1.setLinkId(link1.getId());
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1100, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(1100, 0), false);
 		stop2.setLinkId(link2.getId());
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1200, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(1200, 0), false);
 		stop3.setLinkId(link3.getId());
 
 
@@ -236,10 +236,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 	public void testTeleportationScore() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 1100, (double) 0));
-		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord((double) 1200, (double) 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -258,7 +258,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		plan.addActivity(a1);
 
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
-		Route ptRoute = populationFactory.createRoute(TransportMode.pt, link1.getId(), link3.getId());
+		Route ptRoute = populationFactory.createRoute(Route.class, link1.getId(), link3.getId());
 		ptRoute.setTravelTime(3600);
         ptRoute.setDistance(1000);
 		leg.setRoute(ptRoute);

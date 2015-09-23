@@ -2,26 +2,12 @@ package saleem.stockholmscenario.teleportation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.TimeVariantLinkFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-
-import saleem.p0.P0ControlListener;
 
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
@@ -29,8 +15,8 @@ public static void main(String[] args) {
         String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
         Config config = ConfigUtils.loadConfig(path);
         Controler controler = new Controler(config);
-        Scenario scenario = controler.getScenario();
-        
+        controler.addControlerListener(new StockholmControlListener());
+		Scenario scenario = controler.getScenario();
         Network network = scenario.getNetwork();
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		//network.getLinks().clear();

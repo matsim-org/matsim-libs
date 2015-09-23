@@ -109,8 +109,9 @@ public class RunResultsLoader {
 		//Why we have to do all this, we simply want to read a file
 		Config c = ConfigUtils.createConfig(); 
 		c.plans().setInputFile(path);
-		Scenario sc = ScenarioUtils.createScenario(c);
-		((ScenarioImpl) sc).setNetwork(this.network);
+		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(c) ;
+		builder.setNetwork(this.network) ;
+		Scenario sc = builder.build() ;
 		MatsimPopulationReader pr= new MatsimPopulationReader(sc);
 		pr.readFile(path);
 		return sc.getPopulation();

@@ -216,9 +216,16 @@ public class MyRuns {
 		personRemoveLinkAndRoute.run(population);
 
 		// switch to new network in scenario
-		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
-		scenario.setNetwork(scenario2.getNetwork());
+
+		// this is what I found ...
+//		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new MatsimNetworkReader(scenario2).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+//		scenario.setNetwork(scenario2.getNetwork());
+
+		// ... but I think we can just give the existing scenario to the reader, so I am changing this.  There is so much commented out in this
+		// code that it is probably no longer used anyways. kai, sep'15
+		new MatsimNetworkReader(scenario).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
 

@@ -41,5 +41,11 @@ public class EgapHashGenerator {
 		return (lowerBound + "_" + upperBound);
 		
 	}
+	
+	public static String generateAgeGroupHash(int a0, int aX){
+		
+		return (a0 + "_" + aX);
+		
+	}
 
 }

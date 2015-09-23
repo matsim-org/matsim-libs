@@ -19,7 +19,6 @@
 
 package playground.johannes.synpop.sim.data;
 
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
 
@@ -28,22 +27,52 @@ import playground.johannes.synpop.data.Segment;
  */
 public class CachedSegment extends CachedElement implements Segment {
 
+    private CachedEpisode episode;
+
+    private boolean isLeg;
+
     public CachedSegment(Segment delegate) {
         super(delegate);
     }
 
+    void setEpisode(CachedEpisode episode, boolean isLeg) {
+        this.episode = episode;
+        this.isLeg = isLeg;
+    }
+
     @Override
     public Episode getEpisode() {
-        throw new UnsupportedOperationException("Navigation not supported.");
+        return episode;
+//        throw new UnsupportedOperationException("Navigation not supported.");
     }
 
     @Override
     public Segment next() {
-        throw new UnsupportedOperationException("Navigation not supported.");
+        if (isLeg) {
+            int index = getEpisode().getLegs().indexOf(this);
+            if (index > -1) return getEpisode().getActivities().get(index + 1);
+            else return null;
+        } else {
+            int index = getEpisode().getActivities().indexOf(this);
+            if (index > -1 && index < getEpisode().getLegs().size()) {
+                return getEpisode().getLegs().get(index);
+            } else return null;
+        }
+//        throw new UnsupportedOperationException("Navigation not supported.");
     }
 
     @Override
     public Segment previous() {
-        throw new UnsupportedOperationException("Navigation not supported.");
+        if (isLeg) {
+            int index = getEpisode().getLegs().indexOf(this);
+            if (index > -1) return getEpisode().getActivities().get(index);
+            else return null;
+        } else {
+            int index = getEpisode().getActivities().indexOf(this);
+            if (index > 0) {
+                return getEpisode().getLegs().get(index - 1);
+            } else return null;
+        }
+//        throw new UnsupportedOperationException("Navigation not supported.");
     }
 }

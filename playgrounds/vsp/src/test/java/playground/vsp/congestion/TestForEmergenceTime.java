@@ -59,7 +59,6 @@ import org.matsim.vehicles.VehicleUtils;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -70,9 +69,9 @@ public class TestForEmergenceTime {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void emergenceTimeTest(){
+	public final void emergenceTimeTest_v4(){
 
-		String [] congestionPricingImpl = {"v4","v6"};
+		String [] congestionPricingImpl = {"v4"};
 
 		for(String impl :congestionPricingImpl){
 			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
@@ -85,6 +84,22 @@ public class TestForEmergenceTime {
 		}
 	}
 
+//	@Test
+//	public final void emergenceTimeTest_v6(){
+//
+//		String [] congestionPricingImpl = {"v6"};
+//
+//		for(String impl :congestionPricingImpl){
+//			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
+//			for(CongestionEvent event : congestionEvents){
+//				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
+//					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
+//					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
+//				}
+//			}
+//		}
+//	}
+	
 	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
 
 		int numberOfPersonInPlan = 10;
@@ -111,7 +126,7 @@ public class TestForEmergenceTime {
 		});
 
 		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
