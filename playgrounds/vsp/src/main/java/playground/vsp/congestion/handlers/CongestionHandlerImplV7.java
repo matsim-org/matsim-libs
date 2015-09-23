@@ -141,8 +141,8 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
-		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
+	
+		double delayOnThisLink = delayInfo.linkLeaveTime - delayInfo.freeSpeedLeaveTime ;
 
 		if (delayOnThisLink < 0.) {
 			throw new RuntimeException("The delay is below 0. Aborting...");
@@ -154,6 +154,8 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 			// The agent was leaving the link with a delay.
 
 			// go throw the flow queue and charge all causing agents with the delay on this link
+			LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
+
 			for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {
 				DelayInfo causingAgentDelayInfo = it.next() ;
 				if ( causingAgentDelayInfo.personId.equals( delayInfo.personId ) ) {
