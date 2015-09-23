@@ -91,11 +91,17 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	
 	public VTTSHandler(Scenario scenario) {
 		
+		if (this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() == 0.) {
+			throw new RuntimeException("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time. Aborting...");
+		}
+		
 		this.scenario = scenario;
 		this.currentIteration = Integer.MIN_VALUE;
 		this.defaultVTTS =
 				(1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() + (1.0 / 3600.) *
-						this.scenario.getConfig().planCalcScore().getModes().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0);
+						this.scenario.getConfig().planCalcScore().getModes().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
+						/ this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+
 		this.marginaSumScoringFunction =
 				new MarginalSumScoringFunction(
 						CharyparNagelScoringParameters.getBuilder(
@@ -394,7 +400,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	 * @param id
 	 * @param time
 	 * 
-	 * This method returns the VTTS for a person at a given time and can for example be used to calculate a travel disutility during routing.
+	 * This method returns the VTTS in money per time for a person at a given time and can for example be used to calculate a travel disutility during routing.
 	 * Based on the time, the trip Nr is computed and based on the trip number the VTTS is looked up.
 	 * In case there is no VTTS information available such as in the initial iteration before event handling, the default VTTS is returned.
 	 * 
