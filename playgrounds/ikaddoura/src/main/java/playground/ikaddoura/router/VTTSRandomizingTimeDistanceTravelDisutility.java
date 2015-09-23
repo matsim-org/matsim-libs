@@ -150,7 +150,7 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 		double vtts_hour = this.vttsHandler.getVTTS(person.getId(), time);
 		
 		double linkTravelDisutility = vtts_hour * cnScoringGroup.getMarginalUtilityOfMoney() * travelTime_sec / 3600. + logNormalRnd * marginalCostOfDistance * link.getLength();
-		System.out.println(linkTravelDisutility);
+		
 		return linkTravelDisutility;
 	}
 
