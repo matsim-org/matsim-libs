@@ -101,7 +101,7 @@ public class LegDistanceTask extends AnalyzerTask {
 		for (Person person : persons) {
 			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getActivities().size(); i++) {
-				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
+				purposes.add(plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}
 

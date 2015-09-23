@@ -2,6 +2,7 @@ package playground.dhosse.gap.analysis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -12,14 +13,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.dhosse.gap.Global;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
-public class LegAnalysis {
+public class PersonAnalysis {
 
 	public static void main(String args[]){
 		
-		getPersonsWithNegativeScores("/home/danielhosse/run8b/output/ITERS/it.50/50.plans.xml.gz");
+		getPersonsWithNegativeScores("/home/danielhosse/run9/output/ITERS/it.10/10.plans.xml.gz");
 //		analyzeModeChoice("/home/danielhosse/run8b/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");
+		
+	}
+	
+	public static void createLegModeDistanceDistribution(String plansFile, String outputFolder){
+		
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		new MatsimPopulationReader(scenario).readFile(plansFile);
+		
+		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+		lmdd.init(scenario);
+		lmdd.preProcessData();
+		lmdd.postProcessData();
+		lmdd.writeResults(outputFolder);
 		
 	}
 	
@@ -28,16 +43,27 @@ public class LegAnalysis {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		new MatsimPopulationReader(scenario).readFile(plansFile);
+		int cnt = 0;
 		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			
 			double score = person.getSelectedPlan().getScore();
 			
 			if(score < 0){
-				System.out.println(person.getId().toString() + "\t" + score);
+				
+				cnt++;
+				
+				if(score < -1000){
+					
+					System.out.println(person.getId() + "\t" + score);
+					
+				}
+				
 			}
 			
 		}
+		
+		System.out.println(cnt + " persons with negative scores...");
 		
 	}
 	

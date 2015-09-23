@@ -407,18 +407,27 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			}
 			
 			if (tripNrOfGivenTime == Integer.MIN_VALUE) {
-				log.warn("Couldn't find the trip number of person " + id + "at time " + time + ". Trying to use the average VTTS of that person...");
+			
+				log.warn("Could not identify the trip number of person " + id + " at time " + time + "."
+						+ " Trying to use the average VTTS of that person...");
 				return getAvgVTTSh(id); 
+			
 			} else {
-				double vtts = this.personId2TripNr2VTTSh.get(id).get(tripNrOfGivenTime);			
-//				System.out.println("VTTS of person " + id + " at time " + time + " (trip Nr: " + tripNrOfGivenTime + "): " + vtts);
-				return vtts;
+				if (this.personId2TripNr2VTTSh.containsKey(id)) {
+					
+					double vtts = this.personId2TripNr2VTTSh.get(id).get(tripNrOfGivenTime);			
+					return vtts;
+					
+				} else {
+					log.warn("Could not find the VTTS of person " + id + " and trip number " + tripNrOfGivenTime + " (time: " + time + ")."
+							+ " Trying to use the average VTTS of that person...");
+					return getAvgVTTSh(id);
+				}
 			} 
 			
 		} else {
 			if (this.currentIteration == Integer.MIN_VALUE) {
 				// the initial iteration before handling any events
-				log.info("Using the default VTTS in the initial iteration.");
 				return this.defaultVTTS;
 			} else {
 				throw new RuntimeException("This is not the initial iteration and there is no information available from the previous iteration. Aborting...");

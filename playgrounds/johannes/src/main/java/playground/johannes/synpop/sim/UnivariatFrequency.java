@@ -59,14 +59,15 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         simFreq = initHistogram(simElements, attrKey);
 
         scaleFactor = simElements.size()/(double)refElements.size();
-        normFactor = simElements.size();
+        normFactor = 1;//simElements.size();
 
         int size = Math.max(simFreq.size(), refFreq.size());
         for(int i = 0; i < size; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
 
-            hamiltonianValue += Math.abs(simVal - refVal)/ normFactor;
+//            hamiltonianValue += (Math.abs(simVal - refVal)/ refVal)/normFactor;
+            hamiltonianValue += calculateError(simVal, refVal)/normFactor;
         }
     }
 
@@ -103,13 +104,15 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     private double changeBucketContent(int bucketIndex, int value) {
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double oldDiff = Math.abs(simVal - refVal);
+//        double oldDiff = Math.abs(simVal - refVal)/refVal;
+        double oldDiff = calculateError(simVal, refVal);
 
         simFreq.set(bucketIndex, simFreq.get(bucketIndex) + value);
 
         simVal = simFreq.get(bucketIndex);
         refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double newDiff = Math.abs(simVal - refVal);
+//        double newDiff = Math.abs(simVal - refVal)/refVal;
+        double newDiff = calculateError(simVal, refVal);
 
         return newDiff - oldDiff;
     }
@@ -118,4 +121,15 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
+
+    private double calculateError(double simVal, double refVal) {
+//        return Math.abs(simVal - refVal);
+        if(refVal > 0) {
+            return Math.abs(simVal - refVal)/refVal;
+        } else {
+            if(simVal == 0) return 0;
+            else return 1;
+        }
+    }
+
 }

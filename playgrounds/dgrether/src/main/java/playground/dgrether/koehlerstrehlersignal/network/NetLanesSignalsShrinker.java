@@ -90,9 +90,12 @@ public class NetLanesSignalsShrinker {
 	 * @param freeSpeedFilter the minimal free speed value for the interior link filter in m/s
 	 * @param useFreeSpeedTravelTime a flag for dijkstras cost function:
 	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
+	 * @param simplifyNetwork use network simplifier if true
 	 * @throws IOException
 	 */
-	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, boolean useFreeSpeedTravelTime, double maximalLinkLength) throws IOException{
+	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, 
+			boolean useFreeSpeedTravelTime, double maximalLinkLength, boolean simplifyNetwork) throws IOException{
+		
 		//Some initialization
 		Set<Id<Node>> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
@@ -115,27 +118,28 @@ public class NetLanesSignalsShrinker {
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small");
 		
-		//"clean" the small network
+		// "clean" the small network
 		DgNetworkCleaner cleaner = new DgNetworkCleaner();
 		cleaner.cleanNetwork(smallNetwork);
 		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
 		DgNetworkUtils.writeNetwork(smallNetwork, smallNetworkClean);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_clean");
-
 		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(NetworkCalcTopoType.PASS1WAY); //PASS1WAY: 1 in- and 1 outgoing link
-		nodeTypesToMerge.add(NetworkCalcTopoType.PASS2WAY); //PASS2WAY: 2 in- and 2 outgoing links
+		if (simplifyNetwork){
+			nodeTypesToMerge.add(NetworkCalcTopoType.PASS1WAY); //PASS1WAY: 1 in- and 1 outgoing link
+			nodeTypesToMerge.add(NetworkCalcTopoType.PASS2WAY); //PASS2WAY: 2 in- and 2 outgoing links
+		}
 		NetworkLanesSignalsSimplifier nsimply = new NetworkLanesSignalsSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.setSimplifySignalizedNodes(false);
 		nsimply.setMaximalLinkLength(maximalLinkLength);
-		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, (LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
+		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getLanes(), (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		
 		this.shrinkedNetwork =  smallNetwork;
-		this.shrinkedLanes = (LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		this.shrinkedLanes = this.fullScenario.getLanes();
 		this.shrinkedSignals = (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(smallNetwork, shrinkedLanes);
@@ -149,7 +153,7 @@ public class NetLanesSignalsShrinker {
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_simplified");
 
-		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20((LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20(this.fullScenario.getLanes());
 		lanesWriter.write(outputDirectory + simplifiedLanesFilename);
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);

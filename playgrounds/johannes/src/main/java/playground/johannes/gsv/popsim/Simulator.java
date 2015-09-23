@@ -30,17 +30,18 @@ import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
+import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -67,8 +68,20 @@ public class Simulator {
 				PlainFactory());
 		logger.info(String.format("Loaded %s persons.", refPersons.size()));
 
-		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
+
+		TaskRunner.run(new ReplaceActTypes(), refPersons);
+		new GuessMissingActTypes(random).apply(refPersons);
+		TaskRunner.run(new EpisodeTask() {
+			@Override
+			public void apply(Episode episode) {
+				for (Segment leg : episode.getLegs()) {
+					leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
+				}
+			}
+		}, refPersons);
+
+		logger.info("Cloning persons...");
 		Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), 100000, random);
 		logger.info(String.format("Generated %s persons.", simPersons.size()));
 
@@ -92,15 +105,8 @@ public class Simulator {
 		 * Assign random activity facilities.
 		 */
 		TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
-
-		TaskRunner.run(new EpisodeTask() {
-			@Override
-			public void apply(Episode episode) {
-				for(Segment leg : episode.getLegs()) {
-					leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
-				}
-			}
-		}, simPersons);
+		TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
+		TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
 
 		final String output = config.getParam(MODULE_NAME, "output");
 
@@ -113,17 +119,16 @@ public class Simulator {
 
 		MutatorComposite<? extends Attributable> mutators = new MutatorComposite<>(random);
 
-        UnivariatFrequency distance = new UnivariatFrequency(refPersons, simPersons, CommonKeys.LEG_GEO_DISTANCE, new
-				LinearDiscretizer(10000));
-        hamiltonians.addComponent(distance);
+        UnivariatFrequency distance = buildDistanceHamiltonian(refPersons, simPersons);
+        hamiltonians.addComponent(distance, 1e6);
 
 
         FacilityMutatorBuilder fBuilder = new FacilityMutatorBuilder(dataPool, random);
         fBuilder.addToBlacklist(ActivityTypes.HOME);
 
         AttributeChangeListenerComposite listeners = new AttributeChangeListenerComposite();
-        listeners.addComponent(new GeoDistanceUpdater());
-        listeners.addComponent(distance);
+        listeners.addComponent(new GeoDistanceUpdater(distance));
+//        listeners.addComponent(distance);
         fBuilder.setListener(listeners);
         mutators.addMutator(fBuilder.build());
 
@@ -133,7 +138,7 @@ public class Simulator {
 
 		listener.addComponent(new MarkovEngineListener() {
 
-			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 100000);
+			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 1000000);
 
 			@Override
 			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
@@ -150,7 +155,7 @@ public class Simulator {
 
 		sampler.setListener(listener);
 
-		sampler.run(4000001);
+		sampler.run(10000001);
 	}
 
 	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
@@ -163,6 +168,29 @@ public class Simulator {
 		}
 
 		return values.toNativeArray();
+	}
+
+	private static UnivariatFrequency buildDistanceHamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson>
+			simPersons) {
+		Set<Attributable> refLegs = getLegs(refPersons);
+		Set<Attributable> simLegs = getLegs(simPersons);
+
+
+
+		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, new
+				LinearDiscretizer(10000));
+
+		return f;
+	}
+
+	private static Set<Attributable> getLegs(Set<? extends Person> persons) {
+		Set<Attributable> legs = new HashSet<>();
+		for(Person p : persons) {
+			Episode e = p.getEpisodes().get(0);
+			legs.addAll(e.getLegs());
+		}
+
+		return legs;
 	}
 
 }

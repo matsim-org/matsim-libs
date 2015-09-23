@@ -28,6 +28,10 @@ import java.util.Map;
  */
 public class ZoneData {
 
+    public static final String POPULATION_KEY = "population";
+
+    public static final String NAME_KEY = "name";
+
     private final Map<String, ZoneCollection> layers;
 
     public ZoneData() {
@@ -38,7 +42,7 @@ public class ZoneData {
         return layers.get(name);
     }
 
-    ZoneCollection setLayer(ZoneCollection zones, String name) {
+    ZoneCollection addLayer(ZoneCollection zones, String name) {
         return layers.put(name, zones);
     }
 }

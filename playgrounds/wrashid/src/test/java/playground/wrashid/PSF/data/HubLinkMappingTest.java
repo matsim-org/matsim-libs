@@ -2,12 +2,19 @@ package playground.wrashid.PSF.data;
 
 import java.util.HashMap;
 
+import org.junit.Test;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+
 import junit.framework.TestCase;
 
 public class HubLinkMappingTest extends TestCase {
 
+	@Test
 	public void testReader(){
-		HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",4);
+		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ; // empty network for test 
+		HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",4, network);
 		
 		// check, that the right number of links have been read
 		assertEquals(31, hublinkMapping.getNumberOfLinks());
@@ -21,7 +28,8 @@ public class HubLinkMappingTest extends TestCase {
 	}
 	
 	public void testReader1(){
-		HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping1.txt",4);
+		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ; // empty network for test 
+		HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping1.txt",4, network);
 		
 		// check, that the right number of links have been read
 		assertEquals(15, hublinkMapping.getNumberOfLinks());
@@ -36,7 +44,8 @@ public class HubLinkMappingTest extends TestCase {
 	
 	public void testTooHighNumberOfHubs(){
 		try {
-			HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",5);
+			Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ; // empty network for test 
+			HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",5, network);
 			fail("a run time expection should have been thrown!");
 		} catch (Exception exception){
 			assertTrue(exception instanceof RuntimeException);
@@ -45,7 +54,8 @@ public class HubLinkMappingTest extends TestCase {
 	
 	public void testTooLowNumberOfHubs(){
 		try {
-			HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",3);
+			Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ; // empty network for test 
+			HubLinkMapping hublinkMapping=new HubLinkMapping("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",3, network);
 			fail("a RuntimeException should have been thrown!");
 		} catch (Exception exception){
 			assertTrue(exception instanceof RuntimeException);

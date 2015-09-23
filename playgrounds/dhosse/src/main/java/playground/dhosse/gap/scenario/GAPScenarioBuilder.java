@@ -1,9 +1,7 @@
 package playground.dhosse.gap.scenario;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -31,14 +29,15 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
+import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -111,7 +110,7 @@ public class GAPScenarioBuilder {
 		
 		initQuadTrees(scenario);
 		
-		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
+		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
 //		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
 //		//create plans
@@ -141,11 +140,12 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
+		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
 		
+		log.info("Dumping agent attributes...");
 		//write object attributes to file
 		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
 		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
@@ -245,6 +245,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
+		//WGS84
 		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
@@ -256,6 +257,7 @@ public class GAPScenarioBuilder {
 			
 		}
 		
+		//WGS84
 		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
@@ -278,17 +280,18 @@ public class GAPScenarioBuilder {
 			
 		}
 		
-		Collection<SimpleFeature> countries = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "europa_staaten.shp");
+//		Collection<SimpleFeature> countries = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "europa_staaten.shp");
+//		
+//		for(SimpleFeature f : countries){
+//			
+//			Geometry geometry = (Geometry) f.getDefaultGeometry();
+//			String identifier = (String) f.getAttribute("NUTS0");
+//			
+//			getMunId2Geometry().put("0" + identifier, geometry);
+//			
+//		}
 		
-		for(SimpleFeature f : countries){
-			
-			Geometry geometry = (Geometry) f.getDefaultGeometry();
-			String identifier = (String) f.getAttribute("NUTS0");
-			
-			getMunId2Geometry().put("0" + identifier, geometry);
-			
-		}
-		
+		//WGS84
 		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;

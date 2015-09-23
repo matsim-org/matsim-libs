@@ -65,6 +65,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
 
+	private double totalDelay = 0.;
 	private double delayNotInternalized_roundingErrors = 0.;
 	private double totalInternalizedDelay = 0.;
 
@@ -101,6 +102,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
 
+		this.totalDelay = 0.;
 		this.delayNotInternalized_roundingErrors = 0.;
 		this.totalInternalizedDelay = 0.;
 	}
@@ -161,6 +163,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		
 		// coming here ...
 		
+		
 		Id<Person> personId = this.getVehicleId2personId().get( event.getVehicleId() ) ;
 
 		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), this.getLinkId2congestionInfo(), scenario);
@@ -178,7 +181,10 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 		linkInfo.getAgentsOnLink().remove( personId ) ;
 
+		// global book-keeping:
+		this.totalDelay += ( event.getTime() - delayInfo.freeSpeedLeaveTime );
 
+		
 	}
 
 	@Override
@@ -193,6 +199,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 			// queue is already empty; nothing to do
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+//			earliestLeaveTime = delayInfo.freeSpeedLeaveTime ;
 			if ( time > earliestLeaveTime + 1.) { 
 				// bottleneck is not active anymore.
 
@@ -259,6 +266,11 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 		return remainingDelay;
 	}
+	
+	@Override
+	public double getTotalDelay() {
+		return this.totalDelay ;
+	}
 
 	public double getDelayNotInternalized_roundingErrors() {
 		return delayNotInternalized_roundingErrors;
@@ -295,11 +307,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public double getTotalDelay() {
 		throw new RuntimeException("not implemented") ;
 	}
 

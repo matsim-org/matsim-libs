@@ -19,7 +19,10 @@
 package playground.johannes.gsv.synPop.data;
 
 import org.matsim.core.config.ConfigGroup;
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -28,6 +31,16 @@ import java.util.Collection;
 public class ZoneDataLoader implements DataLoader {
 
     private final static String PARAMSET_TYPE = "zoneData";
+
+    private final static String LAYERNAME_PARAM = "layer";
+
+    private final static String FILE_PARAM = "file";
+
+    private final static String PRIMARY_ZONE_KEY_PARAM = "primaryZoneKey";
+
+    private final static String NAME_KEY_PARAM = "nameKey";
+
+    private final static String POPULATION_KEY_PARAM = "populationKey";
 
     private final ConfigGroup module;
 
@@ -41,33 +54,28 @@ public class ZoneDataLoader implements DataLoader {
 
         Collection<? extends ConfigGroup> modules = module.getParameterSets(PARAMSET_TYPE);
         for(ConfigGroup paramset : modules) {
-            String layerName = paramset.getName();
-            String file = paramset.getValue("file");
-            String key = paramset.getValue("primaryKey");
-            String nameKey = paramset.getValue("namekey");
-            String popKey = paramset.getValue("popkey");
+            String layerName = paramset.getValue(LAYERNAME_PARAM);
+            String file = paramset.getValue(FILE_PARAM);
+            String primaryKey = paramset.getValue(PRIMARY_ZONE_KEY_PARAM);
+            String nameKey = paramset.getValue(NAME_KEY_PARAM);
+            String populationKey = paramset.getValue(POPULATION_KEY_PARAM);
 
-//            try {
-//                ZoneCollection zones = ZoneCollection.readFromGeoJSON(file, key);
-//
-//                for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-//                    zone.getAttribute().put(LandUseData.NAME_KEY, zone.getAttribute().get(nameKey));
-//                    Object value = zone.getAttribute().get(popKey);
-//                    if(value != null) {
-//                        double d = Double.parseDouble(value.toString());
-//                        zone.getAttribute().put(LandUseData.POPULATION_KEY, d);
-//                    }
-//                }
-//
-//                return zoneLayer;
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        } else {
-//            return null;
+            try {
+                ZoneCollection zones = ZoneCollection.readFromGeoJSON(file, primaryKey);
+
+                for(Zone zone : zones.zoneSet()) {
+                    zone.setAttribute(ZoneData.POPULATION_KEY, zone.getAttribute(populationKey));
+                    zone.setAttribute(ZoneData.NAME_KEY, zone.getAttribute(nameKey));
+                }
+
+                data.addLayer(zones, layerName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
-        return null;
+
+        return data;
     }
 }
