@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -38,10 +37,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -57,8 +54,6 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 	private CongestionHandlerBaseImpl delegate;
 
-	private double totalDelay = 0.;
-
 	private Scenario scenario;
 	private EventsManager events;
 	
@@ -71,8 +66,6 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 	@Override
 	public final void reset(int iteration) {
 		delegate.reset(iteration);
-		
-		this.totalDelay = 0.;
 	}
 
 	@Override
@@ -111,7 +104,7 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.totalDelay/ 3600.);
+			bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
 			bw.newLine();
 			bw.write("Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
 			bw.newLine();
@@ -128,7 +121,7 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 
 	@Override
 	public final double getTotalDelay() {
-		return this.totalDelay;
+		return this.delegate.getTotalDelay();
 	}
 
 	@Override
@@ -150,9 +143,6 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
-
-		// global book-keeping:
-		this.totalDelay += delayOnThisLink;
 
 		if (delayOnThisLink < 0.) {
 			throw new RuntimeException("The delay is below 0. Aborting...");

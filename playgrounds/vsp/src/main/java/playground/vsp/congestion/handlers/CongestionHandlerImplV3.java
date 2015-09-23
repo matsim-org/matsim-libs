@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
 
 /** 
@@ -66,11 +65,8 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
-	private double totalDelay = 0.;
 
-	private Scenario scenario;
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
-		this.scenario = scenario;
 		this.delegate = new CongestionHandlerBaseImpl(events, scenario);
 	}
 
@@ -81,7 +77,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		this.agentId2storageDelay.clear();
 		this.delayNotInternalized_spillbackNoCausingAgent = 0.;
-		this.totalDelay = 0.;
 	}
 
 	@Override
@@ -120,7 +115,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.totalDelay/ 3600.);
+			bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
 			bw.newLine();
 			bw.write("Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
 			bw.newLine();
@@ -139,7 +134,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	@Override
 	public final double getTotalDelay() {
-		return this.totalDelay;
+		return this.delegate.getTotalDelay();
 	}
 	
 	
@@ -186,9 +181,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 		
 		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
-
-		// global book-keeping:
-		this.totalDelay += delayOnThisLink;
 
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
 
