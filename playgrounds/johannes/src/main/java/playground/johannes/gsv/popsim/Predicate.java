@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.distribution.withScoringFast;
+package playground.johannes.gsv.popsim;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+/**
+ * @author johannes
+ */
+public interface Predicate<T> {
 
-public class ResponsibilityScoringFunctionFactory implements
-		ScoringFunctionFactory {
-
-	private CharyparNagelScoringFunctionFactory delegate;
-	private EmissionControlerListener ecl;
-	
-	public ResponsibilityScoringFunctionFactory(EmissionControlerListener ecl, Scenario scenario) {
-		this.delegate = new CharyparNagelScoringFunctionFactory(scenario);
-		this.ecl = ecl;
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		// TODO Auto-generated method stub
-		return new ResponsiblityScoringFunction(person.getSelectedPlan(), delegate.createNewScoringFunction(person), ecl);
-	}
-
+    boolean test(T t);
 }

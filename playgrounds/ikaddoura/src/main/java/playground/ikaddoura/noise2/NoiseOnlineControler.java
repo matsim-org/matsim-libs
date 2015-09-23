@@ -150,7 +150,7 @@ public class NoiseOnlineControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));

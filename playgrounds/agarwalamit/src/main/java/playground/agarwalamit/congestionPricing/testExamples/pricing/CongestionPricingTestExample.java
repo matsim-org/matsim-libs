@@ -110,7 +110,7 @@ class CongestionPricingTestExample {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(fact);
+					bindCarTravelDisutilityFactory().toInstance(fact);
 				}
 			});
 

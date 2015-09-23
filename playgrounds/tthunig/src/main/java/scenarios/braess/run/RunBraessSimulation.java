@@ -148,7 +148,7 @@ public class RunBraessSimulation {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(builder);
+					bindCarTravelDisutilityFactory().toInstance(builder);
 				}
 			});
 		}

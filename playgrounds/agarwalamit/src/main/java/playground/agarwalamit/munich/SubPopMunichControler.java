@@ -144,7 +144,7 @@ public class SubPopMunichControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(emissionTducf);
+					bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 				}
 			});
 			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
@@ -156,7 +156,7 @@ public class SubPopMunichControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
@@ -169,7 +169,7 @@ public class SubPopMunichControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
 				}
 			});
 			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (ScenarioImpl) controler.getScenario(), tollHandler));

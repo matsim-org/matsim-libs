@@ -82,7 +82,7 @@ public class VTTSspecificRouterTest {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
 			}
 		}); 		
 		
@@ -243,7 +243,7 @@ public class VTTSspecificRouterTest {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
 			}
 		}); 		
 		
@@ -319,9 +319,7 @@ public class VTTSspecificRouterTest {
 	 */
 	@Test
 	public final void test4(){
-		
-		// starts the VTTS-specific router
-		
+				
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
 		final Controler controler = new Controler(configFile);
 		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
