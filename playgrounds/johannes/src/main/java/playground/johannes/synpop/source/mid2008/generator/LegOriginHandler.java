@@ -19,12 +19,12 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -37,9 +37,9 @@ public class LegOriginHandler implements LegAttributeHandler {
 		String origin = attributes.get(VariableNames.LEG_ORIGIN);
 
 		if(origin.equalsIgnoreCase("1"))
-			leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityType.HOME);
+			leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityTypes.HOME);
 		else if(origin.equalsIgnoreCase("2"))
-			leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityType.WORK);
+			leg.setAttribute(MiDKeys.LEG_ORIGIN, ActivityTypes.WORK);
 		else if(origin.equalsIgnoreCase("3"))
 			leg.setAttribute(MiDKeys.LEG_ORIGIN, MiDValues.IN_TOWN);
 		else if(origin.equalsIgnoreCase("4"))

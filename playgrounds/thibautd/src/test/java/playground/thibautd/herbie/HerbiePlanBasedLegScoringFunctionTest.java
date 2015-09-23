@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,7 +38,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -43,7 +51,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -60,9 +67,11 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
-import java.util.*;
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
+import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
  * @author thibautd
@@ -171,7 +180,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		act.setEndTime( 100 );
 		((ActivityImpl) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
 		Leg l = plan.createAndAddLeg( TransportMode.transit_walk );
-		GenericRoute route = new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
+		Route route = new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
 		l.setRoute( route );
 		l.setDepartureTime( 123 );
 		l.setTravelTime( 456 );
@@ -254,9 +263,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initFacilities() {
 		facilities = new ActivityFacilitiesImpl();
-		ActivityFacilityImpl fac = facilities.createAndAddFacility( Id.create( "h" , ActivityFacility.class ) , new Coord((double) 0, (double) 0));
+		ActivityFacilityImpl fac = facilities.createAndAddFacility( Id.create( "h" , ActivityFacility.class ) , new Coord(0, 0));
 		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( 0 , 24 * 3600 ) );
-		fac = facilities.createAndAddFacility( Id.create( "w" , ActivityFacility.class) , new Coord((double) 0, (double) 0));
+		fac = facilities.createAndAddFacility( Id.create( "w" , ActivityFacility.class) , new Coord(0, 0));
 		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( 7 , 20 * 3600 ) );
 	}
 
@@ -287,10 +296,10 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initNetwork() {
 		NetworkImpl nImpl = (NetworkImpl) ScenarioUtils.createScenario( config ).getNetwork();
-		Node n1 = nImpl.createAndAddNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
-		Node n2 = nImpl.createAndAddNode( Id.create( 2, Node.class ) , new Coord((double) 1, (double) 0));
-		Node n3 = nImpl.createAndAddNode( Id.create( 3, Node.class ) , new Coord((double) 1, (double) 2));
-		Node n4 = nImpl.createAndAddNode( Id.create( 4, Node.class ) , new Coord((double) 4, (double) 2));
+		Node n1 = nImpl.createAndAddNode( Id.create( 1, Node.class ) , new Coord(0, 0));
+		Node n2 = nImpl.createAndAddNode( Id.create( 2, Node.class ) , new Coord(1, 0));
+		Node n3 = nImpl.createAndAddNode( Id.create( 3, Node.class ) , new Coord(1, 2));
+		Node n4 = nImpl.createAndAddNode( Id.create( 4, Node.class ) , new Coord(4, 2));
 
 		nImpl.createAndAddLink( Id.create( 12 , Link.class ) , n1 , n2 , 1 , 1 , 1 , 1 );
 		nImpl.createAndAddLink( Id.create( 13 , Link.class ) , n1 , n3 , 1 , 1 , 1 , 1 );

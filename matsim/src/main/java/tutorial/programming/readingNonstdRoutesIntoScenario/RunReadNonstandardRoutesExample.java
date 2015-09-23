@@ -31,7 +31,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,18 +52,103 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunReadNonstandardRoutesExample {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
-		modeRouteFactory.setRouteFactory( "mySpecialMode" , new RouteFactory(){
+		modeRouteFactory.setRouteFactory(MySpecialRoute.class, new RouteFactory() {
 			@Override
 			public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
-				// TODO Auto-generated method stub
-				return null;
-			}} );
-		ScenarioUtils.loadScenario( scenario );
-		Controler controler = new Controler( scenario ) ;
-		controler.run() ;
+				return new MySpecialRoute(startLinkId, endLinkId);
+			}
+			@Override
+			public String getCreatedRouteType() {
+				return MySpecialRoute.ROUTE_TYPE;
+			}
+		});
+		ScenarioUtils.loadScenario(scenario);
+		Controler controler = new Controler(scenario);
+		controler.run();
+
+	}
+
+	public static class MySpecialRoute implements Route {
+
+		/*package*/ final static String ROUTE_TYPE = "mySpecialType";
+		
+		public MySpecialRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
+			// TODO Auto-generated method stub
+		}
+		
+		@Override
+		public double getDistance() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setDistance(double distance) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public double getTravelTime() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setTravelTime(double travelTime) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public Id<Link> getStartLinkId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Id<Link> getEndLinkId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setStartLinkId(Id<Link> linkId) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void setEndLinkId(Id<Link> linkId) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public String getRouteDescription() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setRouteDescription(String routeDescription) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public String getRouteType() {
+			return ROUTE_TYPE;
+		}
+
+		@Override
+		public Route clone() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
 	}
 

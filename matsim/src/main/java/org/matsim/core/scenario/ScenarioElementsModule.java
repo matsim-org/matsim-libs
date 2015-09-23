@@ -25,6 +25,7 @@ package org.matsim.core.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -32,7 +33,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class ScenarioElementsModule extends AbstractModule {
-    
+
+    public ScenarioElementsModule() {
+    }
+
+    public ScenarioElementsModule(Config config) {
+        super(config);
+    }
+
     @Override
     public void install() {
         bind(Network.class).toProvider(NetworkProvider.class);

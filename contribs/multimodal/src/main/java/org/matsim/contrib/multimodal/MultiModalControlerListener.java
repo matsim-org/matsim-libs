@@ -20,20 +20,15 @@
 
 package org.matsim.contrib.multimodal;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.CollectionUtils;
+import java.util.Map;
 
 import javax.inject.Inject;
-import java.util.Map;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalControlerListener implements StartupListener {
 
@@ -55,14 +50,6 @@ public class MultiModalControlerListener implements StartupListener {
                     "It must be enabled since otherwise also link travel times of multi-modal legs would be " +
                     "taken into account!");
         }
-
-		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-
-		// ensure that NetworkRoutes are created for legs using one of the simulated modes
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
-		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
-			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
-		}
 	}
 
 }

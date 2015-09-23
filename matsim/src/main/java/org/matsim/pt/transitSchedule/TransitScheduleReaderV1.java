@@ -20,10 +20,15 @@
 
 package org.matsim.pt.transitSchedule;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimSomeReader;
@@ -33,11 +38,14 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
-
-import java.util.*;
 
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
@@ -159,7 +167,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 				if (this.currentRouteProfile.lastLinkId == null) {
 					this.currentRouteProfile.lastLinkId = this.currentRouteProfile.firstLinkId;
 				}
-				route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
+				route = this.routeFactory.createRoute(NetworkRoute.class, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
 				route.setLinkIds(this.currentRouteProfile.firstLinkId, this.currentRouteProfile.linkIds, this.currentRouteProfile.lastLinkId);
 			}
 			TransitRoute transitRoute = this.schedule.getFactory().createTransitRoute(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);

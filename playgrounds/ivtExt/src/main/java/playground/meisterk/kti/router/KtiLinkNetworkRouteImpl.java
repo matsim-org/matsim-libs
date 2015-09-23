@@ -23,7 +23,6 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
@@ -38,6 +37,8 @@ import playground.meisterk.org.matsim.config.PlanomatConfigGroup.SimLegInterpret
  */
 public class KtiLinkNetworkRouteImpl extends LinkNetworkRouteImpl {
 
+	/*package*/ final static String ROUTE_TYPE = "links";
+	
 	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	final private Network network;
 
@@ -50,7 +51,7 @@ public class KtiLinkNetworkRouteImpl extends LinkNetworkRouteImpl {
 	@Override
 	public double getDistance() {
 
-		double distance = RouteUtils.calcDistance((NetworkRoute)this, this.network);
+		double distance = RouteUtils.calcDistance(this, this.network);
 
 		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
 			switch (this.simLegInterpretation) {

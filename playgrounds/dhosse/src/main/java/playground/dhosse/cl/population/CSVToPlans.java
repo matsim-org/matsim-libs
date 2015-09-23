@@ -1,6 +1,7 @@
 package playground.dhosse.cl.population;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -42,8 +44,9 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
 	
-	private final String carAvail = "carAvail";
-	
+	private final String carUsers = "carUsers"; 	//Attribute name for subpopulation
+	private final String carAvail = "carAvail";		//Attribute value for subpopulation -> car is available
+
 	private final String shapefile;
 	private final String outputDirectory;
 	
@@ -57,6 +60,7 @@ public class CSVToPlans {
 	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
 	private Map<String, Coord> hogarId2Coord = new HashMap<>();
 	private Map<String,String> comunaName2Id = new HashMap<>();
+	private Map<String,String> agentId2carLicenceAttr = new TreeMap<String,String>();
 	
 	private static final Logger log = Logger.getLogger(CSVToPlans.class);
 	private final Config config;
@@ -522,9 +526,14 @@ public class CSVToPlans {
 						
 					String legMode = this.getLegMode(Integer.valueOf(etapa.getMode()));
 					
+					//here are persons using a car (leg mode) who have neither a driver licence or a car.... 
+					//write the information for the decision to a map and write this data later to a file
+					//; can be commented - no influence on functionality
+					agentId2carLicenceAttr.put(persona.getId(), " has car: " + persona.hasCar()  + " ,  driving licence: "+  persona.hasDrivingLicence() + " , car or pt user: " + isCarOrPTUser(legMode));
+					
 					if(persona.hasCar() && persona.hasDrivingLicence() && isCarOrPTUser(legMode)){
-						agentAttributes.putAttribute(person.getId().toString(), this.carAvail, this.carAvail);
-					}
+						agentAttributes.putAttribute(person.getId().toString(), this.carUsers, this.carAvail);
+					} 
 					
 					Leg leg = popFactory.createLeg(legMode);
 					
@@ -581,6 +590,22 @@ public class CSVToPlans {
 		for(String mode : this.legMode2NumberOfShotLegs.keySet()){
 			log.info("Shot " + this.legMode2NumberOfShotLegs.get(mode) + " " + mode + " legs.");
 		}
+		
+		//export the information on which the decision carAvail true/false bases to file. ; can be commented - no influence on functionality
+		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDirectory + "AgentCarAvailAttributes.txt");
+		try {
+			
+			for (String id : agentId2carLicenceAttr.keySet()){
+					writer.write(id + ":" + agentId2carLicenceAttr.get(id));
+					writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		
 	}
 	

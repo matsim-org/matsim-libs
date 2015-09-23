@@ -325,7 +325,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				}
 
 				for (ZoneDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					log.info("here");
+					//log.info("here");
 					zoneDataExchangeInterface.setZoneAccessibilities(origin, fromNode, accessibilities);
 				}
 			}

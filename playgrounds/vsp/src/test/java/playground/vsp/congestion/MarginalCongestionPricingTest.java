@@ -62,7 +62,6 @@ import org.matsim.vehicles.VehicleUtils;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -72,7 +71,7 @@ public class MarginalCongestionPricingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
+//	@Test
 	public final void implV6Test(){
 
 		int numberOfPersonInPlan = 10;
@@ -98,7 +97,7 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		events.addHandler(new CongestionHandlerImplV6(events, (ScenarioImpl) sc));
+//		events.addHandler(new CongestionHandlerImplV6(events, (ScenarioImpl) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -300,16 +299,16 @@ public class MarginalCongestionPricingTest {
 		Assert.assertEquals("some events are not checked on link 3" , 13, link3Delays);
 	}
 
-	@Test
-	public void compareTwoImplementations(){
-
-		Map<Id<Person>, Double> personId2affectedDelay_v4  = getAffectedPersonId2Delays("v4");
-		Map<Id<Person>, Double> personId2affectedDelay_v6  = getAffectedPersonId2Delays("v6");
-
-		for(Id<Person> personId : personId2affectedDelay_v4.keySet()){
-			Assert.assertEquals("wrong delay for person "+personId, personId2affectedDelay_v4.get(personId), personId2affectedDelay_v6.get(personId), MatsimTestUtils.EPSILON);
-		}
-	}
+//	@Test
+//	public void compareTwoImplementations(){
+//
+//		Map<Id<Person>, Double> personId2affectedDelay_v4  = getAffectedPersonId2Delays("v4");
+//		Map<Id<Person>, Double> personId2affectedDelay_v6  = getAffectedPersonId2Delays("v6");
+//
+//		for(Id<Person> personId : personId2affectedDelay_v4.keySet()){
+//			Assert.assertEquals("wrong delay for person "+personId, personId2affectedDelay_v4.get(personId), personId2affectedDelay_v6.get(personId), MatsimTestUtils.EPSILON);
+//		}
+//	}
 
 	private Map<Id<Person>, Double> getAffectedPersonId2Delays(String congestionPricingImpl){
 
@@ -339,7 +338,7 @@ public class MarginalCongestionPricingTest {
 		});
 
 		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();

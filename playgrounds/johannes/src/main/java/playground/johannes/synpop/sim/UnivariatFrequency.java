@@ -19,14 +19,14 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.sim.data.CachedElement;
+import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -50,7 +50,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private double hamiltonianValue;
 
-    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements,
+    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
         this.discretizer = discretizer;
         this.attrKey = attrKey;
@@ -59,14 +59,15 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         simFreq = initHistogram(simElements, attrKey);
 
         scaleFactor = simElements.size()/(double)refElements.size();
-        normFactor = simElements.size();
+        normFactor = 1;//simElements.size();
 
         int size = Math.max(simFreq.size(), refFreq.size());
         for(int i = 0; i < size; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
 
-            hamiltonianValue += Math.abs(simVal - refVal)/ normFactor;
+//            hamiltonianValue += (Math.abs(simVal - refVal)/ refVal)/normFactor;
+            hamiltonianValue += calculateError(simVal, refVal)/normFactor;
         }
     }
 
@@ -103,19 +104,32 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     private double changeBucketContent(int bucketIndex, int value) {
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double oldDiff = Math.abs(simVal - refVal);
+//        double oldDiff = Math.abs(simVal - refVal)/refVal;
+        double oldDiff = calculateError(simVal, refVal);
 
         simFreq.set(bucketIndex, simFreq.get(bucketIndex) + value);
 
         simVal = simFreq.get(bucketIndex);
         refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double newDiff = Math.abs(simVal - refVal);
+//        double newDiff = Math.abs(simVal - refVal)/refVal;
+        double newDiff = calculateError(simVal, refVal);
 
         return newDiff - oldDiff;
     }
 
     @Override
-    public double evaluate(Person person) {
+    public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
+
+    private double calculateError(double simVal, double refVal) {
+//        return Math.abs(simVal - refVal);
+        if(refVal > 0) {
+            return Math.abs(simVal - refVal)/refVal;
+        } else {
+            if(simVal == 0) return 0;
+            else return 1;
+        }
+    }
+
 }

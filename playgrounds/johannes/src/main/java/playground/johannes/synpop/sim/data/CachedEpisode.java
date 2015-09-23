@@ -40,12 +40,16 @@ public class CachedEpisode extends CachedElement implements Episode {
 
         activities = new ArrayList<>(delegate.getActivities().size());
         for(Segment activity : delegate.getActivities()) {
-            activities.add(new CachedSegment(activity));
+            CachedSegment s = new CachedSegment(activity);
+            s.setEpisode(this, false);
+            activities.add(s);
         }
 
         legs = new ArrayList<>(delegate.getLegs().size());
         for(Segment leg : delegate.getLegs()) {
-            legs.add(new CachedSegment(leg));
+            CachedSegment s = new CachedSegment(leg);
+            s.setEpisode(this, true);
+            legs.add(s);
         }
     }
 
@@ -71,6 +75,16 @@ public class CachedEpisode extends CachedElement implements Episode {
     public void addLeg(Segment leg) {
         throw new UnsupportedOperationException("Structural modification not allowed.");
 //        ((Episode)getDelegate()).addLeg(leg);
+    }
+
+    @Override
+    public void insertActivity(Segment activity, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
+    }
+
+    @Override
+    public void insertLeg(Segment leg, int index) {
+        throw new UnsupportedOperationException("Structural modification not allowed.");
     }
 
     @Override

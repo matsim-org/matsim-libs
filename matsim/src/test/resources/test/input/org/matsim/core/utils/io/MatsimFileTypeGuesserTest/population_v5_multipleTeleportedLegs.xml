@@ -9,13 +9,13 @@
 		<plan selected="yes">
 			<act type="h" link="1" />
 			<leg mode="walk" trav_time="00:03:21">
-				<route></route>
+				<route type="generic" start_link="1" end_link="2"></route>
 			</leg>
 			<leg mode="car">
 				<route type="links">2 3 4</route>
 			</leg>
 			<leg mode="walk" trav_time="00:04:32">
-				<route></route>
+				<route type="generic" start_link="4" end_link="6"></route>
 			</leg>
 			<act type="h" link="6" />
 		</plan>

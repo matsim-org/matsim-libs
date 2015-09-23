@@ -1,5 +1,6 @@
 package scenarios.braess.run;
 
+import java.io.File;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
@@ -11,19 +12,26 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 import scenarios.analysis.TtControlerListener;
@@ -35,8 +43,8 @@ import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
- * Class to run a simulation of the braess scenario without signals. It also
- * analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * Class to run a simulation of the braess scenario with or without signals. 
+ * It analyzes the simulation with help of AnalyseBraessSimulation.java.
  * 
  * @author tthunig
  * 
@@ -49,23 +57,25 @@ public class RunBraessSimulation {
 	/* population parameter */
 	// If false, agents are initialized without any routes. If true, with all
 	// three possible routes.
-	private final boolean INIT_WITH_ALL_ROUTES = true;
+	private final boolean INIT_WITH_ALL_ROUTES = false;
 	// initial score for all initial plans
 	private final Double INIT_PLAN_SCORE = 110.;
 
-	/// defines which kind of signals should be used: ALL_GREEN, ONE_SECOND_Z, GREEN_WAVE_Z, GREEN_WAVE_SO
-	private final SignalControlType SIGNAL_TYPE = SignalControlType.GREEN_WAVE_SO;
+	/// defines which kind of signals should be used
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	
 	// defines which kind of lanes should be used: NONE, TRIVIAL or REALISTIC
-	private static final LaneType LANE_TYPE = LaneType.REALISTIC;
+	private static final LaneType LANE_TYPE = LaneType.NONE;
 
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private final double SIGMA = 0.0;	
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
-	private static String INIT_FILE_DIR = DgPaths.SHAREDSVN + "projects/cottbus/data/scenarios/braess_scenario/testRun/";
-
+	
+	private static String OUTPUT_BASE_DIR = DgPaths.RUNSSVN + "braess/withoutSignalsWithoutLanes/";
+//	private static String OUTPUT_BASE_DIR = "/Users/nagel/kairuns/braess/output";
+	
 	/**
 	 * prepare, run and analyze the Braess simulation
 	 */
@@ -87,6 +97,9 @@ public class RunBraessSimulation {
 					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
 			createSignals(scenario);
 		}
+		
+		if (WRITE_INITIAL_FILES) 
+			writeInitFiles(scenario);
 		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
@@ -113,7 +126,7 @@ public class RunBraessSimulation {
 		
 		// add a controller listener to analyze results
 		controler.addControlerListener(new TtControlerListener(scenario, new TtAnalyzeBraess()));
-		
+
 		// run the simulation
 		controler.run();
 	}
@@ -129,19 +142,20 @@ public class RunBraessSimulation {
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils
 				.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 						SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems( true );
+		signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
-		config.controler().setLinkToLinkRoutingEnabled( true );
+		boolean link2linkRouting = false;
+		config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
 		
-		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes( true );
+		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
 		// set travelTimeBinSize
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 600 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -152,7 +166,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			strat.setWeight( 0.0 ) ;
+			strat.setWeight( 0.1 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -166,7 +180,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 1.0 ) ;
+			strat.setWeight( 0.9 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -199,10 +213,9 @@ public class RunBraessSimulation {
 		// use -0.000015 to approximately balance the utility of travel time and
 		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
 		// use -0.0 to use only time.)
-		double monetaryDistanceRateCar = -0.0;
-		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );		
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
 		
 		config.vspExperimental().setWritingOutputEvents(true);
@@ -215,36 +228,27 @@ public class RunBraessSimulation {
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
 		
-		// TODO enable this if you need the conig file
-//		if (WRITE_INITIAL_FILES){
-//			new ConfigWriter(config).write(INIT_FILE_DIR + "config.xml");
-//		}
-		
 		return config;
 	}
 
 	private static void createNetwork(Scenario scenario) {	
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
-		netCreator.setUseBTUProperties( true );
+		netCreator.setUseBTUProperties( false );
 		netCreator.setSimulateInflowCap( true );
 		netCreator.setMiddleLinkExists( true );
 		netCreator.setLaneType( LANE_TYPE );
 		netCreator.createNetworkAndLanes();
-		
-		if (WRITE_INITIAL_FILES) netCreator.writeNetworkAndLanes(INIT_FILE_DIR);
 	}
 
 	private void createPopulation(Scenario scenario) {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons( 3600 );
+		popCreator.setNumberOfPersons( 2000 );
 		
 		popCreator.createPersons(INIT_WITH_ALL_ROUTES ? TtCreateBraessPopulation.InitRoutes.ALL
 				: TtCreateBraessPopulation.InitRoutes.NONE, INIT_PLAN_SCORE);
-		
-		if (WRITE_INITIAL_FILES) popCreator.writePopulation(INIT_FILE_DIR + "plans3600.xml");
 	}
 
 	private void createSignals(Scenario scenario) {
@@ -253,8 +257,6 @@ public class RunBraessSimulation {
 		signalsCreator.setLaneType( LANE_TYPE );
 		signalsCreator.setSignalType( SIGNAL_TYPE );
 		signalsCreator.createSignals();
-		
-		if (WRITE_INITIAL_FILES) signalsCreator.writeSignalFiles(INIT_FILE_DIR);
 	}
 
 	private void createRunNameAndOutputDir(Scenario scenario) {
@@ -352,11 +354,37 @@ public class RunBraessSimulation {
 			runName += "_" + SIGNAL_TYPE;
 		}
 
-		String outputDir = DgPaths.RUNSSVN + "braess/withSignals/" + runName + "/"; //TODO change this, e.g. when considering tolls
-//		outputDir = "/Users/nagel/kairuns/braess/output";
+		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
+		// create directory
+		new File(outputDir).mkdir();
 
 		config.controler().setOutputDirectory(outputDir);
 		log.info("The output will be written to " + outputDir);
+	}
+
+	private void writeInitFiles(Scenario scenario) {
+		String outputDir = scenario.getConfig().controler().getOutputDirectory() + "initialFiles/";
+		// create directory
+		new File(outputDir).mkdir();
+		
+		// write network and lanes
+		new NetworkWriter(scenario.getNetwork()).write(outputDir + "network.xml");
+		if (!LANE_TYPE.equals(LaneType.NONE)) 
+			new LaneDefinitionsWriter20(scenario.getLanes()).write(outputDir + "lanes.xml");
+		
+		// write population
+		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");
+		
+		// write signal files
+		if (!SIGNAL_TYPE.equals(SignalControlType.NONE)) {
+			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(outputDir + "signalSystems.xml");
+			new SignalControlWriter20(signalsData.getSignalControlData()).write(outputDir + "signalControl.xml");
+			new SignalGroupsWriter20(signalsData.getSignalGroupsData()).write(outputDir + "signalGroups.xml");
+		}
+		
+		// write config
+		new ConfigWriter(scenario.getConfig()).write(outputDir + "config.xml");
 	}
 
 	public static void main(String[] args) {

@@ -59,12 +59,8 @@ public class IOUtilsTest {
 
 		File l = new File(outDir + OutputDirectoryLogging.LOGFILE);
 		File errorLog = new File(outDir + OutputDirectoryLogging.WARNLOGFILE);
-		Assert.assertNotNull(l);
-		Assert.assertNotNull(errorLog);
 		Assert.assertTrue(l.exists());
 		Assert.assertTrue(errorLog.exists());
-		Assert.assertEquals(0, l.length());
-		Assert.assertEquals(0, errorLog.length());
 	}
 
 	/**

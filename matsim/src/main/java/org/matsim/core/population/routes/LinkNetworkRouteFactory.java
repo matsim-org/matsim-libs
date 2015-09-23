@@ -34,4 +34,9 @@ public class LinkNetworkRouteFactory implements RouteFactory {
 		return new LinkNetworkRouteImpl(startLinkId, endLinkId);
 	}
 
+	@Override
+	public String getCreatedRouteType() {
+		return LinkNetworkRouteImpl.ROUTE_TYPE;
+	}
+	
 }

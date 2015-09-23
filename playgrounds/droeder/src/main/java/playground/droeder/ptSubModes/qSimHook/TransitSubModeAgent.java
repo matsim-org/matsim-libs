@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -188,7 +187,7 @@ class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverP
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
@@ -205,7 +204,7 @@ class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverP
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

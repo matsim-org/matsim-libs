@@ -24,13 +24,14 @@ import gnu.trove.TObjectDoubleIterator;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.gsv.synPop.data.*;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.PersonsTask;
 
 import java.util.*;
 
@@ -38,7 +39,7 @@ import java.util.*;
  * @author johannes
  * 
  */
-public class InitHomeLocations implements ProxyPersonsTask {
+public class InitHomeLocations implements PersonsTask {
 
 	private static final Logger logger = Logger.getLogger(InitHomeLocations.class);
 
@@ -52,7 +53,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 	}
 
 	@Override
-	public void apply(Collection<PlainPerson> persons) {
+	public void apply(Collection<? extends Person> persons) {
 		LandUseData landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
 
 		// ZoneLayer<Map<String, Object>> zoneLayer =
@@ -78,7 +79,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 
 		FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		Map<Zone<?>, List<ActivityFacility>> zoneFacilities = new IdentityHashMap<>(zones.size());
-		List<ActivityFacility> homeFacils = facilityData.getFacilities(ActivityType.HOME);
+		List<ActivityFacility> homeFacils = facilityData.getFacilities(ActivityTypes.HOME);
 		ProgressLogger.init(homeFacils.size(), 2, 10);
 		for (ActivityFacility facility : homeFacils) {
 			Zone<?> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(facility.getCoord()));
@@ -101,7 +102,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 
 		logger.info("Assigning facilities to persons...");
 		ProgressLogger.init(persons.size(), 2, 10);
-		List<PlainPerson> shuffledPersons = new ArrayList<>(persons);
+		List<Person> shuffledPersons = new ArrayList<>(persons);
 		Collections.shuffle(shuffledPersons, random);
 		TObjectDoubleIterator<Zone<?>> it = zoneProba.iterator();
 		int j = 0;
@@ -115,7 +116,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 				}
 				for (int k = j; k < (j + n); k++) {
 					ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
-					shuffledPersons.get(k).setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
+					((PlainPerson)shuffledPersons.get(k)).setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
 
 					ProgressLogger.step();
 				}
@@ -126,10 +127,10 @@ public class InitHomeLocations implements ProxyPersonsTask {
 		
 		logger.info("Checking for homeless persons...");
 		int cnt = 0;
-		for(PlainPerson person : shuffledPersons) {
-			if(person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
+		for(Person person : shuffledPersons) {
+			if(((PlainPerson)person).getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
 				ActivityFacility f = homeFacils.get(random.nextInt(homeFacils.size()));
-				person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
+				((PlainPerson)person).setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);
 				cnt++;
 			}
 		}

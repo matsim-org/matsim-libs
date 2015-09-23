@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
  * A module using reflection for easy implementation of config groups.
@@ -76,7 +77,7 @@ import org.matsim.api.core.v01.Id;
  *
  * @author thibautd
  */
-public abstract class ReflectiveConfigGroup extends ConfigGroup {
+public abstract class ReflectiveConfigGroup extends ConfigGroup implements MatsimExtensionPoint {
 	private static final Logger log =
 		Logger.getLogger(ReflectiveConfigGroup.class);
 

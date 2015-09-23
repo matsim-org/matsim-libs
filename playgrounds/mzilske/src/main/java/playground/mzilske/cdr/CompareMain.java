@@ -1,8 +1,10 @@
 package playground.mzilske.cdr;
 
-import com.telmomenezes.jfastemd.Feature;
-import com.telmomenezes.jfastemd.JFastEMD;
-import com.telmomenezes.jfastemd.Signature;
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -22,16 +24,16 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Arrays;
+import com.telmomenezes.jfastemd.Feature;
+import com.telmomenezes.jfastemd.JFastEMD;
+import com.telmomenezes.jfastemd.Signature;
+
+import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
 @Singleton
 public class CompareMain {
@@ -213,9 +215,7 @@ public class CompareMain {
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
-
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario2.setNetwork(network);
+		final Scenario scenario2 = new ScenarioBuilder(config).setNetwork(network).build() ;
 
 		PopulationFromSightings.createPopulationWithTwoPlansEach(scenario2, linkToZoneResolver, allSightings);
 //		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);

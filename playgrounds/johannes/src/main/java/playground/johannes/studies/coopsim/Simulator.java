@@ -30,6 +30,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,13 +42,13 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.vehicles.Vehicle;
@@ -123,6 +124,7 @@ import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
 import playground.johannes.socialnetworks.statistics.PowerLawDistribution;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.utils.NetworkLegRouter;
 
 /**
  * @author illenberger
@@ -299,8 +301,7 @@ public class Simulator {
 	}
 	
 	private static void loadPlans(String file) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario.setNetwork(network);
+		Scenario scenario = new ScenarioBuilder(config).setNetwork(network).build() ;
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(file);
 		Population pop = scenario.getPopulation();

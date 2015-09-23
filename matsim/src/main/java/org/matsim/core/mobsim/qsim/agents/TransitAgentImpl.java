@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -90,7 +89,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();

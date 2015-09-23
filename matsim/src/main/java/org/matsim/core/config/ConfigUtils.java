@@ -20,6 +20,7 @@
 package org.matsim.core.config;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -29,7 +30,7 @@ import java.util.Iterator;
 /**
  * @author mrieser
  */
-public abstract class ConfigUtils {
+public abstract class ConfigUtils implements MatsimExtensionPoint {
 	
 	public static Config createConfig() {
 		Config config = new Config();

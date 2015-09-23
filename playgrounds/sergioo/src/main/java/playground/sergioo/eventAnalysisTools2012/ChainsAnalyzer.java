@@ -38,7 +38,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.population.routes.GenericRoute;
 
 
 public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, PersonStuckEventHandler {
@@ -87,7 +86,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 					Id<Person> personId =  activityChain.getKey();
 					String plan = personId+": ";
 					for(PlanElement planElement:population.getPersons().get(personId).getSelectedPlan().getPlanElements())
-						plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
+						plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+(((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
 					writer.println(plan);
 					String chain = activityChain.getKey()+": ";
 					for(String activity:activityChain.getValue())

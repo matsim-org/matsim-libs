@@ -122,10 +122,11 @@ public class AmenitySink implements Sink {
 //	}
 
 	private void processFacilities(ActivityFacilitiesFactory aff,
-			Map<Long,? extends EntityContainer> nodeMap) {
-		for(long n : nodeMap.keySet()){
-			Entity entity = nodeMap.get(n).getEntity();
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long n : entityMap.keySet()){
+			Entity entity = entityMap.get(n).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			
 			/* Check amenities */
 			String amenity = tags.get("amenity");
 			String matsimType = null;
@@ -133,11 +134,11 @@ public class AmenitySink implements Sink {
 				matsimType = getActivityType(amenity);
 			}
 			if(matsimType != null){
-				String activityType = getActivityType(amenity);
+				//String activityType = getActivityType(amenity);
 				String name = tags.get("name");
 				if(name != null){
 					/* Check education level. */
-					if(activityType.equalsIgnoreCase("e")){
+					if(matsimType.equalsIgnoreCase("e")){
 						getEducationLevel(name);
 					}					
 				} else{
@@ -146,7 +147,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				//Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -156,11 +157,12 @@ public class AmenitySink implements Sink {
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
-				ActivityOption ao = aff.createActivityOption(activityType);
+				ActivityOption ao = aff.createActivityOption(matsimType);
 				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
 			}
+			
 			/* Check shops */
 			String shops = tags.get("shop");
 			if(shops != null){
@@ -171,7 +173,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 //				Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){

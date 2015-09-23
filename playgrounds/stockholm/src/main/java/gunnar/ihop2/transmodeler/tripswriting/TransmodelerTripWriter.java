@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -19,15 +20,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
-class TransmodelerTripWriter {
+public class TransmodelerTripWriter {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -39,12 +44,14 @@ class TransmodelerTripWriter {
 	private static final String DesID = "DesID";
 	private static final String OriType = "OriType";
 	private static final String DesType = "DesType";
+	private static final String Class = "Class";
 	private static final String OriLink = "OriLink";
 	private static final String Path = "Path";
 	private static final String EndLink = "EndLink";
 	private static final String DepTime = "DepTime";
 
 	private static final String Node = "Node";
+	private static final String PC1 = "PC1";
 
 	// -------------------- MEMBERS --------------------
 
@@ -77,8 +84,8 @@ class TransmodelerTripWriter {
 		final TabularFileWriter tripWriter = new TabularFileWriter();
 		tripWriter.setNoDataValue("");
 		tripWriter.setSeparator(",");
-		tripWriter.addKeys(ID, OriID, DesID, OriType, DesType, OriLink, Path,
-				EndLink, DepTime);
+		tripWriter.addKeys(ID, OriID, DesID, OriType, DesType, Class, OriLink,
+				Path, EndLink, DepTime);
 		tripWriter.open(tripFileName);
 
 		for (Map.Entry<Id<Person>, ? extends Person> id2personEntry : this.population
@@ -86,7 +93,7 @@ class TransmodelerTripWriter {
 			final Plan plan = id2personEntry.getValue().getSelectedPlan();
 			if (plan != null) {
 				for (PlanElement planElement : plan.getPlanElements()) {
-					if (planElement instanceof Leg) { // TODO Use "instanceof"?
+					if (planElement instanceof Leg) {
 						final Leg leg = (Leg) planElement;
 						if (car.equals(leg.getMode())) {
 							final NetworkRoute route = (NetworkRoute) leg
@@ -105,7 +112,22 @@ class TransmodelerTripWriter {
 								linkIds.add(route.getStartLinkId());
 								linkIds.addAll(route.getLinkIds());
 
-								// Avoid double-storing identical paths.
+								/*
+								 * Avoid double-storing identical paths.
+								 * 
+								 * TODO: This does hopefully NOT remove the
+								 * one-on-one coupling between persons and paths
+								 * because the trips still have unique IDs. But
+								 * TM then also writes trip- and not
+								 * vehicle-specific events. Possible solutions:
+								 * 
+								 * (1) Give a person_id -> {trip_id} mapping to
+								 * TM and let it use person_id instead of all
+								 * corresponding {trip_id}.
+								 * 
+								 * (2) Let TM write events per trip and
+								 * re-assemble this somehow within MATSim.
+								 */
 								Integer pathId = linkIds2pathId.get(linkIds);
 								if (pathId == null) {
 									pathId = linkIds2pathId.size();
@@ -129,6 +151,7 @@ class TransmodelerTripWriter {
 								tripWriter.setValue(DesID, toNodeId);
 								tripWriter.setValue(OriType, Node);
 								tripWriter.setValue(DesType, Node);
+								tripWriter.setValue(Class, PC1);
 								tripWriter.setValue(OriLink,
 										this.linkAttributes.getAttribute(
 												linkIds.get(0).toString(),
@@ -157,8 +180,33 @@ class TransmodelerTripWriter {
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 
+		System.out.println("STARTED ...");
+
+		final String networkFileName = "./data/transmodeler/network.xml";
+		final String plansFileName = "./data/saleem/10.plans.xml.gz";
+		final String linkAttributesFileName = "./data/transmodeler/linkAttributes.xml";
+
+		final String pathFileName = "./data/saleem/paths.csv";
+		final String tripFileName = "./data/saleem/trips.csv";
+
+		final Config config = ConfigUtils.createConfig();
+		config.setParam("network", "inputNetworkFile", networkFileName);
+		config.setParam("plans", "inputPlansFile", plansFileName);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		final ObjectAttributes linkAttributes = new ObjectAttributes();
+		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+				linkAttributes);
+		reader.parse(linkAttributesFileName);
+
+		final TransmodelerTripWriter tripWriter = new TransmodelerTripWriter(
+				scenario.getPopulation(), scenario.getNetwork(), linkAttributes);
+
+		tripWriter.writeTrips(pathFileName, tripFileName);
+
+		System.out.println("... DONE");
 	}
 
 }

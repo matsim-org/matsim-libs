@@ -84,15 +84,18 @@ public class PersonTripAnalysisMain {
 			throw new RuntimeException("Aborting...");
 			
 		} else {			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_config.xml";
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/output_plans.xml.gz";
+			String id = "c9";
 			
-			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/n/ITERS/it.100/100.events.xml.gz";
+			networkFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_network.xml.gz";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_config.xml";
+			
+			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
+			outputPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/detailedAnalysis/";
+			populationFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_plans.xml.gz";
+			
+			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
+			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
 		}
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
@@ -128,7 +131,7 @@ public class PersonTripAnalysisMain {
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
 		events.addHandler(congestionHandler);
-		events.addHandler(noiseHandler);
+//		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -166,17 +169,17 @@ public class PersonTripAnalysisMain {
 		
 		// noise events analysis
 	
-		if (noiseHandler.isCaughtNoiseEvent()) {
-			log.info("Noise events have already been analyzed based on the standard events file.");
-		} else {
-			EventsManager eventsNoise = EventsUtils.createEventsManager();
-			eventsNoise.addHandler(noiseHandler);
-					
-			log.info("Reading noise events file...");
-			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-			noiseEventReader.parse(noiseEventsFile);
-			log.info("Reading noise events file... Done.");	
-		}	
+//		if (noiseHandler.isCaughtNoiseEvent()) {
+//			log.info("Noise events have already been analyzed based on the standard events file.");
+//		} else {
+//			EventsManager eventsNoise = EventsUtils.createEventsManager();
+//			eventsNoise.addHandler(noiseHandler);
+//					
+//			log.info("Reading noise events file...");
+//			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
+//			noiseEventReader.parse(noiseEventsFile);
+//			log.info("Reading noise events file... Done.");	
+//		}	
 		
 		// print the results
 		

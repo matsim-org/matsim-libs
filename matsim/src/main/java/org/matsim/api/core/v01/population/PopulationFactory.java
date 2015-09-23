@@ -53,6 +53,6 @@ public interface PopulationFactory extends MatsimFactory {
 
 	Leg createLeg(String legMode);
 
-	Route createRoute(String transportMode, Id<Link> startLinkId, Id<Link> endLinkId);
+	<R extends Route> R createRoute(Class<R> routeType, Id<Link> startLinkId, Id<Link> endLinkId);
 
 }

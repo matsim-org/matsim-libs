@@ -33,6 +33,7 @@ public interface CommonKeys {
 	
 	String LEG_PURPOSE = "purpose";
 
+	@Deprecated
 	String LEG_ROUNDTRIP = "roundTrip";
 	
 	String LEG_ROUTE_DISTANCE = "routeDistance";

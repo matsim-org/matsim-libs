@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 /**
  * @author illenberger
@@ -29,6 +31,8 @@ import org.apache.log4j.Logger;
 public class LoggerUtils {
 
 	private static boolean disallowVerbose = true;
+
+	private static PatternLayout defaultLayout;
 	
 	public static void setDisallowVerbose(boolean disallow) {
 		disallowVerbose = disallow;
@@ -41,5 +45,17 @@ public class LoggerUtils {
 			Logger.getRootLogger().setLevel(Level.WARN);
 		}
 			
+	}
+
+	public static void disableNewLine() {
+		Appender appender = Logger.getRootLogger().getAppender("stdout");
+		defaultLayout = (PatternLayout)appender.getLayout();
+		PatternLayout newLayout = new PatternLayout(defaultLayout.getConversionPattern().replace("%n",""));
+		appender.setLayout(newLayout);
+	}
+
+	public static void enableNewLine() {
+		Appender appender = Logger.getRootLogger().getAppender("stdout");
+		appender.setLayout(defaultLayout);
 	}
 }

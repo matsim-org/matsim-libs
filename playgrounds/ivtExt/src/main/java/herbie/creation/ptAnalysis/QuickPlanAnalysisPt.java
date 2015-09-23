@@ -8,7 +8,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,12 +19,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -188,18 +184,16 @@ public class QuickPlanAnalysisPt {
 		
 		new MatsimPopulationReader(scenario).readFile(PLANSFILE);
 		
-		((PopulationFactoryImpl) pop.getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
 		
-		
-		scenario.getConfig().scenario().setUseVehicles(true);
+//		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().transit().setUseTransit(true);
 		
-		Network network = scenario.getNetwork();
+//		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		this.transitFactory = schedule.getFactory();
-		new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
+		new TransitScheduleReaderV1(scenario).readFile(transitScheduleFile);
 		
 		Vehicles vehicles = scenario.getTransitVehicles();
 		new VehicleReaderV1(vehicles).readFile(transitVehicleFile);
@@ -266,7 +260,7 @@ public class QuickPlanAnalysisPt {
 		for(Person p : pop.getPersons().values()){
 			
 			totalNrOfAgents++;
-			Id persId = p.getId();
+			Id<Person> persId = p.getId();
 			
 			Plan plan = p.getSelectedPlan();
 			
@@ -316,9 +310,9 @@ public class QuickPlanAnalysisPt {
 				
 				if (pE instanceof Leg) {
 					LegImpl leg = (LegImpl) pE;
-					if(leg.getMode().equals("pt") && leg.getRoute() instanceof GenericRoute){
+					if(leg.getMode().equals("pt")){
 						
-						String routeDescription = ((GenericRoute)leg.getRoute()).getRouteDescription();
+						String routeDescription = (leg.getRoute()).getRouteDescription();
 						
 						
 						String[] description =  routeDescription.split(SEPARATOR);
@@ -402,7 +396,7 @@ public class QuickPlanAnalysisPt {
 		}
 	}
 
-	private void addHeadwayToBins(QuickPlanAnalysisPt recordPt, Id persId, Double score) {
+	private void addHeadwayToBins(QuickPlanAnalysisPt recordPt, Id<Person> persId, Double score) {
 		
 		double actualTT = recordPt.getTravelTime();
 		

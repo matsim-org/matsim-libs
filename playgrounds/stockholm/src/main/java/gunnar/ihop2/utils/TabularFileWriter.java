@@ -101,12 +101,16 @@ public class TabularFileWriter {
 	public void writeValues() {
 		for (Iterator<String> it = this.key2value.values().iterator(); it
 				.hasNext();) {
-			this.writer.print(this.formattedValue(it.next()));
+			final String val = it.next();
+			this.writer.print(val);
+			// System.out.print(val);
 			if (it.hasNext()) {
 				this.writer.print(this.separator);
+				// System.out.print(this.separator);
 			}
 		}
 		this.writer.println();
+		// System.out.println();
 		this.clearValues();
 	}
 
