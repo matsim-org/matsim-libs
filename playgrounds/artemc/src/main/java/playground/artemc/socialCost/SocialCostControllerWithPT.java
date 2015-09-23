@@ -96,7 +96,7 @@ public class SocialCostControllerWithPT {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindTravelDisutilityFactory().toInstance(factory);
+						bindCarTravelDisutilityFactory().toInstance(factory);
 					}
 				});
 

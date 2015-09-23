@@ -88,7 +88,7 @@ public class SocialCostControllerV2 {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindTravelDisutilityFactory().toInstance(factory);
+						bindCarTravelDisutilityFactory().toInstance(factory);
 					}
 				});
 

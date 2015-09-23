@@ -102,7 +102,7 @@ final class RunWithinDayExample implements StartupListener {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+				bindCarTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 			}
 		});
 

@@ -23,19 +23,14 @@
 package org.matsim.core.router.costcalculators;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        addTravelDisutilityFactoryBinding(TransportMode.car).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+        addTravelDisutilityFactoryBinding(TransportMode.car).to(carTravelDisutilityFactoryKey());
+        bindCarTravelDisutilityFactory().to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
     }
 
 }

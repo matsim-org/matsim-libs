@@ -82,7 +82,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//				bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //			}
 //		});
 //

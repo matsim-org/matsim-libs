@@ -82,7 +82,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+				bindCarTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 			}
 		});
 		this.initWithinDayTripRouterFactory();

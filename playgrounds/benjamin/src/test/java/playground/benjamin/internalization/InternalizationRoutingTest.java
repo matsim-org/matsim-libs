@@ -231,7 +231,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissiondcf);
+				bindCarTravelDisutilityFactory().toInstance(emissiondcf);
 			}
 		});
 	}

@@ -111,7 +111,7 @@ public class CongestionPricingControler {
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
 					public void install() {
-						this.bindTravelDisutilityFactory().toInstance( factory );
+						this.bindCarTravelDisutilityFactory().toInstance( factory );
 					}
 				}); 
 				
@@ -137,7 +137,7 @@ public class CongestionPricingControler {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+						bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 					}
 				});
 				
@@ -152,7 +152,7 @@ public class CongestionPricingControler {
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
 					public void install() {
-						this.bindTravelDisutilityFactory().toInstance( factory );
+						this.bindCarTravelDisutilityFactory().toInstance( factory );
 					}
 				}); 
 				
@@ -167,7 +167,7 @@ public class CongestionPricingControler {
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
 					public void install() {
-						this.bindTravelDisutilityFactory().toInstance( factory );
+						this.bindCarTravelDisutilityFactory().toInstance( factory );
 					}
 				}); 
 				
