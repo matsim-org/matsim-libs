@@ -28,6 +28,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -39,6 +40,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import java.util.ArrayList;
@@ -68,6 +70,8 @@ public abstract class AbstractModule implements Module {
     private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
     private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
+    private MapBinder<String, TravelDisutilityFactory> travelDisutilityFactoryMultibinder;
+    private MapBinder<String, TravelTime> travelTimeMultibinder;
 
     @Inject
     com.google.inject.Injector bootstrapInjector;
@@ -94,6 +98,8 @@ public abstract class AbstractModule implements Module {
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
         this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
+        this.travelDisutilityFactoryMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelDisutilityFactory>(){});
+        this.travelTimeMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelTime>(){});
         this.install();
     }
 
@@ -137,11 +143,19 @@ public abstract class AbstractModule implements Module {
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {
-        return bind(TravelDisutilityFactory.class);
+        return addTravelDisutilityFactoryBinding(TransportMode.car);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
+        return travelDisutilityFactoryMultibinder.addBinding(mode);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
         return bind(LeastCostPathCalculatorFactory.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
+        return travelTimeMultibinder.addBinding(mode);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {

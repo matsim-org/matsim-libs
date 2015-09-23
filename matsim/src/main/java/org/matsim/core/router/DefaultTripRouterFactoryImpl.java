@@ -106,8 +106,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
             LeastCostPathCalculator routeAlgo =
             leastCostPathCalculatorFactory.createPathCalculator(
                     filteredNetwork,
-                    routingContext.getTravelDisutility(),
-                    routingContext.getTravelTime());
+                    routingContext.getTravelDisutility(mode),
+                    routingContext.getTravelTime(mode));
 
             final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
                     filteredNetwork, routeAlgo);

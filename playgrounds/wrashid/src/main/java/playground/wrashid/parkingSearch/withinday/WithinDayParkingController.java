@@ -71,7 +71,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		this.initIdentifiers();
 	
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), this.getConfig().planCalcScore()), this.getTravelTimeCollector());
 		
 		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
 				this.getWithinDayTripRouterFactory(), routingContext);

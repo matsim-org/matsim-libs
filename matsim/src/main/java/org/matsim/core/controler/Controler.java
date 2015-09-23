@@ -20,7 +20,9 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
@@ -30,6 +32,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,8 +47,10 @@ import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -63,10 +68,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -397,7 +399,7 @@ public class Controler extends AbstractController {
 	// ******** --------- *******
 
 	public final TravelTime getLinkTravelTimes() {
-        return injector.getInstance(TravelTime.class);
+        return injector.getInstance(ReplanningContext.class).getTravelTime();
 	}
 
     /**
@@ -461,7 +463,8 @@ public class Controler extends AbstractController {
 	}
 
     public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(TravelDisutilityFactory.class);
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
+				.get(TransportMode.car);
 	}
 
 	public final javax.inject.Provider<TransitRouter> getTransitRouterFactory() {

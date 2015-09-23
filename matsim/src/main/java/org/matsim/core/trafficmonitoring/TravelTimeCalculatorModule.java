@@ -24,6 +24,7 @@ package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
@@ -60,11 +61,11 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // I don't say "asSingleton" here, because I don't need to care -
         // The TravelTimeCalculator is the singleton, and the TravelTime reference can be
         // fetched from it as often as the framework wants.
-        bind(TravelTime.class).toProvider(TravelTimeProvider.class);
+        addTravelTimeBinding(TransportMode.car).toProvider(FromTravelTimeCalculator.class);
         bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
     }
 
-    static class TravelTimeProvider implements Provider<TravelTime> {
+    private static class FromTravelTimeCalculator implements Provider<TravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;
@@ -76,7 +77,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     }
 
-    static class LinkToLinkTravelTimeProvider implements Provider<LinkToLinkTravelTime> {
+    private static class LinkToLinkTravelTimeProvider implements Provider<LinkToLinkTravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;
@@ -88,7 +89,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     }
 
-    static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
+    private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
         @Inject
         Scenario scenario;

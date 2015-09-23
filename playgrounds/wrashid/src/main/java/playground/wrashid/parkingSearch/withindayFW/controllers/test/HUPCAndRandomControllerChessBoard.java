@@ -87,7 +87,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		});
 		this.initWithinDayTripRouterFactory();
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), this.getConfig().planCalcScore()), this.getTravelTimeCollector());
 		
 		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.getScenario(), travelTimes,
 				this.getTravelDisutilityFactory());

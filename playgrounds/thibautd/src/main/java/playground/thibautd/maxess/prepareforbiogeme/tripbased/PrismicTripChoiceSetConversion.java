@@ -23,6 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -50,22 +51,11 @@ public class PrismicTripChoiceSetConversion {
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks( sc.getActivityFacilities() , (NetworkImpl) sc.getNetwork() );
 		new XY2Links( sc ).run( sc.getPopulation() );
+		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( config.planCalcScore() );
 
 		final TripRouter tripRouter =
 				new TripRouterFactoryBuilderWithDefaults().build( sc ).instantiateAndConfigureTripRouter(
-						new RoutingContext() {
-							final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( config.planCalcScore() );
-							@Override
-							public TravelDisutility getTravelDisutility() {
-								return tt;
-							}
-
-							@Override
-							public TravelTime getTravelTime() {
-								return tt;
-							}
-						}
-				);
+						new RoutingContextImpl(tt, tt));
 
 		Converter.<Trip,TripChoiceSituation>builder()
 				.withRecordFiller(

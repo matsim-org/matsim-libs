@@ -22,6 +22,7 @@
 
 package org.matsim.core.router.costcalculators;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelDisutility;
@@ -34,7 +35,7 @@ public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        bind(TravelDisutilityFactory.class).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+        addTravelDisutilityFactoryBinding(TransportMode.car).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
     }
 
 }

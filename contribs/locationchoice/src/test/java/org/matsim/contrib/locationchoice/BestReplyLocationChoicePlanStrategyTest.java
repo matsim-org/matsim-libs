@@ -24,10 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -106,18 +103,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 
 		@Override
 		public TripRouter getTripRouter() {
-			return this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
-
-				@Override
-				public TravelDisutility getTravelDisutility() {
-					return travelDisutility;
-				}
-
-				@Override
-				public TravelTime getTravelTime() {
-					return travelTime;
-				}
-			});
+			return this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(travelDisutility, travelTime));
 		}
 	}
 }
