@@ -1,7 +1,6 @@
 package playground.artemc.psim;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
@@ -10,11 +9,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
+import playground.artemc.crowding.CrowdednessObserver;
+import playground.artemc.crowding.newScoringFunctions.ScoreListener;
+import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
+import playground.artemc.crowding.rules.SimpleRule;
 import playground.artemc.plansTools.PlanRouteStripper;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
@@ -27,19 +29,19 @@ import java.util.HashMap;
  * Takes folder with simulation outputs and the desired output folder as parameters.
  * Created by artemc on 21/4/15.
  */
-public class ChoiceSetGenerator implements ShutdownListener {
+public class ChoiceSetAndCrowdingAnalysisGenerator implements ShutdownListener {
 
 	static private String inputDirectory;
 	static private String outputDirectory;
 	static private String eventFilePath;
 
-	private static String simType = "10min";
-	private static String schema = "corridor_10min";
+	private static String simType = "5min";
+	private static String schema = "corridor_5min";
 
 	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/";
 	private static String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
 
-	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
+	private static final Logger log = Logger.getLogger(ChoiceSetAndCrowdingAnalysisGenerator.class);
 
 	private final ChoiceGenerationControler choiceGenerationControler;
 
@@ -48,13 +50,12 @@ public class ChoiceSetGenerator implements ShutdownListener {
 	private HashMap<Id<Person>, Plan> initialPlans = new HashMap<Id<Person>, Plan>();
 	static Integer departureTimeChoices = 3;
 
-	public ChoiceSetGenerator(Config config, String eventsFile) {
+	public ChoiceSetAndCrowdingAnalysisGenerator(Config config, String eventsFile) {
 
 		choiceGenerationControler = new ChoiceGenerationControler(config, eventsFile);
 
 		this.controler = choiceGenerationControler.getControler();
 		this.population = controler.getScenario().getPopulation();
-
 		controler.addControlerListener(this);
 	}
 
@@ -66,7 +67,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			eventFilePath = args[2];
 
 			Config config = ScenarioInitializerFromOutput.initScenario(inputDirectory, outputDirectory);
-			ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+			ChoiceSetAndCrowdingAnalysisGenerator choiceSetGenerator = new ChoiceSetAndCrowdingAnalysisGenerator(config, eventFilePath);
 			choiceSetGenerator.CreateChoiceSets();
 
 			choiceSetGenerator.choiceGenerationControler.run();
@@ -84,7 +85,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 					eventFilePath = file.getAbsolutePath() + "/it." + lastIteration+"/"+lastIteration+".events.xml.gz";
 
 					Config config = ScenarioInitializerFromOutput.initScenario(inputDirectory, outputDirectory);
-					ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+					ChoiceSetAndCrowdingAnalysisGenerator choiceSetGenerator = new ChoiceSetAndCrowdingAnalysisGenerator(config, eventFilePath);
 					choiceSetGenerator.CreateChoiceSets();
 
 					choiceSetGenerator.choiceGenerationControler.run();
@@ -98,11 +99,6 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		PopulationFactory populationFactory = population.getFactory();
 		ArrayList<Person> newPersons = new ArrayList<>();
 
-		/*Clean routes*/
-		PlanRouteStripper planRouteStripper = new PlanRouteStripper();
-		planRouteStripper.run(population);
-
-
 		for (Id<Person> personId : population.getPersons().keySet()) {
 
 			Plan plan = population.getPersons().get(personId).getSelectedPlan();
@@ -115,6 +111,10 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			population.getPersons().get(personId).getPlans().clear();
 			population.getPersons().get(personId).addPlan(planTmp);
 		}
+
+		/*Clean routes*/
+		PlanRouteStripper planRouteStripper = new PlanRouteStripper();
+		planRouteStripper.run(population);
 
 		/*Create optimal walk plan and substitute it in the planMap*/
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(controler.getConfig());
@@ -260,8 +260,6 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			int count = 0;
 			population.getPersons().get(personId).setSelectedPlan(planMap.get(initialMode));
 			for (Plan newPlan : population.getPersons().get(personId).getPlans()) {
-				if(personId.toString().equals("1000"))
-					System.out.println();
 				if (!newPlan.isSelected()) {
 					count++;
 					Person newPerson = populationFactory.createPerson(Id.createPersonId(personId.toString() + "_" + count));
@@ -284,9 +282,9 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			population.addPerson(newPerson);
 		}
 
-	/*Write out new population file*/
+//		/*Write out new population file*/
 //		System.out.println("New number of persons: " + population.getPersons().size());
-		new org.matsim.core.population.PopulationWriter(population, controler.getScenario().getNetwork()).write("/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/popText.xml");
+//		new org.matsim.core.population.PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outputPopulationFile);
 
 	}
 

@@ -23,6 +23,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.crowding.internalization.InternalizationPtControlerListener;
 import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.heterogeneity.eventsBasedPTRouter.TransitRouterEventsAndHeterogeneityBasedWSModule;
 import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
@@ -31,6 +32,7 @@ import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAn
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
@@ -98,7 +100,7 @@ public class ControlerWithHeteroAndToll {
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
 //			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillAndOffSwitch());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

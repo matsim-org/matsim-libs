@@ -30,6 +30,7 @@ import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAn
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
@@ -115,7 +116,7 @@ public class ControlerWithHeteroAndTollLoop {
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
 //			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillAndOffSwitch());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
