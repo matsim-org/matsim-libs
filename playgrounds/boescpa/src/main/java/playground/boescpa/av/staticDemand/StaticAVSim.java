@@ -156,8 +156,13 @@ public class StaticAVSim {
 
 	private static void sortVehiclesInUse() {
 		if (vehiclesInUseChanged) {
-			vehiclesInUse.sort(vehicleComparator);
+//			vehiclesInUse.sort(vehicleComparator);
+			Collections.sort( vehiclesInUse, vehicleComparator );
+			// can't say if it does the right thing, but it compiles ... kai, sep'15
+			
 			vehiclesInUseChanged = false;
+			throw new RuntimeException( "not sure if the above does the right thing, but it compiles.  Remove this warning if "
+					+ "it works as desired. kai, sep'15") ;
 		}
 	}
 }

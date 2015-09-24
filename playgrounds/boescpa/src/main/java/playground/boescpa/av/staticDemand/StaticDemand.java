@@ -61,12 +61,20 @@ public class StaticDemand {
 	}
 
 	private void sortTripsByStartTime(List<Trip> trips) {
-		trips.sort(new Comparator<Trip>() {
+//		trips.sort(new Comparator<Trip>() {
+//			@Override
+//			public int compare(Trip o1, Trip o2) {
+//				return (int) (o2.startTime - o1.startTime);
+//			}
+//		});
+		Collections.sort(trips, new Comparator<Trip>() {
 			@Override
 			public int compare(Trip o1, Trip o2) {
 				return (int) (o2.startTime - o1.startTime);
 			}
 		});
+		throw new RuntimeException( "not sure if the above does the right thing, but it compiles.  Remove this warning if "
+				+ "it works as desired. kai, sep'15") ;
 	}
 
 	private List<Trip> filterTrips(Map<Long, Trip> trips, String[] modes) {

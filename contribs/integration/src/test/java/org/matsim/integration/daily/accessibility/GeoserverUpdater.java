@@ -31,6 +31,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 	@Override
 	public void setAndProcessSpatialGrids(Map<Modes4Accessibility, SpatialGrid> spatialGrids) {
+		log.info("starting setAndProcessSpatialGrids ...");
 		GeometryFactory fac = new GeometryFactory();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("accessibilities");
@@ -108,7 +109,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		log.info("ending setAndProcessSpatialGrids.");
 	}
 
 }
