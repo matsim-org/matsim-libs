@@ -23,10 +23,7 @@ package playground.boescpa.av.staticDemand;
 
 import playground.boescpa.lib.tools.tripReader.Trip;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * WHAT IS IT FOR?
@@ -43,12 +40,12 @@ public class AttractionRedistribution implements Redistribution {
 	public List<AutonomousVehicle> getRedistributingVehicles(List<AutonomousVehicle> availableVehicles, List<Trip> openRequests) {
 		List<AutonomousVehicle> availableVehiclesSorted = new ArrayList<>();
 		availableVehiclesSorted.addAll(availableVehicles);
-		availableVehiclesSorted.sort(new Comparator<AutonomousVehicle>() {
-			@Override
-			public int compare(AutonomousVehicle o1, AutonomousVehicle o2) {
-				return o1.getLastArrivalTime() - o2.getLastArrivalTime();
-			}
-		});
+		Collections.sort(availableVehiclesSorted, new Comparator<AutonomousVehicle>() {
+            @Override
+            public int compare(AutonomousVehicle o1, AutonomousVehicle o2) {
+                return o1.getLastArrivalTime() - o2.getLastArrivalTime();
+            }
+        });
 		// return the longest not moved x% of the available cars IF they were not moved within the last 2xConstants.REDISTRIBUTIONINTERVAL.
 		List<AutonomousVehicle> vehiclesToRedistribute = new ArrayList<>();
 		for (int i = 0; i < Constants.SHARE_OF_FREE_AV_TO_REDISTRIBUTE*availableVehiclesSorted.size(); i++) {

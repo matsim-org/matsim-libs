@@ -25,10 +25,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.boescpa.av.staticDemand.ForceModel.Force;
 import playground.boescpa.lib.tools.tripReader.Trip;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * WHAT IS IT FOR?
@@ -59,12 +56,12 @@ public class ForcefieldRedistribution implements Redistribution {
 			resultingForcesAvailableVehicles.add(resForce);
 		}
 		// sort resulting forces from greatest to smallest:
-		resultingForcesAvailableVehicles.sort(new Comparator<Force>() {
-			@Override
-			public int compare(Force o1, Force o2) {
-				return (int) Math.round(100*(o2.getStrength() - o1.getStrength()));
-			}
-		});
+		Collections.sort(resultingForcesAvailableVehicles, new Comparator<Force>() {
+            @Override
+            public int compare(Force o1, Force o2) {
+                return (int) Math.round(100 * (o2.getStrength() - o1.getStrength()));
+            }
+        });
 		return resultingForcesAvailableVehicles;
 	}
 
