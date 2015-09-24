@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.artemc.crowding.internalizationPt;
+package playground.artemc.crowding.internalization;
 
 import org.matsim.core.events.handler.EventHandler;
 
@@ -28,6 +28,6 @@ import org.matsim.core.events.handler.EventHandler;
  * @author ikaddoura
  *
  */
-public interface CapacityDelayEventHandler extends EventHandler {
-	public void handleEvent(CapacityDelayEvent event);
+public interface TransferDelayInVehicleEventHandler extends EventHandler {
+	public void handleEvent(TransferDelayInVehicleEvent event);
 }

@@ -1,11 +1,10 @@
 package playground.artemc.crowding.run;
 
-import playground.artemc.crowding.internalizationPt.InternalizationPtControlerListener;
+import playground.artemc.crowding.internalizationOLD.InternalizationPtControlerListener;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -26,12 +25,9 @@ import playground.artemc.crowding.CrowdednessObserver;
 import playground.artemc.crowding.DatabaseSQLwriter;
 import playground.artemc.crowding.rules.SimpleRule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import playground.artemc.crowding.newScoringFunctions.LoadFactor60ScoringFunction;
 import playground.artemc.crowding.newScoringFunctions.LoadFactor60ScoringFunctionFactory;
 import playground.artemc.crowding.newScoringFunctions.ScoreListener;
 import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
-import playground.artemc.crowding.newScoringFunctions.SecondBestScoringFunctionFactory;
-import playground.artemc.crowding.newScoringFunctions.StandeeAndSittersScoringFunctionFactory;
 
 
 /**
@@ -139,7 +135,7 @@ public class CrowdingM4CorridorControler {
 				writer.writeSQLCrowdednessObserver("VehicleStates_"+population+"_CrowdingM4_"+externalityType +"_"+numberOfIterations+"It", "ModelM4_"+population+"_"+externalityType, observer.getVehicleStates());
 				
 				// Write a SQL File describing score, crowding penalty and externalities of each agent. 
-				writer.writeSQLPersonScore("PersonScore_"+population+"_CrowdingM4_"+externalityType +"_"+numberOfIterations+"It", "ModelM4_"+population+"_"+externalityType, scoreTracker, scenario, controler);
+				writer.writeSQLPersonScore("PersonScore_"+population+"_CrowdingM4_"+externalityType +"_"+numberOfIterations+"It", "ModelM4_"+population+"_"+externalityType, scoreTracker, scenario);
 			
 				// Write a SQL File describing crowding and externalities pro vehicle.
 				writer.writeSQLVehicleScore("VehicleScore_"+population+"_CrowdingM4_"+externalityType +"_"+numberOfIterations+"It", "ModelM4_"+population+"_"+externalityType, scoreTracker, scenario);

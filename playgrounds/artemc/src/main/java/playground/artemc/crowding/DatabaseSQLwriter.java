@@ -15,7 +15,6 @@ import java.util.Set;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -115,7 +114,7 @@ public class DatabaseSQLwriter {
 		busWriter.finish();
 	}
 	
-	public void writeSQLPersonScore(String tableName, String simulationType, ScoreTracker scoreTracker, Scenario scenario, Controler controler) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException,SQLException
+	public void writeSQLPersonScore(String tableName, String simulationType, ScoreTracker scoreTracker, Scenario scenario) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException,SQLException
 	{
 
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_MM");
@@ -146,7 +145,7 @@ public class DatabaseSQLwriter {
 
 		for (Id agentId : scenario.getPopulation().getPersons().keySet()) {
 
-			double score = controler.getScenario().getPopulation().getPersons().get(agentId).getSelectedPlan().getScore();
+			double score = scenario.getPopulation().getPersons().get(agentId).getSelectedPlan().getScore();
 			
 			if(scoreTracker.getPersonScores().containsKey(agentId)){
 				scoreTracker.getPersonScores().get(agentId).setTotalUtility(score);
