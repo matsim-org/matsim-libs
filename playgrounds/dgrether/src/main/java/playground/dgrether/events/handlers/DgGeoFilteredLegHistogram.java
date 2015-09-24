@@ -39,18 +39,19 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -62,10 +63,10 @@ import playground.dgrether.events.GeospatialEventTools;
  *  based on implementation of mrieser in the org.matsim project
  *
  */
-public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
+public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
 
-	private Map<Id, LinkEnterEvent> firstTimeSeenMap;
-	private Map<Id, LinkLeaveEvent> lastTimeSeenMap;
+	private Map<Id<Vehicle>, LinkEnterEvent> firstTimeSeenMap;
+	private Map<Id<Vehicle>, LinkLeaveEvent> lastTimeSeenMap;
 	private GeospatialEventTools geospatialTools;
 	private int iteration = 0;
 	private final int binSizeSeconds;
@@ -76,8 +77,8 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 		this.geospatialTools = new GeospatialEventTools(network, networkCrs);
 		this.binSizeSeconds = binSizeSeconds;
 		this.nofBins = nofBins;
-		this.firstTimeSeenMap = new HashMap<Id, LinkEnterEvent>();
-		this.lastTimeSeenMap = new HashMap<Id, LinkLeaveEvent>();
+		this.firstTimeSeenMap = new HashMap<>();
+		this.lastTimeSeenMap = new HashMap<>();
 		reset(0);
 	}
 
@@ -97,22 +98,22 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())){
-			this.lastTimeSeenMap.put(event.getPersonId(), event);
+			this.lastTimeSeenMap.put(event.getVehicleId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())){
-			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
-				this.firstTimeSeenMap.put(event.getPersonId(), event);
+			if (! this.firstTimeSeenMap.containsKey(event.getVehicleId())) {
+				this.firstTimeSeenMap.put(event.getVehicleId(), event);
 			} 
 		}
 	}
 	
-	private void handleArrivalOrStuck(Event event, Id personId) {
-		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(personId);
-		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
+	private void handleArrivalOrStuck(Event event, Id<Vehicle> vehicleId) {
+		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(vehicleId);
+		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(vehicleId);
 		if (firstEvent != null && lastEvent != null){
 			int index = getBinIndex(firstEvent.getTime());
 			this.allModesData.countsDep[index]++;
@@ -122,13 +123,13 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.handleArrivalOrStuck(event, event.getPersonId());		
+	public void handleEvent(VehicleAbortsEvent event) {
+		this.handleArrivalOrStuck(event, event.getVehicleId());		
 	}
 	
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.handleArrivalOrStuck(event, event.getPersonId());
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.handleArrivalOrStuck(event, event.getVehicleId());
 	}
 
 	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple) {
