@@ -77,23 +77,6 @@ public class GtfsConverter {
 
 	private TransitSchedule ts;
 	
-	public static void main( String[] args ) {
-		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
-		// ---
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario0 = ScenarioUtils.createScenario(config);
-		// ---
-		final String filepath0 = "/Users/nagel/shared-svn/studies/countries/cl/santiago_pt_demand_matrix/gtfs_201306";
-		// ---
-		GtfsConverter converter = new GtfsConverter(filepath0, scenario0, transform0 ) ;
-		converter.convert() ;
-		// ---
-		new NetworkWriter(scenario0.getNetwork()).write( filepath0 + "/output_network.xml.gz");
-		new TransitScheduleWriter( scenario0.getTransitSchedule() ).writeFile( filepath0 + "/output_transitschedule.xml.gz");
-		new VehicleWriterV1( scenario0.getTransitVehicles() ).writeFile( filepath0 + "/output_transitvehicles.xml.gz");
-	}
-
-
 	public GtfsConverter(String filepath, Scenario scenario, CoordinateTransformation transform) {
 		this.filepath = filepath;
 		this.transform = transform;
