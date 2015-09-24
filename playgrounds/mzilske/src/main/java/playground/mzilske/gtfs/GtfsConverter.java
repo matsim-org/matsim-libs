@@ -12,29 +12,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
 
 
 public class GtfsConverter {
@@ -68,6 +76,22 @@ public class GtfsConverter {
 
 
 	private TransitSchedule ts;
+	
+	public static void main( String[] args ) {
+		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
+		// ---
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario0 = ScenarioUtils.createScenario(config);
+		// ---
+		final String filepath0 = "/Users/nagel/shared-svn/studies/countries/cl/santiago_pt_demand_matrix/gtfs_201306";
+		// ---
+		GtfsConverter converter = new GtfsConverter(filepath0, scenario0, transform0 ) ;
+		converter.convert() ;
+		// ---
+		new NetworkWriter(scenario0.getNetwork()).write( filepath0 + "/output_network.xml.gz");
+		new TransitScheduleWriter( scenario0.getTransitSchedule() ).writeFile( filepath0 + "/output_transitschedule.xml.gz");
+		new VehicleWriterV1( scenario0.getTransitVehicles() ).writeFile( filepath0 + "/output_transitvehicles.xml.gz");
+	}
 
 
 	public GtfsConverter(String filepath, Scenario scenario, CoordinateTransformation transform) {
@@ -331,11 +355,30 @@ public class GtfsConverter {
 			double startTime = Time.parseTime(entries[startTimeIndex].trim());
 			double endTime = Time.parseTime(entries[endTimeIndex].trim());
 			double step = Double.parseDouble(entries[stepIndex]);
+			// ---
+			final Id<TransitLine> key = routeToTripAssignments.get(tripId);
+			Assert.assertNotNull(key);
+			final Id<TransitRoute> key2 = this.matsimRouteIdToGtfsTripIdAssignments.get(tripId);
+			Assert.assertNotNull(key2);
+			final TransitLine transitLine = ts.getTransitLines().get(key);
+			Assert.assertNotNull( transitLine );
+			final TransitRoute transitRoute = transitLine.getRoutes().get(key2);
+			if ( transitRoute==null ) {
+				for ( Id<TransitRoute> key3 : transitLine.getRoutes().keySet() ) {
+					System.err.println(  key3 ) ;
+				}
+				System.err.println( "key=" + key ) ;
+				System.err.println( "key2=" + key2 ) ;
+				System.err.println( "transitLine=" + transitLine ) ;
+				System.err.println("does not exist; skipping ...") ;
+				continue ;
+			}
+			// ---
 			if((!(entries[tripIdIndex].equals(oldTripId))) && (usedTripIds.contains(tripId))){
-				departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures().size();
+				departureCounter = transitRoute.getDepartures().size();
 			}
 			if(usedTripIds.contains(tripId)){
-				Map<Id<Departure>, Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures();
+				Map<Id<Departure>, Departure> depatures = transitRoute.getDepartures();
 				double latestDeparture = 0;
 				for(Departure d: depatures.values()){
 					if(latestDeparture < d.getDepartureTime()){
@@ -347,8 +390,8 @@ public class GtfsConverter {
 					if(time>startTime){
 						Departure d = ts.getFactory().createDeparture(Id.create(tripId.toString() + "." + departureCounter, Departure.class), time);
 						d.setVehicleId(Id.create(tripId.toString() + "." + departureCounter, Vehicle.class));
-						this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.lineToVehicleType.get(routeToTripAssignments.get(tripId)));
-						ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).addDeparture(d);
+						this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.lineToVehicleType.get(key));
+						transitRoute.addDeparture(d);
 						departureCounter++;
 					}						
 					time = time + step;
