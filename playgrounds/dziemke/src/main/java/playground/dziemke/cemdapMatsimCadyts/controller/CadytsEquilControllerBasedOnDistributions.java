@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accessibility.FacilityTypes;
@@ -17,12 +18,15 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -30,6 +34,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
@@ -182,7 +187,11 @@ public class CadytsEquilControllerBasedOnDistributions {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
+//				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
+				final CharyparNagelScoringParametersBuilder paramsBuilder = CharyparNagelScoringParameters.getBuilder(
+						ScenarioUtils.createScenario(config), person.getId());
+				
+				final CharyparNagelScoringParameters params = paramsBuilder.create();
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -255,6 +264,16 @@ public class CadytsEquilControllerBasedOnDistributions {
 	private static TreeMap<Integer, Integer> buildMeasurementsMapSingle(){
 		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
 
+		map.put(69200, 10);
+		map.put(69400, 40);
+		map.put(69600, 100);
+		map.put(69800, 150);
+		map.put(70000, 300);
+		map.put(70200, 150);
+		map.put(70400, 100);
+		map.put(70600, 40);
+		map.put(70800, 10);
+		
 		map.put(69200, 10);
 		map.put(69400, 40);
 		map.put(69600, 100);
