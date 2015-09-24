@@ -1,6 +1,0 @@
-language: java
-script:
-    - mvn test -B -Dmaven.test.redirectTestOutputToFile
-env:
-  global:
-    - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"

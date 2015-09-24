@@ -10,3 +10,5 @@ matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
 .gitignore
 .gitignore
+/common/
+/socnetsim/

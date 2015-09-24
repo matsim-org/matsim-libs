@@ -1,0 +1,8 @@
+language: java
+script:
+    - cd matsim ; mvn test -B -Dmaven.test.redirectTestOutputToFile
+    - cd contribs ; mvn test -B -Dmaven.test.redirectTestOutputToFile
+    - cd playgrounds ; mvn test -B -Dmaven.test.redirectTestOutputToFile
+env:
+  global:
+    - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"
