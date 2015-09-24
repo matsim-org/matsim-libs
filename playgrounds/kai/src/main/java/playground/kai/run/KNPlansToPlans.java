@@ -19,18 +19,11 @@
 
 package playground.kai.run;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -38,11 +31,15 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 class KNPlansToPlans {
 
-	static void run(final String[] args) {
+	void run(final String[] args) {
 		
 		Config config = ConfigUtils.createConfig() ;
-		config.plans().setInputFile( "/Users/nagel/kairuns/new-gauteng/output_base_vot110_3/100.plans.xml.gz") ;
-		config.network().setInputFile( "/Users/nagel/kairuns/new-gauteng/3sep-wo-toll-vot110_3-output/output_network.xml.gz") ;
+//		config.plans().setInputFile( "/Users/nagel/kairuns/new-gauteng/output_base_vot110_3/100.plans.xml.gz") ;
+//		config.network().setInputFile( "/Users/nagel/kairuns/new-gauteng/3sep-wo-toll-vot110_3-output/output_network.xml.gz") ;
+		
+		
+		config.network().setInputFile("/Users/nagel/git/matsim/matsim/src/test/resources/test/scenarios/berlin/network.xml.gz");
+		config.plans().setInputFile("/Users/nagel/git/matsim/contribs/common/src/test/resources/test/input/org/matsim/integration/always/ReRoutingTest/testReRoutingFastAStarLandmarks/1.plans.xml.gz");
 
 		Scenario sc = ScenarioUtils.loadScenario(config) ;
 		
@@ -58,25 +55,25 @@ class KNPlansToPlans {
 //			pm.run(plan);
 //		}
 
-		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation() ;
-		for ( Person person : pop.getPersons().values() ) {
-			Plan plan = person.getSelectedPlan() ;
-			List<Leg> legs = PopulationUtils.getLegs(plan) ;
-			boolean accept = true ;
-//			for ( Leg leg : legs ) {
-//				if ( leg.getMode().equals( TransportMode.car ) ) {
-//					accept = false ;
-//				}
+//		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation() ;
+//		for ( Person person : pop.getPersons().values() ) {
+//			Plan plan = person.getSelectedPlan() ;
+//			List<Leg> legs = PopulationUtils.getLegs(plan) ;
+//			boolean accept = true ;
+////			for ( Leg leg : legs ) {
+////				if ( leg.getMode().equals( TransportMode.car ) ) {
+////					accept = false ;
+////				}
+////			}
+//			if ( Math.random() < 0.9 ) accept = false ;
+//			if ( accept ) {
+//				System.out.println("adding person...");
+//				newPop.addPerson(person);
 //			}
-			if ( Math.random() < 0.9 ) accept = false ;
-			if ( accept ) {
-				System.out.println("adding person...");
-				newPop.addPerson(person);
-			}
-		}
+//		}
 		
 
-		PopulationWriter popwriter = new PopulationWriter(newPop,sc.getNetwork()) ;
+		PopulationWriter popwriter = new PopulationWriter(pop,sc.getNetwork()) ;
 		popwriter.write("/Users/nagel/kw/pop.xml.gz") ;
 
 		System.out.println("done.");

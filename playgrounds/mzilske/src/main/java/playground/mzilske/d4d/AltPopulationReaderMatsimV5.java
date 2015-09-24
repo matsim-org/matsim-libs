@@ -42,7 +42,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -280,7 +285,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			currRoute = linkNetworkRoute;
 		} else if ("generic".equals(routeType)) {
 			GenericRouteImpl genericRoute = new GenericRouteImpl(Id.create(startLink, Link.class), Id.create(endLink, Link.class));
-			genericRoute.setRouteDescription(null, routeDescription.trim(), null);
+			genericRoute.setRouteDescription(routeDescription.trim());
 			currRoute = genericRoute;
 		} else if ("experimentalPt1".equals(routeType)) {
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();

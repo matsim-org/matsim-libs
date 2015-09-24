@@ -217,7 +217,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );

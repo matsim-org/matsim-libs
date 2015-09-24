@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -51,7 +50,7 @@ public class SingaporeFareScoring implements LegScoring {
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Leg && ((Leg)planElement).getMode().equals(TransportMode.pt))
 				if(num==0) {
-					String[] parts = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split("===");
+					String[] parts = (((Leg)planElement).getRoute()).getRouteDescription().split("===");
 					Id fromLinkId = transitSchedule.getFacilities().get(Id.create(parts[1], TransitStopFacility.class)).getLinkId();
 					Id toLinkId = transitSchedule.getFacilities().get(Id.create(parts[4], TransitStopFacility.class)).getLinkId();
 					return RouteUtils.calcDistance(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);

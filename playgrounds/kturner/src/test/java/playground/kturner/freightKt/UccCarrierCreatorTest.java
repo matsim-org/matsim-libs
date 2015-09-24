@@ -29,7 +29,7 @@ import playground.kturner.freightKt.UccCarrierCreator;
 public class UccCarrierCreatorTest {
 	
 	
-	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	// Test, ob bei retailerNames = null alle Carrier extrahiert werden.
     @Test

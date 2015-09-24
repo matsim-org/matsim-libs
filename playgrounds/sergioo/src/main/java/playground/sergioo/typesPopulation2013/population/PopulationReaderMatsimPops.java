@@ -20,7 +20,6 @@
 package playground.sergioo.typesPopulation2013.population;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -31,16 +30,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 /**
@@ -243,22 +244,24 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 			if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}
-			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
-			} else if (this.currRoute instanceof NetworkRoute) {
-				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
-				if (linkIds.size() > 0) {
-					linkIds.remove(0);
-				}
-				if (linkIds.size() > 0) {
-					linkIds.remove(linkIds.size() - 1);
-				}
-				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
-			} else {
-				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
-			}
-			this.routeDescription = null;
-			this.currRoute = null;
+			throw new RuntimeException("This looks like an exact copy of the class in the core. Please use that class, I do not want to refactor a class multiple times."); // mrieser, 8sep2015
+
+//			if (this.currRoute instanceof GenericRoute) {
+//				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
+//			} else if (this.currRoute instanceof NetworkRoute) {
+//				List<Id<Link>> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
+//				if (linkIds.size() > 0) {
+//					linkIds.remove(0);
+//				}
+//				if (linkIds.size() > 0) {
+//					linkIds.remove(linkIds.size() - 1);
+//				}
+//				((NetworkRoute) this.currRoute).setLinkIds(startLinkId, linkIds, endLinkId);
+//			} else {
+//				throw new RuntimeException("unknown route type: " + this.currRoute.getClass().getName());
+//			}
+//			this.routeDescription = null;
+//			this.currRoute = null;
 		}
 	}
 
@@ -274,12 +277,14 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
-		this.currleg.setRoute(this.currRoute);
+		throw new RuntimeException("This looks like an exact copy of the class in the core. Please use that class, I do not want to refactor a class multiple times."); // mrieser, 13sep2015
 
-		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
-		}
+//		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
+//		this.currleg.setRoute(this.currRoute);
+//
+//		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
+//			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
+//		}
 
 	}
 

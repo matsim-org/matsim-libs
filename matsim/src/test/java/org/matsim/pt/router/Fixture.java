@@ -95,7 +95,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		this.config.transit().setUseTransit(true);
 		
 		ScenarioBuilder scBuilder = new ScenarioBuilder(config) ;
-		this.scenario = (ScenarioImpl) scBuilder.createScenario() ;
+		this.scenario = (ScenarioImpl) scBuilder.build() ;
 
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();

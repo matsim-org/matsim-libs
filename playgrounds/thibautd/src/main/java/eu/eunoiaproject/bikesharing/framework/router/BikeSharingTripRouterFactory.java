@@ -116,7 +116,10 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 		if ( routePtUsingSchedule || scenario.getConfig().transit().isUseTransit() ) {
 			// XXX should be person-dependent
 			final CharyparNagelScoringParameters scoringParams =
-					CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
+					CharyparNagelScoringParameters.getBuilder(
+							scenario.getConfig().planCalcScore(),
+							scenario.getConfig().planCalcScore().getScoringParameters( null ),
+							scenario.getConfig().scenario()).create();
 			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
 			initialNodeRouters.add( 
 					new InitialNodeRouter(

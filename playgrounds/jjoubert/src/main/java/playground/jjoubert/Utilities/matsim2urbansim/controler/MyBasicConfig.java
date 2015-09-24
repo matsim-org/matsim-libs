@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -73,7 +74,8 @@ public class MyBasicConfig {
 		config.planCalcScore().setLateArrival_utils_hr(-18.0);
 		config.planCalcScore().setEarlyDeparture_utils_hr(-18.0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
-		config.planCalcScore().setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		//---------------------------------------------------------------------
 		ActivityParams home = new ActivityParams("home");
 		home.setPriority(1.0);

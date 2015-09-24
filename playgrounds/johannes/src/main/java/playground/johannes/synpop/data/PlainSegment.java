@@ -19,8 +19,6 @@
 
 package playground.johannes.synpop.data;
 
-import java.util.List;
-
 /**
  * @author johannes
  */
@@ -30,8 +28,6 @@ public class PlainSegment extends PlainElement implements Segment {
 
     private boolean isLeg;
 
-//    private int index;
-
     @Override
     public Episode getEpisode() {
         return episode;
@@ -39,31 +35,29 @@ public class PlainSegment extends PlainElement implements Segment {
 
     @Override
     public Segment next() {
-        if(isLeg) {
+        if (isLeg) {
             int index = getEpisode().getLegs().indexOf(this);
-            if(index > -1) return getEpisode().getActivities().get(index + 1);
+            if (index > -1) return getEpisode().getActivities().get(index + 1);
             else return null;
         } else {
             int index = getEpisode().getActivities().indexOf(this);
-            if(index > -1 && index < getEpisode().getLegs().size()) {
+            if (index > -1 && index < getEpisode().getLegs().size()) {
                 return getEpisode().getLegs().get(index);
-            }
-            else return null;
+            } else return null;
         }
     }
 
     @Override
     public Segment previous() {
-        if(isLeg) {
+        if (isLeg) {
             int index = getEpisode().getLegs().indexOf(this);
-            if(index > -1) return getEpisode().getActivities().get(index);
+            if (index > -1) return getEpisode().getActivities().get(index);
             else return null;
         } else {
             int index = getEpisode().getActivities().indexOf(this);
-            if(index > 0) {
+            if (index > 0) {
                 return getEpisode().getLegs().get(index - 1);
-            }
-            else return null;
+            } else return null;
         }
     }
 
@@ -75,7 +69,7 @@ public class PlainSegment extends PlainElement implements Segment {
     public PlainSegment clone() {
         PlainSegment clone = new PlainSegment();
 
-        for(String key : keys()) {
+        for (String key : keys()) {
             clone.setAttribute(key, getAttribute(key));
         }
 

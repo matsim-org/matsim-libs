@@ -51,6 +51,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
@@ -73,7 +75,7 @@ public class QNetsimEngine implements MobsimEngine {
 	private final AbstractAgentSnapshotInfoBuilder positionInfoBuilder;
 
 	private final double stucktimeCache;
-	private final DepartureHandler dpHandler;
+	private final VehicularDepartureHandler dpHandler;
 
 	private double infoTime = 0;
 
@@ -116,6 +118,7 @@ public class QNetsimEngine implements MobsimEngine {
 	//		}
 	//	}
 
+	@Inject
 	public QNetsimEngine(final QSim sim) {
 		this(sim, null);
 	}
@@ -409,7 +412,7 @@ public class QNetsimEngine implements MobsimEngine {
 		return this.stucktimeCache;
 	}
 
-	public DepartureHandler getDepartureHandler() {
+	public VehicularDepartureHandler getDepartureHandler() {
 		return dpHandler;
 	}
 

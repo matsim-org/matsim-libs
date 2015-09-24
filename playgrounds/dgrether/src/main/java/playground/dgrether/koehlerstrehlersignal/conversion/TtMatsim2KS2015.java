@@ -53,6 +53,7 @@ public class TtMatsim2KS2015 {
 	 * @param matsimPopSampleSize 1.0 means a 100% sample
 	 * @param ksModelCommoditySampleSize 1.0 means that 1 vehicle is equivalent to 1 unit of flow
 	 * @param minCommodityFlow only commodities with at least this demand will be optimized in the BTU model
+	 * @param simplifyNetwork use network simplifier if true
 	 * @param cellsX number of cells in x direction
 	 * @param cellsY number of cells in y direction
 	 * @param scenarioDescription
@@ -68,6 +69,7 @@ public class TtMatsim2KS2015 {
 			double freeSpeedFilter, boolean useFreeSpeedTravelTime,
 			double maximalLinkLength, double matsimPopSampleSize,
 			double ksModelCommoditySampleSize, double minCommodityFlow,
+			boolean simplifyNetwork,
 			int cellsX, int cellsY, String scenarioDescription,
 			String dateFormat, String outputDirectory) throws Exception{
 		
@@ -92,7 +94,7 @@ public class TtMatsim2KS2015 {
 				fullScenario, CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory,
 				cuttingBoundingBoxOffset, freeSpeedFilter,
-				useFreeSpeedTravelTime, maximalLinkLength);
+				useFreeSpeedTravelTime, maximalLinkLength, simplifyNetwork);
 
 		// create the geometry for zones. The geometry itself is not used, but
 		// the object serves as container for the link -> link OD pairs

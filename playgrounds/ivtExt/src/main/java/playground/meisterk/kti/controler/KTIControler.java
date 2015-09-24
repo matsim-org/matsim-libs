@@ -19,18 +19,20 @@
 
 package playground.meisterk.kti.controler;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
+import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
@@ -58,8 +60,8 @@ public class KTIControler extends Controler {
 
 		super.getConfig().addModule(this.ktiConfigGroup);
 
-        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
-        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(KtiPtRoute.class, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
         this.loadMyControlerListeners();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL
 				+ Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
@@ -88,7 +90,7 @@ public class KTIControler extends Controler {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//				bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //			}
 //		});
 //

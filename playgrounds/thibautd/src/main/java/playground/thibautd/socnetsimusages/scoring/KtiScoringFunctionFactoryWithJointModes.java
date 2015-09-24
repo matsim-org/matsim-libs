@@ -30,17 +30,14 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 
 /**
@@ -49,7 +46,7 @@ import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionFactory {
     private final ScoringFunctionFactory delegate;
 
-	private final CharyparNagelScoringParameters params;
+	private final CharyparNagelScoringParametersForPerson parameters;
 	private final Scenario scenario;
 
 	private final ScoringFunctionConfigGroup group;
@@ -57,37 +54,19 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
-			final StageActivityTypes typesNotToScore,
-			final KtiLikeScoringConfigGroup ktiConfig,
-			final PlanCalcScoreConfigGroup config,
-			final ScoringFunctionConfigGroup group,
-			final Scenario scenario) {
-		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
-		this.group = group;
-		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
-			typesNotToScore,
-			ktiConfig,
-			config,
-			scenario);
-	}
-
-	public KtiScoringFunctionFactoryWithJointModes(
 			final ScoringFunctionFactory delegate,
 			final Scenario scenario) {
 		this( delegate,
-				scenario.getConfig().planCalcScore(),
 				( ScoringFunctionConfigGroup ) scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME ),
 				scenario );
 	}
 
 	public KtiScoringFunctionFactoryWithJointModes(
 			final ScoringFunctionFactory delegate,
-			final PlanCalcScoreConfigGroup config,
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config, scenario.getConfig().scenario()).create();
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.group = group;
 		this.delegate = delegate;
 	}
@@ -96,6 +75,8 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	public SumScoringFunction createNewScoringFunction(final Person person) {
 		final SumScoringFunction scoringFunctionAccumulator =
 			(SumScoringFunction) delegate.createNewScoringFunction( person );
+
+		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 		// joint modes
 		// XXX: do better for shared cost

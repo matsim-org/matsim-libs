@@ -2,7 +2,6 @@ package playground.wrashid.PSF;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
@@ -13,36 +12,22 @@ import playground.wrashid.PSF.data.powerCharging.DefaultChargingPower;
 import playground.wrashid.PSF.data.powerCharging.FacilityChargingPowerMapper;
 
 public class ParametersPSF {
+	private ParametersPSF(){} // do not instantiate
 
-	private static Controler matsimControler;
-	
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
-	private static EventsManager events=null;
 
-	public static EventsManager getEvents() {
-		return events;
-	}
-
-	public static void setEvents(EventsManager events) {
-		ParametersPSF.events = events;
-	}
-
-	private static String PSFModule = "PSF";
-
-	public static String getPSFModule() {
-		return PSFModule;
-	}
+	public static final String PSF_MODULE = "PSF";
 
 	// default parameters
-	private static String default_maxBatteryCapacity = "default.maxBatteryCapacity";
+	private static final String default_maxBatteryCapacity = "default.maxBatteryCapacity";
 	private static double defaultMaxBatteryCapacity;
 	// in [J]
-	private static String default_chargingPowerAtParking = "default.chargingPowerAtParking";
+	private static final String default_chargingPowerAtParking = "default.chargingPowerAtParking";
 	private static double defaultChargingPowerAtParking;
 	private static FacilityChargingPowerMapper facilityChargingPowerMapper;
 
 	
-	private static String main_chargingPriceScalingFactor = "main.chargingPriceScalingFactor";
+	private static final String main_chargingPriceScalingFactor = "main.chargingPriceScalingFactor";
 	private static double mainChargingPriceScalingFactor=-1.0;
 	
 	public static double getMainChargingPriceScalingFactor() {
@@ -50,10 +35,10 @@ public class ParametersPSF {
 	}
 
 	// in [W]
-	private static String main_numberOfHubs = "main.numberOfHubs";
+	private static final String main_numberOfHubs = "main.numberOfHubs";
 	private static int numberOfHubs;
 	// number of hubs the network is divided into
-	private static String main_hubPricesPath = "main.hubPricesPath";
+	private static final String main_hubPricesPath = "main.hubPricesPath";
 	private static HubPriceInfo hubPriceInfo;
 	public static void setHubPriceInfo(HubPriceInfo hubPriceInfo) {
 		ParametersPSF.hubPriceInfo = hubPriceInfo;
@@ -61,23 +46,23 @@ public class ParametersPSF {
 
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
-	private static String main_hubLinkMappingPath = "main.hubLinkMappingPath";
+	private static final String main_hubLinkMappingPath = "main.hubLinkMappingPath";
 	private static HubLinkMapping hubLinkMapping;
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
 	private static AverageEnergyConsumptionBins averageEnergyConsumptionBins;
 
-	private static String main_chargingTimesOutputFilePath = "main.chargingTimesOutputFilePath";
+	private static final String main_chargingTimesOutputFilePath = "main.chargingTimesOutputFilePath";
 	private static String mainChargingTimesOutputFilePath = null;
 
 	// used both for output of text file and png (just extentions added to the
 	// given input file name)
-	private static String main_energyUsageStatistics = "main.energyUsageStatistics";
+	private static final String main_energyUsageStatistics = "main.energyUsageStatistics";
 	private static String mainEnergyUsageStatistics = null;
 
 	// the data about the base load (without electric vehicles at each hub), in
 	// joules
-	private static String main_baseLoadPath = "main.baseLoadPath";
+	private static final String main_baseLoadPath = "main.baseLoadPath";
 	private static double[][] mainBaseLoad = null;
 	
 	// when this is set, unmapped links are added automatically when loading the mapping
@@ -106,7 +91,7 @@ public class ParametersPSF {
 	public static final String MODERATE_CHARGING = "moderateCharging";
 	public static final String EARLIEST_CHARGING = "earliestCharging";
 	// default charging mode: earliest charging
-	private static String main_chargingMode = "main.chargingMode";
+	private static final String main_chargingMode = "main.chargingMode";
 	private static String mainChargingMode = EARLIEST_CHARGING;
 
 	// its value is between 0 and 1.
@@ -123,7 +108,7 @@ public class ParametersPSF {
 	
 	
 	// values -2.0, -3.0, etc have meansings, see usage of this variable in this class
-	private static String main_chargingPriceBlurFactor = "main.chargingPriceBlurFactor";
+	private static final String main_chargingPriceBlurFactor = "main.chargingPriceBlurFactor";
 	private static double mainChargingPriceBlurFactor = -1.0;
 	
 	
@@ -135,8 +120,6 @@ public class ParametersPSF {
 	
 	/**
 	 * see usage of this function for what it does.
-	 * 
-	 * @return
 	 */
 	public static boolean useLinearProbabilisticScalingOfPrice(){
 		if(mainChargingPriceBlurFactor==-2.0){
@@ -202,7 +185,6 @@ public class ParametersPSF {
 		facilityChargingPowerMapper=null;
 		mainChargingPriceScalingFactor=-1.0;
 		numberOfHubs=0;
-		events=null;
 		averageEnergyConsumptionBins=null;
 		hubPriceInfo=null;
 		mainChargingPriceBlurFactor = -1.0;
@@ -222,14 +204,13 @@ public class ParametersPSF {
 	}
 
 	public static void readConfigParamters(Controler controler) {
-		setMatsimControler(controler);
 		
 		// reset simulation parameters
 		reset();
 		
 		String tempStringValue;
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, default_maxBatteryCapacity);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, default_maxBatteryCapacity);
 		if (tempStringValue != null) {
 			defaultMaxBatteryCapacity = Double.parseDouble(tempStringValue);
 		} else {
@@ -237,14 +218,14 @@ public class ParametersPSF {
 		}
 
 		// the loading of this variable must happen before loading of the hub link mapping
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_initUnmappedLinks);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_initUnmappedLinks);
 		if (tempStringValue != null) {
 			mainInitUnmappedLinks = new Boolean(tempStringValue);
 		} else {
 			mainInitUnmappedLinks=null;
 		}
 		
-		tempStringValue = controler.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, default_chargingPowerAtParking);
 		if (tempStringValue != null) {
 			defaultChargingPowerAtParking = Double.parseDouble(tempStringValue);
 			facilityChargingPowerMapper = new DefaultChargingPower(defaultChargingPowerAtParking);
@@ -252,14 +233,14 @@ public class ParametersPSF {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingPriceBlurFactor);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_chargingPriceBlurFactor);
 		if (tempStringValue != null) {
 			mainChargingPriceBlurFactor = Double.parseDouble(tempStringValue);
 		} else {
 			infoMissingReadingParameter(main_chargingPriceBlurFactor);
 		}
 		
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingPriceScalingFactor);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_chargingPriceScalingFactor);
 		if (tempStringValue != null) {
 			mainChargingPriceScalingFactor = Double.parseDouble(tempStringValue);
 		} else {
@@ -268,56 +249,56 @@ public class ParametersPSF {
 		
 		
 		
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_numberOfHubs);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_numberOfHubs);
 		if (tempStringValue != null) {
 			numberOfHubs = Integer.parseInt(tempStringValue);
 		} else {
 			errorReadingParameter(main_numberOfHubs);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubPricesPath);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_hubPricesPath);
 		if (tempStringValue != null) {
 			hubPriceInfo = new HubPriceInfo(tempStringValue, numberOfHubs);
 		} else {
 			errorReadingParameter(main_hubPricesPath);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubLinkMappingPath);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_hubLinkMappingPath);
 		if (tempStringValue != null) {
-			hubLinkMapping = new HubLinkMapping(tempStringValue, numberOfHubs);
+			hubLinkMapping = new HubLinkMapping(tempStringValue, numberOfHubs, controler.getScenario().getNetwork() );
 		} else {
 			errorReadingParameter(main_hubLinkMappingPath);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_baseLoadPath);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_baseLoadPath);
 		if (tempStringValue != null) {
 			mainBaseLoad = GeneralLib.readMatrix(96, numberOfHubs, false, tempStringValue);
 		} else {
 			errorReadingParameter(main_baseLoadPath);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingMode);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_chargingMode);
 		if (tempStringValue != null) {
 			mainChargingMode = tempStringValue;
 		} else {
 			infoMissingReadingParameter(main_chargingMode);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, testing_ModeOn);
 		if (tempStringValue != null) {
 			testingModeOn = Boolean.parseBoolean(tempStringValue);
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingTimesOutputFilePath);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_chargingTimesOutputFilePath);
 		if (tempStringValue != null) {
 			mainChargingTimesOutputFilePath = tempStringValue;
 		} else {
 			errorReadingParameter(main_chargingTimesOutputFilePath);
 		}
 
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_energyUsageStatistics);
+		tempStringValue = controler.getConfig().findParam(PSF_MODULE, main_energyUsageStatistics);
 		if (tempStringValue != null) {
 			mainEnergyUsageStatistics = tempStringValue;
 		} else {
@@ -325,28 +306,28 @@ public class ParametersPSF {
 		}
 
 		if (testingModeOn) {
-			tempStringValue = controler.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
+			tempStringValue = controler.getConfig().findParam(PSF_MODULE, testing_energyConsumptionPerLink);
 			if (tempStringValue != null) {
 				testingEnergyConsumptionPerLink = Double.parseDouble(tempStringValue);
 			} else {
 				errorReadingParameter(testing_energyConsumptionPerLink);
 			}
 
-			tempStringValue = controler.getConfig().findParam(PSFModule, testing_maxEnergyPriceWillingToPay);
+			tempStringValue = controler.getConfig().findParam(PSF_MODULE, testing_maxEnergyPriceWillingToPay);
 			if (tempStringValue != null) {
 				testingMaxEnergyPriceWillingToPay = Double.parseDouble(tempStringValue);
 			} else {
 				errorReadingParameter(testing_maxEnergyPriceWillingToPay);
 			}
 
-			tempStringValue = controler.getConfig().findParam(PSFModule, testing_peakHourElectricityPrice);
+			tempStringValue = controler.getConfig().findParam(PSF_MODULE, testing_peakHourElectricityPrice);
 			if (tempStringValue != null) {
 				testingPeakHourElectricityPrice = Double.parseDouble(tempStringValue);
 			} else {
 				errorReadingParameter(testing_peakHourElectricityPrice);
 			}
 
-			tempStringValue = controler.getConfig().findParam(PSFModule, testing_lowTariffElectrictyPrice);
+			tempStringValue = controler.getConfig().findParam(PSF_MODULE, testing_lowTariffElectrictyPrice);
 			if (tempStringValue != null) {
 				testingLowTariffElectrictyPrice = Double.parseDouble(tempStringValue);
 			} else {
@@ -504,14 +485,6 @@ public class ParametersPSF {
 					.getTestingPeakHourElectricityPrice());
 		}
 
-	}
-
-	public static void setMatsimControler(Controler matsimControler) {
-		ParametersPSF.matsimControler = matsimControler;
-	}
-
-	public static Controler getMatsimControler() {
-		return matsimControler;
 	}
 
 }

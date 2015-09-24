@@ -20,13 +20,20 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -35,9 +42,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class PseudoTransitRoutingModule implements RoutingModule {
 
@@ -184,7 +188,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			// so let's calculate the final part.
 			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.speedFactor);
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
+			Route route = this.routeFactory.createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
@@ -196,7 +200,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			Route route = this.routeFactory.createRoute(TransportMode.pt, fromLink.getId(), toLink.getId());
+			Route route = this.routeFactory.createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);

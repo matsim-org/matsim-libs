@@ -48,7 +48,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
 	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
-        super(config, controler.getScenario().getNetwork());
+        super(config, scConfig, controler.getScenario().getNetwork());
 		this.controler = controler;
 		this.config = config;
 		this.init();

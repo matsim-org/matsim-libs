@@ -25,7 +25,7 @@ class CoordUtils {
 	private final static Logger log = Logger.getLogger(CoordUtils.class);
 
 
-	public static Coord getCoord(
+	public static Coord getCentroidCoord(
 			Entity entity,
 			CoordinateTransformation ct,			
 			Map<Long, NodeContainer> nodeMap,
@@ -127,7 +127,7 @@ class CoordUtils {
 	}
 	
 	
-	static Coord[] getWayCoords(Way way, CoordinateTransformation ct, Map<Long, NodeContainer> nodeMap){
+	public static Coord[] getAllWayCoords(Way way, CoordinateTransformation ct, Map<Long, NodeContainer> nodeMap){
 		List<Coord> list = new ArrayList<Coord>(); 
 		
 		for(WayNode wayNode : way.getWayNodes()){

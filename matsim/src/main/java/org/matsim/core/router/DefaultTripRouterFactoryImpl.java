@@ -1,5 +1,13 @@
 package org.matsim.core.router;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,16 +22,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouter;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryImpl.class);
-
+    
     public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new TripRouterFactoryModule(),
@@ -35,6 +37,9 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                 })
                 .getInstance(TripRouterFactory.class);
 	}
+
+    // Use a cache for the single mode networks. Otherwise, a new network is created for each TripRouterFactory instance!
+    private final Map<String, Network> singleModeNetworksCache = new ConcurrentHashMap<>();
 
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private final Provider<TransitRouter> transitRouterFactory;
@@ -62,8 +67,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-        final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
-
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             final RoutingModule routingModule = DefaultRoutingModules.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 
 			        scenario.getNetwork(), routeAlgoPtFreeFlow, routeConfigGroup.getModeRoutingParams().get( mode ) );
@@ -84,17 +87,27 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
         }
 
         for ( String mode : routeConfigGroup.getNetworkModes() ) {
-            TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-            Set<String> modes = new HashSet<>();
-            modes.add(mode);
-            Network filteredNetwork = NetworkUtils.createNetwork();
-            filter.filter(filteredNetwork, modes);
+        	
+        	Network filteredNetwork = null;
+        	
+        	// Ensure this is not performed concurrently by multiple threads!
+        	synchronized (this.singleModeNetworksCache) {
+        		filteredNetwork = this.singleModeNetworksCache.get(mode);
+        		if (filteredNetwork == null) {
+        			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+        			Set<String> modes = new HashSet<>();
+        			modes.add(mode);
+        			filteredNetwork = NetworkUtils.createNetwork();
+        			filter.filter(filteredNetwork, modes);
+        			this.singleModeNetworksCache.put(mode, filteredNetwork);
+        		}
+			}
 
             LeastCostPathCalculator routeAlgo =
             leastCostPathCalculatorFactory.createPathCalculator(
                     filteredNetwork,
-                    routingContext.getTravelDisutility(),
-                    routingContext.getTravelTime());
+                    routingContext.getTravelDisutility(mode),
+                    routingContext.getTravelTime(mode));
 
             final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
                     filteredNetwork, routeAlgo);
@@ -106,21 +119,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ": "+result );
             }
             
-            // The default router will always route on the car network.  A user may, however, have prepared a network with dedicated bicycle
-            // links and then expect the router to route on that.  The following test tries to catch that.  If someone improves on this,
-            // the test can be removed.  kai, feb'15
-            if ( networkIsMultimodal ) {
-            	switch ( mode ) {
-            	case TransportMode.car :
-            	case TransportMode.ride :
-            		break ;
-            	default:
-            		throw new RuntimeException("you have a multi-modal network and configured " + mode + " to be routed as a network mode.  "
-            				+ "The present configuration will route this "
-            				+ "mode on the car network.  This may be ok (e.g. with ``truck'' or ``motorbike''), or not (e.g. with ``bicycle''). "
-            				+ "Throwing an exception anyways; please use a uni-modal network if you want to keep this configuration.") ;
-            	}
-            }
         }
 
         if ( scenario.getConfig().transit().isUseTransit() ) {

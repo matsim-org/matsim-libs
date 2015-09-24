@@ -30,6 +30,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -50,9 +52,10 @@ public class KNOwnScoring {
 		Controler controler = new Controler( scenario ) ;
 		
 		ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory(){
+			final CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
+				final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 
 				MySumScoringFunction sumScoringFunction = new MySumScoringFunction() ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));

@@ -19,10 +19,63 @@
 
 package playground.johannes.synpop.data;
 
+import gnu.trove.TObjectDoubleHashMap;
+import playground.johannes.sna.util.ProgressLogger;
+
+import java.util.*;
+
 /**
  * @author johannes
  */
 public class PersonUtils {
+
+    public static  Set<? extends Person> weightedCopy(Collection<? extends Person> persons, Factory factory, int N,
+                                                      Random random) {
+        if(persons.size() == N) {
+            return new HashSet<>(persons); //TODO weights are left untouched
+        } else if(persons.size() > N) {
+            throw new IllegalArgumentException("Cannot shrink population.");
+        }
+
+        List<Person> templates = new ArrayList<>(persons);
+		/*
+		 * get max weight
+		 */
+        TObjectDoubleHashMap<Person> weights = new TObjectDoubleHashMap<>(persons.size());
+        double maxW = 0;
+        for(Person person : persons) {
+            String wStr = person.getAttribute(CommonKeys.PERSON_WEIGHT);
+            double w = 0;
+            if(wStr != null) {
+                w = Double.parseDouble(wStr);
+            }
+            weights.put(person, w);
+            maxW = Math.max(w, maxW);
+        }
+		/*
+		 * adjust weight so that max weight equals probability 1
+		 */
+        ProgressLogger.init(N, 2, 10);
+        Set<Person> clones = new HashSet<>();
+        while(clones.size() < N) {
+            Person template = templates.get(random.nextInt(templates.size()));
+            double w = weights.get(template);
+            double p = w/maxW;
+            if(p > random.nextDouble()) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(template.getId());
+                builder.append("clone");
+                builder.append(clones.size());
+
+                Person clone = PersonUtils.deepCopy(template, builder.toString(), factory);
+                clone.setAttribute(CommonKeys.PERSON_WEIGHT, "1.0");
+                clones.add(clone);
+                ProgressLogger.step();
+            }
+        }
+
+        return clones;
+    }
 
     public static Person shallowCopy(Person person, Factory factory) {
         return shallowCopy(person, person.getId(), factory);
@@ -34,6 +87,14 @@ public class PersonUtils {
             clone.setAttribute(key, person.getAttribute(key));
         }
 
+        return clone;
+    }
+
+    public static Person deepCopy(Person person, String id, Factory factory) {
+        Person clone = shallowCopy(person, id, factory);
+        for(Episode e : person.getEpisodes()) {
+            clone.addEpisode(deepCopy(e, factory));
+        }
         return clone;
     }
 

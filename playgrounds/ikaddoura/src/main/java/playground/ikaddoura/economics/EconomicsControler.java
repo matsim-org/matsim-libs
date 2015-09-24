@@ -119,7 +119,7 @@ public class EconomicsControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
@@ -201,6 +201,11 @@ public class EconomicsControler {
 		controler.run();
 	}
 
+	
+	// variiere die Flusskapazität von sehr hoch bis super viel Stau
+	// lass die Nachfrage reagieren
+	// lese Auto-Nachfrage ab (x)
+	// berechne mit diesem x und der Flusskapazität die Auto-Kosten (AC)
 	private void generateDemandAsFunctionOfCost() {
 		
 		String csvFile = path + "/economics_DemandAsFunctionOfCost.csv";
@@ -213,7 +218,8 @@ public class EconomicsControler {
 			
 			config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 9.);
 			config.plansCalcRoute().setBeelineDistanceFactor(1.0);
-			config.planCalcScore().setConstantCar(-1. * cost);
+			double constantCar = -1. * cost;
+			config.planCalcScore().getModes().get(TransportMode.car).setConstant(constantCar);
 			config.controler().setOutputDirectory(path + "output_DemandAsFunctionOfCost_" + cost + "/");
 			config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 			
@@ -302,7 +308,7 @@ public class EconomicsControler {
 			double totalPrivateCost = -1. * userBenefitsCalculator_selected.calculateUtility_utils(scenario.getPopulation());
 			this.demand2privateCost.put(demand, totalPrivateCost);
 
-			double totalExternalCost = -1 * (config.planCalcScore().getTraveling_utils_hr() / 3600) * economicsControlerListener.getCongestionHandler().getTotalDelay();
+			double totalExternalCost = -1 * (config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600) * economicsControlerListener.getCongestionHandler().getTotalDelay();
 			this.demand2externalCost.put(demand, totalExternalCost);
 			
 			log.info("#####################################################################");

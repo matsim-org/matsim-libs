@@ -39,7 +39,7 @@ import playground.kturner.freightKt.CarrierScoringFunctionFactoryImpl_KT;
 
 public class CarrierScoringFunctionFactoryImpl_KTTest {
 	
-	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test //Fixkosten
 	public void fixCosts() throws IOException {

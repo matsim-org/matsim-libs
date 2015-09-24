@@ -101,27 +101,27 @@ public class AccessEgressDemoSimple {
 		
 		Node n01, n10, n11, n12, n13, n14;
 		double x1 = -500;
-		network.addNode(n01 = network.getFactory().createNode(Id.create("01", Node.class), new Coord(x1, (double) 0)));
-		network.addNode(n10 = network.getFactory().createNode(Id.create("10", Node.class), new Coord((double) 0, (double) 0)));
-		network.addNode(n11 = network.getFactory().createNode(Id.create("11", Node.class), new Coord((double) 500, (double) 0)));
-		network.addNode(n12 = network.getFactory().createNode(Id.create("12", Node.class), new Coord((double) 1000, (double) 0)));
-		network.addNode(n13 = network.getFactory().createNode(Id.create("13", Node.class), new Coord((double) 1500, (double) 0)));
-		network.addNode(n14 = network.getFactory().createNode(Id.create("14", Node.class), new Coord((double) 2000, (double) 0)));
+		network.addNode(n01 = network.getFactory().createNode(Id.create("01", Node.class), new Coord(x1, 0)));
+		network.addNode(n10 = network.getFactory().createNode(Id.create("10", Node.class), new Coord(0, 0)));
+		network.addNode(n11 = network.getFactory().createNode(Id.create("11", Node.class), new Coord(500, 0)));
+		network.addNode(n12 = network.getFactory().createNode(Id.create("12", Node.class), new Coord(1000, 0)));
+		network.addNode(n13 = network.getFactory().createNode(Id.create("13", Node.class), new Coord(1500, 0)));
+		network.addNode(n14 = network.getFactory().createNode(Id.create("14", Node.class), new Coord(2000, 0)));
 		
 		Node n02, n20, n21, n22, n23, n24;
 		double x = -500;
 		double y5 = -500;
 		network.addNode(n02 = network.getFactory().createNode(Id.create("02", Node.class), new Coord(x, y5)));
 		double y4 = -500;
-		network.addNode(n20 = network.getFactory().createNode(Id.create("20", Node.class), new Coord((double) 0, y4)));
+		network.addNode(n20 = network.getFactory().createNode(Id.create("20", Node.class), new Coord(0, y4)));
 		double y3 = -500;
-		network.addNode(n21 = network.getFactory().createNode(Id.create("21", Node.class), new Coord((double) 500, y3)));
+		network.addNode(n21 = network.getFactory().createNode(Id.create("21", Node.class), new Coord(500, y3)));
 		double y2 = -500;
-		network.addNode(n22 = network.getFactory().createNode(Id.create("22", Node.class), new Coord((double) 1000, y2)));
+		network.addNode(n22 = network.getFactory().createNode(Id.create("22", Node.class), new Coord(1000, y2)));
 		double y1 = -500;
-		network.addNode(n23 = network.getFactory().createNode(Id.create("23", Node.class), new Coord((double) 1500, y1)));
+		network.addNode(n23 = network.getFactory().createNode(Id.create("23", Node.class), new Coord(1500, y1)));
 		double y = -500;
-		network.addNode(n24 = network.getFactory().createNode(Id.create("24", Node.class), new Coord((double) 2000, y)));
+		network.addNode(n24 = network.getFactory().createNode(Id.create("24", Node.class), new Coord(2000, y)));
 		
 		Link l;
 		l = network.getFactory().createLink(Id.create("0110", Link.class), n01, n10); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
@@ -149,22 +149,22 @@ public class AccessEgressDemoSimple {
 		TransitStopFacility stopFac;
 		TransitRouteStop stop;
 
-		stopFac = builder.createTransitStopFacility(Id.create("11", TransitStopFacility.class), new Coord((double) 500, (double) 0), stopsBlockLane); stopFac.setLinkId(Id.create("1011", Link.class)); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("11", TransitStopFacility.class), new Coord(500, 0), stopsBlockLane); stopFac.setLinkId(Id.create("1011", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 0, 10); stopListA.add(stop);
-		stopFac = builder.createTransitStopFacility(Id.create("13", TransitStopFacility.class), new Coord((double) 1500, (double) 0), stopsBlockLane); stopFac.setLinkId(Id.create("1213", Link.class)); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("13", TransitStopFacility.class), new Coord(1500, 0), stopsBlockLane); stopFac.setLinkId(Id.create("1213", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 50, 60); stopListA.add(stop);
 
 		double y1 = -500;
-		stopFac = builder.createTransitStopFacility(Id.create("21", TransitStopFacility.class), new Coord((double) 500, y1), stopsBlockLane); stopFac.setLinkId(Id.create("2021", Link.class)); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("21", TransitStopFacility.class), new Coord(500, y1), stopsBlockLane); stopFac.setLinkId(Id.create("2021", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 0, 10); stopListB.add(stop);
 		double y = -500;
-		stopFac = builder.createTransitStopFacility(Id.create("23", TransitStopFacility.class), new Coord((double) 1500, y), stopsBlockLane); stopFac.setLinkId(Id.create("2223", Link.class)); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("23", TransitStopFacility.class), new Coord(1500, y), stopsBlockLane); stopFac.setLinkId(Id.create("2223", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 50, 60); stopListB.add(stop);
 
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
-		NetworkRoute networkRouteA = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 		
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
 		linkListA.add(Id.create("1011", Link.class)); 
@@ -184,7 +184,7 @@ public class AccessEgressDemoSimple {
 		// transit line B		
 		Link startLinkB = this.scenario.getNetwork().getLinks().get(Id.create("0220", Link.class));
 		Link endLinkB = this.scenario.getNetwork().getLinks().get(Id.create("2324", Link.class));
-		NetworkRoute networkRouteB = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkB.getId(), endLinkB.getId());
+		NetworkRoute networkRouteB = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkB.getId(), endLinkB.getId());
 		
 		ArrayList<Id<Link>> linkListB = new ArrayList<Id<Link>>();
 		linkListB.add(Id.create("2021", Link.class));

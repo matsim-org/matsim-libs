@@ -23,6 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -38,16 +40,25 @@ public class DgScenarioUtils {
 			String signalGroupsFilename, String signalControlFilename){
 		Config c2 = ConfigUtils.createConfig();
 		c2.qsim().setUseLanes(true);
-		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+		
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(c2,
+				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalsConfigGroup.setUseSignalSystems(true);
+		
 		c2.network().setInputFile(net);
 		if (loadPopulation){
 			c2.plans().setInputFile(pop);
 		}
 		c2.network().setLaneDefinitionsFile(lanesFilename);
-		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsFilename);
-		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFilename);
-		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFilename);
+		signalsConfigGroup.setSignalSystemFile(signalsFilename);
+		signalsConfigGroup.setSignalGroupsFile(signalGroupsFilename);
+		signalsConfigGroup.setSignalControlFile(signalControlFilename);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(c2);
+		
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+				new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+		
 		return scenario;
 	}
 

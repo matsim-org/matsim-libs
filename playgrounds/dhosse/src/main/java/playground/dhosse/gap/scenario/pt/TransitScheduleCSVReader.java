@@ -68,19 +68,33 @@ public class TransitScheduleCSVReader {
 		
 		this.vehicles = scenario.getTransitVehicles();
 		
-		VehicleType type = new VehicleTypeImpl(Id.create("bus", VehicleType.class));
+		VehicleType bus = new VehicleTypeImpl(Id.create("bus", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(45); //TODO
 		capacity.setStandingRoom(55); //TODO
-		type.setCapacity(capacity);
-		type.setDoorOperationMode(DoorOperationMode.serial);
+		bus.setCapacity(capacity);
+		bus.setDoorOperationMode(DoorOperationMode.serial);
 		EngineInformation currentEngineInfo = new EngineInformationImpl(FuelType.diesel, 4);
-		type.setEngineInformation(currentEngineInfo);
-		type.setLength(18);
-		type.setMaximumVelocity(80);
-		type.setWidth(3);
+		bus.setEngineInformation(currentEngineInfo);
+		bus.setLength(18);
+		bus.setMaximumVelocity(80);
+		bus.setWidth(3);
 		
-		this.vehicles.addVehicleType(type);
+		this.vehicles.addVehicleType(bus);
+		
+		VehicleType train = new VehicleTypeImpl(Id.create("train", VehicleType.class));
+		VehicleCapacity capacity2 = new VehicleCapacityImpl();
+		capacity2.setSeats(206); //TODO
+		capacity2.setStandingRoom(228); //TODO
+		train.setCapacity(capacity2);
+		train.setDoorOperationMode(DoorOperationMode.serial);
+		EngineInformation currentEngineInfo2 = new EngineInformationImpl(FuelType.diesel, 4);
+		train.setEngineInformation(currentEngineInfo2);
+		train.setLength(200);
+		train.setMaximumVelocity(200);
+		train.setWidth(3);
+		
+		this.vehicles.addVehicleType(train);
 		
 	}
 	
@@ -348,7 +362,8 @@ public class TransitScheduleCSVReader {
 				
 			}
 			
-			TransitRoute transitRoute = this.schedule.getFactory().createTransitRoute(Id.create(id, TransitRoute.class), route, stops, TransportMode.pt);
+			String m = mode.equals("bus") ? TransportMode.pt : "train";
+			TransitRoute transitRoute = this.schedule.getFactory().createTransitRoute(Id.create(id, TransitRoute.class), route, stops, m);
 			for(Departure d : departures){
 				transitRoute.addDeparture(d);
 			}

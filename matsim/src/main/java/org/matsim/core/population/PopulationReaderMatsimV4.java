@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -43,6 +42,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.xml.sax.Attributes;
 
 /**
@@ -293,18 +293,16 @@ import org.xml.sax.Attributes;
 			if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}
-			if (this.currRoute instanceof GenericRoute) {
-				((GenericRoute) this.currRoute).setRouteDescription(
-						startLinkId, this.routeDescription.trim(), endLinkId);
-			} else if (this.currRoute instanceof NetworkRoute) {
+			this.currRoute.setStartLinkId(startLinkId);
+			this.currRoute.setEndLinkId(endLinkId);
+			if (this.currRoute instanceof NetworkRoute) {
 				((NetworkRoute) this.currRoute).setLinkIds(startLinkId,
 						NetworkUtils.getLinkIds(RouteUtils
 								.getLinksFromNodes(NetworkUtils.getNodes(
 										this.network, this.routeDescription))),
 						endLinkId);
 			} else {
-				throw new RuntimeException("unknown route type: "
-						+ this.currRoute.getClass().getName());
+				this.currRoute.setRouteDescription(this.routeDescription.trim());
 			}
 			this.routeDescription = null;
 			this.currRoute = null;
@@ -323,7 +321,11 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(this.currleg.getMode(), null, null);
+		Class<? extends Route> routeType = NetworkRoute.class;
+		if ("pt".equals(this.currleg.getMode())) {
+			routeType = ExperimentalTransitRoute.class;
+		}
+		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

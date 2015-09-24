@@ -71,7 +71,7 @@ public class IKControler_Berlin {
 		transitActivityParams.setTypicalDuration(120.0);
 		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 
-        controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getConfig().scenario(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getScenario().getNetwork()));
+        controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getScenario(), new BvgScoringFunctionConfigGroup(controler.getConfig()) ) );
 		controler.run();
 	}
 }

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRoute;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -72,8 +71,8 @@ public class VktEstimator {
 			if(pe instanceof Leg){
 				Leg leg = (Leg)pe;
 				Route route = leg.getRoute();
-				if(route != null && route instanceof GenericRoute){
-					GenericRoute gr = (GenericRoute)route;
+				if(route != null){
+					Route gr = route;
 					String[] sa = gr.getRouteDescription().split(" ");
 					for(String s : sa){
 						Id<Link> linkId = Id.createLinkId(s);

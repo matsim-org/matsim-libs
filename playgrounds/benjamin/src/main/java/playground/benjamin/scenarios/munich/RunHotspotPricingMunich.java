@@ -93,7 +93,7 @@ public class RunHotspotPricingMunich {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissionTducf);
+				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 			}
 		});
 

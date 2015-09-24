@@ -109,7 +109,7 @@ public class ScenarioUtils {
 			return this ;
 		}
 		// final creational method:
-		public Scenario createScenario() {
+		public Scenario build() {
 			this.scenario.setLocked(); // prevents that one can cast to ScenarioImpl and change the containers again. kai, nov'14
 			return this.scenario ;
 		}

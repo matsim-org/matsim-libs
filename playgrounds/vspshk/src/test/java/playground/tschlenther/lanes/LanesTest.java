@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class LanesTest {
 
-	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	private static String OUTPUT_DIR = "";
 	private static Id<Link> linkId1 = Id.create("L1", Link.class);
@@ -188,7 +188,7 @@ public class LanesTest {
 		
 	}
 	
-	static Config createConfig(){
+	 Config createConfig(){
 		Config config = utils.loadConfig(null);
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);

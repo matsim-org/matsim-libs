@@ -23,17 +23,18 @@
 package org.matsim.contrib.multimodal;
 
 import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
-import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
-import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.contrib.multimodal.router.util.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.TripRouterFactory;
@@ -41,6 +42,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
@@ -48,10 +50,15 @@ import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
 
+    private static final Logger log = Logger.getLogger(ControlerDefaultsWithMultiModalModule.class);
+
     private final Map<String, Provider<TravelTime>> additionalTravelTimeFactories = new LinkedHashMap<>();
+
+    private Map<Id<Link>, Double> linkSlopes;
 
     @Override
     public void install() {
@@ -62,32 +69,42 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
                 bind(TripRouterFactory.class).toProvider(MultiModalTripRouterFactoryProvider.class).in(Singleton.class);
             }
         }));
+
+        PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = getConfig().plansCalcRoute();
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
+
+        for (String mode : simulatedModes) {
+            if (mode.equals(TransportMode.walk)) {
+                Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+                addTravelTimeBinding(mode).toProvider(factory);
+            } else if (mode.equals(TransportMode.transit_walk)) {
+                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+                addTravelTimeBinding(mode).toProvider(factory);
+            } else if (mode.equals(TransportMode.bike)) {
+                Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+                addTravelTimeBinding(mode).toProvider(factory);
+            } else {
+                Provider<TravelTime> factory = this.additionalTravelTimeFactories.get(mode);
+                if (factory == null) {
+                    log.warn("Mode " + mode + " is not supported! " +
+                            "Use a constructor where you provide the travel time objects. " +
+                            "Using a UnknownTravelTime calculator based on constant speed." +
+                            "Agent specific attributes are not taken into account!");
+                    factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
+                } else {
+                    log.info("Found additional travel time factory from type " + factory.getClass().toString() +
+                            " for mode " + mode + ".");
+                }
+                addTravelTimeBinding(mode).toProvider(factory);
+            }
+        }
         addControlerListenerBinding().to(MultiModalControlerListener.class);
-        bind(new TypeLiteral<Map<String, TravelTime>>() {
-        }).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
-        bind(new TypeLiteral<Map<String, Provider<TravelTime>>>() {
-        }).toInstance(additionalTravelTimeFactories);
         bindMobsim().toProvider(MultimodalQSimFactory.class);
     }
 
-    private static class MultiModalTravelTimeLoader implements Provider<Map<String, TravelTime>> {
-
-        private final Scenario scenario;
-        private final Map<String, Provider<TravelTime>> additionalTravelTimeFactories;
-
-        @Inject
-        MultiModalTravelTimeLoader(Scenario scenario, Map<String, Provider<TravelTime>> additionalTravelTimeFactories) {
-            this.scenario = scenario;
-            this.additionalTravelTimeFactories = additionalTravelTimeFactories;
-        }
-
-        @Override
-        public Map<String, TravelTime> get() {
-            MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-            Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
-            MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig(), linkSlopes, additionalTravelTimeFactories);
-            return multiModalTravelTimeFactory.createTravelTimes();
-        }
+    public void setLinkSlopes(Map<Id<Link>, Double> linkSlopes) {
+        this.linkSlopes = linkSlopes;
     }
 
     private static class MultiModalTripRouterFactoryProvider implements Provider<TripRouterFactory> {
@@ -99,12 +116,12 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
         private TravelDisutilityFactory travelDisutilityFactory;
 
         @Inject
-        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Provider<TransitRouter> transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, TravelDisutilityFactory travelDisutilityFactory) {
+        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Provider<TransitRouter> transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactory) {
             this.scenario = scenario;
             this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
             this.transitRouterFactory = transitRouterFactory;
             this.multiModalTravelTimes = multiModalTravelTimes;
-            this.travelDisutilityFactory = travelDisutilityFactory;
+            this.travelDisutilityFactory = travelDisutilityFactory.get(TransportMode.car);
         }
 
         @Override
@@ -131,5 +148,6 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
     public void addAdditionalTravelTimeFactory(String mode, Provider<TravelTime> travelTimeFactory) {
         this.additionalTravelTimeFactories.put(mode, travelTimeFactory);
     }
+
 
 }

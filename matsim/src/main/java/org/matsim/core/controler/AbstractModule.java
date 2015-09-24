@@ -39,8 +39,11 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +62,7 @@ import java.util.List;
  *
  * @author michaz
  */
-public abstract class AbstractModule {
+public abstract class AbstractModule implements Module {
 
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
@@ -68,20 +71,25 @@ public abstract class AbstractModule {
     private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
     private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
+    private MapBinder<String, TravelDisutilityFactory> travelDisutilityFactoryMultibinder;
+    private MapBinder<String, TravelTime> travelTimeMultibinder;
 
     @Inject
     com.google.inject.Injector bootstrapInjector;
+    private Config config;
 
-    static com.google.inject.Module toGuiceModule(final AbstractModule module) {
-        return new com.google.inject.Module() {
-            @Override
-            public void configure(Binder binder) {
-                module.configure(binder);
-            }
-        };
+    public AbstractModule() {
+        // config will be injected later
     }
 
-    final void configure(Binder binder) {
+    public AbstractModule(Config config) {
+        this.config = config;
+    }
+
+    public final void configure(Binder binder) {
+        if (this.config == null) {
+            this.config = bootstrapInjector.getInstance(Config.class);
+        }
         // Guice error messages should give the code location of the error in the user's module,
         // not in this class.
         this.binder = binder.skipSources(AbstractModule.class);
@@ -91,26 +99,27 @@ public abstract class AbstractModule {
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
         this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
+        this.travelDisutilityFactoryMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelDisutilityFactory>(){});
+        this.travelTimeMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelTime>(){});
         this.install();
     }
 
     public abstract void install();
 
     protected final Config getConfig() {
-        return bootstrapInjector.getInstance(Config.class);
+        return config;
     }
 
-    protected final void install(AbstractModule module) {
+    protected final void install(Module module) {
         bootstrapInjector.injectMembers(module);
-        Module guiceModule = toGuiceModule(module);
-        binder.install(guiceModule);
+        binder.install(module);
     }
 
-    protected LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
+    protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
         return eventHandlerMultibinder.addBinding();
     }
 
-    protected LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
+    protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
         return controlerListenerMultibinder.addBinding();
     }
 
@@ -134,12 +143,32 @@ public abstract class AbstractModule {
         return snapshotWriterMultibinder.addBinding();
     }
 
-    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {
-        return bind(TravelDisutilityFactory.class);
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
+        return bind(carTravelDisutilityFactoryKey());
+    }
+
+    protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
+        return Key.get(TravelDisutilityFactory.class, ForCar.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
+        return travelDisutilityFactoryMultibinder.addBinding(mode);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
         return bind(LeastCostPathCalculatorFactory.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
+        return travelTimeMultibinder.addBinding(mode);
+    }
+
+    protected final LinkedBindingBuilder<TravelTime> bindCarTravelTime() {
+        return bind(carTravelTimeKey());
+    }
+
+    protected final Key<TravelTime> carTravelTimeKey() {
+        return Key.get(TravelTime.class, ForCar.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -169,10 +198,10 @@ public abstract class AbstractModule {
                 final List<com.google.inject.Module> guiceModules = new ArrayList<>();
                 for (AbstractModule module : modules) {
                     bootstrapInjector.injectMembers(module);
-                    guiceModules.add(AbstractModule.toGuiceModule(module));
+                    guiceModules.add(module);
                 }
                 bootstrapInjector.injectMembers(abstractModule);
-                binder().install(Modules.override(guiceModules).with(AbstractModule.toGuiceModule(abstractModule)));
+                binder().install(Modules.override(guiceModules).with(abstractModule));
             }
         };
     }
@@ -184,4 +213,8 @@ public abstract class AbstractModule {
         };
     }
 
+    @BindingAnnotation
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ForCar {
+    }
 }

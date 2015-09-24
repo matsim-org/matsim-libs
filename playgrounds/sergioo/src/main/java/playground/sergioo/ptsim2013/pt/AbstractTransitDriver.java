@@ -186,7 +186,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	final Netsim getSimulation(){
-		return ((QSim) this.internalInterface.getMobsim());
+		return (this.internalInterface.getMobsim());
 	}
 
 	/**Design comments:<ul>
@@ -412,6 +412,21 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		@Override
 		public double getTravelTime() {
 			return this.delegate.getTravelTime();
+		}
+
+		@Override
+		public String getRouteDescription() {
+			return this.delegate.getRouteDescription();
+		}
+		
+		@Override
+		public void setRouteDescription(String routeDescription) {
+			this.delegate.setRouteDescription(routeDescription);
+		}
+		
+		@Override
+		public String getRouteType() {
+			return this.delegate.getRouteType();
 		}
 
 		@Override

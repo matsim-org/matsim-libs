@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -41,8 +40,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
 
 /**
  * @author nagel
@@ -107,13 +107,13 @@ public class KNFrozen {
 		
 		
 		ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory() {
+			final CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
+
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				
-				PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
-				CharyparNagelScoringParametersBuilder builder = CharyparNagelScoringParameters.getBuilder(pcsConfig, config.scenario()) ;
-				CharyparNagelScoringParameters params = builder.create() ;
+				CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 				
 				sum.addScoringFunction( new CharyparNagelActivityScoring(params));
 				sum.addScoringFunction( new CharyparNagelMoneyScoring(params) );

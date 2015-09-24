@@ -20,10 +20,18 @@
 
 package org.matsim.integration.always;
 
-import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -32,8 +40,13 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -48,6 +61,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,13 +69,6 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different
@@ -118,6 +125,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	public void testBetaTravel_6() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);	
+		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
 		 * to store the persons in the population, we have to sort the population manually.  
@@ -133,8 +141,8 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		});
 		controler.addControlerListener(new TestControlerListener());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -147,13 +155,15 @@ public class BetaTravelTest extends MatsimTestCase {
 	public void testBetaTravel_66() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
+		// ---
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
 		 * to store the persons in the population, we have to sort the population manually.  
 		 * cdobler, oct'11
 		 */
-		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
+		// ---
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -162,8 +172,8 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		});
 		controler.addControlerListener(new TestControlerListener());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -284,11 +294,18 @@ public class BetaTravelTest extends MatsimTestCase {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<Plan, Person>(config.planCalcScore()));
 			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
 
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
+			
+			// Trying to replace this by the standard mutator ...
+//			double mutationRange = 1800. ;
+//			boolean affectingDuration = false ;
+//			strategy2.addStrategyModule( new TimeAllocationMutator(config, mutationRange, affectingDuration));
+			// ... but the test result looks different. kai, sep'15
+			
 			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
 
 			// reduce the replanning probabilities over the iterations
@@ -318,7 +335,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
             // do some test to ensure the scenario is correct
-            double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
+			double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
             if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
                 throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
             }
@@ -361,7 +378,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
+				double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 *

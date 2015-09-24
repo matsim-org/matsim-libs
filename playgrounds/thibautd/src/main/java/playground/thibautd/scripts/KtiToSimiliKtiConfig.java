@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -48,22 +49,13 @@ public class KtiToSimiliKtiConfig {
 		// XXX KTI defines a constant for car in the config group,
 		// BUT IT IS NOT USED IN THE SCORING FUNCTION!!!!!!!
 		//planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
-		planCalcScore.setConstantCar( 0 );
-		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
-		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
-		planCalcScore.setMonetaryDistanceRatePt(
-				// yes, that's really it. In KTI, the (monetary) cost of distance
-				// is *multiplied* by the marginal utility of distance.
-				// This makes it completely meaningless, but we need to reproduce it
-				// if we want to use the "calibrated" parameters.
-				// In particular, as the MonetaryDistanceCostRateCar is null
-				// in the calibrated config, this makes the "fuel cost"
-				// parameter unused...
-				(planCalcScore.getMonetaryDistanceRatePt() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
-				planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceRateCar(
-				(planCalcScore.getMonetaryDistanceRateCar() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
-				planCalcScore.getMarginalUtilityOfMoney() );
+		planCalcScore.getModes().get(TransportMode.car).setConstant((double) 0);
+		planCalcScore.getModes().get(TransportMode.bike).setConstant(ktiConfigGroup.getConstBike());
+		planCalcScore.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(ktiConfigGroup.getTravelingBike());
+		planCalcScore.getModes().get(TransportMode.pt).setMonetaryDistanceRate((planCalcScore.getModes().get(TransportMode.pt).getMonetaryDistanceRate() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
+				planCalcScore.getMarginalUtilityOfMoney());
+		planCalcScore.getModes().get(TransportMode.car).setMonetaryDistanceRate((planCalcScore.getModes().get(TransportMode.car).getMonetaryDistanceRate() * planCalcScore.getMarginalUtilityOfMoney() * ktiConfigGroup.getDistanceCostCar() / 1000d) /
+				planCalcScore.getMarginalUtilityOfMoney());
 
 		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
 		outputConfig.addModule( ktiLikeConfigGroup );

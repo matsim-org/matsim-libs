@@ -75,7 +75,7 @@ public class RunAmenityReaderForBe {
 //		}
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", crs);
-		AmenityReader msr = new AmenityReader(osmFile, ct, buildOsmToMatsimTypeMap());
+		AmenityReader msr = new AmenityReader(osmFile, ct, buildOsmAmentityTypeToMatsimTypeMap());
 		try {
 			msr.parseAmenity(osmFile);
 			msr.writeFacilities(facilityFile);
@@ -144,51 +144,161 @@ public class RunAmenityReaderForBe {
 	}
 	
 
-	private static Map<String, String> buildOsmToMatsimTypeMap(){
+	private static Map<String, String> buildOsmAmentityTypeToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
 		
-		map.put("school", "e");
-		map.put("kindergarten", "e");
-		map.put("college", "e");
-		map.put("university", "e");
+		// "subsistence" section in osm wiki
+		map.put("bar", "leisure"); // used to be "l"
+
+		map.put("bbq", "leisure");
+		map.put("biergarten", "leisure");
 		
-		map.put("bar", "l");
-		map.put("cafe", "l");
-		map.put("fast_food", "l");
-		map.put("food_court", "l");
-		map.put("ice_cream", "l");
-		map.put("pub", "l");
-		map.put("restaurant", "l");
-		map.put("arts_centre", "l");
-		map.put("cinema", "l");
-		map.put("nightclub", "l");
-		map.put("stripclub", "l");
-		map.put("theatre", "l");
-		map.put("brothel", "l");
+		map.put("cafe", "leisure"); // used to be "l"
 		
-		map.put("clinic", "m");
-		map.put("dentist", "m");
-		map.put("doctors", "m");
-		map.put("hospital", "m");
-		map.put("nursing_home", "m");
-		map.put("pharmacy", "m");
+		map.put("drinking_water", "ignore");
 		
-		map.put("polic", "p");
+		map.put("fast_food", "leisure"); // used to be "l"
+		map.put("food_court", "leisure"); // used to be "l"
+		map.put("ice_cream", "leisure"); // used to be "l"
+		map.put("pub", "leisure"); // used to be "l"
+		map.put("restaurant", "leisure"); // used to be "l"
 		
-		map.put("library", "t");
-		map.put("car_wash", "t");
-		map.put("fuel", "t");
-		map.put("atm", "t");
-		map.put("bank", "t");
-		map.put("bureau_de_change", "t");
-		map.put("social_centre", "t");
-		map.put("marketplace", "t");
-		map.put("place_of_worship", "t");
-		map.put("post_office", "t");
-		map.put("townhall", "t");
+		// "education" section in osm wiki
+		map.put("college", "education"); // used to be "e"
+		map.put("kindergarten", "education"); // used to be "e"
+		
+		map.put("library", "other"); // used to be "t"
+		map.put("public_bookcase", "ignore");
+		
+		map.put("school", "education"); // used to be "e"
+		map.put("university", "education"); // used to be "e"
+		
+		// "transportation" section in osm wiki
+		map.put("bicycle_parking", "ignore");
+		map.put("bicycle_repair_station", "ignore");
+		
+		map.put("bicycle_rental", "other");
+		
+		map.put("boat_sharing", "ignore");
+		map.put("bus_station", "ignore");
+		
+		map.put("car_rental", "other");
+		
+		map.put("car_sharing", "ignore");
+		
+		map.put("car_wash", "other"); // used to be "t"
+		
+		map.put("charging_station", "ignore");
+		map.put("ferry_terminal", "ignore");
+		
+		map.put("fuel", "other"); // used to be "t"
+		
+		map.put("grit_bin", "ignore");
+		map.put("motorcycle_parking", "ignore");
+		map.put("parking", "ignore");
+		map.put("parking_entrance", "ignore");
+		map.put("taxi", "ignore");
+		
+		// "financial" section in osm wiki
+		map.put("atm", "other"); // used to be "t"
+		map.put("bank", "other"); // used to be "t"
+		map.put("bureau_de_change", "other"); // used to be "t"
+		
+		// "healthcare" section in osm wiki
+		map.put("baby_hatch", "ignore");
+		
+		map.put("clinic", "medical"); // used to be "m"
+		map.put("dentist", "medical"); // used to be "m"
+		map.put("doctors", "medical"); // used to be "m"
+		map.put("hospital", "medical"); // used to be "m"
+		map.put("nursing_home", "medical"); // used to be "m"
+		map.put("pharmacy", "medical"); // used to be "m"
+		
+		map.put("social_facility", "ignore");
+		map.put("veterinary", "ignore");
+		map.put("blood_donation", "ignore");
+		
+		// "entertainment, arts & culture" section in osm wiki
+		map.put("arts_centre", "leisure"); // used to be "l"
+		map.put("brothel", "leisure"); // used to be "l"
+		map.put("casino", "leisure");
+		map.put("cinema", "leisure"); // used to be "l"
+
+		map.put("community_centre", "ignore");
+		map.put("fountain", "ignore");
+		
+		map.put("gambling", "leisure");
+		map.put("nightclub", "leisure"); // used to be "l"
+		map.put("planetarium", "leisure");
+
+		map.put("social_centre", "other"); // used to be "t"
+		
+		map.put("stripclub", "leisure"); // used to be "l"
+		map.put("studio", "leisure");
+		map.put("swingerclub", "leisure");
+		
+		map.put("theatre", "leisure"); // used to be "l"
+		
+		// "other" section in osm wiki
+		map.put("animal_boarding", "ignore");
+		map.put("animal_shelter", "ignore");
+		map.put("bench", "ignore");
+		map.put("clock", "ignore");
+		map.put("courthouse", "ignore");
+
+		map.put("coworking_space", "work");
+
+		map.put("crematorium", "ignore");
+		map.put("crypt", "ignore");
+		map.put("dojo", "ignore");
+
+		map.put("embassy", "other");
+
+		map.put("fire_station", "work");
+
+		map.put("game_feeding", "leisure");
+		
+		map.put("grave_yard", "ignore");
+		
+		map.put("gym", "leisure");
+		
+		map.put("hunting_stand", "ignore");
+		map.put("kneipp_water_cure", "ignore");
+		
+		map.put("marketplace", "shopping"); // used to be "t" = other
+		
+		map.put("photo_booth", "leisure");
+		
+		map.put("place_of_worship", "other"); // used to be "t"
+		
+		map.put("polic", "police"); // used to be "p"
+		
+		map.put("post_box", "ignore");
+		
+		map.put("post_office", "other"); // used to be "t"
+		
+		map.put("prison", "ignore");
+		map.put("ranger_station", "ignore");
+		map.put("register_office", "ignore");
+		map.put("recycling", "ignore");
+		map.put("rescue_station", "ignore");
+		
+		map.put("sauna", "leisure");
+		
+		map.put("shelter", "ignore");
+		map.put("shower", "ignore");
+		map.put("telephone", "ignore");
+		map.put("toilets", "ignore");
+		
+		map.put("townhall", "other"); // used to be "t"
+
+		map.put("vending_machine", "shopping");
+		
+		map.put("waste_basket", "ignore");
+		map.put("waste_disposal", "ignore");
+		map.put("watering_place", "ignore");
+		map.put("water_point", "ignore");
+		
 		return map;
 	}
-	
-	
-
 }

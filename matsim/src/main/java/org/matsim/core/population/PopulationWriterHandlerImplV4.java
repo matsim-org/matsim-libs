@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -324,17 +323,16 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		if (route instanceof GenericRoute) {
-			String rd = ((GenericRoute) route).getRouteDescription();
-			if (rd != null) {
-				out.write(rd);
-				out.write(" "); // this is at the moment only to maintain binary compatibility
-			}
-		}
-		else if (route instanceof NetworkRoute) {
+		if (route instanceof NetworkRoute) {
 			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
 				out.write(n.getId().toString());
 				out.write(" ");
+			}
+		} else {
+			String rd = route.getRouteDescription();
+			if (rd != null) {
+				out.write(rd);
+				out.write(" "); // this is at the moment only to maintain binary compatibility
 			}
 		}
 

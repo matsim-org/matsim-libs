@@ -97,7 +97,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		emissionCostModule = new EmissionCostModule(1.0);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6.000);
+		final double traveling = -6.000;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
@@ -133,7 +134,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(0.0);
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
@@ -165,7 +166,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6000.0);
+		final double traveling = -6000.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		//pcs.setMonetaryDistanceCostRateCar(-0.0001);
 		pcs.setMonetaryDistanceCostRateCar(0.000);
@@ -192,7 +194,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissiondcf);
+				bindCarTravelDisutilityFactory().toInstance(emissiondcf);
 			}
 		});
 	}
@@ -244,7 +246,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.addActivityParams(act2Params);
 
 		pcs.setBrainExpBeta(1.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(0.6);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 

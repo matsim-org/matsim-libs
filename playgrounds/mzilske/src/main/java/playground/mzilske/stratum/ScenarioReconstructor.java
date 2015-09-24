@@ -22,6 +22,8 @@
 
 package playground.mzilske.stratum;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -33,14 +35,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
+
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Sightings;
 import playground.mzilske.cdr.ZoneTracker;
-
-import javax.inject.Provider;
 
 class ScenarioReconstructor implements Provider<Scenario> {
 
@@ -62,8 +62,7 @@ class ScenarioReconstructor implements Provider<Scenario> {
 
     @Override
     public Scenario get() {
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-        scenario.setNetwork(network);
+	    Scenario scenario = new ScenarioBuilder(config).setNetwork(network).build() ;
 
         PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, sightings);
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, sightings);

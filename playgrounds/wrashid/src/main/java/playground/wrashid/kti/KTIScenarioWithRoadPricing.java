@@ -47,8 +47,7 @@ public class KTIScenarioWithRoadPricing {
 				new KtiLikeActivitiesScoringFunctionFactory(
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
-					config.planCalcScore(),
-					scenario) );
+						scenario) );
 
 //        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
 			Logger.getLogger("KTIScenarioWithRoadPricing.class").fatal("this above syntax is no longer there.  "

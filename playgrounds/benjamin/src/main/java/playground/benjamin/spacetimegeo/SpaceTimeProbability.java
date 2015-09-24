@@ -19,6 +19,17 @@
  * *********************************************************************** */
 package playground.benjamin.spacetimegeo;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,14 +37,22 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.*;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -45,13 +64,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author benjamin
@@ -191,7 +203,7 @@ public class SpaceTimeProbability {
 
 		pcs.setBrainExpBeta(entry.getValue().getMu());
 		pcs.setPerforming_utils_hr(entry.getValue().getBetaPerf());
-		pcs.setTraveling_utils_hr(entry.getValue().getBetaTraveling());
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(entry.getValue().getBetaTraveling());
 		pcs.setMarginalUtilityOfMoney(entry.getValue().getBetaCost());
 		pcs.setLateArrival_utils_hr(entry.getValue().getBetaLate());
 //		pcs.setMonetaryDistanceCostRateCar(-0.0);
@@ -267,8 +279,8 @@ public class SpaceTimeProbability {
 				throw new RuntimeException();
 			}
 			
-			Route route1 = pFactory.createRoute(leg1.getMode(), null, null);
-			((NetworkRoute) route1).setLinkIds(homeLinkId, routeLinkIds, workLinkId);
+			NetworkRoute route1 = pFactory.createRoute(NetworkRoute.class, null, null);
+			route1.setLinkIds(homeLinkId, routeLinkIds, workLinkId);
 			leg1.setRoute(route1);
 			logger.info(((NetworkRoute) leg1.getRoute()).getLinkIds());
 			plan.addLeg(leg1);
@@ -287,8 +299,8 @@ public class SpaceTimeProbability {
 			routeLinkIds2.add(id6);
 			routeLinkIds2.add(id7);
 
-			Route route2 = pFactory.createRoute(leg2.getMode(), null, null);
-			((NetworkRoute) route2).setLinkIds(workLinkId, routeLinkIds2, homeLinkId);
+			NetworkRoute route2 = pFactory.createRoute(NetworkRoute.class, null, null);
+			route2.setLinkIds(workLinkId, routeLinkIds2, homeLinkId);
 			leg2.setRoute(route2);
 			logger.info(((NetworkRoute) leg2.getRoute()).getLinkIds());
 			plan.addLeg(leg2);

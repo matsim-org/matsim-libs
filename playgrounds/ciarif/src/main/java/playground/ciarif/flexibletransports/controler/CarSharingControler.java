@@ -97,7 +97,7 @@ public final class CarSharingControler extends Controler
 //        this.addOverridingModule(new AbstractModule() {
 //            @Override
 //            public void install() {
-//                bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//                bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //            }
 //        });
 //        super.setUp();

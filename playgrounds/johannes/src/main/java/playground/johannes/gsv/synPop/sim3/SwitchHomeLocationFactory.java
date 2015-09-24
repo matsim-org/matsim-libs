@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Random;
-
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import java.util.Random;
 
 public class SwitchHomeLocationFactory implements MutatorFactory {
 

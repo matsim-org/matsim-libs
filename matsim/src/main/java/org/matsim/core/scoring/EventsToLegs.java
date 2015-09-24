@@ -41,12 +41,12 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -185,7 +185,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
-	    	GenericRoute genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
+	    	Route genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
 	    	genericRoute.setTravelTime(travelTime);
 	        if (travelEvent != null) {
 	            genericRoute.setDistance(travelEvent.getDistance());

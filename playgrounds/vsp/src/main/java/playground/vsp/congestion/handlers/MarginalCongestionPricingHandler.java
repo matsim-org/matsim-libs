@@ -23,6 +23,7 @@
 package playground.vsp.congestion.handlers;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -50,7 +51,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	public MarginalCongestionPricingHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("Using the same VTTS for each agent to translate delays into monetary units.");
 		log.info("VTTS_car: " + vtts_car);
 	}

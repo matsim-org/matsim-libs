@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -39,22 +40,22 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
-import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
-import playground.thibautd.router.multimodal.LinkSlopeScorer;
-import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
-import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
+import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
+import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRoute;
+import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
+import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -143,12 +144,10 @@ public class BikeSharingScenarioUtils {
 
 		if ( multimodalConfigGroup != null ) {
 			final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( );
-			for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
-				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
-			}
+			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
 		}
 
-		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingConstants.MODE , new BikeSharingRouteFactory() );
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingRoute.class , new BikeSharingRouteFactory() );
 	}
 
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
@@ -167,10 +166,8 @@ public class BikeSharingScenarioUtils {
 
 		// PrepareMultiModalScenario.run( scenario );
 
-		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( );
-        for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
-			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
-		}
+		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory();
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
 
 		final Map<Id<Link>, Double> linkSlopes = (Map<Id<Link>, Double>)
 			scenario.getScenarioElement( LINK_SLOPES_ELEMENT_NAME );

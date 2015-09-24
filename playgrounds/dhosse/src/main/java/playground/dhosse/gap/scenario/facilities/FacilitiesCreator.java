@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -129,6 +130,8 @@ public class FacilitiesCreator {
 	
 	public static void readWorkplaces(Scenario scenario, String file){
 		
+		Log.info("Reading workplaces from " + file);
+		
 		BufferedReader reader = IOUtils.getBufferedReader(file);
 		
 		final int idxX = 0;
@@ -143,7 +146,7 @@ public class FacilitiesCreator {
 			while((line = reader.readLine()) != null){
 				
 				String[] parts = line.split(",");
-
+				
 				Coord coord = Global.ct.transform(new Coord(Double.parseDouble(parts[idxX]), Double.parseDouble(parts[idxY])));
 				
 				ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(Global.ActType.work.name() + "_" + counter, ActivityFacility.class), coord);
@@ -163,6 +166,8 @@ public class FacilitiesCreator {
 			e.printStackTrace();
 			
 		}
+		
+		Log.info("Done reading workplaces.");
 		
 	}
 
