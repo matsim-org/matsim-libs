@@ -27,12 +27,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -41,8 +44,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import com.vividsolutions.jts.util.Assert;
 
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
@@ -142,13 +143,13 @@ public class VTTSspecificRouterTest {
 			if (id.toString().contains("highVTTS")) {
 				
 				// the high VTTS person should use the fast but expensive route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
 			}
 			
 			if (id.toString().contains("lowVTTS")) {
 
 				// the low VTTS person should use the slow but cheap route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
 			}
 		}		
 	}
@@ -210,7 +211,7 @@ public class VTTSspecificRouterTest {
 			if (id.toString().contains("highVTTS")) {
 				
 				// both persons use the slow but cheap route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
 				
 //				System.out.println(vehicleId2linkIds.get(id).toString());
 			}
@@ -218,7 +219,7 @@ public class VTTSspecificRouterTest {
 			if (id.toString().contains("lowVTTS")) {
 
 				// both persons use the slow but cheap route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
 				
 //				System.out.println(vehicleId2linkIds.get(id).toString());
 			}
@@ -295,6 +296,12 @@ public class VTTSspecificRouterTest {
 		// ==> the high VTTS person will choose the high speed route
 		// ==> the low VTTS person will choose the high speed route
 		
+		double scoreSum = 0.;
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
+			scoreSum += person.getSelectedPlan().getScore();
+		}
+		Assert.assertEquals("not the same score sum", 147.36748899537443, scoreSum, MatsimTestUtils.EPSILON);
+		
 		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
 		
 		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
@@ -302,13 +309,13 @@ public class VTTSspecificRouterTest {
 			if (id.toString().contains("highVTTS")) {
 				
 				// both persons use the fast route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
 			}
 			
 			if (id.toString().contains("lowVTTS")) {
 
 				// both persons use the fast route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
 			}
 		}		
 	}
@@ -354,6 +361,12 @@ public class VTTSspecificRouterTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
+		double scoreSum = 0.;
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
+			scoreSum += person.getSelectedPlan().getScore();
+		}
+		Assert.assertEquals("not the same score sum", 147.36748899537443, scoreSum, MatsimTestUtils.EPSILON);
+		
 		// both persons use the fast route
 		
 		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
@@ -363,15 +376,124 @@ public class VTTSspecificRouterTest {
 			if (id.toString().contains("highVTTS")) {
 				
 				// both persons use the fast route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
 			}
 			
 			if (id.toString().contains("lowVTTS")) {
 
 				// both persons use the fast route
-				Assert.equals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
 			}
 		}		
+	}
+	
+	/**
+	 * compares the default with the VTTS specific router with distance cost = 0
+	 * 
+	 */
+	@Test
+	public final void test5(){
+		
+		// starts the VTTS-specific router
+		
+		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost_largePopulation_1.xml";
+		final Controler controler1 = new Controler(configFile1);
+		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
+		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory1 = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler1) ;
+		factory1.setSigma(0.); // no randomness
+		
+		controler1.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory1 );
+			}
+		}); 		
+		
+		controler1.addControlerListener(new VTTScomputation(vttsHandler1));
+		
+		controler1.addOverridingModule(new OTFVisModule());
+		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler1.run();
+		
+		double scoreSum1 = 0.;
+		for (Person person : controler1.getScenario().getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				scoreSum1 += plan.getScore();
+			}
+		}
+		
+		
+		// default run
+		
+		final String configFile2 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost_largePopulation_2.xml";
+		final Controler controler2 = new Controler(configFile2);
+		
+		controler2.addOverridingModule(new OTFVisModule());
+		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler2.run();
+		
+		double scoreSum2 = 0.;
+		for (Person person : controler2.getScenario().getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				scoreSum2 += plan.getScore();
+			}
+		}
+		System.out.println(scoreSum1 + " / " + scoreSum2);
+		Assert.assertEquals("not the same score sum", scoreSum1, scoreSum2, MatsimTestUtils.EPSILON);
+			
+	}
+	
+	/**
+	 * compares the default with the VTTS specific router with distance cost = -0.002
+	 */
+	@Test
+	public final void test6(){
+		
+		// starts the VTTS-specific router
+		
+		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_1.xml";
+		final Controler controler1 = new Controler(configFile1);
+		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
+		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory1 = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler1) ;
+		factory1.setSigma(0.); // no randomness
+		
+		controler1.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory1 );
+			}
+		}); 		
+		
+		controler1.addControlerListener(new VTTScomputation(vttsHandler1));
+		
+		controler1.addOverridingModule(new OTFVisModule());
+		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler1.run();
+		
+		double scoreSum1 = 0.;
+		for (Person person : controler1.getScenario().getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				scoreSum1 += plan.getScore();
+			}
+		}
+		
+		// default run
+		
+		final String configFile2 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_2.xml";
+		final Controler controler2 = new Controler(configFile2);
+		
+		controler2.addOverridingModule(new OTFVisModule());
+		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler2.run();
+		
+		double scoreSum2 = 0.;
+		for (Person person : controler2.getScenario().getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				scoreSum2 += plan.getScore();
+			}
+		}
+		System.out.println(scoreSum1 + " / " + scoreSum2);
+		Assert.assertTrue(scoreSum1 - scoreSum2 > 1.0);
 	}
 	
 }
