@@ -135,7 +135,7 @@ public class Simulator {
 
 		listener.addComponent(new MarkovEngineListener() {
 
-			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 1000000);
+			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 10000000);
 
 			@Override
 			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
@@ -152,7 +152,7 @@ public class Simulator {
 
 		sampler.setListener(listener);
 
-		sampler.run(10000001);
+		sampler.run(100000001);
 	}
 
 	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
