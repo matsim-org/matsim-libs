@@ -28,6 +28,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -51,6 +52,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -59,8 +61,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
-
-import junit.framework.Assert;
 
 /**
  * @author mrieser
@@ -327,7 +327,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser / senozon
 	 */
 	public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
@@ -357,7 +357,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser / senozon
 	 */
 	public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
@@ -389,7 +389,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoAnalyzedModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModes("");
@@ -424,7 +424,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_CarAnalyzedModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModes(TransportMode.car);
@@ -465,7 +465,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoFilterModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModes("");
@@ -506,7 +506,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_FilterDefaultModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setFilterModes(true);
