@@ -85,17 +85,21 @@ public class PersonTripAnalysisMain {
 			
 		} else {			
 			
-			String id = "c9";
+			String id = "c13";
 			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_config.xml";
+			String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+//			String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/c/output/";
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_plans.xml.gz";
+			networkFile = runDirectory + id + "/output_network.xml.gz";
+			configFile = runDirectory + id + "/output_config.xml.gz";
 			
-			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
+			eventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+			outputPath = runDirectory + id + "/ITERS/it.100/detailedAnalysis/";
+			populationFile = runDirectory + id + "/output_plans.xml.gz";
+			
+			noiseEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+			congestionEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+			
 		}
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
