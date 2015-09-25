@@ -1,9 +1,11 @@
 package playground.dhosse.gap.scenario.population;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -78,6 +80,25 @@ public class PlansCreatorV2 {
 		//the actual demand generation
 		createPersonsWithDemographicData(scenario, cdr.getCommuterRelations(), matrices);
 		
+		//remove persons with plans containing less than three plan elements
+		Set<Person> toBeRemoved = new HashSet<>();
+		
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			
+			if(person.getSelectedPlan().getPlanElements().size() < 3){
+				
+				toBeRemoved.add(person);
+				
+			}
+			
+		}
+		
+		for(Person p : toBeRemoved){
+			scenario.getPopulation().getPersons().remove(p.getId());
+		}
+		
+		log.info(toBeRemoved.size() + " persons had plans containing less than three plan elements and had thus to be removed from the population...");
+		
 		return scenario.getPopulation();
 		
 	}
@@ -91,11 +112,12 @@ public class PlansCreatorV2 {
 		MiDCSVReader reader = new MiDCSVReader();
 		reader.readV2(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv", templates);
 		templates.setWeights();
-		
-		
-//		for(MiDSurveyPerson p : persons.values()){
-//			templates.handlePerson(p);
-//		}
+
+		CreateDemand.getNinetyPctDistances().put(TransportMode.car, new Double(33526));
+		CreateDemand.getNinetyPctDistances().put(TransportMode.ride, new Double(43960));
+		CreateDemand.getNinetyPctDistances().put(TransportMode.bike, new Double(8719));
+		CreateDemand.getNinetyPctDistances().put(TransportMode.walk, new Double(2939));
+		CreateDemand.getNinetyPctDistances().put(TransportMode.pt, new Double(49541));
 		
 		for(Entry<String, Municipality> entry : Municipalities.getMunicipalities().entrySet()){
 			
@@ -136,7 +158,7 @@ public class PlansCreatorV2 {
 			
 		}
 		
-		CreateCommutersFromElsewhere.run(scenario.getPopulation(), relations.values(), personGroupData);
+		CreateCommutersFromElsewhere.run(scenario, relations.values(), personGroupData);
 		
 	}
 	

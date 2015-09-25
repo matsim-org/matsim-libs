@@ -136,6 +136,8 @@ public class FacilitiesCreator {
 		
 		final int idxX = 0;
 		final int idxY = 1;
+		final int idxCapacity = 3;
+		final int idxActivityOptions = 4;
 		
 		int counter = 0;
 		
@@ -151,7 +153,18 @@ public class FacilitiesCreator {
 				
 				ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(Global.ActType.work.name() + "_" + counter, ActivityFacility.class), coord);
 				ActivityOption work = scenario.getActivityFacilities().getFactory().createActivityOption(Global.ActType.work.name());
+				work.setCapacity(Double.parseDouble(parts[idxCapacity]));
 				facility.addActivityOption(work);
+				String[] activityOptions = parts[idxActivityOptions].split(";");
+				for(String ao : activityOptions){
+					
+					if(!facility.getActivityOptions().containsKey(ao)){
+						ActivityOption activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ao);
+						activityOption.setCapacity(Double.parseDouble(parts[idxCapacity]));
+						facility.addActivityOption(activityOption);
+					}
+					
+				}
 				
 				scenario.getActivityFacilities().addActivityFacility(facility);
 				
