@@ -83,7 +83,7 @@ public class GAPScenarioBuilder {
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
 //		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-network.xml.gz");
-//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-network.xml.gz", "/home/danielhosse/Dokumente/net.shp");
+//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-network.xml.gz", "/home/dhosse/Dokumente/net.shp");
 		
 		new MatsimNetworkReader(scenario).readFile(Global.matsimInputDir + "Netzwerk/merged-network_20150914.xml");
 		new NetworkCleaner().run(scenario.getNetwork());
@@ -94,7 +94,7 @@ public class GAPScenarioBuilder {
 //		//create counting stations
 //		Counts counts = CountsCreator.createCountingStations(scenario.getNetwork());
 //		new CountsWriter(counts).write(Global.matsimInputDir + "Counts/counts.xml.gz");
-//		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/danielhosse/Dokumente/counts.shp");
+//		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/dhosse/Dokumente/counts.shp");
 //		
 //		//init administrative boundaries
 		initMunicipalities(scenario);
@@ -246,7 +246,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
 			
@@ -258,7 +258,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
 			
@@ -292,7 +292,7 @@ public class GAPScenarioBuilder {
 //		}
 		
 		//WGS84
-		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;
 		

@@ -5,12 +5,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.matrices.Matrix;
 
 import playground.wisinee.IPF.Ipf;
 
 public class GAPMatrices {
+	
+	private static Matrix distances = new Matrix("dij", "distance matrix");
 
 	public static Map<String, Matrix> run(){
 		
@@ -92,6 +95,16 @@ public class GAPMatrices {
 						{51400,48400,32700,32100,22200,18900,27900,29800,2000,10000,42500,36800,27200,38700,46700,46100,34900,44200,47700,48300,40800,2000}
 		};
 		
+		for(int i = 0; i < dij.length; i++){
+			
+			for(int j = 0; j < dij.length; j++){
+				
+				distances.createEntry(getId(i), getId(j), dij[i][j]);
+				
+			}
+			
+		}
+		
 		//distance matrix
 		double[][] dij2 = new double[][]{
 						{0,6600,28600,19300,28900,33900,42500,28800,49600,50400,19700,15600,24900,27000,23000,5300,32100,19900,24000,24900,11200,51400},
@@ -126,12 +139,14 @@ public class GAPMatrices {
 			double[] d = entry.getValue().getSecond();
 			
 			double[][] rij = new double[o.length][d.length];
+			double[][] rijWalk = new double[o.length][d.length];
 			
 			for(int i = 0; i < rij.length; i++){
 				
 				for(int j = 0; j < rij.length; j++){
 					
 					rij[i][j] = o[i] * d[j] / dij[i][j];
+					rijWalk[i][j] = o[i] * d[j] / (dij[i][j] * dij[i][j] * dij[i][j]);
 					
 				}
 				
@@ -146,6 +161,16 @@ public class GAPMatrices {
 			
 			Matrix m = createMatrixFromResultArray(entry.getKey(), result);
 			map.put(m.getId(), m);
+			
+			Ipf ipfWalk = new Ipf();
+			ipfWalk.setFixColumn(cWB, 0);
+			ipfWalk.setFixRow(rWB, 0);
+			ipfWalk.setInitialMatrix(rijWalk, 1, 0);
+			
+			double[][] resultWalk = ipfWalk.ipfcal(o.length, d.length, 1, 100);
+			
+			Matrix mWalk = createMatrixFromResultArray(entry.getKey() + "_" + TransportMode.walk, resultWalk);
+			map.put(mWalk.getId(), mWalk);
 			
 		}
 		
@@ -204,6 +229,10 @@ public class GAPMatrices {
 		default: return null;
 		}
 		
+	}
+
+	public static Matrix getDistances() {
+		return distances;
 	}
 	
 }

@@ -7,21 +7,18 @@ import java.util.List;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -78,7 +75,7 @@ public class TtWriteSHP {
 	
 	private Collection<SimpleFeature> createFeatures() {
 		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for (Id personId : routesHandler.getAgentRoutes().keySet()) {
+		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
 			SimpleFeature feature = getFeature(personId);
 			if (feature != null)
 				features.add(feature);
@@ -86,11 +83,11 @@ public class TtWriteSHP {
 		return features;
 	}
 	
-	private SimpleFeature getFeature(Id agentId) {
+	private SimpleFeature getFeature(Id<Person> agentId) {
 
 			LineString[] route = new LineString[routesHandler.getAgentRoute(agentId).size()];
 			int i = 0;
-			for (Id linkId : routesHandler.getAgentRoute(agentId)) {
+			for (Id<Link> linkId : routesHandler.getAgentRoute(agentId)) {
 				Link link = scenario.getNetwork().getLinks().get(linkId);
 
 				route[i] = this.geometryFactory

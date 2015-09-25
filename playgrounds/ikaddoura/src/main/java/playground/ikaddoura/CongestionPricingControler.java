@@ -43,6 +43,7 @@ import playground.vsp.congestion.controler.MarginalCongestionPricingContolerList
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
@@ -195,7 +196,12 @@ public class CongestionPricingControler {
 			} else if (VTTSapproach.equals("equal") && implementation.equals("V8")) {
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV8(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
-				
+			} else if (VTTSapproach.equals("different") && implementation.equals("V9")) {
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV9(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+			} else if (VTTSapproach.equals("equal") && implementation.equals("V9")) {
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV9(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+		
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}

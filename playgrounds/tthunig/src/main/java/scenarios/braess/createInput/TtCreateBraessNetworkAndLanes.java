@@ -49,23 +49,24 @@ public final class TtCreateBraessNetworkAndLanes {
 	private boolean middleLinkExists = true;
 	private LaneType laneType = LaneType.NONE; 
 	private boolean btuRun = false;
+	private int numberOfPersons;
 	
 	// capacity at the links that all agents have to use
-	private long capFirstLast = 3600; // [veh/h]
+	private long capFirstLast; // [veh/h]
 	// capacity at all other links
-	private long capMain = 1800; // [veh/h]
+	private long capMain; // [veh/h]
 	// link length for the inflow links
-	private double inflowLinkLength = 7.5 * 1; // [m]
+	private double inflowLinkLength; // [m]
 	// link length for all other links
-	private long linkLength = 10000; // [m]
+	private long linkLength; // [m]
 	// travel time for the middle link
-	private double linkTTMid = 1;
+	private double linkTTMid;
 	// travel time for the middle route links
-	private double linkTTSmall = 1*60; // [s]
+	private double linkTTSmall; // [s]
 	// travel time for the two remaining outer route links (choose at least 3*LINK_TT_SMALL!)
-	private double linkTTBig = 10*60; // [s]
+	private double linkTTBig; // [s]
 	// travel time for inflow links and links that all agents have to use
-	private double minimalLinkTT = 1; // [s]
+	private double minimalLinkTT; // [s]
 
 	public TtCreateBraessNetworkAndLanes(Scenario scenario) {		
 		this.scenario = scenario;
@@ -90,22 +91,22 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	private void initNetworkParams() {
 		if (btuRun){
-			capFirstLast = 3600;
-			capMain = 3600;
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 200;
 			linkTTMid = 1;
 			linkTTSmall = 10;
 			linkTTBig = 20;
 			minimalLinkTT = 1;
-		}else{
-			capFirstLast = 3600; 
-			capMain = 1800; 
+		} else {
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons / 2;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 10000;
-			linkTTMid = 1*60;
-			linkTTSmall = 1*60;
-			linkTTBig = 10*60;
+			linkTTMid = 1 * 60;
+			linkTTSmall = 1 * 60;
+			linkTTBig = 10 * 60;
 			minimalLinkTT = 1;
 		}
 	}
@@ -390,6 +391,10 @@ public final class TtCreateBraessNetworkAndLanes {
 	public void writeNetworkAndLanes(String directory) {
 		new NetworkWriter(scenario.getNetwork()).write(directory + "network.xml");
 		if (!laneType.equals(LaneType.NONE)) new LaneDefinitionsWriter20(scenario.getLanes()).write(directory + "lanes.xml");
+	}
+
+	public void setNumberOfPersons(int numberOfPersons) {
+		this.numberOfPersons = numberOfPersons;
 	}
 
 }

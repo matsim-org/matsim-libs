@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistFunction;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -84,7 +85,7 @@ public class SetActivityLocations {
 		double A = Double.parseDouble(config.getParam(MODULE_NAME, "A"));
 		double alpha = Double.parseDouble(config.getParam(MODULE_NAME, "alpha"));
 		double min = Double.parseDouble(config.getParam(MODULE_NAME, "min"));
-		TaskRunner.run(new Route2GeoDistance(A, alpha, min), persons);
+		TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction(A, alpha, min)), persons);
 
 		logger.info("Truncating distances...");
 		TaskRunner.run(new TruncateDistances(1000000), persons);
