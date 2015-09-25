@@ -195,6 +195,12 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
 		
+		double delay = time - delayInfo.freeSpeedLeaveTime;
+
+		if ( delay < 1.0 ) { 
+			linkInfo.getFlowQueue().clear(); 
+		}
+		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
