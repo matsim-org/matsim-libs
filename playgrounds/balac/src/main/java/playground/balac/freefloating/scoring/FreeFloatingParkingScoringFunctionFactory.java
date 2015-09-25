@@ -5,13 +5,13 @@ import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunction;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 
 import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
 
@@ -19,13 +19,13 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 	
 	private ParkingScoreManager parkingScoreManager;
 	private Controler controler;
+	private CharyparNagelScoringParametersForPerson parameters;
 
 	public FreeFloatingParkingScoringFunctionFactory(
 			Controler controler, ParkingScoreManager parkingScoreManager) {
-
-		super();
 		this.controler = controler;
 		this.parkingScoreManager = parkingScoreManager;
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 	}
 
 	@Override
@@ -34,14 +34,23 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 		
 		
 		scoringFunctionSum.addScoringFunction(
-			      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(), 
-			    		  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create(), 
-			      this.controler.getConfig(), 
-			      this.controler.getScenario().getNetwork()));
-		scoringFunctionSum.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(),  CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create(), null, ((ScenarioImpl) this.controler.getScenario()).getActivityFacilities()));
+			      new FreeFloatingLegScoringFunction( (PlanImpl) person.getSelectedPlan(),
+						  parameters.getScoringParameters( person ),
+						  this.controler.getConfig(),
+						  this.controler.getScenario().getNetwork()));
+		scoringFunctionSum.addScoringFunction(
+				new KtiActivtyWithoutPenaltiesScoring(
+						person.getSelectedPlan(),
+						parameters.getScoringParameters( person ),
+						null,
+						this.controler.getScenario().getActivityFacilities()));
 				   
-		scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create()));
-		scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring( CharyparNagelScoringParameters.getBuilder(this.controler.getConfig().planCalcScore(), this.controler.getConfig().scenario()).create()));
+		scoringFunctionSum.addScoringFunction(
+				new CharyparNagelMoneyScoring(
+						parameters.getScoringParameters( person ) ) );
+		scoringFunctionSum.addScoringFunction(
+				new CharyparNagelAgentStuckScoring(
+						parameters.getScoringParameters( person ) ) );
 		scoringFunctionSum.addScoringFunction(new ParkingScoringFunction(person
 				.getSelectedPlan(),parkingScoreManager));
 		return scoringFunctionSum;

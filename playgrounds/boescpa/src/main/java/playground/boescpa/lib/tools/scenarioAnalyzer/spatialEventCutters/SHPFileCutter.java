@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
+import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -19,6 +19,7 @@
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -40,6 +41,7 @@ import java.util.Set;
  */
 public class TravelTimesRecord implements PersonDepartureEventHandler,
 		ActivityStartEventHandler {
+	private static final Logger log = Logger.getLogger(TravelTimesRecord.class);
 	private final Map<Id<Person>, TravelTimesForPerson> times = new HashMap<>();
 	private final Set<Id<Person>> ignoreDeparture = new HashSet<>();
 
@@ -59,6 +61,10 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling activity start "+event );
+		}
+
 		if ( stageActivityTypes.isStageActivity( event.getActType() ) ) {
 			ignoreDeparture.add( event.getPersonId() );
 		}
@@ -72,6 +78,10 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling person departure "+event );
+		}
+
 		if ( !ignoreDeparture.remove( event.getPersonId() ) ) {
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),

@@ -102,12 +102,12 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
 				/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
 
-		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ; 
+		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		
 		// pt:
-		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
+		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
-		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceRatePt();
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 
 		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 

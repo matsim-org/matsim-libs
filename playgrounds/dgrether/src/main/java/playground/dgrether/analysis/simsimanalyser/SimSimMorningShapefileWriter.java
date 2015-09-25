@@ -61,11 +61,11 @@ public class SimSimMorningShapefileWriter {
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id, Double> delayPerLink1, Map<Id, Double> delayPerLink2){
+	public void writeShape(String outfile, Map<Id<Link>, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id<Link>, Double> delayPerLink1, Map<Id<Link>, Double> delayPerLink2){
 		this.writeShape(outfile, countSimLinkLeaveCompMap, delayPerLink1, delayPerLink2, "sim", "count");
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id, Double> delayPerLink1, Map<Id, Double> delayPerLink2, String runId, String runId2) {
+	public void writeShape(String outfile, Map<Id<Link>, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id<Link>, Double> delayPerLink1, Map<Id<Link>, Double> delayPerLink2, String runId, String runId2) {
 		PolygonFeatureFactory factory = createFeatureType(this.crs, runId, runId2);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();

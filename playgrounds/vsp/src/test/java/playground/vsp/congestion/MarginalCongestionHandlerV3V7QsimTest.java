@@ -28,16 +28,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -60,7 +55,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -68,6 +62,7 @@ import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 
 /**
  * @author ikaddoura , lkroeger
@@ -186,54 +181,102 @@ public class MarginalCongestionHandlerV3V7QsimTest {
 			Assert.assertEquals("wrong total internalized delay", 15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
 		}
 	
-	private void setPopulation1(Scenario scenario) {
+	// three agents moving along the corridor (unlimited storage capacity), arriving at the bottleneck at the same time (special case)
+	@Test
+	public final void testFlowCongestion_3agents_V8(){
 		
-		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+		Scenario sc = loadScenario1();
+		setPopulation1(sc);
+		
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final CongestionHandlerImplV8 congestionHandler = new CongestionHandlerImplV8(events, sc);
+		
+		events.addHandler( new CongestionEventHandler() {
 
-		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				congestionEvents.add(event);
+			}	
+		});
 		
-		// leg: 1,2,3,4,5
-		Leg leg_1_5 = popFactory.createLeg("car");
-		List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
-		linkIds234.add(linkId2);
-		linkIds234.add(linkId3);
-		linkIds234.add(linkId4);
-		NetworkRoute route1_5 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId5);
-		route1_5.setLinkIds(linkId1, linkIds234, linkId5);
-		leg_1_5.setRoute(route1_5);
+		events.addHandler(congestionHandler);
+				
+		QSim sim = createQSim(sc, events);
+		sim.run();
+			
+		for (CongestionEvent event : congestionEvents) {
+			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
+				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+			}
+			
+			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
+				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+			}
+			
+			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
+				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
+			}
+		}
 		
-		Person person1 = popFactory.createPerson(testAgent1);
-		Plan plan1 = popFactory.createPlan();
-		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
-		homeActLink1_1.setEndTime(100);
-		plan1.addActivity(homeActLink1_1);
-		plan1.addLeg(leg_1_5);
-		plan1.addActivity(workActLink5);
-		person1.addPlan(plan1);
-		population.addPerson(person1);
-		
-		Person person2 = popFactory.createPerson(testAgent2);
-		Plan plan2 = popFactory.createPlan();
-		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
-		homeActLink1_2.setEndTime(100);
-		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(leg_1_5);
-		plan2.addActivity(workActLink5);
-		person2.addPlan(plan2);
-		population.addPerson(person2);
-		
-		Person person3 = popFactory.createPerson(testAgent3);
-		Plan plan3 = popFactory.createPlan();
-		Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
-		homeActLink1_3.setEndTime(100);
-		plan3.addActivity(homeActLink1_3);
-		plan3.addLeg(leg_1_5);
-		plan3.addActivity(workActLink5);
-		person3.addPlan(plan3);
-		population.addPerson(person3);
+		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
+	
+		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
+		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
+		Assert.assertEquals("wrong total internalized delay", 9., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
 	}
+
+	private void setPopulation1(Scenario scenario) {
+	
+	Population population = scenario.getPopulation();
+	PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+	LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+
+	Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
+	
+	// leg: 1,2,3,4,5
+	Leg leg_1_5 = popFactory.createLeg("car");
+	List<Id<Link>> linkIds234 = new ArrayList<Id<Link>>();
+	linkIds234.add(linkId2);
+	linkIds234.add(linkId3);
+	linkIds234.add(linkId4);
+	NetworkRoute route1_5 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId5);
+	route1_5.setLinkIds(linkId1, linkIds234, linkId5);
+	leg_1_5.setRoute(route1_5);
+	
+	Person person1 = popFactory.createPerson(testAgent1);
+	Plan plan1 = popFactory.createPlan();
+	Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
+	homeActLink1_1.setEndTime(100);
+	plan1.addActivity(homeActLink1_1);
+	plan1.addLeg(leg_1_5);
+	plan1.addActivity(workActLink5);
+	person1.addPlan(plan1);
+	population.addPerson(person1);
+	
+	Person person2 = popFactory.createPerson(testAgent2);
+	Plan plan2 = popFactory.createPlan();
+	Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
+	homeActLink1_2.setEndTime(100);
+	plan2.addActivity(homeActLink1_2);
+	plan2.addLeg(leg_1_5);
+	plan2.addActivity(workActLink5);
+	person2.addPlan(plan2);
+	population.addPerson(person2);
+	
+	Person person3 = popFactory.createPerson(testAgent3);
+	Plan plan3 = popFactory.createPlan();
+	Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
+	homeActLink1_3.setEndTime(100);
+	plan3.addActivity(homeActLink1_3);
+	plan3.addLeg(leg_1_5);
+	plan3.addActivity(workActLink5);
+	person3.addPlan(plan3);
+	population.addPerson(person3);
+}
 	
 	private Scenario loadScenario1() {
 		

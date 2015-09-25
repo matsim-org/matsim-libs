@@ -59,7 +59,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 		public double computeZeroUtilityDuration_s(double priority, double typicalDuration_s) {
 			final double priority1 = priority;
 			final double typicalDuration_s1 = typicalDuration_s;
-			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -10.0 / priority1 );
+			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -1.0 / priority1 );
 			
 			return zeroUtilityDuration;
 		}

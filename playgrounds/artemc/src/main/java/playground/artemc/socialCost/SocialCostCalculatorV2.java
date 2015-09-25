@@ -152,7 +152,7 @@ AfterMobsimListener, PersonDepartureEventHandler, PersonArrivalEventHandler, Lin
 		this.blendFactor = blendFactor;
 
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.opportunityCostOfCarTravel = -controler.getConfig().planCalcScore().getTraveling_utils_hr()
+		this.opportunityCostOfCarTravel = -controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling()
 				+ controler.getConfig().planCalcScore().getPerforming_utils_hr();
 
 		init();

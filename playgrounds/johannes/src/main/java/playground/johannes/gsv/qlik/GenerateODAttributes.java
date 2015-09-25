@@ -36,7 +36,9 @@ public class GenerateODAttributes {
         ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[1], "NO");
         DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
 
-        KeyMatrix m = new KeyMatrix();
+        KeyMatrix idMatrix = new KeyMatrix();
+        KeyMatrix distMatrix = new KeyMatrix();
+
         int idCounter = 0;
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
@@ -51,17 +53,19 @@ public class GenerateODAttributes {
         writer2.write(";\"odId\";\"distance\"");
         writer2.newLine();
 
-        double d = 0.0;
+//        double d = 0.0;
 
         while((line = reader.readLine()) != null) {
             String tokens[] = line.split(";");
             String i = tokens[0];
             String j = tokens[1];
 
-            Double id = m.get(i, j);
+            Double id = idMatrix.get(i, j);
+            Double d = distMatrix.get(i, j);
+
             if(id == null) {
                 id = new Double(idCounter);
-                m.set(i, j, id);
+                idMatrix.set(i, j, id);
                 idCounter++;
 
                 writer.write(i);
@@ -76,6 +80,7 @@ public class GenerateODAttributes {
 
                 if(zi != null && zj != null) {
                     d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                    distMatrix.set(i, j, d);
                     writer.write(String.valueOf(d));
                 } else {
                     d = 0.0;
@@ -85,7 +90,7 @@ public class GenerateODAttributes {
             }
 
             writer2.write(line);
-            writer2.write(String.format(";%s;%s", id.intValue(), d));
+            writer2.write(String.format(";%s;%s", id.intValue(), d.intValue()));
             writer2.newLine();
         }
     }

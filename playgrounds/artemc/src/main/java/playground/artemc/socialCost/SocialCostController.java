@@ -91,7 +91,7 @@ public class SocialCostController {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindTravelDisutilityFactory().toInstance(factory);
+						bindCarTravelDisutilityFactory().toInstance(factory);
 					}
 				});
 
@@ -118,8 +118,8 @@ public class SocialCostController {
 		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculator scc, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.travelTime = travelTime;
 			this.scc = scc;
-			this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-			this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceRateCar() * cnScoringGroup.getMarginalUtilityOfMoney();
+			this.marginalCostOfTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+			this.marginalCostOfDistance = -cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney();
 		}
 
 		@Override

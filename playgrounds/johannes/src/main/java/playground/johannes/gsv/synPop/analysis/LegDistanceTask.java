@@ -101,7 +101,7 @@ public class LegDistanceTask extends AnalyzerTask {
 		for (Person person : persons) {
 			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getActivities().size(); i++) {
-				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
+				purposes.add(plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}
 
@@ -119,7 +119,7 @@ public class LegDistanceTask extends AnalyzerTask {
 
 			if (outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 1000, 50);
+					writeHistograms(stats, key, 100, 50);
 					writeHistograms(stats, new LinearDiscretizer(25000), key, false);
 				} catch (IOException e) {
 					e.printStackTrace();

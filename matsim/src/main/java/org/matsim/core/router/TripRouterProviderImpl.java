@@ -22,7 +22,6 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouter;
 
@@ -49,17 +48,7 @@ public class TripRouterProviderImpl implements Provider<TripRouter> {
 				leastCostAlgoFactory,
 				transitRouterFactory );
 		
-		this.context = new RoutingContext() {
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return disutilityFactory.createTravelDisutility( travelTime , scenario.getConfig().planCalcScore() );
-			}
-
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTime;
-			}
-		};
+		this.context = new RoutingContextImpl(disutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore()), travelTime);
 	}
 
 

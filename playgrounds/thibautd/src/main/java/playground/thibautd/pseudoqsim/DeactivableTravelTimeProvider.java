@@ -20,19 +20,16 @@
 package playground.thibautd.pseudoqsim;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
@@ -47,8 +44,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
  * @author thibautd
  */
 public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-			PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
-			PersonStuckEventHandler {
+			Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler, 
+			VehicleAbortsEventHandler {
 	private static final Logger log =
 		Logger.getLogger(DeactivableTravelTimeProvider.class);
 
@@ -77,13 +74,13 @@ public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, Lin
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if ( !isListenning ) return;
 		delegate.handleEvent(event);
 	}
 
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if ( !isListenning ) return;
 		delegate.handleEvent(event);
 	}
@@ -95,13 +92,7 @@ public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, Lin
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if ( !isListenning ) return;
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		if ( !isListenning ) return;
 		delegate.handleEvent(event);
 	}

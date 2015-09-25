@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -33,11 +34,13 @@ import com.google.inject.Inject;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
 import javax.inject.Provider;
+import java.util.Map;
 
 /**
  * @author thibautd
  */
 public class JointTripRouterFactory implements Provider<TripRouter> {
+	private static final Logger log = Logger.getLogger(JointTripRouterFactory.class);
 	private final Provider<TripRouter> defaultFactory;
 	private final PopulationFactory populationFactory;
 
@@ -51,18 +54,19 @@ public class JointTripRouterFactory implements Provider<TripRouter> {
 	@Inject
 	public JointTripRouterFactory(
 			final Scenario scenario,
-			final TravelDisutilityFactory disutilityFactory,
-			final TravelTime travelTime,
+			final Map<String, TravelDisutilityFactory> disutilityFactory,
+			final Map<String, TravelTime> travelTime,
 			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final Provider<TransitRouter> transitRouterFactory) {
 		this(
 			new TripRouterProviderImpl(
 					scenario,
-					disutilityFactory,
-					travelTime,
+					disutilityFactory.get( TransportMode.car ),
+					travelTime.get( TransportMode.car ),
 					leastCostAlgoFactory,
 					transitRouterFactory),
 			scenario.getPopulation().getFactory() );
+		log.warn( getClass().getName()+" uses "+TripRouterProviderImpl.class.getName()+" with travel time for car. This is not anymore the default." );
 	}
 
 	@Override

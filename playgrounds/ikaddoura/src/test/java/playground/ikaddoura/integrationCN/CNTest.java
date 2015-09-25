@@ -26,17 +26,27 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
 
 /**
  * @author ikaddoura
@@ -105,6 +115,35 @@ public class CNTest {
 		// in this setup the demand goes down on the noise sensitive route in case of simultaneous congestion and noise pricing (cn)
 		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler4) < getNoiseSensitiveRouteDemand(handler1));
 
+	}
+	
+	@Ignore
+	@Test
+	public final void test2(){
+		
+		// just starts the randomized router
+		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";
+		Controler controler = new Controler(configFile1);
+		TollHandler tollHandler = new TollHandler(controler.getScenario());
+
+		final RandomizedTollTimeDistanceTravelDisutilityFactory factory = new RandomizedTollTimeDistanceTravelDisutilityFactory(
+				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+				tollHandler
+			) ;
+		factory.setSigma(3.);
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
+			}
+		}); 		
+		
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+		controler.addOverridingModule(new OTFVisModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
 	}
 
 	private int getNoiseSensitiveRouteDemand(LinkDemandEventHandler handler) {

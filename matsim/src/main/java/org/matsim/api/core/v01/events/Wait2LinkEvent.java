@@ -34,22 +34,28 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
-	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_NETWORKMODE = "networkMode";
+	public static final String ATTRIBUTE_DRIVER = "person";
+	public static final String ATTRIBUTE_POSITION = "relativePosition";
 
-	private final Id<Person> personId;
+	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
+	private final String networkMode;
+	private final double relativePositionOnLink;
 
-	public Wait2LinkEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
+	
+	public Wait2LinkEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId, String networkMode, double relativePositionOnLink) {
 		super(time);
-		this.personId = agentId;
+		this.driverId = driverId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
+		this.networkMode = networkMode;
+		this.relativePositionOnLink = relativePositionOnLink;
 	}
 	
 	public Id<Person> getPersonId() {
-		return this.personId;
+		return this.driverId;
 	}	
 	
 	public Id<Link> getLinkId() {
@@ -64,18 +70,26 @@ public class Wait2LinkEvent extends Event implements HasPersonId {
 		return EVENT_TYPE;
 	}
 	
-	public String getLegMode() {
-		return null;
+	public String getNetworkMode() {
+		return networkMode;
+	}
+	
+	public double getRelativePositionOnLink() {
+		return relativePositionOnLink;
 	}
 	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());
 		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
 		if (this.vehicleId != null) {
 			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		}
+		if (this.networkMode != null) {
+			attr.put(ATTRIBUTE_NETWORKMODE, networkMode);
+		}
+		attr.put(ATTRIBUTE_POSITION, Double.toString(this.relativePositionOnLink));
 		return attr;
 	}
 }

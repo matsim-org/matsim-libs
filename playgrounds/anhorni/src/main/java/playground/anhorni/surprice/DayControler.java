@@ -64,7 +64,7 @@ public class DayControler extends Controler {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+//				bindCarTravelDisutilityFactory().toInstance(travelDisutilityFactory);
 //			}
 //		});
 //		super.setUp();

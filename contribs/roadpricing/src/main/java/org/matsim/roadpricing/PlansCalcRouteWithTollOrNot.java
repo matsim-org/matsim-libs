@@ -22,6 +22,7 @@
 
 package org.matsim.roadpricing;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -36,6 +37,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 
@@ -46,12 +48,12 @@ public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 	private TravelTime travelTime;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(Config config, RoadPricingScheme roadPricingScheme, TripRouterFactory tripRouterFactory, TravelDisutilityFactory travelDisutilityFactory, TravelTime travelTime) {
+	PlansCalcRouteWithTollOrNot(Config config, RoadPricingScheme roadPricingScheme, TripRouterFactory tripRouterFactory, Map<String, TravelDisutilityFactory> travelDisutilityFactory, Map<String, TravelTime> travelTime) {
 		this.config = config;
 		this.roadPricingScheme = roadPricingScheme;
 		this.tripRouterFactory = tripRouterFactory;
-		this.travelDisutilityFactory = travelDisutilityFactory;
-		this.travelTime = travelTime;
+		this.travelDisutilityFactory = travelDisutilityFactory.get(TransportMode.car);
+		this.travelTime = travelTime.get(TransportMode.car);
 	}
 
 	@Override

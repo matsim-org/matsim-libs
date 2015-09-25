@@ -50,32 +50,40 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private double hamiltonianValue;
 
+    private final boolean absoluteMode;
+
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
+        this(refElements, simElements, attrKey, discretizer, false);
+    }
+
+    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
+                              String attrKey, Discretizer discretizer, boolean absoluteMode) {
         this.discretizer = discretizer;
         this.attrKey = attrKey;
+        this.absoluteMode = absoluteMode;
 
         refFreq = initHistogram(refElements, attrKey);
         simFreq = initHistogram(simElements, attrKey);
 
-        scaleFactor = simElements.size()/(double)refElements.size();
-        normFactor = simElements.size();
+        scaleFactor = simElements.size() / (double) refElements.size();
+        normFactor = 1;//simElements.size(); //TODO: do we need this for the absolute mode?
 
         int size = Math.max(simFreq.size(), refFreq.size());
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
 
-            hamiltonianValue += Math.abs(simVal - refVal)/ normFactor;
+            hamiltonianValue += calculateError(simVal, refVal) / normFactor;
         }
     }
 
     private DynamicIntArray initHistogram(Set<? extends Attributable> elements, String key) {
         DynamicIntArray array = new DynamicIntArray(12, 0);
 
-        for(Attributable element : elements) {
+        for (Attributable element : elements) {
             String strVal = element.getAttribute(key);
-            if(strVal != null) {
+            if (strVal != null) {
                 double value = Double.parseDouble(strVal);
                 int bucket = discretizer.index(value);
                 array.set(bucket, array.get(bucket) + 1);
@@ -87,29 +95,29 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
-        if(this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
+        if (this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
 
-        if(this.dataKey.equals(dataKey)) {
-            int bucket = discretizer.index((Double)oldValue);
+        if (this.dataKey.equals(dataKey)) {
+            int bucket = discretizer.index((Double) oldValue);
             double diff1 = changeBucketContent(bucket, -1);
 
-            bucket = discretizer.index((Double)newValue);
+            bucket = discretizer.index((Double) newValue);
             double diff2 = changeBucketContent(bucket, 1);
 
-            hamiltonianValue += (diff1 + diff2)/ normFactor;
+            hamiltonianValue += (diff1 + diff2) / normFactor;
         }
     }
 
     private double changeBucketContent(int bucketIndex, int value) {
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double oldDiff = Math.abs(simVal - refVal);
+        double oldDiff = calculateError(simVal, refVal);
 
         simFreq.set(bucketIndex, simFreq.get(bucketIndex) + value);
 
         simVal = simFreq.get(bucketIndex);
         refVal = refFreq.get(bucketIndex) * scaleFactor;
-        double newDiff = Math.abs(simVal - refVal);
+        double newDiff = calculateError(simVal, refVal);
 
         return newDiff - oldDiff;
     }
@@ -118,4 +126,18 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
+
+    private double calculateError(double simVal, double refVal) {
+        if (absoluteMode) {
+            return Math.abs(simVal - refVal);
+        } else {
+            if (refVal > 0) {
+                return Math.abs(simVal - refVal) / refVal;
+            } else {
+                if (simVal == 0) return 0;
+                else return 1;
+            }
+        }
+    }
+
 }
