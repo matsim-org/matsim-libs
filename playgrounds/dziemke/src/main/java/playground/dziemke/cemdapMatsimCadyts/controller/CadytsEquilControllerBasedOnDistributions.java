@@ -15,6 +15,9 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.distribution.CadytsContextDistributionBased;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.contrib.cadyts.measurement.MeasurementCadytsContext;
+import org.matsim.contrib.cadyts.measurement.Measurement;
+import org.matsim.contrib.cadyts.measurement.Measurements;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -73,7 +76,7 @@ public class CadytsEquilControllerBasedOnDistributions {
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
 		
 		// controller
-		String runId = "73";
+		String runId = "74";
 		String outputDirectory = "/Users/dominik/Workspace/data/examples/equil/output/" + runId + "/";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
@@ -143,7 +146,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 //		controler.getConfig().getModule("cadytsCar").addParam("endTime", "07:00:00");
 		
 		//
-		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsMapSingle());
+		final MeasurementCadytsContext cContext2 = new MeasurementCadytsContext(config, buildMeasurements());
+//		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsMapSingle());
 //		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsMapCumulative());		
 //		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config);
 //		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsAsCounts());
@@ -205,7 +209,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 				
 				//
 //				final CadytsScoring<Link> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
-				final CadytsScoring<Integer> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
+//				final CadytsScoring<Integer> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
+				final CadytsScoring<Measurement> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
 				final double cadytsScoringWeight2 = 0. * config.planCalcScore().getBrainExpBeta() ;
 				scoringFunction2.setWeightOfCadytsCorrection(cadytsScoringWeight2) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction2 );
@@ -214,6 +219,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
+		
+		
 		
 		controler.run() ;
 	}
@@ -263,16 +270,6 @@ public class CadytsEquilControllerBasedOnDistributions {
 
 	private static TreeMap<Integer, Integer> buildMeasurementsMapSingle(){
 		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-
-		map.put(69200, 10);
-		map.put(69400, 40);
-		map.put(69600, 100);
-		map.put(69800, 150);
-		map.put(70000, 300);
-		map.put(70200, 150);
-		map.put(70400, 100);
-		map.put(70600, 40);
-		map.put(70800, 10);
 		
 		map.put(69200, 10);
 		map.put(69400, 40);
@@ -300,79 +297,87 @@ public class CadytsEquilControllerBasedOnDistributions {
 //			}
 //		}
 //
-//		{
-//			Id<Link> id = Id.create(4000, Link.class);
-//			counts.createAndAddCount(id, "< 4000m");
-//			Double value = 50.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(62000, Link.class);
-//			counts.createAndAddCount(id, "< 6000m");
-//			Double value = 150.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(8000, Link.class);
-//			counts.createAndAddCount(id, "< 8000m");
-//			Double value = 300.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(10000, Link.class);
-//			counts.createAndAddCount(id, "< 10000m");
-//			Double value = 700.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(12000, Link.class);
-//			counts.createAndAddCount(id, "< 12000m");
-//			Double value = 850.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(14000, Link.class);
-//			counts.createAndAddCount(id, "< 14000m");
-//			Double value = 950.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{		
-//			Id<Link> id = Id.create(16000, Link.class);
-//			counts.createAndAddCount(id, "< 16000m");
-//			Double value = 990.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		{
-//			Id<Link> id = Id.create(18000, Link.class);
-//			counts.createAndAddCount(id, "< 18000m");
-//			Double value = 1000.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		return counts;
+//		
 //	}
+	
+	
+	private static Measurements buildMeasurements(){
+		Measurements measurements = new Measurements();
+		
+		{
+			Id<Measurement> id = Id.create(69200, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 10.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
 
+		{
+			Id<Measurement> id = Id.create(69400, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 40.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(69600, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 100.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(69800, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 150.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(70000, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 300.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(70200, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 150.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(70400, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 100.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(70600, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 40.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		{
+			Id<Measurement> id = Id.create(70800, Measurement.class);
+			measurements.createAndAddMeasurement(id);
+			Double value = 10.;
+			for (int h = 1; h<=24; h++) {
+				measurements.getMeasurment(id).createVolume(h, value);
+			}
+		}
+		
+		return measurements;
+	}
 }
