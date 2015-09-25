@@ -66,7 +66,7 @@ public class NoCrowdingCorridorControler {
 		
 		// Set the scoring function a Null-Scoring function, "NoCrowding". It allow to write the Score SQL table
 		controler.setScoringFunctionFactory(new NoCrowdingScoringFunctionFactory(
-				new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()),
+				new CharyparNagelScoringFunctionFactory(scenario),
 				controler.getEvents(), scoreTracker, controler));
 
 		Initializer initializer = new Initializer();

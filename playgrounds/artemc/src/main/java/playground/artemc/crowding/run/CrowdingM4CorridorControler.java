@@ -68,7 +68,7 @@ public class CrowdingM4CorridorControler {
 
 		// Set the Scoring Function LoadFactor60ScoringFunction (model M4)
 		controler.setScoringFunctionFactory(new LoadFactor60ScoringFunctionFactory(
-				new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()),
+				new CharyparNagelScoringFunctionFactory(scenario),
 				controler.getEvents(), scoreTracker, controler));
 
 		// Set the Second-Best pricing function

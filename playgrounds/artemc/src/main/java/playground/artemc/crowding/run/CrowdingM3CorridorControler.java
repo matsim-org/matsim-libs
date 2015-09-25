@@ -67,7 +67,7 @@ public class CrowdingM3CorridorControler {
 
 		// Set the scoring function StandeeAndSittersScoring (model M3)
 		controler.setScoringFunctionFactory(new StandeeAndSittersScoringFunctionFactory(
-				new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()),
+				new CharyparNagelScoringFunctionFactory(scenario),
 				controler.getEvents(), scoreTracker, controler));
 		
 		// Set the Second-Best pricing function

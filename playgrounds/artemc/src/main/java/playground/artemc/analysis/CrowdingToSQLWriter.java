@@ -85,7 +85,7 @@ public class CrowdingToSQLWriter {
 				eventsManager.addHandler(observer);
 				new MatsimEventsReader(eventsManager).readFile(eventFilePath);
 
-				ScoringFunctionFactory sfFactory = new LoadFactor60ScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+				ScoringFunctionFactory sfFactory = new LoadFactor60ScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(scenario));
 				events2Score = new EventsToScore(scenario, sfFactory);
 				events2Score.finish();
 				writeTables(scenario);
