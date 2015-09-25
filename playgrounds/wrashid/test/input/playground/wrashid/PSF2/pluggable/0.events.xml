@@ -16,10 +16,6 @@
 	<event time="22500.0" type="actstart" person="1" link="20" actType="w"  />
 	<event time="23100.0" type="actend" person="1" link="20" actType="w"  />
 	<event time="23100.0" type="departure" person="1" link="20"  />
-	<event time="23100.0" type="PersonEntersVehicle" person="1" vehicle="1"  />
-	<event time="23100.0" type="wait2link" person="1" link="20" vehicle="1" networkMode="car" relativePosition="1.0"  />
-	<event time="23100.0" type="vehicle leaves traffic" person="1" link="20" vehicle="1" networkMode="car" relativePosition="1.0"  />
-	<event time="23100.0" type="PersonLeavesVehicle" person="1" vehicle="1"  />
 	<event time="23100.0" type="arrival" person="1" link="20"  />
 	<event time="23100.0" type="actstart" person="1" link="20" actType="w"  />
 	<event time="35700.0" type="actend" person="1" link="20" actType="w"  />
