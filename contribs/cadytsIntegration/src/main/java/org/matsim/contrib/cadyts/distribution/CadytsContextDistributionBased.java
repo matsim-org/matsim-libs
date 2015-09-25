@@ -105,7 +105,7 @@ public class CadytsContextDistributionBased implements CadytsContextI<Integer>, 
 //		} else {
 //			this.counts = counts ;
 //		}
-		 this.measurementsMap = measurementsMap; // idea
+		 this.measurementsMap = measurementsMap;
 		
 //		Set<Id<Link>> countedLinks = new TreeSet<>();
 //		for (Id<Link> id : this.counts.getCounts().keySet()) {
@@ -145,7 +145,7 @@ public class CadytsContextDistributionBased implements CadytsContextI<Integer>, 
 
 		// ---------- 1st important Cadyts method is "calibrator.addMesurement"; in this implementation it is called by the "CadytsBuilder"
 //		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
-		this.calibrator = CadytsBuilder.buildCalibratorDistribution(scenario.getConfig(), this.measurementsMap);
+		this.calibrator = CadytsBuilder.buildCalibratorDistributionBased(scenario.getConfig(), this.measurementsMap);
 	}
 
     @Override

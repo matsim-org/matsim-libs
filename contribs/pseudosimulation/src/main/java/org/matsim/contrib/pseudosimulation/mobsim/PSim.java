@@ -46,6 +46,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -348,28 +349,28 @@ public class PSim implements Mobsim {
                 System.out.println();
             double tt = 0;
             if (route.getStartLinkId() != route.getEndLinkId()) {
-                Id startLink = route.getStartLinkId();
+                Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
-                Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId);
+                Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId, PtConstants.NETWORK_MODE, 1.0);
                 LinkEnterEvent linkEnterEvent = null;
                 LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink, agentId);
                 eventQueue.add(wait2Link);
                 eventQueue.add(linkLeaveEvent);
                 double linkLeaveTime = linkEnterTime;
-                List<Id<Link>> ids = route.getLinkIds();
-                for (Id<Link> id : ids) {
+                List<Id<Link>> routeLinkIds = route.getLinkIds();
+                for (Id<Link> routeLinkId : routeLinkIds) {
                     if (linkEnterTime > 1E16) {
                         int mmm = 0;
                     }
                     linkEnterTime = linkLeaveTime;
-                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId, id, agentId);
+                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId, routeLinkId, agentId);
                     eventQueue.add(linkEnterEvent);
 
-                    double linkTime = travelTime.getLinkTravelTime(network.getLinks().get(id), linkEnterTime, null, null);
+                    double linkTime = travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId), linkEnterTime, null, null);
                     tt += Math.max(linkTime, 1.0);
 
                     linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime + linkTime);
-                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, agentId, id, agentId);
+                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, agentId, routeLinkId, agentId);
                     eventQueue.add(linkLeaveEvent);
                 }
                 tt = linkLeaveTime - startTime;

@@ -52,6 +52,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -147,15 +148,19 @@ public class JointTripRouterFactoryTest {
 	private static JointTripRouterFactory createFactory( final Scenario scenario ) {
 		return new JointTripRouterFactory(
 				scenario,
-				new TravelDisutilityFactory () {
-					@Override
-					public TravelDisutility createTravelDisutility(
-							TravelTime timeCalculator,
-							PlanCalcScoreConfigGroup cnScoringGroup) {
-						return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
-					}
-				},
-				new FreeSpeedTravelTime(),
+				Collections.<String,TravelDisutilityFactory>singletonMap(
+						TransportMode.car,
+						new TravelDisutilityFactory () {
+							@Override
+							public TravelDisutility createTravelDisutility(
+									TravelTime timeCalculator,
+									PlanCalcScoreConfigGroup cnScoringGroup) {
+								return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
+							}
+						} ),
+				Collections.<String,TravelTime>singletonMap(
+						TransportMode.car,
+						new FreeSpeedTravelTime() ),
 				new DijkstraFactory(),
 				null);
 	}

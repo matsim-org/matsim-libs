@@ -49,7 +49,7 @@ public class TaxiVehicleCreator
 	{
 
 
-	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml.gz";
+	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml";
 	private String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Untersuchungsraum.shp";
 	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/taxi_vehicles_";
 	

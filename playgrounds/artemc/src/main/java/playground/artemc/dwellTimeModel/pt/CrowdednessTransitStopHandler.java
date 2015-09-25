@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandler;
@@ -28,10 +29,13 @@ public class CrowdednessTransitStopHandler implements TransitStopHandler {
 
 	//Constants
 	private final static Logger log = Logger.getLogger(ComplexTransitStopHandler.class);
-	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(null, null, true);
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
 	private static final double ACC_DEC_DELAY = 8.0;
+
+
+	//Attributes
+	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(Id.create("", TransitStopFacility.class), null, true);
 
 	//Attributes
 	private boolean doorsOpen = false;

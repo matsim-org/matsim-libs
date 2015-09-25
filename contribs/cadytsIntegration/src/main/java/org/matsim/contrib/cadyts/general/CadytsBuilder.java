@@ -161,7 +161,7 @@ public final class CadytsBuilder {
 	// -----------------------------------------------------------------------------------------------------------
 //	public static <T> AnalyticalCalibrator<T> buildCalibratorDistribution(final Config config, final Counts occupCounts, LookUp<T> lookUp, Class<T> idType ) {
 //	public static <T> AnalyticalCalibrator<T> buildCalibratorDistribution(final Config config, TreeMap<Integer, Double> measurementsMap, LookUp<T> lookUp, Class<T> idType ) {
-	public static <T> AnalyticalCalibrator<T> buildCalibratorDistribution(final Config config, TreeMap<Integer, Integer> measurementsMap) {
+	public static <T> AnalyticalCalibrator<T> buildCalibratorDistributionBased(final Config config, TreeMap<Integer, Integer> measurementsMap) {
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 
 		//get timeBinSize_s and validate it

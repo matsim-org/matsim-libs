@@ -109,7 +109,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 				.getNetwork(), travelDisutility, travelTime);
 
 		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
+				router, new TimeDiscretizer(30 * 4, 15 * 60, false));
 
 		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
 				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
@@ -121,7 +121,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 
 		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
 				context, calculator, scheduler, vrpFinder, filterFactory,
-				Goal.MIN_WAIT_TIME, tcg.getOutputDir(), null);
+				Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
 		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 
 	}

@@ -103,7 +103,7 @@ public class SrVTripAnalyzer {
 		String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 				
-		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_5";
+		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_7";
 		
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
@@ -165,6 +165,7 @@ public class SrVTripAnalyzer {
 		networkReader.parse(networkFile);
 		
 		List<Event> events = new ArrayList<Event>();
+//		TreeMap<Double, Event> eventsMap = new TreeMap<Double, Event>();
 		
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
@@ -453,6 +454,8 @@ public class SrVTripAnalyzer {
 	    
 	    
 	    // add activities from map to plans
+	    int tripMapEntryCounter = 0;
+	    
 	    for (Id<Person> personId : personTripsMap.keySet()) {
 	    	
 	    	// add person to population
@@ -467,14 +470,15 @@ public class SrVTripAnalyzer {
 	    	Person person = population.getPersons().get(personId);
 	    	
 	    	// TODO exclude trip if first activity is not "home"
+	    	
 	    	for (double departureTime : tripsMap.keySet()) {
+	    		tripMapEntryCounter++;
+	    		
 	    		// plans
 	    		Plan plan = person.getPlans().get(0);
 	    		
 	    		Trip trip = tripsMap.get(departureTime);
-	    		
-//	    		double x = 4590000;
-//	    		double y = 5820000;
+
 	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
 	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
 	    		double y = x;
@@ -515,29 +519,22 @@ public class SrVTripAnalyzer {
 				// events
 				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTimeInSeconds, personId, null, null, activityTypeEndingActivity);
 				events.add(activityEndEvent);
+//				eventsMap.put(departureTimeInSeconds, activityEndEvent);
 				// TODO make mode adjustable
 				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTimeInSeconds, personId, null, "car");
 				events.add(personDepartureEvent);
+//				eventsMap.put(departureTimeInSeconds, personDepartureEvent);
 				
 				double arrivalTimeInMinutes = trip.getArrivalTime();
 				double arrivalTimeInSeconds = arrivalTimeInMinutes * 60;
 				// TODO make mode adjustable
 				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTimeInSeconds, personId, null, "car");
 				events.add(personArrivalEvent);
-				ActivityStartEvent activityStartEvent = new ActivityStartEvent(departureTime, personId, null, null, activityTypeStartingActivity);
+//				eventsMap.put(arrivalTimeInSeconds, personArrivalEvent);
+				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTimeInSeconds, personId, null, null, activityTypeStartingActivity);
 				events.add(activityStartEvent);	
-	    	}
-	    	
-//    		System.out.println("person.getPlans().size() = " + person.getPlans().size());
-//    		Plan plan = person.getPlans().get(0);
-    		
-    		// add last actvity of the day
-    		// now handled above without the assumption that last activity is always home
-//	    	Activity firstActivity = (Activity) plan.getPlanElements().get(0);
-//	    	Coord homeCoord = firstActivity.getCoord();
-//	    	// TODO Is it ok here to assume that last activity is always "home"? probably goes together with above comment that first act always need to be "home"
-//	    	Activity lastActivity = populationFactory.createActivityFromCoord("home", ct.transform(homeCoord));
-//	    	plan.addActivity(lastActivity);	    	
+//				eventsMap.put(arrivalTimeInSeconds, activityStartEvent);
+	    	}  	
 	    }	    
 	    
 	    // write population
@@ -545,11 +542,19 @@ public class SrVTripAnalyzer {
 	    popWriter.write(outputDirectory + "plans.xml");
 	    
 	    //  write events
+	    // TODO have events sorted by time
+	    int eventsCounter = 0;
 	    EventWriterXML eventWriter = new EventWriterXML(outputDirectory + "events.xml");
+//	    for (Event event : eventsMap.values()) {
 	    for (Event event : events) {
 	    	eventWriter.handleEvent(event);
+	    	eventsCounter++;
 	    }
 	    eventWriter.closeFile();
+	    
+	    // print counters
+	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
+	    System.out.println("events added: " + eventsCounter);
 	}
 
 
