@@ -46,7 +46,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 	private static final double EPSILON = 1e-9;
 	private static final double testee_incomeAlphaFactor = 2.0;
-	private static final double testee_sdFactor= 0.5;
+	private static final double testee_betaFactor= 0.5;
 
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final Person person) {
 		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
@@ -417,7 +417,11 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		perf = perf * testee_incomeAlphaFactor;
 		double score = perf * 3.0 * Math.log(2 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(1.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH);
 
-		assertEquals(score + (perf - testee_sdFactor * 0.5 * perf/testee_incomeAlphaFactor) * 1.5, calcScore(f, "heteroAlpha"), EPSILON);
+		double std = 0.25;
+		double mean = Math.log(1) - (std * std) / 2;
+		double lnBetaFactor = Math.exp(mean + std * testee_betaFactor);
+
+		assertEquals(score + (perf - lnBetaFactor * perf) * 1.5, calcScore(f, "heteroAlpha"), EPSILON);
 	}
 
 	/**
@@ -747,7 +751,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			this.person.getCustomAttributes().put("incomeAlphaFactor",testee_incomeAlphaFactor);
-			this.person.getCustomAttributes().put("sdBetaFactor",testee_sdFactor);
+			this.person.getCustomAttributes().put("betaFactor",testee_betaFactor);
 
 			ActivityImpl firstActivity = this.plan.createAndAddActivity("h", link1.getId());
 			firstActivity.setEndTime(firstLegStartTime);
