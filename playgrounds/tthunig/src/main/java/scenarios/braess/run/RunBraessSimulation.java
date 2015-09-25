@@ -178,6 +178,10 @@ public class RunBraessSimulation {
 				congestionHandler = new CongestionHandlerImplV8(controler.getEvents(), 
 						controler.getScenario());
 				break;
+			case V9:
+				congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), 
+						controler.getScenario());
+				break;
 			default:
 				break;
 			}
