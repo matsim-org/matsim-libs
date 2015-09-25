@@ -39,8 +39,6 @@ public class ParkingTimesTest extends MatsimTestCase {
 		
 		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).size());
 		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getArrivalTime(),1.0);
-//		assertEquals(23100, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getDepartureTime(),1.0); // ?
-//		assertEquals(23100, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getArrivalTime(),1.0); // ?
 		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getDepartureTime(),1.0);
 		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getArrivalTime(),1.0);
 		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getDepartureTime(),1.0);
