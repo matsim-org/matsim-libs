@@ -1,8 +1,5 @@
 package playground.artemc.scenarioTools;
 
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.random.RandomGenerator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
