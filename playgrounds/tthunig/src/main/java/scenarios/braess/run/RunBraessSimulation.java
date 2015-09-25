@@ -35,7 +35,9 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import scenarios.analysis.TtControlerListener;
 import scenarios.braess.analysis.TtAnalyzeBraess;
@@ -138,7 +140,7 @@ public class RunBraessSimulation {
 			
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
-							tollHandler, new CongestionHandlerImplV8(controler.getEvents(), 
+							tollHandler, new CongestionHandlerImplV9(controler.getEvents(), 
 									controler.getScenario())));
 		} else {
 			// adapt sigma for randomized routing
@@ -278,7 +280,7 @@ public class RunBraessSimulation {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons( 3600 );
+		popCreator.setNumberOfPersons( 2000 );
 		
 		popCreator.createPersons(INIT_WITH_ALL_ROUTES ? TtCreateBraessPopulation.InitRoutes.ALL
 				: TtCreateBraessPopulation.InitRoutes.NONE, INIT_PLAN_SCORE);
@@ -388,7 +390,7 @@ public class RunBraessSimulation {
 		}
 		
 		if (PRICING){
-			runName += "_princingV8";
+			runName += "_princingV9";
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)
