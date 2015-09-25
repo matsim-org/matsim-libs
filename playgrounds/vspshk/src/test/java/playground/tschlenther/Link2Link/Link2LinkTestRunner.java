@@ -15,7 +15,6 @@ import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -23,9 +22,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -45,7 +41,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class Link2LinkTestRunner {
 	
-	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static String OUTPUT_DIR = "";
 
@@ -73,30 +69,30 @@ public class Link2LinkTestRunner {
 		
 	}
 
-private void prepareAndRun(RunSettings runSettings, TsAnalyzeLink2Link handler) {
-	Config config = defineConfig(runSettings);
-	Scenario scenario = ScenarioUtils.loadScenario(config);
-	SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,SignalSystemsConfigGroup.class);
-	Controler controler = new Controler(scenario);
-	
-	if ((boolean) signalConfigGroup.isUseSignalSystems()){
-		// add the signals module if signal systems are use
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalConfigGroup).loadSignalsData());
-		controler.addOverridingModule(new SignalsModule());
-	}
-	
-	if (config.controler().isLinkToLinkRoutingEnabled()){
-		// add the module for link to link routing if enabled
-		controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
-	}
-	new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
-	this.createPersons(scenario);
+	private void prepareAndRun(RunSettings runSettings, TsAnalyzeLink2Link handler) {
+		Config config = defineConfig(runSettings);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		Controler controler = new Controler(scenario);
 
-	controler.getEvents().addHandler(handler);
-	controler.run();
-	
-	handler.saveRunResults();
-}
+		if ((boolean) signalConfigGroup.isUseSignalSystems()) {
+			// add the signals module if signal systems are use
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalConfigGroup).loadSignalsData());
+			controler.addOverridingModule(new SignalsModule());
+		}
+
+		if (config.controler().isLinkToLinkRoutingEnabled()) {
+			// add the module for link to link routing if enabled
+			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		}
+		new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
+		this.createPersons(scenario);
+
+		controler.getEvents().addHandler(handler);
+		controler.run();
+
+		handler.saveRunResults();
+	}
 
 	private void createOutputDir(RunSettings settings) {
 		OUTPUT_DIR = utils.getOutputDirectory();

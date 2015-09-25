@@ -118,6 +118,10 @@ public class TtTotalDelayTest {
 		
 		QSim QSim = QSimUtils.createDefaultQSim(scenario, events);
 		QSim.run();
+
+		if(WRITE_OUTPUT){
+			generateOutput(scenario, eventslist);
+		}
 		
 		//expectedDelay = inserting delay as a result of capacity of first link being 3600 vh/h
 		int expectedDelay = 0;
@@ -125,10 +129,6 @@ public class TtTotalDelayTest {
 			expectedDelay +=  i;
 		}
 		Assert.assertEquals("Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.", expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
-
-		if(WRITE_OUTPUT){
-			generateOutput(scenario, eventslist);
-		}
 	}
 
 	private void generateOutput(Scenario scenario, final List<Event> eventslist) {		
