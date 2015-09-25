@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,14 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
@@ -59,12 +46,20 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author thibautd
  */
 public class JointTripRouterFactoryTest {
 	private static final Logger log =
-			Logger.getLogger(JointTripRouterFactoryTest.class);
+		Logger.getLogger(JointTripRouterFactoryTest.class);
 
 	private JointTripRouterFactory factory;
 	private Scenario scenario;
@@ -150,19 +145,17 @@ public class JointTripRouterFactoryTest {
 	}
 
 	private static JointTripRouterFactory createFactory( final Scenario scenario ) {
-		final Map<String,TravelDisutilityFactory> tdMap = new HashMap<>();
-		tdMap.put( TransportMode.car, new TravelDisutilityFactory () {
-			@Override
-			public TravelDisutility createTravelDisutility( TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-				return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
-			}
-		});
-		final Map<String,TravelTime> ttMap = new HashMap<>() ;
-		ttMap.put( TransportMode.car, new FreeSpeedTravelTime() ) ;
 		return new JointTripRouterFactory(
 				scenario,
-				tdMap,
-				ttMap, 
+				new TravelDisutilityFactory () {
+					@Override
+					public TravelDisutility createTravelDisutility(
+							TravelTime timeCalculator,
+							PlanCalcScoreConfigGroup cnScoringGroup) {
+						return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
+					}
+				},
+				new FreeSpeedTravelTime(),
 				new DijkstraFactory(),
 				null);
 	}
@@ -170,8 +163,8 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-				new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
-						factory.get() );
+			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			boolean toRoute = false;
@@ -207,8 +200,8 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-				new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
-						factory.get() );
+			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
+					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			final List<Id> passengerIds = new ArrayList<Id>();
