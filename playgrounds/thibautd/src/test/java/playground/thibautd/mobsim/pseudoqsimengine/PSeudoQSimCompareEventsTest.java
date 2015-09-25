@@ -65,32 +65,28 @@ import java.util.Random;
  */
 //@Ignore( "fails since refactoring in DriverAgent. to fix!!!" )
 public class PSeudoQSimCompareEventsTest {
-	private static final boolean DUMP_EVENTS = true;
+	private static final boolean DUMP_EVENTS = false;
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore( "fails since adding of VehicleLeavesTrafficEvents. to fix!!!" )
 	public void testEventsSimilarToQsim() {
 		testEventsSimilarToQsim( false , 1 );
 	}
 
 	@Test
-	@Ignore( "fails since adding of VehicleLeavesTrafficEvents. to fix!!!" )
 	public void testEventsSimilarToQsimParallel() {
 		//Logger.getLogger( "playground.thibautd.mobsim.pseudoqsimengine" ).setLevel( Level.TRACE );
 		testEventsSimilarToQsim( false , 15 );
 	}
 
 	@Test
-	@Ignore( "fails since adding of VehicleLeavesTrafficEvents. to fix!!!" )
 	public void testEventsSimilarToQsimPt() {
 		testEventsSimilarToQsim( true , 1 );
 	}
 
 	@Test
-	@Ignore( "fails since adding of VehicleLeavesTrafficEvents. to fix!!!" )
 	public void testEventsSimilarToQsimParallelPt() {
 		//Logger.getLogger( "playground.thibautd.mobsim.pseudoqsimengine" ).setLevel( Level.TRACE );
 		testEventsSimilarToQsim( true , 15 );
