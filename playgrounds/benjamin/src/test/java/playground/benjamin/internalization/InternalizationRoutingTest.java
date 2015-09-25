@@ -84,9 +84,10 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
-		pcs.setTraveling_utils_hr(0.0);
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceRateCar(-0.001);
+		double monetaryDistanceRateCar = -0.001;
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		//link 11 distance
 		int expectedRoad = 11;
@@ -118,9 +119,11 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceRateCar(-0.0);
+		double monetaryDistanceRateCar = -0.0;
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		//link 9 time
 		int expectedRoad = 9;
@@ -152,9 +155,11 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceRateCar(-0.001);
+		double monetaryDistanceRateCar = -0.001;
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		//link 13 time AND distance
 		int expectedRoad = 13;
@@ -191,9 +196,11 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceRateCar(-0.001);
+		double monetaryDistanceRateCar = -0.001;
+		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		installEmissionDisutilityCalculatorFactory();
 		installEmissionInternalizationListener();
@@ -224,7 +231,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissiondcf);
+				bindCarTravelDisutilityFactory().toInstance(emissiondcf);
 			}
 		});
 	}

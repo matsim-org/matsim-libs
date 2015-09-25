@@ -56,6 +56,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -185,11 +187,11 @@ public class CadytsCarIntegrationTest {
 		controler.addControlerListener(cContext);
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
-				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;

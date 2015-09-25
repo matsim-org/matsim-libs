@@ -41,16 +41,16 @@ public class IterationResource {
 		return baseScenario;
 	}
 
-	public void postExperiencedPlans() {
-		Scenario scenario = getRun().getOutputScenario();
-		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
-		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
-		eventsManager.addHandler(events2Score);
-		new MatsimEventsReader(eventsManager).readFile(getEventsFileName());
-		events2Score.finish();
-		events2Score.writeExperiencedPlans(wd + "/" + iterationPrefix() + "experienced_plans.xml.gz");
-	}
+	//public void postExperiencedPlans() {
+	//	Scenario scenario = getRun().getOutputScenario();
+	//	scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
+	//	EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+	//	EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+	//	eventsManager.addHandler(events2Score);
+	//	new MatsimEventsReader(eventsManager).readFile(getEventsFileName());
+	//	events2Score.finish();
+	//	events2Score.writeExperiencedPlans(wd + "/" + iterationPrefix() + "experienced_plans.xml.gz");
+	//}
 
 	public String getEventsFileName() {
 		return wd + "/" + iterationPrefix() + "events.xml.gz";

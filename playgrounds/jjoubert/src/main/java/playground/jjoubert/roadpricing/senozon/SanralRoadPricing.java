@@ -97,7 +97,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 				}
 			});
 		}

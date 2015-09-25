@@ -20,18 +20,14 @@
 package playground.dgrether.signalsystems.cottbus;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
 
@@ -39,15 +35,14 @@ import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballS
  * @author dgrether
  * 
  */
-public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class CottbusFootballTraveltimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private Map<Id, Double> arrivaltimesSPN2FB;
-	private Map<Id, Double> arrivaltimesCB2FB;
-
-	private Map<Id, Double> arrivaltimesFB2SPN;
-	private Map<Id, Double> arrivaltimesFB2CB;
-	private Map<Id, Double> personId2TravelTimeMap;
+	private Map<Id<Person>, Double> arrivaltimesSPN2FB;
+	private Map<Id<Person>, Double> arrivaltimesCB2FB;
+	private Map<Id<Person>, Double> arrivaltimesFB2SPN;
+	private Map<Id<Person>, Double> arrivaltimesFB2CB;
+	
+	private Map<Id<Person>, Double> travelTimesPerPerson;
 
 	public CottbusFootballTraveltimeHandler(){
 		this.reset(0);
@@ -55,30 +50,18 @@ public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
 	
 	@Override
 	public void reset(int iteration) {
-		this.personId2TravelTimeMap = new TreeMap<Id, Double>();
-		this.arrivaltimesFB2CB = new TreeMap<Id, Double>();
-		this.arrivaltimesFB2SPN = new TreeMap<Id, Double>();
-		this.arrivaltimesCB2FB = new TreeMap<Id, Double>();
-		this.arrivaltimesSPN2FB = new TreeMap<Id, Double>();
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
+		this.travelTimesPerPerson = new TreeMap<>();
+		this.arrivaltimesFB2CB = new TreeMap<>();
+		this.arrivaltimesFB2SPN = new TreeMap<>();
+		this.arrivaltimesCB2FB = new TreeMap<>();
+		this.arrivaltimesSPN2FB = new TreeMap<>();
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
-
+		double previousTT = travelTimesPerPerson.get(event.getPersonId());
+		travelTimesPerPerson.put(event.getPersonId(), previousTT + event.getTime());
+		
 		if (event.getPersonId().toString().endsWith(CottbusFootballStrings.SPN2FB)) {
 			Double tr = this.arrivaltimesSPN2FB.get(event.getPersonId());
 			if (tr == null) {
@@ -101,37 +84,34 @@ public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
-		if (agentTt == null) {
-			this.personId2TravelTimeMap.put(event.getPersonId(), 0 - event.getTime());
-		}
-		else {
-			this.personId2TravelTimeMap.put(event.getPersonId(), agentTt - event.getTime());
-		}
+		if (!travelTimesPerPerson.containsKey(event.getPersonId()))
+			travelTimesPerPerson.put(event.getPersonId(), 0.0);
+		double previousTT = travelTimesPerPerson.get(event.getPersonId());
+		travelTimesPerPerson.put(event.getPersonId(), previousTT - event.getTime());
 	}
 
 	public double getAverageTravelTime() {
 		Double att = 0.0;
-		for (Entry<Id, Double> entry : personId2TravelTimeMap.entrySet()) {
-			att += entry.getValue();
+		for (Double travelTime : travelTimesPerPerson.values()) {
+			att += travelTime;
 		}
-		att = att / personId2TravelTimeMap.size();
+		att = att / travelTimesPerPerson.size();
 		return att;
 	}
 
-	public Map<Id, Double> getArrivalTimesCB2FB() {
+	public Map<Id<Person>, Double> getArrivalTimesCB2FB() {
 		return this.arrivaltimesCB2FB;
 	}
 
-	public Map<Id, Double> getArrivalTimesFB2CB() {
+	public Map<Id<Person>, Double> getArrivalTimesFB2CB() {
 		return this.arrivaltimesFB2CB;
 	}
 
-	public Map<Id, Double> getArrivalTimesSPN2FB() {
+	public Map<Id<Person>, Double> getArrivalTimesSPN2FB() {
 		return this.arrivaltimesSPN2FB;
 	}
 
-	public Map<Id, Double> getArrivalTimesFB2SPN() {
+	public Map<Id<Person>, Double> getArrivalTimesFB2SPN() {
 		return this.arrivaltimesFB2SPN;
 	}
 

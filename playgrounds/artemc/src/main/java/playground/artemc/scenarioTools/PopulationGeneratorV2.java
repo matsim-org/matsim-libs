@@ -60,9 +60,9 @@ public class PopulationGeneratorV2 {
 		HashMap<Integer, ArrayList<Id>> zoneWorkFacilities = new HashMap<Integer, ArrayList<Id>>();	
 		HashMap<Integer, Double> occupancy = new HashMap<Integer, Double>();
 		
-		Random generator = new Random();	
+		Random generator = new Random();
 		
-		ArrayList<String[]> facilityIncome = CSVReader.readCSV(incomeFilePath);	
+		ArrayList<String[]> facilityIncome = CSVReader.readCSV(incomeFilePath, ",");
 		HashMap<Id, Integer> facilityIncomeMap = new HashMap<Id, Integer>(); 
 
 		for(String[] entry:facilityIncome){

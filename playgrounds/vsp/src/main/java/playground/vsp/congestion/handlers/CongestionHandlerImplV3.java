@@ -180,17 +180,17 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 		
-		double delayOnThisLink = event.getTime() - delayInfo.freeSpeedLeaveTime ;
+		double delayOnThisLink = delayInfo.linkLeaveTime - delayInfo.freeSpeedLeaveTime ;
 
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
 
 		double agentDelayWithDelaysOnPreviousLinks = 0.;		
 
-		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
+		if (this.agentId2storageDelay.get(delayInfo.personId) == null) {
 			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(delayInfo.personId);
+			this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), 0.);
 		}
 
 		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
@@ -212,7 +212,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 			} else if (storageDelay > 0.) {	
 				// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-				this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
+				this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), storageDelay);
 			} 
 		}
 	}

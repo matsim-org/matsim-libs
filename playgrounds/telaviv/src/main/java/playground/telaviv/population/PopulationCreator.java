@@ -213,7 +213,7 @@ public class PopulationCreator {
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
+		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
 		final TripRouterProviderImpl tripRouterFactory = new TripRouterProviderImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
 		ReplanningContext context = new ReplanningContext() {
 			@Override

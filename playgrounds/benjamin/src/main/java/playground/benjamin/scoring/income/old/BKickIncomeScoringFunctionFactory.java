@@ -36,36 +36,36 @@ import org.matsim.households.PersonHouseholdMapping;
  * @author dgrether
  *
  */
-public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory {
-
-	private PlanCalcScoreConfigGroup configGroup;
-	private CharyparNagelScoringParameters params;
-	private PersonHouseholdMapping hhdb;
-    private Network network;
-
-    public BKickIncomeScoringFunctionFactory(
-            PlanCalcScoreConfigGroup charyparNagelScoring, final ScenarioConfigGroup scenarioConfig, PersonHouseholdMapping hhmapping, Network network) {
-		this.configGroup = charyparNagelScoring;
-		this.params = CharyparNagelScoringParameters.getBuilder(configGroup, scenarioConfig).create();
-		this.hhdb = hhmapping;
-        this.network = network;
-	}
-
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
-
-		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(person.getSelectedPlan(), params, this.hhdb, network));
-
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
-
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-		return scoringFunctionAccumulator;
-	
-	}
-
-}
+//public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory {
+//
+//	private PlanCalcScoreConfigGroup configGroup;
+//	private CharyparNagelScoringParameters params;
+//	private PersonHouseholdMapping hhdb;
+//    private Network network;
+//
+//    public BKickIncomeScoringFunctionFactory(
+//            PlanCalcScoreConfigGroup charyparNagelScoring, final ScenarioConfigGroup scenarioConfig, PersonHouseholdMapping hhmapping, Network network) {
+//		this.configGroup = charyparNagelScoring;
+//		this.params = CharyparNagelScoringParameters.getBuilder(configGroup, scenarioConfig).create();
+//		this.hhdb = hhmapping;
+//        this.network = network;
+//	}
+//
+//	@Override
+//	public ScoringFunction createNewScoringFunction(Person person) {
+//
+//		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
+//
+//		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(person.getSelectedPlan(), params, this.hhdb, network));
+//
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
+//
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//		return scoringFunctionAccumulator;
+//
+//	}
+//
+//}

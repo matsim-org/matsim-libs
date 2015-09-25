@@ -31,7 +31,8 @@ import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
-import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
@@ -40,10 +41,7 @@ import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author johannes
@@ -64,8 +62,7 @@ public class Simulator {
 
 		logger.info("Loading persons...");
 		Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
-				"popInputFile"), new
-				PlainFactory());
+				"popInputFile"), new PlainFactory());
 		logger.info(String.format("Loaded %s persons.", refPersons.size()));
 
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
@@ -138,7 +135,7 @@ public class Simulator {
 
 		listener.addComponent(new MarkovEngineListener() {
 
-			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 1000000);
+			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 10000000);
 
 			@Override
 			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
@@ -155,7 +152,7 @@ public class Simulator {
 
 		sampler.setListener(listener);
 
-		sampler.run(10000001);
+		sampler.run(100000001);
 	}
 
 	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
@@ -175,10 +172,11 @@ public class Simulator {
 		Set<Attributable> refLegs = getLegs(refPersons);
 		Set<Attributable> simLegs = getLegs(simPersons);
 
+		List<Double> values = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE).collect(refPersons);
+		double[] nativeValues = CollectionUtils.toNativeArray(values);
+		Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
-
-		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, new
-				LinearDiscretizer(10000));
+		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
 
 		return f;
 	}

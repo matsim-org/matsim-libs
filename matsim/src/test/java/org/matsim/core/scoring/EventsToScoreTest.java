@@ -87,7 +87,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		PlanImpl plan = new PlanImpl() ;
 		person.addPlan(plan);
 		
-		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), null);
+		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );
 		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);

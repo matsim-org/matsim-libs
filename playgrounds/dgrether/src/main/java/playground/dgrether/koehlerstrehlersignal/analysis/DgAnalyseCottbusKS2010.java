@@ -41,6 +41,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -52,15 +55,14 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.RunResultsLoader;
@@ -73,8 +75,6 @@ import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.InMemoryEventsManager;
 import playground.dgrether.events.filters.TimeEventFilter;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 public class DgAnalyseCottbusKS2010 {
@@ -253,14 +253,14 @@ public class DgAnalyseCottbusKS2010 {
 		Set<Id<Person>> allPersonIds = new HashSet<>();
 		allPersonIds.addAll(baseResult.seenPersonIds);
 		allPersonIds.addAll(r.seenPersonIds);
-		Set<Id<Person>> disattractedPersonsIds = new HashSet<>();
-		Set<Id<Person>> attractedPersonsIds = new HashSet<>();
-		for (Id<Person> id : allPersonIds) {
-			if (baseResult.seenPersonIds.contains(id) && ! r.seenPersonIds.contains(id)) {
-				disattractedPersonsIds.add(id);
+		Set<Id<Person>> disattractedPersonIds = new HashSet<>();
+		Set<Id<Person>> attractedPersonIds = new HashSet<>();
+		for (Id<Person> personId : allPersonIds) {
+			if (baseResult.seenPersonIds.contains(personId) && ! r.seenPersonIds.contains(personId)) {
+				disattractedPersonIds.add(personId);
 			}
-			if (! baseResult.seenPersonIds.contains(id) && r.seenPersonIds.contains(id)) {
-				attractedPersonsIds.add(id);
+			if (! baseResult.seenPersonIds.contains(personId) && r.seenPersonIds.contains(personId)) {
+				attractedPersonIds.add(personId);
 			}
 		}
 		
@@ -268,12 +268,12 @@ public class DgAnalyseCottbusKS2010 {
 		Population pop = baseResult.runLoader.getPopulation();
 		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/";
 		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
-		Population newPop = this.getFilteredPopulation(pop, disattractedPersonsIds);
+		Population newPop = this.getFilteredPopulation(pop, disattractedPersonIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_disattracted_acts");
 
 		out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/");
-		newPop = this.getFilteredPopulation(pop, attractedPersonsIds);
+		newPop = this.getFilteredPopulation(pop, attractedPersonIds);
 		sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");
 	}
@@ -304,7 +304,7 @@ public class DgAnalyseCottbusKS2010 {
 
 	private void createAndWriteSimSimComparison(Result baseResult, Result result) {
 		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
-		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
+		Map<Id<Link>, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
 		String shapeBase = baseResult.runInfo.runId + "_it_" + baseResult.runInfo.iteration + "_vs_";
 		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration;
 
@@ -379,13 +379,13 @@ public class DgAnalyseCottbusKS2010 {
 					mfd.completedEventsHandling();
 					result.volumes = volumes;
 					result.travelTime = avgTtSpeed.getTravelTime();
-					result.numberOfPersons = avgTtSpeed.getNumberOfPersons();
+					result.numberOfPersons = avgTtSpeed.getNumberOfVehicles();
 					result.mfd = mfd;
 					result.totalDelay = totalDelay.getTotalDelay();
 					result.distanceMeter = avgTtSpeed.getDistanceMeter();
 					result.noTrips = avgTtSpeed.getNumberOfTrips();
 					result.seenPersonIds = avgTtSpeed.getSeenPersonIds();
-					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfPersons());
+					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
 				}
 			}
 		}

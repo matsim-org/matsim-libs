@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -86,14 +87,27 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private final Map<Id<Person>, Map<Integer, Double>> personId2TripNr2DepartureTime = new HashMap<>();
 		
 	private final MarginalSumScoringFunction marginaSumScoringFunction;
-	private final double defaultVTTS;
+	private final double defaultVTTS_moneyPerHour;
 	
 	public VTTSHandler(Scenario scenario) {
 		
+		if (scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() == 0.) {
+			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time. Aborting...");
+		}
 		this.scenario = scenario;
 		this.currentIteration = Integer.MIN_VALUE;
-		this.defaultVTTS = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() + (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1.0);
-		this.marginaSumScoringFunction = new MarginalSumScoringFunction(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create());
+		this.defaultVTTS_moneyPerHour =
+				(this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()
+				+ this.scenario.getConfig().planCalcScore().getModes().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
+				) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+
+		this.marginaSumScoringFunction =
+				new MarginalSumScoringFunction(
+						CharyparNagelScoringParameters.getBuilder(
+								scenario.getConfig().planCalcScore(),
+								scenario.getConfig().planCalcScore().getScoringParameters( null ),
+								scenario.getConfig().scenario()).create());
+
 	}
 
 	@Override
@@ -232,19 +246,19 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		double tripDelayDisutilityOneSec = 0.;
 		
 		if (this.personId2currentTripMode.get(personId).equals("car")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 			
 		} else if (this.personId2currentTripMode.get(personId).equals("walk")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() * (-1);
 
 		} else if (this.personId2currentTripMode.get(personId).equals("pt")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() * (-1);
 
 		} else if (this.personId2currentTripMode.get(personId).equals("bike")) {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingBike_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() * (-1);
 			
 		} else {
-			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingOther_utils_hr() * (-1);
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.other).getMarginalUtilityOfTraveling() * (-1);
 		}
 		
 		// Translate the disutility into monetary units.
@@ -376,7 +390,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} else {
 			
 			log.warn("Couldn't find any VTTS of person " + id + ". Using the default VTTS...");
-			return this.defaultVTTS;
+			return this.defaultVTTS_moneyPerHour;
 		}
 	}
 	
@@ -385,7 +399,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	 * @param id
 	 * @param time
 	 * 
-	 * This method returns the VTTS for a person at a given time and can for example be used to calculate a travel disutility during routing.
+	 * This method returns the VTTS in money per hour for a person at a given time and can for example be used to calculate a travel disutility during routing.
 	 * Based on the time, the trip Nr is computed and based on the trip number the VTTS is looked up.
 	 * In case there is no VTTS information available such as in the initial iteration before event handling, the default VTTS is returned.
 	 * 
@@ -428,7 +442,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} else {
 			if (this.currentIteration == Integer.MIN_VALUE) {
 				// the initial iteration before handling any events
-				return this.defaultVTTS;
+				return this.defaultVTTS_moneyPerHour;
 			} else {
 				throw new RuntimeException("This is not the initial iteration and there is no information available from the previous iteration. Aborting...");
 			}

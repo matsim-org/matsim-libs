@@ -4,18 +4,16 @@
 package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.contrib.pseudosimulation.RunPSim;
 
 /**
  * @author fouriep
@@ -56,13 +54,13 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
@@ -74,13 +72,7 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if (switcher.isQSimIteration())
-			super.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
+	public void handleEvent(VehicleAbortsEvent event) {
 		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}

@@ -86,11 +86,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		transitActivityParams.setTypicalDuration(120.0);
 
 		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTraveling_utils_hr(0);
-		config.planCalcScore().setTravelingPt_utils_hr(0);
-		config.planCalcScore().setTravelingWalk_utils_hr(0);
-		config.planCalcScore().setMonetaryDistanceRateCar(10);
-		config.planCalcScore().setMonetaryDistanceRatePt(0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
 		config.planCalcScore().addActivityParams(h);
 		config.planCalcScore().addActivityParams(w);
 		config.planCalcScore().addActivityParams(transitActivityParams);
@@ -218,7 +218,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scorer =
+				new EventsToScore(
+						scenario,
+						new CharyparNagelScoringFunctionFactory(
+								scenario ) );
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
@@ -276,11 +280,13 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
-		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(-1.00);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(-0.001);
+		final double travelingPt = -1.00;
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		double monetaryDistanceRatePt = -0.001;
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 		scenario.getConfig().planCalcScore().addActivityParams(h);
 		scenario.getConfig().planCalcScore().addActivityParams(w);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

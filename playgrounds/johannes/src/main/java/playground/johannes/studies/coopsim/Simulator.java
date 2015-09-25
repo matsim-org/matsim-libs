@@ -29,6 +29,7 @@ import java.util.Random;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -237,7 +238,7 @@ public class Simulator {
 		double beta_join = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "beta_join"));
 		double delta_type = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "delta_type"));
 		double beta_act = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getPerforming_utils_hr() / 3600.0;
-		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getTraveling_utils_hr() / 3600.0;
+		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0;
 	
 		if(nonCooperativeMode && beta_join != 0) {
 			logger.warn("Simulation runs in non-cooperative mode with beta_join set!");

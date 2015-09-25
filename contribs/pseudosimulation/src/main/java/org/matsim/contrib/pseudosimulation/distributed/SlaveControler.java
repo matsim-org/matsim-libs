@@ -236,7 +236,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
-                            bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                            bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                         }
                     });
                     disutilityFactory.setSigma(0.1);
@@ -276,7 +276,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                    bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                 }
             });
             disutilityFactory.setSigma(0.1);

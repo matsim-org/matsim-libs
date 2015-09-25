@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -51,10 +50,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
 import com.vividsolutions.jts.geom.Geometry;
+import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
+import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
 
 /**
  * Provides a matsim-events specific implementation of RouteConverter.
@@ -118,10 +116,6 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		if (path2EventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 			reader.parse(path2EventsFile);
-		}
-		else if (path2EventsFile.endsWith(".txt.gz")) {	// if events-File is in the older txt-format
-			EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-			reader.readFile(path2EventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

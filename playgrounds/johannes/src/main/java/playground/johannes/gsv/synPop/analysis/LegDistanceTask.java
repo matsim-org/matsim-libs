@@ -119,7 +119,7 @@ public class LegDistanceTask extends AnalyzerTask {
 
 			if (outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 1000, 50);
+					writeHistograms(stats, key, 100, 50);
 					writeHistograms(stats, new LinearDiscretizer(25000), key, false);
 				} catch (IOException e) {
 					e.printStackTrace();

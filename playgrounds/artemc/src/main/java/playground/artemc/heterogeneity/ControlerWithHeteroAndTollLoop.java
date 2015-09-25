@@ -1,6 +1,7 @@
 package playground.artemc.heterogeneity;
 
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,12 +15,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.heterogeneity.eventsBasedPTRouter.TransitRouterEventsAndHeterogeneityBasedWSModule;
 import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
 import playground.artemc.heterogeneity.routing.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper;
@@ -27,6 +30,7 @@ import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAn
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
@@ -54,6 +58,12 @@ public class ControlerWithHeteroAndTollLoop {
 		simulationTypes.add("heteroAlpha");
 		simulationTypes.add("heteroGamma");
 
+//		simulationTypes.add("heteroAlphaRatio");
+
+//		simulationTypes.add("heteroAlphaOnly");
+//		simulationTypes.add("heteroGammaOnly");
+
+
 		input = args[0];
 		if(args.length>1){
 			output = args[1];
@@ -73,7 +83,7 @@ public class ControlerWithHeteroAndTollLoop {
 			}
 
 			log.info("Simulation type: " + simulationType);
-			if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma")) {
+			if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma") || simulationType.equals("heteroAlphaRatio") || simulationType.equals("heteroAlphaOnly") || simulationType.equals("heteroGammaOnly")) {
 				log.info("Heterogeneityfactor: " + heterogeneityFactor);
 			}else if(!simulationType.equals("homo")){
 				throw new RuntimeException("Unknown income heterogeneity type");
@@ -89,13 +99,10 @@ public class ControlerWithHeteroAndTollLoop {
 		Scenario scenario = initScenario();
 		//System.setProperty("matsim.preferLocalDtds", "true");
 
-		Controler controler = new Controler(scenario);
+		final Controler controler = new Controler(scenario);
 
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
-
-		log.info("Adding Simple Annealer...");
-		controler.addControlerListener(new SimpleAnnealer());
 
 		//Adjust heterogeneity parameters from input arguments
 		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
@@ -103,14 +110,13 @@ public class ControlerWithHeteroAndTollLoop {
 		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostLambda", adjustedIncomeOnTravelCostLambda.toString());
 		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
 
-
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
 
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
 //			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillAndOffSwitch());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -148,6 +154,19 @@ public class ControlerWithHeteroAndTollLoop {
 		{
 			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}
+
+		//Sun's Dwell Time model
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new QSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());

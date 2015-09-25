@@ -153,11 +153,12 @@ public class PTRoutingFrequencyV2 {
 		//config.scenario().setUseKnowledge(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		
-		config.planCalcScore().setTravelingWalk_utils_hr(-12.0); // setting 2 times higher disutility of walking according to SImon's analysis
-		
-		
+
+
+		final double travelingWalk = -12.0;
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+
+
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
 

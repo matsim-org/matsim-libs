@@ -19,7 +19,13 @@
 
 package org.matsim.counts;
 
-import com.google.inject.Provider;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,12 +47,9 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import com.google.inject.Provider;
 
 /**
  * @author mrieser
@@ -401,7 +404,7 @@ public class CountsControlerListenerTest {
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, Id.create(i, Vehicle.class)));
 			}
 		}
 	}
@@ -425,13 +428,15 @@ public class CountsControlerListenerTest {
 			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < 100; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
+				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, vehId));
 			}
 			for (int i = 100; i < 150; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
+				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, vehId));
 			}
 		}
 	}

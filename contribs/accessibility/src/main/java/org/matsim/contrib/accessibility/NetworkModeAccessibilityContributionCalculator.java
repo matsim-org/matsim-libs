@@ -75,14 +75,14 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 
-		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceRateCar();
+		betaCarTT 	   	= planCalcScoreConfigGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 
-		constCar		= planCalcScoreConfigGroup.getConstantCar();
+		constCar		= planCalcScoreConfigGroup.getModes().get(TransportMode.car).getConstant();
 
-		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		this.walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ) * 3600;
 	}

@@ -83,7 +83,7 @@ public class CASimulationRunner implements IterationStartsListener{
 			controller.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
 			controller.addControlerListener(new MSAMarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new MSACongestionHandler(controller.getEvents(), controller.getScenario())));

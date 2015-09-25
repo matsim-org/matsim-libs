@@ -40,12 +40,12 @@ import playground.boescpa.converters.osm.networkCreator.MMStreetNetworkCreatorFa
 import playground.boescpa.converters.osm.ptMapping.PTMapperOnlyBusses;
 import playground.boescpa.converters.osm.ptMapping.PseudoNetworkCreator;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
+import playground.boescpa.converters.osm.tools.TransitRouterNetworkThinner;
+import playground.boescpa.converters.osm.tools.TransitRouterNetworkWriter;
 import playground.boescpa.lib.tools.cutter.ScheduleCutter;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
 import playground.boescpa.lib.tools.merger.ScheduleMerger;
 import playground.boescpa.lib.tools.merger.VehicleMerger;
-import playground.christoph.evacuation.pt.TransitRouterNetworkThinner;
-import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
 
 /**
  * New main to create multimodal MATSim environment from OSM and HAFAS.

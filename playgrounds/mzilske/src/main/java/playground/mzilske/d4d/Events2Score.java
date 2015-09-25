@@ -18,7 +18,7 @@ public class Events2Score {
 		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		new MatsimPopulationReader(scenario).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/output_plans.xml.gz");
-		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore events2Score = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
 		eventsManager.addHandler(events2Score);
 		new MatsimEventsReader(eventsManager).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/ITERS/it.180/180.events.xml.gz");
 		// new MatsimEventsReader(eventsManager).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/ITERS/it.180/my_guy.xml");

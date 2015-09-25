@@ -28,4 +28,8 @@ public interface RoutingContext {
 
 	TravelTime getTravelTime();
 
+	TravelDisutility getTravelDisutility(String mode);
+
+	TravelTime getTravelTime(String mode);
+
 }

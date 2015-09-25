@@ -1,6 +1,7 @@
 package playground.artemc.heterogeneity.routing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -68,9 +69,9 @@ public class TimeDistanceTollAndHeterogeneityBasedTravelDisutility implements Tr
 		this.timeCalculator = timeCalculator;
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0)  + (cnScoringGroup.getPerforming_utils_hr() / 3600.0) ;
+		this.marginalCostOfTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0)  + (cnScoringGroup.getPerforming_utils_hr() / 3600.0) ;
 		this.marginalUtilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney() ;
-		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+		this.marginalCostOfDistance = -cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
@@ -94,7 +95,7 @@ public class TimeDistanceTollAndHeterogeneityBasedTravelDisutility implements Tr
 
 		if ( noramlisationWrnCnt < 1 ) {
 			noramlisationWrnCnt++;
-			if (cnScoringGroup.getMonetaryDistanceRateCar() > 0.) {
+			if (cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0.) {
 				Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal" + "behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.");
 			}
 		}

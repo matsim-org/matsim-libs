@@ -63,9 +63,7 @@ public class RunIndivSimulation {
 			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
 				controler.getConfig().planCalcScore();
 			ScoringFunctionFactory factory =
-				new CharyparNagelOpenTimesScoringFunctionFactory(
-						planCalcScoreConfigGroup,
-						controler.getScenario());
+				new CharyparNagelOpenTimesScoringFunctionFactory( controler.getScenario() );
 			controler.setScoringFunctionFactory(factory);
 		}
 	}

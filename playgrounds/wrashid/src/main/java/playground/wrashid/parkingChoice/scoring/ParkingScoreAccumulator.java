@@ -26,6 +26,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.wrashid.lib.obj.Collections;
@@ -61,15 +63,17 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		this.parkingManager = parkingManager;
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(controler.getConfig().planCalcScore(), controler.getConfig().scenario()).create();
+			CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
+				CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, controler.getScenario().getNetwork()));
-				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
-				sumScoringFunction.addScoringFunction(new ParkingScoring(controler.getConfig(), this.params, person.getId()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				sumScoringFunction.addScoringFunction(new ParkingScoring(controler.getConfig(), params, person.getId()));
 				return sumScoringFunction;
 			}
 		});

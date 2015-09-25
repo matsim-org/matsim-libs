@@ -23,6 +23,7 @@
 package playground.ikaddoura.internalizationPt;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -46,7 +47,7 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
 		this.scenario = scenario;
-		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();	
+		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.vtts_waiting = (this.scenario.getConfig().planCalcScore().getMarginalUtlOfWaitingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		
 		log.info("VTTS_inVehicleTime: " + vtts_inVehicle);

@@ -39,8 +39,11 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +71,8 @@ public abstract class AbstractModule implements Module {
     private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
     private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
+    private MapBinder<String, TravelDisutilityFactory> travelDisutilityFactoryMultibinder;
+    private MapBinder<String, TravelTime> travelTimeMultibinder;
 
     @Inject
     com.google.inject.Injector bootstrapInjector;
@@ -94,6 +99,8 @@ public abstract class AbstractModule implements Module {
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
         this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
+        this.travelDisutilityFactoryMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelDisutilityFactory>(){});
+        this.travelTimeMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelTime>(){});
         this.install();
     }
 
@@ -108,11 +115,11 @@ public abstract class AbstractModule implements Module {
         binder.install(module);
     }
 
-    protected LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
+    protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
         return eventHandlerMultibinder.addBinding();
     }
 
-    protected LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
+    protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
         return controlerListenerMultibinder.addBinding();
     }
 
@@ -136,12 +143,32 @@ public abstract class AbstractModule implements Module {
         return snapshotWriterMultibinder.addBinding();
     }
 
-    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {
-        return bind(TravelDisutilityFactory.class);
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
+        return bind(carTravelDisutilityFactoryKey());
+    }
+
+    protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
+        return Key.get(TravelDisutilityFactory.class, ForCar.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
+        return travelDisutilityFactoryMultibinder.addBinding(mode);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
         return bind(LeastCostPathCalculatorFactory.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
+        return travelTimeMultibinder.addBinding(mode);
+    }
+
+    protected final LinkedBindingBuilder<TravelTime> bindCarTravelTime() {
+        return bind(carTravelTimeKey());
+    }
+
+    protected final Key<TravelTime> carTravelTimeKey() {
+        return Key.get(TravelTime.class, ForCar.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -186,4 +213,8 @@ public abstract class AbstractModule implements Module {
         };
     }
 
+    @BindingAnnotation
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ForCar {
+    }
 }

@@ -23,27 +23,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
  * @author tthunig
  *
  */
-public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
+public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
 
 	private Network network;
-	private Map<Id, LinkEnterEvent> linkEnterByPerson;
-	private Map<Id, Double> delayPerLink;
+	private Map<Id<Vehicle>, LinkEnterEvent> linkEnterPerVehicle;
+	private Map<Id<Link>, Double> delayPerLink;
 
 	public TtDelayPerLink(Network network) {
 		this.network = network;
@@ -52,17 +53,17 @@ public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHand
 
 	@Override
 	public void reset(int iteration) {
-		this.linkEnterByPerson = new HashMap<Id, LinkEnterEvent>();
-		this.delayPerLink = new HashMap<Id, Double>();
+		this.linkEnterPerVehicle = new HashMap<>();
+		this.delayPerLink = new HashMap<>();
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		//calculate delay for signalized links, so the delay caused by the signals
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
-			Link link = this.network.getLinks().get(event.getLinkId());
-			Id linkId = link.getId();
+			LinkEnterEvent linkEnterEvent = this.linkEnterPerVehicle.remove(event.getVehicleId());
+			Id<Link> linkId = event.getLinkId();
+			Link link = this.network.getLinks().get(linkId);
 			double freespeedTravelTime = link.getLength()/link.getFreespeed();
 			
 			if (linkEnterEvent != null) {
@@ -78,22 +79,22 @@ public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHand
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			this.linkEnterByPerson.put(event.getPersonId(), event);
+			this.linkEnterPerVehicle.put(event.getVehicleId(), event);
 		}
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.linkEnterByPerson.remove(event.getPersonId());
+	public void handleEvent(VehicleAbortsEvent event) {
+		this.linkEnterPerVehicle.remove(event.getVehicleId());
 	}
 
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.linkEnterByPerson.remove(event.getPersonId());		
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.linkEnterPerVehicle.remove(event.getVehicleId());		
 	}
 
 	
-	public Map<Id, Double> getDelayPerLink() {
+	public Map<Id<Link>, Double> getDelayPerLink() {
 		return delayPerLink;
 	}
 
