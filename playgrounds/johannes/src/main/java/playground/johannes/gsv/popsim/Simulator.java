@@ -20,6 +20,8 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,13 +32,17 @@ import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.processing.*;
+import playground.johannes.synpop.processing.CalculateGeoDistance;
+import playground.johannes.synpop.processing.GuessMissingActTypes;
+import playground.johannes.synpop.processing.LegAttributeRemover;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
@@ -69,14 +75,7 @@ public class Simulator {
 
 		TaskRunner.run(new ReplaceActTypes(), refPersons);
 		new GuessMissingActTypes(random).apply(refPersons);
-		TaskRunner.run(new EpisodeTask() {
-			@Override
-			public void apply(Episode episode) {
-				for (Segment leg : episode.getLegs()) {
-					leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
-				}
-			}
-		}, refPersons);
+		TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
 
 		logger.info("Cloning persons...");
 		Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), 100000, random);
@@ -189,6 +188,16 @@ public class Simulator {
 		}
 
 		return legs;
+	}
+
+	private static class Route2GeoDistFunction implements UnivariateRealFunction {
+
+		@Override
+		public double value(double x) throws FunctionEvaluationException {
+			double routDist = x/1000.0;
+			double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+			return routDist * factor * 1000;
+		}
 	}
 
 }

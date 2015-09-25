@@ -29,12 +29,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -403,7 +399,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			final MobsimDriverAgent agent = event.vehicle.getDriver();
 
 			final EventsManager eventsManager =
-					((QSim) internalInterface.getMobsim()).getEventsManager();
+				 internalInterface.getMobsim().getEventsManager();
 
 			if ( agent instanceof TransitDriverAgent ) {
 				final TransitDriverAgent transitDriver = (TransitDriverAgent) agent;
@@ -448,6 +444,14 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 							event.vehicle) );
 			}
 			else {
+				eventsManager.processEvent(
+						new VehicleLeavesTrafficEvent(
+							time,
+							agent.getId(),
+							event.linkId,
+							event.vehicle.getId(),
+							TransportMode.car,
+							1) );
 				eventsManager.processEvent(
 						new PersonLeavesVehicleEvent(
 							time,
