@@ -2,6 +2,7 @@ package playground.artemc.pricing;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -90,7 +91,7 @@ public class UpdateSocialCostPricingSchemeWithSpillAndOffSwitch extends Abstract
 
 					for (int i = 0; i < scc.getSocialCostsMap().get(link).socialCosts.length; i++) {
 						double socialCost = scc.getSocialCostsMap().get(link).socialCosts[i];
-						double opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
+						double opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 						double toll = (opportunityCostOfCarTravel * socialCost / 3600) / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 						if(toll<0.01){

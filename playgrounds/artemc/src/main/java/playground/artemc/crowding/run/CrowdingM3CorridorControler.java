@@ -1,7 +1,5 @@
 package playground.artemc.crowding.run;
 
-import playground.artemc.crowding.internalizationOLD.InternalizationPtControlerListener;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +21,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.artemc.crowding.CrowdednessObserver;
 import playground.artemc.crowding.DatabaseSQLwriter;
+import playground.artemc.crowding.internalization.InternalizationPtControlerListener;
 import playground.artemc.crowding.rules.SimpleRule;
 import playground.artemc.crowding.newScoringFunctions.ScoreListener;
 import playground.artemc.crowding.newScoringFunctions.ScoreTracker;

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -72,7 +73,7 @@ public class StandeeAndSittersScoringFunction implements ScoringFunction {
 		this.delegate = delegate;
 		this.events = events;
 		this.scoreTracker = scoreTracker;
-		this.opportunityCostOfPtTravel = - controler.getConfig().planCalcScore().getTravelingPt_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
+		this.opportunityCostOfPtTravel = - controler.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 	}
 
