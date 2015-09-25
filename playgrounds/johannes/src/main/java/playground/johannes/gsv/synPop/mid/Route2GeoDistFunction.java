@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,     *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.johannes.gsv.synPop.mid;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class Route2GeoDistance implements EpisodeTask {
+public class Route2GeoDistFunction implements UnivariateRealFunction {
 
-    private UnivariateRealFunction function;
+    private double min = 0.5;
 
-    public Route2GeoDistance(UnivariateRealFunction function) {
-        this.function = function;
+    private double A = 4;
+
+    private double alpha = -0.5;
+
+    public Route2GeoDistFunction(double A, double alpha, double min) {
+        this.A = A;
+        this.alpha = alpha;
+        this.min = min;
     }
 
     @Override
-    public void apply(Episode episode) {
-        for(Attributable leg : episode.getLegs()) {
-            String routeDist = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
-            if(routeDist != null) {
-                double rDist = Double.parseDouble(routeDist);
-
-                double gDist = 0;
-                try {
-                    gDist = function.value(rDist);
-                } catch (FunctionEvaluationException e) {
-                    e.printStackTrace();
-                }
-
-                leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(gDist));
-            }
-        }
+    public double value(double x) throws FunctionEvaluationException {
+        double routDist = x/1000.0;
+        double factor = 1 - A * Math.pow(routDist, alpha);
+        factor = Math.max(min, factor);
+        return routDist * factor * 1000.0;
     }
 }
