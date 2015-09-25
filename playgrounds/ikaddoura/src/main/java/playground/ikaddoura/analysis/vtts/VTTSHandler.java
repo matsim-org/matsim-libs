@@ -67,6 +67,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 	private final static Logger log = Logger.getLogger(VTTSHandler.class);
 	private static int incompletedPlanWarning = 0;
+	private static int noCarVTTSWarning = 0;
 	
 	private final Scenario scenario;
 	private int currentIteration;
@@ -87,7 +88,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private final Map<Id<Person>, Map<Integer, Double>> personId2TripNr2DepartureTime = new HashMap<>();
 		
 	private final MarginalSumScoringFunction marginaSumScoringFunction;
-	private final double defaultVTTS_moneyPerHour;
+	private final double defaultVTTS_moneyPerHour; // for the car mode!
 	
 	public VTTSHandler(Scenario scenario) {
 		
@@ -117,6 +118,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		log.warn("Resetting VTTS information from previous iteration.");
 		
 		incompletedPlanWarning = 0;
+		noCarVTTSWarning = 0;
 		
 		this.departedPersonIds.clear();
 		this.personId2currentActivityStartTime.clear();
@@ -394,18 +396,45 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		}
 	}
 	
+	public double getAvgVTTSh(Id<Person> id, String mode) {
+		double sum = 0.;
+		int counter = 0;
+		
+		if (this.personId2TripNr2VTTSh.containsKey(id)) {
+			for (Integer tripNr : this.personId2TripNr2VTTSh.get(id).keySet()) {
+				if (this.personId2TripNr2Mode.get(id).get(tripNr).equals(mode)) {
+					sum += this.personId2TripNr2VTTSh.get(id).get(tripNr);
+					counter++;
+				}
+			}
+			
+			if (counter == 0) {
+				log.warn("Couldn't find any VTTS of person " + id + " with transport mode + " + mode + ". Using the default VTTS...");
+				return this.defaultVTTS_moneyPerHour;
+			
+			} else {
+				double avgVTTSmode = sum / counter;
+				return avgVTTSmode;
+			}
+			
+		} else {
+			log.warn("Couldn't find any VTTS of person " + id + ". Using the default VTTS...");
+			return this.defaultVTTS_moneyPerHour;
+		}
+	}
+	
 	/**
 	 * 
 	 * @param id
 	 * @param time
 	 * 
-	 * This method returns the VTTS in money per hour for a person at a given time and can for example be used to calculate a travel disutility during routing.
+	 * This method returns the car mode VTTS in money per hour for a person at a given time and can for example be used to calculate a travel disutility during routing.
 	 * Based on the time, the trip Nr is computed and based on the trip number the VTTS is looked up.
 	 * In case there is no VTTS information available such as in the initial iteration before event handling, the default VTTS is returned.
 	 * 
 	 * @return
 	 */
-	public double getVTTS(Id<Person> id, double time) {
+	public double getCarVTTS(Id<Person> id, double time) {
 			
 		if (this.personId2TripNr2DepartureTime.containsKey(id)) {
 			
@@ -423,23 +452,40 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			if (tripNrOfGivenTime == Integer.MIN_VALUE) {
 			
 				log.warn("Could not identify the trip number of person " + id + " at time " + time + "."
-						+ " Trying to use the average VTTS of that person...");
-				return getAvgVTTSh(id); 
+						+ " Trying to use the average car VTTS...");
+				return this.getAvgVTTSh(id, TransportMode.car);
 			
 			} else {
 				if (this.personId2TripNr2VTTSh.containsKey(id)) {
 					
-					double vtts = this.personId2TripNr2VTTSh.get(id).get(tripNrOfGivenTime);			
-					return vtts;
+					if (this.personId2TripNr2Mode.get(id).get(tripNrOfGivenTime) == TransportMode.car) {
+						// everything fine
+						double vtts = this.personId2TripNr2VTTSh.get(id).get(tripNrOfGivenTime);			
+						return vtts;
+						
+					} else {
+
+						
+						if (noCarVTTSWarning <= 10) {
+							log.warn("In the previous iteration at the given time " + time + " the agent " + id + " was performing a trip with a different mode (" + this.personId2TripNr2Mode.get(id).get(tripNrOfGivenTime) + ")."
+									+ "Trying to use the average car VTTS.");
+							if (noCarVTTSWarning == 10) {
+								log.warn("Additional warnings of this type are suppressed.");
+							}
+							noCarVTTSWarning++;
+						}
+						return this.getAvgVTTSh(id, TransportMode.car);
+					}
 					
 				} else {
 					log.warn("Could not find the VTTS of person " + id + " and trip number " + tripNrOfGivenTime + " (time: " + time + ")."
-							+ " Trying to use the average VTTS of that person...");
-					return getAvgVTTSh(id);
+							+ " Trying to use the average car VTTS...");
+					return this.getAvgVTTSh(id, TransportMode.car);
 				}
 			} 
 			
 		} else {
+			
 			if (this.currentIteration == Integer.MIN_VALUE) {
 				// the initial iteration before handling any events
 				return this.defaultVTTS_moneyPerHour;

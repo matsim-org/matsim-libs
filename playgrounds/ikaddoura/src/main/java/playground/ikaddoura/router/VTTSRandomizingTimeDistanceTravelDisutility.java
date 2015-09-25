@@ -20,6 +20,7 @@
 
 package playground.ikaddoura.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +40,7 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
  * @author ikaddoura
  */
 public final class VTTSRandomizingTimeDistanceTravelDisutility implements TravelDisutility {
+	private final static Logger log = Logger.getLogger(VTTSRandomizingTimeDistanceTravelDisutility.class);
 	
 	private final RandomizingTimeDistanceTravelDisutility delegate;
 	private final TravelTime timeCalculator;
@@ -67,7 +69,17 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 		
 		double marginalCostOfDistance = - cnScoringGroup.getModes().get( TransportMode.car ).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 		
-		double vtts_hour = this.vttsHandler.getVTTS(person.getId(), time);
+		double vtts_hour = this.vttsHandler.getCarVTTS(person.getId(), time);
+		
+		if (vtts_hour < 1.0) {
+			log.warn("The VTTS is " + vtts_hour + " and considered as too small. Setting the VTTS to 1.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
+			vtts_hour = 1.0;
+		}
+		
+		if (vtts_hour > 1000.) {
+			log.warn("The VTTS is " + vtts_hour + " and considered as too large. Setting the VTTS to 1000.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
+			vtts_hour = 1000.0;
+		}
 		
 		double logNormalRnd = 1. ;
 		if ( sigma != 0. ) {
