@@ -19,9 +19,8 @@
 
 package playground.jbischoff.av.preparation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
@@ -38,7 +37,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,11 +48,11 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
@@ -62,26 +60,26 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author  jbischoff
  *
  */
-public class ScenarioPreparator {
+public class TinyScenarioPreparator {
 	Scenario scenario;
 	CoordinateTransformation dest = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,"EPSG:25833");
 	private Geometry geometry;
 
 	public static void main(String[] args) {
 		
-		ScenarioPreparator pm = new ScenarioPreparator();
+		TinyScenarioPreparator pm = new TinyScenarioPreparator();
 		
 		String networkFile = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz";
-		String popFile = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/ITERS/it.100/bvg.run132.25pct.100.plans.selected.xml.gz";
-		String newpopFile = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/ITERS/it.100/cp.xml.gz";
-		String newNetworkFile = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/network.xml.gz";
+		String popFile = "C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz";
+		String newpopFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/population.xml.gz";
+		String newNetworkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/network.xml.gz";
 		pm.run(networkFile,popFile,newpopFile,newNetworkFile);
 		
 		
 	}
 
 	public void run(String networkFile, String popFile, String newpopFile, String newNetworkFile) {
-		this.geometry = readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Untersuchungsraum.shp");
+		this.geometry = readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/untersuchungsraumAll.shp");
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(popFile);
@@ -92,35 +90,40 @@ public class ScenarioPreparator {
 		
 		System.out.println("filter");
 		for (Person p : scenario.getPopulation().getPersons().values()){
-//			for (Plan plan : p.getPlans()){
+			boolean clone = false;
 			Plan plan = p.getSelectedPlan();
-
+			
 				for (PlanElement pe : plan.getPlanElements()){
 					
 					if (pe instanceof Leg){
 					Leg leg = (Leg) pe;
 					if (leg.getMode().equals("car")){
 						Route route = leg.getRoute();
-						if (startInBox(route)||endInBox(route)){
-							
-							Person p2 = factory.createPerson(p.getId());
-							p2.addPlan(plan);
-							newScen.getPopulation().addPerson(p2);
-							break;
+						if (routeInBox(route)){
+							route = null;
+							leg.setMode("taxi");
+							leg.setDepartureTime(Time.UNDEFINED_TIME);
+							clone = true;
 						}
 					
 					}
 				}
-					
+					else if (pe instanceof Activity){
+						Coord c = dest.transform(((Activity) pe).getCoord());
+						((Activity) pe).getCoord().setXY(c.getX(), c.getY());
+					}
 				}
-//			}
+			if	(clone){
+			Person p2 =  factory.createPerson(p.getId());
+			p2.addPlan(plan);
+			newScen.getPopulation().addPerson(p2);
+			}
+			
+					
 		} 
-		scenario.getPopulation().getPersons().clear();
-		Scenario scen3 = multiplyPopulation(newScen.getPopulation(), 3);
-		newScen.getPopulation().getPersons().clear();
-		changeLegsToTaxi(scen3);
-		new PopulationWriter(scen3.getPopulation()).write(newpopFile);
+		new PopulationWriter(newScen.getPopulation()).write(newpopFile);
 		new NetworkWriter(scenario.getNetwork()).write(newNetworkFile);
+		
 	}
 
 	private void convertNetwork(Network network) {
@@ -132,110 +135,19 @@ public class ScenarioPreparator {
 		
 	}
 
-	private Scenario multiplyPopulation(Population population, int factor) {
-		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		Population newPopulation = newScenario.getPopulation();
-		Random rnd = MatsimRandom.getRandom();
-		
-		for (Person p : population.getPersons().values()){
-			
-			
-			for (int i = 0; i<factor+1; i++){
-				double r = 0.5;
-				double s = 0.5;
-				double t = 0.5;
-				if (i>0){
-				r = rnd.nextDouble();
-				s = rnd.nextDouble();
-				t = rnd.nextDouble();
-				}
-				
-				
-				Person n = population.getFactory().createPerson(Id.createPersonId(p.getId().toString()+"_"+i));	
-				newPopulation.addPerson(n);
-				Plan plan = p.getSelectedPlan();
-				Plan newPlan = population.getFactory().createPlan();
-				n.addPlan(newPlan);
-				double timeOffset = -1800+3600*r;
-				double xoffset = -500+1000*s;
-				double yoffset = -500+1000*t;
-				boolean ignoreNextLeg = false;
-				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Activity){
-											
-						Activity a = (Activity) pe;
-						
-						if (a.getType().equals("pt interaction")){
-							ignoreNextLeg = true;
-						}
-						else{
-						
-						double x = a.getCoord().getX()+xoffset;
-						double y = a.getCoord().getY()+yoffset;
-						Activity na = population.getFactory().createActivityFromCoord(a.getType(),dest.transform(new Coord(x, y)));
-						na.setEndTime(a.getEndTime()+timeOffset);
-						newPlan.addActivity(na);
-						}
-					}
-					else if (pe instanceof Leg){
-						
-						if (ignoreNextLeg){
-							ignoreNextLeg = false;
-							
-						}
-						else{
-							String mode = ((Leg) pe).getMode();
-							if (mode.equals("transit_walk")) mode = "pt";
-							Leg nl = population.getFactory().createLeg(mode);
-							newPlan.addLeg(nl);
-						}
-						}
-					
-				}
-				
-				
-			}
-		}
-		return newScenario;
-	}
 	
-	private void changeLegsToTaxi(Scenario scenario){
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			Plan plan = p.getSelectedPlan();
-			Activity previousAct = null;
-			Leg previousLeg = null;
-			for (PlanElement pe : plan.getPlanElements()){
-				if (pe instanceof Activity){
-					Activity currentAct = (Activity) pe;
-					if (previousAct== null){
-						previousAct = currentAct;
-						
-					}
-					else {
-						if(coordIsInBox(previousAct.getCoord())&&coordIsInBox(currentAct.getCoord())){
-							if (previousLeg.getMode().equals("car")){
-							previousLeg.setMode("taxi");
-							previousAct = currentAct;
-							}
-						}
-						
-					}
-				}
-				else if (pe instanceof Leg){
-					previousLeg = (Leg) pe;
-				}
-			}
-			
-		}
-	}
-
 	
 	private boolean routeInBox(Route route) {
+		int i = 0;
+		try{
 		Coord start = scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord();
 		Coord end = scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord();
-		
 		return (coordIsInBox(start)&&coordIsInBox(end));
+		} catch (NullPointerException e){
+			System.err.println("null  " + i++);
+			return false;
+		}
+		
 	}
 	
 	private boolean startInBox(Route route) {

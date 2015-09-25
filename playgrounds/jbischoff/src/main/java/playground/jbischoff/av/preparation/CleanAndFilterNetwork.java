@@ -17,52 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.av.run;
+package playground.jbischoff.av.preparation;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.jbischoff.taxi.usability.ConfigBasedTaxiLaunchUtils;
-import playground.jbischoff.taxi.usability.TaxiConfigGroup;
 
 /**
  * @author  jbischoff
  *
  */
-public class AVLauncher {
-
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/config.xml");
+public class CleanAndFilterNetwork {
+public static void main(String[] args) {
+	Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	new MatsimNetworkReader(s).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml");
+	NetworkFilterManager nfm = new NetworkFilterManager(s.getNetwork());
+	nfm.addLinkFilter(new NetworkLinkFilter() {
 		
-		TaxiConfigGroup tcg = new TaxiConfigGroup();
-		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/taxi_vehicles_50000.xml.gz");
-		tcg.addParam("ranksFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/ranks.xml");
-		tcg.addParam("outputDir", config.controler().getOutputDirectory()+"/taxi");
-		tcg.addParam("algorithm", "dummy");
-		tcg.addParam("nearestVehicleLimit", "50");
-		tcg.addParam("nearestRequestLimit", "50");
-		tcg.addParam("pickupDuration", "60");
-		tcg.addParam("dropOffDuration", "60");
-		config.addModule(tcg);
-		config.global().setNumberOfThreads(16);
-		config.qsim().setNumberOfThreads(16);
-		
-		
-		
-		
-		
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		@Override
+		public boolean judgeLink(Link l) {
+			if (l.getAllowedModes().contains("car")) return true;
+			else return false;
+		}
+	});
+	Network newNet = nfm.applyFilters();
 	
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxiLaunchUtils(controler).initiateTaxis();
-		controler.run();
-	}
-
+	new NetworkCleaner().run(newNet);
+	new NetworkWriter(newNet).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml");
+	
+}
 }
