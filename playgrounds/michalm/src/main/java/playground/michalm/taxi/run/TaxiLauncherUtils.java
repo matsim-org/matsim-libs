@@ -23,11 +23,11 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
@@ -95,13 +95,13 @@ public class TaxiLauncherUtils
     public static void initChargingAndDischargingHandlers(ETaxiData taxiData, Network network,
             QSim qSim, TravelTime travelTime)
     {
-        Map<Id<Person>, ETaxi> driverToTaxi = new HashMap<>();
+        Map<Id<Vehicle>, ETaxi> vehicleToTaxi = new HashMap<>();
         for (ETaxi t : taxiData.getETaxis().values()) {
-            driverToTaxi.put(Id.createPersonId(t.getId()), t);
+            vehicleToTaxi.put(Id.create(t.getId(), Vehicle.class ), t);
         }
 
         qSim.getEventsManager()
-                .addHandler(new DriveDischargingHandler(driverToTaxi, network, travelTime));
+                .addHandler(new DriveDischargingHandler(vehicleToTaxi, network, travelTime));
 
         qSim.addQueueSimulationListeners(
                 new ChargingAuxDischargingHandler(taxiData.getChargers().values(), CHARGE_TIME_STEP,
