@@ -19,10 +19,6 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -43,13 +39,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
 import playground.johannes.gsv.sim.cadyts.ODAdjustor;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.ZoneCollection;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author johannes

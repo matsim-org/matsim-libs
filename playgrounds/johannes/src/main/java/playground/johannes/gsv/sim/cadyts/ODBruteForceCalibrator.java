@@ -44,7 +44,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.*;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.*;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.ObjectKeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.math.Discretizer;
@@ -54,6 +56,8 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -133,7 +137,7 @@ public class ODBruteForceCalibrator {
 		DistanceCalculator distCalc = CartesianDistanceCalculator.getInstance();
 		Discretizer disc = new LinearDiscretizer(50000);
 
-		Set<Zone> zoneSet = zones.zoneSet();
+		Set<Zone> zoneSet = zones.getZones();
 		for (Zone origin : zoneSet) {
 			processZone(zoneSet, origin, distCalc, disc, simMatrix);
 		}

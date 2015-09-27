@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.synpop.gis;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+/**
+ * @author jillenberger
+ */
+public class ZoneData {
 
-public class DataPool {
+    public static final String POPULATION_KEY = "population";
 
-	private static final Logger logger = Logger.getLogger(DataPool.class);
-	
-	private final Map<String, Object> dataObjects;
-	
-	private final Map<String, DataLoader> dataLoaders;
-	
-	public DataPool() {
-		dataObjects = new HashMap<>();
-		dataLoaders = new HashMap<>();
-	}
-	
-	public void register(DataLoader loader, String key) {
-		if(dataLoaders.containsKey(key)) {
-			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
-		} else {
-			dataLoaders.put(key, loader);
-		}
-	}
-	
-	public Object get(String key) {
-		Object data = dataObjects.get(key);
+    public static final String NAME_KEY = "name";
 
-		if(data == null) {
-			loadData(key);
-			data = dataObjects.get(key);
-		}
-		
-		return data;
-	}
-	
-	private synchronized void loadData(String key) {
-		DataLoader loader = dataLoaders.get(key);
-		if(loader == null) {
-			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
-		} else {
-			Object data = loader.load();
-			dataObjects.put(key, data);
-		}
-	}
+    private final Map<String, ZoneCollection> layers;
+
+    public ZoneData() {
+        layers = new HashMap<>();
+    }
+
+    public ZoneCollection getLayer(String name) {
+        return layers.get(name);
+    }
+
+    ZoneCollection addLayer(ZoneCollection zones, String name) {
+        return layers.put(name, zones);
+    }
 }

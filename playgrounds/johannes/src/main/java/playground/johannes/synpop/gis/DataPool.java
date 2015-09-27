@@ -17,63 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+package playground.johannes.synpop.gis;
 
 import org.apache.log4j.Logger;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygonal;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * @author johannes
- * 
- */
-public class Zone {
+public class DataPool {
 
-	private static final Logger logger = Logger.getLogger(Zone.class);
+	private static final Logger logger = Logger.getLogger(DataPool.class);
 	
-	private final Geometry geometry;
+	private final Map<String, Object> dataObjects;
+	
+	private final Map<String, DataLoader> dataLoaders;
+	
+	public DataPool() {
+		dataObjects = new HashMap<>();
+		dataLoaders = new HashMap<>();
+	}
+	
+	public void register(DataLoader loader, String key) {
+		if(dataLoaders.containsKey(key)) {
+			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
+		} else {
+			dataLoaders.put(key, loader);
+		}
+	}
+	
+	public Object get(String key) {
+		Object data = dataObjects.get(key);
 
-	private Map<String, String> attributes;
-
-	public Zone(Geometry geometry) {
-		if(!(geometry instanceof Polygonal))
-			logger.warn("Geometry is not instance of Polygonal. This is ok but may have effects on geometric operations.");
+		if(data == null) {
+			loadData(key);
+			data = dataObjects.get(key);
+		}
 		
-		this.geometry = geometry;
-	}
-
-	public Geometry getGeometry() {
-		return geometry;
+		return data;
 	}
 	
-	private void initAttributes() {
-		if (attributes == null)
-			attributes = new HashMap<String, String>();
-	}
-
-	public String getAttribute(String key) {
-		if (attributes == null)
-			return null;
-		else
-			return attributes.get(key);
-	}
-
-	public Map<String, String> attributes() {
-		return Collections.unmodifiableMap(attributes);
-	}
-	
-	public String setAttribute(String key, String value) {
-		initAttributes();
-		return attributes.put(key, value);
-	}
-
-	public String removeAttribute(String key) {
-		if(attributes == null) return null;
-		else return attributes.remove(key);
+	private synchronized void loadData(String key) {
+		DataLoader loader = dataLoaders.get(key);
+		if(loader == null) {
+			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
+		} else {
+			Object data = loader.load();
+			dataObjects.put(key, data);
+		}
 	}
 }

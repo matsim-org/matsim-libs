@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.synPop.data;
 
-import playground.johannes.gsv.zones.ZoneCollection;
+package playground.johannes.synpop.gis;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygonal;
+import org.apache.log4j.Logger;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author jillenberger
+ * @author johannes
+ * 
  */
-public class ZoneData {
+public class Zone {
 
-    public static final String POPULATION_KEY = "population";
+	private static final Logger logger = Logger.getLogger(Zone.class);
+	
+	private final Geometry geometry;
 
-    public static final String NAME_KEY = "name";
+	private Map<String, String> attributes;
 
-    private final Map<String, ZoneCollection> layers;
+	public Zone(Geometry geometry) {
+		if(!(geometry instanceof Polygonal))
+			logger.warn("Geometry is not instance of Polygonal. This is ok but may have effects on geometric operations.");
+		
+		this.geometry = geometry;
+	}
 
-    public ZoneData() {
-        layers = new HashMap<>();
-    }
+	public Geometry getGeometry() {
+		return geometry;
+	}
+	
+	private void initAttributes() {
+		if (attributes == null)
+			attributes = new HashMap<String, String>();
+	}
 
-    public ZoneCollection getLayer(String name) {
-        return layers.get(name);
-    }
+	public String getAttribute(String key) {
+		if (attributes == null)
+			return null;
+		else
+			return attributes.get(key);
+	}
 
-    ZoneCollection addLayer(ZoneCollection zones, String name) {
-        return layers.put(name, zones);
-    }
+	public Map<String, String> attributes() {
+		return Collections.unmodifiableMap(attributes);
+	}
+	
+	public String setAttribute(String key, String value) {
+		initAttributes();
+		return attributes.put(key, value);
+	}
+
+	public String removeAttribute(String key) {
+		if(attributes == null) return null;
+		else return attributes.remove(key);
+	}
 }

@@ -19,15 +19,15 @@
 
 package playground.johannes.gsv.gis;
 
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
 
 /**
  * @author johannes
@@ -43,7 +43,7 @@ public class ExtractModenaZones {
 		ZoneCollection world = ZoneCollectionSHPReader.read("");
 		ZoneCollection ger = new ZoneCollection();
 		
-		for(Zone zone : world.zoneSet()) {
+		for(Zone zone : world.getZones()) {
 			if("DE".equalsIgnoreCase(zone.getAttribute("NUTS0_CODE"))) {
 				Zone newZone = new Zone(zone.getGeometry());
 				newZone.setAttribute("nuts0_code", zone.getAttribute("NUTS0_CODE"));
@@ -63,7 +63,7 @@ public class ExtractModenaZones {
 			}
 		}
 		
-		String data = Zone2GeoJSON.toJson(ger.zoneSet());
+		String data = Zone2GeoJSON.toJson(ger.getZones());
 		Files.write(Paths.get(""), data.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
 
 	}

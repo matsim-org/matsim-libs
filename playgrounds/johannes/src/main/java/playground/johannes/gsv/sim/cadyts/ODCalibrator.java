@@ -19,17 +19,10 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,32 +34,26 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author johannes
@@ -412,7 +399,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		 * collect zones according key
 		 */
 		Map<String, Set<Zone>> zonesMap = new HashMap<>();
-		for(Zone zone : zones.zoneSet()) {
+		for(Zone zone : zones.getZones()) {
 			String code = zone.getAttribute(key);
 			Set<Zone> set = zonesMap.get(code);
 			if(set == null) {
@@ -451,7 +438,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 	}
 	
 	private void determineCandidates(ZoneCollection zones, Population pop, double distThreshold) {
-		List<Zone> zoneList = new ArrayList<>(zones.zoneSet());
+		List<Zone> zoneList = new ArrayList<>(zones.getZones());
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		double minZoneDist = Double.MAX_VALUE;
 		

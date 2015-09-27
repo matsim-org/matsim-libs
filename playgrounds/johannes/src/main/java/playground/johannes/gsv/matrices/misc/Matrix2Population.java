@@ -37,11 +37,11 @@ import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.matrices.io.Visum2KeyMatrix;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.File;
 import java.io.IOException;

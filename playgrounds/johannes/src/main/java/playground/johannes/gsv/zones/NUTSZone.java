@@ -20,6 +20,7 @@
 package playground.johannes.gsv.zones;
 
 import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.synpop.gis.Zone;
 
 /**
  * @author johannes

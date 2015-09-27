@@ -19,18 +19,8 @@
 
 package playground.johannes.gsv.fpd;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,18 +48,22 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.gis.ZoneCollection;
 
-import com.vividsolutions.jts.geom.Point;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author johannes

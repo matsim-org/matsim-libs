@@ -28,10 +28,8 @@ import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.sna.math.Discretizer;
@@ -39,6 +37,8 @@ import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.ZoneDataLoader;
 import playground.johannes.synpop.processing.CalculateGeoDistance;
 import playground.johannes.synpop.processing.GuessMissingActTypes;
 import playground.johannes.synpop.processing.LegAttributeRemover;
@@ -84,19 +84,20 @@ public class Simulator {
 		logger.info("Loading data...");
 		DataPool dataPool = new DataPool();
 		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+//		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+		dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
 		logger.info("Done.");
 
-		logger.info("Validation data...");
-		//FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
-		//FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
-		logger.info("Done.");
+//		logger.info("Validation data...");
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
+//		logger.info("Done.");
 
 		logger.info("Setting up sampler...");
 		/*
 		 * Distribute population according to zone values.
 		 */
-		new SetHomeFacilities(dataPool, random).apply(simPersons);
+		new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
 		/*
 		 * Assign random activity facilities.
 		 */

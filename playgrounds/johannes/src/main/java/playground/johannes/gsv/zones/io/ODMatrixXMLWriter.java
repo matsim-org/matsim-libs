@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.zones.io;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ODMatrix;
+import playground.johannes.synpop.gis.Zone;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes

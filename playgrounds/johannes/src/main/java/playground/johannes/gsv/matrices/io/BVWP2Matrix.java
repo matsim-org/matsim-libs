@@ -19,19 +19,18 @@
 
 package playground.johannes.gsv.matrices.io;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author johannes
@@ -67,8 +66,8 @@ public class BVWP2Matrix {
 		
 		KeyMatrix m = new KeyMatrix();
 		
-		for(Zone i : zones.zoneSet()) {
-			for(Zone j : zones.zoneSet()) {
+		for(Zone i : zones.getZones()) {
+			for(Zone j : zones.getZones()) {
 				double sum = 0;
 				
 				String id_i = i.getAttribute("gsvId");

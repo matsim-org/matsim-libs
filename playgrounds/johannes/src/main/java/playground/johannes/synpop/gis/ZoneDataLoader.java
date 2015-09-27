@@ -16,11 +16,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.synpop.gis;
 
 import org.matsim.core.config.ConfigGroup;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -30,7 +28,7 @@ import java.util.Collection;
  */
 public class ZoneDataLoader implements DataLoader {
 
-    private final static String PARAMSET_TYPE = "zoneData";
+    public final static String KEY = "zoneData";
 
     private final static String LAYERNAME_PARAM = "layer";
 
@@ -52,7 +50,7 @@ public class ZoneDataLoader implements DataLoader {
     public Object load() {
         ZoneData data = new ZoneData();
 
-        Collection<? extends ConfigGroup> modules = module.getParameterSets(PARAMSET_TYPE);
+        Collection<? extends ConfigGroup> modules = module.getParameterSets(KEY);
         for(ConfigGroup paramset : modules) {
             String layerName = paramset.getValue(LAYERNAME_PARAM);
             String file = paramset.getValue(FILE_PARAM);
@@ -63,7 +61,7 @@ public class ZoneDataLoader implements DataLoader {
             try {
                 ZoneCollection zones = ZoneCollection.readFromGeoJSON(file, primaryKey);
 
-                for(Zone zone : zones.zoneSet()) {
+                for(Zone zone : zones.getZones()) {
                     zone.setAttribute(ZoneData.POPULATION_KEY, zone.getAttribute(populationKey));
                     zone.setAttribute(ZoneData.NAME_KEY, zone.getAttribute(nameKey));
                 }

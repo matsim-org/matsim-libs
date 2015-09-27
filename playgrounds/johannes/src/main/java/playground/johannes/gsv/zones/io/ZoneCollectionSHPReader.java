@@ -19,18 +19,16 @@
 
 package playground.johannes.gsv.zones.io;
 
+import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes

@@ -19,16 +19,15 @@
 
 package playground.johannes.gsv.zones.io;
 
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import playground.johannes.gsv.zones.ODMatrix;
+import playground.johannes.synpop.gis.Zone;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-
-import playground.johannes.gsv.zones.ODMatrix;
-import playground.johannes.gsv.zones.Zone;
 
 /**
  * @author johannes

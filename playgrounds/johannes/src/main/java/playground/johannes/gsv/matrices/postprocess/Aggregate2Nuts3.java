@@ -19,18 +19,18 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
@@ -69,7 +69,7 @@ public class Aggregate2Nuts3 {
 
 		Map<String, String> idMap = ZoneIDMappings.modena2gsv2008(idMappingsFile);
 
-		for (Zone zone : modenaZones.zoneSet()) {
+		for (Zone zone : modenaZones.getZones()) {
 			String id = zone.getAttribute(ZONE_KEY);
 			String gsvId = idMap.get(id);
 			if (gsvId != null) {

@@ -19,23 +19,13 @@
 
 package playground.johannes.gsv.zones.io;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.wololo.geojson.Feature;
-import org.wololo.geojson.FeatureCollection;
-import org.wololo.geojson.GeoJSON;
-import org.wololo.geojson.GeoJSONFactory;
-import org.wololo.geojson.Geometry;
+import org.wololo.geojson.*;
 import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
+import playground.johannes.synpop.gis.Zone;
 
-import playground.johannes.gsv.zones.Zone;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author johannes

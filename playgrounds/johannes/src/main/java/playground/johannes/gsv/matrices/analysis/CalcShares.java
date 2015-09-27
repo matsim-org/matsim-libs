@@ -20,29 +20,22 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import gnu.trove.TDoubleArrayList;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.utils.collections.Tuple;
+import playground.johannes.gsv.sim.cadyts.ODUtils;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes

@@ -20,10 +20,10 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.*;
 

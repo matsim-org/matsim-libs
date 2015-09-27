@@ -17,20 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+package playground.johannes.synpop.gis;
 
 import com.vividsolutions.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -38,6 +25,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * @author johannes
@@ -106,7 +99,7 @@ public class ZoneCollection {
 
 	}
 
-	public Set<Zone> zoneSet() {
+	public Set<Zone> getZones() {
 		return Collections.unmodifiableSet(zones);
 	}
 	

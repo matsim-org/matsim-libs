@@ -19,133 +19,197 @@
 
 package playground.johannes.synpop.sim;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import gnu.trove.TDoubleFunction;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.data.*;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.processing.PersonsTask;
 
 import java.util.*;
 
 /**
  * @author johannes
- * 
  */
 public class SetHomeFacilities implements PersonsTask {
 
-	private static final Logger logger = Logger.getLogger(SetHomeFacilities.class);
+    private static final Logger logger = Logger.getLogger(SetHomeFacilities.class);
 
-	private final DataPool dataPool;
+    private final DataPool dataPool;
 
-	private final Random random;
+    private final Random random;
 
-	public SetHomeFacilities(DataPool dataPool, Random random) {
-		this.dataPool = dataPool;
-		this.random = random;
-	}
+    private final String zoneLayerKey;
 
-	@Override
-	public void apply(Collection<? extends Person> persons) {
-		LandUseData landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
+    public SetHomeFacilities(DataPool dataPool, String zoneLayerKey, Random random) {
+        this.dataPool = dataPool;
+        this.random = random;
+        this.zoneLayerKey = zoneLayerKey;
+    }
 
-		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getModenaLayer();
-		List<Zone<Map<String, Object>>> zones = new ArrayList<>(zoneLayer.getZones());
-		TObjectDoubleHashMap<Zone<?>> zoneProba = new TObjectDoubleHashMap<>();
+    @Override
+    public void apply(Collection<? extends Person> persons) {
+        ZoneCollection zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer(zoneLayerKey);
+        FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 
-		double sum = 0;
-		for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			sum += (Double) zone.getAttribute().get(LandUseData.POPULATION_KEY);
-		}
+        TObjectDoubleHashMap<Zone> probabilities = calculateProbabilities(zones);
 
-		for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			double inhabs = (Double) zone.getAttribute().get(LandUseData.POPULATION_KEY);
-			double p = inhabs / sum;
-			zoneProba.put(zone, p);
-		}
+        logger.info("Assigning facilities to zones...");
+        List<ActivityFacility> homeFacilities = facilityData.getFacilities(ActivityTypes.HOME);
+        Map<Zone, List<ActivityFacility>> facilityMapping = assignToZones(homeFacilities, zones);
 
-		logger.info("Assigning facilities to zones...");
+        logger.info("Assigning facilities to persons...");
+        List<Person> shuffledPersons = new ArrayList<>(persons);
+        Collections.shuffle(shuffledPersons, random);
+        assignToPersons(shuffledPersons, facilityMapping, probabilities);
 
-		int unassigned = 0;
+        // this is only necessary if there are zones with a population but no facilities
+        logger.info("Checking for homeless persons...");
+        validate(shuffledPersons, homeFacilities);
 
-		FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
-		Map<Zone<?>, List<ActivityFacility>> zoneFacilities = new IdentityHashMap<>(zones.size());
-		List<ActivityFacility> homeFacils = facilityData.getFacilities(ActivityTypes.HOME);
-		ProgressLogger.init(homeFacils.size(), 2, 10);
-		for (ActivityFacility facility : homeFacils) {
-			Zone<?> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(facility.getCoord()));
-			if (zone != null) {
-				List<ActivityFacility> facilities = zoneFacilities.get(zone);
-				if (facilities == null) {
-					facilities = new ArrayList<>();
-					zoneFacilities.put(zone, facilities);
-				}
-				facilities.add(facility);
-			} else {
-				unassigned++;
-			}
-			ProgressLogger.step();
-		}
 
-		if (unassigned > 0) {
-			logger.warn(String.format("%s facilities are out if zone bounds.", unassigned));
-		}
+    }
 
-		logger.info("Assigning facilities to persons...");
-		ProgressLogger.init(persons.size(), 2, 10);
-		List<Person> shuffledPersons = new ArrayList<>(persons);
-		Collections.shuffle(shuffledPersons, random);
-		TObjectDoubleIterator<Zone<?>> it = zoneProba.iterator();
-		int j = 0;
-		for (int i = 0; i < zoneProba.size(); i++) {
-			it.advance();
-			int n = (int) Math.ceil(persons.size() * it.value());
-			List<ActivityFacility> facilities = zoneFacilities.get(it.key());
-			if (facilities != null) {
-				if (n + j > persons.size()) {
-					n = persons.size() - j;
-				}
-				for (int k = j; k < (j + n); k++) {
-					ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
-					setHomeFacility(shuffledPersons.get(k), f);
+    private TObjectDoubleHashMap<Zone> calculateProbabilities(ZoneCollection zones) {
+        TObjectDoubleHashMap<Zone> zoneValues = new TObjectDoubleHashMap<>();
 
-					ProgressLogger.step();
-				}
+        double sum = 0;
+        for (Zone zone : zones.getZones()) {
+            String value = zone.getAttribute(ZoneData.POPULATION_KEY);
+            if (value != null & !value.isEmpty()) {
+                double population = Double.parseDouble(value);
+                zoneValues.put(zone, population);
+                sum += population;
+            }
+        }
 
-				j += n;
-			}
-		}
-		
-		logger.info("Checking for homeless persons...");
-		int cnt = 0;
-		for(Person person : shuffledPersons) {
-			//if(((PlainPerson)person).getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
-			if(person.getAttribute(CommonKeys.ACTIVITY_FACILITY) == null) {
-				ActivityFacility f = homeFacils.get(random.nextInt(homeFacils.size()));
-				setHomeFacility(person, f);
-				cnt++;
-			}
-		}
-		if(cnt > 0) {
-			logger.info(String.format("Assigned %s persons a random home.", cnt));
-		}
+        final double total = sum;
+        zoneValues.transformValues(new TDoubleFunction() {
+            @Override
+            public double execute(double v) {
+                return v / total;
+            }
+        });
 
-		ProgressLogger.termiante();
-	}
+        return zoneValues;
+    }
 
-	private void setHomeFacility(Person person, ActivityFacility facility) {
-		for(Episode e : person.getEpisodes()) {
-			for(Segment act : e.getActivities()) {
-				if(ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-					act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility.getId().toString());
-				}
-			}
-		}
-	}
+    private Map<Zone, List<ActivityFacility>> assignToZones(Collection<ActivityFacility> homeFacils, ZoneCollection zones) {
+        Map<Zone, List<ActivityFacility>> facilityMapping = new IdentityHashMap<>(zones.getZones().size());
 
+        int unassigned = 0;
+
+        ProgressLogger.init(homeFacils.size(), 2, 10);
+        for (ActivityFacility facility : homeFacils) {
+            Zone zone = zones.get(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
+
+            if (zone != null) {
+                List<ActivityFacility> facilities = facilityMapping.get(zone);
+
+                if (facilities == null) {
+                    facilities = new ArrayList<>();
+                    facilityMapping.put(zone, facilities);
+                }
+
+                facilities.add(facility);
+
+            } else {
+                unassigned++;
+            }
+
+            ProgressLogger.step();
+        }
+
+        ProgressLogger.termiante();
+
+        if (unassigned > 0) {
+            logger.warn(String.format("%s facilities are out of zone bounds.", unassigned));
+        }
+
+        return facilityMapping;
+    }
+
+    private void assignToPersons(List<Person> persons, Map<Zone, List<ActivityFacility>> facilityMapping, TObjectDoubleHashMap<Zone> probabilities) {
+        ProgressLogger.init(persons.size(), 2, 10);
+
+        TObjectDoubleIterator<Zone> it = probabilities.iterator();
+        int total = 0;
+
+        // go through all zones
+        for (int zoneIdx = 0; zoneIdx < probabilities.size(); zoneIdx++) {
+            it.advance();
+
+            // round number of inhabitants up to ensure that all persons are assigned
+            int n = (int) Math.ceil(persons.size() * it.value());
+
+            List<ActivityFacility> facilities = facilityMapping.get(it.key());
+            if (facilities != null) {
+
+                // check for out of bounds
+                if (n + total > persons.size()) {
+                    n = persons.size() - total;
+                }
+
+                for (int idx = total; idx < (total + n); idx++) {
+                    ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
+                    setHomeFacility(persons.get(idx), f);
+
+                    ProgressLogger.step();
+                }
+
+                total += n;
+            }
+        }
+
+        ProgressLogger.termiante();
+
+        if (total < persons.size()) {
+            logger.warn("Not all persons precessed. Check facilities and zones!");
+        }
+
+    }
+
+    private void validate(List<Person> shuffledPersons, List<ActivityFacility> homeFacilities) {
+        int cnt = 0;
+        for (Person person : shuffledPersons) {
+            boolean invalid = false;
+
+            for (Episode episode : person.getEpisodes()) {
+                for (Segment act : episode.getActivities()) {
+                    if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+                        if (act.getAttribute(CommonKeys.ACTIVITY_FACILITY) == null) {
+                            invalid = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (invalid) {
+                ActivityFacility f = homeFacilities.get(random.nextInt(homeFacilities.size()));
+                setHomeFacility(person, f);
+                cnt++;
+            }
+        }
+
+        if (cnt > 0) {
+            logger.warn(String.format("Assigned %s persons a random home. Check if each zone has as at least one facility.", cnt));
+        }
+    }
+
+    private void setHomeFacility(Person person, ActivityFacility facility) {
+        for (Episode e : person.getEpisodes()) {
+            for (Segment act : e.getActivities()) {
+                if (ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+                    act.setAttribute(CommonKeys.ACTIVITY_FACILITY, facility.getId().toString());
+                }
+            }
+        }
+    }
 }

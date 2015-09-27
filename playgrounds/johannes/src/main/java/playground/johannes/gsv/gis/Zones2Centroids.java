@@ -20,8 +20,8 @@
 package playground.johannes.gsv.gis;
 
 import com.vividsolutions.jts.geom.Point;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -38,7 +38,7 @@ public class Zones2Centroids {
         BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
         writer.write("id,name,lng,lat");
         writer.newLine();
-        for(Zone zone : zones.zoneSet()) {
+        for(Zone zone : zones.getZones()) {
             Point c = zone.getGeometry().getCentroid();
             String id = zone.getAttribute("NO");
             String name = zone.getAttribute("NAME");

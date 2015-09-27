@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.matrices.misc;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 
 /**
  * @author johannes

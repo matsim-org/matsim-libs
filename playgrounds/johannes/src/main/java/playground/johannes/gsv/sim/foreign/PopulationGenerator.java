@@ -32,14 +32,14 @@ import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 

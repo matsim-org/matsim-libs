@@ -19,6 +19,11 @@
 
 package playground.johannes.gsv.gis;
 
+import com.vividsolutions.jts.geom.Geometry;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,14 +33,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.swing.text.ZoneView;
-
-import com.vividsolutions.jts.geom.Geometry;
-
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
@@ -55,7 +52,7 @@ public class JointZones {
 		zones.setPrimaryKey("gsvId");
 
 		Map<String, Set<Zone>> aggZones = new HashMap<>();
-		for(Zone zone : zones.zoneSet()) {
+		for(Zone zone : zones.getZones()) {
 			String code = zone.getAttribute("nuts2_code");
 			Set<Zone> set = aggZones.get(code);
 			if(set == null) {

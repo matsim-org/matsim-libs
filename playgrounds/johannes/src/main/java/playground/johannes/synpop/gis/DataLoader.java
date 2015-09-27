@@ -17,10 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.synpop.gis;
 
 public interface DataLoader {
 
-	public Object load();
+	Object load();
 	
 }

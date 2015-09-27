@@ -19,6 +19,13 @@
 
 package playground.johannes.gsv.matrices.io;
 
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.ODMatrix;
+import playground.johannes.gsv.zones.io.ODMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,13 +34,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ODMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.ODMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
@@ -55,7 +55,7 @@ public class Intraplan2Matrix {
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		
 		Map<String, String> nuts2gsv = new HashMap<String, String>();
-		for (Zone zone : zones.zoneSet()) {
+		for (Zone zone : zones.getZones()) {
 //			nuts2gsv.put((String) zone.getAttribute().get("CODE"), zone.getAttribute().get("NO").toString());
 			nuts2gsv.put(zone.getAttribute("nuts3_code"), zone.getAttribute("gsvId"));
 		}

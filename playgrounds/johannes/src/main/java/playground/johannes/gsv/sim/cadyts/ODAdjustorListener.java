@@ -19,21 +19,20 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
-
 import playground.johannes.gsv.sim.Simulator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.ZoneCollection;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author johannes

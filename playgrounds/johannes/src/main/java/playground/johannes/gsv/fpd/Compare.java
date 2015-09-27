@@ -19,24 +19,24 @@
 
 package playground.johannes.gsv.fpd;
 
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.TDoubleDoubleHashMap;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-
-import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.*;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 /**
  * @author johannes

@@ -19,22 +19,20 @@
 
 package playground.johannes.gsv.gis;
 
+import com.vividsolutions.jts.geom.Point;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
-import playground.johannes.sna.gis.CRSUtils;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -55,7 +53,7 @@ public class MergeZoneAttributes {
 
 		ZoneCollection newCollection = new ZoneCollection();
 
-		for (Zone gsvZone : gsvZones.zoneSet()) {
+		for (Zone gsvZone : gsvZones.getZones()) {
 			if (gsvZone.getAttribute("NUTS0_CODE").equalsIgnoreCase("DE")) {
 				Point p = gsvZone.getGeometry().getCentroid();
 				p = CRSUtils.transformPoint(p, transform);
@@ -86,7 +84,7 @@ public class MergeZoneAttributes {
 			}
 		}
 
-		String data = Zone2GeoJSON.toJson(newCollection.zoneSet());
+		String data = Zone2GeoJSON.toJson(newCollection.getZones());
 		Files.write(Paths.get("/home/johannes/gsv/gis/de.nuts3.json"), data.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
 
 	}

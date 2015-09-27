@@ -20,13 +20,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.apache.log4j.Level;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,14 +38,18 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.Simulator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import playground.johannes.synpop.gis.ZoneCollection;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to

@@ -19,17 +19,17 @@
 
 package playground.johannes.gsv.matrices.io;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
