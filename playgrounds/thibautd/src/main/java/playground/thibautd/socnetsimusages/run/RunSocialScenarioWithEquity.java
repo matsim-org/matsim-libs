@@ -43,6 +43,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.ivt.analysis.IvtAnalysisModule;
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
@@ -90,6 +91,7 @@ public class RunSocialScenarioWithEquity {
 						install(new JointTripsModule());
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
+						install(new IvtAnalysisModule() );
 					}
 				});
 		controller.addOverridingModule(
