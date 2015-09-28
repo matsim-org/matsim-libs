@@ -101,6 +101,7 @@ public final class PopulationUtils {
         } else {
             throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
         }
+        routeFactory.setRouteFactory(NetworkRoute.class, factory);
         return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
 	
