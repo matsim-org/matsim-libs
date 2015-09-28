@@ -151,6 +151,13 @@
             <url>http://dl.bintray.com/matsim/matsim</url>
         </repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jcenter</id>
+			<name>jcenter</name>
+			<url>http://jcenter.bintray.com </url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
