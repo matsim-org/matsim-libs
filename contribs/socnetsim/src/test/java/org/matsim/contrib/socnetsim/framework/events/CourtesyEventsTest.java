@@ -45,29 +45,182 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 public class CourtesyEventsTest {
 	private static final Logger log =
 		Logger.getLogger(CourtesyEventsTest.class);
+	public static final Id<Person> ID_1 = Id.create("tintin", Person.class);
+	public static final Id<Person> ID_2 = Id.create("milou", Person.class);
+	public static final Id<Link> LINK_ID = Id.createLinkId("Link");
+	public static final Id<ActivityFacility> FACILITY_ID = Id.create("Facility", ActivityFacility.class);
+	public static final String TYPE = "type";
 
-	// TODo test all overlaps possible (none, A arrives B departs, A arrives and departs)
 	@Test
-	public void testEvents() {
-		final EventsManager events = EventsUtils.createEventsManager();
+	public void testFullOverlap() {
 
-		final Id<Person> id1 = Id.create( "tintin" , Person.class );
-		final Id<Person> id2 = Id.create( "milou" , Person.class );
+		testEvents( 4,
+				// 1:|------------------|
+				// 2:      |-------|
+				new ActivityStartEvent(
+						0,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityStartEvent(
+						2,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						3,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						4,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE) );
+	}
 
-		final Id<Link> link = Id.createLinkId( "Link" );
-		final Id<ActivityFacility> facility = Id.create( "Facility" , ActivityFacility.class );
+	@Test
+	public void testPartialOverlap() {
+		testEvents( 4,
+				// 1:|------------------|
+				// 2:      |-------------------|
+				new ActivityStartEvent(
+						0,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityStartEvent(
+						2,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						3,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						4,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE) );
+	}
+
+	@Test
+	public void testNoOverlap() {
+		testEvents( 0,
+				// 1:|-----|
+				// 2:            |------------|
+				new ActivityStartEvent(
+						0,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						2,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityStartEvent(
+						3,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						4,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE) );
+	}
+
+	@Test
+	public void testStartTogether() {
+		testEvents( 4,
+				// 1:|-----|
+				// 2:|------------------------|
+				new ActivityStartEvent(
+						0,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityStartEvent(
+						0,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						2,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						4,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE) );
+	}
+
+	@Test
+	public void testEndTogether() {
+		testEvents( 4,
+				// 1:|------------------------|
+				// 2:            |------------|
+				new ActivityStartEvent(
+						0,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityStartEvent(
+						1,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						2,
+						ID_1,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE),
+				new ActivityEndEvent(
+						2,
+						ID_2,
+						LINK_ID,
+						FACILITY_ID,
+						TYPE) );
+	}
+
+	public void testEvents( int expectedCourtesy, Event... events ) {
+		final EventsManager eventManager = EventsUtils.createEventsManager();
 
 		final SocialNetwork sn = new SocialNetworkImpl();
-		sn.addEgo( id1 );
-		sn.addEgo( id2 );
-		sn.addBidirectionalTie( id1 , id2 );
+		sn.addEgo(ID_1);
+		sn.addEgo(ID_2);
+		sn.addBidirectionalTie(ID_1, ID_2);
 
-		events.addHandler(
+		eventManager.addHandler(
 				new CourtesyEventsGenerator(
-					events,
+					eventManager,
 					sn ) );
 		final List<CourtesyEvent> collected = new ArrayList< >();
-		events.addHandler(
+		eventManager.addHandler(
 				 new BasicEventHandler() {
 						@Override
 						public void reset( int iteration ) {}
@@ -81,43 +234,12 @@ public class CourtesyEventsTest {
 						}
 				});
 
-		// 1:|------------------|
-		// 2:      |-------|
-		events.processEvent(
-				new ActivityStartEvent(
-					0,
-					id1,
-					link,
-					facility,
-					"type" ) );
-		events.processEvent(
-				new ActivityStartEvent(
-					2,
-					id2,
-					link,
-					facility,
-					"type" ) );
-		events.processEvent(
-				new ActivityEndEvent(
-					3,
-					id2,
-					link,
-					facility,
-					"type" ) );
-		events.processEvent(
-				new ActivityEndEvent(
-					4,
-					id1,
-					link,
-					facility,
-					"type" ) );
+		for ( Event e : events ) eventManager.processEvent( e );
 
 		Assert.assertEquals(
 				"wrong number of events in "+collected,
-				4,
+				expectedCourtesy,
 				collected.size() );
-		// TODO: more thorough
 	}
-
 }
 
