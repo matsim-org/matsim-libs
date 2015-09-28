@@ -29,7 +29,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.analysis.LegHistogram;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -39,7 +38,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import javax.inject.Singleton;
-import javax.media.jai.Histogram;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -72,11 +70,16 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "courtesyHistogram.txt"));
 		if (this.outputGraph) {
-			writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "courtesyHistogram.png"));
+			for ( String type : histogram.getDataFrames().keySet() ) {
+				writeGraphic(
+						this.histogram,
+						type,
+						controlerIO.getIterationFilename(event.getIteration(), "courtesyHistogram_"+type+".png"));
+			}
 		}
 	}
 
-	static JFreeChart getGraphic(final CourtesyHistogram.DataFrame dataFrame, int iteration) {
+	static JFreeChart getGraphic(final CourtesyHistogram.DataFrame dataFrame, int iteration, String actType) {
 		final XYSeriesCollection xyData = new XYSeriesCollection();
 		final XYSeries helloSeries = new XYSeries("hello", false, true);
 		final XYSeries goodbyeSerie = new XYSeries("goodbye", false, true);
@@ -95,7 +98,9 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 		xyData.addSeries(togetherSerie);
 
         final JFreeChart chart = ChartFactory.createXYStepChart(
-				"Courtesy Statistics, it." + iteration,
+				"Courtesy Statistics," +
+				"actType "+actType+
+				" it." + iteration,
 				"time", "# persons",
 				xyData,
 				PlotOrientation.VERTICAL,
@@ -120,9 +125,14 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 		return chart;
 	}
 
-	public static void writeGraphic(CourtesyHistogram courtesyHistogram, final String filename) {
+	public static void writeGraphic(CourtesyHistogram courtesyHistogram, final String actType, final String filename) {
 		try {
-            ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(courtesyHistogram.getDataFrame(), courtesyHistogram.getIteration()), 1024, 768);
+            ChartUtilities.saveChartAsPNG(
+					new File(filename),
+					getGraphic(
+							courtesyHistogram.getDataFrames().get( actType ),
+							courtesyHistogram.getIteration(),
+							actType), 1024, 768);
 		} catch (IOException e) {
             throw new UncheckedIOException(e);
 		}

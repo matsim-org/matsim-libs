@@ -27,7 +27,9 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author thibautd
@@ -40,7 +42,7 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 	private final int nofBins;
 
 
-	private DataFrame data = null;
+	private final Map<String,DataFrame> dataPerActType = new TreeMap<>();
 
 	@Inject
 	CourtesyHistogram() {
@@ -74,6 +76,7 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 	@Override
 	public void handleEvent(final CourtesyEvent event) {
 		int index = getBinIndex(event.getTime());
+		final DataFrame data = getData( event.getActType() );
 		switch ( event.getType() ) {
 			case sayHelloEvent:
 				data.countsHello[ index ]++;
@@ -86,10 +89,19 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 		}
 	}
 
+	private DataFrame getData(final String actType) {
+		DataFrame dataFrame = this.dataPerActType.get( actType );
+		if (dataFrame == null) {
+			dataFrame = new DataFrame(this.binSize, this.nofBins + 1); // +1 for all times out of our range
+			this.dataPerActType.put(actType, dataFrame);
+		}
+		return dataFrame;
+	}
+
 	@Override
 	public void reset(final int iter) {
 		this.iteration = iter;
-		this.data = new DataFrame( binSize , nofBins );
+		this.dataPerActType.clear();
 	}
 
 	/**
@@ -111,15 +123,23 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 	 * @param stream The data stream where to write the gathered data.
 	 */
 	public void write(final PrintStream stream) {
-		stream.print("time\ttime_s\thello\tgoodbye\tpairs_together");
+		stream.print("time\ttime_s" );
+		for ( String actType : dataPerActType.keySet() ) {
+			stream.print("\thello_"+actType+"\tgoodbye_"+actType+"\tpairs_together_"+actType);
+		}
 		stream.print("\n");
 
-		int pairsTogether = 0;
-        for (int i = 0; i < data.countsHello.length; i++) {
-			pairsTogether = pairsTogether + data.countsHello[i] - data.countsGoodbye[i];
+		int[] pairsTogetherPerType = new int[ dataPerActType.size() ];
 
-			stream.print(Time.writeTime(i * this.binSize) + "\t" + i*this.binSize);
-			stream.print("\t" + data.countsHello[i] + "\t" + data.countsGoodbye[i] + "\t" + pairsTogether);
+        for (int i = 0; i < nofBins; i++) {
+			int mode = 0;
+			for ( DataFrame data : dataPerActType.values() ) {
+				pairsTogetherPerType[ mode ] = pairsTogetherPerType[ mode ] + data.countsHello[i] - data.countsGoodbye[i];
+
+				stream.print(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize);
+				stream.print("\t" + data.countsHello[i] + "\t" + data.countsGoodbye[i] + "\t" + pairsTogetherPerType);
+				mode++;
+			}
 
 			// new line
 			stream.print("\n");
@@ -139,8 +159,8 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 		return iteration;
 	}
 
-	DataFrame getDataFrame() {
-		return data;
+	Map<String,DataFrame> getDataFrames() {
+		return dataPerActType;
 	}
 
 	static class DataFrame {
