@@ -4,3 +4,6 @@ script:
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"
+after_success:
+  - mvn deploy -DskipTests
+  
