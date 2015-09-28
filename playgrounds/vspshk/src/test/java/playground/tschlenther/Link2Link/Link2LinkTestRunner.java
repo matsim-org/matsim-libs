@@ -44,8 +44,7 @@ public class Link2LinkTestRunner {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static String OUTPUT_DIR = "";
-
-	private int NUMBER_OF_PERSONS = 15000;
+	private int NUMBER_OF_PERSONS = 1500;
 	
 //	private EventsManager events = EventsUtils.createEventsManager();
 	

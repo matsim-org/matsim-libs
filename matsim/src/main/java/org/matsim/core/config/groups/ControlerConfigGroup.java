@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -53,6 +54,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
+	public static final String CREATE_GRAPHS = "createGraphs";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim}
@@ -98,7 +100,10 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false; "); // TODO: add description
 		map.put(FIRST_ITERATION, "Default=0; "); // TODO: add description
 		map.put(LAST_ITERATION, "Default=1000; "); // TODO: add description
-		
+		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
+				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
+				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
+
 		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
 			mobsimTypes.append(mtype.toString());
@@ -285,6 +290,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
+	@StringGetter( CREATE_GRAPHS )
 	public boolean isCreateGraphs() {
 		return createGraphs;
 	}
@@ -299,6 +305,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
      * @param createGraphs
      *            true if graphs showing analyses' output should be generated.
      */
+	@StringSetter( CREATE_GRAPHS )
 	public void setCreateGraphs(boolean createGraphs) {
 		this.createGraphs = createGraphs;
 	}
