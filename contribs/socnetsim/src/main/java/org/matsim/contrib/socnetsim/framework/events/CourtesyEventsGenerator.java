@@ -47,7 +47,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 
 	private final EventsManager events;
 	private final SocialNetwork socialNetwork;
-	private final Map< Id<ActivityFacility> , Set< Id<Person> > > personsAtFacility = new HashMap< >();
+	private final Map< Id<ActivityFacility> , Map<String, Set< Id<Person> > > > personsAtFacility = new HashMap< >();
 
 	@Inject
 	public CourtesyEventsGenerator(
@@ -76,7 +76,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 				event.getActType(),
 				event.getPersonId(),
 				event.getFacilityId(),
-				event.getTime() );
+				event.getTime());
 	}
 
 	@Override
@@ -103,16 +103,16 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 				// avoid problems with wrap-around: do not say goodbye before being tracked.
 				// this caused problems with agents having leisure at home.
 				// solution would be to track the agents from the start of the simulation
-				if ( !MapUtils.getSet( facility , personsAtFacility ).remove( ego ) ) return;
+				if ( !getPersonsAtFacilityForType( facility , actType ).remove( ego ) ) return;
 				break;
 			case sayHelloEvent:
-				MapUtils.getSet( facility , personsAtFacility ).add( ego );
+				getPersonsAtFacilityForType( facility , actType ).add( ego );
 				break;
 			default:
 				throw new RuntimeException( type+"?" );
 		}
 
-		for ( Id<Person> present : MapUtils.getSet( facility , personsAtFacility ) ) {
+		for ( Id<Person> present : getPersonsAtFacilityForType( facility , actType ) ) {
 			if ( alters.contains( present ) ) {
 				events.processEvent(
 						new CourtesyEvent(
@@ -130,6 +130,14 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 							type ) );
 			}
 		}
+	}
+
+	private Set<Id<Person>> getPersonsAtFacilityForType( Id<ActivityFacility> facility, String actType ) {
+		return MapUtils.getSet(
+				actType,
+				MapUtils.getMap(
+						facility,
+						personsAtFacility ) );
 	}
 }
 
