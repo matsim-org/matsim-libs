@@ -19,6 +19,7 @@
 
 package playground.artemc.crowding.newScoringFunctions;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -47,7 +48,20 @@ public class LoadFactor60ScoringFunctionFactory implements ScoringFunctionFactor
 	private ScoringFunctionFactory delegate;
 	private EventsManager events;
 	private ScoreTracker scoreTracker;
-	private Controler controler;
+
+	public void setScenario(Scenario scenario) {
+		this.scenario = scenario;
+	}
+
+	public void setEvents(EventsManager events) {
+		this.events = events;
+	}
+
+	public void setScoreTracker(ScoreTracker scoreTracker) {
+		this.scoreTracker = scoreTracker;
+	}
+
+	private Scenario scenario;
 	
 	/**
 	 * Constructs a ScoringFunctionFactory that adds disutilities for
@@ -71,18 +85,18 @@ public class LoadFactor60ScoringFunctionFactory implements ScoringFunctionFactor
 	 * @param delegate
 	 */
 	
-	public LoadFactor60ScoringFunctionFactory(ScoringFunctionFactory delegate, EventsManager events, ScoreTracker scoreTracker, Controler controler)
+	public LoadFactor60ScoringFunctionFactory(ScoringFunctionFactory delegate, EventsManager events, ScoreTracker scoreTracker, Scenario scenario)
 	{
 		this.delegate = delegate;
 		this.events = events;
 		this.scoreTracker = scoreTracker;
-		this.controler = controler;
+		this.scenario = scenario;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person)
 	{
-		return new LoadFactor60ScoringFunction(delegate.createNewScoringFunction(person), events,  scoreTracker, controler);
+		return new LoadFactor60ScoringFunction(delegate.createNewScoringFunction(person), events,  scoreTracker, scenario);
 	}
 
 }

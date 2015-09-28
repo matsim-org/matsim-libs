@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -31,8 +32,6 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.scoring.ScoringFunction;
 
 import playground.artemc.crowding.BusFacilityInteractionEvent;
@@ -69,13 +68,13 @@ public class LoadFactor60ScoringFunction implements ScoringFunction {
 		this.events = events;
 	}
 	
-	public LoadFactor60ScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, Controler controler) {
+	public LoadFactor60ScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, Scenario scenario) {
 
 		this.delegate = delegate;
 		this.events = events;
 		this.scoreTracker = scoreTracker;
-		this.opportunityCostOfPtTravel = - controler.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
-		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.opportunityCostOfPtTravel = - scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() + scenario.getConfig().planCalcScore().getPerforming_utils_hr();
+		this.marginalUtilityOfMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 	}
 
 
