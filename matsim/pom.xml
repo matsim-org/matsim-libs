@@ -18,8 +18,8 @@
 	</licenses>
 	<scm>
 		<url>https://github.com/matsim-org/matsim</url>
-		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
-		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
+		<connection>scm:git:https://github.com/matsim-org/matsim.git</connection>
+		<developerConnection>scm:git:https@github.com:matsim-org/matsim.git</developerConnection>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
