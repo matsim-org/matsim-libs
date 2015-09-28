@@ -110,7 +110,7 @@ public class RunSocialScenarioWithEquity {
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario(config);
 		RunUtils.enrichScenario(scenario);
-		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
+		//scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
