@@ -73,6 +73,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	public void handleEvent(final ActivityStartEvent event) {
 		handleEvent(
 				CourtesyEvent.Type.sayHelloEvent,
+				event.getActType(),
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -82,6 +83,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	public void handleEvent(final ActivityEndEvent event) {
 		handleEvent(
 				CourtesyEvent.Type.sayGoodbyeEvent,
+				event.getActType(),
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -89,6 +91,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 
 	private void handleEvent(
 			final CourtesyEvent.Type type,
+			final String actType,
 			final Id<Person> ego,
 			final Id<ActivityFacility> facility,
 			final double time) {
@@ -114,12 +117,14 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 				events.processEvent(
 						new CourtesyEvent(
 							time,
+							actType,
 							ego,
 							present,
 							type ) );
 				events.processEvent(
 						new CourtesyEvent(
 							time,
+							actType,
 							present,
 							ego,
 							type ) );

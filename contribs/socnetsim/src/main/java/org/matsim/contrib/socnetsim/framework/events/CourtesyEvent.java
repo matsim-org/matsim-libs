@@ -30,20 +30,24 @@ import org.matsim.core.api.internal.HasPersonId;
  * @author thibautd
  */
 public class CourtesyEvent extends Event implements HasPersonId {
-	public static enum Type {
+
+	public enum Type {
 		sayHelloEvent, sayGoodbyeEvent;
 	}
 
 	private final Type type;
+	private final String actType;
 	private final Id<Person> ego;
 	private final Id<Person> alter;
 
 	public CourtesyEvent(
 			final double time,
+			final String actType,
 			final Id<Person> ego,
 			final Id<Person> alter,
 			final Type type ) {
 		super( time );
+		this.actType = actType;
 		this.ego = ego;
 		this.alter = alter;
 		this.type = type;
@@ -65,6 +69,10 @@ public class CourtesyEvent extends Event implements HasPersonId {
 
 	public Type getType() {
 		return type;
+	}
+
+	public String getActType() {
+		return actType;
 	}
 
 	@Override
