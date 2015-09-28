@@ -104,6 +104,7 @@ public class ActivityHistogram implements ActivityStartEventHandler, ActivityEnd
 
 	@Override
 	public void reset(final int iter) {
+		// TODO: initialise the data to take into account initial location?
 		this.iteration = iter;
 		this.data.clear();
 	}
