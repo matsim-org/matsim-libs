@@ -49,6 +49,24 @@ public class ScoreListener implements IterationEndsListener {
 			//System.out.println("ItNum " + iterationNumber + ", crowd " + totalCrowdednessUtility);		
 	}
 
+	public void finish(int iteration) {
+
+		double totalCrowdednessUtility = scoreTracker.getTotalCrowdednessUtility();
+		double totalCrowdednessExternalityCharges = scoreTracker.getTotalCrowdednessExternalityCharges();
+		double totalInVehTimeDelayExternalityCharge = scoreTracker.getTotalInVehicleTimeDelayExternalityCharges();
+		double totalCapacityConstraintsExternalityCharge = scoreTracker.getTotalCapacityConstraintsExternalityCharges();
+		double totalMoneyPaid = scoreTracker.getTotalMoneyPaid();
+		int iterationNumber = iteration;
+
+		iterations.add(iterationNumber);
+		crowdednessUtilityProIteration.put(iterationNumber, totalCrowdednessUtility);
+		crowdednessExternalitiesProIteration.put(iterationNumber, totalCrowdednessExternalityCharges);
+		inVehicleTimeDelayExternalitiesProIteration.put(iterationNumber, totalInVehTimeDelayExternalityCharge);
+		capacityConstraintsExternalitiesProIteration.put(iterationNumber, totalCapacityConstraintsExternalityCharge);
+		moneyPaidProIteration.put(iterationNumber, totalMoneyPaid);
+		//System.out.println("ItNum " + iterationNumber + ", crowd " + totalCrowdednessUtility);
+	}
+
 	public Set<Integer> getIterations() {
 		return iterations;
 	}

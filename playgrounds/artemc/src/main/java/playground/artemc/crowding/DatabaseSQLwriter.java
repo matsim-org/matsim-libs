@@ -58,7 +58,7 @@ public class DatabaseSQLwriter {
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("VehicleId", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("StationId", PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("StationIdSpec", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("StationIdSpec", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("Time", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("TravelTime", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("LoadFactorAtArrival", PostgresType.FLOAT8));
@@ -83,7 +83,7 @@ public class DatabaseSQLwriter {
 				args[0] = vehicle.getId().toString();
 				BusFacilityInteractionEvent state = vehicleStates.get(vehicle).getFacilityStates().get(facilityId);
 				args[1] = new String(state.getStationId().toString());
-				args[2] = new Double(state.getStationId().toString() + ".1");
+				args[2] = new String(state.getStationId().toString() + ".1");
 				args[3] = new Double(state.getBusArrivalTime());
 				args[4] = new Double(state.getBusArrivalTime()-vehicleStates.get(vehicle).getRouteDepartureTime());
 				args[5] = new Double(state.getArrivalLoadFactor());

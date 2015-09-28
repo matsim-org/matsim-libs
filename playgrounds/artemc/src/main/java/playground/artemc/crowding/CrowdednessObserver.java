@@ -103,7 +103,7 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	public CrowdednessObserver( Scenario sc, EventsManager ev , SeatAssignmentRule rule) {
 		this.sc = sc ;
 		this.ev = ev ;
-		this.vehs = ((ScenarioImpl)this.sc).getVehicles() ;
+		this.vehs = sc.getTransitVehicles();
 		this.rule = rule;
 		this.vehicleStates = new LinkedHashMap<Vehicle,VehicleStateAdministrator>();
 		this.pendingObservation = new HashSet<Vehicle>();

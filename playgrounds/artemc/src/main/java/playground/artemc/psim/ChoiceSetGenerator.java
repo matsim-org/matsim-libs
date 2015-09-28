@@ -33,8 +33,8 @@ public class ChoiceSetGenerator implements ShutdownListener {
 	static private String outputDirectory;
 	static private String eventFilePath;
 
-	private static String simType = "10min";
-	private static String schema = "corridor_10min";
+	private static String simType = "2min";
+	private static String schema = "corridor_2min";
 
 	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/";
 	private static String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
