@@ -35,6 +35,8 @@ public class P0ControlHandler implements BasicEventHandler{
 	public Map<Double, Double> capacitiesLink4 = new HashMap<Double, Double>();
 	public static Map<Double, Double> lastcapacitiesLink2 = new HashMap<Double, Double>();
 	public static Map<Double, Double> lastcapacitiesLink4 = new HashMap<Double, Double>();
+	ArrayList<Double> initialcapacitiesLink2 = new ArrayList<Double>();
+	ArrayList<Double> initialcapacitiesLink4 = new ArrayList<Double>();
 	Map<String, Double> arrtimes = new HashMap<String, Double>();
 	Map<String, Double> deptimes = new HashMap<String, Double>();
 	Map<String, String> vehiclesandlinks = new HashMap<String, String>();
@@ -57,6 +59,8 @@ public class P0ControlHandler implements BasicEventHandler{
 		 satcapacity5 = link5.getCapacity();
 		 capacity2=satcapacity2*satcapacity5/(satcapacity2+satcapacity4);//In Veh Per Hour
 		 capacity4=satcapacity4*satcapacity5/(satcapacity2+satcapacity4);
+		 initialcapacitiesLink2.add(capacity2);
+		 initialcapacitiesLink4.add(capacity4);
 		 if(iter==0){
 			 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change.addLink(link2);
@@ -67,6 +71,7 @@ public class P0ControlHandler implements BasicEventHandler{
 			 change1.addLink(link4);
 			 change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
 			 events.add(change1);
+			 
 			}
 	}
 	@Override
@@ -138,14 +143,17 @@ public class P0ControlHandler implements BasicEventHandler{
 				if(averagedelaylink2!=0)delaysLink2.put(bintime, averagedelaylink2);
 				if(averagedelaylink4!=0)delaysLink4.put(bintime, averagedelaylink4);
 				adjustCapacityP0(bintime-500);
-				double abspreslink2 = averagedelaylink2*satcapacity2/capacity2;
-				double abspres1ink4 = averagedelaylink4*satcapacity4/capacity4;	
+				double abspreslink2 = averagedelaylink2*satcapacity2;
+				double abspres1ink4 = averagedelaylink4*satcapacity4;	
 				double abspresdiff = Math.abs(abspreslink2 - abspres1ink4);
 				if(abspresdiff!=0)absolutepressuredifference.add(abspresdiff);
 				if(abspreslink2!=0)absolutepressurelink2.add(abspreslink2);
 				if(abspres1ink4!=0)absolutepressurelink4.add(abspres1ink4);
 				capacitiesLink2.put(bintime-500, capacity2);
 				capacitiesLink4.put(bintime-500, capacity4);
+				
+				initialcapacitiesLink2.add(initialcapacitiesLink2.get(0));
+				initialcapacitiesLink4.add(initialcapacitiesLink4.get(0));
 			}
 	    }
 	}
@@ -190,8 +198,8 @@ public class P0ControlHandler implements BasicEventHandler{
 		   else{
 			   return;
 		   }
-		   p2=p2/capacity2;
-		   p4=p4/capacity4;
+		   //p2=p2/capacity2;
+		   //p4=p4/capacity4;
 		   if (p2>=p4){
 			   		if(capacity2+factor<satcapacity5 && capacity2+factor<satcapacity2  && capacity4-factor>0){
 			   			capacity2=capacity2+factor;
@@ -246,15 +254,31 @@ public class P0ControlHandler implements BasicEventHandler{
 		}
 		System.out.println();
 	}
+	public void writeInitiaDelaystoFile(){
+		TextReaderWriter rw = new TextReaderWriter();
+		rw.writeToTextFile(toArrayList(delaysLink2.values().iterator()), "H:\\Mike Work\\delayslink2.txt");
+		rw.writeToTextFile(toArrayList(delaysLink2.keySet().iterator()), "H:\\Mike Work\\timelink2.txt");
+		rw.writeToTextFile(toArrayList(delaysLink4.values().iterator()), "H:\\Mike Work\\delayslink4.txt");
+		rw.writeToTextFile(toArrayList(delaysLink4.keySet().iterator()), "H:\\Mike Work\\timelink4.txt");
+	}
+	public void readInitiaDelaysFromFile(String path){
+		
+	}
 	public void plotStats(){
+		TextReaderWriter rw = new TextReaderWriter();
+		ArrayList<Double> initialdelaysLink2 = rw.readFromTextFile("H:\\Mike Work\\delayslink2.txt");
+		ArrayList<Double> initialdelaysLink4 = rw.readFromTextFile("H:\\Mike Work\\delayslink4.txt");
+		ArrayList<Double> initialtimeslink2 = rw.readFromTextFile("H:\\Mike Work\\timelink2.txt");
+		ArrayList<Double> initialtimeslink4 = rw.readFromTextFile("H:\\Mike Work\\timelink4.txt");
+		//if(iter==20)writeInitiaDelaystoFile();//For dashed line, writing to text file
 		ArrayList<Double> capacitieslink2 = toArrayList(capacitiesLink2.values().iterator());
 		ArrayList<Double> capacitieslink4 = toArrayList(capacitiesLink4.values().iterator());
 		ArrayList<Double> times = toArrayList(capacitiesLink2.keySet().iterator());
 		ArrayList<Double> delayslink2 = toArrayList(delaysLink2.values().iterator());
 		ArrayList<Double> delayslink4 = toArrayList(delaysLink4.values().iterator());
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotCapacities(iter, times, capacitieslink2, capacitieslink4);
-		plot.PlotDelays(iter, times, delayslink2, delayslink4);
+		plot.PlotCapacities(iter, times, capacitieslink2, capacitieslink4, initialcapacitiesLink2, initialcapacitiesLink4);
+		plot.PlotDelays(iter, toArrayList(delaysLink2.keySet().iterator()), toArrayList(delaysLink4.keySet().iterator()), delayslink2, delayslink4, initialtimeslink2, initialtimeslink4, initialdelaysLink2, initialdelaysLink4);
 		plot.PlotDelaysandCapacities(iter, times, capacitieslink2, capacitieslink4, delayslink2, delayslink4);
 	}
 	public ArrayList<Double> toArrayList(Iterator<Double> iter){
@@ -281,8 +305,8 @@ public class P0ControlHandler implements BasicEventHandler{
 		PlotStatistics plot = new PlotStatistics();
 		plot.plotAbsolutePressures(iter, times, abspreslink2, abspreslink4);
 	}
-	public void plotAbsoultePressureDifference(ArrayList<Double> iters, ArrayList<Double> avgabsolutepressuredifference){
+	public void plotAbsoultePressureDifference(ArrayList<Double> iters,ArrayList<Double> itersscaled, ArrayList<Double> initialabsolutepressuredifference, ArrayList<Double> avgabsolutepressuredifference){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotAbsolutePressureDiff(iter, iters, avgabsolutepressuredifference);
+		plot.PlotAbsolutePressureDiff(iter, iters, itersscaled, initialabsolutepressuredifference, avgabsolutepressuredifference);
 	}
 }
