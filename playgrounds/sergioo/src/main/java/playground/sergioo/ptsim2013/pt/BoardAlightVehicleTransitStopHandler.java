@@ -2,8 +2,8 @@ package playground.sergioo.ptsim2013.pt;
 
 import java.util.List;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -66,8 +66,8 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 		double std = (2.2+0.12*mean);
 		try {
 			double r = MatsimRandom.getRandom().nextDouble();
-			return Math.max(new NormalDistributionImpl(mean,std).inverseCumulativeProbability(r), 0.5*mean);
-		} catch (MathException e) {
+			return Math.max(new NormalDistribution(mean,std).inverseCumulativeProbability(r), 0.5*mean);
+		} catch (NotStrictlyPositiveException e) {
 			e.printStackTrace();
 		}
 		return 0;
