@@ -21,14 +21,7 @@
 		<connection>scm:git:https://github.com/matsim-org/matsim.git</connection>
 		<developerConnection>scm:git:https://github.com/matsim-org/matsim.git</developerConnection>
 	  <tag>HEAD</tag>
-  </scm>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>oss-jfrog-artifactory</id>
-			<name>artifactory-snapshots</name>
-			<url>http://oss.jfrog.org/oss-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
+  	</scm>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
 		<resources>
@@ -125,6 +118,31 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
             </plugin>
+			<plugin>
+				<!-- Apparently, this plugin configuration "bubbles through" to contribs if 'deploy' is called on the
+				top-level pom, even though perhaps it shouldn't. But in our case, it is what we want. -->
+				<groupId>org.jfrog.buildinfo</groupId>
+				<artifactId>artifactory-maven-plugin</artifactId>
+				<version>2.4.0</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+						<configuration>
+							<publisher>
+								<contextUrl>https://oss.jfrog.org</contextUrl>
+								<username>michaz</username>
+								<password>${artifactory-password}</password>
+								<repoKey>oss-release-local</repoKey>
+								<snapshotRepoKey>oss-snapshot-local</snapshotRepoKey>
+							</publisher>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

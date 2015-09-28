@@ -10,4 +10,7 @@
 		<module>matsim</module>
 		<module>contribs</module>
 	</modules>
+	<!-- The Artifactory deployment plugin is configured in 'matsim'. Yet it works when we call 'mvn deploy' on this
+	top-level pom here. I don't fully understand why, but it is what we want. -->
+
 </project>
