@@ -15,13 +15,13 @@ import org.matsim.core.controler.listener.StartupListener;
  * 
  * @author tthunig
  */
-public class TtControlerListener implements StartupListener, IterationEndsListener {
+public class TtListenerToBindAndWriteAnalysis implements StartupListener, IterationEndsListener {
 
-	Scenario scenario;
-	TtAbstractAnalysisTool handler;
-	TtAnalyzedResultsWriter writer;
+	private Scenario scenario;
+	private TtAbstractAnalysisTool handler;
+	private TtAnalyzedResultsWriter writer;
 	
-	public TtControlerListener(Scenario scenario, TtAbstractAnalysisTool handler) {
+	public TtListenerToBindAndWriteAnalysis(Scenario scenario, TtAbstractAnalysisTool handler) {
 		this.scenario = scenario;
 		this.handler = handler;
 	}
