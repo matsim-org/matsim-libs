@@ -74,7 +74,7 @@
 							<publisher>
 								<contextUrl>https://oss.jfrog.org</contextUrl>
 								<username>michaz</username>
-								<password>${env.artifactory-password}</password>
+								<password>${env.ARTIFACTORY_PASSWORD}</password>
 								<repoKey>oss-release-local</repoKey>
 								<snapshotRepoKey>oss-snapshot-local</snapshotRepoKey>
 							</publisher>
