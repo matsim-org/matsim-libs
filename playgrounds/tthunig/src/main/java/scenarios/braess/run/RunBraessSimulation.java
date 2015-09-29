@@ -42,7 +42,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
-import scenarios.analysis.TtControlerListener;
+import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
@@ -202,7 +202,7 @@ public class RunBraessSimulation {
 		}
 		
 		// add a controller listener to analyze results
-		controler.addControlerListener(new TtControlerListener(scenario, new TtAnalyzeBraess()));
+		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess()));
 		
 		return controler;
 	}

@@ -20,8 +20,8 @@
 
 package playground.sergioo.ptsim2013.qnetsimengine;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -1106,8 +1106,8 @@ public class PTQLink implements NetsimLink {
 				if(variance!=0) {
 					try {
 						double r = MatsimRandom.getRandom().nextDouble();
-						earliestExitTime += new NormalDistributionImpl(stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), now), Math.sqrt(variance)).inverseCumulativeProbability(r);
-					} catch (MathException e) {
+						earliestExitTime += new NormalDistribution(stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), now), Math.sqrt(variance)).inverseCumulativeProbability(r);
+					} catch (NotStrictlyPositiveException e) {
 						e.printStackTrace();
 					}
 				}
@@ -1130,9 +1130,9 @@ public class PTQLink implements NetsimLink {
 						if(TIMES[i]==(int)(now/3600)%24)
 							try {
 								double r = MatsimRandom.getRandom().nextDouble();
-								speed = new NormalDistributionImpl(veh.getMaximumVelocity()-0.5556-(MEANS_S[i]>MEANS_R[i]?(MEANS_S[i]-MEANS_R[i])/3.6:0), STDS_R[i]*1.1/3.6).inverseCumulativeProbability(r);
+								speed = new NormalDistribution(veh.getMaximumVelocity()-0.5556-(MEANS_S[i]>MEANS_R[i]?(MEANS_S[i]-MEANS_R[i])/3.6:0), STDS_R[i]*1.1/3.6).inverseCumulativeProbability(r);
 								break TIMES;
-							} catch (MathException e) {
+							} catch (NotStrictlyPositiveException e) {
 								e.printStackTrace();
 							}
 				speed = Math.max(MIN_SPEED_BUS, speed);

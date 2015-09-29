@@ -308,6 +308,17 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
 		String routeType = atts.getValue("type");
 		
+		if (routeType == null) {
+			String legMode = this.currleg.getMode();
+			if ("pt".equals(legMode)) {
+				routeType = "experimentalPt1";
+			} else if ("car".equals(legMode)) {
+				routeType = "links";
+			} else {
+				routeType = "generic";
+			}
+		}
+		
 		ModeRouteFactory factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 		

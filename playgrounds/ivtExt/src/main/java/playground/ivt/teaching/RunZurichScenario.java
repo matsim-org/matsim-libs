@@ -78,9 +78,7 @@ public class RunZurichScenario {
 
 		final Controler controler = new Controler( scenario );
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles  );
 
 		connectFacilitiesWithNetwork( controler );
 

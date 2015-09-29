@@ -50,8 +50,8 @@ import org.matsim.facilities.Facility;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private final Map<String, RoutingModule> routingModules =
-		new HashMap<>();
+	private final Map<String, RoutingModule> routingModules = new HashMap<>();
+	
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -149,6 +149,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {
