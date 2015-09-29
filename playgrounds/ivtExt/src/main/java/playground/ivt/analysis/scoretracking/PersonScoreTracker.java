@@ -16,17 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.analysis.scoretracking;
+package playground.ivt.analysis.scoretracking;
 
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+
+import java.util.*;
 
 /**
  * @author thibautd
  */
-public class ScoreTrackingModule extends AbstractModule {
-	@Override
-	public void install() {
-		bind( ScoreTrackingListener.class );
-		addControlerListenerBinding().to( ScoreTrackingListener.class );
+class PersonScoreTracker {
+	private final Map<String, BasicScoring> scoringElements = new HashMap<>();
+
+	public void addScoringFunction( final String name, final BasicScoring scoring ) {
+		this.scoringElements.put(name, scoring);
+	}
+
+	public Map<String, Double> getDecomposedScoring() {
+		final Map<String,Double> map = new LinkedHashMap<>();
+
+		for (Map.Entry<String,BasicScoring> s :scoringElements.entrySet()) {
+			map.put( s.getKey() , s.getValue().getScore() );
+		}
+
+		return map;
 	}
 }

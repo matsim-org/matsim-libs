@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.analysis.scoretracking;
+package playground.ivt.analysis.scoretracking;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

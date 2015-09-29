@@ -46,7 +46,7 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import org.matsim.pt.PtConstants;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
-import playground.thibautd.analysis.scoretracking.ScoreTrackingListener;
+import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.StandardDeviationScorer;
 import playground.thibautd.socnetsimusages.traveltimeequity.TravelTimesRecord;
@@ -193,8 +193,8 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 			final Id<Person> person,
 			final SumScoringFunction function,
 			final BasicScoring element ) {
-		tracker.addScoringFunction( person, element );
-		function.addScoringFunction( element );
+		tracker.addScoringFunction(person, element);
+		function.addScoringFunction(element);
 	}
 
 	private void addScoringFunction(
@@ -203,6 +203,6 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 			final String name,
 			final BasicScoring element ) {
 		tracker.addScoringFunction( person, name, element );
-		function.addScoringFunction( element );
+		function.addScoringFunction(element);
 	}
 }

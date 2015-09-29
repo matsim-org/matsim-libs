@@ -23,7 +23,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.PtConstants;
-import playground.thibautd.analysis.scoretracking.ScoreTrackingModule;
+import playground.ivt.analysis.scoretracking.ScoreTrackingModule;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModesAndEquity;
 
 /**
