@@ -241,7 +241,7 @@ public class ResultsPostProcessor
     }
 
 
-    public static void processBarcelona()
+    public static void processBarcelonaVariableDemand()
     {
         String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
         String subDirPrefix = "demand_";
@@ -260,10 +260,32 @@ public class ResultsPostProcessor
     }
 
 
+    public static void processBarcelonaVariableSupply()
+    {
+        String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
+        String subDirPrefix = "supply_from_reqs_";
+
+        new ResultsPostProcessor(//
+                //"0.2", //
+                //"0.4", //
+//                "0.6", //
+//                "0.8", //
+//                "1.0", //
+//                "1.2", //
+//                "1.4", //
+//                "1.6", //
+//                "1.8", //
+//                "2.0"//
+                "0.45_DSE"//
+        ).process(dir, subDirPrefix, "stats");
+    }
+
+
     public static void main(String[] args)
     {
         //processMielec();
         //processBerlin();
-        processBarcelona();
+        //processBarcelonaVariableDemand();
+        processBarcelonaVariableSupply();
     }
 }
