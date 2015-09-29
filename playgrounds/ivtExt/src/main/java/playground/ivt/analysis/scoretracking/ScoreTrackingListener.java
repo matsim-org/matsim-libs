@@ -117,7 +117,7 @@ public class ScoreTrackingListener implements StartupListener, ShutdownListener,
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		writer = IOUtils.getBufferedWriter( io.getOutputFilename( "scoringElements.dat" ) );
+		writer = IOUtils.getBufferedWriter( io.getOutputFilename( "scoringElements.dat.gz" ) );
 		try {
 			writer.write( "Iteration\tpersonId\tscoringElement\tscore");
 		}
