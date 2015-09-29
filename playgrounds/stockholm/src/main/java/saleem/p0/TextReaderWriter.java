@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 public class TextReaderWriter {
 	public void writeToTextFile(ArrayList<Double> values, String path){
 		Iterator<Double> iter = values.iterator();
@@ -28,7 +30,11 @@ public class TextReaderWriter {
 	public ArrayList<Double> readFromTextFile(String path){
 		ArrayList<Double> values = new ArrayList<>();
 		try { 
-			for (String line : Files.readAllLines(Paths.get(path))) {
+			for (String line : Files.readAllLines(Paths.get(path), null)) {
+				Logger.getLogger(this.getClass()).fatal("the above line did not compile because second argument was missing "
+						+ "in readAllLines( arg1, arg2 ).  I added `null' to make it compile but do not know if this is the right choice. "
+						+ "kai, sep'15");
+				System.exit(-1);
 			    for (String part : line.split(" ")) {
 			        Double i = Double.valueOf(part);
 			        values.add(i);
