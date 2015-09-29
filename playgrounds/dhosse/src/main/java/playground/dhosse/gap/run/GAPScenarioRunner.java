@@ -4,11 +4,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
@@ -19,8 +20,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.analysis.PersonAnalysis;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
+import playground.dhosse.gap.scenario.network.NetworkCreator;
 
 public class GAPScenarioRunner {
 
@@ -35,7 +36,11 @@ public class GAPScenarioRunner {
 	 * @param args
 	 */
 	public static void main(String args[]){
-
+		
+//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new MatsimNetworkReader(scenario).readFile("/home/dhosse/merged-networkV2_20150929.xml");
+//		NetworkCreator.createAdditionalLinks2025(scenario.getNetwork(), "/home/dhosse/merged-network_2025.xml.gz");
+		
 //		runBaseCaseRouteChoice();
 		runBaseCaseRouteChoiceAndModeChoice();
 //		runAnalysis();
@@ -88,35 +93,7 @@ public class GAPScenarioRunner {
 		
 		addModeChoiceStrategyModules(controler);
 		
-//		final CadytsContext cContext = new CadytsContext(config);
-//		controler.addControlerListener(cContext);
-//		
-//		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
-//		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
-//		
-//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-//			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-//			
-//			@Override
-//			public ScoringFunction createNewScoringFunction(Person person) {
-//
-//				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
-//				
-//				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-//
-//				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-//				final double cadytsScoringWeight = 30. * config.planCalcScore().getBrainExpBeta() ;
-//				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-//				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-//
-//				return scoringFunctionAccumulator;
-//				
-//			}
-//			
-//		}) ;
+		controler.getEvents().addHandler(new ZugspitzbahnFareHandler(controler));
 		
 		controler.run();
 		
@@ -130,6 +107,24 @@ public class GAPScenarioRunner {
 	 */
 	private static void addModeChoiceStrategyModules(final Controler controler) {
 
+		StrategySettings carAvail = new StrategySettings();
+		carAvail.setStrategyName("SubtourModeChoice_".concat(Global.GP_CAR));
+		carAvail.setSubpopulation(Global.GP_CAR);
+		carAvail.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(carAvail);
+		
+		StrategySettings nonCarAvail = new StrategySettings();
+		nonCarAvail.setStrategyName("SubtourModeChoice_".concat(Global.NO_CAR));
+		nonCarAvail.setSubpopulation(null);
+		nonCarAvail.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(nonCarAvail);
+		
+		StrategySettings commuter = new StrategySettings();
+		commuter.setStrategyName("SubtourModeChoice_".concat(Global.COMMUTER));
+		commuter.setSubpopulation(Global.COMMUTER);
+		commuter.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(commuter);
+		
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
@@ -137,6 +132,26 @@ public class GAPScenarioRunner {
 				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
+				
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.NO_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
+					String[] chainBasedModes = {TransportMode.bike};
 
 					@Override
 					public PlanStrategy get() {

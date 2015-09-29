@@ -25,6 +25,7 @@ public class Global {
 	public static final String networkDataDir = dataDir + "Netzwerk/";
 	public static final String matsimDir = projectDir + "30_Modellierung/";
 	public static final String matsimInputDir = matsimDir + "INPUT/";
+	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
 	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output";
 	
 	//coordinate systems and transformations
@@ -73,6 +74,7 @@ public class Global {
 	public static final String USER_GROUP = "usrGroup";
 	public static final String GP_CAR = "GP_CAR";
 	public static final String COMMUTER = "COMMUTER";
+	public static final String NO_CAR = "NO_CAR";
 	
 	//age classes
 	public static final String AGE = "AGE";
@@ -91,9 +93,7 @@ public class Global {
 	public static final String NOT_EMPLOYED = "NOT_EMPLOYED";
 	
 	//car availability
-	public static final String CAR_AVAILABILITY = "CAR_AVAILABILITY";
 	public static final String CAR_AVAIL = "CAR_AVAIL";
-	public static final String NO_CAR = "NO_CAR";
 	
 	//driving license
 	public static final String LICENSE = "LICENSE";

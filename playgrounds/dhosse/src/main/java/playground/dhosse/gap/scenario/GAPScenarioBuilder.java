@@ -15,7 +15,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -36,6 +35,7 @@ import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
+import playground.dhosse.gap.scenario.pt.TransitCreator;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -82,14 +82,14 @@ public class GAPScenarioBuilder {
 		
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
-//		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-network.xml.gz");
-//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-network.xml.gz", "/home/dhosse/Dokumente/net.shp");
+//		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz");
+//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/dhosse/Dokumente/net.shp");
 		
-		new MatsimNetworkReader(scenario).readFile(Global.matsimInputDir + "Netzwerk/merged-network_20150914.xml");
-		new NetworkCleaner().run(scenario.getNetwork());
+		new MatsimNetworkReader(scenario).readFile(/*Global.runInputDir + */"/home/dhosse/merged-networkV2_20150929.xml");
+//		new NetworkCleaner().run(scenario.getNetwork());
 		
 		//create public transport
-//		TransitCreator.createTransit(scenario);
+		TransitCreator.createTransit(scenario);
 		
 //		//create counting stations
 //		Counts counts = CountsCreator.createCountingStations(scenario.getNetwork());
@@ -97,60 +97,60 @@ public class GAPScenarioBuilder {
 //		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/dhosse/Dokumente/counts.shp");
 //		
 //		//init administrative boundaries
-		initMunicipalities(scenario);
-		
-		double[] boundary = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
-		setWorkLocations(new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]));
-
-		//createFacilities
-		FacilitiesCreator.initAmenities(scenario);
-		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150112_Unternehmen_Adressen_geokoordiniert.csv");
-		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
-		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
-		
-		initQuadTrees(scenario);
-		
-		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
+//		initMunicipalities(scenario);
+//		
+//		double[] boundary = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
+//		setWorkLocations(new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]));
+//
+//		//createFacilities
+//		FacilitiesCreator.initAmenities(scenario);
+//		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150929_Unternehmen_Adressen_geokoordiniert.csv");
+//		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
+//		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
+//		
+//		initQuadTrees(scenario);
+//		
+//		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
 //		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
-		
+//		
 //		//create plans
 //		PlansCreator.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
 //		Global.setN(PlansCreator.getInhabitantsCounter());
-		
+//		
 		//create activity parameters for all types of activities
-		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
-		aaip.run();
-		
-		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
-		
-		for(String act : acts.keySet()){
-			
-			ActivityParams params = new ActivityParams();
-			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act).getFirst());
-			params.setMinimalDuration(acts.get(act).getSecond());
-			params.setClosingTime(Time.UNDEFINED_TIME);
-			params.setEarliestEndTime(Time.UNDEFINED_TIME);
-			params.setLatestStartTime(Time.UNDEFINED_TIME);
-			params.setOpeningTime(Time.UNDEFINED_TIME);
-			config.planCalcScore().addActivityParams(params);
-			
-		}
-		
-		ConfigCreator.configureQSimAndCountsConfigGroups(config);
-		
-		//write population to file
-		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
-		
-		//write config file
-		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
-		
-		log.info("Dumping agent attributes...");
-		//write object attributes to file
-		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
-		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
-		
-		log.info("Done!");
+//		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
+//		aaip.run();
+//		
+//		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
+//		
+//		for(String act : acts.keySet()){
+//			
+//			ActivityParams params = new ActivityParams();
+//			params.setActivityType(act);
+//			params.setTypicalDuration(acts.get(act).getFirst());
+//			params.setMinimalDuration(acts.get(act).getSecond());
+//			params.setClosingTime(Time.UNDEFINED_TIME);
+//			params.setEarliestEndTime(Time.UNDEFINED_TIME);
+//			params.setLatestStartTime(Time.UNDEFINED_TIME);
+//			params.setOpeningTime(Time.UNDEFINED_TIME);
+//			config.planCalcScore().addActivityParams(params);
+//			
+//		}
+//		
+//		ConfigCreator.configureQSimAndCountsConfigGroups(config);
+//		
+//		//write population to file
+//		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
+//		
+//		//write config file
+//		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
+//		
+//		log.info("Dumping agent attributes...");
+//		//write object attributes to file
+//		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
+//		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
+//		
+//		log.info("Done!");
 		
 	}
 

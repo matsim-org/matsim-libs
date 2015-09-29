@@ -411,6 +411,10 @@ public class CreateDemand {
 					
 				}
 				
+			} else{
+				
+				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.NO_CAR);
+				
 			}
 			
 			String pHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
@@ -1124,6 +1128,10 @@ public class CreateDemand {
 					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
 					
 				}
+				
+			} else{
+				
+				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.NO_CAR);
 				
 			}
 			
