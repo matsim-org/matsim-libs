@@ -47,7 +47,7 @@ public class PtTutorialTest {
 		@Override public void handleEvent( Event event ) {
 			if ( event instanceof PersonEntersVehicleEvent ) {
 				cnt++ ;
-				System.err.println( event ) ;
+//				System.err.println( event ) ;
 			}
 		}
 		public final long getCnt() {
