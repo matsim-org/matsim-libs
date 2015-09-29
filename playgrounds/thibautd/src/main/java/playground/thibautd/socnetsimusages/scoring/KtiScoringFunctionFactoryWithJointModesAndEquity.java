@@ -19,6 +19,7 @@
 package playground.thibautd.socnetsimusages.scoring;
 
 import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,18 +39,17 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
+import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
-import playground.thibautd.analysis.scoretracking.ScoreTrackingListenner;
+import playground.thibautd.analysis.scoretracking.ScoreTrackingListener;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.StandardDeviationScorer;
 import playground.thibautd.socnetsimusages.traveltimeequity.TravelTimesRecord;
-
-import java.util.Set;
 
 /**
  * @author thibautd
@@ -66,6 +66,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 	private final ScoringFunctionConfigGroup group;
 
 	private static final double UTIL_OF_NOT_PERF = -1000;
+	private final ScoreTrackingListener tracker;
 
 	private static synchronized DestinationChoiceBestResponseContext getOrCreateDestinationChoiceContext(
 			final Scenario scenario) {
@@ -81,10 +82,11 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 
 	@Inject
 	public KtiScoringFunctionFactoryWithJointModesAndEquity(
-				final ScoreTrackingListenner tracker,
+				final ScoreTrackingListener tracker,
 				final Scenario scenario,
 				final TravelTimesRecord travelTimesRecords,
 				final Config config) {
+		this.tracker = tracker;
 		this.scenario = scenario;
 		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.delegate =
@@ -108,7 +110,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 
 		// joint modes
 		// XXX: do better for shared cost
-		function.addScoringFunction(
+		addScoringFunction( person.getId() , function , "driverLegs",
 				new ElementalCharyparNagelLegScoringFunction(
 						JointActingTypes.DRIVER,
 						new LegScoringParameters(
@@ -116,7 +118,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 								group.getMarginalUtilityOfBeingDriver_s(),
 								params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m),
 						scenario.getNetwork()));
-		function.addScoringFunction(
+		addScoringFunction( person.getId() , function , "passengerLegs",
 				new ElementalCharyparNagelLegScoringFunction(
 						JointActingTypes.PASSENGER,
 						new LegScoringParameters(
@@ -126,7 +128,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 								0),
 						scenario.getNetwork()));
 
-		function.addScoringFunction(
+		addScoringFunction( person.getId() , function , "planNotCompletePenalty",
 				// technical penalty: penalize plans which do not result in performing
 				// all activities.
 				// This is necessary when using huge time mutation ranges.
@@ -161,7 +163,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 				});
 
 		if ( group.isUseLocationChoiceEpsilons() ) {
-			function.addScoringFunction(
+			addScoringFunction( person.getId() , function ,
 					new DestinationEspilonScoring(
 							person,
 							getOrCreateDestinationChoiceContext(
@@ -171,7 +173,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 		final GroupSizePreferencesConfigGroup groupSizeGroup = (GroupSizePreferencesConfigGroup)
 			scenario.getConfig().getModule( GroupSizePreferencesConfigGroup.GROUP_NAME );
 
-		function.addScoringFunction(
+		addScoringFunction( person.getId() , function ,
 				new GroupCompositionPenalizer(
 						groupSizeGroup.getActivityType(),
 						new GroupCompositionPenalizer.MinGroupSizeLinearUtilityOfTime(
@@ -179,11 +181,28 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 								groupSizeGroup.getUtilityOfMissingContact_util_s())));
 
 
-		function.addScoringFunction(
+		addScoringFunction( person.getId() , function ,
 				new StandardDeviationScorer(
 						travelTimesRecords,
 						group.getJoinableActivityTypes(),
 						betaStdDev ) );
 		return function;
+	}
+
+	private void addScoringFunction(
+			final Id<Person> person,
+			final SumScoringFunction function,
+			final BasicScoring element ) {
+		tracker.addScoringFunction( person, element );
+		function.addScoringFunction( element );
+	}
+
+	private void addScoringFunction(
+			final Id<Person> person,
+			final SumScoringFunction function,
+			final String name,
+			final BasicScoring element ) {
+		tracker.addScoringFunction( person, name, element );
+		function.addScoringFunction( element );
 	}
 }

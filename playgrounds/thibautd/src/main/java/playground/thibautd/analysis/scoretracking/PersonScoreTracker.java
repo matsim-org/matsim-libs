@@ -16,31 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsimusages.traveltimeequity;
+package playground.thibautd.analysis.scoretracking;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.PtConstants;
-import playground.thibautd.analysis.scoretracking.ScoreTrackingModule;
-import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModesAndEquity;
+import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+
+import java.util.*;
 
 /**
  * @author thibautd
  */
-public class KtiScoringWithEquityModule extends AbstractModule {
-	@Override
-	public void install() {
-		install( new ScoreTrackingModule() );
+class PersonScoreTracker {
+	private final Map<String, BasicScoring> scoringElements = new HashMap<>();
 
-		binder().bind( TravelTimesRecord.class ).toInstance(
-				new TravelTimesRecord(
-						new StageActivityTypesImpl(
-								PtConstants.TRANSIT_ACTIVITY_TYPE,
-								JointActingTypes.INTERACTION
-						)) );
-		addEventHandlerBinding().to( TravelTimesRecord.class );
-		binder().bind(ScoringFunctionFactory.class).to(KtiScoringFunctionFactoryWithJointModesAndEquity.class);
+	public void addScoringFunction( final String name, final BasicScoring scoring ) {
+		this.scoringElements.put( name , scoring );
+	}
+
+	public Map<String, Double> getDecomposedScoring() {
+		final Map<String,Double> map = new LinkedHashMap<>();
+
+		for (Map.Entry<String,BasicScoring> s :scoringElements.entrySet()) {
+			map.put( s.getKey() , s.getValue().getScore() );
+		}
+
+		return map;
 	}
 }
