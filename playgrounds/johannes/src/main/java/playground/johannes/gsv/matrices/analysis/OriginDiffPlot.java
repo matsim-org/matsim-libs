@@ -36,6 +36,7 @@ import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,7 +63,7 @@ public class OriginDiffPlot {
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		KeyMatrix refMatrix = reader.getMatrix();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId");
 
 		ODUtils.cleanDistances(refMatrix, zones, 100000, WGS84DistanceCalculator.getInstance());
 		// ODUtils.cleanDistances(simMatrix, zones, 100000,

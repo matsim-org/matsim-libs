@@ -25,6 +25,8 @@ import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 
 import java.util.HashSet;
 import java.util.List;

@@ -25,11 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -143,13 +139,5 @@ public class ZoneCollection {
 			else
 				return false;
 		}
-	}
-	
-	public static ZoneCollection readFromGeoJSON(String file, String primaryKey) throws IOException {
-		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get(file)));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
-		zones.setPrimaryKey(primaryKey);
-		return zones;
 	}
 }

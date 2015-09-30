@@ -43,8 +43,8 @@ import playground.johannes.gsv.sim.cadyts.ODAdjustor;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -99,7 +99,7 @@ public class ODAdjustorRun {
 		ZoneCollection zones = new ZoneCollection();
 //		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		String data = new String(Files.readAllBytes(Paths.get(args[4])));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		data = null;
 

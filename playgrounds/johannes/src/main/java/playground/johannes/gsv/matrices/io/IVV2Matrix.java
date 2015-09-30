@@ -21,9 +21,9 @@ package playground.johannes.gsv.matrices.io;
 
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -44,7 +44,7 @@ public class IVV2Matrix {
 	public static void main(String[] args) throws IOException {
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		
 		KeyMatrix m = new KeyMatrix();

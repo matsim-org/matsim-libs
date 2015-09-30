@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
@@ -32,6 +31,7 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,7 +55,7 @@ public class SingleZoneDistances {
 
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		data = null;
 

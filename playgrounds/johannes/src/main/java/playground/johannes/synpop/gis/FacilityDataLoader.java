@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.synpop.gis;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -26,7 +26,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import playground.johannes.synpop.gis.DataLoader;
 
 import java.util.Random;
 

@@ -23,6 +23,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import playground.johannes.gsv.zones.ODMatrix;
 import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class ODMatrixXMLReader extends MatsimXmlParser {
 			// do nothing
 		} else if (name.equalsIgnoreCase(ODMatrixXMLWriter.ZONES_TAG)) {
 			zoneIndex = new HashMap<String, Zone>();
-			Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(content);
+			Set<Zone> zones = ZoneGeoJsonIO.parseFeatureCollection(content);
 			for(Zone zone : zones) {
 				String id = zone.getAttribute(ODMatrixXMLWriter.ZONE_ID_KEY);
 				zoneIndex.put(id, zone);

@@ -38,6 +38,7 @@ import playground.johannes.studies.gis.SpanningTree;
 import playground.johannes.studies.gis.SpanningTree.NodeData;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -235,7 +236,7 @@ public class TTMatrixGenerator {
 		reader.parse(netFile);
 		
 		logger.info("Loading zones...");
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zoneFile, zoneIdKey);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey);
 		
 		TTMatrixGenerator generator = new TTMatrixGenerator();
 		KeyMatrix m = generator.generate(scenario.getNetwork(), zones, zoneIdKey, nThreads);

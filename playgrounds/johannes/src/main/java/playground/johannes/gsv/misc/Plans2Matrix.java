@@ -44,6 +44,7 @@ import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -143,7 +144,7 @@ public class Plans2Matrix {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(args[1]);
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[2], args[3]);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], args[3]);
 
 		Set<Plan> plans = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {

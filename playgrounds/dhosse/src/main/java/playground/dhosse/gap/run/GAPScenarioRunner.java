@@ -4,8 +4,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
+import org.matsim.contrib.carsharing.runExample.RunCarsharing;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -21,13 +29,19 @@ import org.matsim.population.algorithms.XY2Links;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
-import playground.dhosse.gap.scenario.network.NetworkCreator;
 
 public class GAPScenarioRunner {
 
 	private static final String inputPath = Global.matsimDir + "INPUT/";
 	private static final String simInputPath = Global.matsimDir + "OUTPUT/" + Global.runID +"/input/";
 	private static final String outputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
+	
+	//configure innovative strategies used
+	private static final boolean addModeChoice = true;
+	private static final boolean addTimeChoice = true;
+	private static final boolean addLocationChoice = false;
+	
+	private static final boolean addCarsharing = false;
 	
 	/**
 	 * edit the static method executed in the main method
@@ -37,27 +51,25 @@ public class GAPScenarioRunner {
 	 */
 	public static void main(String args[]){
 		
-//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new MatsimNetworkReader(scenario).readFile("/home/dhosse/merged-networkV2_20150929.xml");
-//		NetworkCreator.createAdditionalLinks2025(scenario.getNetwork(), "/home/dhosse/merged-network_2025.xml.gz");
-		
-//		runBaseCaseRouteChoice();
-		runBaseCaseRouteChoiceAndModeChoice();
+		run();
 //		runAnalysis();
 		
 	}
 
 	/**
-	 * Runs the base scenario with route choice as only innovative strategy.
+	 * Runs the GP scenario.
 	 */
-	private static void runBaseCaseRouteChoice() {
+	private static void run(){
 		
-		//basics: load config settings and scenario
-		Config config = ConfigUtils.createConfig();
+		//create a new config and a new scenario and load it
+		final Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		Scenario scenario2 = ScenarioUtils.loadScenario(config);
+		//create a second scenario containing only the cleaned (road only) network
+		//in order to map agents on car links
+		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario2).readFile(config.network().getInputFile());
 		new NetworkCleaner().run(scenario2.getNetwork());
 		
 		XY2Links xy2links = new XY2Links(scenario2);
@@ -65,37 +77,120 @@ public class GAPScenarioRunner {
 			xy2links.run(person);
 		}
 		
-		//after everything else is set up, start the simulation
+		//create a new controler
 		final Controler controler = new Controler(scenario);
 		
+		//by default, route choice is the only innovative strategy.
+		//additional strategies can be switched on/off via boolean members (see above)
+		
+		if(addModeChoice){
+			
+			addModeChoice(controler);
+			
+		}
+		
+		if(addTimeChoice){
+			
+			addTimeChoice(controler);
+			
+		}
+		
+		if(addLocationChoice){
+			
+			addLocationChoice(controler);
+			
+		}
+		
+		if(addCarsharing){
+			addCarsharing(controler);
+		}
+		
+		//finally, add controler listeners and event handlers
+		controler.getEvents().addHandler(new ZugspitzbahnFareHandler(controler));
+		
+		//start of the simulation
 		controler.run();
 		
 	}
 	
 	/**
-	 * Runs the base scenario with route choice and mode choice as innovative strategies.
+	 * Adds time choice as additional replanning strategy.
+	 * The method creates separate strategy settings for each subpopulation.
+	 * 
+	 * @param controler
 	 */
-	private static void runBaseCaseRouteChoiceAndModeChoice(){
+	private static void addTimeChoice(final Controler controler){
 		
-		final Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		//New strategy settings are created
+		//Specify a name, a subpopulation and a weight for the new strategy and
+		//add if to the existing ones in the strategy config group
+		StrategySettings tam = new StrategySettings();
+		tam.setStrategyName("TimeAllocationMutator");
+		tam.setSubpopulation(null);
+		tam.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(tam);
 		
-		Scenario scenario2 = ScenarioUtils.loadScenario(config);
-		new NetworkCleaner().run(scenario2.getNetwork());
+		StrategySettings car = new StrategySettings();
+		car.setStrategyName("TimeAllocationMutator");
+		car.setSubpopulation(Global.GP_CAR);
+		car.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(car);
 		
-		XY2Links xy2links = new XY2Links(scenario2);
-		for(Person person : scenario.getPopulation().getPersons().values()){
-			xy2links.run(person);
+		StrategySettings commuter = new StrategySettings();
+		commuter.setStrategyName("TimeAllocationMutator");
+		commuter.setSubpopulation(Global.COMMUTER);
+		commuter.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(commuter);
+		
+	}
+
+	/**
+	 * Adds destination choice as innovative strategy.
+	 * @param controler
+	 */
+	private static void addLocationChoice(final Controler controler) {
+		
+		DestinationChoiceConfigGroup dccg = new DestinationChoiceConfigGroup();
+		
+		StringBuffer sb = new StringBuffer();
+		StringBuffer epsilons = new StringBuffer();
+		for(ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()){
+			
+			if(params.getActivityType().contains("shop") || params.getActivityType().contains("othe") ||
+					params.getActivityType().contains("leis")){
+				if(sb.length() < 1){
+					sb.append(params.getActivityType());
+					epsilons.append("1.0");
+				} else{
+					sb.append(", " + params.getActivityType());
+					epsilons.append(", 1.0");
+				}
+			}
+			
 		}
 		
-		final Controler controler = new Controler(scenario);
+		dccg.setFlexibleTypes(sb.toString());
+		dccg.setEpsilonScaleFactors(epsilons.toString());
 		
-		addModeChoiceStrategyModules(controler);
+		controler.getConfig().addModule(dccg);
+		DestinationChoiceBestResponseContext dcbr = new DestinationChoiceBestResponseContext(controler.getScenario());
+		dcbr.init();
+		DCScoringFunctionFactory scFactory = new DCScoringFunctionFactory(controler.getScenario(), dcbr);
+		scFactory.setUsingConfigParamsForScoring(true);
+		controler.addControlerListener(new DestinationChoiceInitializer(dcbr));
 		
-		controler.getEvents().addHandler(new ZugspitzbahnFareHandler(controler));
+		if (Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+		        Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
+		    controler.addControlerListener(new FacilitiesLoadCalculator(dcbr.getFacilityPenalties()));
+		}
 		
-		controler.run();
+		controler.setScoringFunctionFactory(scFactory);
+		
+		StrategySettings dc = new StrategySettings();
+		dc.setStrategyName("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy");
+		dc.setSubpopulation(null);
+		dc.setWeight(0.1);
+		controler.getConfig().strategy().addStrategySettings(dc);
 		
 	}
 	
@@ -105,7 +200,7 @@ public class GAPScenarioRunner {
 	 * 
 	 * @param controler
 	 */
-	private static void addModeChoiceStrategyModules(final Controler controler) {
+	private static void addModeChoice(final Controler controler) {
 
 		StrategySettings carAvail = new StrategySettings();
 		carAvail.setStrategyName("SubtourModeChoice_".concat(Global.GP_CAR));
@@ -187,6 +282,16 @@ public class GAPScenarioRunner {
 		
 	}
 	
+	private static void addCarsharing(final Controler controler){
+		
+		CarsharingUtils.addConfigModules(controler.getConfig());
+		RunCarsharing.installCarSharing(controler);
+		
+	}
+	
+	/**
+	 * An entry point for some analysis methods...
+	 */
 	private static void runAnalysis() {
 	
 //		PersonAnalysis.createLegModeDistanceDistribution("/home/dhosse/plansV3_cleaned.xml.gz", "/home/danielhosse/Dokumente/lmdd/");

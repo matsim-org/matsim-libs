@@ -22,6 +22,7 @@ package playground.johannes.gsv.gis;
 import com.vividsolutions.jts.geom.Point;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -33,7 +34,7 @@ import java.io.IOException;
 public class Zones2Centroids {
 
     public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.geojson", "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.geojson", "NO");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
         writer.write("id,name,lng,lat");
