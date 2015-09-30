@@ -66,25 +66,25 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 	private void handleActivityStartEvent(final ActivityStartEvent event) {
 		if ( activityType.contains( event.getActType() ) ) {
-			isInActivity = true;
 			currentActivityValues = new ActivityValues();
 			activityValues.add( currentActivityValues );
 
 			currentActivityValues.addArrival( event.getPersonId() , event.getTime() );
 		}
+		else currentActivityValues = null;
 	}
 
 	private void handleActivityEndEvent(final ActivityEndEvent event) {
-		isInActivity = false;
+		//isInActivity = false;
 
 		if ( currentActivityValues != null ) {
 			currentActivityValues.addDeparture( event.getPersonId() , event.getTime() );
-			currentActivityValues = null;
+			//currentActivityValues = null;
 		}
 	}
 
 	private void handleCourtesyEvent(final CourtesyEvent event) {
-		if ( !isInActivity ) return;
+		if ( currentActivityValues == null ) return;
 
 		switch ( event.getType() ) {
 			case sayHelloEvent:
@@ -134,7 +134,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 		}
 
 		public double calcStdDev() {
-			assert departureTimes.size() == arrivalTimes.size();
+			// assert departureTimes.size() == arrivalTimes.size(); // not the case before activity ends (which might never happen)
 			// for each person, sum the travel times: we do not want to enforce that access and egress of an agent have
 			// the same length, but similarity across agents.
 			final TObjectDoubleHashMap<Id<Person>> travelTimes = new TObjectDoubleHashMap<>();
