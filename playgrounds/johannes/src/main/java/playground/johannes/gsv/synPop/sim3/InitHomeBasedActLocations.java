@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -31,9 +32,8 @@ import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.gis.DataPool;
 import playground.johannes.synpop.processing.EpisodeTask;
 
+import java.util.List;
 import java.util.Random;
-
-//import playground.johannes.gsv.misc.QuadTree;
 
 /**
  * @author johannes
@@ -97,31 +97,31 @@ public class InitHomeBasedActLocations implements EpisodeTask {
 	}
 
 	private ActivityFacility getFacility(Coord center, double radius, String type) {
-//		QuadTree<ActivityFacility> quadTree = data.getQuadTree(type);
-//		double factor = error;
-//
-//		ActivityFacility f = null;
-//		int i = 0;
-//		while (f == null) {
-//			double min = Math.max(0, radius * (1 - factor));
-//			double max = radius * (1 + factor);
-//
-////			List<ActivityFacility> list = new ArrayList<>(quadTree.get(center.getX(), center.getY(), min, max));
-//			List<ActivityFacility> list = (List<ActivityFacility>) quadTree.get(center.getX(), center.getY(), min, max);
-//			if (list.isEmpty()) {
-//				if(i > 9) {
-//					f = data.randomFacility(type);
-//				} else {
-//					factor = factor * 2;
-//				}
-//			} else {
-//				f = list.get(random.nextInt(list.size()));
-//			}
-//			i++;
-//		}
-//
-//		return f;
-		return null;
+		QuadTree<ActivityFacility> quadTree = data.getQuadTree(type);
+		double factor = error;
+
+		ActivityFacility f = null;
+		int i = 0;
+		while (f == null) {
+			double min = Math.max(0, radius * (1 - factor));
+			double max = radius * (1 + factor);
+
+//			List<ActivityFacility> list = new ArrayList<>(quadTree.get(center.getX(), center.getY(), min, max));
+			List<ActivityFacility> list = (List<ActivityFacility>) quadTree.get(center.getX(), center.getY(), min, max);
+			if (list.isEmpty()) {
+				if(i > 9) {
+					f = data.randomFacility(type);
+				} else {
+					factor = factor * 2;
+				}
+			} else {
+				f = list.get(random.nextInt(list.size()));
+			}
+			i++;
+		}
+
+		return f;
+
 	}
 
 }

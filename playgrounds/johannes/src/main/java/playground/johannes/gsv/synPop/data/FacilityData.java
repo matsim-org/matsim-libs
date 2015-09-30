@@ -29,8 +29,6 @@ import org.matsim.facilities.ActivityOption;
 import java.util.*;
 import java.util.Map.Entry;
 
-//import playground.johannes.gsv.misc.QuadTree;
-
 /**
  * @author johannes
  */
