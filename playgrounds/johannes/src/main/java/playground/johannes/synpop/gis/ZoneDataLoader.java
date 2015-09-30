@@ -59,7 +59,15 @@ public class ZoneDataLoader implements DataLoader {
             String populationKey = paramset.getValue(POPULATION_KEY_PARAM);
 
             try {
-                ZoneCollection zones = ZoneCollection.readFromGeoJSON(file, primaryKey);
+                ZoneCollection zones;
+                if(file.endsWith(".json") || file.endsWith(".geojson"))
+                    zones = ZoneGeoJsonIO.readFromGeoJSON(file, primaryKey);
+                else if(file.endsWith(".shp")) {
+                    zones = ZoneEsriShapeIO.read(file);
+                    zones.setPrimaryKey(primaryKey);
+                } else {
+                    throw new RuntimeException("Unknown file format.");
+                }
 
                 for(Zone zone : zones.getZones()) {
                     zone.setAttribute(ZoneData.POPULATION_KEY, zone.getAttribute(populationKey));

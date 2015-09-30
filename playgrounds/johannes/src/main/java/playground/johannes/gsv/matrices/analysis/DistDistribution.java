@@ -31,6 +31,7 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class DistDistribution {
 //		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.modena.xml");
 		KeyMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 

@@ -42,8 +42,8 @@ import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.Simulator;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -148,7 +148,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			try {
 				data = new String(Files.readAllBytes(Paths.get(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
 				ZoneCollection zones = new ZoneCollection();
-				zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 				
 				odCalibrator = new ODCalibrator(event.getControler().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
 				event.getControler().getEvents().addHandler(odCalibrator);

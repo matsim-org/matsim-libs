@@ -41,12 +41,12 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -260,7 +260,7 @@ public class NetworkExtender {
 
 		logger.info("Loading geometries...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
-		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> zones = ZoneGeoJsonIO.parseFeatureCollection(data);
 
 		logger.info("Extracting boundary...");
 		Set<Geometry> deGeometries = new HashSet<>();
@@ -277,7 +277,7 @@ public class NetworkExtender {
 
 		logger.info("Loading boundary...");
 		data = new String(Files.readAllBytes(Paths.get(boundaryFile)));
-		Set<Zone> tmp = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> tmp = ZoneGeoJsonIO.parseFeatureCollection(data);
 		Geometry boundary = tmp.iterator().next().getGeometry();
 
 		logger.info("Extracting intersecting links...");

@@ -23,9 +23,9 @@ import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,7 +63,7 @@ public class Aggregate2Nuts3 {
 
 		ZoneCollection modenaZones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
-		modenaZones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		modenaZones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		modenaZones.setPrimaryKey(ZONE_KEY);
 		data = null;
 

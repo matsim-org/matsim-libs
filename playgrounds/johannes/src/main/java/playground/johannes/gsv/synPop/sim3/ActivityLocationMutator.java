@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 
 import java.util.List;
 import java.util.Random;

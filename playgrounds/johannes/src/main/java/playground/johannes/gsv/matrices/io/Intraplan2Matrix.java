@@ -22,9 +22,9 @@ package playground.johannes.gsv.matrices.io;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.ODMatrix;
 import playground.johannes.gsv.zones.io.ODMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -52,7 +52,7 @@ public class Intraplan2Matrix {
 //		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		
 		Map<String, String> nuts2gsv = new HashMap<String, String>();
 		for (Zone zone : zones.getZones()) {

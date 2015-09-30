@@ -57,6 +57,7 @@ import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -111,7 +112,7 @@ public class NetLoad {
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonesFile, "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
 		/*
 		 * setup router
 		 */

@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.sim.data.ActivityFacilityConverter;
 import playground.johannes.synpop.sim.data.Converters;
 

@@ -25,8 +25,6 @@ import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.gis.*;

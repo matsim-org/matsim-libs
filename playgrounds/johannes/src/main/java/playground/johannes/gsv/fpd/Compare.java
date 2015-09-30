@@ -32,6 +32,7 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -130,7 +131,7 @@ public class Compare {
 		writer.close();
 		scatterWriter.close();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
 		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais);
 		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
 

@@ -28,13 +28,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.processing.TaskRunner;
 
@@ -73,7 +73,7 @@ public class PopGeoExtract {
 		FacilityData fData = (FacilityData) loader.load();
 
 		String data = new String(Files.readAllBytes(Paths.get(geoFile)));
-		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> zones = ZoneGeoJsonIO.parseFeatureCollection(data);
 
 		logger.info("Applying filter...");
 		TaskRunner.validatePersons(new GeoFilter(fData.getAll(), zones.iterator().next().getGeometry()), persons);
