@@ -1,32 +1,25 @@
 package playground.dziemke.cemdapMatsimCadyts.controller;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.distribution.CadytsContextDistributionBased;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.measurement.MeasurementCadytsContext;
 import org.matsim.contrib.cadyts.measurement.Measurement;
+import org.matsim.contrib.cadyts.measurement.MeasurementCadytsContext;
 import org.matsim.contrib.cadyts.measurement.Measurements;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,8 +31,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
 
 public class CadytsEquilControllerBasedOnDistributions {
 	private final static Logger log = Logger.getLogger(CadytsEquilControllerBasedOnDistributions.class);
@@ -60,10 +51,13 @@ public class CadytsEquilControllerBasedOnDistributions {
 		config.plans().setInputFile(inputPlansFile);
 		
 		//simulation
-		config.addModule( new SimulationConfigGroup() );
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
+//		config.addModule( new SimulationConfigGroup() );
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
+		config.qsim().setStartTime(0.);
+		config.qsim().setEndTime(0.);
+		config.qsim().setSnapshotPeriod(0.);
 		
 		// counts
 //		String countsFileName = "/Users/dominik/Workspace/data/examples/equil/input/counts100-200.xml";
@@ -73,7 +67,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 		
 		// vsp experimental
 		// config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
-		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
+//		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		
 		// controller
 		String runId = "74";
@@ -89,6 +84,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 		Set<String> snapshotFormat = new HashSet<String>();
 		//snapshotFormat.add("otfvis");
 		config.controler().setSnapshotFormat(snapshotFormat);
+		
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		// strategy
 //		StrategySettings strategySettings1 = new StrategySettings(Id.create(1, StrategySettings.class));
