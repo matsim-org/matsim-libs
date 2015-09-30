@@ -63,12 +63,15 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks;
+	private final Set<Id<Measurement>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
 	MeasurementPlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		for ( String str : abc ) {
+			this.calibratedLinks.add( Id.create( str, Measurement.class ) ) ;
+		}
 		this.driverAgents = new HashSet<>();
 	}
 

@@ -23,6 +23,8 @@ package org.matsim.contrib.cadyts.distribution;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,11 +40,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-
-import cadyts.demand.PlanBuilder;
 import org.matsim.core.config.ConfigUtils;
 
-import javax.inject.Inject;
+import cadyts.demand.PlanBuilder;
 
 //public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 public class DistributionPlanToPlanStepBasedOnEvents implements PlansTranslator<Integer>, LinkLeaveEventHandler, 
@@ -62,12 +62,15 @@ public class DistributionPlanToPlanStepBasedOnEvents implements PlansTranslator<
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks;
+	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
 	DistributionPlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		for ( String str : abc ) {
+			this.calibratedLinks.add( Id.createLinkId( str ) ) ;
+		}
 		this.driverAgents = new HashSet<>();
 	}
 

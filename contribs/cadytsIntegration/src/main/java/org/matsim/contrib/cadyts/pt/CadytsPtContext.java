@@ -139,10 +139,10 @@ CadytsContextI<TransitStopFacility> {
 		events.addHandler(ptStep);
 	}
 
-	private Set<Id<TransitLine>> toTransitLineIdSet(Set<Id<Link>> list) {
+	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<String> list) {
 		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
 		
-		for (Id<Link> id : list) {
+		for ( String id : list) {
 			converted.add(Id.create(id, TransitLine.class));
 		}
 		
@@ -163,7 +163,7 @@ CadytsContextI<TransitStopFacility> {
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
-		for (Id<Link> pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
+		for ( String pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
 			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
 			TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {

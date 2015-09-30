@@ -102,9 +102,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			this.counts = counts ;
 		}
 		
-		Set<Id<Link>> countedLinks = new TreeSet<>();
+		Set<String> countedLinks = new TreeSet<>();
 		for (Id<Link> id : this.counts.getCounts().keySet()) {
-			countedLinks.add(id);
+			countedLinks.add(id.toString());
 		}
 		
 		cadytsConfig.setCalibratedItems(countedLinks);
