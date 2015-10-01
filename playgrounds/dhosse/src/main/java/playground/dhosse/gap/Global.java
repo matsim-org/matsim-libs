@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run9";
+	public static final String runID = "run10";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -18,7 +18,7 @@ public class Global {
 	public static final int N = 86336;
 	
 	//directories
-	static final String smbDir = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/";
+	static final String smbDir = "/run/user/1007/gvfs/smb-share:server=innoz-dc01,share=innoz/";
 	public static final String adminBordersDir = smbDir + "3_Allgemein/Geoinformation/Administrative_Grenzen/"; //gemeinden_2009.shp
 	public static final String projectDir = smbDir + "2_MediengestützteMobilität/10_Projekte/eGAP/";
 	public static final String dataDir = projectDir + "20_Datengrundlage/";
@@ -71,10 +71,10 @@ public class Global {
 	public static final String idWallgau = "09180136";
 	
 	//subpopulation classes
-	public static final String USER_GROUP = "usrGroup";
-	public static final String GP_CAR = "GP_CAR";
+	public static final String USER_GROUP = "userGroup";
+	public static final String GP_CAR = "CAR_OWNER";
 	public static final String COMMUTER = "COMMUTER";
-	public static final String NO_CAR = "NO_CAR";
+	public static final String LICENSE_OWNER = "LICENSE";
 	
 	//age classes
 	public static final String AGE = "AGE";
@@ -103,9 +103,6 @@ public class Global {
 	//status of residence
 	public static final String RESIDENCE = "RESIDENCE";
 	public static final String INHABITANT = "INHABITANT";
-
-	public static final String CARSHARING = "CARSHARING";
-	public static final String CAR_OPTION = "CAR_OPTION";
 
 	public static double getN() {
 		return n;

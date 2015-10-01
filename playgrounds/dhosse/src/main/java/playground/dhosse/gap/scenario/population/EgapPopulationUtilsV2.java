@@ -25,10 +25,10 @@ public class EgapPopulationUtilsV2 {
 		 */
 		public static Map<String,MiDPersonGroupData> createMiDPersonGroups(){
 			
-			MiDPersonGroupData students = new MiDPersonGroupData(0, 17);
+			MiDPersonGroupData students = new MiDPersonGroupData(6, 17);
 			students.setLegsPerPersonAndDay(2.81);
 			setPercentages(students);
-			EgapPopulationUtilsV2.personGroupData.put(EgapHashGenerator.generateAgeGroupHash(0, 17), students);
+			EgapPopulationUtilsV2.personGroupData.put(EgapHashGenerator.generateAgeGroupHash(6, 17), students);
 			
 			MiDPersonGroupData adults = new MiDPersonGroupData(18, 65);
 			students.setLegsPerPersonAndDay(3.44);
