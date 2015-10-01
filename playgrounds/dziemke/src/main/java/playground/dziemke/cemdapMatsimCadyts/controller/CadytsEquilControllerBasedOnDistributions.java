@@ -11,7 +11,6 @@ import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.measurement.Measurement;
 import org.matsim.contrib.cadyts.measurement.MeasurementCadytsContext;
-import org.matsim.contrib.cadyts.measurement.Measurements;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -22,6 +21,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -31,9 +31,11 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.counts.Counts;
 
 public class CadytsEquilControllerBasedOnDistributions {
 	private final static Logger log = Logger.getLogger(CadytsEquilControllerBasedOnDistributions.class);
+	private final static String CADYTS = "cadytsCar";
 
 	public static void main(final String[] args) {
 		final Config config = ConfigUtils.createConfig();
@@ -68,7 +70,7 @@ public class CadytsEquilControllerBasedOnDistributions {
 		// vsp experimental
 		// config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 //		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
-		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		
 		// controller
 		String runId = "74";
@@ -87,31 +89,16 @@ public class CadytsEquilControllerBasedOnDistributions {
 		
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
-		// strategy
-//		StrategySettings strategySettings1 = new StrategySettings(Id.create(1, StrategySettings.class));
-//		strategySettings1.setStrategyName("ChangeExpBeta");
-//		strategySettings1.setWeight(1.);
-//		config.strategy().addStrategySettings(strategySettings1);
-		
-		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
-		strategySettings2.setStrategyName("ReRoute");
+		StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+		strategySettings2.setStrategyName( DefaultStrategy.ReRoute.name() );
 		strategySettings2.setWeight(1.);
 		strategySettings2.setDisableAfter(90);
 		config.strategy().addStrategySettings(strategySettings2);
 				
-//		StrategySettings strategySettings3 = new StrategySettings(Id.create(1, StrategySettings.class));
-//		strategySettings3.setStrategyName("cadytsCar");
-////		strategySettings3.setWeight(1.);
-//		strategySettings3.setWeight(.5);
-//		config.strategy().addStrategySettings(strategySettings3);
-		
-		//
-		StrategySettings strategySettings4 = new StrategySettings(Id.create(3, StrategySettings.class));
-		strategySettings4.setStrategyName("cadytsCar");
+		StrategySettings strategySettings4 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+		strategySettings4.setStrategyName(CADYTS);
 		strategySettings4.setWeight(1.);
-//		strategySettings4.setWeight(.5);
 		config.strategy().addStrategySettings(strategySettings4);
-		//
 					
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		
@@ -134,46 +121,13 @@ public class CadytsEquilControllerBasedOnDistributions {
 		// start controller
 		final Controler controler = new Controler(config);
 		
-		// cadytsContext (and cadytsCarConfigGroup)
-		// CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
-//		final CadytsContext cContext = new CadytsContext(config);
-//		controler.addControlerListener(cContext);
-//			
-//		controler.getConfig().getModule("cadytsCar").addParam("startTime", "06:00:00");
-//		controler.getConfig().getModule("cadytsCar").addParam("endTime", "07:00:00");
-		
-		//
 		final MeasurementCadytsContext cContext2 = new MeasurementCadytsContext(config, buildMeasurements());
-//		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsMapSingle());
-//		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsMapCumulative());		
-//		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config);
-//		final CadytsContextDistributionBased cContext2 = new CadytsContextDistributionBased(config, buildMeasurementsAsCounts());
 		controler.addControlerListener(cContext2);
-//		controler.getConfig().getModule("cadytsCar").addParam("startTime", "06:00:00");
-//		controler.getConfig().getModule("cadytsCar").addParam("endTime", "07:00:00");
-		// TODO may not be called "cadytsCar" a second time
 		
-		//controler.getConfig().getModule("cadytsCar").addParam("preparatoryIterations", "20");
-		//controler.getConfig().getModule("cadytsCar").addParam("useBruteForce", "false");
-						
-		// plan strategy
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				addPlanStrategyBinding("cadytsCar").toProvider(new javax.inject.Provider<PlanStrategy>() {
-//					@Override
-//					public PlanStrategy get() {
-//						return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), cContext));
-//					}
-//				});
-//			}
-//		});
-		
-		//
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("cadytsCar").toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding(CADYTS).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Override
 					public PlanStrategy get() {
 						return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), cContext2));
@@ -188,7 +142,6 @@ public class CadytsEquilControllerBasedOnDistributions {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-//				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.scenario()).create();
 				final CharyparNagelScoringParametersBuilder paramsBuilder = CharyparNagelScoringParameters.getBuilder(
 						ScenarioUtils.createScenario(config), person.getId());
 				
@@ -199,19 +152,10 @@ public class CadytsEquilControllerBasedOnDistributions {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-//				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-//				final double cadytsScoringWeight = 30. * config.planCalcScore().getBrainExpBeta() ;
-//				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-//				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-				
-				//
-//				final CadytsScoring<Link> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
-//				final CadytsScoring<Integer> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
 				final CadytsScoring<Measurement> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
-				final double cadytsScoringWeight2 = 0. * config.planCalcScore().getBrainExpBeta() ;
+				final double cadytsScoringWeight2 = config.planCalcScore().getBrainExpBeta() ;
 				scoringFunction2.setWeightOfCadytsCorrection(cadytsScoringWeight2) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction2 );
-				//
 
 				return scoringFunctionAccumulator;
 			}
@@ -223,24 +167,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 	}
 	
 	
-//	private static Map<String, String> buildMeasurementsMap(){
-//	private static TreeMap<Id<Link>, Count> buildMeasurementsMap(){
-//	private static TreeMap<Double, Double> buildMeasurementsMap(){
 	private static TreeMap<Integer, Integer> buildMeasurementsMapCumulative(){
-//		Map<String, String> map = new TreeMap<String, String>();
-//		TreeMap<Double, Double> map = new TreeMap<Double, Double>();
-		// cumulative!!!
-//		TreeMap<Id<Link>, Double> map = new TreeMap<Id<Link>, Double>();
 		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-//		map.put(Id.create(2000, Link.class), 10.);
-//		map.put(Id.create(4000, Link.class), 50.);
-//		map.put(Id.create(6000, Link.class), 150.);
-//		map.put(Id.create(8000, Link.class), 300.);
-//		map.put(Id.create(10000, Link.class), 700.);
-//		map.put(Id.create(12000, Link.class), 850.);
-//		map.put(Id.create(14000, Link.class), 950.);
-//		map.put(Id.create(16000, Link.class), 990.);
-//		map.put(Id.create(18000, Link.class), 1000.);
 		
 		map.put(69200, 10);
 		map.put(69400, 50);
@@ -252,15 +180,6 @@ public class CadytsEquilControllerBasedOnDistributions {
 		map.put(70600, 990);
 		map.put(70800, 1000);
 		
-//		map.put(62000, 10);
-//		map.put(64000, 20);
-//		map.put(66000, 30);
-//		map.put(68000, 40);
-//		map.put(70000, 50);
-//		map.put(72000, 60);
-//		map.put(74000, 70);
-//		map.put(76000, 80);
-//		map.put(78000, 1000);
 		return map;
 	}
 	
@@ -282,96 +201,80 @@ public class CadytsEquilControllerBasedOnDistributions {
 	}
 	
 	
-	
-//	private static Counts buildMeasurementsAsCounts(){
-//		Counts counts = new Counts();
-//		{
-//			Id<Link> id = Id.create(2000, Link.class);
-//			counts.createAndAddCount(id, "< 2000m");
-//			Double value = 10.;
-//			for (int h=1; h<=24; h++) {
-//				counts.getCount(id).createVolume(h, value);
-//			}
-//		}
-//
-//		
-//	}
-	
-	
-	private static Measurements buildMeasurements(){
-		Measurements measurements = new Measurements();
+	private static Counts<Measurement> buildMeasurements(){
+		Counts<Measurement> measurements = new Counts<>();
 		
 		{
 			Id<Measurement> id = Id.create(69200, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 10.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 
 		{
 			Id<Measurement> id = Id.create(69400, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 40.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(69600, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 100.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(69800, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 150.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70000, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 300.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70200, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 150.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70400, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 100.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70600, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 40.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70800, Measurement.class);
-			measurements.createAndAddMeasurement(id);
+			measurements.createAndAddCount(id, null);
 			Double value = 10.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getMeasurment(id).createVolume(h, value);
+				measurements.getCount(id).createVolume(h, value);
 			}
 		}
 		

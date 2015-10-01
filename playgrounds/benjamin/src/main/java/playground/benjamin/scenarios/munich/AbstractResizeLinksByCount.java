@@ -66,8 +66,8 @@ public abstract class AbstractResizeLinksByCount {
 	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
 	private Double scaleFactor = null;
 	private boolean countsMatched = false;
-	private Counts origCounts;
-	private Counts rescaledCounts = null;
+	private Counts<Link> origCounts;
+	private Counts<Link> rescaledCounts = null;
 		
 	
 	/**
@@ -120,8 +120,8 @@ public abstract class AbstractResizeLinksByCount {
 		writeUnmodifiedLinks2Shape();
 	}
 	
-	private Counts preProcessCounts(Counts oldCounts) {
-		Counts tempCounts = new Counts();
+	private Counts<Link> preProcessCounts(Counts<Link> oldCounts) {
+		Counts<Link> tempCounts = new Counts();
 		Node node;
 		Count oldCount;
 		Count newCount;

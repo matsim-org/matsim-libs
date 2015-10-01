@@ -103,7 +103,7 @@ public class SpatialAnalysis {
 	
 	public static void writeCountsToShape(String countsFile, String outputShapefile){
 		
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		
 		new CountsReaderMatsimV1(counts).parse(countsFile);
 		

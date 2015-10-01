@@ -63,7 +63,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	
 //	private final double countsScaleFactor;
-	private final Counts counts;
+	private final Counts<Link> counts;
 	private final boolean writeAnalysisFile;
 	private final CadytsConfigGroup cadytsConfig;
 	
@@ -91,7 +91,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		cadytsConfig.setWriteAnalysisFile(true);
 		
 		if ( counts==null ) {
-			this.counts = new Counts();
+			this.counts = new Counts<Link>();
 			String occupancyCountsFilename = config.counts().getCountsFileName();
 			if(occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);

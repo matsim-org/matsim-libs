@@ -88,7 +88,7 @@ public class CadytsModule extends AbstractModule {
                     return scenario.getNetwork().getLinks().get(id);
                 }
             };
-            Counts calibrationCounts = (Counts) scenario.getScenarioElement("calibrationCounts");
+            Counts<Link> calibrationCounts = (Counts) scenario.getScenarioElement("calibrationCounts");
 //            cadytsConfig.setCalibratedItems(calibrationCounts.getCounts().keySet());
             Set<String> links = new HashSet<>() ;
             for ( Id<Link> linkId : calibrationCounts.getCounts().keySet() ) {

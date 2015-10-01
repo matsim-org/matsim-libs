@@ -58,7 +58,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	
 	private final double countsScaleFactor;
-	private final Counts counts;
+	private final Counts<Link> counts;
 	private final boolean writeAnalysisFile;
 
 	private AnalyticalCalibrator<Link> calibrator;

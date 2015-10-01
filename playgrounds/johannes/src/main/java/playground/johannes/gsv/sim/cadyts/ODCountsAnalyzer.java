@@ -42,7 +42,7 @@ public class ODCountsAnalyzer implements AfterMobsimListener {
 
 	private static final Logger logger = Logger.getLogger(ODCountsAnalyzer.class);
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	private final SimResultsAdaptor simResults;
 

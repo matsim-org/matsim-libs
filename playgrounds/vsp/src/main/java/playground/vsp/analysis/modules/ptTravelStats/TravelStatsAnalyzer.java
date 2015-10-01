@@ -87,7 +87,7 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	@Override
 	public void writeResults(String outputFolder) {
 		
-		HashMap<String, Counts> mode2countsMap;
+		HashMap<String, Counts<Link>> mode2countsMap;
 		String countsName;
 		
 		mode2countsMap = this.handler.getMode2CountsCapacity();
@@ -120,8 +120,8 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	 * @param mode2countsMap
 	 * @param countsName
 	 */
-	private void writeCounts(String outputFolder, HashMap<String, Counts> mode2countsMap, String countsName) {
-		for (Entry<String, Counts> mode2Counts : mode2countsMap.entrySet()) {
+	private void writeCounts(String outputFolder, HashMap<String, Counts<Link>> mode2countsMap, String countsName) {
+		for (Entry<String, Counts<Link>> mode2Counts : mode2countsMap.entrySet()) {
 			
 			String fileName = outputFolder + this.createFilename(mode2Counts.getKey(), countsName);
 
@@ -177,8 +177,8 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	 * @param paxCounts
 	 * @param capCounts
 	 */
-	private void writeOccupancy(String outputFolder, HashMap<String, Counts> paxCounts, HashMap<String, Counts> capCounts) {
-		for (Entry<String, Counts> mode2CapCounts : capCounts.entrySet()) {
+	private void writeOccupancy(String outputFolder, HashMap<String, Counts<Link>> paxCounts, HashMap<String, Counts<Link>> capCounts) {
+		for (Entry<String, Counts<Link>> mode2CapCounts : capCounts.entrySet()) {
 			
 			String fileName = outputFolder + this.createFilename(mode2CapCounts.getKey(), TravelStatsAnalyzer.OCCUPANCY);
 

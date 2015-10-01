@@ -106,7 +106,7 @@ public class NetLoad {
 		/*
 		 * load counts
 		 */
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
 		cReader.parse(countsFile);
 		/*
@@ -244,7 +244,7 @@ public class NetLoad {
 		}
 	}
 
-	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts obsCounts, String outDir) {
+	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts<Link> obsCounts, String outDir) {
 		MathTransform transform = null;
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));
