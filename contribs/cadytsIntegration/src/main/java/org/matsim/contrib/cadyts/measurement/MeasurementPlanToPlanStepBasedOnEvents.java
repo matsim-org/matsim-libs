@@ -23,8 +23,6 @@ package org.matsim.contrib.cadyts.measurement;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +60,6 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 
 	private final Set<Id<Measurement>> calibratedLinks = new HashSet<>() ;
 
-	@Inject
 	MeasurementPlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
 		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
@@ -77,6 +74,7 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 
 	@Override
 	public final cadyts.demand.Plan<Measurement> getPlanSteps(final Plan plan) {
+		@SuppressWarnings("unchecked")
 		PlanBuilder<Measurement> planStepFactory = (PlanBuilder<Measurement>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
@@ -127,22 +125,25 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 		PlanBuilder<Measurement> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 		
 		// TODO
-//		if (tmpPlanStepFactory != null) {
-//						
+		if (tmpPlanStepFactory != null) {
+			// can this happen?? kai, oct'15
+						
 //			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-//					
-//			// add the "turn" to the planStepfactory
+					
+			// add the "turn" to the planStepfactory
 //			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
-//		}
+		}
+		throw new RuntimeException(" the above needs to be filled with meaning") ;
 	}
 
 	// ###################################################################################
 	// only private functions below here (low level functionality)
 
 	private PlanBuilder<Measurement> getPlanStepFactoryForPlan(final Plan selectedPlan) {
-		PlanBuilder<Measurement> planStepFactory = null;
 
-		planStepFactory = (PlanBuilder<Measurement>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+		@SuppressWarnings("unchecked")
+		PlanBuilder<Measurement> planStepFactory = (PlanBuilder<Measurement>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+
 		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
 		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
 			// attach the iteration number to the plan:

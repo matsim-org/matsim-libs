@@ -48,8 +48,9 @@ public final class PlanStrategyImpl extends GenericPlanStrategyImpl<Plan, Person
 		public Builder( final GenericPlanSelector<Plan,Person> planSelector) {
 			this.planSelector = planSelector;
 		}
-		public final void addStrategyModule( final PlanStrategyModule module) {
+		public final Builder addStrategyModule( final PlanStrategyModule module) {
 			this.modules.add(module);
+			return this ;
 		}
 		public final PlanStrategy build() {
 			PlanStrategyImpl impl = new PlanStrategyImpl(planSelector) ;

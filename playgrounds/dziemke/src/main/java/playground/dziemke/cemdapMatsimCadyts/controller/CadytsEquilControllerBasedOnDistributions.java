@@ -130,7 +130,9 @@ public class CadytsEquilControllerBasedOnDistributions {
 				addPlanStrategyBinding(CADYTS).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Override
 					public PlanStrategy get() {
-						return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), cContext2));
+						PlanStrategyImpl.Builder builder = 
+								new PlanStrategyImpl.Builder(new CadytsPlanChanger<Measurement>(controler.getScenario(), cContext2)) ;
+						return builder.build() ;
 					}
 				});
 			}

@@ -45,8 +45,6 @@ import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.demand.Plan;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -54,7 +52,7 @@ import cadyts.supply.SimResults;
  */
 public class MeasurementCadytsContext implements CadytsContextI<Measurement>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	private final static Logger log = Logger.getLogger(MeasurementCadytsContext.class);
+	final static Logger log = Logger.getLogger(MeasurementCadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
@@ -118,13 +116,13 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+    	
+    	// ---------- 2nd important Cadyts method is "analyzer.calcLinearPlanEffect"
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
-    	
-    	// ---------- 2nd important Cadyts method is "analyzer.calcLinearPlanEffect"
         for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
             Plan<Measurement> planSteps = this.planToPlanStep.getPlanSteps(person.getSelectedPlan());
 			this.calibrator.addToDemand(planSteps);
@@ -141,10 +139,6 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
 		
-		
-		
-		
-
 		// ---------- 3rd important method "calibrator.afterNetworkLoading"
 //		this.calibrator.afterNetworkLoading(this.simResults);
 		this.calibrator.afterNetworkLoading(simResults);
@@ -175,82 +169,5 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	@SuppressWarnings("static-method")
 	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
 		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
-	}
-		
-	
-	/*package*/ static class SimResultsContainerImpl implements SimResults<Measurement> {
-		private static final long serialVersionUID = 1L;
-		private final TravelDistanceAnalyzer travelDistanceAnalyzer;
-
-		SimResultsContainerImpl(final TravelDistanceAnalyzer travelDistanceAnalyzer) {
-			this.travelDistanceAnalyzer = travelDistanceAnalyzer;
-		}
-
-		@Override
-		public double getSimValue(final Measurement measurement, final int startTime_s, final int endTime_s, final TYPE type) {
-
-			Id<Measurement> id = measurement.getMeasurementId();
-			double[] values = null; //travelDistanceAnalyzer.getVolumesPerHourForLink(id); // TODO
-			
-			log.warn("bin = " + measurement + " -- value = " + values);
-
-			if (values == null) {
-				return 0;
-			}
-
-			int startHour = startTime_s / 3600;
-			int endHour = (endTime_s-3599)/3600 ;
-			// (The javadoc specifies that endTime_s should be _exclusive_.  However, in practice I find 7199 instead of 7200.  So
-			// we are giving it an extra second, which should not do any damage if it is not used.) 
-			if (endHour < startHour) {
-				System.err.println(" startTime_s: " + startTime_s + "; endTime_s: " + endTime_s + "; startHour: " + startHour + "; endHour: " + endHour );
-				throw new RuntimeException("this should not happen; check code") ;
-			}
-			double sum = 0. ;
-			for ( int ii=startHour; ii<=endHour; ii++ ) {
-				sum += values[startHour] ;
-			}
-			switch(type){
-			case COUNT_VEH:
-				return sum;
-			case FLOW_VEH_H:
-				throw new RuntimeException(" not yet implemented") ;
-			default:
-				throw new RuntimeException("count type not implemented") ;
-			}
-
-		}
-
-
-		// TODO
-//		@Override
-//		public String toString() {
-//			final StringBuffer stringBuffer2 = new StringBuffer();
-//			final String LINKID = "linkId: ";
-//			final String VALUES = "; values:";
-//			final char TAB = '\t';
-//			final char RETURN = '\n';
-//
-//			for (Id linkId : this.volumesAnalyzer.getLinkIds()) { // Only occupancy!
-//				StringBuffer stringBuffer = new StringBuffer();
-//				stringBuffer.append(LINKID);
-//				stringBuffer.append(linkId);
-//				stringBuffer.append(VALUES);
-//
-//				boolean hasValues = false; // only prints stops with volumes > 0
-//				int[] values = this.volumesAnalyzer.getVolumesForLink(linkId);
-//
-//				for (int ii = 0; ii < values.length; ii++) {
-//					hasValues = hasValues || (values[ii] > 0);
-//
-//					stringBuffer.append(TAB);
-//					stringBuffer.append(values[ii]);
-//				}
-//				stringBuffer.append(RETURN);
-//				if (hasValues) stringBuffer2.append(stringBuffer.toString());
-//			}
-//			return stringBuffer2.toString();
-//		}
-
 	}
 }
