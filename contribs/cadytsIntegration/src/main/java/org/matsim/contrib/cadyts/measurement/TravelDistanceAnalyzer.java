@@ -34,11 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
-/**
- * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
- *
- * @author mrieser
- */
+
 // adapted from VolumesAnalyzer
 public class TravelDistanceAnalyzer implements LinkLeaveEventHandler, PersonDepartureEventHandler {
 
