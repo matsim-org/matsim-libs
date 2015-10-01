@@ -1,6 +1,7 @@
 package playground.dhosse.gap.scenario;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -15,6 +16,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -28,23 +30,23 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
+import playground.dhosse.gap.scenario.population.PlansCreator;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
-import playground.dhosse.gap.scenario.pt.TransitCreator;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
  * This class creates a scenario for
  * Garmisch-Partenkirchen, Bavaria, Germany.
  * 
- * @author dhosse
+ * @author danielhosse
  *
  */
 
@@ -83,74 +85,74 @@ public class GAPScenarioBuilder {
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
 //		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz");
-//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/dhosse/Dokumente/net.shp");
+//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/danielhosse/Dokumente/net.shp");
 		
-		new MatsimNetworkReader(scenario).readFile(/*Global.runInputDir + */"/home/dhosse/merged-networkV2_20150929.xml");
-//		new NetworkCleaner().run(scenario.getNetwork());
+		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		new NetworkCleaner().run(scenario.getNetwork());
 		
 		//create public transport
-		TransitCreator.createTransit(scenario);
+//		TransitCreator.createTransit(scenario);
 		
 //		//create counting stations
 //		Counts counts = CountsCreator.createCountingStations(scenario.getNetwork());
 //		new CountsWriter(counts).write(Global.matsimInputDir + "Counts/counts.xml.gz");
-//		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/dhosse/Dokumente/counts.shp");
+//		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/danielhosse/Dokumente/counts.shp");
 //		
-//		//init administrative boundaries
-//		initMunicipalities(scenario);
-//		
-//		double[] boundary = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
-//		setWorkLocations(new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]));
-//
-//		//createFacilities
-//		FacilitiesCreator.initAmenities(scenario);
-//		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150929_Unternehmen_Adressen_geokoordiniert.csv");
-//		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
-//		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
-//		
-//		initQuadTrees(scenario);
-//		
-//		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
-//		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
-//		
-//		//create plans
+		//init administrative boundaries
+		initMunicipalities(scenario);
+		
+		double[] boundary = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
+		setWorkLocations(new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]));
+
+		//createFacilities
+		FacilitiesCreator.initAmenities(scenario);
+		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150929_Unternehmen_Adressen_geokoordiniert.csv");
+		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
+		
+		initQuadTrees(scenario);
+		
+		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
+		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
+		
+		//create plans
 //		PlansCreator.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
 //		Global.setN(PlansCreator.getInhabitantsCounter());
-//		
+		
 		//create activity parameters for all types of activities
-//		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
-//		aaip.run();
-//		
-//		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
-//		
-//		for(String act : acts.keySet()){
-//			
-//			ActivityParams params = new ActivityParams();
-//			params.setActivityType(act);
-//			params.setTypicalDuration(acts.get(act).getFirst());
-//			params.setMinimalDuration(acts.get(act).getSecond());
-//			params.setClosingTime(Time.UNDEFINED_TIME);
-//			params.setEarliestEndTime(Time.UNDEFINED_TIME);
-//			params.setLatestStartTime(Time.UNDEFINED_TIME);
-//			params.setOpeningTime(Time.UNDEFINED_TIME);
-//			config.planCalcScore().addActivityParams(params);
-//			
-//		}
-//		
-//		ConfigCreator.configureQSimAndCountsConfigGroups(config);
-//		
-//		//write population to file
-//		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
-//		
-//		//write config file
-//		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
-//		
-//		log.info("Dumping agent attributes...");
-//		//write object attributes to file
-//		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
-//		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
-//		
-//		log.info("Done!");
+		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
+		aaip.run();
+		
+		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
+		
+		for(String act : acts.keySet()){
+			
+			ActivityParams params = new ActivityParams();
+			params.setActivityType(act);
+			params.setTypicalDuration(acts.get(act).getFirst());
+			params.setMinimalDuration(acts.get(act).getSecond());
+			params.setClosingTime(Time.UNDEFINED_TIME);
+			params.setEarliestEndTime(Time.UNDEFINED_TIME);
+			params.setLatestStartTime(Time.UNDEFINED_TIME);
+			params.setOpeningTime(Time.UNDEFINED_TIME);
+			config.planCalcScore().addActivityParams(params);
+			
+		}
+		
+		ConfigCreator.configureQSimAndCountsConfigGroups(config);
+		
+		//write population to file
+		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
+		
+		//write config file
+		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
+		
+		log.info("Dumping agent attributes...");
+		//write object attributes to file
+		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
+		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
+		
+		log.info("Done!");
 		
 	}
 
@@ -189,26 +191,26 @@ public class GAPScenarioBuilder {
 	 */
 	private static void initMunicipalities(Scenario scenario){
 		
-		Municipalities.addEntry("09180112", (int) (446), 1559, 526);						//Bad Kohlgrub
+		Municipalities.addEntry("09180112", (int) (446), 1559, 526);					//Bad Kohlgrub
 		Municipalities.addEntry("09180113", (int) (169), 772, 223);						//Bad Bayersoien
 		Municipalities.addEntry("09180114", (int) (269), 908, 368);						//Eschenlohe
 		Municipalities.addEntry("09180115", (int) (103), 534, 368);						//Ettal
-		Municipalities.addEntry("09180116", (int) (636), 2288, 759);						//Farchant
+		Municipalities.addEntry("09180116", (int) (636), 2288, 759);					//Farchant
 		Municipalities.addEntry("09180117", (int) (3744), 15016, 7308);					//Garmisch-Partenkirchen
-		Municipalities.addEntry("09180118", (int) (501), 2193, 841);						//Grainau
+		Municipalities.addEntry("09180118", (int) (501), 2193, 841);					//Grainau
 		Municipalities.addEntry("09180119", (int) (281), 895, 280);						//Großweil
-		Municipalities.addEntry("09180122", (int) (283), 1193, 446);						//Krün
+		Municipalities.addEntry("09180122", (int) (283), 1193, 446);					//Krün
 		Municipalities.addEntry("09180123", (int) (978), 4622, 1834);					//Mittenwald
 		Municipalities.addEntry("09180124", (int) (2003), 7508, 2751);					//Murnau a. Staffelsee
 		Municipalities.addEntry("09180125", (int) (890), 3085, 1253);					//Oberammergau
-		Municipalities.addEntry("09180126", (int) (528), 1787, 691);						//Oberau
-		Municipalities.addEntry("09180127", (int) (596), 1982, 632);						//Ohlstadt
+		Municipalities.addEntry("09180126", (int) (528), 1787, 691);					//Oberau
+		Municipalities.addEntry("09180127", (int) (596), 1982, 632);					//Ohlstadt
 		Municipalities.addEntry("09180128", (int) (206), 683, 266);						//Riegsee
-		Municipalities.addEntry("09180129", (int) (313), 1034, 301);						//Saulgrub
+		Municipalities.addEntry("09180129", (int) (313), 1034, 301);					//Saulgrub
 		Municipalities.addEntry("09180131", (int) (111), 335, 155);						//Schwaigen
-		Municipalities.addEntry("09180132", (int) (486), 1415, 600);						//Seehausen a. Staffelsee
+		Municipalities.addEntry("09180132", (int) (486), 1415, 600);					//Seehausen a. Staffelsee
 		Municipalities.addEntry("09180133", (int) (151), 491, 123);						//Spatzenhausen
-		Municipalities.addEntry("09180134", (int) (582), 1813, 583);						//Uffing a. Staffelsee
+		Municipalities.addEntry("09180134", (int) (582), 1813, 583);					//Uffing a. Staffelsee
 		Municipalities.addEntry("09180135", (int) (294), 857, 315);						//Unterammergau
 		Municipalities.addEntry("09180136", (int) (265), 823, 306);						//Wallgau
 		
@@ -246,7 +248,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
 			
@@ -258,7 +260,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
 			
@@ -292,7 +294,7 @@ public class GAPScenarioBuilder {
 //		}
 		
 		//WGS84
-		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/austria/austria.shp");
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;
 		
@@ -371,5 +373,19 @@ public class GAPScenarioBuilder {
 	public static ObjectAttributes getDemographicAttributes() {
 		return demographicAttributes;
 	}
+	
+	static Comparator<org.matsim.matrices.Entry> matrixEntryComparator = new Comparator<org.matsim.matrices.Entry>() {
+
+		@Override
+		public int compare(org.matsim.matrices.Entry o1, org.matsim.matrices.Entry o2) {
+			if(o1.getValue() > o2.getValue()){
+				return -1;
+			} else if(o1.getValue() < o2.getValue()){
+				return 1;
+			}
+			return 0;
+//			return Double.compare(o1.getValue(), o2.getValue());
+		}
+	};
 	
 }
