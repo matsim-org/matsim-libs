@@ -121,8 +121,8 @@ public class RunCapeTownFreight {
 		/* Set files and folders. */
 		config.controler().setOutputDirectory(folder + "output/");
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(20);
-		config.controler().setWriteEventsInterval(10);
+		config.controler().setLastIteration(100);
+		config.controler().setWriteEventsInterval(20);
 
 		/* Network. */
 		config.network().setInputFile(folder + "network.xml.gz");
@@ -153,17 +153,18 @@ public class RunCapeTownFreight {
 		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpBetaStrategySettings.setWeight(0.8);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
-		/* Subpopulation strategy */
+		/* Subpopulation strategy. */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		commercialStrategy.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		commercialStrategy.setWeight(0.85);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
-		/* Subpopulation ReRoute */
+		/* Subpopulation ReRoute. Switch off after a time. */
 		StrategySettings commercialReRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		commercialReRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		commercialReRoute.setWeight(0.15);
 		commercialReRoute.setSubpopulation("commercial");
+		commercialReRoute.setDisableAfter(85);
 		config.strategy().addStrategySettings(commercialReRoute);
 
 		return config;
@@ -216,10 +217,10 @@ public class RunCapeTownFreight {
 			vehicles.addVehicleType(vt.getVehicleType());
 		}
 		
+		MatsimRandom.reset(2015093001l);
 		for(Person person : sc.getPopulation().getPersons().values()){
 			/* Randomly sample a vehicle type for each person. */
 			VehicleType vehicleType = null; 
-			MatsimRandom.reset(2015093001l);
 			double r = MatsimRandom.getRandom().nextDouble();
 			if(r <= 0.8 ){
 				vehicleType = VehicleTypeSA.A2.getVehicleType();
