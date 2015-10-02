@@ -19,9 +19,12 @@
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
@@ -36,6 +39,9 @@ import org.matsim.population.algorithms.XY2Links;
 import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -49,7 +55,12 @@ public class PrismicTripChoiceSetConversion {
 		IOUtils.createDirectory( group.getOutputPath() );
 
 		final Scenario sc = ScenarioUtils.loadScenario( config );
-		new WorldConnectLocations( config ).connectFacilitiesWithLinks( sc.getActivityFacilities() , (NetworkImpl) sc.getNetwork() );
+
+		final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(sc.getNetwork());
+		final Network carNetwork = NetworkUtils.createNetwork();
+		filter.filter(carNetwork, Collections.singleton( "car" ) );
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks( sc.getActivityFacilities() , (NetworkImpl) carNetwork );
+
 		new XY2Links( sc ).run( sc.getPopulation() );
 		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( config.planCalcScore() );
 

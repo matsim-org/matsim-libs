@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler.DestinationSampler;
@@ -83,8 +84,9 @@ public class PrismicDestinationSampler implements DestinationSampler {
 
 		Collection<ActivityFacility> prism = Collections.emptyList();
 
+		final double radius = Math.max( budget_m , 1.1 * CoordUtils.calcDistance( f1 , f2 ) );
 		for ( int i=1; prism.size() < nSamples; i++ ) {
-			prism = relevantFacilities.getElliptical(f1.getX(), f1.getY(), f2.getX(), f2.getY(), i * budget_m);
+			prism = relevantFacilities.getElliptical(f1.getX(), f1.getY(), f2.getX(), f2.getY(), i * radius);
 		}
 
 		return prism instanceof List ? (List<ActivityFacility>) prism : new ArrayList<>( prism );
