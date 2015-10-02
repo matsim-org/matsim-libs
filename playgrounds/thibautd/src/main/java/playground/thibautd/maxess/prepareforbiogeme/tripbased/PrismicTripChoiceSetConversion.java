@@ -19,6 +19,7 @@
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,6 +38,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
+import playground.thibautd.router.CachingRoutingModuleWrapper;
+import playground.thibautd.router.TripSoftCache.LocationType;
 
 import java.io.File;
 import java.util.Collections;
@@ -67,6 +70,14 @@ public class PrismicTripChoiceSetConversion {
 		final TripRouter tripRouter =
 				new TripRouterFactoryBuilderWithDefaults().build( sc ).instantiateAndConfigureTripRouter(
 						new RoutingContextImpl(tt, tt));
+
+		tripRouter.setRoutingModule(
+				TransportMode.car,
+				new CachingRoutingModuleWrapper(
+						false,
+						LocationType.link,
+						tripRouter.getRoutingModule(
+								TransportMode.car ) ) );
 
 		Converter.<Trip,TripChoiceSituation>builder()
 				.withRecordFiller(
