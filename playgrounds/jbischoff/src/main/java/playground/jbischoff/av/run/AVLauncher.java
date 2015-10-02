@@ -39,7 +39,7 @@ public class AVLauncher {
 		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/config.xml");
 		
 		TaxiConfigGroup tcg = new TaxiConfigGroup();
-		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/taxi_vehicles_50000.xml.gz");
+		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/taxi_vehicles_100000.xml.gz");
 		tcg.addParam("ranksFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/ranks.xml");
 		tcg.addParam("outputDir", config.controler().getOutputDirectory()+"/taxi");
 		tcg.addParam("algorithm", "dummy");

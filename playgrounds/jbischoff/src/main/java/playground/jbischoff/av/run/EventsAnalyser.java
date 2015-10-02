@@ -17,40 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.av.preparation;
+package playground.jbischoff.av.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.jbischoff.taxi.evaluation.TaxiCustomerWaitTimeAnalyser;
+import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 
 /**
  * @author  jbischoff
  *
  */
-public class CleanAndFilterNetwork {
-public static void main(String[] args) {
-	Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(s).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml.gz");
-	NetworkFilterManager nfm = new NetworkFilterManager(s.getNetwork());
-	nfm.addLinkFilter(new NetworkLinkFilter() {
+public class EventsAnalyser {
+
+	public static void main(String[] args) {
+		String pre = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/";
+		String inputFile = pre+"events.out.xml";
+		EventsManager events = EventsUtils.createEventsManager();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(pre+"networkc.xml.gz");
+		TravelDistanceTimeEvaluator tdtc = new TravelDistanceTimeEvaluator(scenario.getNetwork(), 24*3600);
+		TaxiCustomerWaitTimeAnalyser twc = new TaxiCustomerWaitTimeAnalyser(scenario, Double.MAX_VALUE);
+		events.addHandler(twc);
+		events.addHandler(tdtc);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(inputFile);
 		
-		@Override
-		public boolean judgeLink(Link l) {
-			if (l.getAllowedModes().contains("car")) return true;
-			else return false;
-		}
-	});
-	Network newNet = nfm.applyFilters();
-	
-	new NetworkCleaner().run(newNet);
-	new NetworkWriter(newNet).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
-	
-}
+		twc.printTaxiCustomerWaitStatistics();
+		twc.writeCustomerWaitStats(pre+"waitstats.txt");
+		tdtc.printTravelDistanceStatistics();
+		tdtc.writeTravelDistanceStatsToFiles(pre+"distanceStats");
+				
+		
+	}
+
 }

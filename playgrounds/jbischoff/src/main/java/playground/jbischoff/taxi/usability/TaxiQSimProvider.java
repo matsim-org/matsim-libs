@@ -42,6 +42,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.TaxiRequestCreator;
@@ -69,13 +70,21 @@ public class TaxiQSimProvider implements Provider<QSim> {
 	private EventsManager events;
 	private TravelTime travelTime;
 
+//	@Inject
+//	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+//		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
+//		this.context = (MatsimVrpContextImpl) context;
+//		this.events=events;
+//		this.travelTime = travelTime;
+//
+//	}
 	@Inject
-	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events) {
 		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
-		this.travelTime = travelTime;
-
+		this.travelTime = new FreeSpeedTravelTime();
+		
 	}
 
 	private QSim createMobsim(Scenario sc, EventsManager eventsManager) {

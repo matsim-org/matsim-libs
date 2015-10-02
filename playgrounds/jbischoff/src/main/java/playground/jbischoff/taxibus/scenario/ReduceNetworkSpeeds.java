@@ -17,40 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.av.preparation;
+package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author  jbischoff
  *
  */
-public class CleanAndFilterNetwork {
-public static void main(String[] args) {
-	Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(s).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml.gz");
-	NetworkFilterManager nfm = new NetworkFilterManager(s.getNetwork());
-	nfm.addLinkFilter(new NetworkLinkFilter() {
-		
-		@Override
-		public boolean judgeLink(Link l) {
-			if (l.getAllowedModes().contains("car")) return true;
-			else return false;
+public class ReduceNetworkSpeeds {
+
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+		new MatsimNetworkReader(scenario).readFile(basedir+"network.xml");
+		for (Link link : scenario.getNetwork().getLinks().values()){
+			double speed = link.getFreespeed();
+			if (speed<10) link.setFreespeed(0.75*speed);
+			else if (speed<20) link.setFreespeed(0.7*speed);
+			else if (speed<30) 
+			{
+				if (link.getNumberOfLanes()<2) link.setFreespeed(0.7*speed);
+				else link.setFreespeed(0.75*speed);
+			}
+			else link.setFreespeed(0.7*speed);
+			
 		}
-	});
-	Network newNet = nfm.applyFilters();
-	
-	new NetworkCleaner().run(newNet);
-	new NetworkWriter(newNet).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
-	
-}
+		new NetworkWriter(scenario.getNetwork()).write(basedir+"networks.xml");
+		
+		
+		
+	}
+
 }
