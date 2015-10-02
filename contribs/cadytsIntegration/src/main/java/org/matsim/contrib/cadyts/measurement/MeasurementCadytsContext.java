@@ -45,6 +45,7 @@ import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.demand.Plan;
+import cadyts.supply.SimResults;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -62,7 +63,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 
 	private AnalyticalCalibrator<Measurement> calibrator;
 	private MeasurementPlanToPlanStepBasedOnEvents planToPlanStep;
-	private SimResultsContainerImpl simResults;
+	private SimResults<Measurement> simResults;
 	
 	public MeasurementCadytsContext(Config config, Counts<Measurement> measurements) {
 
@@ -117,7 +118,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
     	
-    	// ---------- 2nd important Cadyts method is "analyzer.calcLinearPlanEffect"
+    	// ---------- 2nd important Cadyts method is "analyzer.addToDemand"
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
@@ -140,7 +141,6 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		}
 		
 		// ---------- 3rd important method "calibrator.afterNetworkLoading"
-//		this.calibrator.afterNetworkLoading(this.simResults);
 		this.calibrator.afterNetworkLoading(simResults);
 
 		// write some output
@@ -155,13 +155,6 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 //		}
 	}
 
-	/**
-	 * for testing purposes only
-	 */
-	@Override
-	public AnalyticalCalibrator<Measurement> getCalibrator() {
-		return this.calibrator;
-	}
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
@@ -169,5 +162,11 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	@SuppressWarnings("static-method")
 	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
 		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
+	}
+
+	@Override
+	public AnalyticalCalibrator<Measurement> getCalibrator() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 }

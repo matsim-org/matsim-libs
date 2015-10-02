@@ -21,6 +21,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -35,43 +36,37 @@ import org.matsim.counts.Counts;
 
 public class CadytsEquilControllerBasedOnDistributions {
 	private final static Logger log = Logger.getLogger(CadytsEquilControllerBasedOnDistributions.class);
-	private final static String CADYTS = "cadytsCar";
+//	private final static String CADYTS = "cadytsCar";
 
 	public static void main(final String[] args) {
 		final Config config = ConfigUtils.createConfig();
-		
+
 		// global
 		config.global().setRandomSeed(4711);
 		config.global().setCoordinateSystem("Atlantis");
-		
+
 		// network
 		String inputNetworkFile = "/Users/dominik/Workspace/data/examples/equil/input/network_diff_lengths2.xml";
 		config.network().setInputFile(inputNetworkFile);
-		
+
 		// plans
 		String inputPlansFile = "/Users/dominik/Workspace/data/examples/equil/input/plans1000.xml";
 		config.plans().setInputFile(inputPlansFile);
-		
+
 		//simulation
-//		config.addModule( new SimulationConfigGroup() );
-//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
-//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
-//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
 		config.qsim().setStartTime(0.);
 		config.qsim().setEndTime(0.);
 		config.qsim().setSnapshotPeriod(0.);
-		
+
 		// counts
-//		String countsFileName = "/Users/dominik/Workspace/data/examples/equil/input/counts100-200.xml";
-//		config.counts().setCountsFileName(countsFileName);
-//		//config.counts().setCountsScaleFactor(100);
-//		config.counts().setOutputFormat("all");
-		
+		//		String countsFileName = "/Users/dominik/Workspace/data/examples/equil/input/counts100-200.xml";
+		//		config.counts().setCountsFileName(countsFileName);
+		//		//config.counts().setCountsScaleFactor(100);
+		//		config.counts().setOutputFormat("all");
+
 		// vsp experimental
-		// config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
-//		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
-		
+
 		// controller
 		String runId = "74";
 		String outputDirectory = "/Users/dominik/Workspace/data/examples/equil/output/" + runId + "/";
@@ -79,66 +74,65 @@ public class CadytsEquilControllerBasedOnDistributions {
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(200);
-//		config.controler().setLastIteration(10);
-		//Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
-		//config.controler().setEventsFileFormats(eventsFileFormats);
-		config.controler().setMobsim("qsim");
+		//		config.controler().setLastIteration(10);
 		Set<String> snapshotFormat = new HashSet<String>();
 		//snapshotFormat.add("otfvis");
 		config.controler().setSnapshotFormat(snapshotFormat);
-		
+
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		
-		StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		strategySettings2.setStrategyName( DefaultStrategy.ReRoute.name() );
-		strategySettings2.setWeight(1.);
-		strategySettings2.setDisableAfter(90);
-		config.strategy().addStrategySettings(strategySettings2);
-				
-		StrategySettings strategySettings4 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		strategySettings4.setStrategyName(CADYTS);
-		strategySettings4.setWeight(1.);
-		config.strategy().addStrategySettings(strategySettings4);
-					
+
+		{
+			StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			strategySettings2.setStrategyName( DefaultStrategy.ReRoute.name() );
+			strategySettings2.setWeight(0.1);
+			strategySettings2.setDisableAfter(90);
+			config.strategy().addStrategySettings(strategySettings2);
+		}{				
+			StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			strategySettings2.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			strategySettings2.setWeight(0.9);
+			config.strategy().addStrategySettings(strategySettings2);
+		}
+
+		//		StrategySettings strategySettings4 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+		//		strategySettings4.setStrategyName(CADYTS);
+		//		strategySettings4.setWeight(1.);
+		//		config.strategy().addStrategySettings(strategySettings4);
+
 		config.strategy().setMaxAgentPlanMemorySize(5);
-		
+
 		// planCalcScore
 		ActivityParams homeActivity = new ActivityParams("h");
-		homeActivity.setPriority(1);
 		homeActivity.setTypicalDuration(12*60*60);
-		homeActivity.setMinimalDuration(8*60*60);
 		config.planCalcScore().addActivityParams(homeActivity);
-						
+
 		ActivityParams workActivity = new ActivityParams("w");
-		workActivity.setPriority(1);
 		workActivity.setTypicalDuration(8*60*60);
-		workActivity.setMinimalDuration(6*60*60);
 		workActivity.setOpeningTime(7*60*60);
-		workActivity.setLatestStartTime(9*60*60);
 		workActivity.setClosingTime(18*60*60);
 		config.planCalcScore().addActivityParams(workActivity);
-		
+
 		// start controller
 		final Controler controler = new Controler(config);
-		
+
 		final MeasurementCadytsContext cContext2 = new MeasurementCadytsContext(config, buildMeasurements());
 		controler.addControlerListener(cContext2);
-		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding(CADYTS).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						PlanStrategyImpl.Builder builder = 
-								new PlanStrategyImpl.Builder(new CadytsPlanChanger<Measurement>(controler.getScenario(), cContext2)) ;
-						return builder.build() ;
-					}
-				});
-			}
-		});
-		//
-				
+
+
+		//			@Override
+		//			public void install() {
+		//				addPlanStrategyBinding(CADYTS).toProvider(new javax.inject.Provider<PlanStrategy>() {
+		//					@Override
+		//					public PlanStrategy get() {
+		//						PlanStrategyImpl.Builder builder = 
+		//								new PlanStrategyImpl.Builder(new CadytsPlanChanger<Measurement>(controler.getScenario(), cContext2)) ;
+		//						return builder.build() ;
+		//					}
+		//				});
+		//			}
+		//		});
+		// don't need the above, I think.  cadyts scoring is enough. kai, oct'15
+
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
@@ -146,9 +140,9 @@ public class CadytsEquilControllerBasedOnDistributions {
 
 				final CharyparNagelScoringParametersBuilder paramsBuilder = CharyparNagelScoringParameters.getBuilder(
 						ScenarioUtils.createScenario(config), person.getId());
-				
+
 				final CharyparNagelScoringParameters params = paramsBuilder.create();
-				
+
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -162,16 +156,16 @@ public class CadytsEquilControllerBasedOnDistributions {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-		
-		
-		
+
+
+
 		controler.run() ;
 	}
-	
-	
+
+
 	private static TreeMap<Integer, Integer> buildMeasurementsMapCumulative(){
 		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-		
+
 		map.put(69200, 10);
 		map.put(69400, 50);
 		map.put(69600, 150);
@@ -181,14 +175,14 @@ public class CadytsEquilControllerBasedOnDistributions {
 		map.put(70400, 950);
 		map.put(70600, 990);
 		map.put(70800, 1000);
-		
+
 		return map;
 	}
-	
+
 
 	private static TreeMap<Integer, Integer> buildMeasurementsMapSingle(){
 		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-		
+
 		map.put(69200, 10);
 		map.put(69400, 40);
 		map.put(69600, 100);
@@ -198,14 +192,14 @@ public class CadytsEquilControllerBasedOnDistributions {
 		map.put(70400, 100);
 		map.put(70600, 40);
 		map.put(70800, 10);
-		
+
 		return map;
 	}
-	
-	
+
+
 	private static Counts<Measurement> buildMeasurements(){
 		Counts<Measurement> measurements = new Counts<>();
-		
+
 		{
 			Id<Measurement> id = Id.create(69200, Measurement.class);
 			measurements.createAndAddCount(id, null);
@@ -279,7 +273,7 @@ public class CadytsEquilControllerBasedOnDistributions {
 				measurements.getCount(id).createVolume(h, value);
 			}
 		}
-		
+
 		return measurements;
 	}
 }

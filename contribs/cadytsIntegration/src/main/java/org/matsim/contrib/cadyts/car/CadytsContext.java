@@ -21,6 +21,7 @@
 package org.matsim.contrib.cadyts.car;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.supply.SimResults;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -62,9 +63,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 	private AnalyticalCalibrator<Link> calibrator;
 	private PlanToPlanStepBasedOnEvents planToPlanStep;
-	private SimResultsContainerImpl simResults;
+	private SimResults<Link> simResults;
 	
-	public CadytsContext(Config config, Counts counts ) {
+	public CadytsContext(Config config, Counts<Link> counts ) {
 		
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
@@ -74,7 +75,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		cadytsConfig.setWriteAnalysisFile(true);
 		
 		if ( counts==null ) {
-			this.counts = new Counts();
+			this.counts = new Counts<>();
 			String occupancyCountsFilename = config.counts().getCountsFileName();
 			new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
 		} else {
