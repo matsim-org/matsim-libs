@@ -20,9 +20,13 @@
 
 package playground.telaviv.analysis;
 
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
@@ -48,11 +52,6 @@ public class ComparingDistanceStats implements IterationEndsListener {
 	private ActTypeConverter actTypeConverter;
 	private String mode;
 	private String idExclusion;
-	
-	public ComparingDistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode, double[] referenceShares) {
-		this(Double.parseDouble(config.findParam("locationchoice", "analysisBinSize")), Double.parseDouble(config.findParam("locationchoice", "analysisBoundary")), 
-				config.findParam("locationchoice", "idExclusion"), bestOrSelected, type, actTypeConverter, mode, referenceShares);
-	}
 
 	public ComparingDistanceStats(double analysisBinSize, double analysisBoundary, String idExclusion, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode, double[] referenceShares) {
 		this.analysisBinSize = analysisBinSize;
