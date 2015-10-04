@@ -98,10 +98,10 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		
 		Scenario scenario = event.getControler().getScenario();
 		
-		TravelDistanceAnalyzer travelDistanceAnalyzer = new TravelDistanceAnalyzer(3600, 3600*36, scenario.getNetwork());
-		event.getControler().getEvents().addHandler(travelDistanceAnalyzer);
-		
-		this.simResults = new SimResultsContainerImpl(travelDistanceAnalyzer);
+//		TravelDistanceAnalyzer travelDistanceAnalyzer = new TravelDistanceAnalyzer(3600, 3600*36, scenario.getNetwork());
+//		event.getControler().getEvents().addHandler(travelDistanceAnalyzer);
+//		
+//		this.simResults = new SimResultsContainerImpl(travelDistanceAnalyzer);
 		
 		// this collects events and generates cadyts plans from it
 		this.planToPlanStep = new MeasurementPlanToPlanStepBasedOnEvents(scenario);

@@ -40,10 +40,14 @@ import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.ConfigUtils;
 
 import cadyts.demand.PlanBuilder;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
-public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<Measurement>, LinkLeaveEventHandler, 
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<Measurement>,  
+		PersonDepartureEventHandler, PersonArrivalEventHandler, SimResults<Measurement> {
 	
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger log = Logger.getLogger(MeasurementPlanToPlanStepBasedOnEvents.class);
 
 	private final Scenario scenario;
@@ -106,7 +110,6 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 		this.driverAgents.remove(event.getPersonId());
 	}
 	
-	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// if it is not a driver, ignore the event
@@ -159,5 +162,13 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 
 		return planStepFactory;
 	}
+
+	@Override
+	public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+//	public static duration2measurement() 
 
 }

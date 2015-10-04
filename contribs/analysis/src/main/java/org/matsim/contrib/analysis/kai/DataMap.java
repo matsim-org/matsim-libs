@@ -24,8 +24,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
+ * Data structure that memorizes double values as a function of String keys.  Typically, the key is an aggregation type.  If there 
+ * are also bins, we need something else ({@link DatabinsMap}) . 
+ * 
  * @author nagel
- *
  */
 public class DataMap<K> /*implements Map<K,Double>*/{
 
