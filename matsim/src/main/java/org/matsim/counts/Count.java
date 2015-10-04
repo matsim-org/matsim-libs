@@ -28,15 +28,15 @@ import org.matsim.api.core.v01.network.Link;
 
 public class Count {
 
-	private final Id<Link> linkId;
+	private final Id linkId;
 	private String stationName;
 
 	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
 	private Coord coord;
 
 
-	protected Count(final Id<Link> linkId, final String stationName) {
-		this.linkId = linkId;
+	protected Count(final Id linkId2, final String stationName) {
+		this.linkId = linkId2;
 		this.stationName = stationName;
 	}
 

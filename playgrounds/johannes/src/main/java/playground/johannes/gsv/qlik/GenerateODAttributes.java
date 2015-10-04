@@ -24,6 +24,7 @@ import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.*;
 
@@ -33,7 +34,7 @@ import java.io.*;
 public class GenerateODAttributes {
 
     public static final void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[1], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
         DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
 
         KeyMatrix idMatrix = new KeyMatrix();

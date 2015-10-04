@@ -20,10 +20,10 @@
 package playground.johannes.synpop.sim;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.processing.EpisodeTask;
 
 /**

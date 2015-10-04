@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.jbischoff.taxibus.scenario;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import playground.johannes.synpop.gis.DataLoader;
 
-import java.util.Random;
+/**
+ * @author  jbischoff
+ *
+ */
+public class ReduceNetworkSpeeds {
 
-public class FacilityDataLoader implements DataLoader {
-
-	private static final Logger logger = Logger.getLogger(FacilityDataLoader.class);
-	
-	public static final String KEY = "facilityData";
-	
-	private final String file;
-	
-	private final Random random;
-	
-	public FacilityDataLoader(String file, Random random) {
-		this.file = file;
-		this.random = random;
-	}
-	
-	@Override
-	public Object load() {
-		logger.info("Loading facility data...");
-		Level level = Logger.getRootLogger().getLevel();
-		Logger.getRootLogger().setLevel(Level.WARN);
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+		new MatsimNetworkReader(scenario).readFile(basedir+"network.xml");
+		for (Link link : scenario.getNetwork().getLinks().values()){
+			double speed = link.getFreespeed();
+			if (speed<10) link.setFreespeed(0.75*speed);
+			else if (speed<20) link.setFreespeed(0.7*speed);
+			else if (speed<30) 
+			{
+				if (link.getNumberOfLanes()<2) link.setFreespeed(0.7*speed);
+				else link.setFreespeed(0.75*speed);
+			}
+			else link.setFreespeed(0.7*speed);
+			
+		}
+		new NetworkWriter(scenario.getNetwork()).write(basedir+"networks.xml");
 		
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(scenario);
-		reader.readFile(file);
 		
-		FacilityData data = new FacilityData(scenario.getActivityFacilities(), random);
 		
-		Logger.getRootLogger().setLevel(level);
-		
-		logger.info(String.format("Loaded %s facilities.", data.getAll().getFacilities().size()));
-		
-		return data;
 	}
 
 }

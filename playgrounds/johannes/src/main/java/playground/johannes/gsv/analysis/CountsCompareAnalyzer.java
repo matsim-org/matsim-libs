@@ -59,7 +59,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 
 	private final double factor;
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	public CountsCompareAnalyzer(LinkOccupancyCalculator calculator, String countsFile, double factor) {
 		this.calculator = calculator;

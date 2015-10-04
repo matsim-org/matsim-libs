@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,35 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.cadyts.measurement;
+package playground.ivt.analysis.scoretracking;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+
+import java.util.*;
 
 /**
- * @author dziemke
- *
+ * @author thibautd
  */
-public class BinLookUp implements LookUp<Measurement>{
-	
-//	private Network network;
-//	private Map<Id<Measurement>, Measurement> measurementsMap;
-	private Measurements measurements;
+class PersonScoreTracker {
+	private final Map<String, BasicScoring> scoringElements = new HashMap<>();
 
-//	DistributionBinLookUp( Scenario sc ) {
-//		this.network = sc.getNetwork();
-//	}
-	
-//	LinkLookUp( Network net ) {
-//	BinLookUp(Map<Id<Measurement>, Measurement> measurementsMap) {
-	BinLookUp(Measurements measurements) {
-//		this.network = net ;
-		this.measurements = measurements;
+	public void addScoringFunction( final String name, final BasicScoring scoring ) {
+		this.scoringElements.put(name, scoring);
 	}
-	
-	@Override
-	public Measurement lookUp( Id<Measurement> id ) {
-		Measurement value = measurements.getMeasurment(id);
-		return value;
+
+	public Map<String, Double> getDecomposedScoring() {
+		final Map<String,Double> map = new LinkedHashMap<>();
+
+		for (Map.Entry<String,BasicScoring> s :scoringElements.entrySet()) {
+			map.put( s.getKey() , s.getValue().getScore() );
+		}
+
+		return map;
 	}
 }

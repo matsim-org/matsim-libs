@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * Volume.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.kai.run;
 
-package org.matsim.contrib.cadyts.measurement;
-// import org.matsim.demandmodeling.gbl.Gbl;
+import scenarios.braess.run.RunBraessSimulation;
 
-// for the time being copied here, since otherwise not visible
-public class Volume {
-	private final int h_;
-	private double val_;
+/**
+ * @author nagel
+ *
+ */
+public class KNRunBraessExample {
 
-	protected Volume(final int h, final double val) {
-		
-		/* no error checking needed as we use schema instead of dtd
-		
-		if ((h == -1)) {
-			Gbl.errorMsg("[h="+h+", negative values are not allowed!]");
-		}
-		if ((val == -1)) {
-			Gbl.errorMsg("[val="+val+", negative values are not allowed!]");
-		}
-		*/
-		
-		this.h_ = h;
-		this.val_ = val;	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		RunBraessSimulation.main( args ) ;
 	}
 
-	public final void setValue(double val) {
-		this.val_ = val;
-	}
-
-	public final int getHourOfDayStartingWithOne() {
-		return this.h_;
-	}
-	public final double getValue() {
-		return this.val_;
-	}
-	
-	@Override
-	public final String toString() {
-		return "[" + this.h_ + "===" + this.val_ + "]";
-	}
 }

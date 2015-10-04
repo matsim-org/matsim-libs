@@ -146,7 +146,7 @@ public class GAPMatrices {
 				for(int j = 0; j < rij.length; j++){
 					
 					rij[i][j] = o[i] * d[j] / dij[i][j];
-					rijWalk[i][j] = o[i] * d[j] / (dij[i][j] * dij[i][j] * dij[i][j]);
+					rijWalk[i][j] = o[i] * d[j] / (dij[i][j]);
 					
 				}
 				

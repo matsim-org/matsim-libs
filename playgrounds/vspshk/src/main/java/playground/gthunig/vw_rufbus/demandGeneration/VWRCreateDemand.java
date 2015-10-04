@@ -100,9 +100,10 @@ public class VWRCreateDemand {
 		String retail = "landuse/retail.shp";
 		String schools = "landuse/schools.shp";
 		String universities = "landuse/universities.shp";
-		double scalefactor = 0.01;
+//		double scalefactor = 0.05;
 //		double scalefactor = 0.1;
 //		double scalefactor = 1.0;
+		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 
 		VWRConfig config = new VWRConfig(basedir, network, counties, commercial, industrial, residential, retail,
@@ -147,13 +148,13 @@ public class VWRCreateDemand {
 		createStudents("BS", "BS", 29455 * config.getScalefactor(), 0.1, 0.13, 0.22, "03101", "03101");
 
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | work
-		createWorkers("WB", "WB", 41470 * config.getScalefactor(), 0.55, 0.13, 0.22, "03103", "03103");
+		createWorkers("WB", "WB", 41470 * config.getScalefactor(), 0.4, 0.2, 0.2, "03103", "03103");
 
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | school
-		createPupils("WB", "WB", 13867 * config.getScalefactor(), 0.2, 0.3, 0.2, "03103", "03103");
+		createPupils("WB", "WB", 13867 * config.getScalefactor(), 0.1, 0.13, 0.27, "03103", "03103");
 
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | university
-		createStudents("WB", "WB", 8823 * config.getScalefactor(), 0.05, 0.35, 0.25, "03103", "03103");
+		createStudents("WB", "WB", 8823 * config.getScalefactor(), 0.01, 0.4, 0.25, "03103", "03103");
 
 		// Gifhorn - Wolfsburg, Stadt | work
 		createWorkers("GH", "WB", 26484 * config.getScalefactor(), 0.8, 0.0, 0.0, "03151", "03103");
@@ -320,8 +321,8 @@ public class VWRCreateDemand {
 		// Goslar - Gifhorn | work
 		createWorkers("GL", "GH", 101 * config.getScalefactor(), 0.8, 0.0, 0.0, "03153", "03151");
 
-		createA2TransitTruckers(Math.round(18000 * config.getScalefactor()));
-		createVWTruckers(Math.round(1000* config.getScalefactor()));
+		createA2TransitTruckers(Math.round(15000 * config.getScalefactor()));
+		createVWTruckers(Math.round(900* config.getScalefactor()));
 		replaceDoubtfulLegsByOtherMode();
 		
 		System.out.println("generated Agents: " + commuterCounter);
@@ -710,7 +711,7 @@ public class VWRCreateDemand {
 //		
 		
 		double rand = random.nextDouble();
-		if (rand<0.216) return this.vwGateFE1LinkID;
+		if (rand<0.166) return this.vwGateFE1LinkID;
 		else if  (rand<0.3447)	return this.vwGateFE2LinkID;
 		else if  (rand<0.5084)	return this.vwGateWestLinkID;
 		else if  (rand<0.6765)	return this.vwGateNHSLinkID;
@@ -869,7 +870,7 @@ public class VWRCreateDemand {
 		}
 		else{
 			nextActivity = "shopping";
-			nextDestination = findClosestCoordFromMapRandomized(lastActivityCoord, retail, 5);
+			nextDestination = findClosestCoordFromMapRandomized(lastActivityCoord, retail, 10);
 			duration = 600 +random.nextInt(maxDur);
 			
 		}

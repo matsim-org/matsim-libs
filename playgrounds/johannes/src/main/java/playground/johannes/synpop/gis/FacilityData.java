@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.synpop.gis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -28,8 +28,6 @@ import org.matsim.facilities.ActivityOption;
 
 import java.util.*;
 import java.util.Map.Entry;
-
-//import playground.johannes.gsv.misc.QuadTree;
 
 /**
  * @author johannes

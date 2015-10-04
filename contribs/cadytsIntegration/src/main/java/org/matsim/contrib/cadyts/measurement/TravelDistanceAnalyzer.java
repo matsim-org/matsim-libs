@@ -22,8 +22,6 @@ package org.matsim.contrib.cadyts.measurement;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,11 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
-/**
- * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
- *
- * @author mrieser
- */
+
 // adapted from VolumesAnalyzer
 public class TravelDistanceAnalyzer implements LinkLeaveEventHandler, PersonDepartureEventHandler {
 

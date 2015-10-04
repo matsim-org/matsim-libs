@@ -17,14 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones.io;
+package playground.johannes.synpop.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.synpop.gis.Zone;
-import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -34,7 +32,7 @@ import java.util.Set;
  * @author johannes
  *
  */
-public class ZoneCollectionSHPReader {
+public class ZoneEsriShapeIO {
 
 	public static ZoneCollection read(String filename) {
 		ZoneCollection zones = new ZoneCollection();

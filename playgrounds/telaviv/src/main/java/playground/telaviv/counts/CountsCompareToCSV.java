@@ -58,7 +58,7 @@ public class CountsCompareToCSV {
 		
 		Map<String, List<Line>> countsMap = readCounts(countsInFile);
 			
-		Counts counts = createCounts(countsMap);
+		Counts<Link> counts = createCounts(countsMap);
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(countsOutFile, charset);
 		writeHeader(writer);

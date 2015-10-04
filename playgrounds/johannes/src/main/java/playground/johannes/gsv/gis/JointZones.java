@@ -20,9 +20,9 @@
 package playground.johannes.gsv.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,7 +47,7 @@ public class JointZones {
 	public static void main(String[] args) throws IOException {
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;
 		zones.setPrimaryKey("gsvId");
 
@@ -83,7 +83,7 @@ public class JointZones {
 			newZones.add(zone);
 		}
 		
-		data = Zone2GeoJSON.toJson(newZones);
+		data = ZoneGeoJsonIO.toJson(newZones);
 		Files.write(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts2.gk3.geojson"), data.getBytes(), StandardOpenOption.CREATE);
 	}
 

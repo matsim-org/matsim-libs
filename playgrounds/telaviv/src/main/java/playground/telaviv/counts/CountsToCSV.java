@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -43,7 +44,7 @@ public class CountsToCSV {
 	}
 	
 	public CountsToCSV(String countsInFile, String countsOutFile) throws IOException {
-		Counts counts = new Counts();
+		Counts <Link>counts = new Counts();
 		new CountsReaderMatsimV1(counts).parse(countsInFile);
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(countsOutFile, charset);

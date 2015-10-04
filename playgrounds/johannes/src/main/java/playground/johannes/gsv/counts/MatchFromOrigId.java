@@ -48,7 +48,7 @@ public class MatchFromOrigId {
 	 */
 	public static void main(String[] args) {
 
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
 		cReader.parse("/home/johannes/sge/prj/osm/run/678/output/counts.2013.osm20140909.xml");
 

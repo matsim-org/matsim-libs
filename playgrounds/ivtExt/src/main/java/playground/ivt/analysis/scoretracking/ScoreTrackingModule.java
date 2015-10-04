@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.cadyts.distribution;
+package playground.ivt.analysis.scoretracking;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author dziemke
- *
+ * @author thibautd
  */
-public class DistributionBinLookUp implements LookUp<Double>{
-	
-//	private Network network;
-	private Map<Id<Link>, Double> measurementsMap;
-
-//	DistributionBinLookUp( Scenario sc ) {
-//		this.network = sc.getNetwork();
-//	}
-	
-//	LinkLookUp( Network net ) {
-	DistributionBinLookUp(Map<Id<Link>, Double> measurementsMap) {
-//		this.network = net ;
-		this.measurementsMap = measurementsMap;
-	}
-	
+public class ScoreTrackingModule extends AbstractModule {
 	@Override
-	public Double lookUp( Id<Double> id ) {
-		Double value = measurementsMap.get(id);
-		return value;
+	public void install() {
+		bind( ScoreTrackingListener.class );
+		addControlerListenerBinding().to( ScoreTrackingListener.class );
 	}
 }

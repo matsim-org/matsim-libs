@@ -27,6 +27,7 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.Set;
@@ -39,7 +40,8 @@ public class CalcMileage {
     public static void main(String args[]) throws IOException {
         KeyMatrix m = new KeyMatrix();
         VisumOMatrixReader.read(m, "/home/johannes/gsv/miv-matrix/deploy/r33883/modena/miv.txt");
-        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.gk3.geojson", "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.gk3.geojson",
+                "NO");
 
         DistanceCalculator distCalc = CartesianDistanceCalculator.getInstance();
 

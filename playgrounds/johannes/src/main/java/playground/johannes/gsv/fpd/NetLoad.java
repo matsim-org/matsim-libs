@@ -57,6 +57,7 @@ import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -105,13 +106,13 @@ public class NetLoad {
 		/*
 		 * load counts
 		 */
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
 		cReader.parse(countsFile);
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonesFile, "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
 		/*
 		 * setup router
 		 */
@@ -243,7 +244,7 @@ public class NetLoad {
 		}
 	}
 
-	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts obsCounts, String outDir) {
+	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts<Link> obsCounts, String outDir) {
 		MathTransform transform = null;
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));

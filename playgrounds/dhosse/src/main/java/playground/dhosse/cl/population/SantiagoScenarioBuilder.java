@@ -73,7 +73,7 @@ import playground.dhosse.cl.Constants.SubpopulationValues;
 
 public class SantiagoScenarioBuilder {
 
-	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	static String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";

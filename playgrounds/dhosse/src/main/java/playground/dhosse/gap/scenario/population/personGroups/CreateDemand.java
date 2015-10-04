@@ -403,13 +403,18 @@ public class CreateDemand {
 			
 			if(hasLicense){
 				
-				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 				
 				if(carAvail){
 					
 					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
 					
 				}
+				
+			} else{
+				
+//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, "null");
+//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, "null");
 				
 			}
 			
@@ -715,7 +720,6 @@ public class CreateDemand {
 				return 1;
 			}
 			return 0;
-//			return Double.compare(o1.getValue(), o2.getValue());
 		}
 	};
 	
@@ -727,7 +731,7 @@ public class CreateDemand {
 		int i = 0;
 		for(org.matsim.matrices.Entry entry : entries){
 			double d = GAPMatrices.getDistances().getFromLocations().get(lastMunId).get(i).getValue();
-			if(d * 1.3 <= distance*1000 || entry.getToLocation().equals(lastMunId)){
+			if(d * 2 <= distance*1000 || entry.getToLocation().equals(lastMunId)){
 				entriesInRange.add(entry);
 			}
 			i++;
@@ -736,7 +740,7 @@ public class CreateDemand {
 		double random = Global.random.nextDouble();
 		double accumulatedWeights = 0.;
 		
-		if(entriesInRange.size() < 1) entriesInRange = entries;
+		if(entriesInRange.size() < 1) return lastMunId;
 		
 		for(org.matsim.matrices.Entry entry : entriesInRange){
 			accumulatedWeights += entry.getValue();
@@ -1117,13 +1121,15 @@ public class CreateDemand {
 			
 			if(hasLicense){
 				
-				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 				
 				if(carAvail){
 					
 					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
 					
 				}
+				
+			} else{
 				
 			}
 			
@@ -1482,13 +1488,18 @@ public class CreateDemand {
 			
 			if(hasLicense){
 				
-				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 				
 				if(carAvail){
 					
 					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
 					
 				}
+				
+			} else{
+				
+//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, "null");
+//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, "null");
 				
 			}
 			

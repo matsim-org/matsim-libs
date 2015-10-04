@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
+import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,6 +40,7 @@ import java.util.Set;
 /**
  * @author thibautd
  */
+@Singleton
 public class TravelTimesRecord implements PersonDepartureEventHandler,
 		ActivityStartEventHandler {
 	private static final Logger log = Logger.getLogger(TravelTimesRecord.class);
@@ -141,10 +143,15 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 		}
 
 		public boolean alreadyKnowsTravelTimeAfter( final double time ) {
-			return departures.get( departures.size() - 1 ) >= time;
+			assert arrivals.size() == departures.size() || arrivals.size() == departures.size() - 1;
+			return !departures.isEmpty() &&
+					arrivals.size() == departures.size() &&
+					departures.get( departures.size() - 1 ) >= time;
 
 		}
+
 		public double getTravelTimeAfter( final double time ) {
+			assert arrivals.size() == departures.size();
 			final int bs = departures.binarySearch( time );
 			final int index = bs < 0 ? -bs -1 : bs;
 

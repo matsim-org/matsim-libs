@@ -307,7 +307,7 @@ public class PlansCreator {
 						
 						if(hasLicense){
 							
-							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 							
 							if(carAvail){
 								
@@ -500,7 +500,7 @@ public class PlansCreator {
 					
 						if(hasLicense){
 							
-							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 							
 							if(carAvail){
 								
@@ -807,7 +807,7 @@ public class PlansCreator {
 				
 				if(hasLicense){
 					
-					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 					
 					if(carAvail){
 						

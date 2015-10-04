@@ -20,7 +20,7 @@ class RoadClassificationObjectiveFunction implements
 
 	// -------------------- MEMBERS --------------------
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	// -------------------- CONSTRUCTION --------------------
 

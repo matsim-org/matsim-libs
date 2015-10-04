@@ -57,12 +57,13 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks;
+	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
-	PlanToPlanStepBasedOnEvents(final Scenario scenario, final Set<Id<Link>> calibratedLinks) {
+	PlanToPlanStepBasedOnEvents(final Scenario scenario, final Set<String> calibratedLinks) {
 		this.scenario = scenario;
-		this.calibratedLinks = new HashSet<>(calibratedLinks);
-		
+		for ( String str : calibratedLinks ) {
+			this.calibratedLinks.add( Id.createLinkId( str ) ) ;
+		}
 		this.driverAgents = new HashSet<Id>();
 	}
 

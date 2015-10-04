@@ -17,13 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones.io;
+package playground.johannes.synpop.gis;
 
 import org.wololo.geojson.*;
 import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
-import playground.johannes.synpop.gis.Zone;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -31,7 +33,15 @@ import java.util.Map.Entry;
  * @author johannes
  * 
  */
-public class Zone2GeoJSON {
+public class ZoneGeoJsonIO {
+
+	public static ZoneCollection readFromGeoJSON(String file, String primaryKey) throws IOException {
+		ZoneCollection zones = new ZoneCollection();
+		String data = new String(Files.readAllBytes(Paths.get(file)));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
+		zones.setPrimaryKey(primaryKey);
+		return zones;
+	}
 
 	public static String toJson(Zone zone) {
 		GeoJSONWriter writer = new GeoJSONWriter();
@@ -60,7 +70,6 @@ public class Zone2GeoJSON {
 	}
 
 	public static Set<Zone> parseFeatureCollection(String data) {
-
 		GeoJSON json = GeoJSONFactory.create(data);
 
 		if (json instanceof FeatureCollection) {
@@ -69,7 +78,6 @@ public class Zone2GeoJSON {
 			FeatureCollection features = (FeatureCollection) json;
 			for (Feature feature : features.getFeatures()) {
 				Zone zone = new Zone(reader.read(feature.getGeometry()));
-//				System.out.println(zone.getGeometry().toString());
 				for (Entry<String, Object> prop : feature.getProperties().entrySet()) {
 					Object value = prop.getValue();
 					if(value == null) {
@@ -78,8 +86,6 @@ public class Zone2GeoJSON {
 						zone.setAttribute(prop.getKey(), prop.getValue().toString());
 					}
 				}
-//				System.out.println(zone.attributes().toString());
-//				System.exit(0);
 				zones.add(zone);
 			}
 			return zones;

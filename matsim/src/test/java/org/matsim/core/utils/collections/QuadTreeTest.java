@@ -20,30 +20,20 @@
 
 package org.matsim.core.utils.collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import junit.framework.Assert;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.collections.QuadTree.Rect;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordUtils;
-
-import junit.framework.Assert;
-
-import org.apache.log4j.Logger;
-import org.junit.Test;
-import org.matsim.core.utils.collections.QuadTree.Rect;
+import static org.junit.Assert.*;
 
 /**
  * Test for {@link QuadTree}.
@@ -686,6 +676,55 @@ public class QuadTreeTest {
 			this.objects.add(new Tuple<Coord, String>(new Coord(x, y), object));
 		}
 
+	}
+
+	/**
+	 * Test read access on {@link QuadTree#get(double, double, double, double)}.
+	 */
+	@Test
+	public void testGetRing() {
+		QuadTree qt = new QuadTree(0, 0, 3, 3);
+
+		for(int x = 0; x < 4; x++) {
+			for(int y = 0; y < 4; y++) {
+				qt.put(x, y, String.format("%s,%s", x, y));
+			}
+		}
+
+		Collection<String> result = qt.get(1, 1, 0, 1);
+		assertEquals(result.contains("1,1"), true);
+		assertEquals(result.contains("0,1"), true);
+		assertEquals(result.contains("1,0"), true);
+		assertEquals(result.contains("2,1"), true);
+		assertEquals(result.contains("1,2"), true);
+
+		result = qt.get(1,1, 0.5, 1);
+		assertEquals(result.contains("1,1"), false);
+		assertEquals(result.contains("0,1"), true);
+		assertEquals(result.contains("1,0"), true);
+		assertEquals(result.contains("2,1"), true);
+		assertEquals(result.contains("1,2"), true);
+
+		result = qt.get(1, 1, 1.1, 1);
+		assertEquals(result.size(), 0);
+
+		result = qt.get(1, 1, 0, 0);
+		assertEquals(result.size(), 1);
+		assertEquals(result.contains("1,1"), true);
+
+		result = qt.get(-1, 1, 1, 1.4);
+		assertEquals(result.size(), 1);
+		assertEquals(result.contains("0,1"), true);
+
+		result = qt.get(-1, 1, 1, 1.5);
+		assertEquals(result.size(), 3);
+		assertEquals(result.contains("0,1"), true);
+		assertEquals(result.contains("0,0"), true);
+		assertEquals(result.contains("0,2"), true);
+
+		result = qt.get(0, 0, Math.sqrt(18), Math.sqrt(18));
+		assertEquals(result.size(), 1);
+		assertEquals(result.contains("3,3"), true);
 	}
 
 }
