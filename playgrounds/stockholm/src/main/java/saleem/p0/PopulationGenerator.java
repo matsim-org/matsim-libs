@@ -99,7 +99,7 @@ public class PopulationGenerator {
 
 		}
 		
-		 for(long i=1; i<3000;i++){
+		 for(long i=1; i<1500;i++){
 			key=i+3000;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);

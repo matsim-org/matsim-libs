@@ -1,6 +1,9 @@
 package saleem.stockholmscenario.teleportation;
 
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -11,7 +14,6 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
-		System.out.println("Saleem");
         String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
         Config config = ConfigUtils.loadConfig(path);
         Controler controler = new Controler(config);
@@ -22,6 +24,13 @@ public static void main(String[] args) {
 		//network.getLinks().clear();
 		//network.getNodes().clear();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
+		//Iterator iter = network.getLinks().values().iterator();
+		//while(iter.hasNext()){
+			//Link link = (Link)iter.next();
+			//if(link.getId().toString().startsWith("tr")){
+				//link.setCapacity(link.getCapacity()*20);
+				//}
+		//}
 		NetworkWriter networkWriter =  new NetworkWriter(network);
 		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 		//TransitScheduleWriter tw = new TransitScheduleWriter(schedule);

@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 public class HandleStuckVehicles implements PersonStuckEventHandler, TransitDriverStartsEventHandler{
 	int count = 0;int countveh=0;
 	String persons="Stuck Persons Are: ";
-	String vehicles="Stuck Vehicles Are: ";
+	String vehicles="Vehicles Are: ";
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
