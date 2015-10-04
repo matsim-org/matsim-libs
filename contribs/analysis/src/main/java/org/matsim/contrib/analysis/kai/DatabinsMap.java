@@ -19,7 +19,10 @@
 package org.matsim.contrib.analysis.kai;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -35,28 +38,48 @@ import org.apache.log4j.Logger;
  * @author nagel
  */
 class DatabinsMap<T,K> {
+	static class Databins<K> {
+		private Map<K,double[]> delegate = new TreeMap<>() ;
+		private double[] dataBoundaries ;
+		public double[] getDataBoundaries() {
+			return dataBoundaries ;
+		}
+		public void setDataBoundaries( double[] bnd ) {
+			dataBoundaries = bnd ;
+		}
+		public double[] getValues(K key) {
+			return delegate.get(key) ;
+		}
+		public void instantiate(K key) {
+			double[] array = new double[ dataBoundaries.length] ;
+			delegate.put( key, array ) ;
+		}
+		public void addValue(K key, int idx, Double val) {
+			delegate.get(key)[idx] += val ;
+		}
+		public void inc(K key, int idx) {
+			delegate.get(key)[idx] ++ ;
+		}
+	}
+	
 	private static final Logger log = Logger.getLogger( DatabinsMap.class ) ;
 	
-	private Map< T, Map<K, double[]>> delegate = new TreeMap<>() ;
-	private Map<T, double[]> dataBoundaries = new TreeMap<>() ;
-
-	public final double[] getDataBoundaries( T type ) {
-		return dataBoundaries.get(type) ;
+	private Map< T, Databins<K>> delegate = new TreeMap<>() ;
+	public final  Databins<K> get( T type ) {
+		return delegate.get(type) ;
 	}
-	public final Map<K,double[]> get( T type ) {
-		// yy method maybe too internal?
-
-		return Collections.unmodifiableMap(delegate.get( type )) ; 
+	public final double[] getDataBoundaries( T type ) {
+		return delegate.get(type).getDataBoundaries() ;
 	}
 	public final void reset() {
 		delegate.clear();
 		// dataBoundaries.clear() ; // no
 	}
 	public final void putDataBoundaries( T type, double[] tmp ) {
-		dataBoundaries.put( type, tmp ) ;
+		delegate.get(type).setDataBoundaries( tmp ) ;
 	}
 	public final int getIndex( T type, double dblVal ) {
-		double[] dataBoundariesTmp = dataBoundaries.get(type) ;
+		double[] dataBoundariesTmp = delegate.get(type).getDataBoundaries() ;
 		int ii = dataBoundariesTmp.length-1 ;
 		for ( ; ii>=0 ; ii-- ) {
 			if ( dataBoundariesTmp[ii] <= dblVal ) 
@@ -68,19 +91,22 @@ class DatabinsMap<T,K> {
 	}
 	public final void addValue(  T type, K key, int idx, Double val ) {
 		instantiateIfNecessary(type, key);
-		delegate.get(type).get(key)[idx] += val ;
+//		delegate.get(type).get(key)[idx] += val ;
+		delegate.get(type).addValue( key, idx, val ) ;
 	}
 	public final void inc( T type, K key, int idx ) {
 		instantiateIfNecessary(type,key) ;
-		delegate.get(type).get(key)[idx] ++ ;
+		delegate.get(type).inc(key, idx ) ;
 	}
 	private void instantiateIfNecessary(T type, K key) {
+		// if type does not yet exist:
 		if ( delegate.get(type) == null ) {
-			delegate.put( type, new TreeMap<K, double[]>() );
+			delegate.put( type, new Databins<K>() );
 		}
-		if ( delegate.get(type).get(key) == null  ) {
-			double[] array = new double[ dataBoundaries.get(type).length] ;
-			delegate.get(type).put( key, array ) ;
+		
+		// if key (e.g. trip purpose) does not yet exist:
+		if ( delegate.get(type).getValues(key) == null  ) {
+			delegate.get(type).instantiate(key) ;
 		}
 	}
 }
