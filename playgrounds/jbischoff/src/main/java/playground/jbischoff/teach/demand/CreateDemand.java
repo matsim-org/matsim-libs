@@ -88,7 +88,7 @@ public class CreateDemand {
 		//CB-CB
 		double commuters = 22709*SCALEFACTOR;
 		double carcommuters = 0.55 * commuters;
-		//Achtung! 3 Nullen extra hier ggÃ¼. ISIS Daten
+		//Watch out, counties come with some extra zeros in the end in the shape file
 		System.out.println(this.shapeMap.keySet());
 		Geometry home = this.shapeMap.get("12052000");
 		Geometry work = this.shapeMap.get("12052000");
