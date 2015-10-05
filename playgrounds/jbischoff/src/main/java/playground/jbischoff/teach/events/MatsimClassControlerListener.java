@@ -7,7 +7,7 @@ import org.matsim.core.controler.listener.StartupListener;
 public class MatsimClassControlerListener implements StartupListener, IterationEndsListener {
 
 	MyEventHandler myEventHandler;
-	
+	 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		myEventHandler = new MyEventHandler(); 

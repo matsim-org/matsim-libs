@@ -19,7 +19,6 @@ public class MyEventHandler implements ActivityEndEventHandler,
 		
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
 		
 	}
 
