@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -26,10 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -37,6 +35,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.pt.PtConstants;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
 import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.TripSoftCache.LocationType;
@@ -64,41 +65,55 @@ public class PrismicTripChoiceSetConversion {
 		filter.filter(carNetwork, Collections.singleton( "car" ) );
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks( sc.getActivityFacilities() , (NetworkImpl) carNetwork );
 
-		new XY2Links( sc ).run( sc.getPopulation() );
-		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( config.planCalcScore() );
-
-		final TripRouter tripRouter =
-				new TripRouterFactoryBuilderWithDefaults().build( sc ).instantiateAndConfigureTripRouter(
-						new RoutingContextImpl(tt, tt));
-
-		tripRouter.setRoutingModule(
-				TransportMode.car,
-				new CachingRoutingModuleWrapper(
-						false,
-						LocationType.link,
-						tripRouter.getRoutingModule(
-								TransportMode.car ) ) );
+		new XY2Links( sc ).run(sc.getPopulation());
 
 		Converter.<Trip,TripChoiceSituation>builder()
 				.withRecordFiller(
 						new BasicTripChoiceSetRecordFiller())
 				.withChoiceSetSampler(
-						new RoutingChoiceSetSampler(
-								tripRouter,
-								group.getModes(),
-								new PrismicDestinationSampler(
-										group.getActivityType(),
-										sc.getActivityFacilities(),
-										group.getChoiceSetSize(),
-										group.getBudget_m() ) ) )
+						new Provider<ChoiceSetSampler<Trip, TripChoiceSituation>>() {
+							@Override
+							public ChoiceSetSampler<Trip, TripChoiceSituation> get() {
+								final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( config.planCalcScore() );
+
+								final TripRouter tripRouter =
+										new TripRouterFactoryBuilderWithDefaults().build( sc ).instantiateAndConfigureTripRouter(
+												new RoutingContextImpl(tt, tt));
+
+								tripRouter.setRoutingModule(
+										TransportMode.car,
+										new CachingRoutingModuleWrapper(
+												false,
+												LocationType.link,
+												tripRouter.getRoutingModule(
+														TransportMode.car ) ) );
+
+								return new RoutingChoiceSetSampler(
+										tripRouter,
+										group.getModes(),
+										new PrismicDestinationSampler(
+												group.getActivityType(),
+												sc.getActivityFacilities(),
+												group.getChoiceSetSize(),
+												group.getBudget_m()));
+							}
+						})
 				.withChoicesIdentifier(
-						new TripChoicesIdentifier(
-								group.getActivityType(),
-								sc.getActivityFacilities(),
-								tripRouter.getStageActivityTypes() ) )
+						new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
+							@Override
+							public ChoicesIdentifier<TripChoiceSituation> get() {
+								return new TripChoicesIdentifier(
+											group.getActivityType(),
+											sc.getActivityFacilities(),
+											new StageActivityTypesImpl(
+													PtConstants.TRANSIT_ACTIVITY_TYPE ));
+							}
+						} )
+				.withNumberOfThreads(
+						group.getNumberOfThreads() )
 				.create()
 				.convert(
 						sc.getPopulation(),
-						group.getOutputPath()+"/data.dat" );
+						group.getOutputPath() + "/data.dat");
 	}
 }

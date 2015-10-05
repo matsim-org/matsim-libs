@@ -34,7 +34,6 @@ import java.util.*;
  * @author thibautd
  */
 public class PrismicDestinationSampler implements DestinationSampler {
-	private final ActivityFacilities facilities;
 	private final int nSamples;
 	private final double budget_m;
 
@@ -47,7 +46,6 @@ public class PrismicDestinationSampler implements DestinationSampler {
 			final ActivityFacilities facilities,
 			final int nSamples,
 			final double budget_m) {
-		this.facilities = facilities;
 		this.nSamples = nSamples;
 		this.budget_m = budget_m;
 
