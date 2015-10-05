@@ -121,10 +121,10 @@ class ScaperPopulationReader extends DefaultHandler {
 					.getFactory()
 					.createPerson(
 							Id.createPersonId(attrs.getValue(ID_ATTRIBUTE)));
-			PersonUtils.setEmployed(person, Boolean.parseBoolean(attrs
-					.getValue(EMPLOYED_ATTRIBUTE)));
-			PersonUtils.setAge(person, Integer.parseInt(attrs
-					.getValue(AGE_ATTRIBUTE)));
+			PersonUtils.setEmployed(person,
+					Boolean.parseBoolean(attrs.getValue(EMPLOYED_ATTRIBUTE)));
+			PersonUtils.setAge(person,
+					Integer.parseInt(attrs.getValue(AGE_ATTRIBUTE)));
 			this.scenario.getPopulation().addPerson(person);
 
 			this.plan = this.scenario.getPopulation().getFactory().createPlan();
@@ -169,7 +169,8 @@ class ScaperPopulationReader extends DefaultHandler {
 
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName);
+		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
+				StockholmTransformationFactory.WGS84_EPSG3857);
 		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory
 				.getCoordinateTransformation(
 						StockholmTransformationFactory.WGS84_EPSG3857,

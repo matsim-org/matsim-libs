@@ -8,13 +8,16 @@ import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,6 +33,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import patryk.popgen2.Building;
 import patryk.utils.LinksRemover;
@@ -87,7 +92,8 @@ public class PopulationCreator {
 	// -------------------- CONSTRUCTION --------------------
 
 	public PopulationCreator(final String networkFileName,
-			final String zoneShapeFileName, final String populationFileName) {
+			final String zoneShapeFileName, final String zonalCoordinateSystem,
+			final String populationFileName) {
 
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
@@ -99,7 +105,8 @@ public class PopulationCreator {
 			this.netCoordStats.add(coords, coords);
 		}
 
-		this.zonalSystem = new ZonalSystem(zoneShapeFileName);
+		this.zonalSystem = new ZonalSystem(zoneShapeFileName,
+				zonalCoordinateSystem);
 
 		final RegentPopulationReader regentPopulationReader = new RegentPopulationReader(
 				populationFileName, this.zonalSystem, this.scenario
@@ -140,6 +147,32 @@ public class PopulationCreator {
 	public void setPopulationSampleFactor(final double populationSampleFactor) {
 		this.populationSampleFactor = populationSampleFactor;
 	}
+
+	public void setLinkAttributes(final ObjectAttributes linkAttributes) {
+		final Set<String> tmLinkIds = new LinkedHashSet<String>(
+				ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+		final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
+		for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
+				.keySet()) {
+			if (!tmLinkIds.contains(candidateId.toString())) {
+				removeTheseLinkIds.add(candidateId);
+			}
+		}
+		for (Id<Link> linkId : removeTheseLinkIds) {
+			this.scenario.getNetwork().removeLink(linkId);
+		}
+	}
+
+//	public void setNodeAttributeFileName(final String nodeAttributeFileName) {
+//		final ObjectAttributes nodeAttributes = new ObjectAttributes();
+//		for (Map.Entry<Id<Node>, ? extends Node> id2node : this.scenario
+//				.getNetwork().getNodes().entrySet()) {
+//			
+//		}
+//		final ObjectAttributesXmlWriter nodeAttributesWriter = new ObjectAttributesXmlWriter(
+//				nodeAttributes);
+//		nodeAttributesWriter.writeFile(nodeAttributeFileName);
+//	}
 
 	// -------------------- INTERNALS --------------------
 
@@ -264,12 +297,13 @@ public class PopulationCreator {
 				.getPopulation().getPersonAttributes()
 				.getAttribute(personId, WORKZONE_ATTRIBUTE));
 
-//		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
-//				.getPersonAttributes()
-//				.getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
+		// ((PersonImpl) person).setSex((String) this.scenario.getPopulation()
+		// .getPersonAttributes()
+		// .getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
 		PersonUtils.setEmployed(person, workZone != null);
-		PersonUtils.setAge(person, 2015 - Integer
-				.parseInt((String) this.scenario.getPopulation()
+		PersonUtils.setAge(
+				person,
+				2015 - Integer.parseInt((String) this.scenario.getPopulation()
 						.getPersonAttributes()
 						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE)));
 
@@ -372,9 +406,12 @@ public class PopulationCreator {
 					personId, WORKTOURMODE_ATTRIBUTE);
 
 			if (id2clippedZone.keySet().contains(homeZone)
-					&& id2clippedZone.keySet().contains(workZone)
-					&& (RegentPopulationReader.PT_ATTRIBUTEVALUE
-							.equals(workTourMode) || RegentPopulationReader.CAR_ATTRIBUTEVALUE
+					&& id2clippedZone.keySet().contains(workZone) && (
+
+					// RegentPopulationReader.PT_ATTRIBUTEVALUE
+					// .equals(workTourMode) ||
+
+					RegentPopulationReader.CAR_ATTRIBUTEVALUE
 							.equals(workTourMode))) {
 				if (processedCarDrivers % everyXthPerson == 0) {
 					System.out.print("Person " + personId + ": homeZone = "
@@ -430,17 +467,26 @@ public class PopulationCreator {
 
 		final String initialPlansFile = "./data/demand_output/initial_plans.xml";
 
+//		final String nodeAttributeFileName = "./data/saleem/nodeAttributes.xml";
+
+		final String linkAttributesFileName = "./data/transmodeler/linkAttributes.xml";
+		final ObjectAttributes linkAttributes = new ObjectAttributes();
+		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+				linkAttributes);
+		reader.parse(linkAttributesFileName);
+
 		final PopulationCreator pc = new PopulationCreator(networkFileName,
-				zonesShapeFileName, populationFileName);
+				zonesShapeFileName,
+				StockholmTransformationFactory.WGS84_EPSG3857,
+				populationFileName);
 		pc.setBuildingsFileName(buildingShapeFileName);
 		pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
-
 		pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
-
 		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
-
-		pc.setPopulationSampleFactor(0.001);
+		pc.setPopulationSampleFactor(0.01);
+		pc.setLinkAttributes(linkAttributes);
+//		pc.setNodeAttributeFileName(nodeAttributeFileName);
 
 		pc.run(initialPlansFile);
 
