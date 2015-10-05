@@ -24,13 +24,13 @@ public static void main(String[] args) {
 		//network.getLinks().clear();
 		//network.getNodes().clear();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
-		//Iterator iter = network.getLinks().values().iterator();
-		//while(iter.hasNext()){
-			//Link link = (Link)iter.next();
-			//if(link.getId().toString().startsWith("tr")){
-				//link.setCapacity(link.getCapacity()*20);
-				//}
-		//}
+		Iterator iter = network.getLinks().values().iterator();
+		while(iter.hasNext()){
+			Link link = (Link)iter.next();
+			if(link.getId().toString().startsWith("tr")){
+				//link.setCapacity(link.getCapacity()*10);
+			}
+		}
 		NetworkWriter networkWriter =  new NetworkWriter(network);
 		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 		//TransitScheduleWriter tw = new TransitScheduleWriter(schedule);
