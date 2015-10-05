@@ -33,7 +33,7 @@ class RoadClassificationObjectiveFunction implements
 	@Override
 	public double evaluateState(final RoadClassificationState state) {
 		double result = 0.0;
-		for (Map.Entry<Id<Link>, Count> linkId2measuredVolumes : this.counts
+		for (Map.Entry<Id<Link>, Count<Link>> linkId2measuredVolumes : this.counts
 				.getCounts().entrySet()) {
 			final int[] simulatedVolumes = state.getLinkId2simulatedVolumes()
 					.get(linkId2measuredVolumes.getKey());

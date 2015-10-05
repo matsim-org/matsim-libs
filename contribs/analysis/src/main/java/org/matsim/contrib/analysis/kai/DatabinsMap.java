@@ -18,11 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.analysis.kai;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -38,30 +34,6 @@ import org.apache.log4j.Logger;
  * @author nagel
  */
 class DatabinsMap<T,K> {
-	static class Databins<K> {
-		private Map<K,double[]> delegate = new TreeMap<>() ;
-		private double[] dataBoundaries ;
-		public double[] getDataBoundaries() {
-			return dataBoundaries ;
-		}
-		public void setDataBoundaries( double[] bnd ) {
-			dataBoundaries = bnd ;
-		}
-		public double[] getValues(K key) {
-			return delegate.get(key) ;
-		}
-		public void instantiate(K key) {
-			double[] array = new double[ dataBoundaries.length] ;
-			delegate.put( key, array ) ;
-		}
-		public void addValue(K key, int idx, Double val) {
-			delegate.get(key)[idx] += val ;
-		}
-		public void inc(K key, int idx) {
-			delegate.get(key)[idx] ++ ;
-		}
-	}
-	
 	private static final Logger log = Logger.getLogger( DatabinsMap.class ) ;
 	
 	private Map< T, Databins<K>> delegate = new TreeMap<>() ;
@@ -79,15 +51,7 @@ class DatabinsMap<T,K> {
 		delegate.get(type).setDataBoundaries( tmp ) ;
 	}
 	public final int getIndex( T type, double dblVal ) {
-		double[] dataBoundariesTmp = delegate.get(type).getDataBoundaries() ;
-		int ii = dataBoundariesTmp.length-1 ;
-		for ( ; ii>=0 ; ii-- ) {
-			if ( dataBoundariesTmp[ii] <= dblVal ) 
-				return ii ;
-		}
-		log.warn("statistics contains value that smaller than the smallest category; adding it to smallest category" ) ;
-		log.warn("statType: " + type + "; val: " + dblVal ) ;
-		return 0 ;
+		return this.delegate.get(type).getIndex( dblVal ) ;
 	}
 	public final void addValue(  T type, K key, int idx, Double val ) {
 		instantiateIfNecessary(type, key);
@@ -101,7 +65,7 @@ class DatabinsMap<T,K> {
 	private void instantiateIfNecessary(T type, K key) {
 		// if type does not yet exist:
 		if ( delegate.get(type) == null ) {
-			delegate.put( type, new Databins<K>() );
+			delegate.put( type, new Databins<K>( type.toString() ) );
 		}
 		
 		// if key (e.g. trip purpose) does not yet exist:

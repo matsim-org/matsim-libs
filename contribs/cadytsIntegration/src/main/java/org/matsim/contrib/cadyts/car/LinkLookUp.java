@@ -22,13 +22,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
 /**
  * @author nagel
  *
  */
-class LinkLookUp implements LookUp<Link>{
+class LinkLookUp implements LookUpItemFromId<Link>{
 	
 	private Network network;
 
@@ -41,7 +41,7 @@ class LinkLookUp implements LookUp<Link>{
 	}
 	
 	@Override
-	public Link lookUp( Id<Link> id ) {
+	public Link getItem( Id<Link> id ) {
 		return this.network.getLinks().get( id ) ;
 	}
 

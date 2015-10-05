@@ -30,10 +30,10 @@ import cadyts.utilities.misc.DynamicDataXMLFileIO;
 public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends DynamicDataXMLFileIO<T> {
 
 	private static final long serialVersionUID = 1L;
-	private LookUp<T> lookUp;
+	private LookUpItemFromId<T> lookUp;
 	private Class<T> idType;
 
-	public CadytsCostOffsetsXMLFileIO(final LookUp<T> lookUp, Class<T> idType) {
+	public CadytsCostOffsetsXMLFileIO(final LookUpItemFromId<T> lookUp, Class<T> idType) {
 		super();
 		this.lookUp = lookUp;
 		this.idType = idType;
@@ -41,7 +41,7 @@ public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends
 
 	@Override
 	protected T attrValue2key(final String stopId) {
-		return this.lookUp.lookUp(Id.create(stopId, idType));
+		return this.lookUp.getItem(Id.create(stopId, idType));
 	}
 
 	@Override

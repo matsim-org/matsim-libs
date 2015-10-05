@@ -256,7 +256,7 @@ public class NetLoad {
 		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
-		for (Count count : obsCounts.getCounts().values()) {
+		for (Count<Link> count : obsCounts.getCounts().values()) {
 			Id<Link> linkId = count.getLocId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);
