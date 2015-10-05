@@ -74,8 +74,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private static final int defaultTt_approximationLevel = 1;
 	private static final long defaultRandomSeed = 221177;
 	private static final int defaultProbChoiceSetSize = 5;
-	private static final int defaultAnalysisBoundary = 200000;
-	private static final int defaultAnalysisBinSize = 20000;
+	private static final double defaultAnalysisBoundary = 200000;
+	private static final double defaultAnalysisBinSize = 20000;
 	
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
@@ -104,8 +104,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private String maxDCScoreFile = null;
 	private String prefsFile = null;
 	
-	private int analysisBoundary = 200000;
-	private int analysisBinSize = 20000;
+	private double analysisBoundary = 200000;
+	private double analysisBinSize = 20000;
 //	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
 	private Long idExclusion = null;
 	
@@ -475,7 +475,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
-		map.put(ALGO, this.getAlgorithm().toString()  ) ;
+		map.put(ALGO, this.getAlgorithm().toString());
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
 		this.addParameterToMap(map, MAXDISTANCEDCSCORE);
 		this.addParameterToMap(map, PLANSELECTOR);
@@ -499,19 +499,11 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public double getRestraintFcnFactor() {
 		return this.restraintFcnFactor;
 	}
-	@Deprecated
-	public void setRestraintFcnFactor(final String restraintFcnFactor) {
-		this.setRestraintFcnFactor(Double.parseDouble(restraintFcnFactor));
-	}
 	public void setRestraintFcnFactor(final double restraintFcnFactor) {
 		this.restraintFcnFactor = restraintFcnFactor;
 	}
 	public double getRestraintFcnExp() {
 		return this.restraintFcnExp;
-	}
-	@Deprecated
-	public void setRestraintFcnExp(final String restraintFcnExp) {
-		this.setRestraintFcnExp(Double.parseDouble(restraintFcnExp));
 	}
 	public void setRestraintFcnExp(final double restraintFcnExp) {
 		this.restraintFcnExp = restraintFcnExp;
@@ -519,19 +511,11 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public double getScaleFactor() {
 		return this.scaleFactor;
 	}
-	@Deprecated
-	public void setScaleFactor(final String scaleFactor) {
-		this.setScaleFactor(Double.parseDouble(scaleFactor));
-	}
 	public void setScaleFactor(final double scaleFactor) {
 		this.scaleFactor = scaleFactor;
 	}
 	public double getRecursionTravelSpeedChange() {
 		return this.recursionTravelSpeedChange;
-	}
-	@Deprecated
-	public void setRecursionTravelSpeedChange(final String recursionTravelSpeedChange) {
-		this.setRecursionTravelSpeedChange(Double.parseDouble(recursionTravelSpeedChange));
 	}
 	public void setRecursionTravelSpeedChange(final double recursionTravelSpeedChange) {
 		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
@@ -539,29 +523,17 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public int getMaxRecursions() {
 		return this.maxRecursions;
 	}
-	@Deprecated
-	public void setMaxRecursions(final String maxRecursions) {
-		this.setMaxRecursions(Integer.parseInt(maxRecursions));
-	}
 	public void setMaxRecursions(final int maxRecursions) {
 		this.maxRecursions = maxRecursions;
 	}
 	public double getTravelSpeed_car() {
 		return this.travelSpeed_car;
 	}
-	@Deprecated
-	public void setTravelSpeed_car(final String travelSpeed_car) {
-		this.setTravelSpeed_car(Double.parseDouble(travelSpeed_car));
-	}
 	public void setTravelSpeed_car(final double travelSpeed_car) {
 		this.travelSpeed_car = travelSpeed_car;
 	}
 	public double getTravelSpeed_pt() {
 		return this.travelSpeed_pt;
-	}
-	@Deprecated
-	public void setTravelSpeed_pt(final String travelSpeed_pt) {
-		this.setTravelSpeed_pt(Double.parseDouble(travelSpeed_pt));
 	}
 	public void setTravelSpeed_pt(final double travelSpeed_pt) {
 		this.travelSpeed_pt = travelSpeed_pt;
@@ -605,19 +577,11 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public int getTravelTimeApproximationLevel() {
 		return this.tt_approximationLevel;
 	}
-	@Deprecated
-	public void setTravelTimeApproximationLevel(String tt_approximationLevel) {
-		this.setTravelTimeApproximationLevel(Integer.parseInt(tt_approximationLevel));
-	}
 	public void setTravelTimeApproximationLevel(int tt_approximationLevel) {
 		this.tt_approximationLevel = tt_approximationLevel;
 	}
 	public double getMaxDistanceDCScore() {
 		return this.maxDistanceDCScore;
-	}
-	@Deprecated
-	public void setMaxDistanceDCScore(String maxSearchSpaceRadius) {
-		this.setMaxDistanceDCScore(Double.parseDouble(maxSearchSpaceRadius));
 	}
 	public void setMaxDistanceDCScore(double maxSearchSpaceRadius) {
 		this.maxDistanceDCScore = maxSearchSpaceRadius;
@@ -630,10 +594,6 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	}
 	public long getRandomSeed() {
 		return this.randomSeed;
-	}
-	@Deprecated
-	public void setRandomSeed(String randomSeed) {
-		this.setRandomSeed(Long.parseLong(randomSeed));
 	}
 	public void setRandomSeed(long randomSeed) {
 		this.randomSeed = randomSeed;
@@ -652,10 +612,6 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	}
 	public int getProbChoiceSetSize() {
 		return this.probChoiceSetSize;
-	}
-	@Deprecated
-	public void setProbChoiceSetSize(String probChoiceSetSize) {
-		this.setProbChoiceSetSize(Integer.parseInt(probChoiceSetSize));
 	}
 	public void setProbChoiceSetSize(int probChoiceSetSize) {
 		this.probChoiceSetSize = probChoiceSetSize;
@@ -684,24 +640,16 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setPrefsFile(String prefsFile) {
 		this.prefsFile = prefsFile;
 	}
-	public int getAnalysisBoundary() {
+	public double getAnalysisBoundary() {
 		return this.analysisBoundary;
 	}
-	@Deprecated
-	public void setAnalysisBoundary(String analysisBoundary) {
-		this.setAnalysisBoundary(Integer.parseInt(analysisBoundary));
-	}
-	public void setAnalysisBoundary(int analysisBoundary) {
+	public void setAnalysisBoundary(double analysisBoundary) {
 		this.analysisBoundary = analysisBoundary;
 	}
-	public int getAnalysisBinSize() {
+	public double getAnalysisBinSize() {
 		return this.analysisBinSize;
 	}
-	@Deprecated
-	public void setAnalysisBinSize(String analysisBinSize) {
-		this.setAnalysisBinSize(Integer.parseInt(analysisBinSize));
-	}
-	public void setAnalysisBinSize(int analysisBinSize) {
+	public void setAnalysisBinSize(double analysisBinSize) {
 		this.analysisBinSize = analysisBinSize;
 	}
 	public Long getIdExclusion() {
