@@ -1,13 +1,26 @@
 package gunnar.ihop2.regent.demandreading;
 
+import static java.lang.Math.max;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import patryk.popgen2.Building;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -23,11 +36,18 @@ public class ZonalSystem {
 
 	// -------------------- MEMBERS --------------------
 
+	private final String zonalCoordinateSystem;
+
 	private final Map<String, Zone> id2zone = new LinkedHashMap<String, Zone>();
+
+	private Map<Node, Zone> node2zone = null;
+	private Map<Zone, Set<Node>> zone2nodes = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public ZonalSystem(final String zonesShapeFileName) {
+	public ZonalSystem(final String zonesShapeFileName,
+			final String zonalCoordinateSystem) {
+		this.zonalCoordinateSystem = zonalCoordinateSystem;
 		final GeometryFactory geometryFactory = new GeometryFactory();
 		final WKTReader wktReader = new WKTReader(geometryFactory);
 		for (SimpleFeature ft : ShapeFileReader
@@ -80,6 +100,64 @@ public class ZonalSystem {
 		}
 	}
 
+	public void addNetwork(final Network network,
+			final String networkCoordinateSystem) {
+
+		final CoordinateTransformation node2zoneCoordinateTrafo = StockholmTransformationFactory
+				.getCoordinateTransformation(networkCoordinateSystem,
+						this.zonalCoordinateSystem);
+
+		this.node2zone = new LinkedHashMap<Node, Zone>();
+		this.zone2nodes = new LinkedHashMap<Zone, Set<Node>>();
+
+		for (Node node : network.getNodes().values()) {
+			for (Zone zone : this.id2zone.values()) {
+				if (zone.getGeometry().contains(
+						MGC.coord2Point(node2zoneCoordinateTrafo.transform(node
+								.getCoord())))) {
+					this.node2zone.put(node, zone);
+					Set<Node> nodeSet = zone2nodes.get(zone);
+					if (nodeSet == null) {
+						nodeSet = new LinkedHashSet<Node>();
+						zone2nodes.put(zone, nodeSet);
+					}
+					nodeSet.add(node);
+					break;
+				}
+			}
+		}
+	}
+
+	public int[] getNodePerZoneAbsFreqs() {
+		int maxNodeCnt = 0;
+		for (Set<Node> nodes : this.zone2nodes.values()) {
+			maxNodeCnt = max(maxNodeCnt, nodes.size());
+		}
+		final int[] absoluteFrequencies = new int[maxNodeCnt + 1];
+		for (Set<Node> nodes : this.zone2nodes.values()) {
+			absoluteFrequencies[nodes.size()]++;
+		}
+		return absoluteFrequencies;
+	}
+
+	public Zone getZone(final Node node) {
+		if (this.node2zone == null) {
+			return null;
+		} else {
+			return this.node2zone.get(node);
+		}
+	}
+
+	public Set<Node> getNodes(final Node node) {
+		if (this.zone2nodes == null) {
+			return null;
+		} else {
+			return this.zone2nodes.get(node);
+		}
+	}
+
+	// <<<<< TODO NEW <<<<<
+
 	// -------------------- CONTENT ACCESS --------------------
 
 	public Zone getZone(final String id) {
@@ -118,27 +196,25 @@ public class ZonalSystem {
 
 	public static void main(String[] args) {
 
-		final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
-		// final String zonesBoundaryShape = "./data/shapes/limit_EPSG3857.shp";
-
 		System.out.println("STARTED ...");
 
-		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapefile);
-		// for (String zoneId : zonalSystem.getZonesInsideBoundary(
-		// zonesBoundaryShape).keySet()) {
-		for (String zoneId : zonalSystem.id2zone.keySet()) {
-			System.out.println("  <zone value=\"" + zoneId + "\"/>");
+		final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
+		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapefile,
+				StockholmTransformationFactory.WGS84_EPSG3857);
+
+		final Config config = ConfigUtils.createConfig();
+		config.setParam("network", "inputNetworkFile",
+				"./data/transmodeler/network.xml");
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		zonalSystem.addNetwork(scenario.getNetwork(),
+				StockholmTransformationFactory.WGS84_SWEREF99);
+		final int[] absSizeFreqs = zonalSystem.getNodePerZoneAbsFreqs();
+		System.out.println("nodeCnt\tabsFreq");
+		for (int i = 0; i < absSizeFreqs.length; i++) {
+			System.out.println(i + "\t" + absSizeFreqs[i]);
 		}
 
-		// System.out.println("total number of zones: "
-		// + zonalSystem.getZones().size());
-		// System.out
-		// .println("truncated number of zones: "
-		// + zonalSystem
-		// .getZonesInsideBoundary(zonesBoundaryShape)
-		// .size());
-		//
 		System.out.println("... DONE");
 	}
-
 }
