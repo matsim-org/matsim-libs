@@ -257,7 +257,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 	}
 
 	private final ActivityFacility getFacility(Coord coord, double radius, String act_type) {
-		Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
+		Collection<ActivityFacility> fs = this.getFacilities(act_type).getDisk(coord.getX(), coord.getY(), radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return this.getFacility(coord,2.0*radius,act_type);
@@ -266,8 +266,8 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 	}
 
 	private final ActivityFacility getFacility(Coord coord1, Coord coord2, double radius, String act_type) {
-		Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
-		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
+		Collection<ActivityFacility> fs = this.getFacilities(act_type).getDisk(coord1.getX(), coord1.getY(), radius);
+		fs.addAll(this.getFacilities(act_type).getDisk(coord2.getX(), coord2.getY(), radius));
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException(act_type + " radius>200'000 meters and still no facility found!"); 
 			}

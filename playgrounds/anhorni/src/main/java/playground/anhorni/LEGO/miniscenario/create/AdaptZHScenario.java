@@ -143,7 +143,7 @@ public class AdaptZHScenario {
 //					act.setType(fullType);
 					if (act.getType().equals("tta")) {
 						((ActivityImpl)pe).setFacilityId(
-								trees.get("tta").get(act.getCoord().getX(), act.getCoord().getY()).
+								trees.get("tta").getClosest(act.getCoord().getX(), act.getCoord().getY()).
 								getId());
 					}
 					else {

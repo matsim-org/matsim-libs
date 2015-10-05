@@ -145,7 +145,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 					/* Only consider the activity if it actually happens inside the grid. */
 					if(grid.isInGrid(p)){
 						/* Get the closest cell centroid. */
-						Point centroid = grid.getGrid().get(p.getX(), p.getY());
+						Point centroid = grid.getGrid().getClosest(p.getX(), p.getY());
 						
 						/* Get the hour of day. */
 						if(startTime > Double.NEGATIVE_INFINITY){

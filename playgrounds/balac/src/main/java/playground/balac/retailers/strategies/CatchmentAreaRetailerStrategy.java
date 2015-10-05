@@ -46,7 +46,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				// example of the use of a bad code style, but works anyway....
 				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
 				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
-				Collection<? extends Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),200);
+				Collection<? extends Person> persons = personQuadTree.getDisk(f.getCoord().getX(), f.getCoord().getY(), 200);
 				log.info(" Persons living around the facility " + f.getId() + " are: " + persons.size());
 //				Object[] links = controler.getNetwork().getLinks().values().toArray();
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());

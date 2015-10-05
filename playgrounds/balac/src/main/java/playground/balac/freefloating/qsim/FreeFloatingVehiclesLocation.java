@@ -91,7 +91,7 @@ public class FreeFloatingVehiclesLocation {
 	
 	public void addVehicle(Link link, String id) {
 		
-		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		FreeFloatingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			
@@ -123,7 +123,7 @@ public class FreeFloatingVehiclesLocation {
 	
 	public void removeVehicle(Link link, String id) {
 		
-		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		FreeFloatingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
 			

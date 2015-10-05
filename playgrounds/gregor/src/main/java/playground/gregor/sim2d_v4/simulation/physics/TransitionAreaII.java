@@ -497,7 +497,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 
 	private double handleLeaf(GraphEdge ge, double x,
 			double y, QuadTree<VGraphVertex> qt) {
-		VGraphVertex leaf1 = qt.get(x, y);
+		VGraphVertex leaf1 = qt.getClosest(x, y);
 		if (leaf1 == null || (leaf1.x-x)*(leaf1.x-x)+(leaf1.y-y)*(leaf1.y-y) > EPSILON) {
 			leaf1 = new VGraphVertex();
 			leaf1.site0=ge.site1;

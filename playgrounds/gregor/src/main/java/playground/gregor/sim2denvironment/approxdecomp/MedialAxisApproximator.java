@@ -133,12 +133,12 @@ public class MedialAxisApproximator {
 								continue;
 							}
 
-							Node n0 = quadTree.get(coords[j].x, coords[j].y);
+							Node n0 = quadTree.getClosest(coords[j].x, coords[j].y);
 							if (n0 == null || n0.c.distance(coords[j]) > EPSILON) {
 								n0 = new Node(coords[j], nid++);
 								quadTree.put(coords[j].x, coords[j].y, n0);
 							}
-							Node n1 = quadTree.get(coords[j+1].x, coords[j+1].y);
+							Node n1 = quadTree.getClosest(coords[j + 1].x, coords[j + 1].y);
 							if (n1 == null || n1.c.distance(coords[j+1]) > EPSILON) {
 								n1 = new Node(coords[j+1], nid++);
 								quadTree.put(coords[j+1].x, coords[j+1].y, n1);
@@ -167,7 +167,7 @@ public class MedialAxisApproximator {
 //		GisDebugger.dump("/Users/laemmel/tmp/vis/!v0.shp");
 //		throw new RuntimeException();
 
-		return quadTree.get(0, 0);
+		return quadTree.getClosest(0, 0);
 	}
 
 

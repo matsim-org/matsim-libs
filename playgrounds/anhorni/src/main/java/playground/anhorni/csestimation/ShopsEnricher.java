@@ -95,7 +95,7 @@ public class ShopsEnricher {
 	public void assignSize() {
 		QuadTree<Location> bzQuadTree = Utils.buildLocationQuadTree(this.bzShops); 
 		for (ShopLocation shop:this.shops.values()) {			
-			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
+			BZShop closestBZShop = (BZShop) bzQuadTree.getRectangle(shop.getCoord().getX(), shop.getCoord().getY());
 						
 			if (CoordUtils.calcDistance(closestBZShop.getCoord(), shop.getCoord()) < 200) {
 				if (closestBZShop.sizeMultiplyDefined()) {					

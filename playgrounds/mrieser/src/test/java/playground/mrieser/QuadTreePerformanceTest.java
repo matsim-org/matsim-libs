@@ -67,7 +67,7 @@ public class QuadTreePerformanceTest extends TestCase {
 		for (long i = 0; i < nOfQueries; i++) {
 			double x = r.nextDouble() * deltaX + minX;
 			double y = r.nextDouble() * deltaY + minY;
-			qt.get(x, y);
+			qt.getClosest(x, y);
 		}
 		Gbl.printElapsedTime();
 		log.info("get-Queries ended.");

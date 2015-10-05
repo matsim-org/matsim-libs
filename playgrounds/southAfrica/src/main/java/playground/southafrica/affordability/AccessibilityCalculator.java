@@ -369,7 +369,7 @@ public class AccessibilityCalculator {
 						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
 							/* Only consider intersections. */
 							Coord albersIntersection = new Coord(toNode.getCoord().getX(), toNode.getCoord().getY());
-							Coord closestTaxiStop = taxiStops.get(albersIntersection.getX(), albersIntersection.getY());
+							Coord closestTaxiStop = taxiStops.getClosest(albersIntersection.getX(), albersIntersection.getY());
 							if(closestTaxiStop == null){
 								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
 							} else{
@@ -655,17 +655,17 @@ public class AccessibilityCalculator {
 					time += leg.getTravelTime();
 				} else if(chosenMode.equalsIgnoreCase("pt1")){ /*TODO Change if "pt1" becomes "bus" */
 					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(busStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(busStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				} else if(chosenMode.equalsIgnoreCase("pt2")){ /*TODO Change if "pt2" becomes "rail" */
 					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(railStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(railStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				}else if(chosenMode.equalsIgnoreCase("taxi")){
 					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(taxiStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(taxiStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				}
@@ -685,7 +685,7 @@ public class AccessibilityCalculator {
 	private double getAvailableFacilityScore(Person person){
 		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		
-		Collection<ActivityFacility> facilities = facilityQT.get(homeCoord.getX(), homeCoord.getY(), 1000);
+		Collection<ActivityFacility> facilities = facilityQT.getDisk(homeCoord.getX(), homeCoord.getY(), 1000);
 		if(facilities.size() <= 5){
 			return 0.0;
 		} else if(facilities.size() <= 10){
@@ -772,7 +772,7 @@ public class AccessibilityCalculator {
 	
 	private boolean hasTransitAccess(Coord coord, QuadTree<Coord> qt){
 		Node homeNode = ((NetworkImpl) transitNetwork).getNearestNode(coord);
-		Node transitNode = ((NetworkImpl) transitNetwork).getNearestNode(qt.get(coord.getX(), coord.getY()));
+		Node transitNode = ((NetworkImpl) transitNetwork).getNearestNode(qt.getClosest(coord.getX(), coord.getY()));
 		Path path = routerWalk.calcLeastCostPath(homeNode, transitNode, 25200, null, null);
 		if(path == null){
 			LOG.error("No route found!");
@@ -813,7 +813,7 @@ public class AccessibilityCalculator {
 		
 		/* Or using the A*-Euclidean router. */
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(qt.get(coord.getX(), coord.getY()));
+		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(qt.getClosest(coord.getX(), coord.getY()));
 		Path path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		time = path.travelTime;		
 
@@ -911,7 +911,7 @@ public class AccessibilityCalculator {
 			 * education. */
 //			LOG.warn("Person should have education: " + person.toString() + "; travel time zero.");
 			noEducationCounter++;
-			coord = this.schoolQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
+			coord = this.schoolQT.getClosest(homeCoord.getX(), homeCoord.getY()).getCoord();
 			educationType = "e1";
 		} 
 		/* Using the A*-Euclidean router. */
@@ -958,7 +958,7 @@ public class AccessibilityCalculator {
 		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
-		ActivityFacility healthCareFacility = healthcareQT.get(homeCoord.getX(), homeCoord.getY());
+		ActivityFacility healthCareFacility = healthcareQT.getClosest(homeCoord.getX(), homeCoord.getY());
 		if(healthCareFacility != null){
 			Coord healthcareCoord = healthCareFacility.getCoord();
 			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
@@ -994,7 +994,7 @@ public class AccessibilityCalculator {
 
 		Collection<ActivityFacility> facilitiesInSearchArea = new HashSet<ActivityFacility>();
 		while(facilitiesInSearchArea.size() < 5 && searchTries < 1000){
-			facilitiesInSearchArea = shoppingQT.get(homeCoord.getX(), homeCoord.getY(), searchDistance);
+			facilitiesInSearchArea = shoppingQT.getDisk(homeCoord.getX(), homeCoord.getY(), searchDistance);
 			
 			searchTries++;
 			searchDistance *= 1.5;

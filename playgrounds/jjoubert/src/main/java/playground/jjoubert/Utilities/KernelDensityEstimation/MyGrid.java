@@ -148,7 +148,7 @@ public class MyGrid {
 				int position = line[3].indexOf("H");
 				int hour = Integer.parseInt(line[3].substring(position-2, position));
 				
-				Collection<MyGridCell> cells = grid.get(x, y, radius);
+				Collection<MyGridCell> cells = grid.getDisk(x, y, radius);
 				float value = ((float) 1) / ((float) cells.size());
 				for (MyGridCell cell : cells) {
 					cell.addToTotalCount(value);

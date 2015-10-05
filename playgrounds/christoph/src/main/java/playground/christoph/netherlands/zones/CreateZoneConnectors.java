@@ -170,7 +170,7 @@ public class CreateZoneConnectors {
 			Id<Node> nodeId = Id.create(String.valueOf(zoneId), Node.class);
 			network.addNode(factory.createNode(nodeId, nodeCoord));
 			
-			Node networkConnectorNode = quadTree.get(nodeCoord.getX(), nodeCoord.getY());
+			Node networkConnectorNode = quadTree.getClosest(nodeCoord.getX(), nodeCoord.getY());
 			Id<Node> networkConnectorNodeId = networkConnectorNode.getId();
 			
 			double length = CoordUtils.calcDistance(nodeCoord, networkConnectorNode.getCoord());

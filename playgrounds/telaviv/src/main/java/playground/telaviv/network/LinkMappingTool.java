@@ -62,7 +62,7 @@ public class LinkMappingTool {
 			}
 			Coord fromCoord = fromNode.getCoord();
 			
-			potentialFromNodes = quadTree.get(fromCoord.getX(), fromCoord.getY(), 10.0);			
+			potentialFromNodes = quadTree.getDisk(fromCoord.getX(), fromCoord.getY(), 10.0);
 			
 		} else potentialFromNodes.add(fromNode);
 		
@@ -74,7 +74,7 @@ public class LinkMappingTool {
 			}
 			Coord toCoord = toNode.getCoord();
 			
-			potentialToNodes = quadTree.get(toCoord.getX(), toCoord.getY(), 10.0);
+			potentialToNodes = quadTree.getDisk(toCoord.getX(), toCoord.getY(), 10.0);
 			
 		} else potentialToNodes.add(toNode);
 		

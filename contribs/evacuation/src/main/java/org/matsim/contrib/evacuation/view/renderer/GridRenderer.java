@@ -180,7 +180,7 @@ public class GridRenderer extends AbstractRenderLayer {
 
 			// get all cells from celltree
 			LinkedList<Cell> cells = new LinkedList<Cell>();
-			cellTree.get(new Rect(Double.NEGATIVE_INFINITY,
+			cellTree.getRectangle(new Rect(Double.NEGATIVE_INFINITY,
 					Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY), cells);
 

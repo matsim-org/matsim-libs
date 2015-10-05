@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -123,7 +122,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					int x = (int)a.getCoord().getX();
 					int y = (int)a.getCoord().getY();
 					Coord c = new Coord((double) x, (double) y);
-					ActivityFacilityImpl af = facs.get(x,y);
+					ActivityFacilityImpl af = facs.getClosest(x, y);
 					if (af == null) {
 						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
 						id++;

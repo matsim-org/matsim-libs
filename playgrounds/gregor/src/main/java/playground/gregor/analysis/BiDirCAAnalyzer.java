@@ -106,12 +106,12 @@ public class BiDirCAAnalyzer {
 				//				}
 				//				bw.append("\n");
 
-				Collection<Measurement> c = qt.get(rho1, rho2,incr/2);
+				Collection<Measurement> c = qt.getDisk(rho1, rho2, incr / 2);
 				if (c.size() == 0) {
 					double incr2 = incr/2+0.01;
 					while (c.size() < 1) {
 
-						c = qt.get(rho1, rho2,incr2);
+						c = qt.getDisk(rho1, rho2, incr2);
 						incr2 += 0.01;
 					}
 					for (Measurement mm : c) {

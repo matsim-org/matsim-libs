@@ -132,43 +132,43 @@ public class QuadTreeTest {
 	}
 
 	/**
-	 * Test getting values from a QuadTree using {@link QuadTree#get(double, double)}
-	 * and {@link QuadTree#get(double, double, double)}.
+	 * Test getting values from a QuadTree using {@link QuadTree#getClosest(double, double)}
+	 * and {@link QuadTree#getDisk(double, double, double)}.
 	 */
 	@Test
 	public void testGet() {
 		QuadTree<String> qt = getTestTree();
 
 		// test single get
-		assertEquals("10.0, 10.0", qt.get(0.0, 0.0)); // test nearest
-		assertEquals("-15.0, 0.0", qt.get(-5.0, 0.0)); // test nearest
-		assertEquals("20.0, 10.0", qt.get(20.0, 10.0)); // test with exact coordinate
+		assertEquals("10.0, 10.0", qt.getClosest(0.0, 0.0)); // test nearest
+		assertEquals("-15.0, 0.0", qt.getClosest(-5.0, 0.0)); // test nearest
+		assertEquals("20.0, 10.0", qt.getClosest(20.0, 10.0)); // test with exact coordinate
 
 		// test single get on point with more than one object
-		String object = qt.get(14.9, 14.9);
+		String object = qt.getClosest(14.9, 14.9);
 		assertTrue("15.0, 15.0".equals(object) || "15.0, 15.0 B".equals(object));
 
 		// test "distance" get with exact coordinate
-		Collection<String> values = qt.get(15.0, 15.0, 1.0);
+		Collection<String> values = qt.getDisk(15.0, 15.0, 1.0);
 		assertEquals(2, values.size());
 		assertTrue(values.contains("15.0, 15.0"));
 		assertTrue(values.contains("15.0, 15.0 B"));
 
 		// test "distance" get with exact coordinate and distance=0
-		values = qt.get(15.0, 15.0, 0.0);
+		values = qt.getDisk(15.0, 15.0, 0.0);
 		assertEquals(2, values.size());
 		assertTrue(values.contains("15.0, 15.0"));
 		assertTrue(values.contains("15.0, 15.0 B"));
 
 		// test "distance" get with not exact coordinate
-		values = qt.get(9.0, 9.0, 10.0);
+		values = qt.getDisk(9.0, 9.0, 10.0);
 		assertEquals(3, values.size());
 		assertTrue(values.contains("10.0, 10.0"));
 		assertTrue(values.contains("15.0, 15.0"));
 		assertTrue(values.contains("15.0, 15.0 B"));
 
 		// test "distance" get with points in more than one sub-area
-		values = qt.get(50.0, 0.0, 51.0);
+		values = qt.getDisk(50.0, 0.0, 51.0);
 		assertEquals(5, values.size());
 		assertTrue(values.contains("100.0, 0.0"));
 		assertTrue(values.contains("20.0, 10.0"));
@@ -177,32 +177,32 @@ public class QuadTreeTest {
 		assertTrue(values.contains("15.0, 15.0 B"));
 
 		// test "distance" get with critical distances
-		values = qt.get(90.0, 0.0, 9.0);
+		values = qt.getDisk(90.0, 0.0, 9.0);
 		assertEquals("test with distance 9.0", 0, values.size());
 
-		values = qt.get(90.0, 0.0, 9.999);
+		values = qt.getDisk(90.0, 0.0, 9.999);
 		assertEquals("test with distance 9.999", 0, values.size());
 
-		values = qt.get(90.0, 0.0, 10.0);
+		values = qt.getDisk(90.0, 0.0, 10.0);
 		assertEquals("test with distance 10.0", 1, values.size());
 
-		values = qt.get(90.0, 0.0, 10.001);
+		values = qt.getDisk(90.0, 0.0, 10.001);
 		assertEquals("test with distance 10.001", 1, values.size());
 
-		values = qt.get(90.0, 0.0, 11.0);
+		values = qt.getDisk(90.0, 0.0, 11.0);
 		assertEquals("test with distance 11.0", 1, values.size());
 
 		// test "area"
 		values.clear();
-		qt.get(0.0, 0.0, 20.1, 20.1, values); // test with no object on the boundary
+		qt.getRectangle(0.0, 0.0, 20.1, 20.1, values); // test with no object on the boundary
 		assertEquals(4, values.size());
 
 		values.clear();
-		qt.get(0.0, 0.0, 20.0, 20.0, values); // test with an object exactly on the boundary
+		qt.getRectangle(0.0, 0.0, 20.0, 20.0, values); // test with an object exactly on the boundary
 		assertEquals(4, values.size());
 
 		values.clear();
-		qt.get(0.0, 0.0, 19.9, 19.9, values); // test with no object on the boundary
+		qt.getRectangle(0.0, 0.0, 19.9, 19.9, values); // test with no object on the boundary
 		assertEquals(3, values.size());
 	}
 
@@ -214,9 +214,9 @@ public class QuadTreeTest {
 		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
 		qt.put(30.0, 30.0, "30.0, 30.0"); // on horizontal border
 
-		assertEquals("20.0, 20.0", qt.get(20.0, 20.0));
-		assertEquals("20.0, 30.0", qt.get(20.0, 30.0));
-		assertEquals("30.0, 30.0", qt.get(30.0, 30.0));
+		assertEquals("20.0, 20.0", qt.getClosest(20.0, 20.0));
+		assertEquals("20.0, 30.0", qt.getClosest(20.0, 30.0));
+		assertEquals("30.0, 30.0", qt.getClosest(30.0, 30.0));
 	}
 
 	@Test
@@ -233,23 +233,23 @@ public class QuadTreeTest {
 		qt.put(10.0, 0.0, "S");
 		qt.put(0.0, 10.0, "W");
 
-		assertEquals("SW", qt.get(0.0, 0.0));
-		assertEquals("SE", qt.get(40.0, 0.0));
-		assertEquals("NW", qt.get(0.0, 60.0));
-		assertEquals("NE", qt.get(40.0, 60.0));
-		assertEquals("N", qt.get(10.0, 60.0));
-		assertEquals("E", qt.get(40.0, 10.0));
-		assertEquals("S", qt.get(10.0, 0.0));
-		assertEquals("W", qt.get(0.0, 10.0));
+		assertEquals("SW", qt.getClosest(0.0, 0.0));
+		assertEquals("SE", qt.getClosest(40.0, 0.0));
+		assertEquals("NW", qt.getClosest(0.0, 60.0));
+		assertEquals("NE", qt.getClosest(40.0, 60.0));
+		assertEquals("N", qt.getClosest(10.0, 60.0));
+		assertEquals("E", qt.getClosest(40.0, 10.0));
+		assertEquals("S", qt.getClosest(10.0, 0.0));
+		assertEquals("W", qt.getClosest(0.0, 10.0));
 	}
 
 	@Test
 	public void testGetDistance_fromOutsideExtent() {
 		QuadTree<String> qt = getTestTree();
-		assertContains(new String[] {"100.0, 0.0"}, qt.get(160.0, 0, 60.1)); // E
-		assertContains(new String[] {"15.0, 15.0", "15.0, 15.0 B"}, qt.get(15.0, 160, 145.1)); // N
-		assertContains(new String[] {"-15.0, 0.0"}, qt.get(-60.0, 0, 45.1)); // W
-		assertContains(new String[] {"100.0, 0.0"}, qt.get(100.0, -60, 60.1)); // S
+		assertContains(new String[] {"100.0, 0.0"}, qt.getDisk(160.0, 0, 60.1)); // E
+		assertContains(new String[] {"15.0, 15.0", "15.0, 15.0 B"}, qt.getDisk(15.0, 160, 145.1)); // N
+		assertContains(new String[] {"-15.0, 0.0"}, qt.getDisk(-60.0, 0, 45.1)); // W
+		assertContains(new String[] {"100.0, 0.0"}, qt.getDisk(100.0, -60, 60.1)); // S
 	}
 
 	@Test
@@ -262,16 +262,16 @@ public class QuadTreeTest {
 		qt.put(12.0, 15.0, "12.0, 15.0");
 		qt.put(10.0, 25.0, "10.0, 25.0");
 
-		assertContains(new String[] {"10.0, 10.0"}, qt.get(10.0, 7.0, 3.0));
-		assertContains(new String[] {"10.0, 10.0"}, qt.get(10.0, 12.0, 2.0));
-		assertContains(new String[] {"10.0, 10.0"}, qt.get(7.0, 10.0, 3.0));
-		assertContains(new String[] {"10.0, 10.0"}, qt.get(13.0, 10.0, 3.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.getDisk(10.0, 7.0, 3.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.getDisk(10.0, 12.0, 2.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.getDisk(7.0, 10.0, 3.0));
+		assertContains(new String[] {"10.0, 10.0"}, qt.getDisk(13.0, 10.0, 3.0));
 
-		assertContains(new String[] {"20.0, 20.0"}, qt.get(20.0, 23.0, 3.0));
-		assertContains(new String[] {"20.0, 30.0"}, qt.get(20.0, 27.0, 3.0));
-		assertContains(new String[] {"30.0, 30.0"}, qt.get(27.0, 30.0, 3.0));
-		assertContains(new String[] {"12.0, 15.0"}, qt.get(15.0, 15.0, 3.0));
-		assertContains(new String[] {"10.0, 25.0"}, qt.get(10.0, 28.0, 3.0));
+		assertContains(new String[] {"20.0, 20.0"}, qt.getDisk(20.0, 23.0, 3.0));
+		assertContains(new String[] {"20.0, 30.0"}, qt.getDisk(20.0, 27.0, 3.0));
+		assertContains(new String[] {"30.0, 30.0"}, qt.getDisk(27.0, 30.0, 3.0));
+		assertContains(new String[] {"12.0, 15.0"}, qt.getDisk(15.0, 15.0, 3.0));
+		assertContains(new String[] {"10.0, 25.0"}, qt.getDisk(10.0, 28.0, 3.0));
 	}
 
 	@Test
@@ -288,15 +288,15 @@ public class QuadTreeTest {
 		qt.put(10.0, 0.0, "S");
 		qt.put(0.0, 10.0, "W");
 
-		assertContains(new String[] {"SW"}, qt.get(3.0, 0.0, 3.0));
-		assertContains(new String[] {"SE"}, qt.get(40.0, 3.0, 3.0));
-		assertContains(new String[] {"NW"}, qt.get(3.0, 60.0, 3.0));
-		assertContains(new String[] {"NE"}, qt.get(40.0, 57.0, 3.0));
+		assertContains(new String[] {"SW"}, qt.getDisk(3.0, 0.0, 3.0));
+		assertContains(new String[] {"SE"}, qt.getDisk(40.0, 3.0, 3.0));
+		assertContains(new String[] {"NW"}, qt.getDisk(3.0, 60.0, 3.0));
+		assertContains(new String[] {"NE"}, qt.getDisk(40.0, 57.0, 3.0));
 
-		assertContains(new String[] {"N"}, qt.get(7.0, 60.0, 3.0));
-		assertContains(new String[] {"E"}, qt.get(40.0, 13.0, 3.0));
-		assertContains(new String[] {"S"}, qt.get(13.0, 0.0, 3.0));
-		assertContains(new String[] {"W"}, qt.get(3.0, 10.0, 3.0));
+		assertContains(new String[] {"N"}, qt.getDisk(7.0, 60.0, 3.0));
+		assertContains(new String[] {"E"}, qt.getDisk(40.0, 13.0, 3.0));
+		assertContains(new String[] {"S"}, qt.getDisk(13.0, 0.0, 3.0));
+		assertContains(new String[] {"W"}, qt.getDisk(3.0, 10.0, 3.0));
 	}
 
 	@Test
@@ -376,7 +376,7 @@ public class QuadTreeTest {
 		qt.put(900, 400, "node4");
 		
 		Collection<String> values = new ArrayList<String>();
-		qt.get(new Rect(400, 300, 700, 900), values);
+		qt.getRectangle(new Rect(400, 300, 700, 900), values);
 		Assert.assertEquals(2, values.size());
 		Assert.assertTrue(values.contains("node2"));
 		Assert.assertTrue(values.contains("node3"));
@@ -391,13 +391,13 @@ public class QuadTreeTest {
 		qt.put(900, 0, "node4");
 
 		Collection<String> values = new ArrayList<String>();
-		qt.get(new Rect(90, -10, 600, +10), values);
+		qt.getRectangle(new Rect(90, -10, 600, +10), values);
 		Assert.assertEquals(2, values.size());
 		Assert.assertTrue(values.contains("node2"));
 		Assert.assertTrue(values.contains("node3"));
 
 		Collection<String> values2 = new ArrayList<String>();
-		qt.get(new Rect(90, 0, 600, 0), values2);
+		qt.getRectangle(new Rect(90, 0, 600, 0), values2);
 		Assert.assertEquals(2, values2.size());
 		Assert.assertTrue(values2.contains("node2"));
 		Assert.assertTrue(values2.contains("node3"));
@@ -422,7 +422,7 @@ public class QuadTreeTest {
 		// remove object at place with more than one object
 		assertTrue(qt.remove(15.0, 15.0, "15.0, 15.0"));
 		assertEquals(size-2, qt.size());
-		assertEquals("15.0, 15.0 B", qt.get(15.0, 15.0)); // the other object should still be there...
+		assertEquals("15.0, 15.0 B", qt.getClosest(15.0, 15.0)); // the other object should still be there...
 
 		// restart
 		qt = getTestTree();
@@ -430,7 +430,7 @@ public class QuadTreeTest {
 		 * This is to test that no just by chance the right one got removed before. */
 		assertTrue(qt.remove(15.0, 15.0, "15.0, 15.0 B"));
 		assertEquals(size-1, qt.size());
-		assertEquals("15.0, 15.0", qt.get(15.0, 15.0)); // the other object should still be there...
+		assertEquals("15.0, 15.0", qt.getClosest(15.0, 15.0)); // the other object should still be there...
 
 		// test removing non-existent object at real location
 		assertFalse(qt.remove(10.0, 10.0, "10.0, 10.0 B"));
@@ -679,7 +679,7 @@ public class QuadTreeTest {
 	}
 
 	/**
-	 * Test read access on {@link QuadTree#get(double, double, double, double)}.
+	 * Test read access on {@link QuadTree#getRing(double, double, double, double)}.
 	 */
 	@Test
 	public void testGetRing() {
@@ -691,38 +691,38 @@ public class QuadTreeTest {
 			}
 		}
 
-		Collection<String> result = qt.get(1, 1, 0, 1);
+		Collection<String> result = qt.getRing(1, 1, 0, 1);
 		assertEquals(result.contains("1,1"), true);
 		assertEquals(result.contains("0,1"), true);
 		assertEquals(result.contains("1,0"), true);
 		assertEquals(result.contains("2,1"), true);
 		assertEquals(result.contains("1,2"), true);
 
-		result = qt.get(1,1, 0.5, 1);
+		result = qt.getRing(1, 1, 0.5, 1);
 		assertEquals(result.contains("1,1"), false);
 		assertEquals(result.contains("0,1"), true);
 		assertEquals(result.contains("1,0"), true);
 		assertEquals(result.contains("2,1"), true);
 		assertEquals(result.contains("1,2"), true);
 
-		result = qt.get(1, 1, 1.1, 1);
+		result = qt.getRing(1, 1, 1.1, 1);
 		assertEquals(result.size(), 0);
 
-		result = qt.get(1, 1, 0, 0);
+		result = qt.getRing(1, 1, 0, 0);
 		assertEquals(result.size(), 1);
 		assertEquals(result.contains("1,1"), true);
 
-		result = qt.get(-1, 1, 1, 1.4);
+		result = qt.getRing(-1, 1, 1, 1.4);
 		assertEquals(result.size(), 1);
 		assertEquals(result.contains("0,1"), true);
 
-		result = qt.get(-1, 1, 1, 1.5);
+		result = qt.getRing(-1, 1, 1, 1.5);
 		assertEquals(result.size(), 3);
 		assertEquals(result.contains("0,1"), true);
 		assertEquals(result.contains("0,0"), true);
 		assertEquals(result.contains("0,2"), true);
 
-		result = qt.get(0, 0, Math.sqrt(18), Math.sqrt(18));
+		result = qt.getRing(0, 0, Math.sqrt(18), Math.sqrt(18));
 		assertEquals(result.size(), 1);
 		assertEquals(result.contains("3,3"), true);
 	}

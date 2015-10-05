@@ -35,7 +35,7 @@ public class Skeleton {
 
 
 	public SkeletonNode getOrCreateNode(Point from) {
-		Collection<SkeletonNode> neighbors = this.nodes.get(from.getX(),from.getY(),TOLERANCE);
+		Collection<SkeletonNode> neighbors = this.nodes.getDisk(from.getX(), from.getY(), TOLERANCE);
 
 		//TODO this can never happen?!
 		if (neighbors.size() > 1) {

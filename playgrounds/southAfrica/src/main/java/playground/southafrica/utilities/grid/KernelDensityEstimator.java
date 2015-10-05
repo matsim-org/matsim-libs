@@ -100,7 +100,7 @@ public class KernelDensityEstimator {
 		
 		/* Find all (possible) cells around the point. */
 		double sum = 0.0;
-		Collection<Point> neighbours = this.grid.getGrid().get(p.getX(), p.getY(), usedRadius);
+		Collection<Point> neighbours = this.grid.getGrid().getDisk(p.getX(), p.getY(), usedRadius);
 		Map<Point, Double> interimMap = new HashMap<Point, Double>(neighbours.size());
 
 		/* Determine the interim weights. */

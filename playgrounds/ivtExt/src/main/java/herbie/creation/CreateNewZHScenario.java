@@ -187,7 +187,7 @@ public class CreateNewZHScenario {
 						QuadTree<ActivityFacility> facQuadTree = trees.get(act.getType());
 						
 						// get closest facility.
-						ActivityFacility facility = facQuadTree.get(act.getCoord().getX(), act.getCoord().getY());
+						ActivityFacility facility = facQuadTree.getClosest(act.getCoord().getX(), act.getCoord().getY());
 						act.setFacilityId(facility.getId());
 					}
 				}

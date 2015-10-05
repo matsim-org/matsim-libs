@@ -169,7 +169,7 @@ public class MyGrid2 {
 						double xCentre = cell.centre().x;
 						double yCentre = cell.centre().y;
 						Point pCentre = gf.createPoint(cell.centre());
-						for (ActivityPoint ap : pointTree.get(xCentre, yCentre, radius)) {
+						for (ActivityPoint ap : pointTree.getDisk(xCentre, yCentre, radius)) {
 							double distance = ap.getPoint().distance(pCentre);
 //							double impact = this.triangularKernel(distance, radius);
 							double impact = this.exponentialKernel(distance, radius);
@@ -293,7 +293,7 @@ public class MyGrid2 {
 					int position = line[3].indexOf("H");
 					int hour = Integer.parseInt(line[3].substring(position-2, position));
 
-					Collection<MyGridCell> cells = grid.get(x, y, radius);
+					Collection<MyGridCell> cells = grid.getDisk(x, y, radius);
 					float value = ((float) 1) / ((float) cells.size());
 					for (MyGridCell cell : cells) {
 						cell.addToTotalCount(value);

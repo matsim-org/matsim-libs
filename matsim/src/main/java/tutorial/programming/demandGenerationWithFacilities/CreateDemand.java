@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -290,21 +289,21 @@ class CreateDemand {
 		if (activity.getType().startsWith("s")) {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}
 		else if (activity.getType().startsWith("l")) {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}
 		else {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}

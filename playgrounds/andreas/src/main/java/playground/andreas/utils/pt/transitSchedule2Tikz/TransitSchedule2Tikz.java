@@ -125,7 +125,7 @@ public class TransitSchedule2Tikz {
 		for(TransitStopFacility f: facilities.values()){
 			tikzNode = null;
 			// find all very close nodes
-			Collection<TikzNode> temp = quadTree.get(f.getCoord().getX(), f.getCoord().getY(), 0.1);
+			Collection<TikzNode> temp = quadTree.getDisk(f.getCoord().getX(), f.getCoord().getY(), 0.1);
 			// check if one got the same coords as the current facility
 			for(TikzNode n: temp){
 				if(n.getCoord().equals(f.getCoord())){

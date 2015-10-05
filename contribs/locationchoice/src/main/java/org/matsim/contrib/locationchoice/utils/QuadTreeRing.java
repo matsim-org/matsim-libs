@@ -31,9 +31,9 @@ public class QuadTreeRing<T> extends QuadTree<T> {
 		super(minX, minY, maxX, maxY);
 	}
 	
-	public Collection<T> get(final double x, final double y, final double outerRadius, final double innerradius) {
-		Collection<T> locations = super.get(x, y, outerRadius);
-		Collection<T> innerLocations = super.get(x, y, innerradius);		
+	public Collection<T> getRing(final double x, final double y, final double outerRadius, final double innerradius) {
+		Collection<T> locations = super.getDisk(x, y, outerRadius);
+		Collection<T> innerLocations = super.getDisk(x, y, innerradius);
 		locations.removeAll(innerLocations);
 		return locations;
 	}

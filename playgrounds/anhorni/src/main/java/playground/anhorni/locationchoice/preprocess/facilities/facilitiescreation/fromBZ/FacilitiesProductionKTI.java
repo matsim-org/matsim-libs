@@ -162,7 +162,7 @@ public class FacilitiesProductionKTI {
 		int priceCnt = 0;
 
 		for (ActivityFacility f : this.facilities.getFacilitiesForActivityType("s").values()) {
-			ShopLocation shop = (ShopLocation) zhShopsQuadTree.get(
+			ShopLocation shop = (ShopLocation) zhShopsQuadTree.getClosest(
 					trafo.transform(f.getCoord()).getX(), trafo.transform(f.getCoord()).getY());
 			if (CoordUtils.calcDistance(f.getCoord(), trafoback.transform(shop.getCoord())) < 150.0 &&
 					this.isFood(f)) {

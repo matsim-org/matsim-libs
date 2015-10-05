@@ -153,7 +153,7 @@ public class VDPath implements XYVxVyEventsHandler {
 		for (Cell c : cells) {
 			QuadTree<Coordinate> qt = new QuadTree<Coordinate>(minX, minY, maxX, maxY);
 			for (GraphEdge ed : c.edges){
-				Collection<Coordinate> tmpColl = qt.get(ed.x1, ed.y1, 0.0001);
+				Collection<Coordinate> tmpColl = qt.getDisk(ed.x1, ed.y1, 0.0001);
 				if (tmpColl.size() > 1) {
 					throw new RuntimeException("needs to be handled!!");
 				} else if (tmpColl.size() == 1) {
@@ -162,7 +162,7 @@ public class VDPath implements XYVxVyEventsHandler {
 				} else {
 					qt.put(ed.x1, ed.y1, new Coordinate(ed.x1,ed.y1));
 				}
-				tmpColl = qt.get(ed.x2, ed.y2, 0.0001);
+				tmpColl = qt.getDisk(ed.x2, ed.y2, 0.0001);
 				if (tmpColl.size() > 1) {
 					throw new RuntimeException("needs to be handled!!");
 				} else if (tmpColl.size() == 1) {

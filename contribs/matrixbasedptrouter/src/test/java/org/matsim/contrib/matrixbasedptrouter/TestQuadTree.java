@@ -98,7 +98,7 @@ public class TestQuadTree {
 		double distance = 100.;
 
 		{		
-			Collection<String> ptColHome = qTree.get(home.getX(), home.getY(), distance);
+			Collection<String> ptColHome = qTree.getDisk(home.getX(), home.getY(), distance);
 			Iterator<String> homeIt = ptColHome.iterator();
 			System.out.println("Pt stations in " + distance + "m distance to home location:");
 			StringBuilder strb = new StringBuilder() ;
@@ -110,7 +110,7 @@ public class TestQuadTree {
 			Assert.assertEquals( "pt1a pt2a pt3a ", strb.toString() );
 		}
 		{
-			Collection<String> ptColWork = qTree.get(work.getX(), work.getY(), distance);
+			Collection<String> ptColWork = qTree.getDisk(work.getX(), work.getY(), distance);
 			Iterator<String> workIt = ptColWork.iterator();
 			System.out.println("Pt stations in " + distance + "m distance to work location:");
 			StringBuilder strb = new StringBuilder() ;
