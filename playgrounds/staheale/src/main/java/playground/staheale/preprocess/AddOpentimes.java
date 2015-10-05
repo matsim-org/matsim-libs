@@ -141,7 +141,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		if (activities.containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET400) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_GET100) || activities.containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
 			Double x = facility.getCoord().getX();
 			Double y = facility.getCoord().getY();
-			ActivityFacility closestShop = this.shoppingQuadTree.get(x,y);
+			ActivityFacility closestShop = this.shoppingQuadTree.getClosest(x, y);
 			//log.info("closestShop size: "+ closestShop.getActivityOptions().size());
 			if (closestShop.getActivityOptions().get("shop").getOpeningTimes()!=null) {closestShopOpentimes = closestShop.getActivityOptions().get("shop").getOpeningTimes();}
 //			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon)!=null) {closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));}

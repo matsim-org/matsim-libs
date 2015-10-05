@@ -154,10 +154,10 @@ public class CommercialChainExtractor {
 			int index = 1;
 			while(index < list.size()){
 				Activity a = list.get(index-1);
-				Cluster ca = ((List<ClusterPoint>) qt.get(a.getLocation().getCoordinate().x, a.getLocation().getCoordinate().y, 0)).get(0).getCluster();
+				Cluster ca = ((List<ClusterPoint>) qt.getDisk(a.getLocation().getCoordinate().x, a.getLocation().getCoordinate().y, 0)).get(0).getCluster();
 
 				Activity b = list.get(index);
-				Cluster cb = ((List<ClusterPoint>) qt.get(b.getLocation().getCoordinate().x, b.getLocation().getCoordinate().y, 0)).get(0).getCluster();
+				Cluster cb = ((List<ClusterPoint>) qt.getDisk(b.getLocation().getCoordinate().x, b.getLocation().getCoordinate().y, 0)).get(0).getCluster();
 	
 				// Merge if they are in the SAME cluster.
 				if(ca != null && cb != null){
@@ -177,7 +177,7 @@ public class CommercialChainExtractor {
 		
 		// Set the activity locations to cluster centroids.
 		for (Activity a : list) {
-			Cluster c = ((List<ClusterPoint>) qt.get(a.getLocation().getCoordinate().x, a.getLocation().getCoordinate().y, 0)).get(0).getCluster();
+			Cluster c = ((List<ClusterPoint>) qt.getDisk(a.getLocation().getCoordinate().x, a.getLocation().getCoordinate().y, 0)).get(0).getCluster();
 			if(c != null){
 				a.getLocation().setCoordinate(c.getCenterOfGravity().getCoordinate());
 			}

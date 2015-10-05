@@ -248,7 +248,7 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 		final double xLoc = coordBarycenter.getX() + distance * Math.cos( angle );
 		final double yLoc = coordBarycenter.getY() + distance * Math.sin( angle );
 
-		return quadTreePerType.get( type ).get( xLoc , yLoc );
+		return quadTreePerType.get( type ).getClosest(xLoc, yLoc);
 	}
 
 	private double cachedNormalDouble = Double.NaN;

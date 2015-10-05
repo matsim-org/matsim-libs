@@ -198,14 +198,14 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final Facility facility,
 			final double maxSearchRadius ) {
 		final Collection<BikeSharingFacility> stationsInRadius =
-			bikeSharingFacilities.getCurrentQuadTree().get(
+			bikeSharingFacilities.getCurrentQuadTree().getDisk(
 					facility.getCoord().getX(),
 					facility.getCoord().getY(),
 					Math.min(
-						searchRadius,
-						maxSearchRadius ) );
+							searchRadius,
+							maxSearchRadius));
 		return stationsInRadius.isEmpty() ?
-			bikeSharingFacilities.getCurrentQuadTree().get(
+			bikeSharingFacilities.getCurrentQuadTree().getClosest(
 					facility.getCoord().getX(),
 					facility.getCoord().getY()) :
 			new ArrayList<BikeSharingFacility>( stationsInRadius ).get( random.nextInt( stationsInRadius.size() ) );

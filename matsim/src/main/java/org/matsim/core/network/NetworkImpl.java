@@ -303,7 +303,7 @@ public final class NetworkImpl implements Network {
 	 */
 	public Node getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.get(coord.getX(), coord.getY());
+		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -315,7 +315,7 @@ public final class NetworkImpl implements Network {
 	 */
 	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
+		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 

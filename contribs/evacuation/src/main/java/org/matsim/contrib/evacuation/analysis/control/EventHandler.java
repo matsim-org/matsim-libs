@@ -205,7 +205,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// get the cell data, store event to it
 		List<Event> cellEvents = cell.getData();
@@ -223,7 +223,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// get the cell data, store event to it
 		List<Event> cellEvents = cell.getData();
@@ -271,7 +271,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// do not consider the exit link
 		if ((ignoreExitLink) && (cell.getId().toString().equals("" + Cell.getCurrentId())))
@@ -306,7 +306,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// do not consider the exit link
 		if ((ignoreExitLink) && (cell.getId().toString().equals("" + Cell.getCurrentId())))
@@ -393,7 +393,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				double latestTime = currentLinkLeaveTimes.get(confidentElementNo).getSecond();
 				maxClearingTime = Math.max(latestTime, maxClearingTime);
 
-				cellTree.get(boundary, cells);
+				cellTree.getRectangle(boundary, cells);
 
 				for (Cell cell : cells)
 					cell.updateClearanceTime(latestTime);

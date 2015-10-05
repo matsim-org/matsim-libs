@@ -1216,7 +1216,7 @@ public class CreateDemand {
 					
 				} else{
 					
-					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 					c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
 					
 					Coord coord = checkQuadTreesForFacilityCoords(nextActType, c);
@@ -1664,7 +1664,7 @@ public class CreateDemand {
 					}
 					
 					Coord temp = Global.UTM32NtoGK4.transform(coord2);
-					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().get(temp.getX(), temp.getY());
+					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().getClosest(temp.getX(), temp.getY());
 					
 					if(legMode.equals(TransportMode.walk)){
 							c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
@@ -1763,15 +1763,15 @@ public class CreateDemand {
 		
 		if(nextActType.equals(Global.ActType.leisure.name())){
 			
-			c = GAPScenarioBuilder.getLeisureQT().get(coord.getX(), coord.getY()).getCoord();
+			c = GAPScenarioBuilder.getLeisureQT().getClosest(coord.getX(), coord.getY()).getCoord();
 			
 		} else if(nextActType.equals(Global.ActType.shop.name())){
 			
-			c = GAPScenarioBuilder.getShopQT().get(coord.getX(), coord.getY()).getCoord();
+			c = GAPScenarioBuilder.getShopQT().getClosest(coord.getX(), coord.getY()).getCoord();
 			
 		} else if(nextActType.equals(Global.ActType.education.name())){
 			
-			c = GAPScenarioBuilder.getEducationQT().get(coord.getX(), coord.getY()).getCoord();
+			c = GAPScenarioBuilder.getEducationQT().getClosest(coord.getX(), coord.getY()).getCoord();
 			
 		}
 //		else if(nextActType.equals(Global.ActType.work.name())){

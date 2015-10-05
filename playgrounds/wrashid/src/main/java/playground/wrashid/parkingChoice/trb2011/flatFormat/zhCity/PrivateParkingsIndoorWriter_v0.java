@@ -253,7 +253,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	}
 	
 	public static void assignParkingCapacityToClosestFacility(Coord coord, int parkingCapacity, QuadTree<ActivityFacilityImpl> facilitiesQuadTree, LinkedList<PrivateParking> privateParkings){
-		ActivityFacilityImpl closestFacility=facilitiesQuadTree.get(coord.getX(), coord.getY());
+		ActivityFacilityImpl closestFacility=facilitiesQuadTree.getClosest(coord.getX(), coord.getY());
 		double activityCapacities[]=new double[closestFacility.getActivityOptions().size()];
 		double sumOfFacilityActivityCapacities=0;
 		
@@ -283,7 +283,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	private static ActivityFacilityImpl getClosestFacilityWithin300MeterForActivity(Coord coord,
 			 String activityType) {
 	
-		Collection<ActivityFacilityImpl> facilities = facilitiesQuadTree.get(coord.getX(), coord.getY(), 300);
+		Collection<ActivityFacilityImpl> facilities = facilitiesQuadTree.getDisk(coord.getX(), coord.getY(), 300);
 		
 		ActivityFacilityImpl bestActivityFacility=null;
 		double distanceBestActivityFacility=Double.MAX_VALUE;

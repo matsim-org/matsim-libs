@@ -83,7 +83,7 @@ public class ApproximatelyCoordianteTransformation {
 
 	private Collection<Tuple<Coord, Coord>> getSupportPoints(Coord c) {
 		Collection<Tuple<Coord, Coord>> ret = null;
-		while ((ret = this.quadTree.get(c.getX(), c.getY(), this.fetchRadius)).size() < 4) {
+		while ((ret = this.quadTree.getDisk(c.getX(), c.getY(), this.fetchRadius)).size() < 4) {
 			this.fetchRadius += 10;
 		}
 

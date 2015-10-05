@@ -135,7 +135,7 @@ public class VoronoiDiagramCells <T extends VoronoiCenter> {
 			this.qt.clear();
 			
 			for (GraphEdge ed : vc.getGraphEdges()){
-				Collection<Coordinate> tmpColl = this.qt.get(ed.x1, ed.y1, 0.0001);
+				Collection<Coordinate> tmpColl = this.qt.getDisk(ed.x1, ed.y1, 0.0001);
 				if (tmpColl.size() > 1) {
 					log.warn("Somthing is broken here, ignoring for now!");
 					return new ArrayList<VoronoiCell>();
@@ -145,7 +145,7 @@ public class VoronoiDiagramCells <T extends VoronoiCenter> {
 				} else {
 					this.qt.put(ed.x1, ed.y1, new Coordinate(ed.x1,ed.y1));
 				}
-				tmpColl = this.qt.get(ed.x2, ed.y2, 0.0001);
+				tmpColl = this.qt.getDisk(ed.x2, ed.y2, 0.0001);
 				if (tmpColl.size() > 1) {
 					log.warn("Somthing is broken here, ignoring for now!");
 					return new ArrayList<VoronoiCell>();

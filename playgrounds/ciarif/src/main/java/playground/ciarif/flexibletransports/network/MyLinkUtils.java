@@ -31,7 +31,7 @@ public class MyLinkUtils
       this.links.put(link.getCoord().getX(), link.getCoord().getY(), link);
     }
     log.info("CoordX= " + coordX + "CoordY" + coordY);
-    Link closestLink = this.links.get(coordX, coordY);
+    Link closestLink = this.links.getClosest(coordX, coordY);
     log.info("Nearest link = " + closestLink.getId());
     return closestLink;
   }

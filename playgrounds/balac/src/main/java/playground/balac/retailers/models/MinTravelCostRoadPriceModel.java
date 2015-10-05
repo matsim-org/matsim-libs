@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -77,11 +76,11 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
       Collection<PersonPrimaryActivity> primaryActivities;
       if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
     	  
-	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
+	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
 
       }
       else
-	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
       
       scoreSum = primaryActivities.size();
@@ -105,16 +104,16 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
 	      Collection<ActivityFacility> facilities2;
 
 	      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
-		      facilities1 = Utils.getInsideShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
-		      facilities2 = Utils.getOutsideShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
+		      facilities1 = Utils.getInsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
+		      facilities2 = Utils.getOutsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
 		      if (facilities1.size() ==0)
 		      log.info("size 0");
 		      
 		      link.setPotentialCustomers(availableLinks.get(link.getId()).getScoreSum() / (((facilities2.size() ) * 1.5) + facilities1.size()));
 	      }
 	      else {	    	  
-	    	  facilities1 = Utils.getInsideShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
-	    	  facilities2 = Utils.getOutsideShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	    	  facilities1 = Utils.getInsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	    	  facilities2 = Utils.getOutsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 	    	  if (facilities2.size() == 0)
 			      log.info("size 0");
 	    	  link.setPotentialCustomers(availableLinks.get(link.getId()).getScoreSum() / (((facilities1.size() ) * 0.5) + ((facilities2.size()))));

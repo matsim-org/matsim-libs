@@ -74,7 +74,7 @@ public class RunnableChainReconstructor implements Runnable {
 					}
 					
 					/* Get all the facilities in a 1000m radius around the activity. */
-					Collection<DigicoreFacility> col = this.facilityTree.get(da.getCoord().getX(), da.getCoord().getY(), 1000);
+					Collection<DigicoreFacility> col = this.facilityTree.getDisk(da.getCoord().getX(), da.getCoord().getY(), 1000);
 					List<DigicoreFacility> neighbours = new ArrayList<DigicoreFacility>(col.size());
 					neighbours.addAll(col);
 					

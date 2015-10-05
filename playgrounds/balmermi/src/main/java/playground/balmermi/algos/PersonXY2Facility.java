@@ -162,7 +162,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 				else if (act.getType().startsWith(T)) { qt = this.fqts.get(T); }
 				else { throw new RuntimeException("act type ="+act.getType()+"not known!"); }
 				
-				ActivityFacilityImpl f = qt.get(coord.getX(),coord.getY());
+				ActivityFacilityImpl f = qt.getClosest(coord.getX(), coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
 				Id lId = f.getLinkId();

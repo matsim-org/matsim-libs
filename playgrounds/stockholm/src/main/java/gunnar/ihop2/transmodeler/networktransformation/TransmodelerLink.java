@@ -1,6 +1,12 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
-import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalLinkId;
+import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalId;
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * 
@@ -11,7 +17,7 @@ class TransmodelerLink extends TransmodelerElement {
 
 	private final String bidirectionalId;
 
-	private final String direction;
+	private final DIR dir;
 
 	private final TransmodelerNode fromNode;
 
@@ -19,18 +25,40 @@ class TransmodelerLink extends TransmodelerElement {
 
 	private final String type;
 
-	private final String pathIdPrefix;
+	final SortedSet<TransmodelerSegment> segments = new TreeSet<TransmodelerSegment>();
 
-	TransmodelerLink(final String bidirectionalId, final String direction,
+	final Map<TransmodelerLink, Double> downstreamLink2turnLength = new LinkedHashMap<TransmodelerLink, Double>();
+
+	TransmodelerLink(final String bidirectionalId, final DIR dir,
 			final TransmodelerNode fromNode, final TransmodelerNode toNode,
-			final String type, final String pathIdPrefix) {
-		super(newUnidirectionalLinkId(bidirectionalId, direction));
+			final String type) {
+		super(newUnidirectionalId(bidirectionalId, dir));
 		this.bidirectionalId = bidirectionalId;
-		this.direction = direction;
+		this.dir = dir;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 		this.type = type;
-		this.pathIdPrefix = pathIdPrefix;
+	}
+
+	boolean segmentIsUpstream(final String unidirSegmentId) {
+		if (DIR.AB.equals(this.dir)) {
+			// the highest position index is upstream in direction AB
+			return this.segments.last().getId().equals(unidirSegmentId);
+		} else {
+			// the lowest position index is upstream in direction BA
+			return this.segments.first().getId().equals(unidirSegmentId);
+		}
+	}
+
+	// TODO NEW, check assumptions with Olivier
+	boolean segmentIsDownstream(final String unidirSegmentId) {
+		if (DIR.AB.equals(this.dir)) {
+			// the lowest position index is downstream in direction AB
+			return this.segments.first().getId().equals(unidirSegmentId);
+		} else {
+			// the highest position index is downstream in direction BA
+			return this.segments.last().getId().equals(unidirSegmentId);
+		}
 	}
 
 	TransmodelerNode getFromNode() {
@@ -45,20 +73,16 @@ class TransmodelerLink extends TransmodelerElement {
 		return type;
 	}
 
-	String getPathIdPrefix() {
-		return this.pathIdPrefix;
-	}
-
-	String getPathId() {
-		return this.pathIdPrefix + this.bidirectionalId;
+	String getBidirectionalId() {
+		return this.bidirectionalId;
 	}
 
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "(id=" + this.getId()
 				+ ", bidirectionalId = " + this.bidirectionalId
-				+ ", direction=" + this.direction + ", fromNode="
+				+ ", direction=" + this.dir + ", fromNode="
 				+ this.fromNode.getId() + ", toNode=" + this.toNode.getId()
-				+ ", type=" + this.type + ", pathId=" + this.getPathId() + ")";
+				+ ", type=" + this.type + ")";
 	}
 }

@@ -54,14 +54,14 @@ public class VisumNetwork {
 		if (this.stopsQT == null) {
 			this.cacheStops();
 		}
-		return this.stopsQT.get(coord.getX(), coord.getY(), distance);
+		return this.stopsQT.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public Stop findNearestStop(final Coord coord) {
 		if (this.stopsQT == null) {
 			this.cacheStops();
 		}
-		return this.stopsQT.get(coord.getX(), coord.getY());
+		return this.stopsQT.getClosest(coord.getX(), coord.getY());
 	}
 
 	private synchronized void cacheStops() {

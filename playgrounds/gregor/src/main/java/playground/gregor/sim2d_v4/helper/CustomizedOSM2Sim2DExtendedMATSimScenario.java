@@ -209,7 +209,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 			for (Link l : net.getLinks().values()) {
 				Point p = MGC.coord2Point(l.getCoord());
-				Section sec = qt.get(p.getX(), p.getY());
+				Section sec = qt.getClosest(p.getX(), p.getY());
 				if (!sec.getPolygon().contains(p)) {
 					log.info("could not find link section mapping in quadtree using linear search");
 					for (Section sec2 : env.getSections().values()) {

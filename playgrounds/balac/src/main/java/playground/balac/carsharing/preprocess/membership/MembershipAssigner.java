@@ -267,7 +267,7 @@ public class MembershipAssigner
       }
     }
 
-    int density = this.personsQuadTree.get(c.getX(), c.getY(), 0.05D).size();
+    int density = this.personsQuadTree.getDisk(c.getX(), c.getY(), 0.05D).size();
    // log.info("density " + density);
     return density;
   }

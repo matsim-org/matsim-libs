@@ -186,7 +186,7 @@ public class MyShoppingReader {
 		log.info("Assigning link Ids...");
 		for(Id id : this.shops.getFacilities().keySet()){
 			ActivityFacilityImpl af = (ActivityFacilityImpl) this.shops.getFacilities().get(id);
-			Id linkId = linkQT.get(af.getCoord().getX(), af.getCoord().getY());
+			Id linkId = linkQT.getClosest(af.getCoord().getX(), af.getCoord().getY());
 			af.setLinkId(linkId);
 		}
 	}

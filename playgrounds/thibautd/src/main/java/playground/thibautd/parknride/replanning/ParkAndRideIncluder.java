@@ -63,7 +63,7 @@ public class ParkAndRideIncluder {
 		Coord egress = egressOriginActivity.getCoord();
 
 		// we take the facility which is the closest to the centroid
-		ParkAndRideFacility fac = quadTree.get( 
+		ParkAndRideFacility fac = quadTree.getClosest(
 				(anchor.getX() + access.getX() + egress.getX()) / 3d,
 				(anchor.getY() + access.getY() + egress.getY()) / 3d);
 

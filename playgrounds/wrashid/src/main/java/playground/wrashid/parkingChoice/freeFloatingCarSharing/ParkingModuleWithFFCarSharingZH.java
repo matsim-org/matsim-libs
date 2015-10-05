@@ -53,7 +53,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
 	@Override
 	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
-		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
+		Id vehicleId = vehicleLocations.getClosest(coord.getX(), coord.getY());
 		
 		if (vehicleId==null){
 			return null;

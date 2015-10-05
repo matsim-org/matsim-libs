@@ -89,7 +89,7 @@ public class HitchHikingSpots {
 	}
 
 	public Link getNearestSpot(final Coord c) {
-		return quadTree.get( c.getX() , c.getY() );
+		return quadTree.getClosest(c.getX(), c.getY());
 	}
 
 	public Collection<Link> getSpots(final Coord c , final double distance) {
@@ -97,7 +97,7 @@ public class HitchHikingSpots {
 	}
 
 	public Collection<Link> getSpots(final double x , final double y , final double distance) {
-		return quadTree.get( x , y , distance );
+		return quadTree.getDisk(x, y, distance);
 	}
 }
 
