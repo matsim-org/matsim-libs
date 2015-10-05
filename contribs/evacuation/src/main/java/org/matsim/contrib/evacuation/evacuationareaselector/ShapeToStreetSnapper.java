@@ -209,7 +209,7 @@ public class ShapeToStreetSnapper {
 		
 		Coordinate center = new Coordinate((c0.x+c1.x)/2,(c0.y+c1.y)/2);
 		double searchRange = Math.max(this.maxL, c0.distance(c1));
-		Collection<Node> coll = this.qTree.get(center.x, center.y,searchRange);
+		Collection<Node> coll = this.qTree.getDisk(center.x, center.y, searchRange);
 		
 		List<Link> iLs = new ArrayList<Link>();
 		for (Node n : coll) {

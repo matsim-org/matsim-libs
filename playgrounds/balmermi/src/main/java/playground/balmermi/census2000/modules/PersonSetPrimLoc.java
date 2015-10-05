@@ -274,7 +274,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no work fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.workFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
+				to_fac = this.workFacQuadTree.getClosest(to_zone.getCoord().getX(), to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {
@@ -296,7 +296,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no educ fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.educFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
+				to_fac = this.educFacQuadTree.getClosest(to_zone.getCoord().getX(), to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {

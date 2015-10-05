@@ -124,7 +124,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param y northing, up-down location, latitude
 	 * @return the object found closest to x/y
 	 */
-	public T get(final double x, final double y) {
+	public T getClosest(final double x, final double y) {
 		return this.top.get(x, y, new MutableDouble(Double.POSITIVE_INFINITY));
 	}
 
@@ -136,14 +136,14 @@ public class QuadTree<T> implements Serializable {
 	 * @param distance the maximal distance returned objects can be away from x/y
 	 * @return the objects found within distance to x/y
 	 */
-	public Collection<T> get(final double x, final double y, final double distance) {
+	public Collection<T> getDisk(final double x, final double y, final double distance) {
 		return this.top.get(x, y, distance, new ArrayList<T>());
 	}
 
 	/**
 	 * Gets all objects within a linear ring (including borders).
 	 *
-	 * Note by JI (sept '15): This method can be significant faster than calling {@link #get(double, double, double)}
+	 * Note by JI (sept '15): This method can be significant faster than calling {@link #getDisk(double, double, double)}
 	 * and a manual check on the returned elements for >= r_min. For randomly distributed points one can use the
 	 * following rule-of-thumb: if r_min/r_max > 0.4 this method is likely to be faster than retrieving all elements within r_max.
 	 *
@@ -153,7 +153,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param r_max outer rind radius
 	 * @return objects within the ring
 	 */
-	public Collection<T> get(final double x, final double y, final double r_min, final double r_max) {
+	public Collection<T> getRing(final double x, final double y, final double r_min, final double r_max) {
 		return this.top.get(x, y, r_min, r_max, new ArrayList<T>());
 	}
 
@@ -194,7 +194,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final Rect bounds, final Collection<T> values1) {
+	public Collection<T> getRectangle(final Rect bounds, final Collection<T> values1) {
 		return this.top.get(bounds, values1);
 	}
 
@@ -209,8 +209,8 @@ public class QuadTree<T> implements Serializable {
 	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values1) {
-		return get(new Rect(minX, minY, maxX, maxY), values1);
+	public Collection<T> getRectangle(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values1) {
+		return getRectangle(new Rect(minX, minY, maxX, maxY), values1);
 	}
 
 	/**

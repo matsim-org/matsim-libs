@@ -75,7 +75,7 @@ public class FacilityData {
         }
 
         QuadTree<ActivityFacility> quadTree = quadTrees.get(type);
-        return quadTree.get(coord.getX(), coord.getY());
+        return quadTree.getClosest(coord.getX(), coord.getY());
     }
 
     public QuadTree<ActivityFacility> getQuadTree(String type) {

@@ -167,7 +167,7 @@ public class AddZCoordinatesToNetwork {
 			}
 			
 			// no height value found, therefore interpolate it...
-			Id<Node> neighbourId = quadTree.get(node.getCoord().getX(), node.getCoord().getY());
+			Id<Node> neighbourId = quadTree.getClosest(node.getCoord().getX(), node.getCoord().getY());
 			addZCoord(node, srtmHeights.get(neighbourId));
 			extrapolateCount++;
 		}

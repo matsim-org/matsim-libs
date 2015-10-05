@@ -156,7 +156,7 @@ public class HeatMap {
 		for(Tuple<Coord, Double> v: this.values){
 			// ass we used for the location within the quadtree the centroid of the tile,
 			// this should be the tile containing the object
-			t = this.tiles.get(v.getFirst().getX(), v.getFirst().getY());
+			t = this.tiles.getClosest(v.getFirst().getX(), v.getFirst().getY());
 			// but anyway check it and warn the user if sth is wrong!
 			Point p = new GeometryFactory().createPoint(new Coordinate(v.getFirst().getX(), v.getFirst().getY(), 0.));
 			if(!t.getGeometry().contains(p)){

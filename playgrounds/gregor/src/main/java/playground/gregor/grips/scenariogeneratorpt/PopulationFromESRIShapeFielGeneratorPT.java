@@ -83,7 +83,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);
-		TransitRouteStop stop = this.quad.get(c.getX(), c.getY());
+		TransitRouteStop stop = this.quad.getClosest(c.getX(), c.getY());
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
@@ -118,7 +118,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);
-		TransitRouteStop stop = this.quad.get(c.getX(), c.getY());
+		TransitRouteStop stop = this.quad.getClosest(c.getX(), c.getY());
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();

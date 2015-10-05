@@ -76,7 +76,7 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		// aber dies factor is wichtig, weil parking far away could still be relevant due to the price
 		// so this parameter needs to be chosen in a way keeping this in mind.
 		
-		Collection<PParking> collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
+		Collection<PParking> collection = parkings.getDisk(coord.getX(), coord.getY(), minSearchDistance);
 
 		Collection<PParking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
 				collection);
@@ -84,7 +84,7 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		// widen search space, if no parking found
 		while (resultCollection.size() == 0) {
 			minSearchDistance *= 2;
-			collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
+			collection = parkings.getDisk(coord.getX(), coord.getY(), minSearchDistance);
 			resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo, collection);
 
 			if (minSearchDistance > maxWalkingDistanceSearchSpaceInMeters) {

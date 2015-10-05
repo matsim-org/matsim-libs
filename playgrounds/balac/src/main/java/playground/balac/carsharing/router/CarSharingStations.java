@@ -104,14 +104,14 @@ public class CarSharingStations
   
   public CarSharingStation getClosestLocation(Coord coord)
   {
-    return this.stations.get(coord.getX(), coord.getY());
+    return this.stations.getClosest(coord.getX(), coord.getY());
   }
 
   public Vector<CarSharingStation> findClosestStations(Coord coord, int number, double distance)
   {
     Vector orderedClosestStations = new Vector();
 
-    Collection<CarSharingStation> allClosestStations = this.stations.get(coord.getX(), coord.getY(), distance);
+    Collection<CarSharingStation> allClosestStations = this.stations.getDisk(coord.getX(), coord.getY(), distance);
 
     for (CarSharingStation station : allClosestStations) {
       int i = 0;

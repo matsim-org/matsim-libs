@@ -42,11 +42,11 @@ public class PrtData extends ETaxiData {
     }
     
     public TaxiRank getNearestRank(Coord coord){
-    	return quadTreeRanks.get(coord.getX(), coord.getY());
+    	return quadTreeRanks.getClosest(coord.getX(), coord.getY());
     }
     
     public TaxiRank getNearestRank(Link link){
-    	return quadTreeRanks.get(link.getCoord().getX(), link.getCoord().getY());
+    	return quadTreeRanks.getClosest(link.getCoord().getX(), link.getCoord().getY());
     }
     
     @SuppressWarnings("unchecked")

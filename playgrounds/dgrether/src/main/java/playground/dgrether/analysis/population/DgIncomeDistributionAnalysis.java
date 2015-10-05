@@ -135,7 +135,7 @@ public class DgIncomeDistributionAnalysis {
 		  Polygon p = pi.next();
 		  QuadTree.Rect rect = new QuadTree.Rect(p.getEnvelopeInternal().getMinX(), p.getEnvelopeInternal().getMinY(), 
 		  																																p.getEnvelopeInternal().getMaxX(), p.getEnvelopeInternal().getMaxY());
-		  List<DgPersonData> results = (List<DgPersonData>) quadTree.get(rect, new ArrayList<DgPersonData>());
+		  List<DgPersonData> results = (List<DgPersonData>) quadTree.getRectangle(rect, new ArrayList<DgPersonData>());
 		
 		  //calc average income
 		  double avgIncome = 0.0;

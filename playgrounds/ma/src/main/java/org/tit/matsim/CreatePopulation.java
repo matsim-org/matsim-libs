@@ -102,7 +102,7 @@ public class CreatePopulation {
 				 * Try to understand what is happening here [[ 2 ]]
 				 */
 				Coord homeCoord = new Coord(Double.parseDouble(parts[index_xHomeCoord]), Double.parseDouble(parts[index_yHomeCoord]));
-				ActivityFacility homeFacility = this.homeFacilitiesTree.get(homeCoord.getX(), homeCoord.getY());
+				ActivityFacility homeFacility = this.homeFacilitiesTree.getClosest(homeCoord.getX(), homeCoord.getY());
 				personHomeAndWorkLocations.putAttribute(person.getId().toString(), "home", homeFacility);
 				
 				if (employed) {
@@ -147,7 +147,7 @@ public class CreatePopulation {
 	private ActivityFacility getWorkFacility(String municipalityId) {
 		Coord coord = this.municipalityCentroids.get(municipalityId);
 		ArrayList<ActivityFacility> list = 
-			(ArrayList<ActivityFacility>) this.workFacilitiesTree.get(coord.getX(), coord.getY(), 8000);
+			(ArrayList<ActivityFacility>) this.workFacilitiesTree.getDisk(coord.getX(), coord.getY(), 8000);
 		
 		// pick a facility randomly from this list
 		// TODO: check range of randomIndex. Is last element of list ever chosen?

@@ -74,7 +74,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 			double maxy = node.getCoord().getY() + radius;
 			
 			Set<Node> intersectionNodes = new HashSet<Node>(20);
-			quadTree.get(minx, miny, maxx, maxy, intersectionNodes);
+			quadTree.getRectangle(minx, miny, maxx, maxy, intersectionNodes);
 			
 			if(intersectionNodes.size() > 1) {
 			Set<Node> sourceNodes = new HashSet<Node>();

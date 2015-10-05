@@ -149,7 +149,7 @@ public class PrepareDifferentInitialLocations {
 			double x = coord.getX();
 			double y = coord.getY();
 			
-			Id<ActivityFacility> newFacilityId = quadTree.get(x, y);
+			Id<ActivityFacility> newFacilityId = quadTree.getClosest(x, y);
 			ActivityFacility newFacility = scenario.getActivityFacilities().getFacilities().get(newFacilityId);
 			
 			// replace activity location

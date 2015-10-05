@@ -122,7 +122,7 @@ public class LinksCSReader
         else if (this.freeLinks.contains(link)) {
         	log.info("The link " + link.getId() + " is already in the list");
         } else {
-        	double density = this.personQuadTree.get(link.getCoord().getX(), link.getCoord().getY(), 100.0D).size();
+        	double density = this.personQuadTree.getDisk(link.getCoord().getX(), link.getCoord().getY(), 100.0D).size();
         	if ((this.freeLinks.size() < newLinksMax.intValue()) && 
         			(density > referenceDensity)) {
         		this.freeLinks.add(link);

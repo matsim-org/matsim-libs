@@ -143,7 +143,7 @@ public class EventsToGAP {
 
 						Point thisActivity = gf.createPoint(new Coordinate(x, y) );
 
-						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, GAP_SEARCH_AREA );
+						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.getDisk(x, y, GAP_SEARCH_AREA);
 						SAZone minorZone = findZoneInArrayList(thisActivity, shortlist );
 						if ( minorZone != null ){
 							minorZone.incrementMinorActivityCountDetail( timeOfDay );

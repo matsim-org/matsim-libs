@@ -59,14 +59,14 @@ public class CarSharingStations implements FacilitiesPortfolio
 
   public CarSharingStation getClosestLocation(Coord coord)
   {
-    return (this.stations.get(coord.getX(), coord.getY()));
+    return (this.stations.getClosest(coord.getX(), coord.getY()));
   }
   
   public Vector<CarSharingStation> getClosestStations (Coord coord, int number, double distance) {
 	  
 	  Vector<CarSharingStation> orderedClosestStations = new Vector<CarSharingStation> ();
 	  //orderedClosestStations.add(0, this.stations.get(coord.getX(),coord.getY()));
-	  Collection<CarSharingStation> allClosestStations = this.stations.get(coord.getX(), coord.getY(), distance);
+	  Collection<CarSharingStation> allClosestStations = this.stations.getDisk(coord.getX(), coord.getY(), distance);
 	  //log.info("number of all cs stations = " + allClosestStations.size());
 	  for (CarSharingStation station:allClosestStations){
 		  int i = 0;

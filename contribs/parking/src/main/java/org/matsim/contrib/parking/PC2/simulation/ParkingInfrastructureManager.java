@@ -146,10 +146,10 @@ public class ParkingInfrastructureManager {
 	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
 		PC2Parking parking = null;
 		if (groupName == null) {
-			parking = publicParkingsQuadTree.get(destCoordinate.getX(), destCoordinate.getY());
+			parking = publicParkingsQuadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
 		} else {
 			QuadTree<PC2Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
-			parking = quadTree.get(destCoordinate.getX(), destCoordinate.getY());
+			parking = quadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
 
 			if (parking == null) {
 				DebugLib.stopSystemAndReportInconsistency("not enough parking available for parkingGroupName:" + groupName);
@@ -205,7 +205,7 @@ public class ParkingInfrastructureManager {
 		// if not found, search within distance of 300m:
 		double distance = 300;
 		if (!parkingFound) {
-			Collection<PC2Parking> collection = getPublicParkingQuadTree().get(
+			Collection<PC2Parking> collection = getPublicParkingQuadTree().getDisk(
 					parkingOperationRequestAttributes.destCoordinate.getX(),
 					parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
@@ -214,7 +214,7 @@ public class ParkingInfrastructureManager {
 				
 				while (collection.size() == 0) {
 					distance *= 2;
-					collection = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+					collection = getPublicParkingQuadTree().getDisk(parkingOperationRequestAttributes.destCoordinate.getX(),
 							parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
 					if (distance > 100000000) {
@@ -337,7 +337,7 @@ public class ParkingInfrastructureManager {
 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
 			}
 
-			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
+			Collection<PC2Parking> collection = publicParkingsQuadTree.getDisk(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
 			if (collection.size() == 1) {
 				for (PC2Parking p : collection) {
 					// yyyyyy no idea why we first test for "size of collection == 1" and then iterate over it.  kai, jul'15

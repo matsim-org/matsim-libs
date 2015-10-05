@@ -146,7 +146,7 @@ public class AggregateNetworkDegreeToHexagons {
 			Coord coord = node.getCoord();
 			Point nodePoint = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
 
-			Point zonePoint = grid.get(coord.getX(), coord.getY());
+			Point zonePoint = grid.getClosest(coord.getX(), coord.getY());
 			Polygon zone = polyMap.get(zonePoint);
 			int degree = 0;
 			if(zone.contains(nodePoint)){

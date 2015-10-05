@@ -59,8 +59,8 @@ public class MaxActivityModel extends RetailerModelImpl
       String linkId = this.first.get(i);
 
         LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
-      Collection<ActivityFacility> shops = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
+      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
+      Collection<ActivityFacility> shops = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
 
       int globalShopsCapacity = 0;
       for (ActivityFacility shop : shops) {

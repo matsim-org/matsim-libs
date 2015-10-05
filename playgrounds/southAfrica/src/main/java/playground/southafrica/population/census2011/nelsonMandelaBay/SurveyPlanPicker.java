@@ -276,18 +276,18 @@ public class SurveyPlanPicker {
 		Collection<Plan> plansToRank = null;
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
-			Plan closestPlan = qt.get(c.getX(), c.getY());
+			Plan closestPlan = qt.getClosest(c.getX(), c.getY());
 			/* The closest plan's home coordinate. */
 			Coord closestHome = getQtPlanHomeCoordinate(closestPlan);
 			
 			double radius = CoordUtils.calcDistance(c, closestHome );
-			Collection<Plan> plans = qt.get(c.getX(), c.getY(), radius);
+			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
 				 * then you stand the chance of running into an infinite loop.
 				 * Hence, add a minimum of 1m to move on. */
 				radius += Math.max(radius, 1.0);
-				plans = qt.get(c.getX(), c.getY(), radius);
+				plans = qt.getDisk(c.getX(), c.getY(), radius);
 			}
 			plansToRank = plans;
 		} else{

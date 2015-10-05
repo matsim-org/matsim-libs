@@ -116,7 +116,7 @@ public class PrivateVehicleSpeedEvaluator {
 			Coordinate c = ls.pointAlong(0.5);
 			Point midPoint = gf.createPoint(c);
 
-			Collection<SAZone> zoneList = mgr.getGapQuadTree().get(midPoint.getX(), midPoint.getY(), distanceThreshold);
+			Collection<SAZone> zoneList = mgr.getGapQuadTree().getDisk(midPoint.getX(), midPoint.getY(), distanceThreshold);
 			boolean foundZone = false;
 			for (SAZone zone : zoneList) {
 				if(zone.contains(midPoint)){
