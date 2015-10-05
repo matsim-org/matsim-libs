@@ -95,7 +95,7 @@ public class CadytsModule extends AbstractModule {
             	links.add( linkId.toString() ) ;
             }
       	cadytsConfig.setCalibratedItems(links);
-            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), calibrationCounts, linkLookUp, Link.class);
+            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), calibrationCounts, linkLookUp, Link.class);
             for (MeasurementLoader<Link> measurementLoader : measurementLoaders) {
                 measurementLoader.load(linkAnalyticalCalibrator);
             }

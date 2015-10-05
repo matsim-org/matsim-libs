@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.cadyts.measurement;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,137 +31,115 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.LookUpItemFromId;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.demand.Plan;
-import cadyts.supply.SimResults;
 
-/**
- * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
- * select plans that better match to given occupancy counts.
- */
 public class MeasurementCadytsContext implements CadytsContextI<Measurement>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
 	final static Logger log = Logger.getLogger(MeasurementCadytsContext.class);
 
-	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
-	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-	
+	private final static String COSTOFFSET_FILENAME = "costOffsets.xml";
+	private static final String ANALYSIS_FILENAME = "analysis.txt";
+
 	private final Counts<Measurement> counts;
 	private final boolean writeAnalysisFile;
 
 	private AnalyticalCalibrator<Measurement> calibrator;
-	private MeasurementListener planToPlanStep;
-	private SimResults<Measurement> simResults;
-	
+	private MeasurementListener measurementListener;
+
 	private final Measurements measurements ;
-	
+
 	public MeasurementCadytsContext(Config config, Tuple<Counts<Measurement>, Measurements> tuple) {
-		
-		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup();
-		config.addModule(cadytsConfig);
-		// addModule() also initializes the config group with the values read from the config file
+
+		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
 		cadytsConfig.setWriteAnalysisFile(true);
-		
+
 		this.counts = tuple.getFirst() ;
-		measurements = tuple.getSecond() ;
+		this.measurements = tuple.getSecond() ;
 
 		Set<String> measurementsSet = new TreeSet<>();
 		for (Id<Measurement> id : this.counts.getCounts().keySet()) {
 			measurementsSet.add(id.toString());
 		}
-		
+
 		cadytsConfig.setCalibratedItems(measurementsSet);
-		
+
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
-	}
-	
-	public MeasurementCadytsContext(Config config ) {
-		this( config, null ) ;
 	}
 
 	@Override
 	public PlansTranslator<Measurement> getPlansTranslator() {
-		return this.planToPlanStep;
+		return this.measurementListener;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+		// yy could probably move all of this method into the constructor, and then get rid of this method.  But should
+		// be debugged and a test case written before. kai, oct'15
+
 		Scenario scenario = event.getControler().getScenario();
-		
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, measurements, Measurement.class);
+		Config config = scenario.getConfig();
 
-		// this collects events and generates cadyts plans from it
-		this.planToPlanStep = new MeasurementListener(scenario, measurements );
-		event.getControler().getEvents().addHandler(planToPlanStep);
+		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
 
-			}
+		this.measurementListener = new MeasurementListener(scenario, measurements );
+		event.getControler().getEvents().addHandler(measurementListener);
+	}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-    	
-    	// ---------- 2nd important Cadyts method is "analyzer.addToDemand"
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+
+		// ---------- 2nd important Cadyts method is "analyzer.addToDemand"
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
-            Plan<Measurement> planSteps = this.planToPlanStep.getPlanSteps(person.getSelectedPlan());
+		for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+			Plan<Measurement> planSteps = this.measurementListener.getPlanSteps(person.getSelectedPlan());
 			this.calibrator.addToDemand(planSteps);
-        }
-    }
+		}
+	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
-			String analysisFilepath = null;
-			if (isActiveInThisIteration(event.getIteration(), event.getControler())) {
-				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
-			}
+			String analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), ANALYSIS_FILENAME);
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
-		
+
 		// ---------- 3rd important method "calibrator.afterNetworkLoading"
-		this.calibrator.afterNetworkLoading(simResults);
+		this.calibrator.afterNetworkLoading(this.measurementListener);
 
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
 		// TODO writing does not work currently; reactivate this when other stuff has been sorted out
-//		try {
-////			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()), Link.class)
-//			new CadytsCostOffsetsXMLFileIO<Double>(new DistributionBinLookUp(), Double.class)
-//   			   .write(filename, this.calibrator.getLinkCostOffsets());
-//		} catch (IOException e) {
-//			log.error("Could not write link cost offsets!", e);
-//		}
+		try {
+			new CadytsCostOffsetsXMLFileIO<Measurement>( this.measurements, Measurement.class)
+			.write(filename, this.calibrator.getLinkCostOffsets());
+		} catch (IOException e) {
+			log.error("Could not write link cost offsets!", e);
+		}
 	}
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
 
-	@SuppressWarnings("static-method")
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
-		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
-	}
-
 	@Override
 	public AnalyticalCalibrator<Measurement> getCalibrator() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
+		return this.calibrator ;
 	}
 }

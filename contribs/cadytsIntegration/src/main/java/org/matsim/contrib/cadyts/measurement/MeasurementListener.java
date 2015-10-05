@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -36,9 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.kai.DataMap;
 import org.matsim.contrib.analysis.kai.Databins;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.config.ConfigUtils;
 
 import cadyts.demand.PlanBuilder;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -64,15 +63,20 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 	private static final String STR_ITERATION = "iteration";
 
 	private final Measurements  measurements ;
-	
-	private final DataMap<Measurement> simResults = new DataMap<>() ;
-	private final Databins<Measurement> databins = new Databins<>("dummy") ;
+
+	private final Databins<Measurement> databins ;
 
 	MeasurementListener(final Scenario scenario, Measurements measurements) {
-			
 		this.measurements = measurements ;
-		
 		this.scenario = scenario;
+		
+		this.databins = new Databins<Measurement>( "travel times for measurement facility at each hour" ) ;
+		double[] dataBoundaries = new double[24] ;
+		for ( int ii=0 ; ii<dataBoundaries.length; ii++ ) {
+			dataBoundaries[ii] = ii * 3600. ;
+			// hourly bins, not connected to anything; this might be improved ...
+		}
+		this.databins.setDataBoundaries( dataBoundaries );
 	}
 
 	private long plansFound = 0;
@@ -111,21 +115,14 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 	public void handleEvent(PersonArrivalEvent event) {
 		PersonDepartureEvent dpEvent = this.driverAgents.remove( event.getPersonId() ) ;
 		double ttime = event.getTime() - dpEvent.getTime() ;
+		
+		// the travel time determines the measurement "facility":
 		Measurement measurement = measurements.getMeasurementFromTTimeInSeconds(ttime) ;
 		
-		// ---
-		// the following will lead to getSimValue (observation):
-		int idx = this.databins.getIndex( dpEvent.getTime() ) ;
-		this.databins.inc( measurement, idx);
-		
-
-		// ---
 		// the following will fill the cadyts plan:
-
 		// get the planStepFactory for the plan (or create one):
 		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
 		PlanBuilder<Measurement> tmpPlanStepFactory = getPlanStepFactoryForPlan(person.getSelectedPlan());
-
 		// add the measurement:
 		if (tmpPlanStepFactory != null) {
 			// can this happen?? Maybe in early time steps???
@@ -133,6 +130,10 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 			tmpPlanStepFactory.addTurn( measurement, (int) event.getTime());
 		}
 		
+		// the following will lead to getSimValue:
+		int idx = this.databins.getIndex( dpEvent.getTime() ) ;
+		this.databins.inc( measurement, idx);
+
 	}
 
 	// ###################################################################################
@@ -161,8 +162,8 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 
 	@Override
 	public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
-		int idx = this.databins.getIndex( startTime_s ) ;
-		return this.databins.getValue( mea, idx ) ;
+		Assert.assertNotNull( mea ); 
+		return this.databins.getValue( mea, this.databins.getIndex( startTime_s ) ) ;
 	}
 
 	

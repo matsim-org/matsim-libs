@@ -114,7 +114,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.planToPlanStep = new PlanToPlanStepBasedOnEvents(scenario);
 		event.getControler().getEvents().addHandler(planToPlanStep);
 
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
+		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 	}
 
     @Override

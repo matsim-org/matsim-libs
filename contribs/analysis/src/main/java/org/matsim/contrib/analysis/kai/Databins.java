@@ -24,7 +24,13 @@ public final class Databins<K> {
 	public Databins( String typeName ) {
 		this.typeName = typeName ;
 	}
+	public void setDataBoundaries(double[] tmp) {
+		this.dataBoundaries = tmp ;
+	}
 	public double getValue(K key, int idx) {
+		if ( delegate.get(key)==null ) {
+			instantiate(key) ;
+		}
 		return this.delegate.get(key)[idx] ;
 	}
 	public Set<Entry<K, double[]>> entrySet() {
@@ -33,10 +39,10 @@ public final class Databins<K> {
 	public double[] getDataBoundaries() {
 		return dataBoundaries ;
 	}
-	public void setDataBoundaries( double[] bnd ) {
-		dataBoundaries = bnd ;
-	}
 	public double[] getValues(K key) {
+		if ( delegate.get(key)==null ) {
+			instantiate(key) ;
+		}
 		return delegate.get(key) ;
 	}
 	public void instantiate(K key) {
@@ -44,9 +50,15 @@ public final class Databins<K> {
 		delegate.put( key, array ) ;
 	}
 	public void addValue(K key, int idx, Double val) {
+		if ( delegate.get(key)==null ) {
+			instantiate(key) ;
+		}
 		delegate.get(key)[idx] += val ;
 	}
 	public void inc(K key, int idx) {
+		if ( delegate.get(key)==null ) {
+			instantiate(key) ;
+		}
 		delegate.get(key)[idx] ++ ;
 	}
 	public int getIndex(double dblVal) {

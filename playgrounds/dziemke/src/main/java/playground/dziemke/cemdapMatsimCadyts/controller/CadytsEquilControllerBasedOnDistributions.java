@@ -221,6 +221,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 			for (int h = 1; h<=24; h++) {
 				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 25*60 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(70000, Measurement.class);

@@ -120,7 +120,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		}
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(config, counts , lookUp , Item.class);
+		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, counts , lookUp , Item.class);
 		
 		// prepare the sim results container:
 		this.simResults = new SimResultsImpl<Item>( itemContainer.values() ) ;

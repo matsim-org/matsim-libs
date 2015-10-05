@@ -13,12 +13,6 @@ import org.matsim.counts.Count;
 
 public final class Measurements implements LookUpItemFromId<Measurement> {
 	private static final Logger log = Logger.getLogger( Measurements.class );
-	/* We have:
-	 * () Measurement ... corresponds to a certain ttime bin.
-	 * So we need ttime2mea lookup.
-	 * The Databin then seems a bit overkill: once we have the lookup, we don't need the databins any more.
-	 * 
-	 */
 	
 	private final Map< Id<Measurement>,Measurement > map = new TreeMap<>() ;
 
@@ -38,8 +32,9 @@ public final class Measurements implements LookUpItemFromId<Measurement> {
 	public void add( Count<Measurement> cnt, double lowerBound ) {
 		Measurement mea = new Measurement( cnt.getLocId(), lowerBound ) ;
 		map.put( mea.getId(), mea ) ;
+		set.add( mea ) ;
 	}
-
+	
 	@Override 
 	public Measurement getItem(Id<Measurement> id) {
 		return map.get( id ) ;
@@ -50,8 +45,10 @@ public final class Measurements implements LookUpItemFromId<Measurement> {
 	}
 
 	private Id<Measurement> getMeasurementIdFromTTimeInSeconds( double ttime ) {
+		log.warn("ttime=" + ttime  + " set=" + set );
 		Measurement prev = null ;
 		for ( Measurement mea : set ) {
+			log.warn("lowerBound=" + mea.getLowerBound() ) ;
 			if ( mea.getLowerBound() > ttime ) {
 				if ( prev != null ) {
 					return prev.getId() ;
