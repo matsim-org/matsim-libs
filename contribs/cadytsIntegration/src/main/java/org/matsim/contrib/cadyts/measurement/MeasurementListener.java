@@ -66,6 +66,7 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 	private final Measurements  measurements ;
 	
 	private final DataMap<Measurement> simResults = new DataMap<>() ;
+	private final Databins<Measurement> databins = new Databins<>("dummy") ;
 
 	MeasurementListener(final Scenario scenario, Measurements measurements) {
 			
