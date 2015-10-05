@@ -20,35 +20,47 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RoutingContextImpl implements RoutingContext {
 
-	private final TravelDisutility travelDisutility;
-	private final TravelTime travelTime;
+	private final Map<String, TravelDisutility> travelDisutilities;
+	private final Map<String, TravelTime> travelTimes;
+
+	public RoutingContextImpl(Map<String,TravelDisutility> travelDisutilities, Map<String,TravelTime> travelTimes) {
+		this.travelDisutilities = travelDisutilities;
+		this.travelTimes = travelTimes;
+	}
 
 	public RoutingContextImpl(TravelDisutility travelDisutility, TravelTime travelTime) {
-		this.travelDisutility = travelDisutility;
-		this.travelTime = travelTime;
+		this.travelDisutilities = new HashMap<>();
+		this.travelTimes = new HashMap<>();
+		this.travelDisutilities.put(TransportMode.car, travelDisutility);
+		this.travelTimes.put(TransportMode.car, travelTime);
 	}
 
-	@Deprecated
-	public RoutingContextImpl(TravelDisutilityFactory travelDisutilityFactory, TravelTime travelTime,
-			PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, cnScoringGroup);
-		this.travelTime = travelTime;
-	}
-	
 	@Override
 	public TravelDisutility getTravelDisutility() {
-		return this.travelDisutility;
+		return this.travelDisutilities.get(TransportMode.car);
 	}
 
 	@Override
 	public TravelTime getTravelTime() {
-		return this.travelTime;
+		return this.travelTimes.get(TransportMode.car);
+	}
+
+	@Override
+	public TravelDisutility getTravelDisutility(String mode) {
+		return travelDisutilities.get(mode);
+	}
+
+	@Override
+	public TravelTime getTravelTime(String mode) {
+		return travelTimes.get(mode);
 	}
 }

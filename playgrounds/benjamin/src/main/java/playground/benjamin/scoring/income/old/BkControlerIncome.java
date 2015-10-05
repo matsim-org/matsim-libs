@@ -93,7 +93,7 @@ public class BkControlerIncome extends BkControler {
 			this.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 				}
 			});
 		}
@@ -104,7 +104,7 @@ public class BkControlerIncome extends BkControler {
 			this.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 				}
 			});
 		}

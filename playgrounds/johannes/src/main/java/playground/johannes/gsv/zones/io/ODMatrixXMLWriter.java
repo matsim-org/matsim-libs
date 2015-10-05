@@ -19,14 +19,14 @@
 
 package playground.johannes.gsv.zones.io;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ODMatrix;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
@@ -88,7 +88,7 @@ public class ODMatrixXMLWriter extends MatsimXmlWriter {
 		}
 		
 		writeStartTag(ZONES_TAG, null);
-		writeContent(Zone2GeoJSON.toJson(m.keySet()), false);
+		writeContent(ZoneGeoJsonIO.toJson(m.keySet()), false);
 		writeEndTag(ZONES_TAG);
 	}
 }

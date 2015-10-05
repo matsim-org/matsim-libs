@@ -24,11 +24,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -40,12 +41,12 @@ public class DgSensor {
 	private static final Logger log = Logger.getLogger(DgSensor.class);
 	
 	private Link link = null;
-	public int agentsOnLink = 0;
+	public int vehiclesOnLink = 0;
 	
 	private boolean doDistanceMonitoring = false;
-	private Map<Double, Map<Id, CarLocator>> distanceMeterCarLocatorMap = null;
-	private Map<Id, PersonArrivalEvent> personIdArrivalEventMap = null;
-	private Map<Double, Map<Id,CarLocator>> inActivityDistanceCarLocatorMap = null;
+	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
+	private Map<Id<Vehicle>, VehicleLeavesTrafficEvent> link2WaitEventPerVehicleId = null;
+	private Map<Double, Map<Id<Vehicle>, CarLocator>> inActivityDistanceCarLocatorMap = null;
 	
 	public DgSensor(Link link){
 		this.link  = link;
@@ -59,23 +60,23 @@ public class DgSensor {
 		if (! this.doDistanceMonitoring) {
 			this.enableDistanceMonitoring();
 		}
-		this.distanceMeterCarLocatorMap.put(distanceMeter, new HashMap<Id, CarLocator>());
-		this.inActivityDistanceCarLocatorMap.put(distanceMeter, new HashMap<Id, CarLocator>());
+		this.distanceMeterCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
+		this.inActivityDistanceCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
 	}
 	
 	private void enableDistanceMonitoring() {
 		this.doDistanceMonitoring = true;
-		this.distanceMeterCarLocatorMap = new HashMap<Double, Map<Id, CarLocator>>();
-		this.personIdArrivalEventMap = new HashMap<Id, PersonArrivalEvent>();
-		this.inActivityDistanceCarLocatorMap = new HashMap<Double, Map<Id, CarLocator>>();
+		this.distanceMeterCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
+		this.link2WaitEventPerVehicleId = new HashMap<Id<Vehicle>, VehicleLeavesTrafficEvent>();
+		this.inActivityDistanceCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
 	}
 
 	public int getNumberOfCarsOnLink() {
-		return this.agentsOnLink;
+		return this.vehiclesOnLink;
 	}
 
 	public int getNumberOfCarsInDistance(Double distanceMeter, double timeSeconds) {
-		Map<Id, CarLocator> carLocators = this.distanceMeterCarLocatorMap.get(distanceMeter);
+		Map<Id<Vehicle>, CarLocator> carLocators = this.distanceMeterCarLocatorMap.get(distanceMeter);
 		int count = 0;
 		for (CarLocator cl : carLocators.values()){
 			if (cl.isCarinDistance(timeSeconds)){
@@ -86,58 +87,59 @@ public class DgSensor {
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		this.agentsOnLink++;
+		this.vehiclesOnLink++;
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-				personIdCarLocatorMap.put(event.getPersonId(), new CarLocator(this.link, event.getTime(), distance));
+				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
+				carLocatorPerVehicleId.put(event.getVehicleId(), new CarLocator(this.link, event.getTime(), distance));
 			}
 		}
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		this.agentsOnLink--;
+		this.vehiclesOnLink--;
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-				personIdCarLocatorMap.remove(event.getPersonId());
+				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
+				carLocatorPerVehicleId.remove(event.getVehicleId());
 			}
 		}
 	}
 	
-	public void handleEvent(PersonArrivalEvent event) {
-		this.agentsOnLink--;
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.vehiclesOnLink--;
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-				CarLocator cl = personIdCarLocatorMap.remove(event.getPersonId());
-				this.inActivityDistanceCarLocatorMap.get(distance).put(event.getPersonId(), cl);
+				Map<Id<Vehicle>, CarLocator> vehicleIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
+				CarLocator cl = vehicleIdCarLocatorMap.remove(event.getVehicleId());
+				this.inActivityDistanceCarLocatorMap.get(distance).put(event.getVehicleId(), cl);
 			}			
-			this.personIdArrivalEventMap.put(event.getPersonId(), event);
+			this.link2WaitEventPerVehicleId.put(event.getVehicleId(), event);
 		}
 	}
 	
 	public void handleEvent(Wait2LinkEvent event) {
-		this.agentsOnLink++;
+		this.vehiclesOnLink++;
 		if (this.doDistanceMonitoring){
-			if (! this.personIdArrivalEventMap.containsKey(event.getPersonId())){ // the person leaves his first act on this link --> add a car locator
-//				log.debug("wait2link at: " + event.getTime() + " person: "+ event.getPersonId() + " link: " + event.getLinkId());
+			// the vehicle leaves its first act on this link --> add a car locator
+			if (! this.link2WaitEventPerVehicleId.containsKey(event.getVehicleId())){ 
+//				log.debug("wait2link at: " + event.getTime() + " vehicle: "+ event.getVehicleId() + " link: " + event.getLinkId());
 				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-					Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
+					Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
 					//as the position now is not clear, assume enter time was freespeed travel time ago
 					double fs_tt = this.link.getLength() / this.link.getFreespeed();
-					personIdCarLocatorMap.put(event.getPersonId(), new CarLocator(this.link, event.getTime() - fs_tt, distance));
+					carLocatorPerVehicleId.put(event.getVehicleId(), new CarLocator(this.link, event.getTime() - fs_tt, distance));
 				}				
 			}
 			else {
-				double arrivalTime = this.personIdArrivalEventMap.remove(event.getPersonId()).getTime();
+				double arrivalTime = this.link2WaitEventPerVehicleId.remove(event.getVehicleId()).getTime();
 				double actTime = event.getTime() - arrivalTime;
 				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-					Map<Id, CarLocator> inActPersonIdCarLocatorMap = this.inActivityDistanceCarLocatorMap.get(distance);
-					CarLocator cl = inActPersonIdCarLocatorMap.remove(event.getPersonId());
+					Map<Id<Vehicle>, CarLocator> carLocatorPerInActVehicleId = this.inActivityDistanceCarLocatorMap.get(distance);
+					CarLocator cl = carLocatorPerInActVehicleId.remove(event.getVehicleId());
 					cl.setEarliestTimeInDistance(cl.getEarliestTimeInDistance() + actTime);
-					Map<Id, CarLocator> personIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-					personIdCarLocatorMap.put(event.getPersonId(), cl);
+					Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
+					carLocatorPerVehicleId.put(event.getVehicleId(), cl);
 				}
 			}
 		}

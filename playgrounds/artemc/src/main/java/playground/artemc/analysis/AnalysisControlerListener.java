@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 
 package playground.artemc.analysis;
@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
-import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 import java.io.BufferedWriter;
@@ -139,13 +138,13 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	}
 
 	private void runCalculation(IterationEndsEvent  event){
-		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
-        this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+		UserBenefitsCalculatorMod userBenefitsCalculator_logsum = new UserBenefitsCalculatorMod(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
+		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
-		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);
-        this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+		UserBenefitsCalculatorMod userBenefitsCalculator_selected = new UserBenefitsCalculatorMod(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);
+		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 
@@ -191,7 +190,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			sdcEveningByMode.put(mode, new ArrayList<Double>());
 		}
 
-        for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
+		for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
 
 			if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 				ttcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getTTC_morning().get(id));
@@ -214,7 +213,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 		MeanCalculator meanCalculator = new MeanCalculator();
 		for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
 			this.currentTTC_morning.put(mode, meanCalculator.getMean(ttcMorningByMode.get(mode)));
-			this.currentTTC_evening.put(mode, meanCalculator.getMean(ttcEveningByMode.get(mode)));	
+			this.currentTTC_evening.put(mode, meanCalculator.getMean(ttcEveningByMode.get(mode)));
 			this.currentSCD_morning.put(mode, meanCalculator.getMean(sdcMorningByMode.get(mode)));
 			this.currentSCD_evening.put(mode, meanCalculator.getMean(sdcEveningByMode.get(mode)));
 		}
@@ -226,7 +225,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 	}
 
-	private void writeWelfareAnalysis(IterationEndsEvent event) {	
+	private void writeWelfareAnalysis(IterationEndsEvent event) {
 
 		String welfareFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
 		File welfareFile = new File(welfareFilePath);
@@ -234,22 +233,22 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 		try {
 			BufferedWriter welfareWriter = new BufferedWriter(new FileWriter(welfareFile));
 			welfareWriter.write("Iteration;" +
-					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
-					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
-					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events");
+					                    "User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
+					                    "User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
+					                    "Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events");
 
 			welfareWriter.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
 				welfareWriter.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
-						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected.get(it)
-						+ ";" + this.it2tollSum.get(it)
-						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
-						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
-						+ ";" + this.it2totalTravelTimeAllModes.get(it)
-						+ ";" + this.it2totalTravelTimeCarMode.get(it)
-						+ ";" + (this.it2totalTravelTimeCarMode.get(it) / this.it2carLegs.get(it))
-						+ ";" + this.it2stuckEvents.get(it)
-						);
+						                    + ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected.get(it)
+						                    + ";" + this.it2tollSum.get(it)
+						                    + ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
+						                    + ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
+						                    + ";" + this.it2totalTravelTimeAllModes.get(it)
+						                    + ";" + this.it2totalTravelTimeCarMode.get(it)
+						                    + ";" + (this.it2totalTravelTimeCarMode.get(it) / this.it2carLegs.get(it))
+						                    + ";" + this.it2stuckEvents.get(it)
+				                   );
 				welfareWriter.newLine();
 
 			}
@@ -291,12 +290,12 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			tripsWriter.newLine();
 
 			for (Integer it : this.it2userBenefits_selected.keySet()){
-				tripsWriter.write(it 
-						+ ";" + this.it2carLegs.get(it)
-						+ ";" + this.it2ptLegs.get(it)
-						+ ";" + this.it2walkLegs.get(it)
-						+ ";" + this.it2transitWalkLegs.get(it)
-						);
+				tripsWriter.write(it
+						                  + ";" + this.it2carLegs.get(it)
+						                  + ";" + this.it2ptLegs.get(it)
+						                  + ";" + this.it2walkLegs.get(it)
+						                  + ";" + this.it2transitWalkLegs.get(it)
+				                 );
 
 				tripsWriter.newLine();
 			}
@@ -390,7 +389,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 					data += sumTTCTotal+";"+sumSDCTotal+";"+sumTTCMorning+";"+sumTTCEvening+";"+sumSDCMorning+";"+sumSDCEvening+";"+sumModeJourneys +";";
 
 					timeCostSummaryWriter.write(data);
-					timeCostSummaryWriter.newLine();	
+					timeCostSummaryWriter.newLine();
 				}
 				timeCostSummaryWriter.close();
 				log.info("Time cost summary for the last iteration was written to " + timeCostSummaryFilePath);
@@ -410,7 +409,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				double sumTTCTotal =0.0;
 				double sumSDCTotal = 0.0;
 
-                for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
+				for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
 					if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_evening().get(id);
 						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);
@@ -456,7 +455,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 		chart.addSeries(name, xValues, yValues);
 
-		XYPlot plot = chart.getChart().getXYPlot(); 
+		XYPlot plot = chart.getChart().getXYPlot();
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);
@@ -480,7 +479,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 		chart.addSeries(name, xValues, yValues);
 
-		XYPlot plot = chart.getChart().getXYPlot(); 
+		XYPlot plot = chart.getChart().getXYPlot();
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);
@@ -504,7 +503,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 		chart.addSeries(name, xValues, yValues);
 
-		XYPlot plot = chart.getChart().getXYPlot(); 
+		XYPlot plot = chart.getChart().getXYPlot();
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);

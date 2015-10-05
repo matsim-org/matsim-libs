@@ -23,21 +23,18 @@ import org.matsim.core.utils.io.IOUtils;
  * Exports the coordinates of the links with counting stations.
  * The output can be used for generation of new count-files, when linkIds of the network have changed.
  * @author kturner
- *
  */
 public class ExportCsLinkIdInfo {
 	
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../shared-svn/"; 	
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/counts/" ;
 	
 	//Position (linkId) of Counting Stations
 	private static final String CSIdFILE = workingDirInputFiles + "CSId-LinkId_merged.csv" ;
 	
-	//Position (linkId) of Counting Stations	
+	//Network the CSIdFile correspondent to -> to generate the coordinates of links with counting stations.
 	private static final String NETFILE = workingDirInputFiles + "santiago_merged_cl.xml.gz";	
-	
-	
-	
+
 
 	public static void main(String args[]){
 		Map<String,Id<Link>> idMap = new TreeMap<String,Id<Link>>();	
@@ -47,15 +44,18 @@ public class ExportCsLinkIdInfo {
 		config.network().setInputFile(NETFILE);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		idMap = createIds();
+		idMap = createIdMap();
 		exportCoordinates(idMap, scenario.getNetwork());
 		
-		System.out.println("### Done. ###");
-		
-		
-		
+		System.out.println("### Done. ###");		
 	}
 	
+	/**
+	 * Exports the coordinates of Links with counting stations.
+	 * Output can be used for 
+	 * @param idMap
+	 * @param network
+	 */
 	private static void exportCoordinates(Map<String, Id<Link>> idMap, Network network) {
 		FileWriter writer;
 		File file = new File(workingDirInputFiles + "CSLinkCoordinates.csv");
@@ -67,7 +67,7 @@ public class ExportCsLinkIdInfo {
 			writer.write("CS-Id;FromX;FromY;ToX;ToY" +System.getProperty("line.separator"));
 			writer.flush();
 
-			// Schließt den Stream
+			// close stream
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -78,7 +78,7 @@ public class ExportCsLinkIdInfo {
 			writer.write("Generated code for creation of map (CSId2LinkId) by coordinates " +System.getProperty("line.separator"));
 			writer.flush();
 
-			// Schließt den Stream
+			// close stream
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -92,33 +92,33 @@ public class ExportCsLinkIdInfo {
 			double toY = network.getLinks().get(idMap.get(csId)).getToNode().getCoord().getY();
 			System.out.println(csId + ": FromX: " + fromX + ": FromY: " + fromY + " ; toX: " + toX + " ; toY: " + toY  );		
 			
+			//write them to .csv-file
 			try {
-				writer = new FileWriter(file, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+				writer = new FileWriter(file, true);  //true ---> write to end 
 				writer.write(csId + ";" + fromX + ";" + fromY + ";" + toX + ";" + toY + System.getProperty("line.separator"));
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
+		    //and write them as command for class CreateCountingStations (just copy/paste) to .txt -file	
 			try {
-				writer = new FileWriter(file2, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+				writer = new FileWriter(file2, true);  //true ---> write to end 
 				writer.write("csIdString2LinkCoordinates.put(\"" + csId + "\", new ArrayList<Double>(Arrays.asList(" + fromX + ", " + fromY + ", " + toX + ", " + toY + ")));" + System.getProperty("line.separator"));
-//				writer.write(csId + ";" + fromX + ";" + fromY + ";" + toX + ";" + toY + System.getProperty("line.separator"));
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
 	}
 
-	//Varinte mit CSV Parser, der auch Leerfelder korrekt erfasst.
-		//Zeilen, in denen keine LinkId angegeben ist, werden ignoriert.
-	private static Map<String,Id<Link>> createIds(){
+	/**
+	* Reads CSIdFile and generates idMap <CS-Id (String), Link-Id> from the data.
+	*/
+	private static Map<String,Id<Link>> createIdMap(){
 		
 		Map<String,Id<Link>> idMap = new TreeMap<String,Id<Link>>();	
 			BufferedReader r = IOUtils.getBufferedReader(CSIdFILE);
@@ -128,7 +128,7 @@ public class ExportCsLinkIdInfo {
 
 				while((line = r.readLine()) != null){	
 					String[] splittedLine = line.split(";");
-					String cs_id = splittedLine[0];		//Name of CS in Database
+					String cs_id = splittedLine[0];		//Name of CS in database
 					String link_id = splittedLine[1];		//Link of CS
 
 

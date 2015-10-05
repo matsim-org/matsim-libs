@@ -48,10 +48,11 @@ public class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		ALL_GREEN, ONE_SECOND_Z, GREEN_WAVE_Z, GREEN_WAVE_SO
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO
 	}
 	
 	private static final int CYCLE_TIME = 60;
+	private static final int INTERGREEN_TIME = 0;
 
 	private Scenario scenario;
 	
@@ -77,6 +78,9 @@ public class TtCreateBraessSignals {
 
 	public void createSignals() {
 		
+		if (signalType.equals(SignalControlType.NONE)){
+			log.error("This method should not be called if the signal type NONE is used.");
+		}
 		if (!this.middleLinkExists && !this.signalType.equals(SignalControlType.ALL_GREEN)){
 			log.error("No provided signal control besides ALL_GREEN makes sense in a scenario without the middle link.");
 		}
@@ -95,66 +99,24 @@ public class TtCreateBraessSignals {
 	 */
 	private void createSignalSystems() {
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
-
-		// create signal systems for nodes 2, 3, 4 and 5
-		for (Node node : this.scenario.getNetwork().getNodes().values()){
-			switch (node.getId().toString()){
-			case "2": 
-			case "3":
-			case "4":
-			case "5":
-				// create signal system
-				SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
-						+ node.getId(), SignalSystem.class));
-				signalSystems.addSignalSystemData(signalSystem);
-				
-				// create a signal for every inLink outLink pair
-				for (Id<Link> inLinkId : node.getInLinks().keySet()){
-					int outLinkCounter = 0;
-					for (Id<Link> outLinkId : node.getOutLinks().keySet()){
-						outLinkCounter++;
-						SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
-						+ "." + outLinkCounter, Signal.class));
-						signalSystem.addSignalData(signal);
-						signal.setLinkId(inLinkId);
-						
-						// add turning move restrictions and lanes if necessary
-						switch (this.laneType) {
-						case TRIVIAL:
-							LanesToLinkAssignment20 linkLanes = this.scenario.getLanes()
-									.getLanesToLinkAssignments().get(inLinkId);
-							// the link only contains one lane (the trivial lane)
-							signal.addLaneId(linkLanes.getLanes().firstKey());
-						case NONE:
-							// turning move restrictions are necessary for TRIVIAL and NONE
-							signal.addTurningMoveRestriction(outLinkId);
-							break;
-						case REALISTIC:
-							// find and add the correct lane if it exists
-							linkLanes = this.scenario.getLanes().getLanesToLinkAssignments()
-									.get(inLinkId);
-							if (linkLanes != null) {
-								for (Lane lane : linkLanes.getLanes().values()) {
-									if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty() 
-											&& lane.getToLinkIds().contains(outLinkId))
-										// correct lane found
-										signal.addLaneId(lane.getId());
-								}
-							}
-							break;
-						}
-					}
+		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z)) {
+			// create only one signal system at node 4
+			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
+		} else {
+			// create signal systems at nodes 2, 3, 4 and 5
+			for (Node node : this.scenario.getNetwork().getNodes().values()) {
+				switch (node.getId().toString()) {
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+					createSignalSystemAtNode(node);
+					break;
+				default:
+					break;
 				}
-				break;
-			default:
-				break;
 			}
-		}
-		
+		}		
 		
 //		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 //			// create toNode signal system for all nodes that have outgoing links
@@ -339,6 +301,57 @@ public class TtCreateBraessSignals {
 //		signalSystems.addSignalSystemData(signalSystem);
 	}
 
+	private void createSignalSystemAtNode(Node node) {
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+		
+		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
+		
+		// create signal system
+		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
+				+ node.getId(), SignalSystem.class));
+		signalSystems.addSignalSystemData(signalSystem);
+		
+		// create a signal for every inLink outLink pair
+		for (Id<Link> inLinkId : node.getInLinks().keySet()){
+			int outLinkCounter = 0;
+			for (Id<Link> outLinkId : node.getOutLinks().keySet()){
+				outLinkCounter++;
+				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
+				+ "." + outLinkCounter, Signal.class));
+				signalSystem.addSignalData(signal);
+				signal.setLinkId(inLinkId);
+				
+				// add turning move restrictions and lanes if necessary
+				switch (this.laneType) {
+				case TRIVIAL:
+					LanesToLinkAssignment20 linkLanes = this.scenario.getLanes()
+							.getLanesToLinkAssignments().get(inLinkId);
+					// the link only contains one lane (the trivial lane)
+					signal.addLaneId(linkLanes.getLanes().firstKey());
+				case NONE:
+					// turning move restrictions are necessary for TRIVIAL and NONE
+					signal.addTurningMoveRestriction(outLinkId);
+					break;
+				case REALISTIC:
+					// find and add the correct lane if it exists
+					linkLanes = this.scenario.getLanes().getLanesToLinkAssignments()
+							.get(inLinkId);
+					if (linkLanes != null) {
+						for (Lane lane : linkLanes.getLanes().values()) {
+							if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty() 
+									&& lane.getToLinkIds().contains(outLinkId))
+								// correct lane found
+								signal.addLaneId(lane.getId());
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+
 	private void createSignalGroups() {
 
 		SignalsData signalsData = (SignalsData) this.scenario
@@ -372,6 +385,12 @@ public class TtCreateBraessSignals {
 			// creates a default plan for the signal system (with defined cycle
 			// time and offset 0)
 			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
+			
+			signalSystemControl.addSignalPlanData(signalPlan);
+			signalSystemControl
+					.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			signalControl.addSignalSystemControllerData(signalSystemControl);
+			
 			// specifies signal group settings for all signal groups of this
 			// signal system
 			for (SignalGroupData signalGroup : signalGroups
@@ -380,92 +399,48 @@ public class TtCreateBraessSignals {
 				
 				switch (this.signalType){
 				case GREEN_WAVE_Z:
-					// create signal control such that the middle route is prefered
+					// create signal control such that the middle route is preferred
 					createGreenWaveZSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
 				case GREEN_WAVE_SO:
-					// create signal control such that the outer routes are prefered
+					// create signal control such that the outer routes are preferred
 					createGreenWaveSOSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
 				case ALL_GREEN:
+				case ONE_SECOND_Z:
+				case ONE_SECOND_SO:
 					// create all day green onset and dropping
+					// and change it afterwards in case of ONE_SECOND_* control
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
-				case ONE_SECOND_Z:
-					// create all day green signal control and change it such that
-					// the middle route gets only green for one second a cycle
-					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
-							fac, signalGroup.getId(), 0, CYCLE_TIME));
-					changeAllGreenSignalControlTo1Z();
+				case SIGNAL4_ONE_SECOND_SO:
+					createSignal4Setting(fac, signalPlan, signalGroup.getId(), false);
+					break;
+				case SIGNAL4_ONE_SECOND_Z:
+					createSignal4Setting(fac, signalPlan, signalGroup.getId(), true);
+					break;
+				default:
 					break;
 				}
 			}
-
-			signalSystemControl.addSignalPlanData(signalPlan);
-			signalSystemControl
-					.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			signalControl.addSignalSystemControllerData(signalSystemControl);
 		}
-	}
-
-	private void createGreenWaveSOSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
-			Id<SignalGroup> signalGroupId) {
-		int onset = 0;
-		int dropping = 0;
-		int signalSystemOffset = 0;
-		// set onset and dropping for each signal group and offset for each signal system
-		switch (signalGroupId.toString()){
-		case "signal1_2.1": // signal for turning left (upper or middle route) at node 2
-			onset = 0;
-			dropping = 30;
-			signalSystemOffset = 0;
+		
+		// change the overall signal control to ONE_SECOND_Z or ONE_SECOND_SO respectively if necessary
+		switch (this.signalType){
+		case ONE_SECOND_Z:
+			// change all day green signal control such that
+			// the middle route gets only green for one second a cycle
+			changeAllGreenSignalControlTo1Z();
 			break;
-		case "signal1_2.2": // signal for turning right (lower route) at node 2
-			onset = 30;
-			dropping = 60;
-			signalSystemOffset = 0;
-			break;
-		case "signal23_3.1":
-		case "signal2_3.1": // signals for turning right (middle route) at node 3
-			onset = 30;
-			dropping = 60;
-			signalSystemOffset = 10;
-			break;
-		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
-			onset = 0;
-			dropping = 30;
-			signalSystemOffset = 10;
-			break;
-		case "signal3_4.1": // signal at link 3_4 (middle route at node 4)
-			onset = 0;
-			dropping = 30;
-			signalSystemOffset = 20;
-			break;
-		case "signal24_4.1":
-		case "signal2_4.1": // signals at link 2_4 (lower route at node 4)
-			onset = 30;
-			dropping = 60;
-			signalSystemOffset = 20;
-			break;
-		case "signal45_5.1":
-		case "signal4_5.1": // signals at link 4_5 (lower or middle route at node 5)
-			onset = 30;
-			dropping = 60;
-			signalSystemOffset = 30;
-			break;
-		case "signal3_5.1": // signal at link 3_5 (upper route at node 5)
-			onset = 0;
-			dropping = 30;
-			signalSystemOffset = 30;
+		case ONE_SECOND_SO:
+			// change all day green signal control such that
+			// the outer routes get only green for one second a cycle
+			changeAllGreenSignalControlTo1SO();
 			break;
 		default:
-			log.error("Signal group id " + signalGroupId + " is not known.");
 			break;
 		}
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
-		signalPlan.setOffset(signalSystemOffset);
 	}
 
 	private void createGreenWaveZSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
@@ -477,46 +452,46 @@ public class TtCreateBraessSignals {
 		switch (signalGroupId.toString()){
 		case "signal1_2.1": // signal for turning left (upper or middle route) at node 2
 			onset = 0;
-			dropping = 30;
+			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = 0;
 			break;
 		case "signal1_2.2": // signal for turning right (lower route) at node 2
 			onset = 30;
-			dropping = 60;
+			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = 0;
 			break;
 		case "signal23_3.1":
 		case "signal2_3.1": // signals for turning right (middle route) at node 3
 			onset = 0;
-			dropping = 30;
+			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = 10;
 			break;
 		case "signal23_3.2":
 		case "signal2_32": // signals for going straight on (upper route) at node 3
 			onset = 30;
-			dropping = 60;
+			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = 10;
 			break;
 		case "signal3_4.1": // signal at link 3_4 (middle route at node 4)
 			onset = 0;
-			dropping = 30;
+			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = 11;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signals at link 2_4 (lower route at node 4)
 			onset = 30;
-			dropping = 60;
+			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = 11;
 			break;
 		case "signal45_5.1":
 		case "signal4_5.1": // signals at link 4_5 (lower or middle route at node 5)
 			onset = 0;
-			dropping = 30;
+			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = 21;
 			break;
 		case "signal3_5.1": // signal at link 3_5 (upper route at node 5)
 			onset = 30;
-			dropping = 60;
+			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = 21;
 			break;
 		default:
@@ -525,7 +500,102 @@ public class TtCreateBraessSignals {
 		}
 		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
 		signalPlan.setOffset(signalSystemOffset);
-	}	
+	}
+
+	private void createGreenWaveSOSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
+			Id<SignalGroup> signalGroupId) {
+		int onset = 0;
+		int dropping = 0;
+		int signalSystemOffset = 0;
+		// set onset and dropping for each signal group and offset for each signal system
+		switch (signalGroupId.toString()){
+		case "signal1_2.1": // signal for turning left (upper or middle route) at node 2
+			onset = 0;
+			dropping = 30 - INTERGREEN_TIME;
+			signalSystemOffset = 0;
+			break;
+		case "signal1_2.2": // signal for turning right (lower route) at node 2
+			onset = 30;
+			dropping = 60 - INTERGREEN_TIME;
+			signalSystemOffset = 0;
+			break;
+		case "signal23_3.1":
+		case "signal2_3.1": // signals for turning right (middle route) at node 3
+			onset = 30;
+			dropping = 60 - INTERGREEN_TIME;
+			signalSystemOffset = 10;
+			break;
+		case "signal23_3.2":
+		case "signal2_32": // signals for going straight on (upper route) at node 3
+			onset = 0;
+			dropping = 30 - INTERGREEN_TIME;
+			signalSystemOffset = 10;
+			break;
+		case "signal3_4.1": // signal at link 3_4 (middle route at node 4)
+			onset = 0;
+			dropping = 30 - INTERGREEN_TIME;
+			signalSystemOffset = 20;
+			break;
+		case "signal24_4.1":
+		case "signal2_4.1": // signals at link 2_4 (lower route at node 4)
+			onset = 30;
+			dropping = 60 - INTERGREEN_TIME;
+			signalSystemOffset = 20;
+			break;
+		case "signal45_5.1":
+		case "signal4_5.1": // signals at link 4_5 (lower or middle route at node 5)
+			onset = 30;
+			dropping = 60 - INTERGREEN_TIME;
+			signalSystemOffset = 30;
+			break;
+		case "signal3_5.1": // signal at link 3_5 (upper route at node 5)
+			onset = 0;
+			dropping = 30 - INTERGREEN_TIME;
+			signalSystemOffset = 30;
+			break;
+		default:
+			log.error("Signal group id " + signalGroupId + " is not known.");
+			break;
+		}
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
+		signalPlan.setOffset(signalSystemOffset);
+	}
+
+	private void createSignal4Setting(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, boolean forceSO) {
+		int onset = 0;
+		int dropping = 0;
+		// set onset and dropping depending on the signal group and signal control type
+		switch (signalGroupId.toString()){
+		case "signal3_4.1": // signal at node 4 for the middle route
+			if (forceSO){
+				// set 1 second green for the middle route
+				onset = 0;
+				dropping = 1;
+			} else { // force Z
+				// set 59 seconds green for the middle route
+				onset = 1;
+				dropping = 60;
+			}
+			break;
+		case "signal24_4.1":
+		case "signal2_4.1": // signal at node 4 for the lower route
+			if (forceSO){
+				// set 59 seconds green for the lower route
+				onset = 1;
+				dropping = 60;
+			} else { // force Z
+				// set 1 second green for the lower route
+				onset = 0;
+				dropping = 1;
+			}
+			break;
+		default:
+			log.error("This method was called for signal group ID " + signalGroupId 
+					+ " but should not be called for other signal groups than the ones of signal system 4.");
+			break;
+		}
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
+	}
 
 	/**
 	 * Sets the signal at link 3_4 (i.e. the middle route) green for only one
@@ -548,17 +618,81 @@ public class TtCreateBraessSignals {
 
 			// pick the signal at link 3_4 (which is the middle link) from the
 			// signal plan
-			SignalGroupSettingsData signalGroupZSetting;
-			signalGroupZSetting = signalPlan
+			SignalGroupSettingsData signalGroupZSetting = signalPlan
 						.getSignalGroupSettingsDataByGroupId().get(
 								Id.create("signal3_4.1", SignalGroup.class));
 
 			// set the signal green for only one second
 			signalGroupZSetting.setOnset(0);
 			signalGroupZSetting.setDropping(1);
+			
+			// pick the signal at link 2_4 (or 24_4 respectively) from the signal plan
+			// (which is the lower link in front of crossing 4) 
+			SignalGroupSettingsData signalGroupVSetting;
+			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_4.1", SignalGroup.class)))
+				signalGroupVSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal2_4.1", SignalGroup.class));
+			else
+				signalGroupVSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal24_4.1", SignalGroup.class));
+
+			// set the signal green for only one second
+			signalGroupVSetting.setOnset(1);
+			signalGroupVSetting.setDropping(60);
 		}
 	}
 
+	/**
+	 * Sets the signal for turning right at link 1_2 and the signal for going
+	 * straight on at link 2_3 green for only one second a cylce. (Green for no
+	 * seconds is not possible.)
+	 */
+	private void changeAllGreenSignalControlTo1SO() {
+		
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalControlData signalControl = signalsData.getSignalControlData();
+
+		// adapt signal system 2
+		SignalSystemControllerData signalSystem2Control = signalControl
+				.getSignalSystemControllerDataBySystemId().get(
+						Id.create("signalSystem2", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem2Control
+				.getSignalPlanData().values()) {
+			// note: every signal system has only one signal plan here
+
+			// pick the second signal at link 1_2 (turning right) from the
+			// signal plan
+			SignalGroupSettingsData signalGroupSOSetting;
+			signalGroupSOSetting = signalPlan
+						.getSignalGroupSettingsDataByGroupId().get(
+								Id.create("signal1_2.2", SignalGroup.class));
+
+			// set the signal green for only one second
+			signalGroupSOSetting.setOnset(0);
+			signalGroupSOSetting.setDropping(1);
+		}
+		
+		// adapt signal system 3
+		SignalSystemControllerData signalSystem3Control = signalControl
+				.getSignalSystemControllerDataBySystemId().get(
+						Id.create("signalSystem3", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem3Control
+				.getSignalPlanData().values()) {
+			// note: every signal system has only one signal plan here
+
+			// pick the second signal at link 2_3 (or 23_3 respectively) (going straight on) 
+			// from the signal plan
+			SignalGroupSettingsData signalGroupSOSetting;
+			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_3.2", SignalGroup.class))){
+				signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal2_3.2", SignalGroup.class));
+			} else {
+				signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal23_3.2", SignalGroup.class));
+			}
+
+			// set the signal green for only one second
+			signalGroupSOSetting.setOnset(0);
+			signalGroupSOSetting.setDropping(1);
+		}
+	}
 
 	public void setLaneType(LaneType laneType) {
 		this.laneType = laneType;

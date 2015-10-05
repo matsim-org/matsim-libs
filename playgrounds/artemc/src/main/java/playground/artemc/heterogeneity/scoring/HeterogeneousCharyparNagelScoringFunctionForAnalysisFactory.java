@@ -20,6 +20,7 @@
 
 package playground.artemc.heterogeneity.scoring;
 
+import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -35,15 +36,17 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import static org.apache.commons.math.special.Erf.erf;
+
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
- * 
+ *
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
  *  Transportation, 32 (4) 369-397.</p>
  * </blockquote>
- * 
+ *
  * @author rashid_waraich
  */
 public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory implements ScoringFunctionFactory, PersonalScoringFunctionFactory {
@@ -92,7 +95,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 		DisaggregatedSumScoringFunction sumScoringFunction = new DisaggregatedSumScoringFunction();
 		sumScoringFunction.setParams(params);
 
-		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));		
+		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 		for(String mode:params.modeParams.keySet()){
 			sumScoringFunction.addLegScoringFunction(mode, new CharyparNagelLegScoring(params, this.network));
 		}
@@ -130,7 +133,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 //			inverseFactorMean = inverseFactorSum / (double) incomeFactors.size();
 			
 
-		if(simulationType.equals("hetero")){
+			if(simulationType.equals("hetero")){
 
 			    /* Adjust alpha - value of time*/
 				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
@@ -146,10 +149,10 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * incomeAlphaFactor;
 				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * incomeAlphaFactor;
 
-		}
-		else if(simulationType.equals("heteroAlpha") ){
+			}
+			else if(simulationType.equals("heteroAlpha") ){
 
-				Double sdBetaFactor = (Double) person.getCustomAttributes().get("sdBetaFactor");
+				Double betaFactor = (Double) person.getCustomAttributes().get("betaFactor");
 
 				double performingConst = 	params.marginalUtilityOfPerforming_s;
 
@@ -162,7 +165,20 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 
 				/* Adjust beta - schedule delay early (sdBeta = marginalUtilityOfWaiting - marginalUtilityOfPerforming*/
 				/*relation beta/alpha  = 0.5 for beta_mean is also used by van den Berg and Verhoef (2011)*/
-				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst * 0.5 * sdBetaFactor;
+				//params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst * betaFactor;
+
+				// new beta factor transforms distribution from 0.4 - 1.6 with mean=1 and sd=0.3 to 1 - 3 with mean=2, sd=1/2
+				//double newbetaFactor = (betaFactor + 0.2 ) * (10.0 / 6.0);
+				//params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * 2  / newbetaFactor;
+
+				// new beta factor transforms distribution from 0.4 - 1.6 with mean=1 and sd=0.3 to a standard normal distribution
+
+				//double std = 0.383304098205198;
+				double std = 0.25;
+				double mean = Math.log(1) - (std * std) / 2;
+				double lnBetaFactor = Math.exp(mean + std * betaFactor);
+
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * lnBetaFactor;
 
 				/* Adjust gamma - schedule delay late*/
 				/*relation gamma/beta  = 3.9 as in Arnott, de Palma, Lindsey (1990) and later used by van den Berg and Verhoef (2011)*/
@@ -170,26 +186,73 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 				params.marginalUtilityOfEarlyDeparture_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
 
 
-		}
-		else if(simulationType.equals("heteroGamma") ){
-
-			Double incomeGammaFactor = (Double) person.getCustomAttributes().get("incomeAlphaFactor");
-
-			double performingConst = 	params.marginalUtilityOfPerforming_s;
-			double waitingConst = 	params.marginalUtilityOfWaiting_s;
-			/* Adjust alpha - value of time*/
-			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
-
-			for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
 			}
+			else if(simulationType.equals("heteroAlphaRatio") ){
 
-			/* Adjust beta - schedule delay early*/
-			params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * incomeAlphaFactor;
+				Double betaFactor = (Double) person.getCustomAttributes().get("betaFactor");
+
+				double performingConst = 	params.marginalUtilityOfPerforming_s;
+
+				/* Adjust alpha - value of time*/
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
+
+				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
+				}
+
+			/* Adjust beta - schedule delay early (sdBeta = marginalUtilityOfWaiting - marginalUtilityOfPerforming*/
+			/*relation beta/alpha  = 0.5 for beta_mean is also used by van den Berg and Verhoef (2011)*/
+				//params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst * betaFactor;
+
+				// new beta factor transforms distribution from 0.4 - 1.6 with mean=1 and sd=0.3 to 1 - 3 with mean=2, sd=1/2
+				//double newbetaFactor = (betaFactor + 0.2 ) * (10.0 / 6.0);
+				//params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * 2  / newbetaFactor;
+
+				// new beta factor transforms distribution from 0.4 - 1.6 with mean=1 and sd=0.3 to a standard normal distribution
+
+				//double std = 0.383304098205198;
+				double std = 0.25;
+				double mean = Math.log(1) - (std * std) / 2;
+				double lnBetaFactor = Math.exp(mean + std * betaFactor);
+
+				double inverseMean = 2.132033;
+
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * lnBetaFactor * (inverseMean / 2.0) ;
 
 			/* Adjust gamma - schedule delay late*/
-			params.marginalUtilityOfLateArrival_s =  (waitingConst - performingConst) * 3.9 * incomeGammaFactor;
-			params.marginalUtilityOfEarlyDeparture_s =  (waitingConst- performingConst) * 3.9 * incomeGammaFactor;
+			/*relation gamma/beta  = 3.9 as in Arnott, de Palma, Lindsey (1990) and later used by van den Berg and Verhoef (2011)*/
+				params.marginalUtilityOfLateArrival_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
+				params.marginalUtilityOfEarlyDeparture_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
+
+
+			}
+			else if(simulationType.equals("heteroGamma") ){
+
+				Double incomeGammaFactor = (Double) person.getCustomAttributes().get("incomeGammaFactor");
+
+				double performingConst = 	params.marginalUtilityOfPerforming_s;
+				double waitingConst = 	params.marginalUtilityOfWaiting_s;
+			/* Adjust alpha - value of time*/
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
+
+				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
+				}
+
+			/* Adjust beta - schedule delay early*/
+				params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * incomeAlphaFactor;
+
+			/* Adjust gamma - schedule delay late*/
+				// gamma factor transforms distribution from 0.4 - 1.6 with mean=1 and sd=0.3 to 1 - 6.8 with mean=3.9, sd=1.45
+				Double betaFactor = (Double) person.getCustomAttributes().get("betaFactor");
+				//double gammaFactor = (betaFactor - 28.0/145.0) * 29.0/6.0;
+				double gammaFactor = betaFactor * 0.975 + 3.9;
+
+				params.marginalUtilityOfLateArrival_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)  * gammaFactor;
+				params.marginalUtilityOfEarlyDeparture_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s) * gammaFactor;
+
+//			params.marginalUtilityOfLateArrival_s =  (waitingConst - performingConst) * 3.9 * incomeGammaFactor;
+//			params.marginalUtilityOfEarlyDeparture_s =  (waitingConst- performingConst) * 3.9 * incomeGammaFactor;
 
 
 			/*  OLD VERSION (before April 24, 2015)
@@ -200,6 +263,51 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 
 				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
 			*/
+			}
+
+			else if(simulationType.equals("heteroPropSymmetric") ){
+
+				Double votDeviation = (Double) person.getCustomAttributes().get("votDeviation");
+
+				Double factor = (params.marginalUtilityOfPerforming_s * 2  + votDeviation * params.marginalUtilityOfMoney / 3600.0) / (params.marginalUtilityOfPerforming_s * 2) ;
+
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s  * factor;
+
+				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * factor;
+				}
+
+			/* Adjust beta - schedule delay early*/
+				params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * factor;
+
+			/* Adjust gamma - schedule delay late*/
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * factor;
+				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * factor;
+			}
+
+			else if(simulationType.equals("heteroAlphaOnly") ){
+
+				Double betaFactor = (Double) person.getCustomAttributes().get("betaFactor");
+
+				double std = 0.25;
+				double mean = Math.log(1) - (std * std) / 2;
+				double lnBetaFactor = Math.exp(mean + std * betaFactor);
+
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * lnBetaFactor;
+			/* Adjust gamma - schedule delay late*/
+			/*relation gamma/beta  = 3.9 as in Arnott, de Palma, Lindsey (1990) and later used by van den Berg and Verhoef (2011)*/
+				params.marginalUtilityOfLateArrival_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
+				params.marginalUtilityOfEarlyDeparture_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
+
+			}else if(simulationType.equals("heteroGammaOnly") ) {
+
+			/* Adjust gamma - schedule delay late*/
+
+				Double betaFactor = (Double) person.getCustomAttributes().get("betaFactor");
+				double gammaFactor = betaFactor * 0.975 + 3.9;
+
+				params.marginalUtilityOfLateArrival_s = (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s) * gammaFactor;
+				params.marginalUtilityOfEarlyDeparture_s = (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s) * gammaFactor;
 			}
 
 		/*OLD - Appears to be unrealistic

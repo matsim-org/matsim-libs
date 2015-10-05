@@ -61,12 +61,15 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks;
+	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
 	PlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		for ( String str : abc ) {
+			this.calibratedLinks.add( Id.createLinkId(str) ) ;
+		}
 		this.driverAgents = new HashSet<>();
 	}
 

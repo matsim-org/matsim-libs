@@ -20,11 +20,10 @@
 package playground.johannes.synpop.sim;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
@@ -43,7 +42,7 @@ public class SetActivityFacilities implements EpisodeTask {
         for(Segment act : episode.getActivities()) {
             if(act.getAttribute(CommonKeys.ACTIVITY_FACILITY) == null) {
                 String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-                if(type == null) type = ActivityTypes.MISC;//FIXME
+//                if(type == null) type = ActivityTypes.MISC;//FIXME
                 ActivityFacility f = data.randomFacility(type);
                 act.setAttribute(CommonKeys.ACTIVITY_FACILITY, f.getId().toString());
             }

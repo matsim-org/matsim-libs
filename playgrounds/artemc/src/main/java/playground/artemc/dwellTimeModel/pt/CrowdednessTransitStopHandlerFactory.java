@@ -19,6 +19,7 @@
 
 package playground.artemc.dwellTimeModel.pt;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.vehicles.Vehicle;

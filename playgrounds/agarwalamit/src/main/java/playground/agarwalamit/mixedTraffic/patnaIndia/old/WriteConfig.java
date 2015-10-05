@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -105,17 +106,21 @@ public class WriteConfig {
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);// changed to 0 from (-2) earlier
 
 		config.planCalcScore().setPerforming_utils_hr(6.0);
-		config.planCalcScore().setTraveling_utils_hr(0);
-		config.planCalcScore().setTravelingBike_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(0);
-		config.planCalcScore().setTravelingPt_utils_hr(0);
-		config.planCalcScore().setTravelingWalk_utils_hr(0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.other).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
 
-		config.planCalcScore().setConstantCar(-3.50);
-		config.planCalcScore().setConstantOther(-2.2);
-		config.planCalcScore().setConstantBike(0);
-		config.planCalcScore().setConstantPt(-3.4);
-		config.planCalcScore().setConstantWalk(-0.0);
+		double constantCar = -3.50;
+		config.planCalcScore().getModes().get(TransportMode.car).setConstant(constantCar);
+		double constantOther = -2.2;
+		config.planCalcScore().getModes().get(TransportMode.other).setConstant(constantOther);
+		config.planCalcScore().getModes().get(TransportMode.bike).setConstant((double) 0);
+		double constantPt = -3.4;
+		config.planCalcScore().getModes().get(TransportMode.pt).setConstant(constantPt);
+		double constantWalk = -0.0;
+		config.planCalcScore().getModes().get(TransportMode.walk).setConstant(constantWalk);
 
 		//config.planCalcScore().getOrCreateModeParams("bike").setMarginalUtilityOfDistance(-0.01);
 

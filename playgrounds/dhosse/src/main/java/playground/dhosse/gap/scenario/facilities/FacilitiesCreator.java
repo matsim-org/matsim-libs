@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -129,10 +130,14 @@ public class FacilitiesCreator {
 	
 	public static void readWorkplaces(Scenario scenario, String file){
 		
+		Log.info("Reading workplaces from " + file);
+		
 		BufferedReader reader = IOUtils.getBufferedReader(file);
 		
 		final int idxX = 0;
 		final int idxY = 1;
+		final int idxWorkCapacity = 3;
+		final int idxActivityOptions = 4;
 		
 		int counter = 0;
 		
@@ -148,7 +153,18 @@ public class FacilitiesCreator {
 				
 				ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(Global.ActType.work.name() + "_" + counter, ActivityFacility.class), coord);
 				ActivityOption work = scenario.getActivityFacilities().getFactory().createActivityOption(Global.ActType.work.name());
+				work.setCapacity(Double.parseDouble(parts[idxWorkCapacity]));
 				facility.addActivityOption(work);
+				String[] activityOptions = parts[idxActivityOptions].split(";");
+				for(String ao : activityOptions){
+					
+					if(!facility.getActivityOptions().containsKey(ao)){
+						ActivityOption activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ao);
+						activityOption.setCapacity(Double.parseDouble(parts[idxWorkCapacity]) * 2);
+						facility.addActivityOption(activityOption);
+					}
+					
+				}
 				
 				scenario.getActivityFacilities().addActivityFacility(facility);
 				
@@ -163,6 +179,8 @@ public class FacilitiesCreator {
 			e.printStackTrace();
 			
 		}
+		
+		Log.info("Done reading workplaces.");
 		
 	}
 

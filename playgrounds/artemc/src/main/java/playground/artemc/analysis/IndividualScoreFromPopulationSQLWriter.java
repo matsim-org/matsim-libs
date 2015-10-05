@@ -65,10 +65,17 @@ public class IndividualScoreFromPopulationSQLWriter {
 				}
 			}
 
-			dataMap.get(person.getId().toString()).add(Double.toString(userBenefitsCalculator_logsum.calculateUtilityOfPerson_utils(person)));
 
 			/*Save maximal number of plans*/
 			if (person.getPlans().size() > maximalNumberOfPlans) maximalNumberOfPlans = person.getPlans().size();
+		}
+
+
+		for (Person person : population.getPersons().values()) {
+			while(dataMap.get(person.getId().toString()).size()<2*maximalNumberOfPlans){
+				dataMap.get(person.getId().toString()).add("");
+			}
+			dataMap.get(person.getId().toString()).add(Double.toString(userBenefitsCalculator_logsum.calculateUtilityOfPerson_utils(person)));
 		}
 
 		//Write selected plan scores to Database;
@@ -91,7 +98,8 @@ public class IndividualScoreFromPopulationSQLWriter {
 			PostgresqlCSVWriter individualScoresWriter = new PostgresqlCSVWriter("BENEFITS", tableName, individualScoresDBA, 1000, columns);
 			individualScoresWriter.addComment(String.format("MATSim selected plan scores from output population of %s created on %s.", config.controler().getOutputDirectory(), formattedDate));
 			for (String personId : dataMap.keySet()) {
-				Object[] data = new Object[maximalNumberOfPlans*2 + 2];
+				Object[] data = new Object[2*maximalNumberOfPlans + 2];
+
 				data[0] = personId;
 				for (int i = 1; i < data.length; i++) {
 					data[i] = dataMap.get(personId).get(i - 1);

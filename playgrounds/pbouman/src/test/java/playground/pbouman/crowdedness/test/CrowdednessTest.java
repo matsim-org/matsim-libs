@@ -103,7 +103,7 @@ public class CrowdednessTest
 
         c.setScoringFunctionFactory(
 				new CrowdedScoringFunctionFactory( 
-						new CharyparNagelScoringFunctionFactory(c.getConfig().planCalcScore(), c.getConfig().scenario(), c.getScenario().getNetwork()), c.getEvents()
+						new CharyparNagelScoringFunctionFactory( c.getScenario() ), c.getEvents()
 						)
 				) ;
 

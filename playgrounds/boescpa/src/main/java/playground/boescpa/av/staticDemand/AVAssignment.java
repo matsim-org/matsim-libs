@@ -35,45 +35,60 @@ import java.util.List;
  */
 public class AVAssignment {
 
-	/**
-	 * Searches for an AV to serve the request.
-	 *
-	 * @param requestToHandle
-	 * @param availableAVs
-	 * @return The position of the assigned AV in the list of availableAVs
-	 * 			OR -1 if no AV currently satisfies all search conditions.
-	 */
-	public static int assignVehicleToRequest(Trip requestToHandle, List<AutonomousVehicle> availableAVs) {
-		final Coord requestStartLocation = new Coord(requestToHandle.startXCoord, requestToHandle.startYCoord);
+    /**
+     * Searches for an AV to serve the request.
+     *
+     * @param requestToHandle
+     * @param availableAVs
+     * @return The position of the assigned AV in the list of availableAVs
+     * 			OR -1 if no AV currently satisfies all search conditions.
+     */
+    public static int assignVehicleToRequest(Trip requestToHandle, List<AutonomousVehicle> availableAVs) {
+        // --- Different search approaches: ---
+        //return getAbsoluteClosest(new CoordImpl(requestToHandle.startXCoord, requestToHandle.startYCoord), availableAVs);
+        //return getClosestWithinLevelOfServiceSearchRadius(requestToHandle, availableAVs);
+        return getClosestWithinLevelOfServiceSearchRadius_RadiusReducing(requestToHandle, availableAVs);
+    }
 
-		// --- Different search approaches: ---
-		//return getAbsoluteClosest(requestStartLocation, availableAVs);
-		return getClosestWithinLevelOfServiceSearchRadius(requestStartLocation, availableAVs);
-	}
+    private static int getAbsoluteClosest(Coord requestStartLocation, List<AutonomousVehicle> availableAVs) {
+        int closestVehicle = -1;
+        double minDistance = Double.MAX_VALUE;
+        for (int i = 0; i < availableAVs.size(); i++) {
+            double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(i).getMyPosition());
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestVehicle = i;
+            }
+        }
+        return closestVehicle;
+    }
 
-	private static int getAbsoluteClosest(Coord requestStartLocation, List<AutonomousVehicle> availableAVs) {
-		int closestVehicle = -1;
-		double minDistance = Double.MAX_VALUE;
+    private static int getClosestWithinLevelOfServiceSearchRadius(Trip requestToHandle, List<AutonomousVehicle> availableAVs) {
+        final Coord requestStartLocation = CoordUtils.createCoord(requestToHandle.startXCoord, requestToHandle.startYCoord);
+        int closestVehicle = getAbsoluteClosest(requestStartLocation, availableAVs);
+        if (closestVehicle == -1) {
+            return -1;
+        }
+        double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
+        if (distance <= Constants.getSearchRadiusLevelOfService()) {
+            return closestVehicle;
+        } else {
+            return -1;
+        }
+    }
 
-		for (int i = 0; i < availableAVs.size(); i++) {
-			double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(i).getMyPosition());
-			if (distance < minDistance) {
-				minDistance = distance;
-				closestVehicle = i;
-			}
-		}
-
-		return closestVehicle;
-	}
-
-	private static int getClosestWithinLevelOfServiceSearchRadius(Coord requestStartLocation, List<AutonomousVehicle> availableAVs) {
-		int closestVehicle = getAbsoluteClosest(requestStartLocation, availableAVs);
-		double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
-		if (distance <= Constants.getSearchRadius()) {
-			return closestVehicle;
-		} else {
-			return -1;
-		}
-	}
-
+    private static int getClosestWithinLevelOfServiceSearchRadius_RadiusReducing(Trip requestToHandle, List<AutonomousVehicle> availableAVs) {
+        final Coord requestStartLocation = CoordUtils.createCoord(requestToHandle.startXCoord, requestToHandle.startYCoord);
+        int closestVehicle = getAbsoluteClosest(requestStartLocation, availableAVs);
+        if (closestVehicle == -1) {
+            return -1;
+        }
+        double distanceVehicles = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
+        int searchTime = (int)requestToHandle.startTime + Constants.LEVEL_OF_SERVICE - StaticAVSim.getTime();
+        if (distanceVehicles <= Constants.getSearchRadius(searchTime)) {
+            return closestVehicle;
+        } else {
+            return -1;
+        }
+    }
 }

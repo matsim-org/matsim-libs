@@ -5,6 +5,8 @@ import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Transaction;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -29,6 +31,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 	@Override
 	public void setAndProcessSpatialGrids(Map<Modes4Accessibility, SpatialGrid> spatialGrids) {
+		log.info("starting setAndProcessSpatialGrids ...");
 		GeometryFactory fac = new GeometryFactory();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("accessibilities");
@@ -85,11 +88,28 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 			}
 			dataStore.createSchema(featureType);
 			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource("accessibilities");
+			// ---
+			Transaction t = new DefaultTransaction(); // new
+			featureStore.setTransaction(t); // new
+			// ---
 			featureStore.addFeatures(collection);
+			// ---
+			// new below this line
+			try {
+				t.commit();
+			} catch ( IOException ex ) {
+				// something went wrong;
+				ex.printStackTrace();
+				t.rollback();
+			} finally {
+				t.close();
+			}
+			dataStore.dispose() ;
+			// new above this line
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		log.info("ending setAndProcessSpatialGrids.");
 	}
 
 }

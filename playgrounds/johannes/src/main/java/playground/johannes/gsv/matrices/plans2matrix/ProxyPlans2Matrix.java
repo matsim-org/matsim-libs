@@ -33,17 +33,17 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.io.IOException;
@@ -172,7 +172,7 @@ public class ProxyPlans2Matrix {
 		logger.info("Loading zones...");
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get(args[2])));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 
 		logger.info("Loading persons...");
 		XMLHandler parser = new XMLHandler(new PlainFactory());

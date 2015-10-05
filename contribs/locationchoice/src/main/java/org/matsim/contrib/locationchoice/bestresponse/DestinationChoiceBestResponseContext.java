@@ -103,9 +103,12 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	public void init() {
-		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
-		this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
+		this.params = CharyparNagelScoringParameters.getBuilder(
+				scenario.getConfig().planCalcScore(),
+				scenario.getConfig().planCalcScore().getScoringParameters( null ), // global, so use default subpop
+				scenario.getConfig().scenario()).create();
+	this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+	ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter();
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();

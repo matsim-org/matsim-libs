@@ -81,7 +81,7 @@ public class PRRunner {
 		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
 		controler.getConfig().planCalcScore().addActivityParams(prActivityParams);
 
-        controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getConfig().scenario(), controler.getScenario().getNetwork(), prSettings.getIntermodalTransferPenalty()));
+        controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
 		
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
 		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();

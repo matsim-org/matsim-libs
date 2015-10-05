@@ -1,13 +1,12 @@
 package playground.vsp.pipeline;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationReaderTask implements PersonSource, Runnable {
@@ -31,8 +30,7 @@ public class PopulationReaderTask implements PersonSource, Runnable {
 
 	@Override
 	public void run() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.setNetwork((NetworkImpl) network);
+		Scenario scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(network).build();
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		population.addAlgorithm(new PersonAlgorithm() {

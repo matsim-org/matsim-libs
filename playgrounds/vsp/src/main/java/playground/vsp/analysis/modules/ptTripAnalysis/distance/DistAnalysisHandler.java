@@ -43,11 +43,14 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
@@ -60,23 +63,23 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	private static final Logger log = Logger
 			.getLogger(DistAnalysisHandler.class);
 	
-	private Map<Id, DistAnalysisAgent> persons;
-	private Map<Id, DistAnalysisPtDriver> drivers;
-	private Map<Id, DistAnalysisTransitRoute> routes;
-	private Map<Id, DistAnalysisVehicle> vehicles;
-	private List<Id> stuckAgents;
+	private Map<Id<Person>, DistAnalysisAgent> persons;
+	private Map<Id<Person>, DistAnalysisPtDriver> drivers;
+	private Map<Id<TransitRoute>, DistAnalysisTransitRoute> routes;
+	private Map<Id<Vehicle>, DistAnalysisVehicle> vehicles;
+	private List<Id<Person>> stuckAgents;
 	private Map<String, AnalysisTripSetStorage> tripSets;
 	
 	private Map<Id<Link>, Link> links;
 	
 	public DistAnalysisHandler(){
-		this.persons = new HashMap<Id, DistAnalysisAgent>();
-		this.drivers = new HashMap<Id, DistAnalysisPtDriver>();
-		this.routes = new HashMap<Id, DistAnalysisTransitRoute>();
-		this.vehicles = new HashMap<Id, DistAnalysisVehicle>();
-		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
+		this.persons = new HashMap<>();
+		this.drivers = new HashMap<>();
+		this.routes = new HashMap<>();
+		this.vehicles = new HashMap<>();
+		this.tripSets = new HashMap<>();
 		this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null, null));
-		this.stuckAgents = new ArrayList<Id>();
+		this.stuckAgents = new ArrayList<>();
 	}
 	
 	public void addLinks(Map<Id<Link>, Link> map){
@@ -193,7 +196,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		return this.vehicles.values();
 	}
 	
-	public List<Id> getStuckAgents(){
+	public List<Id<Person>> getStuckAgents(){
 		return this.stuckAgents;
 	}
 }

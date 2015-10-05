@@ -39,9 +39,11 @@ public class TransitRouterConfigTest {
 		PlansCalcRouteConfigGroup planRouting = new PlansCalcRouteConfigGroup();
 		TransitRouterConfigGroup transitRouting = new TransitRouterConfigGroup();
 		VspExperimentalConfigGroup vspConfig = new VspExperimentalConfigGroup() ;
-		
-		planScoring.setTravelingPt_utils_hr(-9.0);
-		planScoring.setTravelingWalk_utils_hr(-11.0);
+
+		final double travelingPt = -9.0;
+		planScoring.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		final double travelingWalk = -11.0;
+		planScoring.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
 //		planScoring.setMarginalUtlOfWaiting_utils_hr(-13.0);
 		planScoring.setMarginalUtlOfWaitingPt_utils_hr(-13.0);

@@ -19,16 +19,26 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
-import junit.framework.Assert;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -65,11 +75,13 @@ public class SignalsMixedLaneTest {
 		Assert.assertTrue(handler.hasCollectedLink3Event );
 	}
 
-	private static class MixedLanesEventsHandler implements LinkEnterEventHandler {
+	private static class MixedLanesEventsHandler implements Wait2LinkEventHandler, LinkEnterEventHandler {
 
 		boolean hasCollectedLink3Event = false;
 		boolean hasCollectedLink2Event = false;
 		private SignalsMixedLaneTestFixture fixture;
+		
+		private Map<Id<Vehicle>, Id<Person>> vehId2DriverId = new HashMap<>();
 
 		public MixedLanesEventsHandler(SignalsMixedLaneTestFixture fixture) {
 			this.fixture = fixture;
@@ -78,17 +90,22 @@ public class SignalsMixedLaneTest {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (event.getLinkId().equals(this.fixture.id2)){
-				Assert.assertEquals(this.fixture.pid1, event.getPersonId());
+				Assert.assertEquals(this.fixture.pid1, vehId2DriverId.get(event.getVehicleId()));
 				hasCollectedLink2Event = true;
 			}
 			else if (event.getLinkId().equals(this.fixture.id3)){
-				Assert.assertEquals(this.fixture.pid2, event.getPersonId());
+				Assert.assertEquals(this.fixture.pid2, vehId2DriverId.get(event.getVehicleId()));
 				hasCollectedLink3Event = true;
 			}
 		}
 
 		@Override
 		public void reset(int iteration) {
+		}
+
+		@Override
+		public void handleEvent(Wait2LinkEvent event) {
+			vehId2DriverId.put(event.getVehicleId(), event.getPersonId());
 		}
 
 	}

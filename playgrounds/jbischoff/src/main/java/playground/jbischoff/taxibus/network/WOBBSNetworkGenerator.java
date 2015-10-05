@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -56,6 +57,7 @@ public class WOBBSNetworkGenerator {
 		
 		onr.parse(dir+"complete_area.osm");
 		
+		new NetworkCleaner().run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(dir+"network.xml");
 
 		

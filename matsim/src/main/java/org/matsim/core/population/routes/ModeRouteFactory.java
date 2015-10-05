@@ -37,8 +37,8 @@ public class ModeRouteFactory {
 	private final Map<String, Class<? extends Route>> type2class = new HashMap<>();
 
 	public ModeRouteFactory() {
-		this.routeFactories.put(NetworkRoute.class, new LinkNetworkRouteFactory());
-		this.routeFactories.put(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
+		this.setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
+		this.setRouteFactory(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
 	}
 	
 	/**

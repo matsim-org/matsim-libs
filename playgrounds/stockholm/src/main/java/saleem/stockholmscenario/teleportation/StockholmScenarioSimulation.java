@@ -24,6 +24,8 @@ public static void main(String[] args) {
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 		NetworkWriter networkWriter =  new NetworkWriter(network);
 		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
+		//TransitScheduleWriter tw = new TransitScheduleWriter(schedule);
+		//tw.writeFile("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoSchedule.xml");
 		
 		controler.run();
         /*Config config = ConfigUtils.loadConfig(path, new MatrixBasedPtRouterConfigGroup());

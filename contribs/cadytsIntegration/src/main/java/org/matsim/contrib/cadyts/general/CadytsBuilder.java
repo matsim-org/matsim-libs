@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -47,7 +46,8 @@ public final class CadytsBuilder {
 		// private Constructor, should not be instantiated
 	}
 
-	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts occupCounts, LookUp<T> lookUp, Class<T> idType ) {
+	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts<T> occupCounts, LookUp<T> lookUp, Class<T> idType ) {
+		
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 
 		//get timeBinSize_s and validate it
@@ -102,7 +102,7 @@ public final class CadytsBuilder {
 		
 		//add counts data into calibrator
 		int numberOfAddedMeasurements = 0 ;
-		for (Map.Entry<Id<Link>, Count> entry : occupCounts.getCounts().entrySet()) {
+		for (Map.Entry<Id<T>, Count> entry : occupCounts.getCounts().entrySet()) {
 			// (loop over all counting "items" (usually locations/stations)
 			
 			T item = lookUp.lookUp(Id.create(entry.getKey(), idType)) ;
@@ -154,4 +154,5 @@ public final class CadytsBuilder {
         }
 		return matsimCalibrator;
 	}
+	
 }

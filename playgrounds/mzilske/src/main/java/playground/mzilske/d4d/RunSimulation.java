@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -177,11 +178,13 @@ public class RunSimulation {
 		// sighting.setClosingTime(0.0);
 		sighting.setTypicalDuration(30.0 * 60);
 		config.planCalcScore().addActivityParams(sighting);
-		config.planCalcScore().setTraveling_utils_hr(-6);
+		final double traveling = -6;
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceRateCar(0);
+		double travelingOtherUtilsHr = -6;
+		config.planCalcScore().getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(travelingOtherUtilsHr);
+		config.planCalcScore().getModes().get(TransportMode.car).setConstant((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
 //		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
 //		config.setParam("JDEQSim", "storageCapacityFactor", "0.05");

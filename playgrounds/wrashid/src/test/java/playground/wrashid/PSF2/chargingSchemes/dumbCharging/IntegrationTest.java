@@ -54,7 +54,7 @@ public class IntegrationTest extends MatsimTestCase {
 		ParametersPSF2.setAllowedChargingLocations(null);
 	}
 	
-	public void testEventFileBased(){
+	public void testEventFileBased(){	
 		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() +  "config-event-file-based.xml", null);
 		pssControler.runMATSimIterations();
 		
@@ -67,23 +67,10 @@ public class IntegrationTest extends MatsimTestCase {
 		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
 	}
 	
-	private void performSingleAgentRun(){
+	private void performSingleAgentRun(){		
 		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() + "config-event-file-based-oneAgent.xml", null);
 		pssControler.runMATSimIterations();
 	}
-	
-	public void testEventFileBasedOneAgent(){
-		performSingleAgentRun();
-		
-		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
-		assertEquals(2, chargingTimesForAgent1.size());
-		
-		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
-		assertEquals(38040, chargingTimesForAgent1.get(1).getStartChargingTime(),1.0);
-		
-		assertEquals(10*3600*1000.0, chargingTimesForAgent1.getLast().getEndSOC());
-	}
-	
 	public void testEventFileBasedOneAgentLocationFilterHome(){
 		addLocationFilter("h");
 		performSingleAgentRun();

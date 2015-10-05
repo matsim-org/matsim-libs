@@ -42,9 +42,12 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -189,8 +192,8 @@ public class PopulationReaderMatsimV4Test {
 	public void testReadActivity() {
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0, 1000));
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node1, node2, 1000.0, 10.0, 2000.0, 1);
 		final Population population = scenario.getPopulation();
 
@@ -214,6 +217,61 @@ public class PopulationReaderMatsimV4Test {
 		Plan plan = person.getPlans().get(0);
 		Assert.assertEquals(link3.getId(), ((Activity) plan.getPlanElements().get(0)).getLinkId());
 		Assert.assertEquals(Id.create("2", Link.class), ((Activity) plan.getPlanElements().get(2)).getLinkId());
+	}
+	
+	@Test
+	public void testReadingRoutesWithoutType() {
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
+		final Population population = scenario.getPopulation();
+
+		String str = "<?xml version=\"1.0\" ?>"+
+		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">"+
+		"<plans>"+
+		"<person id=\"1\">"+
+		"	<plan>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
+		"		<leg mode=\"car\">"+
+		"     <route trav_time=\"00:05\">"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"w\" x=\"10000\" y=\"0\" end_time=\"15:00\"/>"+
+		"		<leg mode=\"walk\">"+
+		"     <route trav_time=\"00:15\">"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"s\" x=\"15000\" y=\"0\" end_time=\"15:30\"/>"+
+		"		<leg mode=\"pt\">"+
+		"     <route trav_time=\"00:15\">"+
+		"       PT1===1===Blue Line===1to3===2a"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" start_time=\"16:00\" />"+
+		"	</plan>"+
+		"</person>"+
+		"</plans>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
+		Assert.assertEquals(7, plan.getPlanElements().size());
+		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
+		
+		Leg leg1 = (Leg) plan.getPlanElements().get(1);
+		Route route1 = leg1.getRoute();
+		Leg leg2 = (Leg) plan.getPlanElements().get(3);
+		Route route2 = leg2.getRoute();
+		Leg leg3 = (Leg) plan.getPlanElements().get(5);
+		Route route3 = leg3.getRoute();
+		
+		Assert.assertTrue(route1 instanceof NetworkRoute);
+		Assert.assertTrue(route2 instanceof GenericRouteImpl);
+		Assert.assertTrue(route3 instanceof ExperimentalTransitRoute);
 	}
 
 	@Test

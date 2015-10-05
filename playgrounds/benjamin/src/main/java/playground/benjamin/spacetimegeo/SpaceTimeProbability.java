@@ -203,7 +203,7 @@ public class SpaceTimeProbability {
 
 		pcs.setBrainExpBeta(entry.getValue().getMu());
 		pcs.setPerforming_utils_hr(entry.getValue().getBetaPerf());
-		pcs.setTraveling_utils_hr(entry.getValue().getBetaTraveling());
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(entry.getValue().getBetaTraveling());
 		pcs.setMarginalUtilityOfMoney(entry.getValue().getBetaCost());
 		pcs.setLateArrival_utils_hr(entry.getValue().getBetaLate());
 //		pcs.setMonetaryDistanceCostRateCar(-0.0);

@@ -29,13 +29,13 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	private Id<Link> linkIdIn;
 
-	private Map<Id<Person>, LinkEnterEvent> enterEvents;
+	private Map<Id<Vehicle>, LinkEnterEvent> enterEvents;
 	
 	private SortedMap<Double, Integer> inflow;
 	
@@ -57,7 +57,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public TTInOutflowEventHandler(Id<Link> linkIdIn, Id<Link> linkIdOut) {
 		this.linkIdIn = linkIdIn;
 		this.linkIdOut = linkIdOut;
-		this.enterEvents = new HashMap<Id<Person>, LinkEnterEvent>();
+		this.enterEvents = new HashMap<>();
 		this.inflow = new TreeMap<Double, Integer>();
 		this.outflow =  new TreeMap<Double, Integer>();
 		this.travelTimes = new TreeMap<Double, Double>();
@@ -80,7 +80,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getInflowMap().put(event.getTime(), in);
 			}
 			//traveltime
-			this.enterEvents.put(event.getPersonId(), event);
+			this.enterEvents.put(event.getVehicleId(), event);
 		}
 	}
 	
@@ -98,7 +98,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.getTime(), out);
 			}
 			//travel time
-			LinkEnterEvent enterEvent = this.enterEvents.get(event.getPersonId());
+			LinkEnterEvent enterEvent = this.enterEvents.get(event.getVehicleId());
 			double tt = event.getTime() - enterEvent.getTime();
 //			log.error("Travel time on link " + event.getLinkId() + " " + tt);
 			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
@@ -134,7 +134,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 
 	
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkIdIn;
 	}
 

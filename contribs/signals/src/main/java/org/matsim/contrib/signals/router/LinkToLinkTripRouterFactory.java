@@ -34,6 +34,7 @@ import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -53,11 +54,11 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	LinkToLinkTripRouterFactory(
             Scenario scenario,
             LeastCostPathCalculatorFactory leastCostAlgoFactory,
-            TravelDisutilityFactory travelDisutilityFactory,
+            Map<String, TravelDisutilityFactory> travelDisutilityFactory,
             LinkToLinkTravelTime travelTimes,
             Provider<TransitRouter> transitRouterFactory) {
 		this.scenario = scenario;
-		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.travelDisutilityFactory = travelDisutilityFactory.get(TransportMode.car);
 		this.travelTimes = travelTimes;
 		this.populationFactory = scenario.getPopulation().getFactory();
 		this.delegate = new DefaultTripRouterFactoryImpl(scenario, leastCostAlgoFactory, transitRouterFactory);

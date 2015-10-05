@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -147,7 +148,6 @@ import junit.framework.TestCase;
 
 	/**
 	 * Creates a population for network1
-	 * @param network the network returned by {@link #createNetwork1()}
 	 **/
 	static void createPopulation1(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
@@ -176,7 +176,6 @@ import junit.framework.TestCase;
 
 	/**
 	 * Creates a population for network2
-	 * @param network the network returned by {@link #createNetwork2()}
 	 **/
 	static void createPopulation2(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
@@ -215,14 +214,14 @@ import junit.framework.TestCase;
 		return person;
 	}
 
-	protected static Population createReferencePopulation1(final PlanCalcScoreConfigGroup config) {
+	protected static Population createReferencePopulation1(final Config config) {
 		// run mobsim once without toll and get score for network1/population1
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork1(scenario);
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
 		events.addHandler(scoring);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();

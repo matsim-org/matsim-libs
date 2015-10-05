@@ -51,8 +51,8 @@ public final class NetherlandsController /*extends Controler*/ {
 			 * We use a Scoring Function that get the Facility Opening Times from
 			 * the Facilities instead of the Config File.
 			 */
-			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), 
-					controler.getScenario()) ) ;
+			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
+					params, controler.getScenario()) ) ;
 
 			controler.run();
 		}

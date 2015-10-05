@@ -106,7 +106,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	
 	private Scenario scenario;
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
-	private Map<Id<Person>, List<Id<Link>>> routes = new HashMap<>();
+	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
@@ -122,7 +122,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    legs.put(event.getPersonId(), leg);
 	    List<Id<Link>> route = new ArrayList<>();
 	    route.add(event.getLinkId());
-	    routes.put(event.getPersonId(), route);
+	    experiencedRoutes.put(event.getPersonId(), route);
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-        List<Id<Link>> route = routes.get(event.getPersonId());
+        List<Id<Link>> route = experiencedRoutes.get(event.getPersonId());
         route.add(event.getLinkId());
     }
 
@@ -164,13 +164,18 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    leg.setArrivalTime(event.getTime());
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
-	    List<Id<Link>> route = routes.remove(event.getPersonId());
-	    assert route.size() >= 1;
+	    List<Id<Link>> experiencedRoute = experiencedRoutes.remove(event.getPersonId());
+	    assert experiencedRoute.size() >= 1;
 	    PendingTransitTravel pendingTransitTravel;
-	    if (route.size() > 1) {
-	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(route, null);
+	    if (experiencedRoute.size() > 1) {
+	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
+
 	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, scenario.getNetwork()));
+	        // TODO MATSIM-227: replace the above by taking distance from List<Id<Link>> experiencedRoute (minus first/last link)
+	        // and add manually distance on first/last link.  Newly based on VehicleEnters/LeavesTrafficEvents, which should (newly)
+	        // contain this information.  kai/mz, sep'15
+	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
 	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
@@ -185,7 +190,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
-	    	Route genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
+	    	Route genericRoute = new GenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
 	    	genericRoute.setTravelTime(travelTime);
 	        if (travelEvent != null) {
 	            genericRoute.setDistance(travelEvent.getDistance());
@@ -206,7 +211,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	@Override
 	public void reset(int iteration) {
 	    legs.clear();
-	    routes.clear();
+	    experiencedRoutes.clear();
 	}
 
 	public void setLegHandler(LegHandler legHandler) {

@@ -66,8 +66,8 @@ public class TransitScheduleModifier {
 	private void changeHeadway(String newServiceInterval) {
 		
 		double arrival = Time.parseTime("00:00:00");
-		double startTime = Time.parseTime("24:00:00");
-		double endTime = Time.parseTime("00:00:00");
+		double startTime = Time.parseTime("06:00:00");
+		double endTime = Time.parseTime("23:00:00");
 		double frequency = Time.parseTime(newServiceInterval);
 
 

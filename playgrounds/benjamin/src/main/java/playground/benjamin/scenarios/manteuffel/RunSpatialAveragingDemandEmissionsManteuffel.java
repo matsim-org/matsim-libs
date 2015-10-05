@@ -34,7 +34,7 @@ import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
  */
 public class RunSpatialAveragingDemandEmissionsManteuffel {
 
-	String inputPath = "../../runs-svn/manteuffelstrasse/";
+	String inputPath = "../../../runs-svn/manteuffelstrasse/";
 	
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:31468");
 //	private final double xMin = 4595288.82;

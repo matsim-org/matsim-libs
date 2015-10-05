@@ -69,7 +69,7 @@ public class MSATollHandler implements CongestionEventHandler, LinkEnterEventHan
 	private double it;
 		
 	public MSATollHandler(Scenario scenario) {
-		this.vtts_car = (scenario.getConfig().planCalcScore().getTraveling_utils_hr() - scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_car = (scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS_car: " + this.vtts_car);
 	}
 

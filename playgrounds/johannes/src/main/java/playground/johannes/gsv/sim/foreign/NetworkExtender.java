@@ -19,20 +19,9 @@
 
 package playground.johannes.gsv.sim.foreign;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.api.core.v01.Coord;
@@ -51,23 +40,18 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.TopologyException;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * @author johannes
@@ -276,7 +260,7 @@ public class NetworkExtender {
 
 		logger.info("Loading geometries...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
-		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> zones = ZoneGeoJsonIO.parseFeatureCollection(data);
 
 		logger.info("Extracting boundary...");
 		Set<Geometry> deGeometries = new HashSet<>();
@@ -293,7 +277,7 @@ public class NetworkExtender {
 
 		logger.info("Loading boundary...");
 		data = new String(Files.readAllBytes(Paths.get(boundaryFile)));
-		Set<Zone> tmp = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> tmp = ZoneGeoJsonIO.parseFeatureCollection(data);
 		Geometry boundary = tmp.iterator().next().getGeometry();
 
 		logger.info("Extracting intersecting links...");

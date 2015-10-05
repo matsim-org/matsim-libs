@@ -20,6 +20,7 @@
 package org.matsim.core.config.consistency;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
@@ -82,19 +83,19 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 
 	/*package*/ void checkPlanCalcScore(final Config c) {
-		if (c.planCalcScore().getTravelingPt_utils_hr() > 0) {
+		if (c.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
 					"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getTraveling_utils_hr() > 0) {
+		if (c.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getTravelingBike_utils_hr() > 0) {
+		if (c.planCalcScore().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getTravelingWalk_utils_hr() > 0) {
+		if (c.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}

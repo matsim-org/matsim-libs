@@ -22,11 +22,17 @@
 
 package playground.mzilske.cadyts;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import com.google.inject.Binder;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,17 +51,15 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+
+import com.google.inject.Binder;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
+
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class CadytsModule extends AbstractModule {
 
@@ -84,8 +88,13 @@ public class CadytsModule extends AbstractModule {
                     return scenario.getNetwork().getLinks().get(id);
                 }
             };
-            Counts calibrationCounts = (Counts) scenario.getScenarioElement("calibrationCounts");
-            cadytsConfig.setCalibratedItems(calibrationCounts.getCounts().keySet());
+            Counts<Link> calibrationCounts = (Counts) scenario.getScenarioElement("calibrationCounts");
+//            cadytsConfig.setCalibratedItems(calibrationCounts.getCounts().keySet());
+            Set<String> links = new HashSet<>() ;
+            for ( Id<Link> linkId : calibrationCounts.getCounts().keySet() ) {
+            	links.add( linkId.toString() ) ;
+            }
+      	cadytsConfig.setCalibratedItems(links);
             AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), calibrationCounts, linkLookUp, Link.class);
             for (MeasurementLoader<Link> measurementLoader : measurementLoaders) {
                 measurementLoader.load(linkAnalyticalCalibrator);

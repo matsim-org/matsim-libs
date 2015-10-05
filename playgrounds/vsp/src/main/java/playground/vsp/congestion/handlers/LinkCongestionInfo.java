@@ -81,7 +81,6 @@ public final class LinkCongestionInfo {
 //	private final Map<Id<Person>, Double> personId2linkEnterTime = new LinkedHashMap<>();
 
 	private final Deque<DelayInfo> flowQueue = new LinkedList<>();
-	private final Deque<DelayInfo> delayQueue = new LinkedList<>() ;
 	private final LinkedHashMap<Id<Person>, AgentOnLinkInfo> agentsOnLink = new LinkedHashMap<>() ;
 
 	private LinkLeaveEvent lastLeavingAgent;
@@ -119,13 +118,6 @@ public final class LinkCongestionInfo {
 	 */
 	public Deque<DelayInfo> getFlowQueue() {
 		return flowQueue;
-	}
-	/**
-	 * Vehicles that have left the link in previous time steps with a delay.  
-	 * The delay queue is in consequence interrupted when vehicles leave the link without a delay.
-	 */
-	public Deque<DelayInfo> getDelayQueue() {
-		return this.delayQueue ;
 	}
 	public LinkedHashMap<Id<Person>, AgentOnLinkInfo> getAgentsOnLink() {
 		return this.agentsOnLink ;

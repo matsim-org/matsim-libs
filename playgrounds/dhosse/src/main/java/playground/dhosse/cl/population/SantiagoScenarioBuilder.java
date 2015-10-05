@@ -68,11 +68,12 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.dhosse.cl.Constants;
+import playground.dhosse.cl.Constants.SubpopulationName;
+import playground.dhosse.cl.Constants.SubpopulationValues;
 
 public class SantiagoScenarioBuilder {
 
-//	static String svnWorkingDir = "../../shared-svn/studies/countries/cl/";
-	static String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	static String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
@@ -91,7 +92,7 @@ public class SantiagoScenarioBuilder {
 	
 	private static double n = 0.;
 	
-	private static final String pathForMatsim = "../../runs-svn/santiago/run9/";		//path within config file to the in-/output files 
+	private static final String pathForMatsim = "../../runs-svn/santiago/run11c/";		//TODO: path within config file to in-/output files 
 	private static final String outPlans = "plans_final";								//name of plan file
 	
 	
@@ -105,6 +106,7 @@ public class SantiagoScenarioBuilder {
 	 * </ol>
 	 * 
 	 * Along with the generation of plans, an input config file is created and written.
+	 * Todo-marks show positions for essential config settings e.g. pathes and names of in-/output.  
 	 * 
 	 * @param args
 	 */
@@ -152,6 +154,17 @@ public class SantiagoScenarioBuilder {
 		
 		randomizeEndTime(populationOut);
 		
+		//freight traffic will only be added to population, if file exists. Otherwise do nothing.
+		//Added at this position, so the end times will not be randomized. (KT 2015-09-16)
+		File freightPlansFile = new File(outputDir + "freight/freight_plans.xml.gz");
+		if (freightPlansFile.exists()){
+			Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+			new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
+			for (Person person : scenarioFreight.getPopulation().getPersons().values()){
+				scenarioOut.getPopulation().addPerson(person);
+			}
+		}
+		
 		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioOut);
 		aap.run();
 		
@@ -186,6 +199,9 @@ public class SantiagoScenarioBuilder {
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform); //TODO: Set to "uniform" or "relative"
+			if (act.equals("pt iNaNH")){			//do not score pt transit activity
+				params.setScoringThisActivityAtAll(false);
+			}
 			config.planCalcScore().addActivityParams(params);
 		}
 		
@@ -673,8 +689,12 @@ public class SantiagoScenarioBuilder {
 		setPlansCalcRouteParameters(config.plansCalcRoute());
 //		setQSimParameters(config.qsim());
 		setScenarioParameters(config.scenario());
-		setStrategyParameters(config.strategy());
-		setSubtourModeChoiceParameters(config.subtourModeChoice());
+		setStrategyParameters(config.strategy());	
+		
+		//creation of more than one subpopulation in config not possible yet ->removed Module, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+//		setSubtourModeChoiceParameters(config.subtourModeChoice());	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+		config.removeModule("subtourModeChoice");
+		
 		setTimeAllocationMutatorParameters(config.timeAllocationMutator());
 		setTravelTimeCalculatorParameters(config.travelTimeCalculator());
 		setVspExperimentalParameters(config.vspExperimental());
@@ -855,10 +875,10 @@ public class SantiagoScenarioBuilder {
 	private static void setPlanParameters(PlansConfigGroup plans){
 		
 		plans.setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		plans.setInputPersonAttributeFile(null); //TODO
+		plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml"); //TODO
 		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName(null); //TODO
+		plans.setSubpopulationAttributeName(SubpopulationName.carUsers); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
 		
 	}
@@ -965,7 +985,7 @@ public class SantiagoScenarioBuilder {
 		
 		StrategySettings changeExpBeta = new StrategySettings();
 		changeExpBeta.setStrategyName("ChangeExpBeta");
-		changeExpBeta.setWeight(0.7);
+		changeExpBeta.setWeight(0.6);
 		strategy.addStrategySettings(changeExpBeta);
 		
 		StrategySettings reRoute = new StrategySettings();
@@ -973,12 +993,22 @@ public class SantiagoScenarioBuilder {
 		reRoute.setWeight(0.3);
 		strategy.addStrategySettings(reRoute);
 		
+		//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+//		//TODO: add subTourModeChoice
+//		StrategySettings subTourModeChoice = new StrategySettings();
+//		subTourModeChoice.setStrategyName("SubtourModeChoice");
+//		subTourModeChoice.setSubpopulation(SubpopulationValues.carAvail);
+//		subTourModeChoice.setWeight(0.1);
+//		strategy.addStrategySettings(subTourModeChoice);
+//	
+		
 	}
 	
+	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
 	private static void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
 		
 		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
-		smc.setConsiderCarAvailability(false);
+		smc.setConsiderCarAvailability(true); //TODO true or false ? (KT 2015-09-18)
 		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
 		
 	}

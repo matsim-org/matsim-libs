@@ -19,38 +19,29 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import com.vividsolutions.jts.algorithm.MinimumDiameter;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
-import com.vividsolutions.jts.algorithm.MinimumDiameter;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * @author johannes
@@ -94,7 +85,7 @@ public class MatrixCompare2 {
 		 */
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 
 		System.out.println(String.format("Intraplan sum: %s", MatrixOperations.sum(m1)));
@@ -121,7 +112,7 @@ public class MatrixCompare2 {
 	}
 
 	private static void writeErrorRank(KeyMatrix err, KeyMatrix m1, KeyMatrix m2, ZoneCollection zoneCollection) {
-		List<Zone> zones = new ArrayList<>(urbanZones(zoneCollection.zoneSet()));
+		List<Zone> zones = new ArrayList<>(urbanZones(zoneCollection.getZones()));
 		SortedSet<Entry> rank = new TreeSet<>(new Comparator<Entry>() {
 
 			@Override

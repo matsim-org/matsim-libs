@@ -96,7 +96,7 @@ public final class FlexibleTransportControler extends Controler
 //      this.addOverridingModule(new AbstractModule() {
 //          @Override
 //          public void install() {
-//              bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//              bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //          }
 //      });
 //      super.setUp();

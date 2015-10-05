@@ -24,6 +24,7 @@
 package playground.ikaddoura.optimization;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -93,7 +94,7 @@ public class InternalControler {
 		this.scenario = scenario;
 		this.fare = fare;
 
-		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
+		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getConstant();
 		log.info("Pt constant set to " + this.CONSTANT_PT);
 		
 //		this.LATE_ARRIVAL = -1. * this.PERFORMING * 2.; // coming early (which is the opportunity costs of time) multiplied by 3 --> multiplying by 2 (see Hollander 2006)
@@ -135,16 +136,16 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MARGINAL_UTILITY_OF_MONEY);
 		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
 
-		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
-		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
-		planCalcScoreConfigGroup.setMonetaryDistanceRateCar(MONETARY_DISTANCE_COST_RATE_CAR);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.car).setConstant(CONSTANT_CAR);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(TRAVEL_CAR);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.car).setMonetaryDistanceRate(MONETARY_DISTANCE_COST_RATE_CAR);
 
-		planCalcScoreConfigGroup.setConstantWalk(CONSTANT_WALK);
-		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
-		planCalcScoreConfigGroup.setMonetaryDistanceRatePt(MONETARY_DISTANCE_COST_RATE_PT);
-		
-		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
-		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT_IN_VEHICLE);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.walk).setConstant(CONSTANT_WALK);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(TRAVEL_WALK);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.pt).setMonetaryDistanceRate(MONETARY_DISTANCE_COST_RATE_PT);
+
+		planCalcScoreConfigGroup.getModes().get(TransportMode.pt).setConstant(CONSTANT_PT);
+		planCalcScoreConfigGroup.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(TRAVEL_PT_IN_VEHICLE);
 		planCalcScoreConfigGroup.setMarginalUtlOfWaitingPt_utils_hr(TRAVEL_PT_WAITING);
 		planCalcScoreConfigGroup.setUtilityOfLineSwitch(LINE_SWITCH);
 		
@@ -153,9 +154,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(WAITING);
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
-				planCalcScoreConfigGroup,
-				scenario.getConfig().scenario(),
-				scenario.getNetwork(), 
+				scenario,
 				STUCK_SCORE);
 		
 		controler.setScoringFunctionFactory(scoringfactory);

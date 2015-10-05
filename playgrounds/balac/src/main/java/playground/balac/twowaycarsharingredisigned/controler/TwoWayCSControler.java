@@ -34,9 +34,9 @@ public class TwoWayCSControler extends Controler{
 
 	public void init(Config config, Network network) {
 		TwoWayCSScoringFunctionFactory onewayScoringFunctionFactory = new TwoWayCSScoringFunctionFactory(
-				      config, 
+				      config,
 				      network);
-	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
+	    this.setScoringFunctionFactory(onewayScoringFunctionFactory);
 				
 	    this.loadMyControlerListeners();
 		}

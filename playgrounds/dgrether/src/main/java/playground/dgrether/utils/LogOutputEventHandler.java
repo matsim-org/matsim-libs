@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -40,6 +42,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
@@ -67,18 +71,18 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	Wait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, VehicleAbortsEventHandler, VehicleLeavesTrafficEventHandler{
 
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
 	public void handleEvent(LinkEnterEvent event) {
-		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " link id " + event.getLinkId());
 	}
 
 	public void reset(int iteration) {}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
@@ -110,7 +114,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	}
 
 	public void handleEvent(Wait2LinkEvent event) {
-		log.info("AgentWait2LinkEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+		log.info("Wait2LinkEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId() + " vehicle id " + event.getVehicleId());
 	}
 
 	public void handleEvent(LaneEnterEvent event) {
@@ -144,6 +148,16 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		log.info("VehicleDepartsAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		log.info("VehicleLeavesTrafficEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId() + " vehicle id " + event.getVehicleId());
+	}
+
+	@Override
+	public void handleEvent(VehicleAbortsEvent event) {
+		log.info("VehicleAbortsEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId());
 	}
 
 }

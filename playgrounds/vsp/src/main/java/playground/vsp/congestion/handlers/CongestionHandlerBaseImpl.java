@@ -65,6 +65,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
 	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
 
+	private double totalDelay = 0.;
 	private double delayNotInternalized_roundingErrors = 0.;
 	private double totalInternalizedDelay = 0.;
 
@@ -101,6 +102,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
 
+		this.totalDelay = 0.;
 		this.delayNotInternalized_roundingErrors = 0.;
 		this.totalInternalizedDelay = 0.;
 	}
@@ -148,8 +150,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
-		throw new RuntimeException("Not implemented. Aborting...");
-		
 		// yy My preference would be if we found a solution where the basic bookkeeping (e.g. update flow and
 		// delay queues) is done here.  However, delegation does not allow to have custom code in between 
 		// standard code (as was the case before with calculateCongestion).  We need to consider if it is possible to 
@@ -160,6 +160,31 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		//             delegate.handleEvent( event ) ;
 		//             ... // more custom code
 		//    ...
+		
+		// coming here ...
+		
+		
+		Id<Person> personId = this.getVehicleId2personId().get( event.getVehicleId() ) ;
+
+		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), this.getLinkId2congestionInfo(), scenario);
+
+		AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
+
+		DelayInfo delayInfo = new DelayInfo.Builder( agentInfo ).setLinkLeaveTime( event.getTime() ).build() ;
+
+		CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
+
+
+		linkInfo.getFlowQueue().add( delayInfo ) ;
+
+		linkInfo.memorizeLastLinkLeaveEvent( event );
+
+		linkInfo.getAgentsOnLink().remove( personId ) ;
+
+		// global book-keeping:
+		this.totalDelay += ( event.getTime() - delayInfo.freeSpeedLeaveTime );
+
+		
 	}
 
 	@Override
@@ -169,23 +194,18 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	}
 
 	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
-		// TODO: Shift everything that is related to the delay queue to V4. I don't need this in V3. ihab, sep'15
-	        // yy I don't think that the delay queue is even needed by V4.  It is probably needed
-	        // for the "Nagel" approach only. kai, sep'15
+		
+		double delay = time - delayInfo.freeSpeedLeaveTime;
 
-		if ( linkInfo.getDelayQueue().isEmpty() ) {
-			// queue is already empty; nothing to do
-		} else {
-			double delay = time - delayInfo.freeSpeedLeaveTime ;
-			if ( delay < 0 ) {
-				linkInfo.getDelayQueue().clear() ;
-			}
+		if ( delay < 1.0 ) { 
+			linkInfo.getFlowQueue().clear(); 
 		}
 		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
 		} else {
 			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+//			earliestLeaveTime = delayInfo.freeSpeedLeaveTime ;
 			if ( time > earliestLeaveTime + 1.) { 
 				// bottleneck is not active anymore.
 
@@ -226,6 +246,10 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; remainingDelay > 0.0 && it.hasNext() ; ) {
 			// Get the agent 'ahead' from the flow queue. The agents 'ahead' are considered as causing agents.
 			DelayInfo causingAgentDelayInfo = it.next() ;
+			if ( causingAgentDelayInfo.personId.equals( affectedAgentDelayInfo.personId ) ) {
+				// not charging to yourself:
+				continue ;
+			}
 
 			double allocatedDelay = Math.min(linkInfo.getMarginalDelayPerLeavingVehicle_sec(), remainingDelay);
 
@@ -247,6 +271,11 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		}
 
 		return remainingDelay;
+	}
+	
+	@Override
+	public double getTotalDelay() {
+		return this.totalDelay ;
 	}
 
 	public double getDelayNotInternalized_roundingErrors() {
@@ -284,11 +313,6 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	@Override
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public double getTotalDelay() {
 		throw new RuntimeException("not implemented") ;
 	}
 

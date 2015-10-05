@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run8";
+	public static final String runID = "run10";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -25,6 +25,7 @@ public class Global {
 	public static final String networkDataDir = dataDir + "Netzwerk/";
 	public static final String matsimDir = projectDir + "30_Modellierung/";
 	public static final String matsimInputDir = matsimDir + "INPUT/";
+	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
 	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output";
 	
 	//coordinate systems and transformations
@@ -45,11 +46,35 @@ public class Global {
 		leisure,
 		other
 	};
+
+	public static final String idBadBayersoien = "09180113";
+	public static final String idBadKohlgrub = "09180112";
+	public static final String idEschenlohe = "09180114";
+	public static final String idEttal = "09180115";
+	public static final String idFarchant = "09180116";
+	public static final String idGarmischPartenkirchen = "09180117";
+	public static final String idGrainau = "09180118";
+	public static final String idGroßweil = "09180119";
+	public static final String idKrün = "09180122";
+	public static final String idMittenwald = "09180123";
+	public static final String idMurnau = "09180124";
+	public static final String idOberammergau = "09180125";
+	public static final String idOberau = "09180126";
+	public static final String idOhlstadt = "09180127";
+	public static final String idRiegsee = "09180128";
+	public static final String idSaulgrub = "09180129";
+	public static final String idSchwaigen = "09180131";
+	public static final String idSeehausen = "09180132";
+	public static final String idSpatzenhausen = "09180133";
+	public static final String idUffing = "09180134";
+	public static final String idUnterammergau = "09180135";
+	public static final String idWallgau = "09180136";
 	
 	//subpopulation classes
-	public static final String USER_GROUP = "usrGroup";
-	public static final String GP_CAR = "GP_CAR";
+	public static final String USER_GROUP = "userGroup";
+	public static final String GP_CAR = "CAR_OWNER";
 	public static final String COMMUTER = "COMMUTER";
+	public static final String LICENSE_OWNER = "LICENSE";
 	
 	//age classes
 	public static final String AGE = "AGE";
@@ -68,9 +93,7 @@ public class Global {
 	public static final String NOT_EMPLOYED = "NOT_EMPLOYED";
 	
 	//car availability
-	public static final String CAR_AVAILABILITY = "CAR_AVAILABILITY";
 	public static final String CAR_AVAIL = "CAR_AVAIL";
-	public static final String NO_CAR = "NO_CAR";
 	
 	//driving license
 	public static final String LICENSE = "LICENSE";
@@ -80,9 +103,6 @@ public class Global {
 	//status of residence
 	public static final String RESIDENCE = "RESIDENCE";
 	public static final String INHABITANT = "INHABITANT";
-
-	public static final String CARSHARING = "CARSHARING";
-	public static final String CAR_OPTION = "CAR_OPTION";
 
 	public static double getN() {
 		return n;

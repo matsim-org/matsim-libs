@@ -1,20 +1,24 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
@@ -22,20 +26,24 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
 import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
 import playground.dhosse.gap.scenario.population.PlanCreationUtils;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
-import playground.dhosse.utils.EgapHashGenerator;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class CreateCommutersFromElsewhere {
 	
+	static TreeMap<Id<ActivityFacility>, ActivityFacility> facilities;
+	
 	private static final Logger log = Logger.getLogger(CreateCommutersFromElsewhere.class);
 	
-	public static void run(Population population, Collection<CommuterDataElement> relations, Map<String, MiDPersonGroupData> groupData){
+	public static void run(Scenario scenario, Collection<CommuterDataElement> relations, Map<String, MiDPersonGroupData> groupData){
 
-		PopulationFactoryImpl factory = (PopulationFactoryImpl) population.getFactory();
+		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		 facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.work.name());
 		
 		//parse over commuter relations
 		for(CommuterDataElement relation : relations){
 			
-			//this is just for the reason that the shape file does not contain any diphtongs
+			//this is just for the reason that the shape file does not contain any diphthongs
 			//therefore, they are removed from the relation names as well
 			String[] diphtong = {"ä", "ö", "ü", "ß"};
 			
@@ -63,10 +71,10 @@ public class CreateCommutersFromElsewhere {
 			String fromTransf = "GK4";
 			String toTransf = "GK4";
 			
-			if(fromId.length() == 3 && !fromId.contains("AT")){
+			if(fromId.length() <= 4 && fromId.length() > 2){
 				fromTransf = "";
 			}
-			if(toId.length() == 3){
+			if(toId.length() <= 4 && toId.length() > 2){
 				toTransf = "";
 			}
 			
@@ -88,8 +96,6 @@ public class CreateCommutersFromElsewhere {
 					int sex = EgapPopulationUtils.setSex(age);
 //					agentAttributes.putAttribute(person.getId().toString(), Global.SEX, sex);
 					
-					MiDPersonGroupData data = groupData.get(EgapHashGenerator.generatePersonGroupHash(age, sex));
-
 					boolean hasLicense = true;//setBooleanAttribute(person.getId().toString(), data.getpLicense(), Global.LICENSE);
 					boolean carAvail = true;//setBooleanAttribute(person.getId().toString(), data.getpCarAvail(), Global.CAR_AVAIL);
 					
@@ -97,7 +103,7 @@ public class CreateCommutersFromElsewhere {
 						
 						if(hasLicense){
 							
-							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 							
 							if(carAvail){
 								
@@ -115,7 +121,7 @@ public class CreateCommutersFromElsewhere {
 					
 					createOrdinaryODPlan(factory, person, fromId, toId, from, to, fromTransf, toTransf);
 					
-					population.addPerson(person);
+					scenario.getPopulation().addPerson(person);
 					
 				}
 				
@@ -171,13 +177,43 @@ public class CreateCommutersFromElsewhere {
 		
 		if(toId.length() < 8 && !toId.contains("A")){
 			
+			if(toId.startsWith("09180")){
+//				workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
+				double aw = 0.;
+				Set<ActivityFacility> facilitiesWithinMunicipality = new HashSet<>();
+				for(ActivityFacility facility : facilities.values()){
+					if(GAPScenarioBuilder.getMunId2Geometry().get(toId).contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
+						facilitiesWithinMunicipality.add(facility);
+						for(ActivityOption ao : facility.getActivityOptions().values()){
+							aw += ao.getCapacity();
+							break;
+						}
+					}
+				}
+				
+				double random = Global.random.nextDouble() * aw;
+				double w = 0;
+				for(ActivityFacility facility : facilitiesWithinMunicipality){
+					
+					w += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
+					if(random >= w){
+						workCoord = facility.getCoord();
+					}
+					
+				}
+			}
+			else{
+				Coord c = Global.UTM32NtoGK4.transform(workCoord);
+				Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
+			}
+			
+		}
+		
+		if(workCoord == null){
 			Coord c = Global.UTM32NtoGK4.transform(workCoord);
 			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
 			workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
-			if(toId.startsWith("09180")){
-				workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
-			}
-			
 		}
 		
 		Activity actHome = factory.createActivityFromCoord("home", homeCoord);

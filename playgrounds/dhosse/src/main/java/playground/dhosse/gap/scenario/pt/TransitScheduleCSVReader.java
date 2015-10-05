@@ -329,7 +329,7 @@ public class TransitScheduleCSVReader {
 				Link nextLink = this.scenario.getNetwork().getLinks().get(nextStopFacility.getLinkId());
 				
 				if(j == 0){
-					
+					System.out.println(stopFacility.getId());
 					routeLinkIds.add(link.getId());
 					
 				}
@@ -348,6 +348,7 @@ public class TransitScheduleCSVReader {
 					
 				} else{
 					
+					log.warn(stopFacility.getId() + "\t" + nextStopFacility.getId());
 					log.warn("Links with ids " + link.getId() + " and  " + nextLink.getId() + " could not be found...");
 					
 				}

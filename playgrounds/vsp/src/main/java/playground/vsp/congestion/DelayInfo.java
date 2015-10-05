@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.vsp.congestion.AgentOnLinkInfo.Builder;
-
 public class DelayInfo {
 
 	public static class Builder {
@@ -13,6 +11,12 @@ public class DelayInfo {
 		private Double linkEnterTime;
 		private Double freeSpeedLeaveTime ;
 		private Double linkLeaveTime;
+		public Builder(){} // yy this could probably go away. kai, sep'15
+		public Builder( AgentOnLinkInfo agentInfo ) {
+			this.personId = agentInfo.getPersonId() ;
+			this.linkEnterTime = agentInfo.getEnterTime() ;
+			this.freeSpeedLeaveTime = agentInfo.getFreeSpeedLeaveTime() ;
+		}
 		public DelayInfo build() {
 			Assert.assertNotNull( personId );
 			Assert.assertNotNull( linkEnterTime );

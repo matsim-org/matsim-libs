@@ -117,7 +117,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalysisModule{
 	/**
 	 * 
 	 */
-	private Map<Id, Double> createTotals(Counts counts, String name) {
+	private Map<Id, Double> createTotals(Counts<Link> counts, String name) {
 		// count totals
 		Map<Id, Double> totals = new HashMap<Id, Double>();
 		Double total;

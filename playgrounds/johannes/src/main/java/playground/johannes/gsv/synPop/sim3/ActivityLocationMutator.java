@@ -20,14 +20,10 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 
 import java.util.List;
 import java.util.Random;

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.counts.Count;
@@ -63,11 +64,11 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	private final Set<Id<Person>> transitVehicleDriverIds;
 	private final Map<Id<Vehicle>, Integer> transitVehicleId2CurrentPaxCountMap;
 	
-	private final HashMap<String, Counts> mode2CountsVehicles;
-	private final HashMap<String, Counts> mode2CountsCapacity;
-	private final HashMap<String, Counts> mode2CountsCapacity_m;
-	private final HashMap<String, Counts> mode2CountsPax;
-	private final HashMap<String, Counts> mode2CountsPax_m;
+	private final HashMap<String, Counts<Link>> mode2CountsVehicles;
+	private final HashMap<String, Counts<Link>> mode2CountsCapacity;
+	private final HashMap<String, Counts<Link>> mode2CountsCapacity_m;
+	private final HashMap<String, Counts<Link>> mode2CountsPax;
+	private final HashMap<String, Counts<Link>> mode2CountsPax_m;
 	
 	private Integer maxSlice = 0;
 	
@@ -224,23 +225,23 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		return this.maxSlice;
 	}
 	
-	protected HashMap<String, Counts> getMode2CountsVehicles() {
+	protected HashMap<String, Counts<Link>> getMode2CountsVehicles() {
 		return this.mode2CountsVehicles;
 	}
 
-	protected HashMap<String, Counts> getMode2CountsCapacity() {
+	protected HashMap<String, Counts<Link>> getMode2CountsCapacity() {
 		return this.mode2CountsCapacity;
 	}
 
-	protected HashMap<String, Counts> getMode2CountsCapacity_m() {
+	protected HashMap<String, Counts<Link>> getMode2CountsCapacity_m() {
 		return this.mode2CountsCapacity_m;
 	}
 
-	protected HashMap<String, Counts> getMode2CountsPax() {
+	protected HashMap<String, Counts<Link>> getMode2CountsPax() {
 		return this.mode2CountsPax;
 	}
 
-	protected HashMap<String, Counts> getMode2CountsPax_m() {
+	protected HashMap<String, Counts<Link>> getMode2CountsPax_m() {
 		return this.mode2CountsPax_m;
 	}
 }

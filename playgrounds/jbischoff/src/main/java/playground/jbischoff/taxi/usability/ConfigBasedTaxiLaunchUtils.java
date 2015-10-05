@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 

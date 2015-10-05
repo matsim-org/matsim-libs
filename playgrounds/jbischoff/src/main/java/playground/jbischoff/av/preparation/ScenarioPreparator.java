@@ -116,7 +116,6 @@ public class ScenarioPreparator {
 //			}
 		} 
 		scenario.getPopulation().getPersons().clear();
-		System.out.println("multiply");
 		Scenario scen3 = multiplyPopulation(newScen.getPopulation(), 3);
 		newScen.getPopulation().getPersons().clear();
 		changeLegsToTaxi(scen3);

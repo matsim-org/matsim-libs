@@ -35,6 +35,20 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
 
     private final Object geoDistDataKey = Converters.register(CommonKeys.LEG_GEO_DISTANCE, DoubleConverter.getInstance());
 
+    private AttributeChangeListener listener;
+
+    public GeoDistanceUpdater() {
+        this.listener = null;
+    }
+
+    public GeoDistanceUpdater(AttributeChangeListener listener) {
+        setListener(listener);
+    }
+
+    public void setListener(AttributeChangeListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
         if (facDataKey == null) facDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
@@ -47,13 +61,19 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
             if (toLeg != null) {
                 CachedSegment prevAct = (CachedSegment) toLeg.previous();
                 double d = distance(prevAct, act);
+                Object old = toLeg.getData(geoDistDataKey);
                 toLeg.setData(geoDistDataKey, d);
+
+                if(listener != null) listener.onChange(geoDistDataKey, old, d, toLeg);
             }
 
             if (fromLeg != null) {
                 CachedSegment nextAct = (CachedSegment) fromLeg.next();
                 double d = distance(act, nextAct);
+                Object old = fromLeg.getData(geoDistDataKey);
                 fromLeg.setData(geoDistDataKey, d);
+
+                if(listener != null) listener.onChange(geoDistDataKey, old, d, fromLeg);
             }
         }
     }

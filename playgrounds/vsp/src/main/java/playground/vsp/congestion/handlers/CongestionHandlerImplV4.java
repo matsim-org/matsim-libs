@@ -76,8 +76,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	private Scenario scenario;
 	private EventsManager events;
 
-	private double totalDelay = 0.0;
-
 	private Map<Id<Link>,Deque<Id<Link>>> linkId2SpillBackCausingLinks = new HashMap<>();
 	private Map<Id<Person>,Integer> personId2legNr = new HashMap<>() ;
 	private Map<Id<Person>,Integer> personId2linkNr = new HashMap<>() ;
@@ -92,8 +90,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	@Override
 	public final void reset(int iteration) {
 		delegate.reset(iteration);
-
-		this.totalDelay = 0.0;
 
 		this.linkId2SpillBackCausingLinks.clear();
 		this.personId2legNr.clear();
@@ -164,7 +160,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			calculateCongestion(event, delayInfo);
 
 			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.getDelayQueue().add( delayInfo ) ;
 
 			linkInfo.memorizeLastLinkLeaveEvent( event );
 
@@ -186,10 +181,6 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 		double remainingDelay = event.getTime() - linkInfo.getAgentsOnLink().get(affectedAgentDelayInfo.personId).getFreeSpeedLeaveTime() ;
 
 		if(remainingDelay == 0.) return;
-
-		// global book-keeping:
-		this.totalDelay += remainingDelay;
-
 
 		if( linkInfo.getFlowQueue().isEmpty() && remainingDelay > 0.0){
 			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
@@ -300,7 +291,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 
 	@Override
 	public double getTotalDelay() {
-		return this.totalDelay;
+		return this.delegate.getTotalDelay();
 	}
 
 	@Override
@@ -317,7 +308,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	public void writeCongestionStats(String file) {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.totalDelay/ 3600.);
+			bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
 			bw.newLine();
 			bw.write("Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
 			bw.newLine();

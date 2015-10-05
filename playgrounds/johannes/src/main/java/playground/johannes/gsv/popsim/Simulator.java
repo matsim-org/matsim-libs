@@ -20,29 +20,34 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
+import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
+import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.CalculateGeoDistance;
+import playground.johannes.synpop.processing.GuessMissingActTypes;
+import playground.johannes.synpop.processing.LegAttributeRemover;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author johannes
@@ -63,44 +68,42 @@ public class Simulator {
 
 		logger.info("Loading persons...");
 		Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
-				"popInputFile"), new
-				PlainFactory());
+				"popInputFile"), new PlainFactory());
 		logger.info(String.format("Loaded %s persons.", refPersons.size()));
 
-		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
+
+		TaskRunner.run(new ReplaceActTypes(), refPersons);
+		new GuessMissingActTypes(random).apply(refPersons);
+		TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
+
+		logger.info("Cloning persons...");
 		Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), 100000, random);
 		logger.info(String.format("Generated %s persons.", simPersons.size()));
 
 		logger.info("Loading data...");
 		DataPool dataPool = new DataPool();
 		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+//		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+		dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
 		logger.info("Done.");
 
-		logger.info("Validation data...");
-		//FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
-		//FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
-		logger.info("Done.");
+//		logger.info("Validation data...");
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
+//		logger.info("Done.");
 
 		logger.info("Setting up sampler...");
 		/*
 		 * Distribute population according to zone values.
 		 */
-		new SetHomeFacilities(dataPool, random).apply(simPersons);
+		new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
 		/*
 		 * Assign random activity facilities.
 		 */
 		TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
-
-		TaskRunner.run(new EpisodeTask() {
-			@Override
-			public void apply(Episode episode) {
-				for(Segment leg : episode.getLegs()) {
-					leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
-				}
-			}
-		}, simPersons);
+		TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
+		TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
 
 		final String output = config.getParam(MODULE_NAME, "output");
 
@@ -113,17 +116,16 @@ public class Simulator {
 
 		MutatorComposite<? extends Attributable> mutators = new MutatorComposite<>(random);
 
-        UnivariatFrequency distance = new UnivariatFrequency(refPersons, simPersons, CommonKeys.LEG_GEO_DISTANCE, new
-				LinearDiscretizer(10000));
-        hamiltonians.addComponent(distance);
+        UnivariatFrequency distance = buildDistanceHamiltonian(refPersons, simPersons);
+        hamiltonians.addComponent(distance, 1e6);
 
 
         FacilityMutatorBuilder fBuilder = new FacilityMutatorBuilder(dataPool, random);
         fBuilder.addToBlacklist(ActivityTypes.HOME);
 
         AttributeChangeListenerComposite listeners = new AttributeChangeListenerComposite();
-        listeners.addComponent(new GeoDistanceUpdater());
-        listeners.addComponent(distance);
+        listeners.addComponent(new GeoDistanceUpdater(distance));
+//        listeners.addComponent(distance);
         fBuilder.setListener(listeners);
         mutators.addMutator(fBuilder.build());
 
@@ -133,7 +135,7 @@ public class Simulator {
 
 		listener.addComponent(new MarkovEngineListener() {
 
-			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 100000);
+			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 10000000);
 
 			@Override
 			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
@@ -150,7 +152,7 @@ public class Simulator {
 
 		sampler.setListener(listener);
 
-		sampler.run(4000001);
+		sampler.run(100000001);
 	}
 
 	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
@@ -163,6 +165,40 @@ public class Simulator {
 		}
 
 		return values.toNativeArray();
+	}
+
+	private static UnivariatFrequency buildDistanceHamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson>
+			simPersons) {
+		Set<Attributable> refLegs = getLegs(refPersons);
+		Set<Attributable> simLegs = getLegs(simPersons);
+
+		List<Double> values = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE).collect(refPersons);
+		double[] nativeValues = CollectionUtils.toNativeArray(values);
+		Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
+
+		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
+
+		return f;
+	}
+
+	private static Set<Attributable> getLegs(Set<? extends Person> persons) {
+		Set<Attributable> legs = new HashSet<>();
+		for(Person p : persons) {
+			Episode e = p.getEpisodes().get(0);
+			legs.addAll(e.getLegs());
+		}
+
+		return legs;
+	}
+
+	private static class Route2GeoDistFunction implements UnivariateRealFunction {
+
+		@Override
+		public double value(double x) throws FunctionEvaluationException {
+			double routDist = x/1000.0;
+			double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+			return routDist * factor * 1000;
+		}
 	}
 
 }

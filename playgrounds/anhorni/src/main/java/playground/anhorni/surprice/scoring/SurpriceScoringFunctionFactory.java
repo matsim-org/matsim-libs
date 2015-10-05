@@ -41,7 +41,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
 			AgentMemories memories, String day, ObjectAttributes preferences) {
-		super(configGroup, network);
+		super(configGroup, scConfig, network);
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;

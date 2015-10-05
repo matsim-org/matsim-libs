@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.sim.data.ActivityFacilityConverter;
 import playground.johannes.synpop.sim.data.Converters;
 
@@ -61,6 +61,10 @@ public class FacilityMutatorBuilder implements MutatorBuilder {
         Object dataKey = Converters.register(CommonKeys.ACTIVITY_FACILITY, ActivityFacilityConverter.getInstance(facilityData));
 
         RandomFacilityGenerator generator = new RandomFacilityGenerator(facilityData);
+        for(String type : blacklist) {
+            generator.addToBlacklist(type);
+        }
+
         AttributeMutator attMutator = new AttributeMutator(dataKey, generator, listener);
         RandomActMutator actMutator = new RandomActMutator(attMutator, random);
 

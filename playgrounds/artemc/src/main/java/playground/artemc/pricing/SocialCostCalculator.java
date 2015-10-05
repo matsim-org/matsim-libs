@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -40,9 +39,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.Vehicle;
 import playground.artemc.analysis.IterationTableWriter;
 import playground.artemc.socialCost.SocialCostWriter;
 
@@ -142,7 +139,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		this.blendFactor = blendFactor;
 
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
+		this.opportunityCostOfCarTravel = -controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 
 		init();
 	}
@@ -589,7 +586,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValue;
-				if (iteration == 0) oldValue = socialCost;
+				if (iteration == 0) oldValue = socialCost * blendFactor;
 				else oldValue = data.socialCosts[k];
 				double blendedOldValue = (1 - blendFactor) * oldValue;
 				double blendedNewValue = blendFactor * socialCost;

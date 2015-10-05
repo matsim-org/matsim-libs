@@ -21,11 +21,7 @@
 package org.matsim.core.utils.collections;
 
 import java.io.Serializable;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * An implementation of a QuadTree to store data assigned to geometric points.
@@ -145,6 +141,23 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	/**
+	 * Gets all objects within a linear ring (including borders).
+	 *
+	 * Note by JI (sept '15): This method can be significant faster than calling {@link #get(double, double, double)}
+	 * and a manual check on the returned elements for >= r_min. For randomly distributed points one can use the
+	 * following rule-of-thumb: if r_min/r_max > 0.4 this method is likely to be faster than retrieving all elements within r_max.
+	 *
+	 * @param x left-right location, longitude
+	 * @param y up-down location, latitude
+	 * @param r_min inner ring radius
+	 * @param r_max outer rind radius
+	 * @return objects within the ring
+	 */
+	public Collection<T> get(final double x, final double y, final double r_min, final double r_max) {
+		return this.top.get(x, y, r_min, r_max, new ArrayList<T>());
+	}
+
+	/**
 	 * Gets all objects within an elliptical region.
 	 *
 	 * @param x1 first focus, longitude
@@ -178,11 +191,11 @@ public class QuadTree<T> implements Serializable {
 	 * boundary are not included.
 	 *
 	 * @param bounds The bounds of the area of interest.
-	 * @param values A collection to store the found objects in.
+	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final Rect bounds, final Collection<T> values) {
-		return this.top.get(bounds, values);
+	public Collection<T> get(final Rect bounds, final Collection<T> values1) {
+		return this.top.get(bounds, values1);
 	}
 
 	/**
@@ -193,11 +206,11 @@ public class QuadTree<T> implements Serializable {
 	 * @param minY The minimum up-down location, latitude
 	 * @param maxX The maximum left-right location, longitude
 	 * @param maxY The maximum up-down location, latitude
-	 * @param values A collection to store the found objects in.
+	 * @param values1 A collection to store the found objects in.
 	 * @return The objects found within the area.
 	 */
-	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values) {
-		return get(new Rect(minX, minY, maxX, maxY), values);
+	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values1) {
+		return get(new Rect(minX, minY, maxX, maxY), values1);
 	}
 
 	/**
@@ -396,7 +409,7 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		/**
-		 * Calculates the distance of a given point to the border of the
+		 * Calculates the (minimum) distance of a given point to the border of the
 		 * rectangle. If the point lies within the rectangle, the distance
 		 * is zero.
 		 *
@@ -421,6 +434,21 @@ public class QuadTree<T> implements Serializable {
 
 			return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 		}
+
+		/**
+		 * Calculates the distance from the given point to the furthest corner of the rectangle
+		 * 
+		 * @param x left-right location
+		 * @param y up-down location
+		 * @return distance to furthest corner of the rectangle
+		 */
+		public double calcMaxDistance(final double x, final double y) {
+			double distanceX = Math.max(Math.abs(this.minX - x), Math.abs(this.maxX - x));
+			double distanceY = Math.max(Math.abs(this.minY - y), Math.abs(this.maxY - y));
+
+			return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+		}
+
 
 		/**
 		 * Tests if a specified coordinate is inside the boundary of this <code>Rect</code>.
@@ -755,6 +783,36 @@ public class QuadTree<T> implements Serializable {
 				}
 			}
 			return values;
+		}
+
+		/* default */ Collection<T> get(final double x, final double y, final double r_min, final double r_max,
+										Collection<T> values) {
+			if (this.hasChilds) {
+				stepInto(this.northwest, x, y, r_min, r_max, values);
+				stepInto(this.northeast, x, y, r_min, r_max, values);
+				stepInto(this.southeast, x, y, r_min, r_max, values);
+				stepInto(this.southwest, x, y, r_min, r_max, values);
+				return values;
+			}
+			// no more childs, so we must contain the closest object
+			if (this.leaf != null && this.leaf.values.size() > 0) {
+				double distance = Math.sqrt(
+						(this.leaf.x - x) * (this.leaf.x - x)
+								+ (this.leaf.y - y) * (this.leaf.y - y));
+				if (distance <= r_max && distance >= r_min) {
+					values.addAll(this.leaf.values);
+				}
+			}
+			return values;
+		}
+
+		private void stepInto(Node node, double x, double y, double r_min, double r_max, Collection<T> values) {
+			double minDistance = node.bounds.calcDistance(x, y);
+			double maxDistance = node.bounds.calcMaxDistance(x, y);
+
+			if(minDistance <= r_max && maxDistance >= r_min) {
+				node.get(x, y, r_min, r_max, values);
+			}
 		}
 
 		/* default */ Collection<T> get(final Rect bounds, final Collection<T> values) {

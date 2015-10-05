@@ -30,6 +30,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TripRouterModule extends AbstractModule {
 
@@ -43,11 +45,11 @@ public class TripRouterModule extends AbstractModule {
 
         final Config config;
         final TripRouterFactory tripRouterFactory;
-        final TravelDisutilityFactory travelDisutilityFactory;
-        final Provider<TravelTime> travelTime;
+        final Map<String, TravelDisutilityFactory> travelDisutilityFactory;
+        final Map<String, TravelTime> travelTime;
 
         @Inject
-        RealTripRouterProvider(Config config, TripRouterFactory tripRouterFactory, TravelDisutilityFactory travelDisutilityFactory, Provider<TravelTime> travelTime) {
+        RealTripRouterProvider(Config config, TripRouterFactory tripRouterFactory, Map<String,TravelDisutilityFactory> travelDisutilityFactory, Map<String,TravelTime> travelTime) {
             this.config = config;
             this.travelDisutilityFactory = travelDisutilityFactory;
             this.tripRouterFactory = tripRouterFactory;
@@ -56,19 +58,11 @@ public class TripRouterModule extends AbstractModule {
 
         @Override
         public TripRouter get() {
-            return tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
-
-                @Override
-                public TravelDisutility getTravelDisutility() {
-                    return travelDisutilityFactory.createTravelDisutility(travelTime.get(), config.planCalcScore());
-                }
-
-                @Override
-                public TravelTime getTravelTime() {
-                    return travelTime.get();
-                }
-
-            });
+            Map<String, TravelDisutility> travelDisutilities = new HashMap<>();
+            for (Map.Entry<String, TravelDisutilityFactory> entry : travelDisutilityFactory.entrySet()) {
+                travelDisutilities.put(entry.getKey(), entry.getValue().createTravelDisutility(travelTime.get(entry.getKey()), config.planCalcScore()));
+            }
+            return tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(travelDisutilities, travelTime));
         }
 
     }

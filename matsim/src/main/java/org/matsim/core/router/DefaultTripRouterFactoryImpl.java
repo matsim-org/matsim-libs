@@ -67,8 +67,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-        final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
-
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
             final RoutingModule routingModule = DefaultRoutingModules.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 
 			        scenario.getNetwork(), routeAlgoPtFreeFlow, routeConfigGroup.getModeRoutingParams().get( mode ) );
@@ -108,8 +106,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
             LeastCostPathCalculator routeAlgo =
             leastCostPathCalculatorFactory.createPathCalculator(
                     filteredNetwork,
-                    routingContext.getTravelDisutility(),
-                    routingContext.getTravelTime());
+                    routingContext.getTravelDisutility(mode),
+                    routingContext.getTravelTime(mode));
 
             final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
                     filteredNetwork, routeAlgo);
@@ -121,21 +119,6 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ": "+result );
             }
             
-            // The default router will always route on the car network.  A user may, however, have prepared a network with dedicated bicycle
-            // links and then expect the router to route on that.  The following test tries to catch that.  If someone improves on this,
-            // the test can be removed.  kai, feb'15
-            if ( networkIsMultimodal ) {
-            	switch ( mode ) {
-            	case TransportMode.car :
-            	case TransportMode.ride :
-            		break ;
-            	default:
-            		throw new RuntimeException("you have a multi-modal network and configured " + mode + " to be routed as a network mode.  "
-            				+ "The present configuration will route this "
-            				+ "mode on the car network.  This may be ok (e.g. with ``truck'' or ``motorbike''), or not (e.g. with ``bicycle''). "
-            				+ "Throwing an exception anyways; please use a uni-modal network if you want to keep this configuration.") ;
-            	}
-            }
         }
 
         if ( scenario.getConfig().transit().isUseTransit() ) {
