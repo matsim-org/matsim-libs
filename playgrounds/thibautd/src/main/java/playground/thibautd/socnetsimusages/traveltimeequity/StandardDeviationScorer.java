@@ -104,7 +104,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 	@Override
 	public double getScore() {
 		double sumStdDevs = 0;
-		for ( ActivityValues values : activityValues ) sumStdDevs += values.calcStdDev();
+		for ( ActivityValues values : activityValues ) sumStdDevs += values.calcNormalizedStdDev();
 
 		assert sumStdDevs >= 0;
 		if ( log.isTraceEnabled() && sumStdDevs > 0 ) {
@@ -133,8 +133,9 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 			departureTimes.add( time );
 		}
 
-		public double calcStdDev() {
-			// assert departureTimes.size() == arrivalTimes.size(); // not the case before activity ends (which might never happen)
+		public double calcNormalizedStdDev() {
+			// assert departureTimes.size() == arrivalTimes.size();
+			// not the case before activity ends (which might never happen)
 			// for each person, sum the travel times: we do not want to enforce that access and egress of an agent have
 			// the same length, but similarity across agents.
 			final TObjectDoubleHashMap<Id<Person>> travelTimes = new TObjectDoubleHashMap<>();
@@ -173,10 +174,10 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 						tt, tt);
 			}
 
-			return calcStdDev( travelTimes.valueCollection() );
+			return calcNormalizedStdDev(travelTimes.valueCollection());
 		}
 
-		private double calcStdDev( final TDoubleCollection travelTimes ) {
+		private double calcNormalizedStdDev(final TDoubleCollection travelTimes) {
 			double avg = 0;
 			for ( double tt : travelTimes.toArray() ) avg += tt;
 			avg /= travelTimes.size();
