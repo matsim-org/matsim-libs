@@ -47,8 +47,8 @@ public class RunEventsHandlingExample {
 
 		//create the handler and add it
 		CityCenterEventEnterHandler cityCenterEventEnterHandler = new CityCenterEventEnterHandler();
-		
-		//möglicherweise ist es cleverer, durch das Netzwerk zu iterieren und alle Links zu finden, die im Stadtzentrum liegen (freespeed....), oder ihr gebt alle Zufahrten zur Innenstadt manuell ein.
+
+		//add the links here that you want to monitor
 		cityCenterEventEnterHandler.addLinkId(Id.createLinkId(28112));
 		
 		
@@ -59,7 +59,7 @@ public class RunEventsHandlingExample {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
 		
-		System.out.println(cityCenterEventEnterHandler.getAgentsInCityCenter());
+		System.out.println(cityCenterEventEnterHandler.getVehiclesInCityCenter());
 		
 		System.out.println("Events file read!");
 	}
