@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -46,7 +47,7 @@ public final class CadytsBuilder {
 		// private Constructor, should not be instantiated
 	}
 
-	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts<T> occupCounts, LookUp<T> lookUp, Class<T> idType ) {
+	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts<T> occupCounts, LookUpItemFromId<T> lookUp, Class<T> idType ) {
 		
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 
@@ -102,10 +103,10 @@ public final class CadytsBuilder {
 		
 		//add counts data into calibrator
 		int numberOfAddedMeasurements = 0 ;
-		for (Map.Entry<Id<T>, Count> entry : occupCounts.getCounts().entrySet()) {
+		for (Map.Entry<Id<T>, Count<T>> entry : occupCounts.getCounts().entrySet()) {
 			// (loop over all counting "items" (usually locations/stations)
 			
-			T item = lookUp.lookUp(Id.create(entry.getKey(), idType)) ;
+			T item = lookUp.getItem(Id.create(entry.getKey(), idType)) ;
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
 			double count = -1 ;

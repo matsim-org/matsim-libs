@@ -18,28 +18,46 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
+import com.google.inject.Provider;
+import eu.eunoiaproject.examples.schedulebasedteleportation.Run;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 
 import java.io.IOException;
+import java.util.concurrent.*;
 
 /**
  * @author thibautd
  */
 public class Converter<T,C extends ChoiceSituation<T>> {
-	private final ChoiceSetSampler<T,C> choiceSetSampler;
+	private final ThreadLocal<ChoiceSetSampler<T,C>> choiceSetSampler;
 	private final ChoiceSetRecordFiller<T> recordFiller;
-	private final ChoicesIdentifier<C> choicesIdentifier;
+	private final ThreadLocal<ChoicesIdentifier<C>> choicesIdentifier;
+
+	private final int nThreads;
 
 	private Converter(
-			final ChoiceSetSampler<T,C> choiceSetSampler,
+			final int nThreads,
+			final Provider<ChoiceSetSampler<T,C>> choiceSetSampler,
 			final ChoiceSetRecordFiller<T> recordFiller,
-			final ChoicesIdentifier<C> choicesIdentifier) {
-		this.choiceSetSampler = choiceSetSampler;
+			final Provider<ChoicesIdentifier<C>> choicesIdentifier) {
+		this.nThreads = nThreads;
+		this.choiceSetSampler = new ThreadLocal<ChoiceSetSampler<T, C>>() {
+			@Override
+			protected ChoiceSetSampler<T, C> initialValue() {
+				return choiceSetSampler.get();
+			}
+		};
 		this.recordFiller = recordFiller;
-		this.choicesIdentifier = choicesIdentifier;
+		this.choicesIdentifier = new ThreadLocal<ChoicesIdentifier<C>>() {
+			@Override
+			protected ChoicesIdentifier<C> initialValue() {
+				return choicesIdentifier.get();
+			}
+		};
 	}
 
 	public static <T,C extends ChoiceSituation<T>> ConverterBuilder<T,C> builder() {
@@ -47,24 +65,70 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 	}
 
 	public void convert( final Population chains , final String dataset ) {
+		final ExecutorService executor = Executors.newFixedThreadPool( nThreads );
+
 		try ( final ChoiceDataSetWriter<T> writer = new ChoiceDataSetWriter<>( recordFiller , dataset ) ) {
+			final WritingRunnable runnable = new WritingRunnable( writer );
+			final Thread writerThread = new Thread( runnable );
+
+			writerThread.start();
+
 			for (Person p : chains.getPersons().values() ) {
-				for ( C choice : choicesIdentifier.identifyChoices(p.getSelectedPlan()) ) {
-					writer.write( choiceSetSampler.sampleChoiceSet( p , choice ) );
-				}
+				final Person pf = p;
+				executor.execute(
+						new Runnable() {
+							@Override
+							public void run() {
+								for (C choice : choicesIdentifier.get().identifyChoices(pf.getSelectedPlan())) {
+									final ChoiceSet<T> set = choiceSetSampler.get().sampleChoiceSet(pf, choice);
+									runnable.queue.add( set );
+								}
+							}
+						});
 			}
+
+			executor.awaitTermination( Long.MAX_VALUE , TimeUnit.DAYS );
+			executor.shutdown();
+			runnable.doRun = false;
+			writerThread.join();
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
+		catch (InterruptedException e) {
+			throw new RuntimeException( e );
+		}
+	}
+
+	private class  WritingRunnable implements Runnable {
+		private final BlockingQueue< ChoiceSet<T> > queue = new LinkedBlockingQueue<>();
+		private boolean doRun = true;
+		final ChoiceDataSetWriter<T> writer;
+
+		private WritingRunnable(ChoiceDataSetWriter<T> writer) {
+			this.writer = writer;
+		}
+
+		@Override
+		public void run() {
+			try {
+				while ( doRun || !queue.isEmpty() ) {
+					writer.write(queue.take());
+				}
+			}
+			catch (InterruptedException e) {
+				throw new RuntimeException( e );
+			}
+		}
 	}
 
 	public static class ConverterBuilder<T,C extends ChoiceSituation<T>> {
-		private ChoiceSetSampler<T,C> choiceSetSampler;
+		private Provider<ChoiceSetSampler<T,C>> choiceSetSampler;
 		private ChoiceSetRecordFiller<T> recordFiller;
-		private ChoicesIdentifier<C> choicesIdentifier;
+		private Provider<ChoicesIdentifier<C>> choicesIdentifier;
+		private int nThreads = 1;
 
-		public ConverterBuilder<T,C> withChoiceSetSampler(final ChoiceSetSampler<T,C> choiceSetSampler) {
+		public ConverterBuilder<T,C> withChoiceSetSampler(final Provider<ChoiceSetSampler<T,C>> choiceSetSampler) {
 			this.choiceSetSampler = choiceSetSampler;
 			return this;
 		}
@@ -74,13 +138,18 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 			return this;
 		}
 
-		public ConverterBuilder<T,C> withChoicesIdentifier(final ChoicesIdentifier<C> choicesIdentifier) {
+		public ConverterBuilder<T,C> withChoicesIdentifier(final Provider<ChoicesIdentifier<C>> choicesIdentifier) {
 			this.choicesIdentifier = choicesIdentifier;
 			return this;
 		}
 
+		public ConverterBuilder<T,C> withNumberOfThreads(final int nThreads) {
+			this.nThreads = nThreads;
+			return this;
+		}
+
 		public Converter<T,C> create() {
-			return new Converter(choiceSetSampler, recordFiller, choicesIdentifier);
+			return new Converter(nThreads, choiceSetSampler, recordFiller, choicesIdentifier);
 		}
 	}
 }

@@ -21,34 +21,39 @@
 package org.matsim.contrib.cadyts.measurement;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.analysis.kai.DataMap;
+import org.matsim.contrib.analysis.kai.Databins;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.ConfigUtils;
 
 import cadyts.demand.PlanBuilder;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
-public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<Measurement>, LinkLeaveEventHandler, 
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class MeasurementListener implements PlansTranslator<Measurement>,  
+		PersonDepartureEventHandler, PersonArrivalEventHandler, SimResults<Measurement> {
 	
-	private static final Logger log = Logger.getLogger(MeasurementPlanToPlanStepBasedOnEvents.class);
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger log = Logger.getLogger(MeasurementListener.class);
 
 	private final Scenario scenario;
 
-	private final Set<Id> driverAgents;
+	private final Map<Id<Person>,PersonDepartureEvent> driverAgents = new TreeMap<>() ;
 	
 	private int iteration = -1;
 
@@ -58,15 +63,15 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Measurement>> calibratedLinks = new HashSet<>() ;
+	private final Measurements  measurements ;
+	
+	private final DataMap<Measurement> simResults = new DataMap<>() ;
 
-	MeasurementPlanToPlanStepBasedOnEvents(final Scenario scenario) {
+	MeasurementListener(final Scenario scenario, Measurements measurements) {
+			
+		this.measurements = measurements ;
+		
 		this.scenario = scenario;
-		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
-		for ( String str : abc ) {
-			this.calibratedLinks.add( Id.create( str, Measurement.class ) ) ;
-		}
-		this.driverAgents = new HashSet<>();
 	}
 
 	private long plansFound = 0;
@@ -98,42 +103,35 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) this.driverAgents.add(event.getPersonId());
+		this.driverAgents.put(event.getPersonId(), event ) ;
 	}
 	
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		this.driverAgents.remove(event.getPersonId());
-	}
-	
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+		PersonDepartureEvent dpEvent = this.driverAgents.remove( event.getPersonId() ) ;
+		double ttime = event.getTime() - dpEvent.getTime() ;
+		Measurement measurement = measurements.getMeasurementFromTTimeInSeconds(ttime) ;
 		
-		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getPersonId())) return;
+		// ---
+		// the following will lead to getSimValue (observation):
+		int idx = this.databins.getIndex( dpEvent.getTime() ) ;
+		this.databins.inc( measurement, idx);
 		
-		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (!calibratedLinks.contains(event.getLinkId())) return;
-		
-		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
-		
-		// get the selected plan:
-		Plan selectedPlan = person.getSelectedPlan();
-		
+
+		// ---
+		// the following will fill the cadyts plan:
+
 		// get the planStepFactory for the plan (or create one):
-		PlanBuilder<Measurement> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
-		
-		// TODO
+		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+		PlanBuilder<Measurement> tmpPlanStepFactory = getPlanStepFactoryForPlan(person.getSelectedPlan());
+
+		// add the measurement:
 		if (tmpPlanStepFactory != null) {
-			// can this happen?? kai, oct'15
+			// can this happen?? Maybe in early time steps???
 						
-//			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-					
-			// add the "turn" to the planStepfactory
-//			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
+			tmpPlanStepFactory.addTurn( measurement, (int) event.getTime());
 		}
-		throw new RuntimeException(" the above needs to be filled with meaning") ;
+		
 	}
 
 	// ###################################################################################
@@ -159,5 +157,13 @@ public class MeasurementPlanToPlanStepBasedOnEvents implements PlansTranslator<M
 
 		return planStepFactory;
 	}
+
+	@Override
+	public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
+		int idx = this.databins.getIndex( startTime_s ) ;
+		return this.databins.getValue( mea, idx ) ;
+	}
+
+	
 
 }

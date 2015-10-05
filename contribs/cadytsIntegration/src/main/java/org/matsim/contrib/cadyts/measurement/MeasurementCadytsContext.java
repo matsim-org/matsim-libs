@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -41,6 +41,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
@@ -62,17 +63,20 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	private final boolean writeAnalysisFile;
 
 	private AnalyticalCalibrator<Measurement> calibrator;
-	private MeasurementPlanToPlanStepBasedOnEvents planToPlanStep;
+	private MeasurementListener planToPlanStep;
 	private SimResults<Measurement> simResults;
 	
-	public MeasurementCadytsContext(Config config, Counts<Measurement> measurements) {
-
+	private final Measurements measurements ;
+	
+	public MeasurementCadytsContext(Config config, Tuple<Counts<Measurement>, Measurements> tuple) {
+		
 		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup();
 		config.addModule(cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 		
-		this.counts = measurements;
+		this.counts = tuple.getFirst() ;
+		measurements = tuple.getSecond() ;
 
 		Set<String> measurementsSet = new TreeSet<>();
 		for (Id<Measurement> id : this.counts.getCounts().keySet()) {
@@ -80,7 +84,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		}
 		
 		cadytsConfig.setCalibratedItems(measurementsSet);
-
+		
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 	
@@ -98,22 +102,13 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		
 		Scenario scenario = event.getControler().getScenario();
 		
-		TravelDistanceAnalyzer travelDistanceAnalyzer = new TravelDistanceAnalyzer(3600, 3600*36, scenario.getNetwork());
-		event.getControler().getEvents().addHandler(travelDistanceAnalyzer);
-		
-		this.simResults = new SimResultsContainerImpl(travelDistanceAnalyzer);
-		
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, measurements, Measurement.class);
+
 		// this collects events and generates cadyts plans from it
-		this.planToPlanStep = new MeasurementPlanToPlanStepBasedOnEvents(scenario);
+		this.planToPlanStep = new MeasurementListener(scenario, measurements );
 		event.getControler().getEvents().addHandler(planToPlanStep);
 
-		LookUp<Measurement> lookUp = new LookUp<Measurement>() {
-			@Override public Measurement lookUp(Id<Measurement> id) {
-				return new Measurement( id ) ;
 			}
-		} ;
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, lookUp, Measurement.class);
-	}
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -154,7 +149,6 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 //			log.error("Could not write link cost offsets!", e);
 //		}
 	}
-
 
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line

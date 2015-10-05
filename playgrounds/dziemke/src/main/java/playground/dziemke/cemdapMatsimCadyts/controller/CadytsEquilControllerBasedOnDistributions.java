@@ -7,20 +7,17 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.measurement.Measurement;
 import org.matsim.contrib.cadyts.measurement.MeasurementCadytsContext;
+import org.matsim.contrib.cadyts.measurement.Measurements;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,6 +29,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
 public class CadytsEquilControllerBasedOnDistributions {
@@ -118,21 +116,6 @@ public class CadytsEquilControllerBasedOnDistributions {
 		final MeasurementCadytsContext cContext2 = new MeasurementCadytsContext(config, buildMeasurements());
 		controler.addControlerListener(cContext2);
 
-
-		//			@Override
-		//			public void install() {
-		//				addPlanStrategyBinding(CADYTS).toProvider(new javax.inject.Provider<PlanStrategy>() {
-		//					@Override
-		//					public PlanStrategy get() {
-		//						PlanStrategyImpl.Builder builder = 
-		//								new PlanStrategyImpl.Builder(new CadytsPlanChanger<Measurement>(controler.getScenario(), cContext2)) ;
-		//						return builder.build() ;
-		//					}
-		//				});
-		//			}
-		//		});
-		// don't need the above, I think.  cadyts scoring is enough. kai, oct'15
-
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
@@ -197,83 +180,99 @@ public class CadytsEquilControllerBasedOnDistributions {
 	}
 
 
-	private static Counts<Measurement> buildMeasurements(){
-		Counts<Measurement> measurements = new Counts<>();
-
+	private static Tuple<Counts<Measurement>,Measurements> buildMeasurements(){
+		Counts<Measurement> counts = new Counts<>();
+		Measurements measurements = new Measurements() ;
 		{
 			Id<Measurement> id = Id.create(69200, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 10.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 0 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 
 		{
 			Id<Measurement> id = Id.create(69400, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 40.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 10*60. ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(69600, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 100.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 20*60. ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(69800, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 150.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
 		}
 		{
 			Id<Measurement> id = Id.create(70000, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 300.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 30*60 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(70200, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 150.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 40*60 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(70400, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 100.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 50*60 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(70600, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 40.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 60*60 ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 		{
 			Id<Measurement> id = Id.create(70800, Measurement.class);
-			measurements.createAndAddCount(id, null);
+			counts.createAndAddCount(id, null);
 			Double value = 10.;
 			for (int h = 1; h<=24; h++) {
-				measurements.getCount(id).createVolume(h, value);
+				counts.getCount(id).createVolume(h, value);
 			}
+			double lowerBound = 70*60. ;
+			measurements.add(counts.getCount(id), lowerBound);
 		}
 
-		return measurements;
+		return new Tuple<>( counts, measurements ) ;
 	}
 }
