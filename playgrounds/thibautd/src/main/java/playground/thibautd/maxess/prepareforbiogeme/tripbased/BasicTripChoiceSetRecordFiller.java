@@ -107,17 +107,15 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 	}
 
 	private short getCarAvailability(final Person decisionMaker) {
-		final String avail = PersonUtils.getCarAvail(decisionMaker).toLowerCase().trim();
+		final String avail = PersonUtils.getCarAvail(decisionMaker);
 
-		switch ( avail ) {
-			case "sometimes":
-			case "always":
-				return 1;
-			case "never":
-				return 0;
-			default:
-				throw new IllegalArgumentException( "unhandled availability "+avail );
-		}
+		if ( "never".equals( avail ) ) return 0;
+
+		final String license = PersonUtils.getLicense( decisionMaker );
+
+		if ( "no".equals( license ) ) return 0;
+
+		return 1;
 	}
 
 	private double getTravelTime(final Trip alternative) {
