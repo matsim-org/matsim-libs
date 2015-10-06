@@ -140,7 +140,7 @@ class Talk_2015_09_03 {
 					}
 
 					final NTimesTwoRoutesSimulator system = new NTimesTwoRoutesSimulator(
-							replanners, demand, capacity, externalities);
+							replanners, capacity);
 
 					// final DecisionVariableRandomizer randomization = new
 					// MultiLevelTollRandomizer(

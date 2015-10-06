@@ -21,10 +21,9 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.searchalgorithms;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -54,7 +53,6 @@ public class RandomSearch {
 
 	private final ConvergenceCriterion convergenceCriterion;
 
-	// private final TrajectorySamplingSelfTuner selfTuner;
 	private final TrajectorySamplingSelfTuner selfTuner;
 
 	private final int maxIterations;
@@ -91,11 +89,9 @@ public class RandomSearch {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RandomSearch(
-			final Simulator system,
+	public RandomSearch(final Simulator system,
 			final DecisionVariableRandomizer randomizer,
 			final ConvergenceCriterion convergenceCriterion,
-			// final TrajectorySamplingSelfTuner selfTuner,
 			final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
 			final int populationSize, final Random rnd,
@@ -165,25 +161,16 @@ public class RandomSearch {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
-				// bestDecisionVariable = sampler.getFinalDecisionVariable();
-				// bestObjectiveFunctionValue = sampler
-				// .getFinalObjectiveFunctionValue();
 				bestDecisionVariable = sampler.getConvergedDecisionVariables()
 						.iterator().next();
 				bestObjectiveFunctionValue = sampler
 						.getFinalObjectiveFunctionValue(bestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				try {
-					this.selfTuner.registerSamplingStageSequence(
-							sampler.getSamplingStages(),
-							bestObjectiveFunctionValue,
-							sampler.getInitialGradientNorm(),
-							bestDecisionVariable);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				this.selfTuner.registerSamplingStageSequence(
+						sampler.getSamplingStages(),
+						bestObjectiveFunctionValue,
+						sampler.getInitialGradientNorm(), bestDecisionVariable);
 
 			} else {
 				final SimulatorState thisRoundsInitialState = newInitialState;

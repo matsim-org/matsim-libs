@@ -55,6 +55,9 @@ import floetteroed.utilities.math.Vector;
  */
 public class TrajectorySamplingSelfTuner {
 
+	// TODO
+	private final double terminationPrecision = 1e-6;
+	
 	// -------------------- CONSTANTS --------------------
 
 	private final int equilibriumGapWeightIndex = 0;
@@ -130,7 +133,7 @@ public class TrajectorySamplingSelfTuner {
 			final List<SamplingStage> samplingStages,
 			final double finalObjectiveFunctionValue,
 			final double gradientNorm,
-			final DecisionVariable finalDecisionVariable) throws IOException {
+			final DecisionVariable finalDecisionVariable) {
 
 		final SamplingStage stage = samplingStages.get(0);
 		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
@@ -162,8 +165,12 @@ public class TrajectorySamplingSelfTuner {
 		this.inputs.addFirst(input);
 		this.outputs.addFirst(output);
 
-		this.log = new PrintWriter(new BufferedWriter(new FileWriter(
-				"./predvsreal.txt", true)));
+		try {
+			this.log = new PrintWriter(new BufferedWriter(new FileWriter(
+					"./predvsreal.txt", true)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		this.log.println((stage.getOriginalObjectiveFunctionValue() + input
 				.innerProd(this.coeffs)) + "\t" + finalObjectiveFunctionValue);
 		this.log.close();
@@ -250,7 +257,7 @@ public class TrajectorySamplingSelfTuner {
 	private void run() {
 		final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
 				NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-				new SimpleValueChecker(1e-8, 1e-8));
+				new SimpleValueChecker(terminationPrecision, terminationPrecision));
 		final PointValuePair result = solver.optimize(new ObjectiveFunction(
 				new MyObjectiveFunction()), new ObjectiveFunctionGradient(
 				new MyGradient()), GoalType.MINIMIZE, new InitialGuess(
