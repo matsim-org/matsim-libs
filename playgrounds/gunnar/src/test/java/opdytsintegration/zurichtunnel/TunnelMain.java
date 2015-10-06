@@ -123,17 +123,17 @@ class TunnelMain {
 		// final double convergenceNoiseVarianceScale = 0.01;
 		final double maximumRelativeGap = 0.05;
 
-		final MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration> predictor = new MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration>(
-				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale,
-				stateFactory, 5, maximumRelativeGap);
-		predictor.setStandardLogFileName("tunnel-log.txt");
-		predictor.setMemory(1);
-		predictor.setBinSize_s(15 * 60);
-		predictor.setBinCnt(24 * 4);
-
-		controler.addControlerListener(predictor);
-		controler.run();
+//		final MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration> predictor = new MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration>(
+//				decisionVariables, objectiveFunction,
+//				// convergenceNoiseVarianceScale,
+//				stateFactory, 5, maximumRelativeGap);
+//		predictor.setStandardLogFileName("tunnel-log.txt");
+//		predictor.setMemory(1);
+//		predictor.setBinSize_s(15 * 60);
+//		predictor.setBinCnt(24 * 4);
+//
+//		controler.addControlerListener(predictor);
+//		controler.run();
 
 		System.out.println("... DONE.");
 	}

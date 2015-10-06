@@ -21,10 +21,9 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.searchalgorithms;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -90,8 +89,7 @@ public class RandomSearch {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RandomSearch(
-			final Simulator system,
+	public RandomSearch(final Simulator system,
 			final DecisionVariableRandomizer randomizer,
 			final ConvergenceCriterion convergenceCriterion,
 			final TrajectorySamplingSelfTuner selfTuner,
@@ -169,16 +167,10 @@ public class RandomSearch {
 						.getFinalObjectiveFunctionValue(bestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				try {
-					this.selfTuner.registerSamplingStageSequence(
-							sampler.getSamplingStages(),
-							bestObjectiveFunctionValue,
-							sampler.getInitialGradientNorm(),
-							bestDecisionVariable);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				this.selfTuner.registerSamplingStageSequence(
+						sampler.getSamplingStages(),
+						bestObjectiveFunctionValue,
+						sampler.getInitialGradientNorm(), bestDecisionVariable);
 
 			} else {
 				final SimulatorState thisRoundsInitialState = newInitialState;

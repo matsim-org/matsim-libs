@@ -383,18 +383,18 @@ public class RunRoadClassification {
 
 		// AND RUN THE ENTIRE THING
 
-		final double maximumRelativeGap = 0.05;
-		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
-				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale,
-				stateFactory, 5, maximumRelativeGap);
-		predictor.setStandardLogFileName("roadclassification-log.txt");
-		predictor.setMemory(1);
-		predictor.setBinSize_s(15 * 60);
-		predictor.setBinCnt(24 * 4);
-
-		controler.addControlerListener(predictor);
-		controler.run();
+//		final double maximumRelativeGap = 0.05;
+//		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
+//				decisionVariables, objectiveFunction,
+//				// convergenceNoiseVarianceScale,
+//				stateFactory, 5, maximumRelativeGap);
+//		predictor.setStandardLogFileName("roadclassification-log.txt");
+//		predictor.setMemory(1);
+//		predictor.setBinSize_s(15 * 60);
+//		predictor.setBinCnt(24 * 4);
+//
+//		controler.addControlerListener(predictor);
+//		controler.run();
 
 		System.out.println("... DONE.");
 	}
