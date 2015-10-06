@@ -1,22 +1,20 @@
 package opdytsintegration.zurichtunnel;
 
-import optdyts.ObjectiveFunction;
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
 
 /**
  * 
  * @author Gunnar Flötteröd
  * 
  */
-class TunnelObjectiveFunction implements ObjectiveFunction<TunnelState> {
+class TunnelObjectiveFunction implements ObjectBasedObjectiveFunction {
 
 	// private final double betaPayScale = 0.04;
 
 	@Override
-	public double evaluateState(final TunnelState state) {
-		// final double avgIncome = (1.0 - this.betaPayScale *
-		// state.getBetaPay()) * 100.0;
-		// return ((-1.0) * (state.getAvgScore() + avgIncome));
-		return (-1.0) * state.getAvgScore();
+	public double value(SimulatorState state) {
+		return (-1.0) * ((TunnelState) state).getAvgScore();
 	}
 
 }

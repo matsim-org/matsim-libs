@@ -12,11 +12,12 @@ import java.util.Random;
 import java.util.Set;
 
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * 
@@ -29,20 +30,12 @@ class RoadInvestmentMain {
 
 		System.out.println("STARTED ...");
 
-		final Controler controler = new Controler(
-				"/Nobackup/Profilen/workspace/MATSim/examples/equil/config.xml");
-		controler.getConfig().getModule("controler")
-				.addParam("lastIteration", "100");
-		controler
-				.getConfig()
-				.getModule("global")
-				.addParam("randomSeed",
-						Long.toString((new Random()).nextLong()));
+		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(100);
+		config.global().setRandomSeed(new Random().nextLong());
 
-		final File out = new File("output/equil");
-		if (out.exists()) {
-			IOUtils.deleteDirectory(out);
-		}
+		final Controler controler = new Controler(config);
 
 		Map<Link, Double> link2freespeed = new LinkedHashMap<Link, Double>();
 		Map<Link, Double> link2capacity = new LinkedHashMap<Link, Double>();
@@ -55,7 +48,7 @@ class RoadInvestmentMain {
 		link2capacity = Collections.unmodifiableMap(link2capacity);
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
+		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
 
 		// 9 DECISION VARIABLES
@@ -211,7 +204,6 @@ class RoadInvestmentMain {
 				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
 
-		predictor.setStandardLogFileName("road-investment-equil.txt");
 		predictor.setMemory(1);
 		predictor.setBinSize_s(10 * 60);
 		predictor.setStartBin(6 * 5);

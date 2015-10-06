@@ -2,6 +2,8 @@ package opdytsintegration.zurichtunnel;
 
 import java.util.Random;
 
+import floetteroed.opdyts.DecisionVariable;
+import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.api.core.v01.population.Population;
@@ -14,15 +16,13 @@ import floetteroed.utilities.math.Vector;
  *
  */
 class TunnelStateFactory implements
-		MATSimStateFactory<TunnelState, TunnelConfiguration> {
+		MATSimStateFactory {
 
 	TunnelStateFactory(final Random rnd) {
 	}
 
 	@Override
-	public TunnelState newState(final Population population,
-			final Vector stateVector, final TunnelConfiguration decisionVariable) {
+	public MATSimState newState(Population population, Vector stateVector, DecisionVariable decisionVariable) {
 		return new TunnelState(population, stateVector);
 	}
-
 }

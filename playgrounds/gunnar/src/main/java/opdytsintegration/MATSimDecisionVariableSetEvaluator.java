@@ -1,15 +1,15 @@
 package opdytsintegration;
 
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
-import optdyts.DecisionVariable;
-import optdyts.DecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
-import optdyts.SimulatorState;
 
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
+import floetteroed.opdyts.VectorBasedObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
+import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,16 +32,15 @@ import floetteroed.utilities.math.Vector;
  * 
  * @see SimulatorState
  * @see DecisionVariable
- * @see DecisionVariableSetEvaluator
  */
 public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U extends DecisionVariable>
 		implements StartupListener, IterationEndsListener {
 
 	// -------------------- MEMBERS --------------------
 
-	private final DecisionVariableSetEvaluator<X, U> evaluator;
+	private final TrajectorySampler evaluator;
 
-	private final MATSimStateFactory<X, U> stateFactory;
+	private final MATSimStateFactory stateFactory;
 
 	private int binSize_s = 3600;
 
@@ -64,17 +63,18 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	// -------------------- CONSTRUCTION --------------------
 
 	/**
-	 * @see DecisionVariableSetEvaluator
 	 * @see MATSimStateFactory
 	 */
 	public MATSimDecisionVariableSetEvaluator(final Set<U> decisionVariables,
-			final ObjectiveFunction<X> objectiveFunction,
-			final MATSimStateFactory<X, U> stateFactory,
+			final ObjectBasedObjectiveFunction objectiveFunction,
+			final MATSimStateFactory stateFactory,
 			final int minimumAverageIterations,
 			final double maximumRelativeGap) {
-		this.evaluator = new DecisionVariableSetEvaluator<X, U>(
-				decisionVariables, objectiveFunction, minimumAverageIterations,
-				maximumRelativeGap);
+		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
+				0.0, 0.0, 0.0, 0.95, 1.0);
+		this.evaluator = new TrajectorySampler(
+				decisionVariables, objectiveFunction, new ObjectiveFunctionChangeConvergenceCriterion(1e-4, 1e-4,minimumAverageIterations),
+				new Random(),selfTuner.getEquilibriumGapWeight(), selfTuner.getUniformityWeight());
 		this.stateFactory = stateFactory;
 	}
 
@@ -117,7 +117,7 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	 * Where to write logging information.
 	 */
 	public void setStandardLogFileName(final String logFileName) {
-		this.evaluator.setStandardLogFileName(logFileName);
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -247,8 +247,8 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 			 * of selecting a new trial decision variable and of implementing
 			 * that decision variable in the simulation.
 			 */
-			final X newState = this.stateFactory.newState(event.getControler()
-					.getScenario().getPopulation(), newSummaryStateVector,
+			final MATSimState newState = this.stateFactory.newState(event.getControler()
+							.getScenario().getPopulation(), newSummaryStateVector,
 					this.evaluator.getCurrentDecisionVariable());
 			this.evaluator.afterIteration(newState);
 		}

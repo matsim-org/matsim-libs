@@ -83,9 +83,13 @@ public class TrajectorySamplingSelfTuner {
 			final double initialEquilibriumGapWeight,
 			final double initialUniformityWeight, final double initialOffset,
 			final double regressionInertia, final double initialValueWeight)
-			throws FileNotFoundException {
+			{
 
-		this.log = new PrintWriter("./predvsreal.txt");
+		try {
+			this.log = new PrintWriter("./predvsreal.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.log.close();
 
 		this.inertia = regressionInertia;

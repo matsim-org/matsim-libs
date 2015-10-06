@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
@@ -113,7 +113,7 @@ public class RunRoadClassification {
 
 		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(
 				controler.getInjector().getProvider(VolumesAnalyzer.class), counts.getCounts().keySet());
-		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction(
+		final ObjectBasedObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
 		final Set<RoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();
 
