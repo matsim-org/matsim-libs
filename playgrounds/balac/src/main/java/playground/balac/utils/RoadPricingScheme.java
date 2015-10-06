@@ -18,7 +18,7 @@ public class RoadPricingScheme {
 	
 	public static boolean outside(Node n, Coord coord) {
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) > 4000)
+		if (CoordUtils.calcDistance(n.getCoord(), coord) > 8000)
 		
 			return true;
 		else 
@@ -29,7 +29,7 @@ public class RoadPricingScheme {
 		
 		
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) < 4000)
+		if (CoordUtils.calcDistance(n.getCoord(), coord) < 8000)
 			
 			return true;
 		else 
@@ -39,7 +39,7 @@ public class RoadPricingScheme {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "RoadPricingLinks.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "RoadPricingLinks_8km.txt");
 		
 		double centerX = 683217.0; 
 		double centerY = 247300.0;

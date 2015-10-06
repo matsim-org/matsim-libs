@@ -2,6 +2,7 @@ package org.matsim.contrib.parking.parkingChoice.carsharing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
@@ -54,6 +55,12 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 
 	@Override
 	public void resetForNewIterationStart() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void makeFFVehicleAvailable(Id vehicleId, PC2Parking parking) {
 		// TODO Auto-generated method stub
 		
 	}

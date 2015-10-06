@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
@@ -48,7 +47,7 @@ class TunnelMain {
 		final Random rnd = new Random();
 
 		final TunnelStateFactory stateFactory = new TunnelStateFactory(rnd);
-		final ObjectiveFunction<TunnelState> objectiveFunction = new TunnelObjectiveFunction();
+		final TunnelObjectiveFunction objectiveFunction = new TunnelObjectiveFunction();
 
 		// CREATE CANDIDATE DECISION VARIABLES
 
