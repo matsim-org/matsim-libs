@@ -23,7 +23,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author thibautd
  */
-class TRBModelConfigGroup extends ReflectiveConfigGroup {
+public class TRBModelConfigGroup extends ReflectiveConfigGroup {
 	private static final String GROUP_NAME = "utility";
 
 	private double b_logDist = -1.222;

@@ -16,40 +16,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemodel;
+package playground.thibautd.initialdemandgeneration.socnetgensimulated.optimaldistancemodel;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class ArentzePopulation extends IndexedPopulation {
-	private final char[] ageCategory;
-	private final boolean[] isMale;
-	private final Coord[] coord;
+@Singleton
+public class OptimalDistanceConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "optimalDistanceScoring";
 
-	protected ArentzePopulation(
-			final Id[] ids,
-			final char[] ageCategory,
-			final boolean[] isMale,
-			final Coord[] coord) {
-		super(ids);
-		this.ageCategory = ageCategory;
-		this.isMale = isMale;
-		this.coord = coord;
+	private double minDistance_m = 1000;
+	private double maxDistance_m = 10000;
+
+	// the higher it is, the less random is the decision
+	private double utilityOfMatch = 1000;
+
+	@Inject
+	public OptimalDistanceConfigGroup() {
+		super( GROUP_NAME );
 	}
 
-	public char getAgeCategory(final int agent) {
-		return ageCategory[agent];
+	@StringGetter( "minDistance_m" )
+	public double getMinDistance_m() {
+		return minDistance_m;
 	}
 
-	public boolean isMale(final int agent) {
-		return isMale[agent];
+	@StringSetter( "minDistance_m" )
+	public void setMinDistance_m(double minDistance_m) {
+		this.minDistance_m = minDistance_m;
 	}
 
-	public Coord getCoord(final int agent) {
-		return coord[agent];
+	@StringGetter( "maxDistance_m" )
+	public double getMaxDistance_m() {
+		return maxDistance_m;
+	}
+
+	@StringSetter( "maxDistance_m" )
+	public void setMaxDistance_m(double maxDistance_m) {
+		this.maxDistance_m = maxDistance_m;
+	}
+
+	@StringGetter( "utilityOfMatch" )
+	public double getUtilityOfMatch() {
+		return utilityOfMatch;
+	}
+
+	@StringSetter( "utilityOfMatch" )
+	public void setUtilityOfMatch(double utilityOfMatch) {
+		this.utilityOfMatch = utilityOfMatch;
 	}
 }
