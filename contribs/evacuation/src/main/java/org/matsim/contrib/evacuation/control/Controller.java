@@ -443,8 +443,9 @@ public class Controller {
 
 	public boolean openEvacuationConfig() {
 		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", this.locale.infoEvacuationFile(), false);
+
 		try {
-			Thread.sleep(100);
+			Thread.sleep(100);//workaround for OS X, without which JFileChooser sometimes does not come up
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
