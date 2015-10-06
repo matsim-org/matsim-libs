@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import com.google.inject.Inject;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntDoubleMap;
@@ -28,6 +29,8 @@ import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -37,6 +40,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -78,11 +83,13 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 	private final int nThreads;
 
+	@Inject
 	public PreprocessedModelRunner(
+			final SocialNetworkGenerationConfigGroup globalConfig,
 			final PreprocessedModelRunnerConfigGroup config,
 			final IndexedPopulation population ,
 			final TieUtility utility,
-			final TiesWeightDistribution distributionToFill) {
+			final TiesWeightDistribution distr) {
 		this.lowestStoredPrimary = config.getLowestStoredPrimary();
 		this.lowestStoredSecondary = config.getLowestStoredSecondary();
 
@@ -95,18 +102,35 @@ public class PreprocessedModelRunner implements ModelRunner {
 		this.maxSizeSecondary = config.getMaxSizeSecondary();
 		this.randomSeed = config.getRandomSeed();
 
+		// This part would be nicer externalized in a "preprocessed network provider" or smth
 		if ( config.getInputPreprocessedNetwork() == null ) {
-			this.updatePrimaryPreprocess( distributionToFill );
-
+			this.updatePrimaryPreprocess( distr );
+			new WeightedSocialNetworkWriter( ).write(preprocess, globalConfig.getOutputDirectory()+"/preprocess-network.xml.gz" );
+			write( distr, globalConfig.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
 		}
 		else {
 			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
 		}
 	}
 
-	public void writePreprocessedNetwork( final String file ) {
-		new WeightedSocialNetworkWriter( ).write( preprocess , file );
+	private static void write(
+			final TiesWeightDistribution distr,
+			final String file ) {
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter(file) ) {
+			writer.write( "binStart\tbinEnd\tcount" );
+
+			final double[] binStarts = distr.getBinStarts();
+			final int[] binCounts = distr.getBinCounts();
+			for ( int i = 0; i < binStarts.length; i++ ) {
+				writer.newLine();
+				writer.write( binStarts[ i ]+"\t"+(binStarts[ i ] + distr.getBinWidth())+"\t"+binCounts[ i ] );
+			}
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
+
 
 	private void updatePrimaryPreprocess( final TiesWeightDistribution distributionToFill ) {
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );

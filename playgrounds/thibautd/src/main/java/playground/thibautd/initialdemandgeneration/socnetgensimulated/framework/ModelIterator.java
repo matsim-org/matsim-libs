@@ -22,6 +22,8 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.ConvergenceChecker;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -41,6 +43,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 /**
  * @author thibautd
  */
+@Singleton
 public class ModelIterator {
 	private static final Logger log =
 		Logger.getLogger(ModelIterator.class);
@@ -61,7 +64,11 @@ public class ModelIterator {
 
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
-	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
+	private final ModelRunner runner;
+
+	@Inject
+	public ModelIterator(final SocialNetworkGenerationConfigGroup config, ModelRunner runner) {
+		this.runner = runner;
 		this.targetClustering = config.getTargetClustering();
 		this.targetDegree = config.getTargetDegree();
 
@@ -90,7 +97,6 @@ public class ModelIterator {
 
 
 	public SocialNetwork iterateModelToTarget(
-			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
 		final MultivariateOptimizer optimizer =
 			new CMAESOptimizer(

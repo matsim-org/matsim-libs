@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModelRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,12 +18,26 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+
+import com.google.inject.AbstractModule;
+import org.apache.log4j.Logger;
 
 /**
  * @author thibautd
  */
-public interface ModelRunner {
-	SocialNetwork runModel( Thresholds thresholds );
-}
+public class SocNetGenFrameworkModule extends AbstractModule {
+	private static final Logger log = Logger.getLogger(SocNetGenFrameworkModule.class);
+	@Override
+	protected void configure() {
+		log.debug( "Configuring "+getClass().getSimpleName() );
 
+		binder().requireExplicitBindings();
+		binder().disableCircularProxies();
+
+		bind( ModelRunner.class ).to( PreprocessedModelRunner.class );
+		bind(TieUtility.class);
+		bind( TiesWeightDistribution.class );
+		bind( ModelIterator.class );
+		log.debug("Configuring " + getClass().getSimpleName() + ": DONE");
+	}
+}

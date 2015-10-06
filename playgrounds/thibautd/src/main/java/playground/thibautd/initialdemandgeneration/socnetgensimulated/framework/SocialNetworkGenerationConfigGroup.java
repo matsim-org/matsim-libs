@@ -46,7 +46,12 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private int maxIterations = 10000;
 
 	public SocialNetworkGenerationConfigGroup( ) {
-		super( GROUP_NAME );
+		super(GROUP_NAME);
+		System.out.println("BIJAXHFUDAGFUW");
+		for ( StackTraceElement e : new RuntimeException().getStackTrace() ) {
+			System.out.println( "               "+e );
+		}
+		System.out.flush();
 	}
 
 	@StringGetter( "inputPopulationFile" )
