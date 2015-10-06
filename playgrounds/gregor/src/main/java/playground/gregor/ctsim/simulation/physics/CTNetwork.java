@@ -1,13 +1,13 @@
 package playground.gregor.ctsim.simulation.physics;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CTNetwork {
 
@@ -26,7 +26,7 @@ public class CTNetwork {
 
 	private void init() {
 		for (Node n : this.network.getNodes().values()) {
-			CTNode ct = new CTNode(n.getId());
+			CTNode ct = new CTNode(n.getId(), n);
 			this.nodes.put(n.getId(),ct);
 		}
 		for (Link l : this.network.getLinks().values()) {
@@ -34,12 +34,15 @@ public class CTNetwork {
 				continue;
 			}
 			Link rev = getRevLink(l);
-			CTLink ct = new CTLink(l,rev,em);
+			CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
 			links.put(l.getId(), ct);
 			if (rev != null) {
 				links.put(rev.getId(), ct);
 			}
 			
+		}
+		for (CTNode ctNode : this.nodes.values()) {
+			ctNode.getCTCell().debug(em);
 		}
 	}
 
@@ -51,6 +54,8 @@ public class CTNetwork {
 		}
 		return null;
 	}
-	
-	
+
+	CTNode getCTNode(Id<Node> id) {
+		return this.nodes.get(id);
+	}
 }

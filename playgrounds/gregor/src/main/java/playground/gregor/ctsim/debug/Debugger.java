@@ -11,7 +11,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.gregor.ctsim.simulation.physics.CTNetwork;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -49,6 +48,16 @@ public class Debugger {
 		em.addHandler(dbg);
 
 		CTNetwork net = new CTNetwork(sc.getNetwork(), em);
+
+
+//		LineSegment ls = new LineSegment();
+//		ls.x0 = 0;
+//		ls.x1 = 0;
+//		ls.y1 = 0;
+//		ls.x1 = -10;
+//		LineEvent le = new LineEvent(0,ls,true,0,128,128,255,0);
+//		em.processEvent(le);
+
 		try {
 			Thread.sleep(10000000);
 		} catch (InterruptedException e) {
