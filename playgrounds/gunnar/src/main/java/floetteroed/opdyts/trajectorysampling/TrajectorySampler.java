@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import java.util.Random;
 import java.util.Set;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -54,7 +55,9 @@ public class TrajectorySampler {
 
 	private final Set<DecisionVariable> decisionVariablesToBeTriedOut;
 
-	private final VectorBasedObjectiveFunction objectiveFunction;
+	private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
+
+	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
@@ -92,12 +95,28 @@ public class TrajectorySampler {
 
 	public TrajectorySampler(
 			final Set<? extends DecisionVariable> decisionVariables,
-			final VectorBasedObjectiveFunction objectiveFunction,
+			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion, final Random rnd,
 			final double equilibriumWeight, final double uniformityWeight) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<DecisionVariable>(
 				decisionVariables);
-		this.objectiveFunction = objectiveFunction;
+		this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
+		this.objectBasedObjectiveFunction = null;
+		this.convergenceCriterion = convergenceCriterion;
+		this.rnd = rnd;
+		this.equilibriumWeight = equilibriumWeight;
+		this.uniformityWeight = uniformityWeight;
+	}
+
+	public TrajectorySampler(
+			final Set<? extends DecisionVariable> decisionVariables,
+			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final ConvergenceCriterion convergenceCriterion, final Random rnd,
+			final double equilibriumWeight, final double uniformityWeight) {
+		this.decisionVariablesToBeTriedOut = new LinkedHashSet<DecisionVariable>(
+				decisionVariables);
+		this.vectorBasedObjectiveFunction = null;
+		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
 		this.convergenceCriterion = convergenceCriterion;
 		this.rnd = rnd;
 		this.equilibriumWeight = equilibriumWeight;
@@ -207,14 +226,14 @@ public class TrajectorySampler {
 			if (currentTransitionSequence == null) {
 				currentTransitionSequence = new TransitionSequence(
 						this.fromState, this.currentDecisionVariable, newState,
-						this.objectiveFunction);
+						this.vectorBasedObjectiveFunction);
 				this.decisionVariable2transitionSequence
 						.put(this.currentDecisionVariable,
 								currentTransitionSequence);
 			} else {
 				currentTransitionSequence.addTransition(this.fromState,
 						this.currentDecisionVariable, newState,
-						this.objectiveFunction);
+						this.vectorBasedObjectiveFunction);
 			}
 			currentTransitionSequence
 					.shrinkToMaximumLength(this.maxMemoryLength);
@@ -264,7 +283,7 @@ public class TrajectorySampler {
 					this.initialGradientNorm = 0.0;
 					for (TransitionSequence transSeq : this.decisionVariable2transitionSequence
 							.values()) {
-						this.initialGradientNorm += this.objectiveFunction
+						this.initialGradientNorm += this.vectorBasedObjectiveFunction
 								.gradient(
 										transSeq.getLastState()
 												.getReferenceToVectorRepresentation())
@@ -287,7 +306,7 @@ public class TrajectorySampler {
 			final TransitionSequencesAnalyzer samplingStageEvaluator = new TransitionSequencesAnalyzer(
 					decisionVariable2transitionSequence,
 					this.equilibriumWeight, this.uniformityWeight,
-					this.objectiveFunction, this.initialGradientNorm);
+					this.vectorBasedObjectiveFunction, this.initialGradientNorm);
 			final Vector alphas = samplingStageEvaluator.optimalAlphas();
 			final SamplingStage samplingStage = new SamplingStage(alphas,
 					samplingStageEvaluator);
