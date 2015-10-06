@@ -226,6 +226,7 @@ public class TrajectorySampler {
 			if (currentTransitionSequence == null) {
 				currentTransitionSequence = new TransitionSequence(
 						this.fromState, this.currentDecisionVariable, newState,
+						this.objectBasedObjectiveFunction,
 						this.vectorBasedObjectiveFunction);
 				this.decisionVariable2transitionSequence
 						.put(this.currentDecisionVariable,
@@ -233,6 +234,7 @@ public class TrajectorySampler {
 			} else {
 				currentTransitionSequence.addTransition(this.fromState,
 						this.currentDecisionVariable, newState,
+						this.objectBasedObjectiveFunction,
 						this.vectorBasedObjectiveFunction);
 			}
 			currentTransitionSequence
@@ -279,7 +281,7 @@ public class TrajectorySampler {
 			 * all decision variables have been tried out once.
 			 */
 			if (this.initialGradientNorm == null) {
-				try {
+				if (this.vectorBasedObjectiveFunction != null) {
 					this.initialGradientNorm = 0.0;
 					for (TransitionSequence transSeq : this.decisionVariable2transitionSequence
 							.values()) {
@@ -291,7 +293,7 @@ public class TrajectorySampler {
 					}
 					this.initialGradientNorm /= this.decisionVariable2transitionSequence
 							.size();
-				} catch (UnsupportedOperationException e) {
+				} else {
 					this.initialGradientNorm = 1.0;
 				}
 			}
@@ -306,6 +308,7 @@ public class TrajectorySampler {
 			final TransitionSequencesAnalyzer samplingStageEvaluator = new TransitionSequencesAnalyzer(
 					decisionVariable2transitionSequence,
 					this.equilibriumWeight, this.uniformityWeight,
+					// this.objectBasedObjectiveFunction,
 					this.vectorBasedObjectiveFunction, this.initialGradientNorm);
 			final Vector alphas = samplingStageEvaluator.optimalAlphas();
 			final SamplingStage samplingStage = new SamplingStage(alphas,

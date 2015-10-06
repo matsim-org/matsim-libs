@@ -18,11 +18,11 @@ class NTimesTwoRoutesSimulator implements Simulator {
 
 	private final List<TwoRoutesReplanner> replanners;
 
-	private final double demand;
+	// private final double demand;
 
 	private final double capacity;
 
-	private final Vector externalities;
+	// private final Vector externalities;
 
 	// -------------------- MEMBERS --------------------
 
@@ -31,12 +31,14 @@ class NTimesTwoRoutesSimulator implements Simulator {
 	// -------------------- CONSTRUCTION --------------------
 
 	NTimesTwoRoutesSimulator(final List<TwoRoutesReplanner> replanners,
-			final double demand, final double capacity,
-			final Vector externalities) {
+	// final double demand,
+			final double capacity
+	// , final Vector externalities
+	) {
 		this.replanners = replanners;
-		this.demand = demand;
+		// this.demand = demand;
 		this.capacity = capacity;
-		this.externalities = externalities.copy();
+		// this.externalities = externalities.copy();
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -64,7 +66,7 @@ class NTimesTwoRoutesSimulator implements Simulator {
 		return data.get(index);
 	}
 
-	// TODO move this to
+	// TODO move this to utils
 	private static double getWraparound(final Vector data, int index) {
 		return getWraparound(data.asList(), index);
 	}
@@ -130,18 +132,18 @@ class NTimesTwoRoutesSimulator implements Simulator {
 			implementQ1sInSimulation(this.q1s);
 		}
 
-//		@Override
-//		public double getObjectiveFunctionValue() {
-//			double result = 0.0;
-//			for (int i = 0; i < replanners.size(); i++) {
-//				result += replanners.get(i).getRealizedQ1()
-//						* (this.tts.get(i) + externalities.get(i));
-//				result += replanners.get(i).getRealizedQ2()
-//						* (getWraparound(this.tts, i + 1) + getWraparound(
-//								externalities, i + 1));
-//			}
-//			return result;
-//		}
+		// @Override
+		// public double getObjectiveFunctionValue() {
+		// double result = 0.0;
+		// for (int i = 0; i < replanners.size(); i++) {
+		// result += replanners.get(i).getRealizedQ1()
+		// * (this.tts.get(i) + externalities.get(i));
+		// result += replanners.get(i).getRealizedQ2()
+		// * (getWraparound(this.tts, i + 1) + getWraparound(
+		// externalities, i + 1));
+		// }
+		// return result;
+		// }
 	}
 
 	// -------------------- IMPLEMENTATION OF System --------------------

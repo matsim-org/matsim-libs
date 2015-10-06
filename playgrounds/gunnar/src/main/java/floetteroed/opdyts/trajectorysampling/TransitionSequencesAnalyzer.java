@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.ArrayList;
@@ -67,17 +67,19 @@ public class TransitionSequencesAnalyzer {
 			final List<Transition> transitions,
 			final double equilibriumGapWeight,
 			final double uniformityWeight,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction objectiveFunction,
+			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
+			// objectBasedObjectiveFunction,
+			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
 			final double initialGradientNorm) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
-		final boolean interpolateStates = true;
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction(
-				objectiveFunction, transitions, equilibriumGapWeight,
-				uniformityWeight, initialGradientNorm, interpolateStates);
+				// objectBasedObjectiveFunction,
+				vectorBasedObjectiveFunction, transitions,
+				equilibriumGapWeight, uniformityWeight, initialGradientNorm);
 	}
 
 	// public TransitionSequencesAnalyzer(
@@ -94,10 +96,14 @@ public class TransitionSequencesAnalyzer {
 			final Map<DecisionVariable, TransitionSequence> decisionVariable2transitionSequence,
 			final double equilibriumWeight,
 			final double uniformityWeight,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction objectiveFunction,
+			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
+			// objectBasedObjectiveFunction,
+			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
 			final double initialGradientNorm) {
 		this(map2list(decisionVariable2transitionSequence), equilibriumWeight,
-				uniformityWeight, objectiveFunction, initialGradientNorm);
+				uniformityWeight,
+				// objectBasedObjectiveFunction,
+				vectorBasedObjectiveFunction, initialGradientNorm);
 	}
 
 	static List<Transition> map2list(

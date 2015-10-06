@@ -54,7 +54,6 @@ public class RandomSearch {
 
 	private final ConvergenceCriterion convergenceCriterion;
 
-	// private final TrajectorySamplingSelfTuner selfTuner;
 	private final TrajectorySamplingSelfTuner selfTuner;
 
 	private final int maxIterations;
@@ -95,7 +94,6 @@ public class RandomSearch {
 			final Simulator system,
 			final DecisionVariableRandomizer randomizer,
 			final ConvergenceCriterion convergenceCriterion,
-			// final TrajectorySamplingSelfTuner selfTuner,
 			final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
 			final int populationSize, final Random rnd,
@@ -165,9 +163,6 @@ public class RandomSearch {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
-				// bestDecisionVariable = sampler.getFinalDecisionVariable();
-				// bestObjectiveFunctionValue = sampler
-				// .getFinalObjectiveFunctionValue();
 				bestDecisionVariable = sampler.getConvergedDecisionVariables()
 						.iterator().next();
 				bestObjectiveFunctionValue = sampler

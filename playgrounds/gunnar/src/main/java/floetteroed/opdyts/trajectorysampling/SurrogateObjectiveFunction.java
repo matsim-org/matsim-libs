@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.List;
@@ -39,7 +39,10 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 
 	// -------------------- MEMBERS --------------------
 
-	private final VectorBasedObjectiveFunction originalObjectiveFunction;
+	// private final ObjectBasedObjectiveFunction
+	// originalObjectBasedObjectiveFunction;
+
+	private final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction;
 
 	private final List<Transition> transitions;
 
@@ -51,22 +54,23 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 
 	private final double initialGradientNorm;
 
-	private final boolean interpolateStates;
-
 	// -------------------- CONSTRUCTION --------------------
 
 	SurrogateObjectiveFunction(
-			final VectorBasedObjectiveFunction originalObjectiveFunction,
+			// final ObjectBasedObjectiveFunction
+			// originalObjectBasedObjectiveFunction,
+			final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction,
 			final List<Transition> transitions,
 			final double equilibriumGapWeight, final double uniformityWeight,
-			final double initialGradientNorm, final boolean interpolateStates) {
+			final double initialGradientNorm) {
 
-		this.originalObjectiveFunction = originalObjectiveFunction;
+		// this.originalObjectBasedObjectiveFunction =
+		// originalObjectBasedObjectiveFunction;
+		this.originalVectorBasedObjectiveFunction = originalVectorBasedObjectiveFunction;
 		this.transitions = transitions;
 		this.equilibriumGapWeight = equilibriumGapWeight;
 		this.uniformityWeight = uniformityWeight;
 		this.initialGradientNorm = initialGradientNorm;
-		this.interpolateStates = interpolateStates;
 
 		this.deltaCovariances = new Matrix(transitions.size(),
 				transitions.size());
@@ -92,15 +96,13 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 	}
 
 	double originalObjectiveFunctionValue(final Vector alphas) {
-		if (this.interpolateStates) {
-			return this.originalObjectiveFunction.value(this
+		if (this.originalVectorBasedObjectiveFunction != null) {
+			return this.originalVectorBasedObjectiveFunction.value(this
 					.interpolatedSimulatorState(alphas));
 		} else {
 			double result = 0;
 			for (int i = 0; i < alphas.size(); i++) {
 				result += alphas.get(i)
-				// * this.originalObjectiveFunction.value(this.transitions
-				// .get(i).getToState());
 						* this.transitions.get(i)
 								.getToStateObjectiveFunctionValue();
 			}
@@ -121,9 +123,13 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 		return Math.sqrt(Math.max(result, 0.0));
 	}
 
-	VectorBasedObjectiveFunction originalObjectiveFunction() {
-		return this.originalObjectiveFunction;
-	}
+	// ObjectBasedObjectiveFunction originalObjectBasedObjectiveFunction() {
+	// return this.originalObjectBasedObjectiveFunction;
+	// }
+
+	// VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction() {
+	// return this.originalVectorBasedObjectiveFunction;
+	// }
 
 	double getEquilibriumGapWeight() {
 		return this.equilibriumGapWeight;
@@ -153,10 +159,10 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 		/*
 		 * objective function value contribution
 		 */
-		if (this.interpolateStates) {
+		if (this.originalVectorBasedObjectiveFunction != null) {
 			final Vector interpolatedState = this
 					.interpolatedSimulatorState(alphas);
-			final Vector originalGradient = this.originalObjectiveFunction
+			final Vector originalGradient = this.originalVectorBasedObjectiveFunction
 					.gradient(interpolatedState);
 			for (int i = 0; i < alphas.size(); i++) {
 				result.set(i, originalGradient.innerProd(this.transitions
