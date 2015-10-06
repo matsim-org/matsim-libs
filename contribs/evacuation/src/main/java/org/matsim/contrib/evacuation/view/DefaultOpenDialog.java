@@ -20,13 +20,11 @@
 
 package org.matsim.contrib.evacuation.view;
 
-import java.io.File;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.matsim.contrib.evacuation.control.Controller;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 
 /**
  * default open dialog
@@ -35,7 +33,10 @@ import org.matsim.contrib.evacuation.control.Controller;
  * 
  */
 public class DefaultOpenDialog extends JFileChooser {
-	private static final long serialVersionUID = 1L;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -7361529399376514942L;
 	protected Controller controller;
 
 	public DefaultOpenDialog(Controller controller, final String fileExtension, final String fileDescription, boolean directory) {
