@@ -54,7 +54,6 @@ public class TSBASt2Count {
 	public static void main(String[] args) throws IOException, ParseException, FactoryException {
 		
 		Map<String,BastHourlyCountData> allCounts = new HashMap<String,BastHourlyCountData>();
-//		Map<Integer,BastHourlyCountData> weekEndCounts = new HashMap<Integer,BastHourlyCountData>();
 		
 		logger.info("Loading bast counts...");
 		BufferedReader reader = new BufferedReader(new FileReader(bastInputFile));
@@ -75,7 +74,6 @@ public class TSBASt2Count {
 		int IndexVolumeR2 = colIndices.get("KFZ_R2");
 		int IndexValidityOfR2 = colIndices.get("K_KFZ_R2");
 		int IndexHour = colIndices.get("Stunde");
-//		int IndexDate = colIndices.get("Datum");
 		int IndexDayOfWeek = colIndices.get("Wotag");
 		int IndexPurpose = colIndices.get("Fahrtzw");
 		
@@ -88,7 +86,6 @@ public class TSBASt2Count {
 			boolean isConsideredWeekDay = (tokens[IndexPurpose].equals("w") && (weekDay >= BEGINNING_WEEKDAY && weekDay <= ENDING_WEEKDAY)); 
 			boolean isConsideredWeekEnd = (CALC_WEEKENDS && (tokens[IndexPurpose].equals("s") || weekDay == 6));
 			
-//			if( tokens[IndexPurpose].equals("w") && (weekDay >= BEGINNING_WEEKDAY && weekDay <= ENDING_WEEKDAY) ){
 			if(isConsideredWeekDay || isConsideredWeekEnd ){
 				int stationNumber = format.parse(tokens[IndexCountNr]).intValue();
 				

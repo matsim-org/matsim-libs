@@ -29,7 +29,6 @@ class BastHourlyCountData{
 		this.R2Divisors = new HashMap<Integer,Integer>();
 	}
 	
-	
 	public Map<Integer,Double> getR1Values(){
 		return this.R1VolumesPerHour;
 	}
@@ -42,7 +41,6 @@ class BastHourlyCountData{
 	public String getId() {
 		return this.id;
 	}
-
 
 	public Day getRepresentedDay() {
 		return representedDay;
