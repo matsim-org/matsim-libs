@@ -75,7 +75,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 		if(counts == null) return 0;
 		int count = 0;
 		// sum up all count-values
-		for(Count c: counts.getCounts().values()){
+		for(Count<Link> c: counts.getCounts().values()){
 			for(Volume v: c.getVolumes().values()){
 				count += v.getValue();
 			}
@@ -102,7 +102,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 		Counts counts = this.linkId2LineCounts.get(linkId);
 		if(counts == null) return 0;
 		// check if ther is a count for the line
-		Count c = counts.getCount(lineId);
+		Count<Link> c = counts.getCount(lineId);
 		if(c == null) return 0;
 		// sum up all volumes
 		int count = 0;

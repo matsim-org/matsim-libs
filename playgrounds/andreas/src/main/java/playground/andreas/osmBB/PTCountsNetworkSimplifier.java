@@ -377,7 +377,7 @@ public class PTCountsNetworkSimplifier {
 				Id<Link> shortNameId = Id.create(this.shortNameMap.get(node.getId().toString()), Link.class);
 				if(this.outCounts.getCount(shortNameId) == null){
 					// Count station wasn't added to outCounts, yet
-					Count oldCount = this.inCounts.getCount(shortNameId);
+					Count<Link> oldCount = this.inCounts.getCount(shortNameId);
 					if(oldCount == null){
 						// count station was mapped, but data can not be provided, do nothing
 						// TODO [AN] Check, if linkToBlock can be removed
@@ -385,7 +385,7 @@ public class PTCountsNetworkSimplifier {
 						// create new count with correct locId and migrate data
 						if(linkToBlock != null){
 							this.outCounts.createAndAddCount(linkToBlock.getId(), oldCount.getCsId());
-							Count newCount = this.outCounts.getCount(linkToBlock.getId());
+							Count<Link> newCount = this.outCounts.getCount(linkToBlock.getId());
 							newCount.setCoord(oldCount.getCoord());
 							for (Volume volume : oldCount.getVolumes().values()) {
 								newCount.createVolume(volume.getHourOfDayStartingWithOne(), volume.getValue());

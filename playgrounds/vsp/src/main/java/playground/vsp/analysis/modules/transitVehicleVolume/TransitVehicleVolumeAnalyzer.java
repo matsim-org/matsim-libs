@@ -97,7 +97,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 		Double total;
 		for(Entry<String, Counts<Link>> e: this.handler.getMode2Counts().entrySet()){
 			Map<Id, Double> temp = new HashMap<Id, Double>(); 
-			for(Count c: e.getValue().getCounts().values()){
+			for(Count<Link> c: e.getValue().getCounts().values()){
 				total = new Double(0.);
 				for(Volume v: c.getVolumes().values()){
 					total += v.getValue();

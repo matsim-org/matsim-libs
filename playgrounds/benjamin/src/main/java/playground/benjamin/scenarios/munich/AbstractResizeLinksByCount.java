@@ -123,8 +123,8 @@ public abstract class AbstractResizeLinksByCount {
 	private Counts<Link> preProcessCounts(Counts<Link> oldCounts) {
 		Counts<Link> tempCounts = new Counts();
 		Node node;
-		Count oldCount;
-		Count newCount;
+		Count<Link> oldCount;
+		Count<Link> newCount;
 		Id outLink = null;
 		tempCounts.setDescription("none");
 		tempCounts.setName("counts merged");
@@ -194,7 +194,7 @@ public abstract class AbstractResizeLinksByCount {
 		this.rescaledCounts.setYear(2009);
 		
 		Count temp ;
-		for(Count c : this.origCounts.getCounts().values()){
+		for(Count<Link> c : this.origCounts.getCounts().values()){
 			temp = rescaledCounts.createAndAddCount(c.getLocId(), c.getCsId());
 			temp.setCoord(c.getCoord());
 			for(Entry<Integer, Volume> ee : c.getVolumes().entrySet()){

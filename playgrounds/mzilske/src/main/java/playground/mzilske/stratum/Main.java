@@ -93,7 +93,7 @@ public class Main {
 
     private static Counts filterCounts(Counts<Link> allCounts, List<Integer> countHours) {
         Counts<Link> someCounts = new Counts();
-        for (Map.Entry<Id<Link>, Count> entry : allCounts.getCounts().entrySet()) {
+        for (Map.Entry<Id<Link>, Count<Link>> entry : allCounts.getCounts().entrySet()) {
             String linkId = entry.getKey().toString();
             if (linkId.equals("1") || linkId.equals("21")) {
                 Count count = someCounts.createAndAddCount(Id.create(linkId, Link.class), "wurst");

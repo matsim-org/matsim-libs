@@ -132,7 +132,7 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 					bw.write(separator + i);
 				}
 				
-				for (Entry<Id<Link>, Count> linkId2Count : mode2Counts.getValue().getCounts().entrySet()) {
+				for (Entry<Id<Link>, Count<Link>> linkId2Count : mode2Counts.getValue().getCounts().entrySet()) {
 					// write one line for each count station registered - links without any count will not be written to file
 					bw.newLine();
 					bw.write(linkId2Count.getKey().toString());
@@ -189,7 +189,7 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 					bw.write(separator + i);
 				}
 				
-				for (Entry<Id<Link>, Count> linkId2Count : mode2CapCounts.getValue().getCounts().entrySet()) {
+				for (Entry<Id<Link>, Count<Link>> linkId2Count : mode2CapCounts.getValue().getCounts().entrySet()) {
 					// write one line for each count station registered - links without any count will not be written to file
 					bw.newLine();
 					bw.write(linkId2Count.getKey().toString());
