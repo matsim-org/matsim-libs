@@ -71,7 +71,7 @@ class Talk_2015_09_03 {
 		final Random rnd = new Random();
 		final double demand = 500;
 		final double capacity = 1000;
-		final int linkCnt = 2 * 20;
+		final int linkCnt = 40;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
@@ -150,7 +150,7 @@ class Talk_2015_09_03 {
 					// ContinuousTollRandomizer(
 					// system, linkCnt, 0.1, 1.0, rnd);
 					final DecisionVariableRandomizer randomization = new ContinuousDiscreteTollRandomizer(
-							system, linkCnt, linkCnt, 0.1, 1.0, rnd);
+							system, linkCnt, linkCnt / 2, 0.1, 1.0, rnd);
 
 					// final TrajectorySamplingSelfTuner selfTuner = new
 					// TrajectorySamplingSelfTuner();
