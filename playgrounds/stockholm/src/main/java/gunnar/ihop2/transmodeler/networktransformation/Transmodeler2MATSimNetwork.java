@@ -50,6 +50,8 @@ public class Transmodeler2MATSimNetwork {
 
 	// public static final String TMTONODEID_ATTR = "TMToNodeID";
 
+	public static final String TMLINKDIRPREFIX_ATTR = "TMLinkDirPrefix";
+
 	// -------------------- STATIC PACKAGE HELPERS --------------------
 
 	static String unquote(final String original) {
@@ -238,8 +240,9 @@ public class Transmodeler2MATSimNetwork {
 					TMPATHID_ATTR, transmodelerLink.getBidirectionalId());
 			linkAttributes.putAttribute(matsimLink.getId().toString(),
 					TMFROMNODEID_ATTR, transmodelerLink.getFromNode().getId());
-			// linkAttributes.putAttribute(matsimLink.getId().toString(),
-			// TMTONODEID_ATTR, transmodelerLink.getToNode().getId());
+			linkAttributes.putAttribute(matsimLink.getId().toString(),
+					TMLINKDIRPREFIX_ATTR,
+					DIR.AB.equals(transmodelerLink.getDirection()) ? "" : "-");
 		}
 
 		System.out.println();
@@ -299,10 +302,6 @@ public class Transmodeler2MATSimNetwork {
 
 		/*
 		 * (3d) Expand networks to allow for turning moves.
-		 * 
-		 * TODO use meaningful parameters
-		 * 
-		 * TODO test!
 		 */
 
 		final Map<Id<Node>, Node> originalMATSimNodes = new LinkedHashMap<>();
@@ -312,54 +311,52 @@ public class Transmodeler2MATSimNetwork {
 
 		for (Map.Entry<Id<Node>, Node> matsimId2node : originalMATSimNodes
 				.entrySet()) {
-			if ((matsimId2node.getValue().getInLinks().size() > 1)
-					|| (matsimId2node.getValue().getInLinks().size() > 1)) {
-				final ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
-				double maxTurnLength = 5.0;
+			// if ((matsimId2node.getValue().getInLinks().size() > 1)
+			// || (matsimId2node.getValue().getInLinks().size() > 1)) {
+			final ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+			double maxTurnLength = 5.0;
 
-				for (Map.Entry<Id<Link>, ? extends Link> matsimId2inLink : matsimId2node
-						.getValue().getInLinks().entrySet()) {
-					TransmodelerLink tmInLink = linksReader.id2link
-							.get(matsimId2inLink.getKey().toString());
-					for (Map.Entry<TransmodelerLink, Double> tmOutLink2turnLength : tmInLink.downstreamLink2turnLength
-							.entrySet()) {
-						final Id<Link> matsimOutLinkId = Id.create(
-								tmOutLink2turnLength.getKey().getId(),
-								Link.class);
-						if (matsimNetwork.getLinks().containsKey(
-								matsimOutLinkId)) {
-							turns.add(new TurnInfo(matsimId2inLink.getKey(),
-									matsimOutLinkId));
-							maxTurnLength = Math.max(maxTurnLength,
-									tmOutLink2turnLength.getValue());
-						}
+			for (Map.Entry<Id<Link>, ? extends Link> matsimId2inLink : matsimId2node
+					.getValue().getInLinks().entrySet()) {
+				TransmodelerLink tmInLink = linksReader.id2link
+						.get(matsimId2inLink.getKey().toString());
+				for (Map.Entry<TransmodelerLink, Double> tmOutLink2turnLength : tmInLink.downstreamLink2turnLength
+						.entrySet()) {
+					final Id<Link> matsimOutLinkId = Id.create(
+							tmOutLink2turnLength.getKey().getId(), Link.class);
+					if (matsimNetwork.getLinks().containsKey(matsimOutLinkId)) {
+						turns.add(new TurnInfo(matsimId2inLink.getKey(),
+								matsimOutLinkId));
+						maxTurnLength = Math.max(maxTurnLength,
+								tmOutLink2turnLength.getValue());
 					}
 				}
-
-				// for (TurnInfo turn : turns) {
-				// System.out.print(turn.getFromLinkId() + " -> "
-				// + turn.getToLinkId());
-				// System.out.print(" ... upstrFromNode = ");
-				// System.out.print(matsimNetwork.getLinks()
-				// .get(turn.getFromLinkId()).getFromNode().getId());
-				// System.out.print(", upstrToNode = ");
-				// System.out.print(matsimNetwork.getLinks()
-				// .get(turn.getFromLinkId()).getToNode().getId());
-				// System.out.print(", downstrFromNode = ");
-				// System.out.print(matsimNetwork.getLinks()
-				// .get(turn.getToLinkId()).getFromNode().getId());
-				// System.out.print(", downstrToNode = ");
-				// System.out.print(matsimNetwork.getLinks()
-				// .get(turn.getToLinkId()).getToNode().getId());
-				// System.out.println();
-				// }
-
-				final double radius = 10.0;
-				final double offset = 5.0;
-				final NetworkExpandNode exp = new NetworkExpandNode(
-						matsimNetwork, radius, offset);
-				exp.expandNode(matsimId2node.getKey(), turns);
 			}
+
+			// for (TurnInfo turn : turns) {
+			// System.out.print(turn.getFromLinkId() + " -> "
+			// + turn.getToLinkId());
+			// System.out.print(" ... upstrFromNode = ");
+			// System.out.print(matsimNetwork.getLinks()
+			// .get(turn.getFromLinkId()).getFromNode().getId());
+			// System.out.print(", upstrToNode = ");
+			// System.out.print(matsimNetwork.getLinks()
+			// .get(turn.getFromLinkId()).getToNode().getId());
+			// System.out.print(", downstrFromNode = ");
+			// System.out.print(matsimNetwork.getLinks()
+			// .get(turn.getToLinkId()).getFromNode().getId());
+			// System.out.print(", downstrToNode = ");
+			// System.out.print(matsimNetwork.getLinks()
+			// .get(turn.getToLinkId()).getToNode().getId());
+			// System.out.println();
+			// }
+
+			final double radius = 10.0;
+			final double offset = 5.0;
+			final NetworkExpandNode exp = new NetworkExpandNode(matsimNetwork,
+					radius, offset);
+			exp.expandNode(matsimId2node.getKey(), turns);
+			// }
 		}
 
 		System.out.println();
@@ -447,12 +444,13 @@ public class Transmodeler2MATSimNetwork {
 		final String lanesFile = path + "Lanes.csv";
 		final String laneConnectorsFile = path + "Lane Connectors.csv";
 		final String linksFile = path + "Links.csv";
-		final String matsimFile = path + "network.xml";
-		final String linkAttributesFile = path + "linkAttributes.xml";
 		final String nodesFile1 = path + "nodes1.txt";
 		final String nodesFile2 = path + "nodes2.txt";
 		final String linksFile1 = path + "links1.shp";
-		final String linksFile2 = path + "links2.shp";
+		final String linksFile2 = path + "links3.shp";
+
+		final String matsimFile = "./data/run/network.xml";
+		final String linkAttributesFile = "./data/run/linkAttributes.xml";
 
 		System.out.println("STARTED ...");
 

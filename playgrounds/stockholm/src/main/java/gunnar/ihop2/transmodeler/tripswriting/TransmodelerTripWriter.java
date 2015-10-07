@@ -1,5 +1,6 @@
 package gunnar.ihop2.transmodeler.tripswriting;
 
+import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMLINKDIRPREFIX_ATTR;
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMPATHID_ATTR;
 import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
 import gunnar.ihop2.utils.TabularFileWriter;
@@ -14,7 +15,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -57,16 +57,13 @@ public class TransmodelerTripWriter {
 
 	private final Population population;
 
-	private final Network network;
-
 	private final ObjectAttributes linkAttributes;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public TransmodelerTripWriter(final Population population,
-			final Network network, final ObjectAttributes linkAttributes) {
+			final ObjectAttributes linkAttributes) {
 		this.population = population;
-		this.network = network;
 		this.linkAttributes = linkAttributes;
 	}
 
@@ -160,6 +157,10 @@ public class TransmodelerTripWriter {
 										pathWriter.print(this.linkAttributes
 												.getAttribute(
 														linkId.toString(),
+														TMLINKDIRPREFIX_ATTR));
+										pathWriter.print(this.linkAttributes
+												.getAttribute(
+														linkId.toString(),
 														TMPATHID_ATTR));
 										pathWriter.print(" ");
 									}
@@ -206,12 +207,12 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data/saleem/network.xml";
-		final String plansFileName = "./data/saleem/output/ITERS/it.0/0.plans.xml.gz";
-		final String linkAttributesFileName = "./data/saleem/linkAttributes.xml";
+		final String networkFileName = "./data/run/network.xml";
+		final String plansFileName = "./data/run/output/ITERS/it.0/0.plans.xml.gz";
+		final String linkAttributesFileName = "./data/run/linkAttributes.xml";
 
-		final String pathFileName = "./data/saleem/paths.csv";
-		final String tripFileName = "./data/saleem/trips.csv";
+		final String pathFileName = "./data/run/paths.csv";
+		final String tripFileName = "./data/run/trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
@@ -224,7 +225,7 @@ public class TransmodelerTripWriter {
 		reader.parse(linkAttributesFileName);
 
 		final TransmodelerTripWriter tripWriter = new TransmodelerTripWriter(
-				scenario.getPopulation(), scenario.getNetwork(), linkAttributes);
+				scenario.getPopulation(), linkAttributes);
 
 		tripWriter.writeTrips(pathFileName, tripFileName);
 
