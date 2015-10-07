@@ -119,7 +119,6 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 		
-		//TODO: if the next state is free-floating, change the 
 		
 		if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
 				((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("freefloating")) {
@@ -137,7 +136,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			insertRoundTripCarsharingTrip(now);
 		}
-		this.basicAgentDelegate.endActivityAndComputeNextState(now);
+		
+		if (!this.getState().equals(State.ABORT))
+			this.basicAgentDelegate.endActivityAndComputeNextState(now);
 
 	}
 
@@ -445,7 +446,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			if (pickUpStation == null) {
 				this.setStateToAbort(now);
-				this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "ff"));
+				this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "tw"));
 				return;
 				
 			}
