@@ -161,6 +161,7 @@ public class PreprocessedRunnerTest {
 
 		final ModelRunner runner =
 			new PreprocessedModelRunner(
+					new SocialNetworkGenerationConfigGroup(),
 					config,
 					population,
 					utility,

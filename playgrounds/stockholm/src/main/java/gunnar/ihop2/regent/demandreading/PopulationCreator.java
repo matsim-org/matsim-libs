@@ -453,23 +453,14 @@ public class PopulationCreator {
 
 		System.out.println("STARTED ...");
 
-		// final String networkFileName =
-		// "./data/network/network_v12_utan_forbifart.xml";
-		final String networkFileName = "./data/transmodeler/network.xml";
 		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
-
 		final String buildingShapeFileName = "./data/shapes/by_full_EPSG3857_2.shp";
-
-		// final String populationFileName = "./150410_worktrips_small.xml";
-		// final String populationFileName =
-		// "./data/synthetic_population/150410_worktrips.xml";
 		final String populationFileName = "./data/synthetic_population/150615_trips.xml";
 
-		final String initialPlansFile = "./data/demand_output/initial_plans.xml";
+		final String networkFileName = "./data/run/network.xml";
+		final String linkAttributesFileName = "./data/run/linkAttributes.xml";
+		final String initialPlansFile = "./data/run/initial_plans.xml";
 
-//		final String nodeAttributeFileName = "./data/saleem/nodeAttributes.xml";
-
-		final String linkAttributesFileName = "./data/transmodeler/linkAttributes.xml";
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				linkAttributes);

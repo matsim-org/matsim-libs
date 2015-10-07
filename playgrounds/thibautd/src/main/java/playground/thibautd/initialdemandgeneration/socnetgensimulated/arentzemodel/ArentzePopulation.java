@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModelRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
+package playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemodel;
 
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
 
 /**
  * @author thibautd
  */
-public interface ModelRunner {
-	SocialNetwork runModel( Thresholds thresholds );
-}
+public class ArentzePopulation extends IndexedPopulation {
+	private final char[] ageCategory;
+	private final boolean[] isMale;
+	private final Coord[] coord;
 
+	protected ArentzePopulation(
+			final Id[] ids,
+			final char[] ageCategory,
+			final boolean[] isMale,
+			final Coord[] coord) {
+		super(ids);
+		this.ageCategory = ageCategory;
+		this.isMale = isMale;
+		this.coord = coord;
+	}
+
+	public char getAgeCategory(final int agent) {
+		return ageCategory[agent];
+	}
+
+	public boolean isMale(final int agent) {
+		return isMale[agent];
+	}
+
+	public Coord getCoord(final int agent) {
+		return coord[agent];
+	}
+}
