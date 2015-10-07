@@ -402,10 +402,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
 				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(),
-						null);
+						this.pickupStations.get(this.pickupStations.size() - 1).getLink().getId());
 
 				routeCar.setLinkIds( this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(), ids, 
-						null);
+						this.pickupStations.get(this.pickupStations.size() - 1).getLink().getId());
 				routeCar.setTravelTime( travelTime);
 
 				Id<Vehicle> vehId = this.vehicleIdLocation.get(route.getStartLinkId());
@@ -577,7 +577,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				&& this.basicAgentDelegate.getNextPlanElement() instanceof Leg
 				) {
 
-			this.pickupStations.remove(this.pickupStations.size() - 1);
+			//this.pickupStations.remove(this.pickupStations.size() - 1);
 			this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
 			this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), twVehId);
 			twVehId = null;
