@@ -20,6 +20,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,15 +30,18 @@ public class SocNetGenFrameworkModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(SocNetGenFrameworkModule.class);
 	@Override
 	protected void configure() {
-		log.debug( "Configuring "+getClass().getSimpleName() );
+		log.debug("Configuring " + getClass().getSimpleName());
 
 		binder().requireExplicitBindings();
 		binder().disableCircularProxies();
 
-		bind( ModelRunner.class ).to( PreprocessedModelRunner.class );
+		bind(ModelRunner.class).to(PreprocessedModelRunner.class);
 		bind(TieUtility.class);
-		bind( TiesWeightDistribution.class );
-		bind( ModelIterator.class );
+		bind(TiesWeightDistribution.class);
+		bind(ModelIterator.class);
+		bind( Thresholds.class )
+				.annotatedWith( Names.named( "initialValue" ) )
+				.toProvider(InitialPointProvider.class);
 		log.debug("Configuring " + getClass().getSimpleName() + ": DONE");
 	}
 }

@@ -44,7 +44,6 @@ public class RunOptimalDistanceModel {
 				new OptimalDistanceTieUtilityModule(),
 				new ArentzePopulationModule());
 
-		final OptimalDistanceConfigGroup scoring =  injector.getInstance( OptimalDistanceConfigGroup.class );
 		final SocialNetworkGenerationConfigGroup config = injector.getInstance( SocialNetworkGenerationConfigGroup.class );
 		final PreprocessedModelRunnerConfigGroup runnerConfig = injector.getInstance( PreprocessedModelRunnerConfigGroup.class );
 
@@ -58,14 +57,12 @@ public class RunOptimalDistanceModel {
 		log.info( "###### secondary sampling rate: " + runnerConfig.getSecondarySampleRate());
 		log.info( "################################################################################" );
 
-		final Thresholds initialPoint = new Thresholds( scoring.getUtilityOfMatch() , 0 );
-
 		final ModelIterator modelIterator = injector.getInstance( ModelIterator.class );
 
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
 
-		final SocialNetwork network = modelIterator.iterateModelToTarget( initialPoint );
+		final SocialNetwork network = modelIterator.iterateModelToTarget();
 
 		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );

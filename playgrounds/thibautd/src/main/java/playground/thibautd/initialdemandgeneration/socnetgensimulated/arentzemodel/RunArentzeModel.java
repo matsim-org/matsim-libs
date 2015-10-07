@@ -70,52 +70,17 @@ public class RunArentzeModel {
 		log.info("###### secondary sampling rate: " + runnerConfig.getSecondarySampleRate());
 		log.info( "################################################################################" );
 
-		final Thresholds initialPoint =
-				generateInitialPoint(
-						injector.getInstance(TiesWeightDistribution.class),
-						injector.getInstance( IndexedPopulation.class ).size(),
-						config );
-
 		final ModelIterator modelIterator = injector.getInstance( ModelIterator.class );
 
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
 
-		final SocialNetwork network = modelIterator.iterateModelToTarget( initialPoint );
+		final SocialNetwork network = modelIterator.iterateModelToTarget();
 
 		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();
 	}
-
-	private static Thresholds generateInitialPoint(
-			final TiesWeightDistribution distr ,
-			final int populationSize,
-			final SocialNetworkGenerationConfigGroup config ) {
-		final double primary = Double.isNaN( config.getInitialPrimaryThreshold() ) ?
-			generateHeuristicPrimaryThreshold( distr , populationSize , config.getTargetDegree() ) :
-			config.getInitialPrimaryThreshold();
-		final double secondary = Double.isNaN( config.getInitialSecondaryReduction() ) ?
-			0 : config.getInitialPrimaryThreshold();
-
-		final Thresholds thresholds = new Thresholds( primary , secondary );
-		log.info( "initial thresholds: "+thresholds );
-		return thresholds;
-	}
-
-
-	private static double generateHeuristicPrimaryThreshold(
-			final TiesWeightDistribution distr ,
-			final int populationSize,
-			final double targetDegree ) {
-		log.info( "generating heuristic initial points" );
-
-		// rationale: sqrt(n) alters * sqrt(n) alters_of_alter
-		final double target = Math.sqrt( targetDegree );
-		return distr.findLowerBound( (long) (populationSize * target) );
-	}
-
-
 }
 
