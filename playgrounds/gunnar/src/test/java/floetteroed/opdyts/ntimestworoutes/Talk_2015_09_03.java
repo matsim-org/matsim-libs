@@ -78,12 +78,12 @@ class Talk_2015_09_03 {
 		final int transitionBinSize = 100;
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
-		final int replications = 1;
+		final int replications = 3;
 		final boolean keepBestSolution = true;
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.1;
 
-		for (Integer populationSize : new Integer[] { 32 }) { // 2, 4, 8, 16,
+		for (Integer populationSize : new Integer[] { 2 }) { // 2, 4, 8, 16,
 																// 32, 64, 128,
 																// 256}) {
 
