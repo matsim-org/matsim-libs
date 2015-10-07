@@ -64,8 +64,8 @@ public class ModelIterator {
 
 	private final double powellMinAbsoluteChange;
 	private final double powellMinRelativeChange;
-	
-	private final int nThreads = 4;
+
+	private final int nThreads;
 
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
@@ -77,6 +77,7 @@ public class ModelIterator {
 			final ModelRunner runner,
 			@Named( "initialValue" )
 			final Provider<Thresholds> initialValue) {
+		this.nThreads = config.getNThreads();
 		this.initialValue = initialValue;
 		this.runner = runner;
 		this.targetClustering = config.getTargetClustering();

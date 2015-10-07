@@ -45,6 +45,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private int maxIterations = 10000;
 
+	private int nThreads = 4;
+
 	public SocialNetworkGenerationConfigGroup( ) {
 		super(GROUP_NAME);
 	}
@@ -157,6 +159,16 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "powellMinRelativeChange" )
 	public void setPowellMinRelativeChange( double powellMinRelativeChange ) {
 		this.powellMinRelativeChange = powellMinRelativeChange;
+	}
+
+	@StringGetter( "nThreads" )
+	public int getNThreads() {
+		return nThreads;
+	}
+
+	@StringSetter( "nThreads" )
+	public void setNThreads(int nThreads) {
+		this.nThreads = nThreads;
 	}
 }
 
