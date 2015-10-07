@@ -47,11 +47,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	public SocialNetworkGenerationConfigGroup( ) {
 		super(GROUP_NAME);
-		System.out.println("BIJAXHFUDAGFUW");
-		for ( StackTraceElement e : new RuntimeException().getStackTrace() ) {
-			System.out.println( "               "+e );
-		}
-		System.out.flush();
 	}
 
 	@StringGetter( "inputPopulationFile" )
