@@ -1,9 +1,9 @@
 package org.matsim.contrib.analysis.kai;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -21,11 +21,9 @@ public final class Databins<K> {
 	private Map<K,double[]> delegate = new TreeMap<>() ;
 	private double[] dataBoundaries ;
 	private final String typeName;
-	public Databins( String typeName ) {
-		this.typeName = typeName ;
-	}
-	public void setDataBoundaries(double[] tmp) {
-		this.dataBoundaries = tmp ;
+	public Databins( String type, double[] dataBoundaries ) {
+		this.typeName = type ;
+		this.dataBoundaries = dataBoundaries ;
 	}
 	public double getValue(K key, int idx) {
 		if ( delegate.get(key)==null ) {
@@ -70,6 +68,9 @@ public final class Databins<K> {
 		log.warn("statistics contains value that smaller than the smallest category; adding it to smallest category" ) ;
 		log.warn("statType: " + typeName + "; val: " + dblVal ) ;
 		return 0 ;
+	}
+	public void clear() {
+		this.delegate.clear();
 	}
 	
 	
