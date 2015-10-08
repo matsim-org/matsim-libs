@@ -46,7 +46,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author amit
  */
 
-public class NetworkModesTest {
+public class NetworkRouteForUncongestedModeTest {
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
