@@ -16,40 +16,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsimusages.traveltimeequity;
+package playground.thibautd.initialdemandgeneration.socnetgensimulated.optimaldistancemodel;
 
-import org.apache.log4j.Logger;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import java.util.Set;
 
 /**
  * @author thibautd
  */
-public class EquityConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "equityScoring";
-	private static final Logger log = Logger.getLogger(EquityConfigGroup.class);
+@Singleton
+public class OptimalDistanceConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "optimalDistanceScoring";
 
-	private double betaStandardDev = -1;
-	// or not? can come form joint scoring...
-	//private Set<String> activityTypes;
-	//private boolean importActivityTypesFromScoring;
+	private double minDistance_m = 1000;
+	private double maxDistance_m = 10000;
 
-	public EquityConfigGroup() {
+	// the higher it is, the less random is the decision
+	private double utilityOfMatch = 1000;
+
+	@Inject
+	public OptimalDistanceConfigGroup() {
 		super( GROUP_NAME );
 	}
 
-	@StringGetter( "betaStandardDev" )
-	public double getBetaStandardDev() {
-		return betaStandardDev;
+	@StringGetter( "minDistance_m" )
+	public double getMinDistance_m() {
+		return minDistance_m;
 	}
 
-	@StringSetter( "betaStandardDev" )
-	public void setBetaStandardDev(double betaStandardDev) {
-		if ( betaStandardDev > 0 ) {
-			log.warn( "setting betaStandardDev to "+betaStandardDev );
-			log.warn( "positive values mean people will MAXIMISE inequity!");
-		}
-		this.betaStandardDev = betaStandardDev;
+	@StringSetter( "minDistance_m" )
+	public void setMinDistance_m(double minDistance_m) {
+		this.minDistance_m = minDistance_m;
+	}
+
+	@StringGetter( "maxDistance_m" )
+	public double getMaxDistance_m() {
+		return maxDistance_m;
+	}
+
+	@StringSetter( "maxDistance_m" )
+	public void setMaxDistance_m(double maxDistance_m) {
+		this.maxDistance_m = maxDistance_m;
+	}
+
+	@StringGetter( "utilityOfMatch" )
+	public double getUtilityOfMatch() {
+		return utilityOfMatch;
+	}
+
+	@StringSetter( "utilityOfMatch" )
+	public void setUtilityOfMatch(double utilityOfMatch) {
+		this.utilityOfMatch = utilityOfMatch;
 	}
 }

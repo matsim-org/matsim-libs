@@ -1,10 +1,11 @@
+package playground.gregor.ctsim.simulation;
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModelRunner.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +18,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import playground.gregor.ctsim.simulation.physics.CTCell;
 
 /**
- * @author thibautd
+ * Created by laemmel on 07/10/15.
  */
-public interface ModelRunner {
-	SocialNetwork runModel( Thresholds thresholds );
-}
+public class CTEvent implements Comparable<CTEvent> {
 
+    private final double execTime;
+    private final CTCell cell;
+
+    private boolean valid = true;
+
+
+    public CTEvent(CTCell cell, double execTime) {
+        this.cell = cell;
+        this.execTime = execTime;
+    }
+
+    public void invalidate() {
+        this.valid = false;
+    }
+
+    public double getExecTime() {
+        return this.execTime;
+    }
+
+    public void execute() {
+        invalidate();
+        cell.jumpAndUpdateNeighbors(execTime);
+    }
+
+    @Override
+    public int compareTo(CTEvent o) {
+        double diff = this.getExecTime()
+                - o.getExecTime();
+
+        if (diff < 0) {
+            return -1;
+        }
+        else {
+            if (diff > 0) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+
+    public boolean isInvalid() {
+        return !valid;
+    }
+}

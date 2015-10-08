@@ -5,6 +5,7 @@ import be.humphreys.simplevoronoi.Voronoi;
 import com.vividsolutions.jts.geom.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 
@@ -13,12 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CTLink {
+public class CTLink implements CTNetworkEntity {
 
 
+    static final double WIDTH = 1;
     private static final double EPSILON = 0.00001;
-
-    private static final double WIDTH = 1;
     private final CTNetwork network;
     private final CTNode dsNode;
     private final CTNode usNode;
@@ -72,8 +72,9 @@ public class CTLink {
         Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
         Map<ProtoCell, Geometry> geoMap = new HashMap<>();
         for (ProtoCell pt : cells) {
-            CTCell c = new CTCell(pt.x, pt.y);
-            this.cells.add(c);
+            CTCell c = new CTCell(pt.x, pt.y, this.network, this);
+            c.setArea(1.5 * Math.sqrt(3) * WIDTH * WIDTH);
+
             cellsMap.put(pt, c);
             Coordinate[] coords = new Coordinate[pt.edges.size() * 2];
             int idx = 0;
@@ -90,8 +91,9 @@ public class CTLink {
             CTCell cell = cellsMap.get(pt);
             Geometry ch = geoMap.get(pt);
             if (p.covers(ch)) {
+                this.cells.add(cell);
                 for (GraphEdge ge : pt.edges) {
-//					debugGE(ge,0,255,0);
+                    debugGe(ge);
                     ProtoCell protoNeighbor = pt.nb.get(ge);
                     Geometry nCh = geoMap.get(protoNeighbor);
                     CTCell neighbor = null;
@@ -101,19 +103,23 @@ public class CTLink {
                     else {
                         if (fromBnd.intersects(nCh)) {
                             neighbor = this.usNode.getCTCell();
-                            CTCellFace nFace = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, cell);
+                            CTCellFace nFace = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, cell, -Math.PI / 2);
                             neighbor.addFace(nFace);
                         }
                         else {
                             if (toBnd.intersects(nCh)) {
                                 neighbor = this.dsNode.getCTCell();
-                                CTCellFace nFace = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, cell);
+                                CTCellFace nFace = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, cell, Math.PI / 2);
                                 neighbor.addFace(nFace);
                             }
                         }
                     }
-                    CTCellFace face = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, neighbor);
-                    cell.addFace(face);
+
+                    if (neighbor != null) {
+                        double dir = getAngle(cell.getX(), cell.getY(), (ge.x1 + ge.x2) / 2, (ge.y1 + ge.y2) / 2, cell.getX() + dy, cell.getY() - dx);
+                        CTCellFace face = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, neighbor, dir);
+                        cell.addFace(face);
+                    }
                 }
             }
         }
@@ -122,6 +128,63 @@ public class CTLink {
         for (CTCell c : this.cells) {
             c.debug(this.em);
         }
+    }
+
+    private double getAngle(double frX, double frY, double toX1, double toY1, double toX2, double toY2) {
+
+        final double l1 = Math.sqrt(3) / 4 * WIDTH;
+        double cosAlpha = ((toX1 - frX) * (toX2 - frX) + (toY1 - frY) * (toY2 - frY)) / l1;
+        double alpha = Math.acos(cosAlpha);
+        if (CGAL.isLeftOfLine(toX1, toY1, frX, frY, toX2, toY2) < 0) {
+            alpha -= Math.PI;
+            alpha = -(Math.PI + alpha);
+        }
+//        debugAngle(alpha,frX,frY,toX1,toY1);
+        return alpha;
+    }
+
+    private void debugAngle(double alpha, double frX, double frY, double toX1, double toY1) {
+        int sect = (int) Math.round(10 * (Math.PI / alpha));
+        LineSegment ls = new LineSegment();
+        ls.x0 = frX;
+        ls.y0 = frY;
+        ls.x1 = toX1;
+        ls.y1 = toY1;
+        if (sect == 60) {
+            LineEvent le = new LineEvent(0, ls, true, 192, 0, 0, 255, 0);
+            em.processEvent(le);
+        }
+        else {
+            if (sect == 20) {
+                LineEvent le = new LineEvent(0, ls, true, 192, 192, 0, 255, 0);
+                em.processEvent(le);
+            }
+            else {
+                if (sect == 12) {
+                    LineEvent le = new LineEvent(0, ls, true, 0, 192, 0, 255, 0);
+                    em.processEvent(le);
+                }
+                else {
+                    if (sect == -12) {
+                        LineEvent le = new LineEvent(0, ls, true, 0, 192, 192, 255, 0);
+                        em.processEvent(le);
+                    }
+                    else {
+                        if (sect == -20) {
+                            LineEvent le = new LineEvent(0, ls, true, 0, 0, 192, 255, 0);
+                            em.processEvent(le);
+                        }
+                        else {
+                            if (sect == -60) {
+                                LineEvent le = new LineEvent(0, ls, true, 192, 0, 192, 255, 0);
+                                em.processEvent(le);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     private List<ProtoCell> computeProtoCells(double dx, double dy) {
@@ -154,13 +217,7 @@ public class CTLink {
                 xl.add(x);
                 ProtoCell cell = new ProtoCell(x, y, idx++);
                 cells.add(cell);
-                LineSegment ls = new LineSegment();
-                ls.x0 = x;
-                ls.x1 = x + 0.1;
-                ls.y0 = y;
-                ls.y1 = y + 0.1;
-                LineEvent le = new LineEvent(0, ls, true, 0, 0, 0, 255, 0);
-                em.processEvent(le);
+
             }
 
         }
@@ -194,6 +251,7 @@ public class CTLink {
         maxY = maxY > y3 ? maxY : y3;
         List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
         for (GraphEdge ge : edges) {
+
             ProtoCell c0 = cells.get(ge.site1);
             c0.edges.add(ge);
             ProtoCell c1 = cells.get(ge.site2);
@@ -201,30 +259,23 @@ public class CTLink {
             c0.nb.put(ge, c1);
             c1.nb.put(ge, c0);
 
-            LineSegment ls = new LineSegment();
-//			ls.x0 = ge.x1;
-//			ls.x1 = ge.x2;
-//			ls.y0 = ge.y1;
-//			ls.y1 = ge.y2;
-//			LineEvent le = new LineEvent(0,ls,true,0,128,128,255,0);
-//			em.processEvent(le);
         }
         return cells;
     }
 
+    private void debugGe(GraphEdge ge) {
+        LineSegment s = new LineSegment();
+        s.x0 = ge.x1;
+        s.x1 = ge.x2;
+        s.y0 = ge.y1;
+        s.y1 = ge.y2;
+        LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
+        em.processEvent(le);
+    }
+
 
     private void debugBound(double dx, double dy) {
-        {
-            LineSegment s = new LineSegment();
-            s.x0 = this.dsLink.getFromNode().getCoord().getX();
-            s.x1 = this.dsLink.getToNode().getCoord().getX();
-            s.y0 = this.dsLink.getFromNode().getCoord().getY();
-            s.y1 = this.dsLink.getToNode().getCoord().getY();
-            LineEvent le = new LineEvent(0, s, true, 0, 128, 128, 255, 0, 0.2, 1);
-            em.processEvent(le);
 
-
-        }
 
         {
             LineSegment s = new LineSegment();
@@ -263,6 +314,10 @@ public class CTLink {
             em.processEvent(le);
         }
 
+    }
+
+    public List<CTCell> getCells() {
+        return cells;
     }
 
     private final class ProtoCell {

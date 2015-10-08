@@ -1,10 +1,11 @@
+package playground.gregor.ctsim.simulation.physics;
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModelRunner.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +18,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
-
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 
 /**
- * @author thibautd
+ * Created by laemmel on 07/10/15.
  */
-public interface ModelRunner {
-	SocialNetwork runModel( Thresholds thresholds );
-}
+public class CTPed {
 
+
+    private CTCell currentCell;
+    private double dir;
+    private CTCell tentativeNextCell;
+
+    public CTPed(CTCell cell, double dir) {
+        this.currentCell = cell;
+        this.dir = dir;
+    }
+
+    public double chooseNextCellAndReturnJumpRate() {
+
+        CTCell bestNB = null;
+        double maxFlowFactor = 0;
+        for (CTCellFace face : this.currentCell.getFaces()) {
+            double flowFactor = (1 + Math.cos(dir - face.h_i)) * currentCell.getJ(face.nb);
+            if (flowFactor > maxFlowFactor) {
+                maxFlowFactor = flowFactor;
+                bestNB = face.nb;
+
+            }
+        }
+        if (bestNB == null) {
+            return Double.NaN;
+        }
+        this.tentativeNextCell = bestNB;
+        return currentCell.getJ(this.tentativeNextCell) * maxFlowFactor;
+    }
+
+
+    public CTCell getNextCellAndJump() {
+        this.currentCell.jumpOffPed(this);
+        this.currentCell = tentativeNextCell;
+        this.currentCell.jumpOnPed(this);
+        this.tentativeNextCell = null;
+        return this.currentCell;
+    }
+}

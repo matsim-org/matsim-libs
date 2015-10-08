@@ -1,10 +1,11 @@
+package playground.gregor.ctsim.simulation.physics;
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModelRunner.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +18,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
-
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 
 /**
- * @author thibautd
+ * Created by laemmel on 07/10/15.
  */
-public interface ModelRunner {
-	SocialNetwork runModel( Thresholds thresholds );
+public interface CTNetworkEntity { //marker interface
 }
-
