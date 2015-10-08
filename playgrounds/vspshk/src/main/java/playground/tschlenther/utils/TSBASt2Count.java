@@ -29,7 +29,7 @@ import playground.tschlenther.utils.BastHourlyCountData.Day;
  *<b><i>BASt_ID-DAY-DIRECTION</i></b> where DAY is either WEEKDAY or WEEKEND.
  *Their linkID is currently set to the same.
  *Every original BASt counting station is converted into two Count objects, one for each direction.
- *The interval of the weekdays to be considered go from <b>BEGINNING_WEEKDAY </b> to
+ *The interval of the weekdays to be considered goes from <b>BEGINNING_WEEKDAY </b> to
  *<b>ENDING_WEEKDAY</b>, 1 representing Monday... 5 Friday.
  *<b><i>CALC_WEEKENDS</i></b> defines whether weekends should be considered. Weekends are defined from Saturday to Sunday. In addition, every public holiday is considered.
  *
@@ -68,26 +68,26 @@ public class TSBASt2Count {
 		
 		NumberFormat format = NumberFormat.getInstance(Locale.US);
 		
-		int IndexCountNr = colIndices.get("Zst");
-		int IndexVolumeR1 = colIndices.get("KFZ_R1");
-		int IndexValidityOfR1 = colIndices.get("K_KFZ_R1");
-		int IndexVolumeR2 = colIndices.get("KFZ_R2");
-		int IndexValidityOfR2 = colIndices.get("K_KFZ_R2");
-		int IndexHour = colIndices.get("Stunde");
-		int IndexDayOfWeek = colIndices.get("Wotag");
-		int IndexPurpose = colIndices.get("Fahrtzw");
+		int indexCountNr = colIndices.get("Zst");
+		int indexVolumeD1 = colIndices.get("KFZ_R1");
+		int indexValidityOfD1 = colIndices.get("K_KFZ_R1");
+		int indexVolumeD2 = colIndices.get("KFZ_R2");
+		int indexValidityOfD2 = colIndices.get("K_KFZ_R2");
+		int indexHour = colIndices.get("Stunde");
+		int indexDayOfWeek = colIndices.get("Wotag");
+		int indexPurpose = colIndices.get("Fahrtzw");
 		
 		int lineNr = 1;
 		
 		while((line = reader.readLine()) != null) {
 			String tokens[] = line.split(";", -1);
-			int weekDay = format.parse(tokens[IndexDayOfWeek].trim()).intValue();
+			int weekDay = format.parse(tokens[indexDayOfWeek].trim()).intValue();
 			
-			boolean isConsideredWeekDay = (tokens[IndexPurpose].equals("w") && (weekDay >= BEGINNING_WEEKDAY && weekDay <= ENDING_WEEKDAY)); 
-			boolean isConsideredWeekEnd = (CALC_WEEKENDS && (tokens[IndexPurpose].equals("s") || weekDay == 6));
+			boolean isConsideredWeekDay = (tokens[indexPurpose].equals("w") && (weekDay >= BEGINNING_WEEKDAY && weekDay <= ENDING_WEEKDAY)); 
+			boolean isConsideredWeekEnd = (CALC_WEEKENDS && (tokens[indexPurpose].equals("s") || weekDay == 6));
 			
 			if(isConsideredWeekDay || isConsideredWeekEnd ){
-				int stationNumber = format.parse(tokens[IndexCountNr]).intValue();
+				int stationNumber = format.parse(tokens[indexCountNr]).intValue();
 				
 				Day day = (isConsideredWeekDay) ? Day.WEEKDAY : Day.WEEKEND;
 				String identifier = "" + stationNumber + "-" + day;
@@ -96,18 +96,18 @@ public class TSBASt2Count {
 					data = new BastHourlyCountData(identifier, day);
 				}
 				
-				int hour = format.parse(tokens[IndexHour]).intValue();
-				switch(tokens[IndexValidityOfR1]){
+				int hour = format.parse(tokens[indexHour]).intValue();
+				switch(tokens[indexValidityOfD1]){
 				case "-":
 				case "s":
 				case "k":	
-					data.computeAndSetVolume(true, hour, format.parse(tokens[IndexVolumeR1].trim()).doubleValue());
+					data.computeAndSetVolume(true, hour, format.parse(tokens[indexVolumeD1].trim()).doubleValue());
 				}
-				switch(tokens[IndexValidityOfR2]){
+				switch(tokens[indexValidityOfD2]){
 				case "-":
 				case "s":
 				case "k":	
-					data.computeAndSetVolume(false, hour, format.parse(tokens[IndexVolumeR2].trim()).doubleValue());
+					data.computeAndSetVolume(false, hour, format.parse(tokens[indexVolumeD2].trim()).doubleValue());
 				}
 				allCounts.put(identifier, data);
 			}
