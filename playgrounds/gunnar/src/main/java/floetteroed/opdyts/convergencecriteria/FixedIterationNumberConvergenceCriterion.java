@@ -82,4 +82,9 @@ public class FixedIterationNumberConvergenceCriterion implements
 	public Double getFinalObjectiveFunctionValue() {
 		return this.finalObjectiveFunctionValue;
 	}
+	
+	@Override
+	public void reset() {
+		this.finalObjectiveFunctionValue = null;
+	}
 }
