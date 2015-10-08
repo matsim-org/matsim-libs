@@ -24,6 +24,8 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Map;
+
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 
@@ -42,7 +44,11 @@ public interface TrajectorySampler {
 	public boolean foundSolution();
 
 	public DecisionVariable getCurrentDecisionVariable();
+
+	public int getTotalTransitionCnt();
 	
+	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue();
+
 	/**
 	 * Call once before the simulation is started. This implements a randomly
 	 * selected decision variable in the simulation, with the objective to

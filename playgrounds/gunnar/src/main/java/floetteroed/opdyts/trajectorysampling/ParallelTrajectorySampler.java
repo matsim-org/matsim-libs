@@ -25,6 +25,7 @@
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -164,9 +165,12 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 				.get(decisionVariable);
 	}
 
-	/* (non-Javadoc)
-	 * @see floetteroed.opdyts.trajectorysampling.TrajectorySamplerInterface#foundSolution()
-	 */
+	@Override
+	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue() {
+		return Collections.unmodifiableMap(this.decisionVariable2finalObjectiveFunctionValue);
+	}
+	
+	@Override
 	public boolean foundSolution() {
 		return (this.decisionVariable2finalObjectiveFunctionValue.size() > 0);
 	}

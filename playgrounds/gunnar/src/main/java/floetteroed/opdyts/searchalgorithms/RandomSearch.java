@@ -38,6 +38,7 @@ import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 
 /**
  * 
@@ -211,50 +212,81 @@ public class RandomSearch {
 						sampler.getInitialGradientNorm(), bestDecisionVariable);
 
 			} else {
+
 				final SimulatorState thisRoundsInitialState = newInitialState;
 
 				bestDecisionVariable = null;
 				bestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
 
 				for (DecisionVariable candidate : candidates) {
-
-					final Set<DecisionVariable> singletonCandidates = new LinkedHashSet<DecisionVariable>();
-					singletonCandidates.add(candidate);
-
-					final ParallelTrajectorySampler sampler;
+					this.convergenceCriterion.reset();
+					final SingleTrajectorySampler singleSampler;
 					if (this.objectBasedObjectiveFunction != null) {
-						sampler = new ParallelTrajectorySampler(singletonCandidates,
+						singleSampler = new SingleTrajectorySampler(candidate,
 								this.objectBasedObjectiveFunction,
-								this.convergenceCriterion, this.rnd,
-								this.selfTuner.getEquilibriumGapWeight(),
-								this.selfTuner.getUniformityWeight());
+								this.convergenceCriterion);
 					} else {
-						sampler = new ParallelTrajectorySampler(singletonCandidates,
+						singleSampler = new SingleTrajectorySampler(candidate,
 								this.vectorBasedObjectiveFunction,
-								this.convergenceCriterion, this.rnd,
-								this.selfTuner.getEquilibriumGapWeight(),
-								this.selfTuner.getUniformityWeight());
+								this.convergenceCriterion);
 					}
-
 					final SimulatorState candidateInitialState = this.simulator
-							.run(sampler, thisRoundsInitialState);
-					final DecisionVariable candidateDecisionVariable = sampler
-							.getConvergedDecisionVariables().iterator().next();
-					final double candidateObjectiveFunctionValue = sampler
-							.getFinalObjectiveFunctionValue(candidateDecisionVariable);
+							.run(singleSampler, thisRoundsInitialState);
+					final double candidateObjectiveFunctionValue = singleSampler
+							.getDecisionVariable2finalObjectiveFunctionValue()
+							.get(candidate);
 					if (candidateObjectiveFunctionValue < bestObjectiveFunctionValue) {
-						bestDecisionVariable = candidateDecisionVariable;
+						bestDecisionVariable = candidate;
 						bestObjectiveFunctionValue = candidateObjectiveFunctionValue;
 						newInitialState = candidateInitialState;
 					}
-					transitionsPerIteration += sampler.getTotalTransitionCnt();
+					transitionsPerIteration += singleSampler
+							.getTotalTransitionCnt();
+
 				}
+
+				// for (DecisionVariable candidate : candidates) {
+				//
+				// final Set<DecisionVariable> singletonCandidates = new
+				// LinkedHashSet<DecisionVariable>();
+				// singletonCandidates.add(candidate);
+				//
+				// final ParallelTrajectorySampler sampler;
+				// if (this.objectBasedObjectiveFunction != null) {
+				// sampler = new ParallelTrajectorySampler(
+				// singletonCandidates,
+				// this.objectBasedObjectiveFunction,
+				// this.convergenceCriterion, this.rnd,
+				// this.selfTuner.getEquilibriumGapWeight(),
+				// this.selfTuner.getUniformityWeight());
+				// } else {
+				// sampler = new ParallelTrajectorySampler(
+				// singletonCandidates,
+				// this.vectorBasedObjectiveFunction,
+				// this.convergenceCriterion, this.rnd,
+				// this.selfTuner.getEquilibriumGapWeight(),
+				// this.selfTuner.getUniformityWeight());
+				// }
+				//
+				// final SimulatorState candidateInitialState = this.simulator
+				// .run(sampler, thisRoundsInitialState);
+				// final DecisionVariable candidateDecisionVariable = sampler
+				// .getConvergedDecisionVariables().iterator().next();
+				// final double candidateObjectiveFunctionValue = sampler
+				// .getFinalObjectiveFunctionValue(candidateDecisionVariable);
+				// if (candidateObjectiveFunctionValue <
+				// bestObjectiveFunctionValue) {
+				// bestDecisionVariable = candidateDecisionVariable;
+				// bestObjectiveFunctionValue = candidateObjectiveFunctionValue;
+				// newInitialState = candidateInitialState;
+				// }
+				// transitionsPerIteration += sampler.getTotalTransitionCnt();
+				// }
 			}
 
 			this.bestDecisionVariables.add(bestDecisionVariable);
 			this.bestObjectiveFunctionValues.add(bestObjectiveFunctionValue);
 			this.transitionEvaluations.add(transitionsPerIteration);
-
 			transitions += transitionsPerIteration;
 		}
 	}
