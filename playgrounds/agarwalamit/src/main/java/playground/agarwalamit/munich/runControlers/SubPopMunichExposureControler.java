@@ -69,6 +69,7 @@ public class SubPopMunichExposureControler {
 	public static void main(String[] args) {
 
 		boolean isRunningOnCluster = false;
+		if ( args.length > 0) isRunningOnCluster = true;
 
 		if(! isRunningOnCluster){
 
