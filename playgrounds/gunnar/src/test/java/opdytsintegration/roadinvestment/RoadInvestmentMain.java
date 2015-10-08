@@ -10,27 +10,22 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import opdytsintegration.MATSimState;
+import opdytsintegration.MATSimSimulator;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.Controler.TerminationCriterion;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
-import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 
 /**
  * 
@@ -211,41 +206,7 @@ class RoadInvestmentMain {
 		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 				1e-1, 1e-1, minimumAverageIterations);
 
-		Simulator system = new Simulator() {
-			@Override
-			public SimulatorState run(TrajectorySampler evaluator) {
-//				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
-//				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
-
-				final MATSimDecisionVariableSetEvaluator predictor
-						= new MATSimDecisionVariableSetEvaluator(evaluator, decisionVariables, stateFactory);
-				predictor.setMemory(1);
-				predictor.setBinSize_s(10 * 60);
-				predictor.setStartBin(6 * 5);
-				predictor.setBinCnt(6 * 20);
-
-				final Controler controler = new Controler(scenario);
-				controler.addControlerListener(predictor);
-				controler.setTerminationCriterion(new TerminationCriterion() {
-					@Override
-					public boolean continueIterations(int iteration) {
-						return !predictor.foundSolution();
-					}
-				});
-				controler.run();
-
-				return predictor.getFinalState();
-			}
-
-			@Override
-			public SimulatorState run(TrajectorySampler evaluator, SimulatorState initialState) {
-				if (initialState != null) {
-					((MATSimState) initialState).setPopulation(scenario.getPopulation());
-					initialState.implementInSimulation();
-				}
-				return run(evaluator);
-			}
-		};
+		Simulator system = new MATSimSimulator(decisionVariables, stateFactory, scenario);
 		DecisionVariableRandomizer randomizer = new DecisionVariableRandomizer() {
 			@Override
 			public DecisionVariable newRandomDecisionVariable() {
@@ -295,4 +256,5 @@ class RoadInvestmentMain {
 		solveFictitiousProblem();
 
 	}
+
 }
