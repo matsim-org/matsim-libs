@@ -69,11 +69,8 @@ public class GenerateFundamentalDiagramData {
 
 	static final Logger log = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
-	//CONFIGURATION: static variables used for aggregating configuration options
-
 	static boolean PASSING_ALLOWED = false;
 	static boolean SEEPAGE_ALLOWED = false;
-	private boolean SEEP_NETWORK_FACTORY = false;
 	private final boolean LIVE_OTFVis = false;
 	static boolean WITH_HOLES = false;
 	boolean WRITE_FD_DATA = true;
@@ -206,10 +203,6 @@ public class GenerateFundamentalDiagramData {
 
 	public void setUseHoles(boolean isUsingHole) {
 		WITH_HOLES = isUsingHole;
-	}
-
-	private void setUsingSeepNetworkFactory(boolean isUsingMySeepNetworkFactory){
-		SEEP_NETWORK_FACTORY = isUsingMySeepNetworkFactory;
 	}
 
 	public void setIsPlottingDistribution(boolean isPlottingDistribution) {
