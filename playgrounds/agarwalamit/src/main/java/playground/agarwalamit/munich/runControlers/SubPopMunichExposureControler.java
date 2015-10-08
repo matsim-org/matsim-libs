@@ -126,13 +126,25 @@ public class SubPopMunichExposureControler {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		controler.getConfig().addModule(ecg);
 		
-		String hbefaDirectory = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/hbefaForMatsim/";
+		ecg.setUsingDetailedEmissionCalculation(true);
+		
+		String hbefaDirectory;
+
+		if (isRunningOnCluster ) hbefaDirectory = "../../matsimHBEFAStandardsFiles/";
+		else hbefaDirectory = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/hbefaForMatsim/";
+		
 		ecg.setAverageColdEmissionFactorsFile(hbefaDirectory+"EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile(hbefaDirectory+"EFA_HOT_vehcat_2005average.txt");
 		ecg.setDetailedColdEmissionFactorsFile(hbefaDirectory+"EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile(hbefaDirectory+"EFA_HOT_SubSegm_2005detailed.txt");
-		ecg.setEmissionRoadTypeMappingFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/emissionVehicles_1pct.xml.gz");
+		
+		String emissionRelatedInputFilesDir ;
+		
+		if(isRunningOnCluster) emissionRelatedInputFilesDir = "../../munich/input/";
+		else emissionRelatedInputFilesDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/";
+		
+		ecg.setEmissionRoadTypeMappingFile(emissionRelatedInputFilesDir + "/roadTypeMapping.txt");
+		ecg.setEmissionVehicleFile(emissionRelatedInputFilesDir + "/emissionVehicles_1pct.xml.gz");
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
