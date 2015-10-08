@@ -1,7 +1,6 @@
 package opdytsintegration.roadinvestment;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,13 +10,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.Simulator;
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-
 import opdytsintegration.MATSimState;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
@@ -26,14 +21,16 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controler.TerminationCriterion;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
-import floetteroed.opdyts.logging.AlphaStatistic;
-import floetteroed.opdyts.logging.InterpolatedObjectiveFunctionValue;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * 
@@ -220,8 +217,8 @@ class RoadInvestmentMain {
 //				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
 //				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
 
-				final MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable> predictor
-						= new MATSimDecisionVariableSetEvaluator<>(evaluator, decisionVariables, stateFactory);
+				final MATSimDecisionVariableSetEvaluator predictor
+						= new MATSimDecisionVariableSetEvaluator(evaluator, decisionVariables, stateFactory);
 				predictor.setMemory(1);
 				predictor.setBinSize_s(10 * 60);
 				predictor.setStartBin(6 * 5);

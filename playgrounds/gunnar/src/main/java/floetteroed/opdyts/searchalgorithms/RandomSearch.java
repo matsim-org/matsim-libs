@@ -37,7 +37,7 @@ import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 
 /**
  * 
@@ -181,15 +181,15 @@ public class RandomSearch {
 				// this.selfTuner.getUniformityWeight(),
 				// this.objectiveFunction);
 
-				final TrajectorySampler sampler;
+				final ParallelTrajectorySampler sampler;
 				if (this.objectBasedObjectiveFunction != null) {
-					sampler = new TrajectorySampler(candidates,
+					sampler = new ParallelTrajectorySampler(candidates,
 							this.objectBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
 							this.selfTuner.getEquilibriumGapWeight(),
 							this.selfTuner.getUniformityWeight());
 				} else {
-					sampler = new TrajectorySampler(candidates,
+					sampler = new ParallelTrajectorySampler(candidates,
 							this.vectorBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
 							this.selfTuner.getEquilibriumGapWeight(),
@@ -218,22 +218,18 @@ public class RandomSearch {
 
 				for (DecisionVariable candidate : candidates) {
 
-					// final SamplingStrategy samplingStrategy = new
-					// FullInterpolationSamplingStrategy(
-					// 1.0, 0.0, 0.0, this.objectiveFunction);
-
 					final Set<DecisionVariable> singletonCandidates = new LinkedHashSet<DecisionVariable>();
 					singletonCandidates.add(candidate);
 
-					final TrajectorySampler sampler;
+					final ParallelTrajectorySampler sampler;
 					if (this.objectBasedObjectiveFunction != null) {
-						sampler = new TrajectorySampler(singletonCandidates,
+						sampler = new ParallelTrajectorySampler(singletonCandidates,
 								this.objectBasedObjectiveFunction,
 								this.convergenceCriterion, this.rnd,
 								this.selfTuner.getEquilibriumGapWeight(),
 								this.selfTuner.getUniformityWeight());
 					} else {
-						sampler = new TrajectorySampler(singletonCandidates,
+						sampler = new ParallelTrajectorySampler(singletonCandidates,
 								this.vectorBasedObjectiveFunction,
 								this.convergenceCriterion, this.rnd,
 								this.selfTuner.getEquilibriumGapWeight(),
