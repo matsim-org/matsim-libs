@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import java.util.Arrays;
 
 /**
  * @author thibautd
  */
+@Singleton
 public class TiesWeightDistribution {
 	private final double binWidth;
 
@@ -33,6 +37,11 @@ public class TiesWeightDistribution {
 	private int[] binNumbers = new int[ INIT_SIZE ];
 	private int[] binCount = new int[ INIT_SIZE ];
 	private long overallCount = 0;
+
+	@Inject
+	public TiesWeightDistribution() {
+		this( 1 );
+	}
 
 	public TiesWeightDistribution( final double binWidth ) {
 		this.binWidth = binWidth;

@@ -77,6 +77,10 @@ class TransmodelerLink extends TransmodelerElement {
 		return this.bidirectionalId;
 	}
 
+	DIR getDirection() {
+		return this.dir;
+	}
+
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "(id=" + this.getId()

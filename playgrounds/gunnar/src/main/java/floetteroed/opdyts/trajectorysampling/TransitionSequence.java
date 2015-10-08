@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.utilities.math.Vector;
@@ -52,9 +53,10 @@ public class TransitionSequence {
 	TransitionSequence(final SimulatorState fromState,
 			final DecisionVariable decisionVariable,
 			final SimulatorState toState,
-			final VectorBasedObjectiveFunction objectiveFunction) {
+			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
 		this.addTransition(fromState, decisionVariable, toState,
-				objectiveFunction);
+				objectBasedObjectiveFunction, vectorBasedObjectiveFunction);
 	}
 
 	// -------------------- SETTERS --------------------
@@ -62,7 +64,8 @@ public class TransitionSequence {
 	void addTransition(final SimulatorState fromState,
 			final DecisionVariable decisionVariable,
 			final SimulatorState toState,
-			final VectorBasedObjectiveFunction objectiveFunction) {
+			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
 
 		if (fromState == null) {
 			throw new IllegalArgumentException("fromState is null");
@@ -88,8 +91,15 @@ public class TransitionSequence {
 
 		final Vector toStateVectorRepresentation = toState
 				.getReferenceToVectorRepresentation();
-		final double toStateObjectiveFunctionValue = objectiveFunction
-				.value(toStateVectorRepresentation);
+
+		final double toStateObjectiveFunctionValue;
+		if (objectBasedObjectiveFunction != null) {
+			toStateObjectiveFunctionValue = objectBasedObjectiveFunction
+					.value(toState);
+		} else {
+			toStateObjectiveFunctionValue = vectorBasedObjectiveFunction
+					.value(toStateVectorRepresentation);
+		}
 
 		// new transitions are added at the end
 		this.transitions.add(new Transition(decisionVariable, delta,

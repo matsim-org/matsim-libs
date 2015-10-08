@@ -80,8 +80,6 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 			BufferedWriter writer = IOUtils.getBufferedWriter("./output/travelTimes.txt");
 			writer.write(buffer.toString());
 			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

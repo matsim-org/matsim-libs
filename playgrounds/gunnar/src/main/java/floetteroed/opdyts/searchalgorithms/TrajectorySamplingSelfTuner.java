@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.searchalgorithms;
 
 import java.io.BufferedWriter;
@@ -55,6 +55,9 @@ import floetteroed.utilities.math.Vector;
  */
 public class TrajectorySamplingSelfTuner {
 
+	// TODO
+	private final double terminationPrecision = 1e-6;
+
 	// -------------------- CONSTANTS --------------------
 
 	private final int equilibriumGapWeightIndex = 0;
@@ -82,10 +85,13 @@ public class TrajectorySamplingSelfTuner {
 	public TrajectorySamplingSelfTuner(
 			final double initialEquilibriumGapWeight,
 			final double initialUniformityWeight, final double initialOffset,
-			final double regressionInertia, final double initialValueWeight)
-			throws FileNotFoundException {
+			final double regressionInertia, final double initialValueWeight) {
 
-		this.log = new PrintWriter("./predvsreal.txt");
+		try {
+			this.log = new PrintWriter("./predvsreal.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.log.close();
 
 		this.inertia = regressionInertia;
@@ -126,7 +132,7 @@ public class TrajectorySamplingSelfTuner {
 			final List<SamplingStage> samplingStages,
 			final double finalObjectiveFunctionValue,
 			final double gradientNorm,
-			final DecisionVariable finalDecisionVariable) throws IOException {
+			final DecisionVariable finalDecisionVariable) {
 
 		final SamplingStage stage = samplingStages.get(0);
 		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
@@ -158,8 +164,12 @@ public class TrajectorySamplingSelfTuner {
 		this.inputs.addFirst(input);
 		this.outputs.addFirst(output);
 
-		this.log = new PrintWriter(new BufferedWriter(new FileWriter(
-				"./predvsreal.txt", true)));
+		try {
+			this.log = new PrintWriter(new BufferedWriter(new FileWriter(
+					"./predvsreal.txt", true)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		this.log.println((stage.getOriginalObjectiveFunctionValue() + input
 				.innerProd(this.coeffs)) + "\t" + finalObjectiveFunctionValue);
 		this.log.close();
@@ -243,15 +253,19 @@ public class TrajectorySamplingSelfTuner {
 		this.run();
 	}
 
+	private double[] initialPoint = new double[] { 1.0, 1.0, 1.0, 1.0 };
+
 	private void run() {
 		final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
 				NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-				new SimpleValueChecker(1e-8, 1e-8));
+				new SimpleValueChecker(this.terminationPrecision,
+						this.terminationPrecision));
 		final PointValuePair result = solver.optimize(new ObjectiveFunction(
 				new MyObjectiveFunction()), new ObjectiveFunctionGradient(
 				new MyGradient()), GoalType.MINIMIZE, new InitialGuess(
-				new double[] { 1.0, 1.0, 1.0, 1.0 }), new MaxEval(
-				Integer.MAX_VALUE), new MaxIter(Integer.MAX_VALUE));
+				this.initialPoint), new MaxEval(Integer.MAX_VALUE),
+				new MaxIter(Integer.MAX_VALUE));
+		this.initialPoint = result.getPoint();
 		this.coeffs = point2coeffs(result.getPoint());
 	}
 

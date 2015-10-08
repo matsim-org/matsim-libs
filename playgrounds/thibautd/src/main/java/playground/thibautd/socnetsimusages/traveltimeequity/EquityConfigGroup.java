@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Set;
@@ -27,8 +28,9 @@ import java.util.Set;
  */
 public class EquityConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "equityScoring";
+	private static final Logger log = Logger.getLogger(EquityConfigGroup.class);
 
-	private double betaStandardDev = 1;
+	private double betaStandardDev = -1;
 	// or not? can come form joint scoring...
 	//private Set<String> activityTypes;
 	//private boolean importActivityTypesFromScoring;
@@ -44,6 +46,10 @@ public class EquityConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "betaStandardDev" )
 	public void setBetaStandardDev(double betaStandardDev) {
+		if ( betaStandardDev > 0 ) {
+			log.warn( "setting betaStandardDev to "+betaStandardDev );
+			log.warn( "positive values mean people will MAXIMISE inequity!");
+		}
 		this.betaStandardDev = betaStandardDev;
 	}
 }

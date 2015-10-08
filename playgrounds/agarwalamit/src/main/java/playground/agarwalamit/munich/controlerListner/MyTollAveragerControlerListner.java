@@ -19,6 +19,7 @@
 package playground.agarwalamit.munich.controlerListner;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,10 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 			pId2Tolls.put(personId, 0.0);
 		}
 
-		String outputFile = controler.getControlerIO().getOutputPath()+"/analysis/simpleAverageToll.txt";
+		String outputDir = controler.getControlerIO().getOutputPath()+"/analysis/";
+		if ( ! new File(outputDir).exists() ) new File(outputDir).mkdirs();
+		
+		String outputFile = outputDir+"/simpleAverageToll.txt";
 		this.writer =IOUtils.getBufferedWriter(outputFile);
 		try {
 			this.writer.write("personId \t  averageToll \n");

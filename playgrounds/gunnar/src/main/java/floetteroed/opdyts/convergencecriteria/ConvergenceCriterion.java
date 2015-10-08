@@ -56,5 +56,7 @@ public interface ConvergenceCriterion {
 	 *         function value of the most recently evaluated TransitionSequence
 	 */
 	public Double getFinalObjectiveFunctionValue();
+	
+	public void reset();
 
 }

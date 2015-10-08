@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
@@ -48,7 +47,7 @@ class TunnelMain {
 		final Random rnd = new Random();
 
 		final TunnelStateFactory stateFactory = new TunnelStateFactory(rnd);
-		final ObjectiveFunction<TunnelState> objectiveFunction = new TunnelObjectiveFunction();
+		final TunnelObjectiveFunction objectiveFunction = new TunnelObjectiveFunction();
 
 		// CREATE CANDIDATE DECISION VARIABLES
 
@@ -124,17 +123,17 @@ class TunnelMain {
 		// final double convergenceNoiseVarianceScale = 0.01;
 		final double maximumRelativeGap = 0.05;
 
-		final MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration> predictor = new MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration>(
-				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale,
-				stateFactory, 5, maximumRelativeGap);
-		predictor.setStandardLogFileName("tunnel-log.txt");
-		predictor.setMemory(1);
-		predictor.setBinSize_s(15 * 60);
-		predictor.setBinCnt(24 * 4);
-
-		controler.addControlerListener(predictor);
-		controler.run();
+//		final MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration> predictor = new MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration>(
+//				decisionVariables, objectiveFunction,
+//				// convergenceNoiseVarianceScale,
+//				stateFactory, 5, maximumRelativeGap);
+//		predictor.setStandardLogFileName("tunnel-log.txt");
+//		predictor.setMemory(1);
+//		predictor.setBinSize_s(15 * 60);
+//		predictor.setBinCnt(24 * 4);
+//
+//		controler.addControlerListener(predictor);
+//		controler.run();
 
 		System.out.println("... DONE.");
 	}

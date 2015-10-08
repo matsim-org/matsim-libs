@@ -21,20 +21,15 @@
 
 package org.matsim.contrib.evacuation.control;
 
-import java.awt.Color;
-import java.awt.Polygon;
+import org.matsim.contrib.evacuation.model.Constants;
+import org.matsim.contrib.evacuation.model.shape.*;
+import org.matsim.contrib.evacuation.model.shape.Shape;
+import org.matsim.contrib.evacuation.model.shape.Shape.DrawMode;
+
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-
-import org.matsim.contrib.evacuation.model.Constants;
-import org.matsim.contrib.evacuation.model.shape.BoxShape;
-import org.matsim.contrib.evacuation.model.shape.CircleShape;
-import org.matsim.contrib.evacuation.model.shape.LineShape;
-import org.matsim.contrib.evacuation.model.shape.PolygonShape;
-import org.matsim.contrib.evacuation.model.shape.Shape;
-import org.matsim.contrib.evacuation.model.shape.ShapeStyle;
-import org.matsim.contrib.evacuation.model.shape.Shape.DrawMode;
 
 /**
  * helper class for creating standard shapes
@@ -185,23 +180,5 @@ public class ShapeFactory
 		
 		return hoverLine;
 	}
-	
-	public static BoxShape getBusStopShape(String linkID, int shapeRendererId, Point2D pos)
-	{
-		
-		BoxShape busStop = new BoxShape(shapeRendererId, pos);
-		busStop.setId(Constants.ID_BUSSTOP_PREFIX + linkID);
-		busStop.setImage(Constants.IMG_BUSSTOP);
-		busStop.setFixedSize(80,40);
-		busStop.setOffset(0,-40);
-		
-		//set style
-		ShapeStyle style = new ShapeStyle(Color.ORANGE, Color.ORANGE, 4f, DrawMode.IMAGE_FILL);
-		busStop.setStyle(style);
-		
-		return busStop;
-	}
 
-
-	
 }

@@ -30,20 +30,13 @@ public class OneWayCarsharingRoutingModule implements RoutingModule{
 			Facility toFacility, double departureTime, Person person) {
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
-		final Leg startWalkLeg = new LegImpl( "walk_ow_sb" );
-		GenericRouteImpl startWalkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		startWalkLeg.setRoute(startWalkRoute);
-		trip.add( startWalkLeg );
+		
 		
 		final Leg csLeg = new LegImpl( "onewaycarsharing" );
 		LinkNetworkRouteImpl csRoute = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		csLeg.setRoute(csRoute);
 		trip.add( csLeg );	
-		
-		final Leg endWalkLeg = new LegImpl( "walk_ow_sb" );
-		GenericRouteImpl endWalkRoute = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		endWalkLeg.setRoute(endWalkRoute);
-		trip.add( endWalkLeg );
+	
 		
 		return trip;
 	}

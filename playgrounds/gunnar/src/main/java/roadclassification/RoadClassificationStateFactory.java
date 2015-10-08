@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Provider;
+import floetteroed.opdyts.DecisionVariable;
+import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.analysis.VolumesAnalyzer;
@@ -21,7 +23,7 @@ import floetteroed.utilities.math.Vector;
  */
 class RoadClassificationStateFactory
 		implements
-		MATSimStateFactory<RoadClassificationState, RoadClassificationDecisionVariable> {
+		MATSimStateFactory {
 
 	// -------------------- MEMBERS --------------------
 
@@ -40,9 +42,7 @@ class RoadClassificationStateFactory
 	// --------------- IMPLEMENTATION OF MATSimStateFactory ---------------
 
 	@Override
-	public RoadClassificationState newState(final Population population,
-			final Vector stateVector,
-			final RoadClassificationDecisionVariable decisionVariable) {
+	public MATSimState newState(Population population, Vector stateVector, DecisionVariable decisionVariable) {
 		final Map<Id<Link>, int[]> linkId2simulatedCounts = new LinkedHashMap<Id<Link>, int[]>();
 		for (Id<Link> linkId : this.relevantLinkIds) {
 			linkId2simulatedCounts.put(linkId,
