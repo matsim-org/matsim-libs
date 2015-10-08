@@ -64,7 +64,7 @@ public class GridFromShape {
 		ReferencedEnvelope e = this.r.getBounds();
 		for (double y = e.getMaxY(); y > e.getMinY(); y -= 0.4) {
 			for (double x = e.getMinX(); x < e.getMaxX(); x += 0.4) {
-				Cell c = this.qt.get(x, y);
+				Cell c = this.qt.getClosest(x, y);
 				br.append(c.type+",");
 			}
 			br.append('\n');
@@ -88,12 +88,12 @@ public class GridFromShape {
 					for (double range = incr; range < l; range+=incr) {
 						double x = prev.x + range*dx;
 						double y = prev.y + range*dy;
-						Cell cell = this.qt.get(x, y);
+						Cell cell = this.qt.getClosest(x, y);
 						cell.type = -1;
 					}
 					
 				}
-				Cell cell = this.qt.get(c.x, c.y);
+				Cell cell = this.qt.getClosest(c.x, c.y);
 				cell.type = -1;
 				prev = c;
 			}

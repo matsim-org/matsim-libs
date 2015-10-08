@@ -79,7 +79,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 		SortedSet<OpeningTime> closestShopOpentimes = null;
-		ActivityFacilityImpl closestShop = (ActivityFacilityImpl) this.shopQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());		
+		ActivityFacilityImpl closestShop = (ActivityFacilityImpl) this.shopQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) closestShop.getActivityOptions().get("shop");
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();

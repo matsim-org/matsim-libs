@@ -197,7 +197,7 @@ public class ExtractAllStudyAreaActivities {
 			for(DigicoreChain chain : vehicle.getChains()){
 				for(DigicoreActivity act : chain.getAllActivities()){
 					Coord actCoord = act.getCoord();
-					Coord closest = qt.get(actCoord.getX(), actCoord.getY());
+					Coord closest = qt.getClosest(actCoord.getX(), actCoord.getY());
 					double dist = CoordUtils.calcDistance(actCoord, closest);
 					if(dist <= this.width){
 						list.add(actCoord);

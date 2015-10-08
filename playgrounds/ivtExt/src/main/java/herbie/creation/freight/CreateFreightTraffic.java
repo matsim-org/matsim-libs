@@ -351,7 +351,7 @@ public class CreateFreightTraffic {
 	 */
 	private ActivityFacility getRandomFacilityFromZone(Zone zone) {
 		Collection<ActivityFacility> candidates = 
-			this.facilityTree.get(zone.getCentroidCoord().getX(), zone.getCentroidCoord().getY(), this.radius);
+			this.facilityTree.getDisk(zone.getCentroidCoord().getX(), zone.getCentroidCoord().getY(), this.radius);
 		
 		Collections.shuffle((List<?>) candidates);
 		ActivityFacility facility = candidates.iterator().next();

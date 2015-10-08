@@ -62,7 +62,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
       String linkId = this.first.get(i);
       //double scoreSum = 0.0D;
         LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
       /*for (PersonPrimaryActivity ppa : primaryActivities)
@@ -107,7 +107,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 
           LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	      
-	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	      int numberShops = facilities.size();
 	      
 	      if (numberShops == 1 || numberShops == 0)

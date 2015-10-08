@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -72,11 +71,11 @@ public class MaxProfitWithLandPrices extends RetailerModelImpl
       Collection<PersonPrimaryActivity> primaryActivities;
       if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
     	  
-	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
       }
       else
-	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
       
       scoreSum = primaryActivities.size();
@@ -102,11 +101,11 @@ public class MaxProfitWithLandPrices extends RetailerModelImpl
           Coord coord = new Coord(centerX, centerY);
 	      Collection<ActivityFacility> facilities;
 	      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
-		      facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+		      facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
 	      }
 	      else {	    	  
-	    	  facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
+	    	  facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 	      }
 	        
 	      landPrice = CoordUtils.calcDistance(link.getCoord(), coord) * (-0.00001) + 1.0;

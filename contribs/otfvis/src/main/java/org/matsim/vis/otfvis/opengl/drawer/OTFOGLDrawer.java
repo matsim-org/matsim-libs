@@ -112,19 +112,25 @@ public class OTFOGLDrawer implements GLEventListener {
 	private class VisGUIMouseHandler extends MouseInputAdapter {
 
 		@Override
-		public void mouseDragged(MouseEvent e) {
+		public void mouseDragged(MouseEvent ee) {
+			int xx = 2*ee.getX();
+			int yy = 2*ee.getY();
+			// yyyyyy For me, the mouse coordinates are different from the screen coordinates.  In past times, resizing the window 
+			// fixed the problem, but that does no longer work.  Now multiplying things by two (as above) seems to fix the problem
+			// ... but I have no idea why.  Also, everything (e.g. agent sizes) seem by a factor of two smaller.  kai, oct'15
+			
 			if (button == 1 || button == 4) {
 				Point3f newRectStart = getOGLPos(start.x, start.y);
-				Point3f newRectEnd = getOGLPos(e.getX(), e.getY());
+				Point3f newRectEnd = getOGLPos( xx, yy );
 				currentRect = new Rectangle(new Point((int)newRectStart.getX(), (int)newRectStart.getY()));
 				currentRect.add(newRectEnd.getX(), newRectEnd.getY());
 				// This only redraws GUI Elements, no need to invalidate(), just redraw()
 				redraw();
 			} else if (button == 2) {
-				int deltax = start.x - e.getX();
-				int deltay = start.y - e.getY();
-				start.x = e.getX();
-				start.y = e.getY();
+				int deltax = start.x - xx ;
+				int deltay = start.y - yy ;
+				start.x = xx ;
+				start.y = yy ;
 				Point3f center = getOGLPos(viewport[2]/2, viewport[3]/2);
 				Point3f excenter = getOGLPos(viewport[2]/2+deltax, viewport[3]/2+deltay);
 				float glDeltaX = excenter.x - center.x;
@@ -135,10 +141,14 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
-			int x = e.getX();
-			int y = e.getY();
-			int mbutton = e.getButton();
+		public void mousePressed(MouseEvent ee) {
+			int x = 2*ee.getX();
+			int y = 2*ee.getY();
+			// yyyyyy For me, the mouse coordinates are different from the screen coordinates.  In past times, resizing the window 
+			// fixed the problem, but that does no longer work.  Now multiplying things by two (as above) seems to fix the problem
+			// ... but I have no idea why.  Also, everything (e.g. agent sizes) seem by a factor of two smaller.  kai, oct'15
+			
+			int mbutton = ee.getButton();
 			String function = "";
 			switch (mbutton) {
 			case 1:
@@ -170,17 +180,30 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
+		public void mouseReleased(MouseEvent ee) {
+			
 			// update screen one last time
-			mouseDragged(e);
+			mouseDragged(ee);
+
+			int xx = 2*ee.getX();
+			int yy = 2*ee.getY();
+			// yyyyyy For me, the mouse coordinates are different from the screen coordinates.  In past times, resizing the window 
+			// fixed the problem, but that does no longer work.  Now multiplying things by two (as above) seems to fix the problem
+			// ... but I have no idea why.  Also, everything (e.g. agent sizes) seem by a factor of two smaller.  kai, oct'15
+
 			Rectangle screenRect = new Rectangle(start);
-			screenRect.add(e.getPoint());
+			//			screenRect.add(ee.getPoint());
+			screenRect.add(new Point(xx,yy) );
+			// yyyyyy
+
 			if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
+				// (I think this is what distinguishes a click from a rectangle. kai, oct'15)
+				
 				if (button == 1 || button == 4) {
 					if (button == 1) {
-						int deltax = Math.abs(start.x - e.getX());
-						int deltay = Math.abs(start.y - e.getY());
-						double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
+						int deltax = Math.abs(start.x - xx);
+						int deltay = Math.abs(start.y - yy);
+						double ratio =( (start.y - yy) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
 						Rectangle2D scaledNewViewBounds = quadTreeRectToRectangle2D(viewBounds.scale(ratio - 1, ratio - 1));
 						Rectangle2D scaledAndTranslatedNewViewBounds = new Rectangle2D.Double(scaledNewViewBounds.getX() + (currentRect.getCenterX() - viewBounds.centerX), scaledNewViewBounds.getY() + (currentRect.getCenterY() - viewBounds.centerY), scaledNewViewBounds.getWidth(), scaledNewViewBounds.getHeight());
 						Animator viewBoundsAnimator = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "viewBounds", quadTreeRectToRectangle2D(viewBounds), scaledAndTranslatedNewViewBounds);
@@ -198,7 +221,7 @@ public class OTFOGLDrawer implements GLEventListener {
 			} else {
 				Point3f newcameraStart = getOGLPos(start.x, start.y);
 				Point2D.Double point = new Point2D.Double(newcameraStart.getX(), newcameraStart.getY());
-				handleClick(point, button, e);
+				handleClick(point, button, ee);
 				currentRect = null;
 			}
 			button = 0;
@@ -346,28 +369,28 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
-		Component canvas;
-        boolean isMac = System.getProperty("os.name").equals("Mac OS X");
-        boolean isJava7 = System.getProperty("java.version").startsWith("1.7");
+		Component canvas1;
+		boolean isMac = System.getProperty("os.name").equals("Mac OS X");
+		boolean isJava7 = System.getProperty("java.version").startsWith("1.7");
 		if (otfVisConfig.isMapOverlayMode() || (isMac && isJava7)) {
-            // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
-            // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
-            // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
-            // On Java 7 on Mac, I get strange behavior (wrong layout on startup with no obvious fix), so I
-            // also use the "more compatible" version, which works.
-            GLJPanel glJPanel = new GLJPanel(caps);
-            glJPanel.addGLEventListener(drawer);
-            if (otfVisConfig.isMapOverlayMode()) {
-                glJPanel.setOpaque(false); // So that the map shines through
-            }
-			canvas = glJPanel;
+			// A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
+			// The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
+			// We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
+			// On Java 7 on Mac, I get strange behavior (wrong layout on startup with no obvious fix), so I
+			// also use the "more compatible" version, which works.
+			GLJPanel glJPanel = new GLJPanel(caps);
+			glJPanel.addGLEventListener(drawer);
+			if (otfVisConfig.isMapOverlayMode()) {
+				glJPanel.setOpaque(false); // So that the map shines through
+			}
+			canvas1 = glJPanel;
 		} else {
 			// This is the default JOGL component. JOGL doc recommends using it if you do not need a GLJPanel.
 			GLCanvas glCanvas = new GLCanvas(caps);
 			glCanvas.addGLEventListener(drawer);
-			canvas = glCanvas;
+			canvas1 = glCanvas;
 		}
-		return canvas;
+		return canvas1;
 	}
 
 	@Override
@@ -554,7 +577,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		return viewBounds;
 	}
 
-	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
+	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent ee) {
 		if(mouseButton == 4 ){
 			this.current = null;
 
@@ -603,7 +626,8 @@ public class OTFOGLDrawer implements GLEventListener {
 					}
 				}
 			} );
-			popmen.show(this.canvas, e.getX(), e.getY());
+			popmen.show(this.canvas, 2*ee.getX(), 2*ee.getY());
+			// yyyyyy 
 			return;
 		}
 		if(this.queryHandler != null) this.queryHandler.handleClick(point,mouseButton);

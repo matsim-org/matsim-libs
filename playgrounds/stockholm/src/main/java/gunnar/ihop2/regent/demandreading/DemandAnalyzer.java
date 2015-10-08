@@ -12,7 +12,7 @@ public class DemandAnalyzer {
 	public DemandAnalyzer() {
 	}
 
-	static void run(final String demandFile) {
+	public static void run(final String demandFile) {
 
 		final ObjectAttributes personAttributes = new ObjectAttributes();
 		(new ObjectAttributesXmlReader(personAttributes)).parse(demandFile);

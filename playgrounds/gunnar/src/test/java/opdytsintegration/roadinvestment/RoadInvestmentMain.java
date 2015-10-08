@@ -1,6 +1,5 @@
 package opdytsintegration.roadinvestment;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,12 +10,22 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
+import opdytsintegration.MATSimSimulator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.Simulator;
+import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 
 /**
  * 
@@ -25,38 +34,28 @@ import org.matsim.core.utils.io.IOUtils;
  */
 class RoadInvestmentMain {
 
-	static void solveFictitiousProblem() {
+	static void solveFictitiousProblem() throws FileNotFoundException {
 
 		System.out.println("STARTED ...");
 
-		final Controler controler = new Controler(
-				"/Nobackup/Profilen/workspace/MATSim/examples/equil/config.xml");
-		controler.getConfig().getModule("controler")
-				.addParam("lastIteration", "100");
-		controler
-				.getConfig()
-				.getModule("global")
-				.addParam("randomSeed",
-						Long.toString((new Random()).nextLong()));
+		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
+				0.0, 0.0, 0.0, 0.95, 1.0);
 
-		final File out = new File("output/equil");
-		if (out.exists()) {
-			IOUtils.deleteDirectory(out);
-		}
 
-		Map<Link, Double> link2freespeed = new LinkedHashMap<Link, Double>();
-		Map<Link, Double> link2capacity = new LinkedHashMap<Link, Double>();
-		for (Link link : controler.getScenario().getNetwork().getLinks()
-				.values()) {
-			link2freespeed.put(link, link.getFreespeed());
-			link2capacity.put(link, link.getCapacity());
-		}
-		link2freespeed = Collections.unmodifiableMap(link2freespeed);
-		link2capacity = Collections.unmodifiableMap(link2capacity);
+		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
+		config.controler()
+				.setOverwriteFileSetting(
+						OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(100);
+		config.global().setRandomSeed(new Random().nextLong());
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		final Map<Link, Double> link2freespeed = Collections.unmodifiableMap(link2freespeed(scenario));
+		final Map<Link, Double> link2capacity = Collections.unmodifiableMap(link2capacity(scenario));
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
-		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
+		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
+		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<>();
 
 		// 9 DECISION VARIABLES
 
@@ -197,32 +196,59 @@ class RoadInvestmentMain {
 		decisionVariables.add(new RoadInvestmentDecisionVariable(1.0, 1.0,
 				link2freespeed, link2capacity));
 
-		List<RoadInvestmentDecisionVariable> shuffle = new ArrayList<RoadInvestmentDecisionVariable>(
+		final List<RoadInvestmentDecisionVariable> shuffle = new ArrayList<>(
 				decisionVariables);
 		Collections.shuffle(shuffle);
 		decisionVariables.clear();
 		decisionVariables.addAll(shuffle);
 
-		// final double convergenceNoiseVarianceScale = 0.001;
-		final double maximumRelativeGap = 0.05;
+		final int minimumAverageIterations = 5;
+		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
+				1e-1, 1e-1, minimumAverageIterations);
 
-		final MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable>(
-				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale,
-				stateFactory, 5, maximumRelativeGap);
+		Simulator system = new MATSimSimulator(decisionVariables, stateFactory, scenario);
+		DecisionVariableRandomizer randomizer = new DecisionVariableRandomizer() {
+			@Override
+			public DecisionVariable newRandomDecisionVariable() {
+				return new RoadInvestmentDecisionVariable(MatsimRandom.getRandom().nextDouble(), MatsimRandom.getRandom().nextDouble(),
+						link2freespeed, link2capacity);
+			}
 
-		predictor.setStandardLogFileName("road-investment-equil.txt");
-		predictor.setMemory(1);
-		predictor.setBinSize_s(10 * 60);
-		predictor.setStartBin(6 * 5);
-		predictor.setBinCnt(6 * 20);
-		controler.addControlerListener(predictor);
-		controler.run();
-
-		// predictor.testCrossValidation();
+			@Override
+			public DecisionVariable newRandomVariation(DecisionVariable decisionVariable) {
+				return newRandomDecisionVariable();
+			}
+		};
+		int maxMemoryLength = 100;
+		boolean keepBestSolution = true;
+		boolean interpolate = false;
+		int maxIterations = 100;
+		int maxTransitions = 100;
+		int populationSize = 100;
+		RandomSearch randomSearch = new RandomSearch(system, randomizer, convergenceCriterion, selfTuner, maxIterations, maxTransitions, populationSize,
+				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+		randomSearch.run();
 
 		System.out.println("... DONE.");
 
+	}
+
+	private static Map<Link, Double> link2capacity(Scenario scenario) {
+		Map<Link, Double> link2capacity = new LinkedHashMap<>();
+		for (Link link : scenario.getNetwork().getLinks()
+				.values()) {
+			link2capacity.put(link, link.getCapacity());
+		}
+		return link2capacity;
+	}
+
+	private static Map<Link, Double> link2freespeed(Scenario scenario) {
+		Map<Link, Double> link2freespeed = new LinkedHashMap<>();
+		for (Link link : scenario.getNetwork().getLinks()
+				.values()) {
+			link2freespeed.put(link, link.getFreespeed());
+		}
+		return link2freespeed;
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -230,4 +256,5 @@ class RoadInvestmentMain {
 		solveFictitiousProblem();
 
 	}
+
 }

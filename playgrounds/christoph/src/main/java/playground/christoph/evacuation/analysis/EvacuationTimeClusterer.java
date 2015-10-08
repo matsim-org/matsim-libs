@@ -234,7 +234,7 @@ public class EvacuationTimeClusterer {
 			double x = sumX / sumPersons;
 			double y = sumY / sumPersons;
 			
-			return quadTree.get(x, y);
+			return quadTree.getClosest(x, y);
 		}
 
 		@Override

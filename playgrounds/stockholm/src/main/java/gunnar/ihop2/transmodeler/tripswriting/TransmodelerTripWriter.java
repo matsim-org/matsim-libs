@@ -1,6 +1,8 @@
 package gunnar.ihop2.transmodeler.tripswriting;
 
+import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMLINKDIRPREFIX_ATTR;
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMPATHID_ATTR;
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
 import gunnar.ihop2.utils.TabularFileWriter;
 
 import java.io.FileNotFoundException;
@@ -13,8 +15,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -57,16 +57,13 @@ public class TransmodelerTripWriter {
 
 	private final Population population;
 
-	private final Network network;
-
 	private final ObjectAttributes linkAttributes;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public TransmodelerTripWriter(final Population population,
-			final Network network, final ObjectAttributes linkAttributes) {
+			final ObjectAttributes linkAttributes) {
 		this.population = population;
-		this.network = network;
 		this.linkAttributes = linkAttributes;
 	}
 
@@ -101,16 +98,37 @@ public class TransmodelerTripWriter {
 							if (route != null) {
 
 								// Include the from-link, exclude the to-link.
-								final Id<Node> fromNodeId = this.network
-										.getLinks().get(route.getStartLinkId())
-										.getFromNode().getId();
-								final Id<Node> toNodeId = this.network
-										.getLinks().get(route.getEndLinkId())
-										.getFromNode().getId();
+
+								// final Id<Node> fromNodeId = this.network
+								// .getLinks().get(route.getStartLinkId())
+								// .getFromNode().getId();
+								// final Id<Node> toNodeId = this.network
+								// .getLinks().get(route.getEndLinkId())
+								// .getFromNode().getId();
+								final String fromNodeTmId = (String) this.linkAttributes
+										.getAttribute(
+												route.getStartLinkId()
+														.toString(),
+												Transmodeler2MATSimNetwork.TMFROMNODEID_ATTR);
+								final String toNodeTmId = (String) this.linkAttributes
+										.getAttribute(
+												route.getEndLinkId().toString(),
+												Transmodeler2MATSimNetwork.TMFROMNODEID_ATTR);
+								System.out.print("ROUTE fromNode = "
+										+ fromNodeTmId + ", toNode = "
+										+ toNodeTmId);
+
 								final List<Id<Link>> linkIds = new ArrayList<Id<Link>>(
 										1 + route.getLinkIds().size());
 								linkIds.add(route.getStartLinkId());
-								linkIds.addAll(route.getLinkIds());
+								// linkIds.addAll(route.getLinkIds());
+								for (Id<Link> linkId : route.getLinkIds()) {
+									if (this.linkAttributes.getAttribute(
+											linkId.toString(), TMPATHID_ATTR) != null) {
+										linkIds.add(linkId);
+									}
+								}
+								System.out.println(", links = " + linkIds);
 
 								/*
 								 * Avoid double-storing identical paths.
@@ -139,6 +157,10 @@ public class TransmodelerTripWriter {
 										pathWriter.print(this.linkAttributes
 												.getAttribute(
 														linkId.toString(),
+														TMLINKDIRPREFIX_ATTR));
+										pathWriter.print(this.linkAttributes
+												.getAttribute(
+														linkId.toString(),
 														TMPATHID_ATTR));
 										pathWriter.print(" ");
 									}
@@ -146,9 +168,10 @@ public class TransmodelerTripWriter {
 								}
 
 								// Write out the trip.
+
 								tripWriter.setValue(ID, ++tripCnt);
-								tripWriter.setValue(OriID, fromNodeId);
-								tripWriter.setValue(DesID, toNodeId);
+								tripWriter.setValue(OriID, fromNodeTmId);
+								tripWriter.setValue(DesID, toNodeTmId);
 								tripWriter.setValue(OriType, Node);
 								tripWriter.setValue(DesType, Node);
 								tripWriter.setValue(Class, PC1);
@@ -184,12 +207,12 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data/transmodeler/network.xml";
-		final String plansFileName = "./data/saleem/10.plans.xml.gz";
-		final String linkAttributesFileName = "./data/transmodeler/linkAttributes.xml";
+		final String networkFileName = "./data/run/network.xml";
+		final String plansFileName = "./data/run/output/ITERS/it.0/0.plans.xml.gz";
+		final String linkAttributesFileName = "./data/run/linkAttributes.xml";
 
-		final String pathFileName = "./data/saleem/paths.csv";
-		final String tripFileName = "./data/saleem/trips.csv";
+		final String pathFileName = "./data/run/paths.csv";
+		final String tripFileName = "./data/run/trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
@@ -202,7 +225,7 @@ public class TransmodelerTripWriter {
 		reader.parse(linkAttributesFileName);
 
 		final TransmodelerTripWriter tripWriter = new TransmodelerTripWriter(
-				scenario.getPopulation(), scenario.getNetwork(), linkAttributes);
+				scenario.getPopulation(), linkAttributes);
 
 		tripWriter.writeTrips(pathFileName, tripFileName);
 

@@ -121,7 +121,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalysisModule{
 		// count totals
 		Map<Id, Double> totals = new HashMap<Id, Double>();
 		Double total;
-		for(Count c: counts.getCounts().values()){
+		for(Count<Link> c: counts.getCounts().values()){
 			total = new Double(0.);
 			for(Volume v: c.getVolumes().values()){
 				total += v.getValue();

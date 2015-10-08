@@ -19,7 +19,6 @@ import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.DrawAllActivitiesWithParkingsCloseBy;
-import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParkingsIndoorWriter_v0;
 
 /*
  * 
@@ -56,10 +55,10 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl activity = (ActivityImpl) pe;
 					Coord actCoord = activity.getCoord();
-					PParking closestParkingZHCity = parkingsQuadTreeZHCity.get(actCoord.getX(), actCoord.getY());
+					PParking closestParkingZHCity = parkingsQuadTreeZHCity.getClosest(actCoord.getX(), actCoord.getY());
 
 					if (isActivityOutsideOfCity(actCoord, closestParkingZHCity)) {
-						PParking closestParkingOutsideZHCity = parkingsQuadTreeOutsideCityZH.get(actCoord.getX(), actCoord.getY());
+						PParking closestParkingOutsideZHCity = parkingsQuadTreeOutsideCityZH.getClosest(actCoord.getX(), actCoord.getY());
 						if (parkingsQuadTreeOutsideCityZH.size() < 1) {
 							createPublicParkingAtActivityLocation(parkingsQuadTreeOutsideCityZH, activity);
 						} else if (GeneralLib.getDistance(actCoord, closestParkingOutsideZHCity.getCoord()) > 200) {

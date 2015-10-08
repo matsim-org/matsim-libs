@@ -146,7 +146,8 @@ public class NetworkChangeEvent {
 	/**
 	 * 
 	 * @param flowCapacityChange
-	 *            the flow capacity changes.
+	 *            the flow capacity changes in veh/s (!!), i.e. the unit which LinkImpl wants,
+	 *            not the unit in network.xml
 	 */
 	public void setFlowCapacityChange(ChangeValue flowCapacityChange) {
 		this.flowCapacityChange = flowCapacityChange;

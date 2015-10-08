@@ -55,6 +55,10 @@ public class SoftCache<K,V> {
 
 	private final QueueCleaner<K, V> cleaner = new QueueCleaner<K, V>();
 
+	private long requests = 0;
+	private long hits = 0;
+	private long nextTrace = 1;
+
 	/**
 	 * Initializes an instance which does not clone objects when they are added
 	 * or returned. This should be used only when <tt>V</tt> objects are immutable
@@ -83,6 +87,7 @@ public class SoftCache<K,V> {
 	}
 
 	public V get( final K key ) {
+		requests++;
 		final SoftEntry<K, V> sr = cleaner.softRefsMap.get( key );
 		if ( sr == null ) return null;
 
@@ -93,6 +98,12 @@ public class SoftCache<K,V> {
 			return null;
 		}
 
+		hits++;
+
+		if ( log.isTraceEnabled() && hits == nextTrace ) {
+			nextTrace *= 2;
+			log.trace( "hits / requests: "+hits+" / "+requests+" ("+( (100d * hits) / requests)+"%)");
+		}
 		return cloner.clone( value );
 	}
 
@@ -122,7 +133,7 @@ public class SoftCache<K,V> {
 	}
 
 
-	public static interface Cloner<T> {
+	public interface Cloner<T> {
 		public T clone( T cloned );
 	}
 

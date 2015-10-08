@@ -22,6 +22,10 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.ConvergenceChecker;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -41,10 +45,14 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 /**
  * @author thibautd
  */
+@Singleton
 public class ModelIterator {
 	private static final Logger log =
 		Logger.getLogger(ModelIterator.class);
 
+	// get the provider to be sure all preprocessed data is there when getting value
+	// not the nicest design...
+	private final Provider<Thresholds> initialValue;
 
 	private final double targetClustering;
 	private final double targetDegree;
@@ -56,12 +64,22 @@ public class ModelIterator {
 
 	private final double powellMinAbsoluteChange;
 	private final double powellMinRelativeChange;
-	
-	private final int nThreads = 4;
+
+	private final int nThreads;
 
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
-	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
+	private final ModelRunner runner;
+
+	@Inject
+	public ModelIterator(
+			final SocialNetworkGenerationConfigGroup config,
+			final ModelRunner runner,
+			@Named( "initialValue" )
+			final Provider<Thresholds> initialValue) {
+		this.nThreads = config.getNThreads();
+		this.initialValue = initialValue;
+		this.runner = runner;
 		this.targetClustering = config.getTargetClustering();
 		this.targetDegree = config.getTargetDegree();
 
@@ -89,9 +107,8 @@ public class ModelIterator {
 	}
 
 
-	public SocialNetwork iterateModelToTarget(
-			final ModelRunner runner,
-			final Thresholds initialThresholds ) {
+	public SocialNetwork iterateModelToTarget() {
+		final Thresholds initialThresholds = initialValue.get();
 		final MultivariateOptimizer optimizer =
 			new CMAESOptimizer(
 					maxIterations,
@@ -146,7 +163,7 @@ public class ModelIterator {
 		return Math.abs( targetDegree -  thresholds.getResultingAverageDegree() );
 	}
 
-	public static interface EvolutionListener {
+	public interface EvolutionListener {
 		public void handleMove( Thresholds m , double fitness );
 	}
 

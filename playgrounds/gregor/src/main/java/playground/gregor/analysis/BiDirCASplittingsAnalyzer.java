@@ -74,7 +74,7 @@ public class BiDirCASplittingsAnalyzer {
 				
 				double rho = rho1/r;
 				double rho2 = (1-r)*rho;
-				Measurement m = qt.get(rho1, rho2);
+				Measurement m = qt.getClosest(rho1, rho2);
 				
 				if (rho1 > 4 && m.q1 > 0.25) {
 					System.out.println("err");

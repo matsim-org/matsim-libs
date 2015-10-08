@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
@@ -113,7 +113,7 @@ public class RunRoadClassification {
 
 		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(
 				controler.getInjector().getProvider(VolumesAnalyzer.class), counts.getCounts().keySet());
-		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction(
+		final ObjectBasedObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
 		final Set<RoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();
 
@@ -383,18 +383,18 @@ public class RunRoadClassification {
 
 		// AND RUN THE ENTIRE THING
 
-		final double maximumRelativeGap = 0.05;
-		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
-				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale,
-				stateFactory, 5, maximumRelativeGap);
-		predictor.setStandardLogFileName("roadclassification-log.txt");
-		predictor.setMemory(1);
-		predictor.setBinSize_s(15 * 60);
-		predictor.setBinCnt(24 * 4);
-
-		controler.addControlerListener(predictor);
-		controler.run();
+//		final double maximumRelativeGap = 0.05;
+//		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
+//				decisionVariables, objectiveFunction,
+//				// convergenceNoiseVarianceScale,
+//				stateFactory, 5, maximumRelativeGap);
+//		predictor.setStandardLogFileName("roadclassification-log.txt");
+//		predictor.setMemory(1);
+//		predictor.setBinSize_s(15 * 60);
+//		predictor.setBinCnt(24 * 4);
+//
+//		controler.addControlerListener(predictor);
+//		controler.run();
 
 		System.out.println("... DONE.");
 	}

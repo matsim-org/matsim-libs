@@ -320,7 +320,7 @@ public class TwoDTree<T extends TwoDObject> {
 		long start3 = System.nanoTime();
 		for (int i = 0; i < 100; i++) {
 			for (Envelope ee : ranges) {
-				quadTree.get(ee.getMinX(), ee.getMinY(), ee.getMaxX(), ee.getMaxY(), new ArrayList<TwoDObj>());
+				quadTree.getRectangle(ee.getMinX(), ee.getMinY(), ee.getMaxX(), ee.getMaxY(), new ArrayList<TwoDObj>());
 			}}
 		long stop3 = System.nanoTime();
 		System.out.println("quad-tree range search took: " + ((stop3-start3)/1000/1000.) + " ms");
@@ -335,7 +335,7 @@ public class TwoDTree<T extends TwoDObject> {
 
 		for (Envelope ee: ranges) {
 			Set<TwoDObj> q = new HashSet<TwoDTree.TwoDObj>();
-			quadTree.get(ee.getMinX(), ee.getMinY(), ee.getMaxX(), ee.getMaxY(), q);
+			quadTree.getRectangle(ee.getMinX(), ee.getMinY(), ee.getMaxX(), ee.getMaxY(), q);
 			List<TwoDObj> k = twoDTree.get(ee);
 			if (q.size() != k.size()) {
 				System.err.println("should not happen");

@@ -170,7 +170,7 @@ public class CreateCommutersFromElsewhere {
 		if(fromId.length() < 8 && !fromId.contains("A")){
 			
 			Coord c = Global.UTM32NtoGK4.transform(homeCoord);
-			Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+			Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 			homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToHome));
 			
 		}
@@ -204,7 +204,7 @@ public class CreateCommutersFromElsewhere {
 			}
 			else{
 				Coord c = Global.UTM32NtoGK4.transform(workCoord);
-				Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+				Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
 			}
 			
@@ -212,7 +212,7 @@ public class CreateCommutersFromElsewhere {
 		
 		if(workCoord == null){
 			Coord c = Global.UTM32NtoGK4.transform(workCoord);
-			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 			workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
 		}
 		

@@ -174,11 +174,11 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 					if (activity.getFacilityId() != null) {
 						Facility newFacility;
 						if (requiredModes.size() > 1) {
-							newFacility = this.facilityQuadTrees.get(this.allModes).get(activity.getCoord().getX(), activity.getCoord().getY());
+							newFacility = this.facilityQuadTrees.get(this.allModes).getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 						} else {
 							String[] modes = new String[1];
 							requiredModes.toArray(modes);
-							newFacility = this.facilityQuadTrees.get(modes[0]).get(activity.getCoord().getX(), activity.getCoord().getY());
+							newFacility = this.facilityQuadTrees.get(modes[0]).getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 						}
 							
 						if (newFacility != null) {
@@ -193,11 +193,11 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 					} else if (activity.getLinkId() != null) {
 						Link newLink;
 						if (requiredModes.size() > 1) {
-							newLink = this.linkQuadTrees.get(this.allModes).get(activity.getCoord().getX(), activity.getCoord().getY());
+							newLink = this.linkQuadTrees.get(this.allModes).getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 						} else {
 							String[] modes = new String[1];
 							requiredModes.toArray(modes);
-							newLink = this.linkQuadTrees.get(modes[0]).get(activity.getCoord().getX(), activity.getCoord().getY());
+							newLink = this.linkQuadTrees.get(modes[0]).getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 						}
 						
 						if (newLink != null) {

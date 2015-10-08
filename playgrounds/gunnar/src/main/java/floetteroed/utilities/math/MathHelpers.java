@@ -19,10 +19,10 @@
  */ 
 package floetteroed.utilities.math;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-
 
 /**
  * 
@@ -102,24 +102,23 @@ public class MathHelpers {
 		return result;
 	}
 
-	// public static double logOfFactorial(final int x) {
-	// double result = 0;
-	// for (int y = 2; y <= x; y++) {
-	// result += Math.log(y);
-	// }
-	// return result;
-	// }
+	// TODO NEW
+	public static <T> T draw(final Collection<T> collection, final Random rnd) {
+		final int index = rnd.nextInt(collection.size());
+		Iterator<T> it = collection.iterator();
+		for (int i = 0; i < index; i++) {
+			it.next();
+		}
+		return it.next();
+	}
 
-	// public static double logOfMultinomialCoefficient(final int... values) {
-	// double result = 0;
-	// int sum = 0;
-	// for (int k : values) {
-	// result -= logOfFactorial(k);
-	// sum += k;
-	// }
-	// result += logOfFactorial(sum);
-	// return result;
-	// }
+	// TODO NEW
+	public static <T> T drawAndRemove(final Collection<T> collection,
+			final Random rnd) {
+		final T result = draw(collection, rnd);
+		collection.remove(result);
+		return result;
+	}
 
 	public static double[] override(final double[] dest, final double[] source,
 			final boolean overrideWithZeros) {
@@ -174,7 +173,7 @@ public class MathHelpers {
 		}
 		return true;
 	}
-	
+
 	// TODO NEW
 	public static <E> E draw(final Map<E, Double> event2proba, final Random rnd) {
 		final double x = rnd.nextDouble();
@@ -206,6 +205,5 @@ public class MathHelpers {
 		}
 		return result;
 	}
-
 
 }

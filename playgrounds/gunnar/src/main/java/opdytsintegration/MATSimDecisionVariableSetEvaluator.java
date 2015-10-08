@@ -5,19 +5,19 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import optdyts.DecisionVariable;
-import optdyts.DecisionVariableSetEvaluator;
-import optdyts.ObjectiveFunction;
-import optdyts.SimulatorState;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -25,23 +25,15 @@ import floetteroed.utilities.math.Vector;
  * 
  * @author Gunnar Flötteröd
  *
- * @param <X>
- *            the simulator state type
- * @param <U>
- *            the decision variable type
- * 
- * @see SimulatorState
- * @see DecisionVariable
- * @see DecisionVariableSetEvaluator
  */
-public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U extends DecisionVariable>
-		implements StartupListener, IterationEndsListener {
+public class MATSimDecisionVariableSetEvaluator
+		implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	// -------------------- MEMBERS --------------------
 
-	private final DecisionVariableSetEvaluator<X, U> evaluator;
+	private final TrajectorySampler trajectorySampler;
 
-	private final MATSimStateFactory<X, U> stateFactory;
+	private final MATSimStateFactory stateFactory;
 
 	private int binSize_s = 3600;
 
@@ -61,24 +53,34 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 
 	private LinkedList<Vector> stateList = null;
 
+	private MATSimState finalState = null;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	/**
-	 * @see DecisionVariableSetEvaluator
 	 * @see MATSimStateFactory
 	 */
-	public MATSimDecisionVariableSetEvaluator(final Set<U> decisionVariables,
-			final ObjectiveFunction<X> objectiveFunction,
-			final MATSimStateFactory<X, U> stateFactory,
-			final int minimumAverageIterations,
-			final double maximumRelativeGap) {
-		this.evaluator = new DecisionVariableSetEvaluator<X, U>(
-				decisionVariables, objectiveFunction, minimumAverageIterations,
-				maximumRelativeGap);
+	public MATSimDecisionVariableSetEvaluator(
+			final TrajectorySampler trajectorySampler,
+			final Set<? extends DecisionVariable> decisionVariables,
+			// final ObjectBasedObjectiveFunction objectiveFunction,
+			// final ConvergenceCriterion convergenceCriterion,
+			final MATSimStateFactory stateFactory
+	// final double equilibriumGapWeight, final double uniformityGapWeight,
+	// final Random rnd
+	) {
+		// this.evaluator = new TrajectorySampler(
+		// decisionVariables, objectiveFunction, convergenceCriterion,
+		// rnd, equilibriumGapWeight, uniformityGapWeight);
+		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
+
+	public boolean foundSolution() {
+		return this.trajectorySampler.foundSolution();
+	}
 
 	/**
 	 * The vector representation of MATSim's instantaneous state omits some
@@ -117,9 +119,9 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	 * Where to write logging information.
 	 */
 	public void setStandardLogFileName(final String logFileName) {
-		this.evaluator.setStandardLogFileName(logFileName);
+		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * The time discretization (in seconds) according to which the simulated
 	 * conditions in MATSim affect the evaluation of a decision variable.
@@ -182,7 +184,7 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 						.getControler().getScenario().getNetwork());
 		event.getControler().getEvents().addHandler(this.volumesAnalyzer);
 
-		this.evaluator.initialize();
+		this.trajectorySampler.initialize();
 	}
 
 	@Override
@@ -224,22 +226,33 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 		}
 
 		{
-			/*
-			 * (3) Create a new summary state vector, either by averaging or by
-			 * concatenating past instantaneous state vectors.
-			 */
-			final Vector newSummaryStateVector;
-			if (this.averageMemory) {
-				// average state vectors
-				newSummaryStateVector = this.stateList.getFirst().copy();
-				for (int i = 1; i < this.memory; i++) {
-					newSummaryStateVector.add(this.stateList.get(i));
-				}
-				newSummaryStateVector.mult(1.0 / this.memory);
-			} else {
-				// concatenate state vectors
-				newSummaryStateVector = Vector.concat(this.stateList);
-			}
+			final MATSimState newState = createState(event.getControler().getScenario().getPopulation());
+			this.trajectorySampler.afterIteration(newState);
+		}
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		this.finalState = createState(event.getControler().getScenario().getPopulation());
+	}
+
+	private MATSimState createState(Population population) {
+    /*
+     * (3) Create a new summary state vector, either by averaging or by
+     * concatenating past instantaneous state vectors.
+     */
+		final Vector newSummaryStateVector;
+		if (this.averageMemory) {
+            // average state vectors
+            newSummaryStateVector = this.stateList.getFirst().copy();
+            for (int i = 1; i < this.memory; i++) {
+                newSummaryStateVector.add(this.stateList.get(i));
+            }
+            newSummaryStateVector.mult(1.0 / this.memory);
+        } else {
+            // concatenate state vectors
+            newSummaryStateVector = Vector.concat(this.stateList);
+        }
 
 			/*
 			 * (4) Extract the current MATSim state and inform the evaluator
@@ -247,10 +260,13 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 			 * of selecting a new trial decision variable and of implementing
 			 * that decision variable in the simulation.
 			 */
-			final X newState = this.stateFactory.newState(event.getControler()
-					.getScenario().getPopulation(), newSummaryStateVector,
-					this.evaluator.getCurrentDecisionVariable());
-			this.evaluator.afterIteration(newState);
-		}
+		return this.stateFactory.newState(population,
+                newSummaryStateVector,
+                this.trajectorySampler.getCurrentDecisionVariable());
 	}
+
+	public MATSimState getFinalState() {
+		return finalState;
+	}
+
 }

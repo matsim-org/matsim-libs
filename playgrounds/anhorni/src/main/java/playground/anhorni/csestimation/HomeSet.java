@@ -26,8 +26,8 @@ public class HomeSet {
 		Collection<Location> stores = new Vector<Location>();
 		while (storeCnt < 10) {
 			r += 0.1;
-			stores = shopQuadTree.get(person.getHomeLocation().getCoord().getX(),
-					person.getHomeLocation().getCoord().getY(), 
+			stores = shopQuadTree.getDisk(person.getHomeLocation().getCoord().getX(),
+					person.getHomeLocation().getCoord().getY(),
 					r);
 			storeCnt = stores.size();		
 		}

@@ -429,7 +429,7 @@ public class TripsPrism {
 			log.trace( "the quad tree contains "+records.size()+" records" );
 		}
 
-		Collection<Record> spaceRestricted = records.get( center.getX() , center.getY(), radius );
+		Collection<Record> spaceRestricted = records.getDisk(center.getX(), center.getY(), radius);
 
 		if (log.isTraceEnabled()) {
 			log.trace( "the space ball contains "+spaceRestricted.size()+" records" );

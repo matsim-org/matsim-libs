@@ -197,7 +197,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
-		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
+		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).getDisk(center.getX(), center.getY(), maxRadius);
 		
 		for (ActivityFacilityWithIndex facility : list) {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());

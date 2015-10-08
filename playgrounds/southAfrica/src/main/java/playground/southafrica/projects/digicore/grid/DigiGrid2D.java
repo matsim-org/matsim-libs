@@ -101,7 +101,7 @@ public abstract class DigiGrid2D extends DigiGrid {
 	public void incrementValue(double x, double y, double weight){
 		Point point = gf.createPoint(new Coordinate(x, y));
 		if(grid.isInGrid(point)){
-			Point centroid = grid.getGrid().get(x, y);
+			Point centroid = grid.getGrid().getClosest(x, y);
 			map.put(centroid, map.get(centroid) + weight);
 			this.pointsConsidered += weight;
 			this.setPopulated(true);
@@ -204,7 +204,7 @@ public abstract class DigiGrid2D extends DigiGrid {
 	public int getCellRisk(double x, double y){
 		Point record = this.gf.createPoint(new Coordinate(x, y));
 		if(this.grid.isInGrid(record)){
-			Point p = this.grid.getGrid().get(x, y);
+			Point p = this.grid.getGrid().getClosest(x, y);
 			return this.getCellRisk(p);
 		} else{
 			/* The record is not in the grid! */

@@ -189,7 +189,7 @@ public class ExtractActivityDensitiesForCapeTownFromDigicore {
 					if(checkInQt(this.qt, coord)){
 						Point point = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
 						
-						Tuple<String, Point> tuple = this.qt.get(coord.getX(), coord.getY());
+						Tuple<String, Point> tuple = this.qt.getClosest(coord.getX(), coord.getY());
 						String zone = tuple.getFirst();
 						
 						if(!hexPolygons.containsKey(zone)){

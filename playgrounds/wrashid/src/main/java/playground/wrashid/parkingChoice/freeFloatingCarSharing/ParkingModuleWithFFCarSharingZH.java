@@ -53,7 +53,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
 	@Override
 	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
-		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
+		Id vehicleId = vehicleLocations.getClosest(coord.getX(), coord.getY());
 		
 		if (vehicleId==null){
 			return null;
@@ -71,12 +71,14 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 
         NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
 		
-		try{
+        //why score parking of a free-floating vehicle? balac Sept '15
+        
+		/*try{
 			double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking, personId, getAverageActDuration());
 			parkingInfrastructureManager.getParkingScoreManager().addScore(personId, walkScore);
 		} catch (Error err){
 			DebugLib.emptyFunctionForSettingBreakPoint();
-		}
+		}*/
 		
 
 		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
@@ -94,13 +96,18 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
         NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
-		
 		PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
 		currentVehicleLocation.put(vehicleId, parking);
-		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
+	//	vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
-		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
-				.getId());
+		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate()).getId(), parking
+				);
+	}
+	@Override
+	public void makeFFVehicleAvailable(Id vehicleId, PC2Parking parking) {
+		
+		this.vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
+		
 	}
 
 	@Override

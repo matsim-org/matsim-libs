@@ -129,7 +129,7 @@ public class Link2ZoneMap {
 		QuadTree<Node> qt = buildCentroidNodeQuadTree(network.getNodes(), true);
 		
 		for (Link l : network.getLinks().values()) {
-			Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
+			Node n = qt.getClosest(l.getCoord().getX(), l.getCoord().getY());
 			this.linkZoneMap.put(l.getId(), Integer.parseInt(n.getId().toString()));
 		}
 		
@@ -149,7 +149,7 @@ public class Link2ZoneMap {
 		QuadTree<Node> qt = buildCentroidNodeQuadTree(tempNetwork.getNodes(), false);
 		
 		for (Link l : network.getLinks().values()) {
-			Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
+			Node n = qt.getClosest(l.getCoord().getX(), l.getCoord().getY());
 			this.linkZoneMap.put(l.getId(), Integer.parseInt(n.getId().toString()));
 		}
 		

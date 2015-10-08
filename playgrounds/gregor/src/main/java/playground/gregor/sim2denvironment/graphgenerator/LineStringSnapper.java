@@ -22,7 +22,7 @@ public class LineStringSnapper {
 		}
 	}
 	private void checkIt(Point start, QuadTree<Coordinate> quad) {
-		Collection<Coordinate> col = quad.get(start.getX(), start.getY(), SNAP);
+		Collection<Coordinate> col = quad.getDisk(start.getX(), start.getY(), SNAP);
 		if (col.size() == 0) {
 			quad.put(start.getX(), start.getY(), start.getCoordinate());
 		} else if (col.size() == 1) {

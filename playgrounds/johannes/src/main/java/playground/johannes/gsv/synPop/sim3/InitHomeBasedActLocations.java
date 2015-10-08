@@ -107,7 +107,7 @@ public class InitHomeBasedActLocations implements EpisodeTask {
 			double max = radius * (1 + factor);
 
 //			List<ActivityFacility> list = new ArrayList<>(quadTree.get(center.getX(), center.getY(), min, max));
-			List<ActivityFacility> list = (List<ActivityFacility>) quadTree.get(center.getX(), center.getY(), min, max);
+			List<ActivityFacility> list = (List<ActivityFacility>) quadTree.getRing(center.getX(), center.getY(), min, max);
 			if (list.isEmpty()) {
 				if(i > 9) {
 					f = data.randomFacility(type);
