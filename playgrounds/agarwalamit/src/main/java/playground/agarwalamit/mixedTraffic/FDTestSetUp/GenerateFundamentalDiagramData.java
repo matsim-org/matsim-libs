@@ -50,6 +50,8 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -128,6 +130,8 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
 		generateFDData.setUseHoles(false);
 		generateFDData.setReduceDataPointsByFactor(10);
+		
+		generateFDData.setUsingSeepNetworkFactory(false);
 		//		HOLE_SPEED = args[4];
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.run();
@@ -474,7 +478,15 @@ public class GenerateFundamentalDiagramData {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		QNetsimEngine netsimEngine  = new QNetsimEngine(qSim);
+		QNetsimEngine netsimEngine ;
+
+		if(SEEP_NETWORK_FACTORY){
+			log.warn("Using modified \"QueueWithBuffer\". Keep eyes open.");
+			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(QueueWithBufferType.amit);
+			netsimEngine = new QNetsimEngine(qSim,seepNetFactory);
+		} else {
+			netsimEngine = new QNetsimEngine(qSim);
+		}
 
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
