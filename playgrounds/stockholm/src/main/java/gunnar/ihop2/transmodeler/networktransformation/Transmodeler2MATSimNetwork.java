@@ -25,6 +25,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -397,6 +398,21 @@ public class Transmodeler2MATSimNetwork {
 			System.out.println();
 
 		}
+
+		// >>>>>>>>>>>>>>>>>>>> TODO >>>>>>>>>>>>>>>>>>>>
+		final boolean scaleUpIntersectionLinks = true;
+		if (scaleUpIntersectionLinks) {
+			final Set<String> allKeys = new LinkedHashSet<>(
+					ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+			for (Map.Entry<Id<Link>, ? extends Link> id2link : matsimNetwork
+					.getLinks().entrySet()) {
+				if (!allKeys.contains(id2link.getKey().toString())) {
+					id2link.getValue().setNumberOfLanes(1e6);
+					id2link.getValue().setCapacity(1e6);
+				}
+			}
+		}
+		// <<<<<<<<<<<<<<<<<<<< TODO <<<<<<<<<<<<<<<<<<<<
 
 		/*
 		 * (3e) Write the network and its attributes to file.
