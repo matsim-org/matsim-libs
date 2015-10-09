@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -171,10 +172,10 @@ public class QNetsimEngine implements MobsimEngine {
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)){
 			QueueWithBuffer.seepageAllowed = true;
-			QueueWithBuffer.seepMode = config.getParam("seepage", "seepMode");
+			QueueWithBuffer.seepModes = Arrays.asList( config.getParam("seepage", "seepMode") );
 			QueueWithBuffer.isSeepModeStorageFree = Boolean.valueOf(config.getParam("seepage", "isSeepModeStorageFree"));
-			log.info("Seepage is allowed. Seep mode is "+QueueWithBuffer.seepMode+".");
-			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode "+QueueWithBuffer.seepMode+" do not take storage space thus only considered for flow capacities.");
+			log.info("Seepage is allowed. Seep mode(s) is(are)  "+QueueWithBuffer.seepModes+".");
+			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode "+QueueWithBuffer.seepModes+" do not take storage space thus only considered for flow capacities.");
 			QueueWithBuffer.isRestrictingNumberOfSeepMode = Boolean.valueOf(config.getParam("seepage", "isRestrictingNumberOfSeepMode"));
 		}
 		

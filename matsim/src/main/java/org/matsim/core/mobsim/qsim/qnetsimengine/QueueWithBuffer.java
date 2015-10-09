@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -33,10 +34,6 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -473,7 +470,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh, now);
 			removeVehicleFromQueue(now,veh);
-			if(isRestrictingNumberOfSeepMode && seepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
+			if(isRestrictingNumberOfSeepMode && seepageAllowed && seepModes.contains( veh.getDriver().getMode() ) ) noOfSeepModeBringFwd++;
 		} // end while
 	}
 
@@ -483,7 +480,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
-		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+		if(seepageAllowed && isSeepModeStorageFree && seepModes.contains( veh.getDriver().getMode() ) ){
 			// yyyy above line feels quite slow/consuming computer time.  Should be switched off completely when seepage is not used. kai, may'15
 
 		} else {
@@ -689,7 +686,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// reduce storage capacity by size of vehicle:
 		//	usedStorageCapacity += veh.getSizeInEquivalents();
 
-		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+		if(isSeepModeStorageFree && seepModes.contains( veh.getDriver().getMode() ) ){
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
 		}
@@ -854,7 +851,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	static boolean seepageAllowed = false;
-	static String seepMode = null; 
+	static List<String> seepModes = null; 
 	static boolean isSeepModeStorageFree = false;
 
 	private int maxSeepModeAllowed = 4;
@@ -883,7 +880,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) ) {
+				if( veh.getEarliestLinkExitTime()<=now && seepModes.contains( veh.getDriver().getMode() ) ) {
 					returnVeh = veh;
 					break;
 				}
