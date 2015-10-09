@@ -24,8 +24,10 @@
  */ 
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.MathHelpers;
@@ -102,8 +104,12 @@ public class SamplingStage {
 		return this.decisionVariable2alphaSum.get(decisionVariable);
 	}
 
+	// TODO NEW; replace by view on the entire map
+	public Set<DecisionVariable> getDecisionVariables() {
+		return Collections.unmodifiableSet(this.decisionVariable2alphaSum.keySet());
+	}
+	
 	DecisionVariable drawDecisionVariable(final Random rnd) {
 		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
 	}
-
 }

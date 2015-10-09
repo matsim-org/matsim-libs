@@ -73,8 +73,37 @@ class RoadInvestmentMain {
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
-		for (double betaPay : new double[] { 0.5, 1.0 }) {
-			for (double betaAlloc : new double[] { 0.5 }) {
+		for (double betaPay : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
+			for (double betaAlloc : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
+				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(objectiveFunction, system, scenario,
+						betaPay, betaAlloc);
+				decVar2objFct.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		for (Map.Entry<DecisionVariable, Double> entry : decVar2objFct
+				.entrySet()) {
+			System.out.println(entry);
+		}
+	}
+
+	static void optimize() {
+
+		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
+		config.controler()
+				.setOverwriteFileSetting(
+						OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(100);
+		config.global().setRandomSeed(new Random().nextLong());
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
+		Simulator system = new MATSimSimulator(stateFactory, scenario);	
+		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
+
+		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
+		for (double betaPay : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
+			for (double betaAlloc : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
 				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(objectiveFunction, system, scenario,
 						betaPay, betaAlloc);
 				decVar2objFct.put(entry.getKey(), entry.getValue());
@@ -164,8 +193,8 @@ class RoadInvestmentMain {
 
 	public static void main(String[] args) throws FileNotFoundException {
 
-		enumerateDecisionVariables();
-		// solveFictitiousProblem();
+		// enumerateDecisionVariables();
+		solveFictitiousProblem();
 
 	}
 
