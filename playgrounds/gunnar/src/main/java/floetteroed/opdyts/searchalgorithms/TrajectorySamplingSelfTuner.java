@@ -128,13 +128,12 @@ public class TrajectorySamplingSelfTuner {
 
 	// -------------------- OPTIMIZATION --------------------
 
-	public void registerSamplingStageSequence(
-			final List<SamplingStage> samplingStages,
+	public <U extends DecisionVariable> void registerSamplingStageSequence(
+			final List<SamplingStage<U>> samplingStages,
 			final double finalObjectiveFunctionValue,
-			final double gradientNorm,
-			final DecisionVariable finalDecisionVariable) {
+			final double gradientNorm, final U finalDecisionVariable) {
 
-		final SamplingStage stage = samplingStages.get(0);
+		final SamplingStage<U> stage = samplingStages.get(0);
 		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
 		final Vector input = new Vector(4);
 		input.set(this.equilibriumGapWeightIndex,

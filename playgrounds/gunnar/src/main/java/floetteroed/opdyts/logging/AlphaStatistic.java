@@ -37,7 +37,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class AlphaStatistic implements Statistic<SamplingStage> {
+public class AlphaStatistic implements Statistic<SamplingStage<?>> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -65,7 +65,7 @@ public class AlphaStatistic implements Statistic<SamplingStage> {
 	}
 
 	@Override
-	public String value(final SamplingStage data) {
+	public String value(final SamplingStage<?> data) {
 		final StringBuffer result = new StringBuffer(Double.toString(data
 				.getAlphaSum(this.decisionVariables.get(0))));
 		for (int i = 1; i < this.decisionVariables.size(); i++) {

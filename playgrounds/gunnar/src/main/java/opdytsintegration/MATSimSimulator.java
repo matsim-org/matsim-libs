@@ -1,9 +1,13 @@
 package opdytsintegration;
 
 import floetteroed.opdyts.DecisionVariable;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
@@ -13,7 +17,8 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
  * Created by michaelzilske on 08/10/15.
  */
 public class MATSimSimulator implements Simulator {
-    // private final Set<? extends DecisionVariable> decisionVariables;
+
+	// private final Set<? extends DecisionVariable> decisionVariables;
     private final MATSimStateFactory stateFactory;
     private final Scenario scenario;
 

@@ -87,16 +87,16 @@ public class RunRoadClassification {
 		int maxIterations = 1;
 		int maxTransitions = 100;
 		int populationSize = 100;
-		DecisionVariableRandomizer randomizer = new DecisionVariableRandomizer() {
+		DecisionVariableRandomizer<RoadClassificationDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadClassificationDecisionVariable>() {
 			@Override
-			public DecisionVariable newRandomDecisionVariable() {
+			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
 				ArrayList<LinkSettings> linkSettingses = new ArrayList<>(almostRealLinkSettings);
 				Collections.shuffle(linkSettingses);
 				return new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, linkSettingses);
 			}
 
 			@Override
-			public DecisionVariable newRandomVariation(DecisionVariable decisionVariable) {
+			public RoadClassificationDecisionVariable newRandomVariation(RoadClassificationDecisionVariable decisionVariable) {
 				return newRandomDecisionVariable();
 			}
 		};

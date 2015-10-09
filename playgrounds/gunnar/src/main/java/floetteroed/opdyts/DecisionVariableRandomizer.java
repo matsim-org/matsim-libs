@@ -31,18 +31,18 @@ package floetteroed.opdyts;
  * @author Gunnar Flötteröd
  *
  */
-public interface DecisionVariableRandomizer {
+public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
 	/**
 	 * @return a completely random decision variable (uniform to the extent
 	 *         possible)
 	 */
-	public DecisionVariable newRandomDecisionVariable();
+	public U newRandomDecisionVariable();
 
 	/**
 	 * @return a random variation of <code>decisionVariable</code>
 	 */
-	public DecisionVariable newRandomVariation(
-			final DecisionVariable decisionVariable);
+	public U newRandomVariation(
+			final U decisionVariable);
 
 }

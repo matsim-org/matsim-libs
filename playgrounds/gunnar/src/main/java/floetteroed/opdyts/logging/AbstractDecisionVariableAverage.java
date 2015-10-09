@@ -9,8 +9,8 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public abstract class AbstractDecisionVariableAverage implements
-		Statistic<SamplingStage> {
+public abstract class AbstractDecisionVariableAverage<U extends DecisionVariable>
+		implements Statistic<SamplingStage<U>> {
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -25,10 +25,9 @@ public abstract class AbstractDecisionVariableAverage implements
 	}
 
 	@Override
-	public String value(final SamplingStage samplingStage) {
+	public String value(final SamplingStage<U> samplingStage) {
 		double average = 0;
-		for (DecisionVariable decisionVariable : samplingStage
-				.getDecisionVariables()) {
+		for (U decisionVariable : samplingStage.getDecisionVariables()) {
 			average += samplingStage.getAlphaSum(decisionVariable)
 					* this.realValue(decisionVariable);
 		}

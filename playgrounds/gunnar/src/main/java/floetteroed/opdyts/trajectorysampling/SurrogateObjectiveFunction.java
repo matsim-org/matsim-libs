@@ -26,6 +26,7 @@ package floetteroed.opdyts.trajectorysampling;
 
 import java.util.List;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
@@ -35,7 +36,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
+class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBasedObjectiveFunction {
 
 	// -------------------- MEMBERS --------------------
 
@@ -44,7 +45,7 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 
 	private final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction;
 
-	private final List<Transition> transitions;
+	private final List<Transition<U>> transitions;
 
 	private final Matrix deltaCovariances;
 
@@ -60,7 +61,7 @@ class SurrogateObjectiveFunction implements VectorBasedObjectiveFunction {
 			// final ObjectBasedObjectiveFunction
 			// originalObjectBasedObjectiveFunction,
 			final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction,
-			final List<Transition> transitions,
+			final List<Transition<U>> transitions,
 			final double equilibriumGapWeight, final double uniformityWeight,
 			final double initialGradientNorm) {
 

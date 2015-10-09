@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class SamplingStage {
+public class SamplingStage<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -54,12 +54,12 @@ public class SamplingStage {
 
 	private final double surrogateObjectiveFunctionValue;
 
-	private final Map<DecisionVariable, Double> decisionVariable2alphaSum;
+	private final Map<U, Double> decisionVariable2alphaSum;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public SamplingStage(final Vector alphas,
-			final TransitionSequencesAnalyzer evaluator) {
+			final TransitionSequencesAnalyzer<U> evaluator) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -105,11 +105,12 @@ public class SamplingStage {
 	}
 
 	// TODO NEW; replace by view on the entire map
-	public Set<DecisionVariable> getDecisionVariables() {
-		return Collections.unmodifiableSet(this.decisionVariable2alphaSum.keySet());
+	public Set<U> getDecisionVariables() {
+		return Collections.unmodifiableSet(this.decisionVariable2alphaSum
+				.keySet());
 	}
-	
-	DecisionVariable drawDecisionVariable(final Random rnd) {
+
+	U drawDecisionVariable(final Random rnd) {
 		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
 	}
 }

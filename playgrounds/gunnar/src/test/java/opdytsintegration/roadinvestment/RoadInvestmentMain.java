@@ -33,10 +33,8 @@ import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 class RoadInvestmentMain {
 
 	static Map.Entry<DecisionVariable, Double> evaluateSingleDecisionVariable(
-			ObjectBasedObjectiveFunction objectiveFunction,
-			Simulator system,
-			Scenario scenario,
-			final double betaPay, final double betaAlloc) {
+			ObjectBasedObjectiveFunction objectiveFunction, Simulator system,
+			Scenario scenario, final double betaPay, final double betaAlloc) {
 
 		final Map<Link, Double> link2freespeed = Collections
 				.unmodifiableMap(link2freespeed(scenario));
@@ -50,7 +48,7 @@ class RoadInvestmentMain {
 		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 				1e-3, 1e-3, 5);
 
-		SingleTrajectorySampler sampler = new SingleTrajectorySampler(
+		SingleTrajectorySampler<DecisionVariable> sampler = new SingleTrajectorySampler<>(
 				decisionVariable, objectiveFunction, convergenceCriterion);
 		system.run(sampler);
 
@@ -69,14 +67,14 @@ class RoadInvestmentMain {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		Simulator system = new MATSimSimulator(stateFactory, scenario);	
+		Simulator system = new MATSimSimulator(stateFactory, scenario);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
 		for (double betaPay : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
 			for (double betaAlloc : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
-				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(objectiveFunction, system, scenario,
-						betaPay, betaAlloc);
+				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(
+						objectiveFunction, system, scenario, betaPay, betaAlloc);
 				decVar2objFct.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -98,14 +96,14 @@ class RoadInvestmentMain {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		Simulator system = new MATSimSimulator(stateFactory, scenario);	
+		Simulator system = new MATSimSimulator(stateFactory, scenario);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
 		for (double betaPay : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
 			for (double betaAlloc : new double[] { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 }) {
-				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(objectiveFunction, system, scenario,
-						betaPay, betaAlloc);
+				Map.Entry<DecisionVariable, Double> entry = evaluateSingleDecisionVariable(
+						objectiveFunction, system, scenario, betaPay, betaAlloc);
 				decVar2objFct.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -145,30 +143,41 @@ class RoadInvestmentMain {
 
 		Simulator system = new MATSimSimulator(// decisionVariables,
 				stateFactory, scenario);
-		DecisionVariableRandomizer randomizer = new DecisionVariableRandomizer() {
+		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
 			@Override
-			public DecisionVariable newRandomDecisionVariable() {
+			public RoadInvestmentDecisionVariable newRandomDecisionVariable() {
 				return new RoadInvestmentDecisionVariable(MatsimRandom
 						.getRandom().nextDouble(), MatsimRandom.getRandom()
 						.nextDouble(), link2freespeed, link2capacity);
 			}
 
 			@Override
-			public DecisionVariable newRandomVariation(
-					DecisionVariable decisionVariable) {
-				return newRandomDecisionVariable();
+			public RoadInvestmentDecisionVariable newRandomVariation(
+					RoadInvestmentDecisionVariable decisionVariable) {
+				return new RoadInvestmentDecisionVariable(Math.max(
+						0,
+						Math.min(1, decisionVariable.betaPay() + 0.1
+								* MatsimRandom.getRandom().nextGaussian())),
+						Math.max(
+								0,
+								Math.min(1, decisionVariable.betaAlloc()
+										+ 0.1
+										* MatsimRandom.getRandom()
+												.nextGaussian())),
+						link2freespeed, link2capacity);
 			}
 		};
-		int maxMemoryLength = 100;
+		int maxMemoryLength = Integer.MAX_VALUE;
 		boolean keepBestSolution = true;
-		boolean interpolate = false;
-		int maxIterations = 100;
-		int maxTransitions = 100;
-		int populationSize = 100;
-		RandomSearch randomSearch = new RandomSearch(system, randomizer,
+		boolean interpolate = true;
+		int maxIterations = 10;
+		int maxTransitions = Integer.MAX_VALUE;
+		int populationSize = 10;
+		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>(system, randomizer,
 				convergenceCriterion, selfTuner, maxIterations, maxTransitions,
 				populationSize, MatsimRandom.getRandom(), interpolate,
 				keepBestSolution, objectiveFunction, maxMemoryLength);
+		randomSearch.setLogFileName("./randomSearchLog.txt");
 		randomSearch.run();
 
 		System.out.println("... DONE.");

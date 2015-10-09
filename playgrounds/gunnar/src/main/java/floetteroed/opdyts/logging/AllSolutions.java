@@ -13,7 +13,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class AllSolutions implements Statistic<SamplingStage> {
+public class AllSolutions implements Statistic<SamplingStage<?>> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -44,7 +44,7 @@ public class AllSolutions implements Statistic<SamplingStage> {
 	}
 
 	@Override
-	public String value(final SamplingStage samplingStage) {
+	public String value(final SamplingStage<?> samplingStage) {
 		final StringBuffer result = new StringBuffer();
 		result.append(this.allDecisionVariables.get(0));
 		for (int i = 1; i < this.allDecisionVariables.size(); i++) {

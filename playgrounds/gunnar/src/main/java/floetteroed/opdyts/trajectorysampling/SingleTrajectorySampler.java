@@ -38,11 +38,12 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
  * @author Gunnar Flötteröd
  *
  */
-public class SingleTrajectorySampler implements TrajectorySampler {
+public class SingleTrajectorySampler<U extends DecisionVariable> implements
+		TrajectorySampler<U> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final DecisionVariable decisionVariable;
+	private final U decisionVariable;
 
 	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
 
@@ -52,11 +53,11 @@ public class SingleTrajectorySampler implements TrajectorySampler {
 
 	private SimulatorState fromState = null;
 
-	private TransitionSequence transitionSequence = null;
+	private TransitionSequence<U> transitionSequence = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SingleTrajectorySampler(final DecisionVariable decisionVariable,
+	public SingleTrajectorySampler(final U decisionVariable,
 			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
@@ -65,7 +66,7 @@ public class SingleTrajectorySampler implements TrajectorySampler {
 		this.convergenceCriterion = convergenceCriterion;
 	}
 
-	public SingleTrajectorySampler(final DecisionVariable decisionVariable,
+	public SingleTrajectorySampler(final U decisionVariable,
 			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
@@ -82,8 +83,8 @@ public class SingleTrajectorySampler implements TrajectorySampler {
 	}
 
 	@Override
-	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue() {
-		final Map<DecisionVariable, Double> result = new LinkedHashMap<>();
+	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue() {
+		final Map<U, Double> result = new LinkedHashMap<>();
 		if (this.convergenceCriterion.isConverged()) {
 			result.put(this.decisionVariable,
 					this.convergenceCriterion.getFinalObjectiveFunctionValue());
@@ -92,7 +93,7 @@ public class SingleTrajectorySampler implements TrajectorySampler {
 	}
 
 	@Override
-	public DecisionVariable getCurrentDecisionVariable() {
+	public U getCurrentDecisionVariable() {
 		return this.decisionVariable;
 	}
 

@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import floetteroed.opdyts.DecisionVariable;
@@ -33,11 +33,11 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-class Transition {
+class Transition<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final DecisionVariable decisionVariable;
+	private final U decisionVariable;
 
 	private final Vector delta;
 
@@ -59,7 +59,7 @@ class Transition {
 	 *            the objective function value of the to-state of this
 	 *            transition
 	 */
-	Transition(final DecisionVariable decisionVariable, final Vector delta,
+	Transition(final U decisionVariable, final Vector delta,
 			final Vector toState, final double toStateObjectiveFunctionValue) {
 		if (decisionVariable == null) {
 			throw new IllegalArgumentException("decisionVariable is null");
@@ -75,7 +75,7 @@ class Transition {
 
 	// -------------------- GETTERS --------------------
 
-	DecisionVariable getDecisionVariable() {
+	U getDecisionVariable() {
 		return this.decisionVariable;
 	}
 
