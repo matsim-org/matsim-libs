@@ -44,8 +44,10 @@ class RoadClassificationObjectiveFunction implements
 			for (Map.Entry<Integer, Volume> hour2measuredVolume : linkId2measuredVolumes
 					.getValue().getVolumes().entrySet()) {
 				final int h = hour2measuredVolume.getKey();
-				final double measuredVolume = hour2measuredVolume.getValue()
-						.getValue();
+				if (simulatedVolumes == null || h > simulatedVolumes.length - 1){
+					continue;
+				}
+				final double measuredVolume = hour2measuredVolume.getValue().getValue();
 				final double residual = measuredVolume - simulatedVolumes[h];
 				result += residual * residual;
 			}
