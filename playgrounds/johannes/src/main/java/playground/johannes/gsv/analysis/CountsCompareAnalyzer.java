@@ -21,31 +21,29 @@ package playground.johannes.gsv.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
-
 import playground.johannes.gsv.gis.CountsCompare2GeoJSON;
 import playground.johannes.gsv.gis.NetworkLoad2GeoJSON;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.statistics.Correlations;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author johannes

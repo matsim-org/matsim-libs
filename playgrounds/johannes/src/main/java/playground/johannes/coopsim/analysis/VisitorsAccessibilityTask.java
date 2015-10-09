@@ -23,26 +23,15 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.mz2005.io.ActivityType;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -50,6 +39,9 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.GridAccessibility;
 import playground.johannes.socialnetworks.statistics.Correlations;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger

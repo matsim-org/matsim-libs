@@ -19,30 +19,22 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
 
 /**
  * @author illenberger

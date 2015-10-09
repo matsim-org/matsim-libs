@@ -20,22 +20,20 @@
 package playground.johannes.sna.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.math.Distribution;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * An AnalyzerTask performs specific analysis on a graph and returns the results

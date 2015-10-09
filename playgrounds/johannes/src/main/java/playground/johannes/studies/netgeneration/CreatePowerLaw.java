@@ -19,16 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.studies.netgeneration;
 
-import java.io.IOException;
-
 import gnu.trove.TDoubleDoubleHashMap;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
 
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import java.io.IOException;
 
 /**
  * @author illenberger

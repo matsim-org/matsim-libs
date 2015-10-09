@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinLogDiscretizerTest.java
+ * UnivariatePiStatistic.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinLogDiscretizer;
-
-
-import junit.framework.TestCase;
+import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
 
 /**
+ * An extension of {@link UnivariateStatistic} that allows to associate
+ * pi-values to the samples.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class LinLogDiscretizerTest extends TestCase {
+public interface UnivariatePiStatistic extends UnivariateStatistic {
 
-	public void test() {
-		Discretizer d = new LinLogDiscretizer(1000.0, 2.0);
-		
-		assertEquals(1000.0, d.discretize(500));
-		assertEquals(1000.0, d.discretize(1000.0));
-		assertEquals(2000.0, d.discretize(1200.0));
-		assertEquals(2000.0, d.discretize(2000.0));
-		assertEquals(4000.0, d.discretize(2100.0));
-		assertEquals(128000.0, d.discretize(84651.54));
-		
-		assertEquals(1000.0, d.binWidth(-1));
-		assertEquals(1000.0, d.binWidth(0));
-		assertEquals(1000.0, d.binWidth(30));
-		assertEquals(1000.0, d.binWidth(999));
-		assertEquals(1000.0, d.binWidth(1000));
-		assertEquals(1000.0, d.binWidth(1400));
-		assertEquals(1000.0, d.binWidth(2000));
-		assertEquals(2000.0, d.binWidth(2100));
-		assertEquals(2000.0, d.binWidth(4000));
-		assertEquals(4000.0, d.binWidth(4100));
-		assertEquals(64000.0, d.binWidth(84651.54));
-	}
+	/**
+	 * Sets the pi-values associated to the samples. The pi-value array must
+	 * have same length and order as the array of samples.
+	 * 
+	 * @param piValues the pi-values
+	 */
+	public void setPiValues(double[] piValues);
+
 }

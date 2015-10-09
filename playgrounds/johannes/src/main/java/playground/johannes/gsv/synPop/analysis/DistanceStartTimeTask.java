@@ -22,9 +22,12 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.*;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
 import java.util.Collection;

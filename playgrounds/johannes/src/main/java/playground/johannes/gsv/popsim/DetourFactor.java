@@ -21,9 +21,9 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.TXTWriter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 

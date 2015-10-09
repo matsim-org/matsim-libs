@@ -17,11 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
-
-import java.util.Arrays;
+package org.matsim.contrib.common.stats;
 
 import org.apache.commons.math.stat.StatUtils;
+
+import java.util.Arrays;
 
 /**
  * A discretizer with predefined bin borders. Values are rounded up to the upper
@@ -85,7 +85,7 @@ public class FixedBordersDiscretizer implements Discretizer {
 	 */
 	@Override
 	public double discretize(double value) {
-		int idx = (int) index(value);
+		int idx = index(value);
 		if (idx >= borders.length)
 			return Double.POSITIVE_INFINITY;
 		else
@@ -101,7 +101,7 @@ public class FixedBordersDiscretizer implements Discretizer {
 	 */
 	@Override
 	public double binWidth(double value) {
-		int idx = (int) index(value);
+		int idx = index(value);
 		if (idx == 0 || idx >= borders.length)
 			return Double.POSITIVE_INFINITY;
 		else

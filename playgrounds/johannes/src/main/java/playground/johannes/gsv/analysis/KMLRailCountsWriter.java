@@ -24,29 +24,14 @@ package playground.johannes.gsv.analysis;
 
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LineStringType;
-import net.opengis.kml._2.LineStyleType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.StyleType;
-
+import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -55,11 +40,16 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 

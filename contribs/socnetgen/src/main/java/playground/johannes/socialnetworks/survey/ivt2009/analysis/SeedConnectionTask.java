@@ -22,18 +22,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
@@ -41,9 +31,13 @@ import playground.johannes.sna.graph.matrix.Dijkstra;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger

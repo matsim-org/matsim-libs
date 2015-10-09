@@ -27,16 +27,14 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleIntHashMap;
 import gnu.trove.TDoubleObjectHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 
 
 /**

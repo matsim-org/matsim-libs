@@ -21,6 +21,15 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -28,17 +37,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 
 /**
  * @author illenberger

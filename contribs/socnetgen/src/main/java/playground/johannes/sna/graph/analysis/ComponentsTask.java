@@ -20,17 +20,15 @@
 package playground.johannes.sna.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
+import playground.johannes.sna.graph.Graph;
 
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * An AnalyzerTask that counts the number of components in a graph.

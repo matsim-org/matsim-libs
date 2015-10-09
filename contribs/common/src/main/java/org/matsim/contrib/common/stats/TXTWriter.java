@@ -17,31 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.util;
+package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.*;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.utils.collections.Tuple;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LogDiscretizerTest.java
+ * LinearDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,69 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
-import junit.framework.TestCase;
-
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LogDiscretizer;
-
+import org.apache.commons.math.stat.StatUtils;
 
 /**
+ * A discretizer with bin of equal width.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class LogDiscretizerTest extends TestCase {
+public class LinearDiscretizer implements Discretizer {
 
-	public void test() {
-		Discretizer d = new LogDiscretizer(2.0);
-		
-		assertEquals(1.0, d.discretize(-1.0));
-		assertEquals(1.0, d.discretize(0.0));
-		assertEquals(1.0, d.discretize(0.9));
-		assertEquals(1.0, d.discretize(1.0));
-		assertEquals(2.0, d.discretize(1.5));
-		assertEquals(512.0, d.discretize(352.5));
-		
-		assertEquals(1.0, d.binWidth(-1.0));
-		assertEquals(1.0, d.binWidth(0.0));
-		assertEquals(1.0, d.binWidth(1.0));
-		assertEquals(1.0, d.binWidth(1.5));
-		assertEquals(2.0, d.binWidth(2.1));
-		assertEquals(4.0, d.binWidth(5.0));
-		assertEquals(4.0, d.binWidth(8.0));
-		assertEquals(8.0, d.binWidth(8.1));
+	private final double binwidth;
+
+	/**
+	 * Creates a new discretizer.
+	 * 
+	 * @param binwidth
+	 *            the bin width.
+	 */
+	public LinearDiscretizer(double binwidth) {
+		this.binwidth = binwidth;
 	}
+
+	/**
+	 * Creates a new discretizer with bin width calculated such that
+	 * <tt>values</tt> would be descretized to <tt>bins</tt> categories.
+	 * 
+	 * @param values an array of values.
+	 * @param bins the number of bins.
+	 */
+	public LinearDiscretizer(double[] values, int bins) {
+		double min = StatUtils.min(values);
+		double max = StatUtils.max(values);
+		this.binwidth = Math.abs(max - min) / (double) bins;
+	}
+
+	/**
+	 * @param value
+	 *            a value.
+	 * @return rounds <tt>value</tt> up to the upper bin border.
+	 */
+	@Override
+	public double discretize(double value) {
+		return index(value) * binwidth;
+	}
+
+	/**
+	 * @param value
+	 *            a value.
+	 * @return the bin width.
+	 */
+	@Override
+	public double binWidth(double value) {
+		return binwidth;
+	}
+
+	/**
+	 * @see {@link Discretizer#index(double)}
+	 */
+	@Override
+	public int index(double value) {
+		return (int)Math.ceil(value / binwidth);
+	}
+
 }

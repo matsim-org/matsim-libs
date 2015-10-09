@@ -21,17 +21,16 @@ package playground.johannes.sna.snowball.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.Collection;
-import java.util.Set;
-
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Transitivity;
-import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
+
+import java.util.Collection;
+import java.util.Set;
 
 
 /**

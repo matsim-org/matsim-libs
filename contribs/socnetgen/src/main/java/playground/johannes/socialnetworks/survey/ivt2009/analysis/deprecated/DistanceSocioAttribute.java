@@ -19,7 +19,24 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.core.population.PersonUtils;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,26 +45,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import org.matsim.core.population.PersonUtils;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger

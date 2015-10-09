@@ -21,6 +21,12 @@ package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,14 +34,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger

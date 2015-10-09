@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.studies.gis;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -36,18 +33,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author illenberger

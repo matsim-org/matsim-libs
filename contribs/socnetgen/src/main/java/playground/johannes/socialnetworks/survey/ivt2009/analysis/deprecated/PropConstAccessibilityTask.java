@@ -19,28 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.ObservedDegree;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
@@ -48,7 +38,9 @@ import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelati
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.AcceptPropConst2;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger

@@ -19,37 +19,27 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
 import playground.johannes.gsv.matrices.MatrixOperations;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author johannes

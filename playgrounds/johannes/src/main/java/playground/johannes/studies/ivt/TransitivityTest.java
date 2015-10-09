@@ -19,31 +19,29 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

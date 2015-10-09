@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UnivariatePiStatistic.java
+ * FixedSampleSizeDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
-import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
+import junit.framework.TestCase;
 
 /**
- * An extension of {@link UnivariateStatistic} that allows to associate
- * pi-values to the samples.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface UnivariatePiStatistic extends UnivariateStatistic {
+public class FixedSampleSizeDiscretizerTest extends TestCase {
 
-	/**
-	 * Sets the pi-values associated to the samples. The pi-value array must
-	 * have same length and order as the array of samples.
-	 * 
-	 * @param piValues the pi-values
-	 */
-	public void setPiValues(double[] piValues);
-
+	public void test() {
+		double[] samples = new double[]{1,2,3,4,6,7,8,9,10,12}; 
+		Discretizer d = FixedSampleSizeDiscretizer.create(samples, 3);
+		
+		assertEquals(7.0, d.discretize(3.4));
+		assertEquals(12.0, d.discretize(10.0));
+		assertEquals(12.0, d.discretize(11.0));
+		assertEquals(3.0, d.discretize(1.0));
+		
+		assertEquals(2.0, d.binWidth(1.0), 0.0001);
+		assertEquals(4.0, d.binWidth(4.5), 0.0001);
+		assertEquals(5.0, d.binWidth(12.0), 0.0001);
+		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(100.0));
+	}
 }

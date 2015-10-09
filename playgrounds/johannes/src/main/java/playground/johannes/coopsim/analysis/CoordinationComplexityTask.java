@@ -22,22 +22,20 @@ package playground.johannes.coopsim.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.stats.TXTWriter;
+import playground.johannes.coopsim.mental.ActivityDesires;
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.coopsim.pysical.VisitorTracker;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.mental.ActivityDesires;
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger

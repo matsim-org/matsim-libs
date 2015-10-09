@@ -19,28 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.Id;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger

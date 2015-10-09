@@ -17,19 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleFunction;
-
-import java.util.Arrays;
-
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import java.util.Arrays;
+
 /**
- * Functions to create histograms out of a set of samples.
+ * Utility functions to generate histograms.
  * 
  * @author illenberger
  * 

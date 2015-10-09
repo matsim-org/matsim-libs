@@ -19,42 +19,27 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.stats.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
@@ -65,8 +50,10 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.AlterTableReader.VertexRecord;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author illenberger

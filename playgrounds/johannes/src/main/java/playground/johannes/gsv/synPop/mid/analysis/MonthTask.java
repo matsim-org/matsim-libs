@@ -21,11 +21,10 @@ package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;

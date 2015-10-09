@@ -20,30 +20,12 @@
 package playground.johannes.studies.snowball;
 
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.*;
 
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author illenberger

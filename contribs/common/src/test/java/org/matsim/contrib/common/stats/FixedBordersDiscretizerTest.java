@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DiscretizerComposite.java
+ * FixedBordersDiscretizerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,58 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
+
+import junit.framework.TestCase;
 
 /**
- * A composition of two discretizers. Values are first discretized with the
- * first discretizer, the bin indicies are the discretized with the second
- * discretizer, e.g., meters to kilometers and then kilometers in log2 bins.
- * 
  * @author illenberger
- * 
+ *
  */
-public class DiscretizerComposite implements Discretizer {
+public class FixedBordersDiscretizerTest extends TestCase {
 
-	private Discretizer first;
-
-	private Discretizer second;
-
-	/**
-	 * Creates a new discretizer composite.
-	 * @param first the first discretizer.
-	 * @param second the second discretizer.
-	 */
-	public DiscretizerComposite(Discretizer first, Discretizer second) {
-		this.first = first;
-		this.second = second;
+	public void test() {
+		Discretizer d = new FixedBordersDiscretizer(new double[]{1.5, 2.3, 4.9});
+		
+		assertEquals(1.5, d.discretize(1.0));
+		assertEquals(2.3, d.discretize(1.6));
+		assertEquals(2.3, d.discretize(2.3));
+		assertEquals(4.9, d.discretize(2.4));
+		assertEquals(4.9, d.discretize(4.9));
+		assertEquals(Double.POSITIVE_INFINITY, d.discretize(5.0));
+		
+		assertEquals(0.8, d.binWidth(2.0), 0.0001);
+		assertEquals(0.8, d.binWidth(2.3), 0.0001);
+		assertEquals(2.6, d.binWidth(2.4), 0.0001);
+		
+		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(0.0), 0.0001);
+		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(1.5), 0.0001);
+		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(5.0), 0.0001);
 	}
-
-	/**
-	 * @see {@link Discretizer#binWidth(double)}
-	 */
-	@Override
-	public double binWidth(double value) {
-		double bin = first.index(value);
-		return second.binWidth(bin) * first.binWidth(value);
+	
+	public void test2() {
+		double[] borders = new double[]{1.5, 2.3, 4.9};
+		double[] values = new double[]{1.0, 5.0};
+		
+		Discretizer d = new FixedBordersDiscretizer(values, borders);
+		
+		assertEquals(1.5, d.discretize(1.0));
+		assertEquals(5.0, d.discretize(5.0));
+		
+		assertEquals(0.5, d.binWidth(1.0), 0.0001);
+		assertEquals(0.1, d.binWidth(5.0), 0.0001);
 	}
-
-	/**
-	 * @see {@link Discretizer#discretize(double)}
-	 */
-	@Override
-	public double discretize(double value) {
-		double bin = first.index(value);
-		bin = second.discretize(bin);
-		return bin * first.binWidth(value);
-	}
-
-	/**
-	 * @see {@link Discretizer#index(double)}
-	 */
-	@Override
-	public int index(double value) {
-		double bin = first.index(value);
-		return second.index(bin);
-	}
-
 }

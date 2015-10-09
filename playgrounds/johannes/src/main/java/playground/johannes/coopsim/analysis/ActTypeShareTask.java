@@ -22,16 +22,14 @@ package playground.johannes.coopsim.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.TXTWriter;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

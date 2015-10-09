@@ -17,65 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleArrayList;
-
-import java.util.Arrays;
+import junit.framework.TestCase;
 
 /**
  * @author johannes
  *
  */
-public class InterpolatingDiscretizer implements Discretizer {
+public class InterpolatingDiscretizerTest extends TestCase {
 
-	private double[] binValues;
-	
-	private Discretizer borders;
-	
-	public InterpolatingDiscretizer(double[] values) {
-		Arrays.sort(values);
-		TDoubleArrayList tmpBorders = new TDoubleArrayList();
-		TDoubleArrayList tmpValues = new TDoubleArrayList();
-		double low = values[0];
-		double high;
-		for(int i = 1; i < values.length; i++) {
-			high = values[i];
-			if(low < high) {
-				tmpBorders.add(low + (high - low)/2.0);
-				tmpValues.add(low);
-			}
-			low = high;
-		}
-		tmpValues.add(values[values.length - 1]);
+	public void test1() {
+		double[] values = new double[10];
+		values[0] = 5;
+		values[1] = 2;
+		values[2] = 5;
+		values[3] = 5;
+		values[4] = 2;
+		values[5] = 6.8;
+		values[6] = 2.3;
+		values[7] = 10;
+		values[8] = 2.3;
+		values[9] = 10;
 		
-		borders = new FixedBordersDiscretizer(tmpBorders.toNativeArray());
-		binValues = tmpValues.toNativeArray();
+		InterpolatingDiscretizer discretizer = new InterpolatingDiscretizer(values);
+		
+		assertEquals(2.0, discretizer.discretize(-1));
+		assertEquals(2.0, discretizer.discretize(2));
+		assertEquals(2.0, discretizer.discretize(2.14));
+		
+		assertEquals(5.0, discretizer.discretize(5));
+		assertEquals(5.0, discretizer.discretize(5.89));
+		assertEquals(5.0, discretizer.discretize(4.15));
+		
+		assertEquals(10.0, discretizer.discretize(1000));
+		
+		assertEquals(6.8, discretizer.discretize(6.77));
 	}
-	
-	/* (non-Javadoc)
-	 * @see playground.johannes.sna.math.Discretizer#discretize(double)
-	 */
-	@Override
-	public double discretize(double value) {
-		int idx = (int)index(value);
-		return binValues[idx];
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.sna.math.Discretizer#index(double)
-	 */
-	@Override
-	public int index(double value) {
-		return borders.index(value);
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.sna.math.Discretizer#binWidth(double)
-	 */
-	@Override
-	public double binWidth(double value) {
-		return borders.binWidth(value);
-	}
-
 }

@@ -22,23 +22,20 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.analysis.F2FFrequency;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
-import playground.johannes.socialnetworks.statistics.WeightedSampleMean;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger

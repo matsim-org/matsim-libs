@@ -20,18 +20,16 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger

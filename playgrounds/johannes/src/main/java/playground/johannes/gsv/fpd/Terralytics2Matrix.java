@@ -23,9 +23,9 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.sna.util.TXTWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

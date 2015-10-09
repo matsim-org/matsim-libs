@@ -20,20 +20,18 @@
 package playground.johannes.studies.coopsim;
 
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.choice.DurationSelector;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger

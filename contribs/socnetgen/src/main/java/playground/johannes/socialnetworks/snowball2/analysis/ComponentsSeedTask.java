@@ -20,19 +20,17 @@
 package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.TXTWriter;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.Components;
+import playground.johannes.sna.snowball.SampledVertex;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.Components;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

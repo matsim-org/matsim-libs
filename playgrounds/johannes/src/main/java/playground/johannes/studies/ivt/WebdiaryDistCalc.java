@@ -19,27 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TIntIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.FixedBordersDiscretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.*;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -51,9 +39,13 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author illenberger

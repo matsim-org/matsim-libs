@@ -20,16 +20,14 @@
 package playground.johannes.studies.mcmc;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReader;
-
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

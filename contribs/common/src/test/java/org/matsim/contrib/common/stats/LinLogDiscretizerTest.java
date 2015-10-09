@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinLogDiscretizer.java
+ * LinLogDiscretizerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
+
+import junit.framework.TestCase;
 
 /**
- * A composition of a linear and a log discretizer. Bin indices are first
- * determined with the linear discretizer and then discretized with the log
- * discretizer.
- * 
  * @author illenberger
- * 
+ *
  */
-public class LinLogDiscretizer extends DiscretizerComposite {
+public class LinLogDiscretizerTest extends TestCase {
 
-	/**
-	 * Creates a new discretizer.
-	 * 
-	 * @param linearBinWidth
-	 *            the bin width for the linear discretizer
-	 * @param base
-	 *            the base for the log discretizer
-	 */
-	public LinLogDiscretizer(double linearBinWidth, double base) {
-		super(new LinearDiscretizer(linearBinWidth), new LogDiscretizer(base));
+	public void test() {
+		Discretizer d = new LinLogDiscretizer(1000.0, 2.0);
+		
+		assertEquals(1000.0, d.discretize(500));
+		assertEquals(1000.0, d.discretize(1000.0));
+		assertEquals(2000.0, d.discretize(1200.0));
+		assertEquals(2000.0, d.discretize(2000.0));
+		assertEquals(4000.0, d.discretize(2100.0));
+		assertEquals(128000.0, d.discretize(84651.54));
+		
+		assertEquals(1000.0, d.binWidth(-1));
+		assertEquals(1000.0, d.binWidth(0));
+		assertEquals(1000.0, d.binWidth(30));
+		assertEquals(1000.0, d.binWidth(999));
+		assertEquals(1000.0, d.binWidth(1000));
+		assertEquals(1000.0, d.binWidth(1400));
+		assertEquals(1000.0, d.binWidth(2000));
+		assertEquals(2000.0, d.binWidth(2100));
+		assertEquals(2000.0, d.binWidth(4000));
+		assertEquals(4000.0, d.binWidth(4100));
+		assertEquals(64000.0, d.binWidth(84651.54));
 	}
-
 }

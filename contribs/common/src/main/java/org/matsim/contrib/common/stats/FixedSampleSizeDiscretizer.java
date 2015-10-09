@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleIntHashMap;

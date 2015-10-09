@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FixedSampleSizeDiscretizer.java
+ * DummyDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
-
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-
-import junit.framework.TestCase;
+package org.matsim.contrib.common.stats;
 
 /**
- * @author illenberger
- *
+ * A dummy discretizer that returns just the input value.
+ * 
+ * @author jillenberger
+ * 
  */
-public class FixedSampleSizeDiscretizerTest extends TestCase {
+public class DummyDiscretizer implements Discretizer {
 
-	public void test() {
-		double[] samples = new double[]{1,2,3,4,6,7,8,9,10,12}; 
-		Discretizer d = FixedSampleSizeDiscretizer.create(samples, 3);
+	private static DummyDiscretizer instance;
+
+	/**
+	 * Singleton access.
+	 *
+	 * @return an instance of <tt>DummyDiscretizer</tt> creating a new one if necessary
+	 */
+	public static DummyDiscretizer getInstance() {
+		if(instance == null)
+			instance = new DummyDiscretizer();
 		
-		assertEquals(7.0, d.discretize(3.4));
-		assertEquals(12.0, d.discretize(10.0));
-		assertEquals(12.0, d.discretize(11.0));
-		assertEquals(3.0, d.discretize(1.0));
-		
-		assertEquals(2.0, d.binWidth(1.0), 0.0001);
-		assertEquals(4.0, d.binWidth(4.5), 0.0001);
-		assertEquals(5.0, d.binWidth(12.0), 0.0001);
-		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(100.0));
+		return instance;
 	}
+	
+	/**
+	 * This method has no meaning here.
+	 *
+	 * @throws {@link UnsupportedOperationException}
+	 */
+	@Override
+	public double binWidth(double value) {
+		throw new UnsupportedOperationException(
+				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
+	}
+
+	/**
+	 * Just returns <tt>value</tt>.
+	 *
+	 * @return <tt>value</tt>
+	 */
+	@Override
+	public double discretize(double value) {
+		return value;
+	}
+
+	/**
+	 * This method has no meaning here.
+	 *
+	 * @throws {@link UnsupportedOperationException}
+	 */
+	@Override
+	public int index(double value) {
+		throw new UnsupportedOperationException(
+				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
+	}
+
 }

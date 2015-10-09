@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinearDiscretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,69 +16,66 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
 
-import org.apache.commons.math.stat.StatUtils;
+package org.matsim.contrib.common.stats;
+
+import gnu.trove.TDoubleArrayList;
+
+import java.util.Arrays;
 
 /**
- * A discretizer with bin of equal width.
- * 
- * @author illenberger
- * 
+ * @author johannes
+ *
  */
-public class LinearDiscretizer implements Discretizer {
+public class InterpolatingDiscretizer implements Discretizer {
 
-	private final double binwidth;
-
-	/**
-	 * Creates a new discretizer.
-	 * 
-	 * @param binwidth
-	 *            the bin width.
-	 */
-	public LinearDiscretizer(double binwidth) {
-		this.binwidth = binwidth;
+	private double[] binValues;
+	
+	private Discretizer borders;
+	
+	public InterpolatingDiscretizer(double[] values) {
+		Arrays.sort(values);
+		TDoubleArrayList tmpBorders = new TDoubleArrayList();
+		TDoubleArrayList tmpValues = new TDoubleArrayList();
+		double low = values[0];
+		double high;
+		for(int i = 1; i < values.length; i++) {
+			high = values[i];
+			if(low < high) {
+				tmpBorders.add(low + (high - low)/2.0);
+				tmpValues.add(low);
+			}
+			low = high;
+		}
+		tmpValues.add(values[values.length - 1]);
+		
+		borders = new FixedBordersDiscretizer(tmpBorders.toNativeArray());
+		binValues = tmpValues.toNativeArray();
 	}
-
-	/**
-	 * Creates a new discretizer with bin width calculated such that
-	 * <tt>values</tt> would be descretized to <tt>bins</tt> categories.
-	 * 
-	 * @param values an array of values.
-	 * @param bins the number of bins.
-	 */
-	public LinearDiscretizer(double[] values, int bins) {
-		double min = StatUtils.min(values);
-		double max = StatUtils.max(values);
-		this.binwidth = Math.abs(max - min) / (double) bins;
-	}
-
-	/**
-	 * @param value
-	 *            a value.
-	 * @return rounds <tt>value</tt> up to the upper bin border.
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.common.stats.Discretizer#discretize(double)
 	 */
 	@Override
 	public double discretize(double value) {
-		return index(value) * binwidth;
+		int idx = (int)index(value);
+		return binValues[idx];
 	}
 
-	/**
-	 * @param value
-	 *            a value.
-	 * @return the bin width.
-	 */
-	@Override
-	public double binWidth(double value) {
-		return binwidth;
-	}
-
-	/**
-	 * @see {@link Discretizer#index(double)}
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.common.stats.Discretizer#index(double)
 	 */
 	@Override
 	public int index(double value) {
-		return (int)Math.ceil(value / binwidth);
+		return borders.index(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.common.stats.Discretizer#binWidth(double)
+	 */
+	@Override
+	public double binWidth(double value) {
+		return borders.binWidth(value);
 	}
 
 }

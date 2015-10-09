@@ -23,11 +23,10 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;

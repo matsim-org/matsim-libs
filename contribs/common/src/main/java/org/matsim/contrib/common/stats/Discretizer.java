@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyDiscretizer.java
+ * Descretizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
 /**
- * A dummy discretizer that does no descretization at all.
- * 
- * @author jillenberger
- * 
+ * A <tt>Discretizer</tt> "rounds" values to values of defined bins (buckets/categories). For instance, use this class
+ * to generate histograms.
+ *
+ * @author illenberger
  */
-public class DummyDiscretizer implements Discretizer {
+public interface Discretizer {
 
-	private static DummyDiscretizer instance;
-	
-	public static DummyDiscretizer getInstance() {
-		if(instance == null)
-			instance = new DummyDiscretizer();
-		
-		return instance;
-	}
-	
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
-	@Override
-	public double binWidth(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
-	}
+    /**
+     * Returns the bin's value of which <tt>value</tt> is associated to.
+     *
+     * @param value the value to discretized
+     * @return the bin's value
+     */
+    double discretize(double value);
 
-	/**
-	 * @return <tt>value</tt>
-	 */
-	@Override
-	public double discretize(double value) {
-		return value;
-	}
+    /**
+     * Returns the bin's index of which <tt>values</tt> is associated to.
+     *
+     * @param value the value to discretize
+     * @return the index of the bin
+     */
+    int index(double value);
 
-	/**
-	 * @throws {@link UnsupportedOperationException}
-	 */
-	@Override
-	public int index(double value) {
-		throw new UnsupportedOperationException(
-				"It is no obvious what to return here. Probably you want to use a linear discretizer with bin width 1.0");
-	}
+    /**
+     * Returns the bin's width of which <tt>value</tt> is associated to.
+     *
+     * @param value the value to discretize
+     * @return returns the width of the bin.
+     */
+    double binWidth(double value);
 
 }

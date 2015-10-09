@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.math;
+package org.matsim.contrib.common.stats;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
@@ -27,7 +27,7 @@ import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.commons.math.util.ResizableDoubleArray;
 
 /**
- * Descriptive statistics object where each sample has a pi-value assigned.
+ * Descriptive statistics object where each sample has a pi-value (1/weight) assigned.
  * 
  * @author illenberger
  * 

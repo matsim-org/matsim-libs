@@ -22,16 +22,15 @@ package playground.johannes.socialnetworks.graph.analysis;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import playground.johannes.sna.graph.Vertex;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
 
 
 /**

@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.TXTWriter;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 

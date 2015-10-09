@@ -21,13 +21,9 @@ package playground.johannes.gsv.fpd;
 
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.*;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;

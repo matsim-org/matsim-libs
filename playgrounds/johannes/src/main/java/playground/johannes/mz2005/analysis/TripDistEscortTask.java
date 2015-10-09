@@ -20,24 +20,22 @@
 package playground.johannes.mz2005.analysis;
 
 import gnu.trove.TDoubleObjectHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.TXTWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.io.EscortData;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger
