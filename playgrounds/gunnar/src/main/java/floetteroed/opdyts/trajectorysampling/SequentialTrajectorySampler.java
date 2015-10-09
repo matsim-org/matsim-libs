@@ -25,10 +25,10 @@
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -76,8 +76,8 @@ public class SequentialTrajectorySampler implements TrajectorySampler {
 
 	@Override
 	public boolean foundSolution() {
-		return this.processedSingleTrajectorySamplers.getFirst()
-				.foundSolution();
+		return ((this.untriedSingleTrajectorySamplers.size() == 0) && this.processedSingleTrajectorySamplers
+				.getFirst().foundSolution());
 	}
 
 	@Override
@@ -90,11 +90,17 @@ public class SequentialTrajectorySampler implements TrajectorySampler {
 	public void afterIteration(final SimulatorState newState) {
 		this.processedSingleTrajectorySamplers.getFirst().afterIteration(
 				newState);
+		if ((this.untriedSingleTrajectorySamplers.size() > 0)
+				&& this.processedSingleTrajectorySamplers.getFirst()
+						.foundSolution()) {
+			this.processedSingleTrajectorySamplers
+					.addFirst(this.untriedSingleTrajectorySamplers.removeLast());
+		}
 	}
 
 	@Override
 	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue() {
-		final Map<DecisionVariable, Double> result = new TreeMap<DecisionVariable, Double>();
+		final Map<DecisionVariable, Double> result = new LinkedHashMap<DecisionVariable, Double>();
 		for (SingleTrajectorySampler singleSampler : this.processedSingleTrajectorySamplers) {
 			result.putAll(singleSampler
 					.getDecisionVariable2finalObjectiveFunctionValue());
@@ -106,8 +112,7 @@ public class SequentialTrajectorySampler implements TrajectorySampler {
 	public int getTotalTransitionCnt() {
 		int result = 0;
 		for (SingleTrajectorySampler singleSampler : this.processedSingleTrajectorySamplers) {
-			result += singleSampler
-					.getTotalTransitionCnt();
+			result += singleSampler.getTotalTransitionCnt();
 		}
 		return result;
 	}

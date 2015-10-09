@@ -1,7 +1,6 @@
 package opdytsintegration;
 
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -16,7 +15,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -62,7 +60,7 @@ public class MATSimDecisionVariableSetEvaluator
 	 */
 	public MATSimDecisionVariableSetEvaluator(
 			final TrajectorySampler trajectorySampler,
-			final Set<? extends DecisionVariable> decisionVariables,
+			// final Set<? extends DecisionVariable> decisionVariables,
 			// final ObjectBasedObjectiveFunction objectiveFunction,
 			// final ConvergenceCriterion convergenceCriterion,
 			final MATSimStateFactory stateFactory

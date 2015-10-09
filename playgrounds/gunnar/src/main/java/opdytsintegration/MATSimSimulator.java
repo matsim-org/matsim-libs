@@ -1,24 +1,23 @@
 package opdytsintegration;
 
-import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.searchalgorithms.Simulator;
-import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
-import java.util.Set;
+import floetteroed.opdyts.SimulatorState;
+import floetteroed.opdyts.searchalgorithms.Simulator;
+import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 
 /**
  * Created by michaelzilske on 08/10/15.
  */
 public class MATSimSimulator implements Simulator {
-    private final Set<? extends DecisionVariable> decisionVariables;
+    // private final Set<? extends DecisionVariable> decisionVariables;
     private final MATSimStateFactory stateFactory;
     private final Scenario scenario;
 
-    public MATSimSimulator(Set<? extends DecisionVariable> decisionVariables, MATSimStateFactory stateFactory, Scenario scenario) {
-        this.decisionVariables = decisionVariables;
+    public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
+    		MATSimStateFactory stateFactory, Scenario scenario) {
+        // this.decisionVariables = decisionVariables;
         this.stateFactory = stateFactory;
         this.scenario = scenario;
     }
@@ -29,7 +28,9 @@ public class MATSimSimulator implements Simulator {
 //				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
 
 		final MATSimDecisionVariableSetEvaluator predictor
-				= new MATSimDecisionVariableSetEvaluator(evaluator, decisionVariables, stateFactory);
+				= new MATSimDecisionVariableSetEvaluator(evaluator, 
+						// decisionVariables, 
+						stateFactory);
 		predictor.setMemory(1);
 		predictor.setBinSize_s(10 * 60);
 		predictor.setStartBin(6 * 5);
