@@ -1,6 +1,8 @@
 package opdytsintegration;
 
+import floetteroed.opdyts.DecisionVariable;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 import floetteroed.opdyts.SimulatorState;
@@ -38,6 +40,12 @@ public class MATSimSimulator implements Simulator {
 
 		final Controler controler = new Controler(scenario);
 		controler.addControlerListener(predictor);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				binder().requestInjection(stateFactory);
+			}
+		});
 		controler.setTerminationCriterion(new Controler.TerminationCriterion() {
 			@Override
 			public boolean continueIterations(int iteration) {

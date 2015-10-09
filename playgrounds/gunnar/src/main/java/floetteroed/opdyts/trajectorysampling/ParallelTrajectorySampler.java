@@ -41,7 +41,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
 import floetteroed.utilities.statisticslogging.Statistic;
-import floetteroed.utilities.statisticslogging.StatisticsWriter;
+import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
 
 /**
  * 
@@ -72,7 +72,7 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 
 	private int maxMemoryLength = Integer.MAX_VALUE;
 
-	private Map<String, StatisticsWriter<SamplingStage>> fileName2statsWriter = new LinkedHashMap<String, StatisticsWriter<SamplingStage>>();
+	private final StatisticsMultiWriter<SamplingStage> statisticsWriter = new StatisticsMultiWriter<SamplingStage>();
 
 	// runtime variables
 
@@ -136,13 +136,7 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 
 	public void addStatistic(final String logFileName,
 			final Statistic<SamplingStage> statistic) {
-		StatisticsWriter<SamplingStage> statsWriter = this.fileName2statsWriter
-				.get(logFileName);
-		if (statsWriter == null) {
-			statsWriter = new StatisticsWriter<SamplingStage>(logFileName);
-			this.fileName2statsWriter.put(logFileName, statsWriter);
-		}
-		statsWriter.addSearchStatistic(statistic);
+		this.statisticsWriter.addStatistic(logFileName, statistic);
 	}
 
 	@Override
@@ -167,9 +161,10 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 
 	@Override
 	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue() {
-		return Collections.unmodifiableMap(this.decisionVariable2finalObjectiveFunctionValue);
+		return Collections
+				.unmodifiableMap(this.decisionVariable2finalObjectiveFunctionValue);
 	}
-	
+
 	@Override
 	public boolean foundSolution() {
 		return (this.decisionVariable2finalObjectiveFunctionValue.size() > 0);
@@ -185,8 +180,12 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	/* (non-Javadoc)
-	 * @see floetteroed.opdyts.trajectorysampling.TrajectorySamplerInterface#initialize()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * floetteroed.opdyts.trajectorysampling.TrajectorySamplerInterface#initialize
+	 * ()
 	 */
 	public void initialize() {
 		if (this.initialized) {
@@ -201,8 +200,11 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 		this.currentDecisionVariable.implementInSimulation();
 	}
 
-	/* (non-Javadoc)
-	 * @see floetteroed.opdyts.trajectorysampling.TrajectorySamplerInterface#afterIteration(floetteroed.opdyts.SimulatorState)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see floetteroed.opdyts.trajectorysampling.TrajectorySamplerInterface#
+	 * afterIteration(floetteroed.opdyts.SimulatorState)
 	 */
 	public void afterIteration(final SimulatorState newState) {
 
@@ -314,10 +316,8 @@ public class ParallelTrajectorySampler implements TrajectorySampler {
 			final SamplingStage samplingStage = new SamplingStage(alphas,
 					samplingStageEvaluator);
 
-			for (StatisticsWriter<SamplingStage> statsWriter : this.fileName2statsWriter
-					.values()) {
-				statsWriter.writeToFile(samplingStage);
-			}
+			this.statisticsWriter.writeToFile(samplingStage);
+
 			this.samplingStages.add(samplingStage);
 			this.currentDecisionVariable = samplingStage
 					.drawDecisionVariable(this.rnd);

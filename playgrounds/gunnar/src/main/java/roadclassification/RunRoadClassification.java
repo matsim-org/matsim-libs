@@ -24,41 +24,31 @@ package roadclassification;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectBasedObjectiveFunction;
-import opdytsintegration.MATSimDecisionVariableSetEvaluator;
+import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 
-import org.matsim.analysis.VolumesAnalyzer;
+import opdytsintegration.MATSimSimulator;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class RunRoadClassification {
 
 	static void justRun() {
-		// System.out.println("STARTED ...");
-		// Scenario scenario = ScenarioUtils.createScenario(createConfig());
-		// try (InputStream is = new FileInputStream(
-		// DownloadExampleData.SIOUX_FALLS)) {
-		// OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
-		// scenario.getNetwork(),
-		// DownloadExampleData.COORDINATE_TRANSFORMATION);
-		// osmNetworkReader.parse(is);
-		// } catch (IOException e) {
-		// throw new RuntimeException(e);
-		// }
-		// final Controler controler = new Controler(scenario);
-		// controler.run();
-		// System.out.println("... DONE.");
 
 		final String path = "./test/input/berlin_145f/";
 		final String configFileName = path + "run_145f.output_config.xml";
@@ -75,311 +65,53 @@ public class RunRoadClassification {
 
 	}
 
-	static void optimize() {
+	public static void optimize(final Scenario scenario) {
 
 		System.out.println("STARTED ...");
 
-		// Scenario scenario = ScenarioUtils.createScenario(createConfig());
-		// try (InputStream is = new FileInputStream(
-		// DownloadExampleData.SIOUX_FALLS)) {
-		// OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
-		// scenario.getNetwork(),
-		// DownloadExampleData.COORDINATE_TRANSFORMATION);
-		// osmNetworkReader.parse(is);
-		// } catch (IOException e) {
-		// throw new RuntimeException(e);
-		// }
-
-		// using runs-svn/cemdapMatsimCadyts/run_145f from TUB repo
-		final String path = "./test/input/berlin_145f/";
-		final String configFileName = path + "run_145f.output_config.xml";
-		final String countsFileName = path + "vmz_di-do.xml";
-
-		final Config config = ConfigUtils.loadConfig(configFileName);
-
-		final File out = new File(config.findParam("controler",
-				"outputDirectory"));
-		if (out.exists()) {
-			IOUtils.deleteDirectory(out);
-		}
-
-		final Counts counts = new Counts();
-		final CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(
-				counts);
-		countsReader.parse(countsFileName);
-
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		final Controler controler = new Controler(scenario);
-
-		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(
-				controler.getInjector().getProvider(VolumesAnalyzer.class), counts.getCounts().keySet());
+		final ObjectAttributes linkAttributes = (ObjectAttributes) scenario.getScenarioElement("linkAttributes");
+		Counts counts = (Counts) scenario.getScenarioElement(Counts.ELEMENT_NAME);
+		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(scenario);
 		final ObjectBasedObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
-		final Set<RoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();
+		final List<LinkSettings> almostRealLinkSettings = new ArrayList<>();
+		almostRealLinkSettings.add(new LinkSettings(14.0, 2000.0, 2.0));
+		almostRealLinkSettings.add(new LinkSettings(14.0, 900.0, 1.0));
+		almostRealLinkSettings.add(new LinkSettings(28.0, 6000.0, 3.0));
+		almostRealLinkSettings.add(new LinkSettings(16.0, 3000.0, 2.0));
+		almostRealLinkSettings.add(new LinkSettings(25.0, 4000.0, 2.5));
 
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
+		int maxMemoryLength = 100;
+		boolean keepBestSolution = true;
+		boolean interpolate = false;
+		int maxIterations = 1;
+		int maxTransitions = 100;
+		int populationSize = 100;
+		DecisionVariableRandomizer randomizer = new DecisionVariableRandomizer() {
 			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// default capacities
-				// motorway 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 2000, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 1,
-						80.0 / 3.6, 1.0, 1500, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 1, 80.0 / 3.6,
-						1.0, 2000);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1000);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 300);
+			public DecisionVariable newRandomDecisionVariable() {
+				ArrayList<LinkSettings> linkSettingses = new ArrayList<>(almostRealLinkSettings);
+				Collections.shuffle(linkSettingses);
+				return new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, linkSettingses);
+			}
 
-			}
-		});
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
 			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// Derived capacities (from triangular fundamental diagram)
-				// motorway 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 1900, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 1,
-						80.0 / 3.6, 1.0, 1800, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 1, 80.0 / 3.6,
-						1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 1400);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 1000);
+			public DecisionVariable newRandomVariation(DecisionVariable decisionVariable) {
+				return newRandomDecisionVariable();
 			}
-		});
+		};
 
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// default capacities
-				// no multi-lane roads
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 1,
-						120.0 / 3.6, 1.0, 2000, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 1,
-						80.0 / 3.6, 1.0, 1500, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 1, 80.0 / 3.6,
-						1.0, 2000);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1000);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 300);
+		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
+				0.0, 0.0, 0.0, 0.95, 1.0);
+		final int minimumAverageIterations = 5;
 
-			}
-		});
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// Derived capacities (from triangular fundamental diagram)
-				// no multi-lane roads
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 1,
-						120.0 / 3.6, 1.0, 1900, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 1,
-						80.0 / 3.6, 1.0, 1800, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 1, 80.0 / 3.6,
-						1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 1400);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 1000);
-			}
-		});
+		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
+				1e-1, 1e-1, minimumAverageIterations);
 
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// default capacities
-				// motorway, trunk 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 2000, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 2,
-						80.0 / 3.6, 1.0, 1500, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 2, 80.0 / 3.6,
-						1.0, 2000);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1000);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 300);
+		RandomSearch randomSearch = new RandomSearch(new MATSimSimulator(stateFactory, scenario), randomizer, convergenceCriterion, selfTuner, maxIterations, maxTransitions, populationSize,
+				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+		randomSearch.run();
 
-			}
-		});
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// Derived capacities (from triangular fundamental diagram)
-				// motorway, trunk 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 1900, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 2,
-						80.0 / 3.6, 1.0, 1800, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 2, 80.0 / 3.6,
-						1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 1,
-						50.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 1,
-						80.0 / 3.6, 1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 1400);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 1000);
-			}
-		});
-
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// default capacities
-				// motorway, trunk, primary 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 2000, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 2,
-						80.0 / 3.6, 1.0, 1500, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 2, 80.0 / 3.6,
-						1.0, 2000);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 2,
-						50.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 2,
-						80.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1500);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1000);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 600);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 300);
-
-			}
-		});
-		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
-				.getNetwork()) {
-			@Override
-			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-				// Derived capacities (from triangular fundamental diagram)
-				// motorway, trunk, primary 2 instead of 1 lane
-				osmNetworkReader.setHighwayDefaults(1, "motorway", 2,
-						120.0 / 3.6, 1.0, 1900, true);
-				osmNetworkReader.setHighwayDefaults(1, "motorway_link", 2,
-						80.0 / 3.6, 1.0, 1800, true);
-				osmNetworkReader.setHighwayDefaults(2, "trunk", 2, 80.0 / 3.6,
-						1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(2, "trunk_link", 2,
-						50.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(3, "primary", 2,
-						80.0 / 3.6, 1.0, 1800);
-				osmNetworkReader.setHighwayDefaults(3, "primary_link", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(4, "secondary", 1,
-						60.0 / 3.6, 1.0, 1700);
-				osmNetworkReader.setHighwayDefaults(5, "tertiary", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "minor", 1, 45.0 / 3.6,
-						1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "unclassified", 1,
-						45.0 / 3.6, 1.0, 1600);
-				osmNetworkReader.setHighwayDefaults(6, "residential", 1,
-						30.0 / 3.6, 1.0, 1400);
-				osmNetworkReader.setHighwayDefaults(6, "living_street", 1,
-						15.0 / 3.6, 1.0, 1000);
-			}
-		});
 
 		// AND RUN THE ENTIRE THING
 
@@ -400,9 +132,21 @@ public class RunRoadClassification {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
+		final String path = "./test/input/berlin_145f/";
+		final String configFileName = path + "run_145f.output_config.xml";
+		final String countsFileName = path + "vmz_di-do.xml";
 
+		final Config config = ConfigUtils.loadConfig(configFileName);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		final Counts counts = new Counts();
+		final CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(
+				counts);
+		countsReader.parse(countsFileName);
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);
 		// justRun();
-		optimize();
+		optimize(scenario);
 
 	}
 
