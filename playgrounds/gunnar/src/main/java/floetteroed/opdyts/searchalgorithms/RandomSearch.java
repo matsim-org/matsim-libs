@@ -175,12 +175,9 @@ public class RandomSearch {
 			}
 
 			int transitionsPerIteration = 0;
+			DecisionVariable newBestDecisionVariable;
+			double newBestObjectiveFunctionValue;
 			if (this.interpolate) {
-				// final SamplingStrategy samplingStrategy = new
-				// FullInterpolationSamplingStrategy(
-				// 1.0, this.selfTuner.getEquilibriumGapWeight(),
-				// this.selfTuner.getUniformityWeight(),
-				// this.objectiveFunction);
 
 				final ParallelTrajectorySampler sampler;
 				if (this.objectBasedObjectiveFunction != null) {
@@ -200,23 +197,24 @@ public class RandomSearch {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
-				bestDecisionVariable = sampler.getConvergedDecisionVariables()
-						.iterator().next();
-				bestObjectiveFunctionValue = sampler
-						.getFinalObjectiveFunctionValue(bestDecisionVariable);
+				newBestDecisionVariable = sampler
+						.getConvergedDecisionVariables().iterator().next();
+				newBestObjectiveFunctionValue = sampler
+						.getFinalObjectiveFunctionValue(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
 				this.selfTuner.registerSamplingStageSequence(
 						sampler.getSamplingStages(),
-						bestObjectiveFunctionValue,
-						sampler.getInitialGradientNorm(), bestDecisionVariable);
+						newBestObjectiveFunctionValue,
+						sampler.getInitialGradientNorm(),
+						newBestDecisionVariable);
 
 			} else {
 
 				final SimulatorState thisRoundsInitialState = newInitialState;
 
-				bestDecisionVariable = null;
-				bestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
+				newBestDecisionVariable = null;
+				newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
 
 				for (DecisionVariable candidate : candidates) {
 					this.convergenceCriterion.reset();
@@ -235,9 +233,9 @@ public class RandomSearch {
 					final double candidateObjectiveFunctionValue = singleSampler
 							.getDecisionVariable2finalObjectiveFunctionValue()
 							.get(candidate);
-					if (candidateObjectiveFunctionValue < bestObjectiveFunctionValue) {
-						bestDecisionVariable = candidate;
-						bestObjectiveFunctionValue = candidateObjectiveFunctionValue;
+					if (candidateObjectiveFunctionValue < newBestObjectiveFunctionValue) {
+						newBestDecisionVariable = candidate;
+						newBestObjectiveFunctionValue = candidateObjectiveFunctionValue;
 						newInitialState = candidateInitialState;
 					}
 					transitionsPerIteration += singleSampler
@@ -282,6 +280,12 @@ public class RandomSearch {
 				// }
 				// transitionsPerIteration += sampler.getTotalTransitionCnt();
 				// }
+			}
+
+			if (bestObjectiveFunctionValue == null
+					|| newBestObjectiveFunctionValue < bestObjectiveFunctionValue) {
+				bestDecisionVariable = newBestDecisionVariable;
+				bestObjectiveFunctionValue = newBestObjectiveFunctionValue;
 			}
 
 			this.bestDecisionVariables.add(bestDecisionVariable);
