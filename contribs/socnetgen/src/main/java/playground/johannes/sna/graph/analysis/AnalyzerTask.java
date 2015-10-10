@@ -154,7 +154,7 @@ public abstract class AnalyzerTask {
 	protected TDoubleDoubleHashMap writeCumulativeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
 		if (values.length > 0) {
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), false, false);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), false);
 			hist = Histogram.createCumulativeHistogram(hist);
 			Histogram.normalizeCumulative(hist);
 			Histogram.complementary(hist);
