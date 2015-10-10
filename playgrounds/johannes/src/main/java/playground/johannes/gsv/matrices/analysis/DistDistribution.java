@@ -24,7 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -78,8 +78,8 @@ public class DistDistribution {
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(25000), true);
 		Histogram.normalize(hist);
-//		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
+//		TXTWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
 	}
 
 }

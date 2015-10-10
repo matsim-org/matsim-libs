@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -62,7 +62,7 @@ public class TransitivityAccessibilityTask extends ModuleAnalyzerTask<Accessibil
 		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(localClustering, accessValues,	discretizer);
 		
 		try {
-			TXTWriter.writeMap(correl, "A", "c_local_mean", getOutputDirectory() + "c_local_mean_A.txt");
+			StatsWriter.writeHistogram(correl, "A", "c_local_mean", getOutputDirectory() + "c_local_mean_A.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

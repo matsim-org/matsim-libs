@@ -28,7 +28,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -136,7 +136,7 @@ public class KreisOsmCompare {
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
 		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
-		TXTWriter.writeMap(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/leisure.mean.txt");
+		StatsWriter.writeHistogram(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/leisure.mean.txt");
 		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/leisure.txt"));
 		writer.write("attractivity\tfacilities");
 		writer.newLine();

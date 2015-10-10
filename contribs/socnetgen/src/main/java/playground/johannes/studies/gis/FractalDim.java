@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -113,7 +113,7 @@ public class FractalDim {
 			System.out.println("Calculating fractal dimension for type " + entry.getKey());
 //			DescriptivePiStatistics stats = calcuate(entry.getValue(), null, null);
 			TDoubleDoubleHashMap hist = calcuate(entry.getValue(), null, null);//Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 1000), true);
-			TXTWriter.writeMap(hist, "d", "n", "/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/fdim." + entry.getKey() + ".txt");
+			StatsWriter.writeHistogram(hist, "d", "n", "/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/fdim." + entry.getKey() + ".txt");
 		}
 	}
 

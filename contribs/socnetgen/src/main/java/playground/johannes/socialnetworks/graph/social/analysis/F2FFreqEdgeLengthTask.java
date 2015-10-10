@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
@@ -51,7 +51,7 @@ public class F2FFreqEdgeLengthTask extends AnalyzerTask {
 		
 		TDoubleDoubleHashMap hist = VertexPropertyCorrelation.mean(F2FFrequency.getInstance(), len, graph.getEdges(), discretizer);
 		try {
-			TXTWriter.writeMap(hist, "d", "f", getOutputDirectory() + "/f2ffreq_d.txt");
+			StatsWriter.writeHistogram(hist, "d", "f", getOutputDirectory() + "/f2ffreq_d.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

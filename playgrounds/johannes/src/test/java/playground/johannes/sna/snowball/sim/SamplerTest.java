@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import playground.johannes.sna.TestCaseUtils;
 import playground.johannes.sna.graph.Edge;
@@ -69,7 +69,7 @@ public class SamplerTest extends TestCase {
 			String reference = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getPackageInputDirecoty(getClass()), it);
 			String tmp = String.format("%1$s/k.%2$s.txt", TestCaseUtils.getOutputDirectory(), it);
 
-			TXTWriter.writeMap(Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false), "bin", "count", tmp);
+			StatsWriter.writeHistogram(Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false), "bin", "count", tmp);
 
 			assertEquals(CRCChecksum.getCRCFromFile(reference), CRCChecksum.getCRCFromFile(tmp));
 		}

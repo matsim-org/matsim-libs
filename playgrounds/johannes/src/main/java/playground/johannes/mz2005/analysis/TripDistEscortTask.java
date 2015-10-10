@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
@@ -88,7 +88,7 @@ public class TripDistEscortTask extends TrajectoryAnalyzerTask {
 		}
 
 		try {
-			TXTWriter.writeStatistics(statsMap, "escorts", getOutputDirectory() + "/d_trip_escorts.txt");
+			StatsWriter.writeStatistics(statsMap, "escorts", getOutputDirectory() + "/d_trip_escorts.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

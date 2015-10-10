@@ -27,7 +27,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
@@ -97,7 +97,7 @@ public class AcceptanceProbaDegreeTask extends AnalyzerTask {
 			TDoubleDoubleHashMap histogram = entry.getValue();
 			Histogram.normalize(histogram, sum);
 			try {
-				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), key));
+				StatsWriter.writeHistogram(histogram, "d", "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), key));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -106,7 +106,7 @@ public class AcceptanceProbaDegreeTask extends AnalyzerTask {
 			histogram = Histogram.createCumulativeHistogram(histogram);
 			Histogram.complementary(histogram);
 			try {
-				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.cum.txt", getOutputDirectory(), key));
+				StatsWriter.writeHistogram(histogram, "d", "p", String.format("%1$s/%2$s.cum.txt", getOutputDirectory(), key));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

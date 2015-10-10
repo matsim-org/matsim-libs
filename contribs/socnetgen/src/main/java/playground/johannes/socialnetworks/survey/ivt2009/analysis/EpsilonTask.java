@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
@@ -140,7 +140,7 @@ public class EpsilonTask extends AnalyzerTask {
 			 * dump histogram
 			 */
 			try {
-				TXTWriter.writeMap(epsilon_d, "d", "epsilon", String.format("%1$s/epsilon.cat%2$s.txt", getOutputDirectory(), A_cat));
+				StatsWriter.writeHistogram(epsilon_d, "d", "epsilon", String.format("%1$s/epsilon.cat%2$s.txt", getOutputDirectory(), A_cat));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

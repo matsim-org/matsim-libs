@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.counts.Count;
@@ -116,16 +116,16 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 
 		try {
 			TDoubleDoubleHashMap map = Correlations.mean(caps.toNativeArray(), errorVals.toNativeArray());
-			TXTWriter.writeMap(map, "capacity", "counts", String.format("%s/countsError.capacity.txt", outdir));
+			StatsWriter.writeHistogram(map, "capacity", "counts", String.format("%s/countsError.capacity.txt", outdir));
 
 			map = Correlations.mean(speeds.toNativeArray(), errorVals.toNativeArray());
-			TXTWriter.writeMap(map, "speed", "counts", String.format("%s/countsError.speed.txt", outdir));
+			StatsWriter.writeHistogram(map, "speed", "counts", String.format("%s/countsError.speed.txt", outdir));
 
-			TXTWriter.writeMap(Histogram.createHistogram(error, new LinearDiscretizer(0.1), false), "Error", "Frequency",
+			StatsWriter.writeHistogram(Histogram.createHistogram(error, new LinearDiscretizer(0.1), false), "Error", "Frequency",
 					String.format("%s/countsError.hist.txt", outdir));
-			TXTWriter.writeMap(Histogram.createHistogram(errorAbs, new LinearDiscretizer(0.1), false), "Error (absolute)", "Frequency",
+			StatsWriter.writeHistogram(Histogram.createHistogram(errorAbs, new LinearDiscretizer(0.1), false), "Error (absolute)", "Frequency",
 					String.format("%s/countsErrorAbs.hist.txt", outdir));
-			TXTWriter.writeMap(Histogram.createHistogram(errorWeighted, new LinearDiscretizer(0.1), true), "Error (weighted)", "Frequency",
+			StatsWriter.writeHistogram(Histogram.createHistogram(errorWeighted, new LinearDiscretizer(0.1), true), "Error (weighted)", "Frequency",
 					String.format("%s/countsErrorWeighted.hist.txt", outdir));
 
 			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);

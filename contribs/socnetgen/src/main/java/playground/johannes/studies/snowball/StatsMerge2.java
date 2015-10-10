@@ -211,7 +211,7 @@ public class StatsMerge2 {
 		 */
 		Discretizer discretizer = FixedSampleSizeDiscretizer.create(piStats.getValues(), 50);
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(piStats, discretizer, false);
-		TXTWriter.writeMap(hist, "n", "apl", outputAvr);
+		StatsWriter.writeHistogram(hist, "n", "apl", outputAvr);
 		logger.info("Done.");
 	}
 }

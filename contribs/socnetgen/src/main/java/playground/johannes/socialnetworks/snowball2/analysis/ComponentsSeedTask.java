@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.analysis.Components;
@@ -55,7 +55,7 @@ public class ComponentsSeedTask extends AnalyzerTask {
 			}
 
 			try {
-				TXTWriter.writeMap(map, "size", "seeds", String.format("%1$s/componentSeeds.txt", getOutputDirectory()), true);
+				StatsWriter.writeHistogram(map, "size", "seeds", String.format("%1$s/componentSeeds.txt", getOutputDirectory()), true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

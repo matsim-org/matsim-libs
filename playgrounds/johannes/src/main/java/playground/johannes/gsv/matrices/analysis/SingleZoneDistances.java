@@ -24,7 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -79,7 +79,7 @@ public class SingleZoneDistances {
 		}
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(20000), true);
-		TXTWriter.writeMap(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
+		StatsWriter.writeHistogram(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
 	}
 
 }

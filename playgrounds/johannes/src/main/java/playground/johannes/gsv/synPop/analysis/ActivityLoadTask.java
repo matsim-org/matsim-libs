@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -55,7 +55,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 		for(String purpose : purposes) {
 			TDoubleDoubleHashMap load = activityLoad(persons, purpose);
 			try {
-				TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/actload.%2$s.txt", outDir, purpose));
+				StatsWriter.writeHistogram(load, "t", "freq", String.format("%1$s/actload.%2$s.txt", outDir, purpose));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -63,7 +63,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 
 		TDoubleDoubleHashMap load = activityLoad(persons, null);
 		try {
-			TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/actload.all.txt", outDir));
+			StatsWriter.writeHistogram(load, "t", "freq", String.format("%1$s/actload.all.txt", outDir));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

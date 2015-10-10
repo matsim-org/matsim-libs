@@ -26,7 +26,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
@@ -70,7 +70,7 @@ public class TripTask extends AnalyzerTask {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 50), true);
 		Histogram.normalize(hist);
 		try {
-			TXTWriter.writeMap(hist, "d", "p_trip", getOutputDirectory() + "p_trip.txt");
+			StatsWriter.writeHistogram(hist, "d", "p_trip", getOutputDirectory() + "p_trip.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

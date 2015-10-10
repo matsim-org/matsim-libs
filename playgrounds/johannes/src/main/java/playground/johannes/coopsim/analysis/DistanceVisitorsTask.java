@@ -25,7 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
@@ -79,7 +79,7 @@ public class DistanceVisitorsTask extends TrajectoryAnalyzerTask {
 			try {
 				if(purpose == null)
 					purpose = "all";
-				TXTWriter.writeMap(correl, "visitors", "d", String.format("%1$s/d_visitors.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(correl, "visitors", "d", String.format("%1$s/d_visitors.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -23,7 +23,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.choice.DurationSelector;
@@ -53,7 +53,7 @@ public class DurationChoiceLogger extends TrajectoryAnalyzerTask implements Choi
 		try {
 			if(stats.getN() > 0) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 30), true);
-			TXTWriter.writeMap(hist, "t", "n", getOutputDirectory() + "dur.choices.txt");
+			StatsWriter.writeHistogram(hist, "t", "n", getOutputDirectory() + "dur.choices.txt");
 			stats.clear();
 			}
 		} catch (IOException e) {

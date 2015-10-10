@@ -26,7 +26,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -72,28 +72,28 @@ public class SpatialPropertyAccessibilityTask extends ModuleAnalyzerTask<LogAcce
 				 */
 				TObjectDoubleHashMap yVals = Degree.getInstance().values(graph.getVertices());
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, discretizer);
-				TXTWriter.writeMap(correl, "A", "k", getOutputDirectory() + "k_A.mean.txt");
+				StatsWriter.writeHistogram(correl, "A", "k", getOutputDirectory() + "k_A.mean.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> statistics = VertexPropertyCorrelation.statistics(yVals, xVals, discretizer);
-				TXTWriter.writeStatistics(statistics, "A", getOutputDirectory() + "k_A.stats.txt");
+				StatsWriter.writeStatistics(statistics, "A", getOutputDirectory() + "k_A.stats.txt");
 				/*
 				 * transitivity-accessibility correlation
 				 */
 				yVals = Transitivity.getInstance().values(graph.getVertices());
 				correl = VertexPropertyCorrelation.mean(yVals, xVals, discretizer);
-				TXTWriter.writeMap(correl, "A", "c_local", getOutputDirectory() + "c_local_A.mean.txt");
+				StatsWriter.writeHistogram(correl, "A", "c_local", getOutputDirectory() + "c_local_A.mean.txt");
 				
 				statistics = VertexPropertyCorrelation.statistics(yVals, xVals, discretizer);
-				TXTWriter.writeStatistics(statistics, "A", getOutputDirectory() + "c_local_A.stats.txt");
+				StatsWriter.writeStatistics(statistics, "A", getOutputDirectory() + "c_local_A.stats.txt");
 				/*
 				 * mean distance-accessibility correlation
 				 */
 				TObjectDoubleHashMap<SpatialVertex> dVals = Distance.getInstance().vertexMean(graph.getVertices());
 				correl = VertexPropertyCorrelation.mean(dVals, xVals, discretizer);
-				TXTWriter.writeMap(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.mean.txt");
+				StatsWriter.writeHistogram(correl, "A", "d_mean", getOutputDirectory() + "d_mean_A.mean.txt");
 				
 				statistics = VertexPropertyCorrelation.statistics(dVals, xVals, discretizer);
-				TXTWriter.writeStatistics(statistics, "A", getOutputDirectory() + "d_mean_A.stats.txt");
+				StatsWriter.writeStatistics(statistics, "A", getOutputDirectory() + "d_mean_A.stats.txt");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

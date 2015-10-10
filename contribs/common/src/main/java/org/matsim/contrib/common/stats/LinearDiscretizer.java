@@ -22,7 +22,7 @@ package org.matsim.contrib.common.stats;
 import org.apache.commons.math.stat.StatUtils;
 
 /**
- * A discretizer with bin of equal width.
+ * A discretizer with bins of equal width.
  * 
  * @author illenberger
  * 
@@ -42,7 +42,7 @@ public class LinearDiscretizer implements Discretizer {
 	}
 
 	/**
-	 * Creates a new discretizer with bin width calculated such that
+	 * Creates a new discretizer with bin width calculated so that
 	 * <tt>values</tt> would be descretized to <tt>bins</tt> categories.
 	 * 
 	 * @param values an array of values.

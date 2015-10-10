@@ -360,10 +360,10 @@ public class GraphBuilder {
 		try {
 			
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(okStats, new LinearDiscretizer(1), false);
-		TXTWriter.writeMap(hist, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ok.txt");
+		StatsWriter.writeHistogram(hist, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ok.txt");
 		
 		TDoubleDoubleHashMap hist2 = Histogram.createHistogram(notOkStats, new LinearDiscretizer(1), false);
-		TXTWriter.writeMap(hist2, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_notok.txt");
+		StatsWriter.writeHistogram(hist2, "k", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_notok.txt");
 		
 		TDoubleDoubleHashMap ratio = new TDoubleDoubleHashMap();
 		double[] keys = hist.keys();
@@ -373,7 +373,7 @@ public class GraphBuilder {
 			
 			ratio.put(k, val1/(val2+val1));
 		}
-		TXTWriter.writeMap(ratio, "k", "p", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ratio.txt");
+		StatsWriter.writeHistogram(ratio, "k", "p", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/k_ratio.txt");
 		
 			logger.info("Mean num of cliques: " + numDistrNoZero.getMean());
 			logger.info("Mean size: " + sizeDistr.getMean());
@@ -382,11 +382,11 @@ public class GraphBuilder {
 			
 			TDoubleDoubleHashMap histNum = Histogram.createHistogram(numDistrNoZero, FixedSampleSizeDiscretizer.create(numDistrNoZero.getValues(), 2, 20), true);
 			Histogram.normalize(histNum);
-			TXTWriter.writeMap(histNum, "num", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numCliques.txt");
+			StatsWriter.writeHistogram(histNum, "num", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numCliques.txt");
 			
 			TDoubleDoubleHashMap histSize = Histogram.createHistogram(sizeDistr, FixedSampleSizeDiscretizer.create(sizeDistr.getValues(), 2, 20), true);
 			Histogram.normalize(histSize);
-			TXTWriter.writeMap(histSize, "size", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numPersons.txt");
+			StatsWriter.writeHistogram(histSize, "size", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numPersons.txt");
 			
 			Discretizer discretizer = FixedSampleSizeDiscretizer.create(kSizeValues.toNativeArray(), 20, 20);
 			TDoubleArrayList valuesX = new TDoubleArrayList();

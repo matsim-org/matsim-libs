@@ -22,7 +22,7 @@ package playground.johannes.studies.netgeneration;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 
 import java.io.IOException;
 
@@ -47,11 +47,11 @@ public class CreatePowerLaw {
 //		Discretizer d = FixedSampleSizeDiscretizer.create(stats.getValues(), 10);
 //		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, d, true);
 		
-		TXTWriter.writeMap(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.txt");
+		StatsWriter.writeHistogram(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.txt");
 		
 		hist = Histogram.createCumulativeHistogram(hist);
 		
-		TXTWriter.writeMap(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.cum.txt");
+		StatsWriter.writeHistogram(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.cum.txt");
 	}
 
 }

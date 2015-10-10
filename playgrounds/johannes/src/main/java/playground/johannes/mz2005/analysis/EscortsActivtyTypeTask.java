@@ -21,7 +21,7 @@ package playground.johannes.mz2005.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.mz2005.io.EscortData;
@@ -64,7 +64,7 @@ public class EscortsActivtyTypeTask extends TrajectoryAnalyzerTask {
 		}
 
 		try {
-			TXTWriter.writeStatistics(statsMap, getOutputDirectory() + "/escorts_type.txt");
+			StatsWriter.writeStatistics(statsMap, getOutputDirectory() + "/escorts_type.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -27,7 +27,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
@@ -89,7 +89,7 @@ public class TransitivityTest {
 				ProgressLogger.step();
 			}
 			ProgressLogger.termiante();
-			TXTWriter.writeMap(M_d, "d", "m/A", String.format("%1$s/M_A.%2$.4f.txt", "/Users/jillenberger/Work/socialnets/mcmc/output", it.key()));
+			StatsWriter.writeHistogram(M_d, "d", "m/A", String.format("%1$s/M_A.%2$.4f.txt", "/Users/jillenberger/Work/socialnets/mcmc/output", it.key()));
 		}
 	}
 

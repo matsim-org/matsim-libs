@@ -24,7 +24,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
@@ -83,10 +83,10 @@ public class TimeSamplerTest {
 		
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(durations, FixedSampleSizeDiscretizer.create(durations.getValues(), 1, 30), true);
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, "t", "n", "/Users/jillenberger/Work/socialnets/locationChoice/output/durations.txt");
+		StatsWriter.writeHistogram(hist, "t", "n", "/Users/jillenberger/Work/socialnets/locationChoice/output/durations.txt");
 
 		TDoubleDoubleHashMap correl = Correlations.mean(arrivals.getValues(), durations.getValues(), FixedSampleSizeDiscretizer.create(arrivals.getValues(), 1, 24));
-		TXTWriter.writeMap(correl, "arr", "dur", "/Users/jillenberger/Work/socialnets/locationChoice/output/dur_arr.txt");
+		StatsWriter.writeHistogram(correl, "arr", "dur", "/Users/jillenberger/Work/socialnets/locationChoice/output/dur_arr.txt");
 	}
 
 }

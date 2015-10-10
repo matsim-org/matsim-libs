@@ -24,7 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -97,7 +97,7 @@ public class FacilityChoiceSetDistribution {
 				}
 			}
 
-			TXTWriter.writeMap(hist, "d", "n", "/Users/jillenberger/Work/socialnets/locationChoice/output/" + entry2.getKey() + ".txt");
+			StatsWriter.writeHistogram(hist, "d", "n", "/Users/jillenberger/Work/socialnets/locationChoice/output/" + entry2.getKey() + ".txt");
 		}
 	}
 }

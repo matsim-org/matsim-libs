@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -82,7 +82,7 @@ public class TripDurationArrivalTime extends TrajectoryAnalyzerTask {
 			type = "all";
 		
 		try {
-			TXTWriter.writeMap(map, "arrival", "tripDuration", String.format("%1$s/tripdur_arr.%2$s.txt", getOutputDirectory(), type));
+			StatsWriter.writeHistogram(map, "arrival", "tripDuration", String.format("%1$s/tripdur_arr.%2$s.txt", getOutputDirectory(), type));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

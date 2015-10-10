@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
@@ -108,7 +108,7 @@ public abstract class TransitionLoadTask extends TrajectoryAnalyzerTask {
 			if (!samples.isEmpty()) {
 				Discretizer disc = FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 100);
 				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), disc, true);
-				TXTWriter.writeMap(load, "time", "n", String.format("%s/%s.%s.txt", getOutputDirectory(), key, filter));
+				StatsWriter.writeHistogram(load, "time", "n", String.format("%s/%s.%s.txt", getOutputDirectory(), key, filter));
 			}
 
 		} catch (IOException e) {

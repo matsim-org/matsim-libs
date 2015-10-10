@@ -25,7 +25,7 @@ import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.graph.Vertex;
@@ -85,7 +85,7 @@ public class TripDistanceAccessibilityTask extends TrajectoryAnalyzerTask {
 			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
 					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
 			try {
-				TXTWriter.writeMap(correl, "A", "d", getOutputDirectory() + "d_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "d", getOutputDirectory() + "d_mean_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

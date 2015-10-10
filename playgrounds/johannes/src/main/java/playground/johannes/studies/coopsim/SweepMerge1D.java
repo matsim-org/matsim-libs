@@ -22,7 +22,7 @@ package playground.johannes.studies.coopsim;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 
@@ -121,7 +121,7 @@ public class SweepMerge1D {
 			}
 		}
 		
-		TXTWriter.writeMap(values, parameterKey, property, String.format("%1$s/%2$s.txt", analysis.getAbsolutePath(), property));
+		StatsWriter.writeHistogram(values, parameterKey, property, String.format("%1$s/%2$s.txt", analysis.getAbsolutePath(), property));
 	}
 
 }

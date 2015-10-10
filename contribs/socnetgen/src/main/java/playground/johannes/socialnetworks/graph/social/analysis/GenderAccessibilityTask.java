@@ -23,7 +23,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -66,7 +66,7 @@ public class GenderAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 50));
 
 			try {
-				TXTWriter.writeMap(correl, "A", "gender", getOutputDirectory() + "gender_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "gender", getOutputDirectory() + "gender_mean_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

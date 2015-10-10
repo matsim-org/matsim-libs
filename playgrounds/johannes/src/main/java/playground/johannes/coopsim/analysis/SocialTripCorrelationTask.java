@@ -26,7 +26,7 @@ import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -88,11 +88,11 @@ public abstract class SocialTripCorrelationTask extends TrajectoryAnalyzerTask {
 		
 		try {
 			TDoubleDoubleHashMap correl = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray());
-			TXTWriter.writeMap(correl, key, key, String.format("%1$s/%2$s.txt", getOutputDirectory(), key2));
+			StatsWriter.writeHistogram(correl, key, key, String.format("%1$s/%2$s.txt", getOutputDirectory(), key2));
 			
 			TDoubleObjectHashMap<DescriptiveStatistics> table = Correlations.statistics(xvals.toNativeArray(), yvals.toNativeArray(), new DummyDiscretizer());
-			TXTWriter.writeBoxplotStats(table, String.format("%1$s/%2$s.table.txt", getOutputDirectory(), key2));
-			TXTWriter.writeScatterPlot(table, String.format("%1$s/%2$s.xy.txt", getOutputDirectory(), key2));
+			StatsWriter.writeBoxplotStats(table, String.format("%1$s/%2$s.table.txt", getOutputDirectory(), key2));
+			StatsWriter.writeScatterPlot(table, String.format("%1$s/%2$s.xy.txt", getOutputDirectory(), key2));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

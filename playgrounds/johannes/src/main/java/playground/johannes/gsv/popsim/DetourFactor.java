@@ -21,7 +21,7 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.CommonKeys;
@@ -63,7 +63,7 @@ public class DetourFactor extends AnalyzerTask {
 
             try {
                 String filename = getOutputDirectory() + "/detours.txt";
-                TXTWriter.writeScatterPlot(xvalues, yvalues, "d.route", "d.geo", filename);
+                StatsWriter.writeScatterPlot(xvalues, yvalues, "d.route", "d.geo", filename);
             } catch (IOException e) {
                 e.printStackTrace();
             }

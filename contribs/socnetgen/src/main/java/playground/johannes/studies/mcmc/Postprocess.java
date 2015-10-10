@@ -20,7 +20,7 @@
 package playground.johannes.studies.mcmc;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 
@@ -81,7 +81,7 @@ public class Postprocess {
 			}
 		}
 		
-		TXTWriter.writeMap(values, "theta", "value", String.format("%1$s/analysis/%2$s.txt", rootDir, key));
+		StatsWriter.writeHistogram(values, "theta", "value", String.format("%1$s/analysis/%2$s.txt", rootDir, key));
 	}
 
 }

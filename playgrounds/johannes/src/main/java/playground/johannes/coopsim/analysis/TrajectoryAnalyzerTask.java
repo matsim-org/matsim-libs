@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
@@ -84,7 +84,7 @@ public abstract class TrajectoryAnalyzerTask {
 			
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
 			Histogram.normalize(hist);
-			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
+			StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
 		} else {
 			logger.debug("Cannot create histogram. No samples.");
 		}
@@ -92,8 +92,8 @@ public abstract class TrajectoryAnalyzerTask {
 	
 	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
-		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
+		StatsWriter.writeHistogram(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+		StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
 	}
 }

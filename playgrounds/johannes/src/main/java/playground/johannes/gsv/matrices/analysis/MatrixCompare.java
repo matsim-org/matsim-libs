@@ -27,7 +27,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
@@ -279,8 +279,8 @@ public class MatrixCompare {
 		}
 
 		try {
-			TXTWriter.writeMap(Histogram.createHistogram(stats1, FixedSampleSizeDiscretizer.create(stats1.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist1.txt");
-			TXTWriter.writeMap(Histogram.createHistogram(stats2, FixedSampleSizeDiscretizer.create(stats2.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist2.txt");
+			StatsWriter.writeHistogram(Histogram.createHistogram(stats1, FixedSampleSizeDiscretizer.create(stats1.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist1.txt");
+			StatsWriter.writeHistogram(Histogram.createHistogram(stats2, FixedSampleSizeDiscretizer.create(stats2.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist2.txt");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -336,7 +336,7 @@ public class MatrixCompare {
 
 		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 		TDoubleDoubleHashMap distErrCorrelation = distErrCorrelation(m1, m2, zones, false, ignoreZeros);
-		TXTWriter.writeMap(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.txt");
+		StatsWriter.writeHistogram(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.txt");
 		
 		Map<String, String> ids = new HashMap<>();
 		ids.put("6412", "FRA");
@@ -349,7 +349,7 @@ public class MatrixCompare {
 
 		zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 //		distErrCorrelation = distErrCorrelation(m1, m2, zones, ids.keySet(), false, ignoreZeros);
-//		TXTWriter.writeMap(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.sel.txt");
+//		TXTWriter.writeHistogram(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.sel.txt");
 		
 		Map<String, double[]> relErrs = relError(m1, m2, ids, false);
 		for(java.util.Map.Entry<String, double[]> entry : relErrs.entrySet()) {

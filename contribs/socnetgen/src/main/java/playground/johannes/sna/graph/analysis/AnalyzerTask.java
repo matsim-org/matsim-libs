@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.math.Distribution;
 
@@ -138,10 +138,10 @@ public abstract class AnalyzerTask {
 		if (values.length > 0) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats,
 					FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
-			TXTWriter.writeMap(hist, name, "p",
+			StatsWriter.writeHistogram(hist, name, "p",
 					String.format("%1$s/%2$s.n%3$s.nonorm.txt", getOutputDirectory(), name, values.length / bins));
 			Histogram.normalize(hist);
-			TXTWriter.writeMap(hist, name, "p",
+			StatsWriter.writeHistogram(hist, name, "p",
 					String.format("%1$s/%2$s.n%3$s.txt", getOutputDirectory(), name, values.length / bins));
 			
 			return hist;
@@ -158,7 +158,7 @@ public abstract class AnalyzerTask {
 			hist = Histogram.createCumulativeHistogram(hist);
 			Histogram.normalizeCumulative(hist);
 			Histogram.complementary(hist);
-			TXTWriter.writeMap(hist, name, "P",	String.format("%1$s/%2$s.n%3$s.cum.txt", getOutputDirectory(), name, values.length / bins));
+			StatsWriter.writeHistogram(hist, name, "P", String.format("%1$s/%2$s.n%3$s.cum.txt", getOutputDirectory(), name, values.length / bins));
 			
 			return hist;
 		} else {
@@ -169,9 +169,9 @@ public abstract class AnalyzerTask {
 	
 	protected TDoubleDoubleHashMap writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
-		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
+		StatsWriter.writeHistogram(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+		StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
 		
 		return hist;
 	}

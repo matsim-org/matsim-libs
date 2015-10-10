@@ -27,7 +27,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -97,7 +97,7 @@ public class Plz8OsmCompare {
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
 		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
-		TXTWriter.writeMap(stats, "employees", "facilities", "/home/johannes/gsv/osm/shop-compare.txt");
+		StatsWriter.writeHistogram(stats, "employees", "facilities", "/home/johannes/gsv/osm/shop-compare.txt");
 //		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/shop-compare.txt"));
 //		writer.write("employees\tfacilities");
 //		writer.newLine();

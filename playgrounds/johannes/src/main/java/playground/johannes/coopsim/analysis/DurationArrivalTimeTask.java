@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -83,9 +83,9 @@ public class DurationArrivalTimeTask extends TrajectoryAnalyzerTask {
 		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), d);
 		try {
 			if(purpose == null)
-				TXTWriter.writeMap(map, "arr", "dur", String.format("%1$s/dur_arr.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(map, "arr", "dur", String.format("%1$s/dur_arr.txt", getOutputDirectory()));
 			else
-				TXTWriter.writeMap(map, "arr", "dur", String.format("%1$s/dur_arr.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(map, "arr", "dur", String.format("%1$s/dur_arr.%2$s.txt", getOutputDirectory(), purpose));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

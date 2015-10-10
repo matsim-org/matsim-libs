@@ -25,7 +25,7 @@ import gnu.trove.TObjectDoubleIterator;
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Degree;
@@ -76,7 +76,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
 //			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, new LinearDiscretizer(5.0));
 			try {
-				TXTWriter.writeMap(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -93,7 +93,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
 
 			try {
-				TXTWriter.writeMap(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

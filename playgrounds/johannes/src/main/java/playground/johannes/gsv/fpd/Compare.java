@@ -129,13 +129,13 @@ public class Compare {
 
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
 		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
 
 		hist = calcDistDistribution(zones, model, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
 
 		hist = calcDistDistribution(zones, sim, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
 	}
 
 	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, KeyMatrix m, KeyMatrix relations) {

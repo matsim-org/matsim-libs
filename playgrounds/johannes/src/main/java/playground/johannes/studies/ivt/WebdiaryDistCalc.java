@@ -143,16 +143,16 @@ public class WebdiaryDistCalc {
 		Discretizer disc = new FixedBordersDiscretizer(new double[]{0,1,2,3,4,5,6,7,8,9,10,60});
 //		correl = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray(), FixedSampleSizeDiscretizer.create(xvals.toNativeArray(), 20, 20));
 		correl = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray(), disc);
-//		TXTWriter.writeMap(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members_k.txt");
-		TXTWriter.writeMap(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.txt");
+//		TXTWriter.writeHistogram(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members_k.txt");
+		StatsWriter.writeHistogram(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.txt");
 		
 		
 		TDoubleObjectHashMap<DescriptiveStatistics> correl2 = Correlations.statistics(xvals.toNativeArray(), yvals.toNativeArray(), disc);
 //		TXTWriter.writeBoxplotStats(correl2,"/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
-		TXTWriter.writeStatistics(correl2, "members", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
+		StatsWriter.writeStatistics(correl2, "members", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
 		DescriptiveStatistics stats = new DescriptiveStatistics(xvals.toNativeArray());
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new DummyDiscretizer(), false);
-		TXTWriter.writeMap(hist, "members", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members.txt");
+		StatsWriter.writeHistogram(hist, "members", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members.txt");
 		
 		DescriptiveStatistics dists = new DescriptiveStatistics(yvals.toNativeArray());
 		System.out.println("Mean dist = " + dists.getMean());

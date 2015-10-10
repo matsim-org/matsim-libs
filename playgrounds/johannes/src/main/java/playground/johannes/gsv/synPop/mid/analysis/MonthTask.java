@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
@@ -55,7 +55,7 @@ public class MonthTask extends AnalyzerTask {
 
 		if (outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(values, "month", "count", String.format("%s/months.txt", getOutputDirectory()));
+				StatsWriter.writeLabeledHistogram(values, "month", "count", String.format("%s/months.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

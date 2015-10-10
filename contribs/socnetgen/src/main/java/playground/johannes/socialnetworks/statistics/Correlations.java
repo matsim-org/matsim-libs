@@ -31,7 +31,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -165,7 +165,7 @@ public class Correlations {
 	 */
 	public static void writeToFile(TDoubleDoubleHashMap values, String filename, String xLabel, String yLabel)
 			throws FileNotFoundException, IOException {
-		TXTWriter.writeMap(values, xLabel, yLabel, filename);
+		StatsWriter.writeHistogram(values, xLabel, yLabel, filename);
 	}
 
 }

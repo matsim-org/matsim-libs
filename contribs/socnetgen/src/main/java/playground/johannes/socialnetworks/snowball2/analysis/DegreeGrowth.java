@@ -148,9 +148,9 @@ public class DegreeGrowth implements SamplerListener {
 //			file.mkdirs();
 //
 //			try {
-//				TXTWriter.writeMap(growth, "k", "growth", String.format("%1$s/k_growth.txt", file.getAbsolutePath()));
-//				TXTWriter.writeMap(hist, "k", "growth", String.format("%1$s/k_hist.txt", file.getAbsolutePath()));
-//				TXTWriter.writeMap(prevHist, "k", "growth",String.format("%1$s/k_prevHist.txt", file.getAbsolutePath()));
+//				TXTWriter.writeHistogram(growth, "k", "growth", String.format("%1$s/k_growth.txt", file.getAbsolutePath()));
+//				TXTWriter.writeHistogram(hist, "k", "growth", String.format("%1$s/k_hist.txt", file.getAbsolutePath()));
+//				TXTWriter.writeHistogram(prevHist, "k", "growth",String.format("%1$s/k_prevHist.txt", file.getAbsolutePath()));
 //
 //			} catch (IOException e) {
 //				e.printStackTrace();

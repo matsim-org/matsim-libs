@@ -25,7 +25,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
@@ -105,7 +105,7 @@ public class FracDimOpportunities {
 		System.out.println("Creating histograms...");
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 500), true);
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, "d", "p", outFile);
+		StatsWriter.writeHistogram(hist, "d", "p", outFile);
 	}
 
 }

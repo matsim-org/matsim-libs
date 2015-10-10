@@ -23,7 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
@@ -205,10 +205,10 @@ public class SeedConnectionTask extends AnalyzerTask {
 				}
 				
 				TDoubleDoubleHashMap map = Correlations.mean(xVals.toNativeArray(), yVals.toNativeArray());
-				TXTWriter.writeMap(map, "k", "connects", String.format("%1$s/connects_k.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(map, "k", "connects", String.format("%1$s/connects_k.txt", getOutputDirectory()));
 				
 				map = Correlations.mean(xVals2.toNativeArray(), yVals2.toNativeArray());
-				TXTWriter.writeMap(map, "k", "closeness", String.format("%1$s/closeness_k.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(map, "k", "closeness", String.format("%1$s/closeness_k.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

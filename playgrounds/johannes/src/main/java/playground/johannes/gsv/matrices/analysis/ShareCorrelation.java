@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
@@ -98,10 +98,10 @@ public class ShareCorrelation {
 		System.out.println(String.format("%s relations", errVals.size()));
 		TDoubleDoubleHashMap values = Correlations.mean(shareVals.toNativeArray(), errVals.toNativeArray(), FixedSampleSizeDiscretizer.create(shareVals.toNativeArray(), 50));
 //		TDoubleDoubleHashMap values = Correlations.mean(errVals.toNativeArray(), shareVals.toNativeArray(), 0.05);
-		TXTWriter.writeMap(values, "share", "error", "/home/johannes/gsv/matrices/analysis/marketShares/shareCorrelation.txt");
+		StatsWriter.writeHistogram(values, "share", "error", "/home/johannes/gsv/matrices/analysis/marketShares/shareCorrelation.txt");
 		
 		values = Correlations.mean(volVals.toNativeArray(), errVals.toNativeArray(), FixedSampleSizeDiscretizer.create(volVals.toNativeArray(), 50));
-		TXTWriter.writeMap(values, "volume", "error", "/home/johannes/gsv/matrices/analysis/marketShares/volCorrelation.txt");
+		StatsWriter.writeHistogram(values, "volume", "error", "/home/johannes/gsv/matrices/analysis/marketShares/volCorrelation.txt");
 	}
 	
 	private static void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {

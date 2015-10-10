@@ -25,7 +25,7 @@ import gnu.trove.TObjectDoubleIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
@@ -81,7 +81,7 @@ public class EdgeLengthDegreeTask extends ModuleAnalyzerTask<Degree> {
 		TDoubleDoubleHashMap correl = Correlations.mean(xVals, yVals, discretizer);
 		
 		try {
-			TXTWriter.writeMap(correl, "k", "d_mean", getOutputDirectory() + "d_mean_k.txt");
+			StatsWriter.writeHistogram(correl, "k", "d_mean", getOutputDirectory() + "d_mean_k.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

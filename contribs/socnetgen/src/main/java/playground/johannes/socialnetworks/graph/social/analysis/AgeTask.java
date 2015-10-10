@@ -22,7 +22,7 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 import gnu.trove.TDoubleObjectHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
@@ -59,10 +59,10 @@ public class AgeTask extends ModuleAnalyzerTask<Age> {
 			try {
 				writeHistograms(stats, new LinearDiscretizer(1.0), key, false);
 			
-				TXTWriter.writeMap(module.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
+				StatsWriter.writeHistogram(module.correlation((Set<? extends SocialVertex>) graph.getVertices()), "age", "age_mean", getOutputDirectory() + "/age_age.mean.txt");
 			
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = module.boxplot((Set<? extends SocialVertex>) graph.getVertices());
-				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "age_age.table.txt");
+				StatsWriter.writeBoxplotStats(stat, getOutputDirectory() + "age_age.table.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

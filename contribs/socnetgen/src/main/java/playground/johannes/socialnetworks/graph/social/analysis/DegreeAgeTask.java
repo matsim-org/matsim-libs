@@ -22,7 +22,7 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -46,7 +46,7 @@ public class DegreeAgeTask extends ModuleAnalyzerTask<Degree> {
 		if(outputDirectoryNotNull()) {
 			TDoubleDoubleHashMap hist = VertexPropertyCorrelation.mean(module, Age.getInstance(), graph.getVertices(), new LinearDiscretizer(5.0));
 			try {
-				TXTWriter.writeMap(hist, "age", "k", getOutputDirectory() + "/k_mean_age.txt");
+				StatsWriter.writeHistogram(hist, "age", "k", getOutputDirectory() + "/k_mean_age.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

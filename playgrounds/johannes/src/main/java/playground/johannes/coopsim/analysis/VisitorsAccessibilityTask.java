@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.sna.graph.Vertex;
@@ -107,8 +107,8 @@ public class VisitorsAccessibilityTask extends TrajectoryAnalyzerTask {
 			TDoubleObjectHashMap<DescriptiveStatistics> stats = Correlations.statistics(accessVals.toNativeArray(),
 					visitorVals.toNativeArray(), discretizer);
 			try {
-				TXTWriter.writeMap(correl, "A", "n", String.format("%1$s/visitors_A.%2$s.txt", getOutputDirectory(), purpose));
-				TXTWriter.writeStatistics(stats, "access",
+				StatsWriter.writeHistogram(correl, "A", "n", String.format("%1$s/visitors_A.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeStatistics(stats, "access",
 						String.format("%1$s/visitors_A.stats.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();

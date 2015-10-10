@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.data.Person;
 
 import java.io.BufferedWriter;
@@ -130,7 +130,7 @@ public class HamiltonianLogger implements SamplerListener {
 			File afile = new File(file);
 			afile.mkdirs();
 			try {
-				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
+				StatsWriter.writeHistogram(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

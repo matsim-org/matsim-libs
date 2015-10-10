@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
@@ -102,7 +102,7 @@ public class ActivityFacilitySelector implements ChoiceSelector {
 			Discretizer discretizer = FixedSampleSizeDiscretizer.create(stats.getValues(), 50, 50);
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, true);
 			try {
-				TXTWriter.writeMap(hist, "d", "p", String.format("/Users/jillenberger/Work/socialnets/locationChoice/output/%1$s.%2$s.choiceset.txt", count, type));
+				StatsWriter.writeHistogram(hist, "d", "p", String.format("/Users/jillenberger/Work/socialnets/locationChoice/output/%1$s.%2$s.choiceset.txt", count, type));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -24,7 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
@@ -114,7 +114,7 @@ public class TTRatio {
 		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50, 200);
 //		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
 		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), new LinearDiscretizer(0.02));
-		TXTWriter.writeMap(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
+		StatsWriter.writeHistogram(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
 	}
 
 	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {

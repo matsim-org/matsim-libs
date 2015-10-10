@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 		if(outputDirectoryNotNull()) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false);
 			try {
-				TXTWriter.writeMap(hist, "size", "n", String.format("%1$s/components.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(hist, "size", "n", String.format("%1$s/components.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -23,7 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
@@ -103,7 +103,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 		
 			TDoubleDoubleHashMap map = Correlations.mean(distances.toNativeArray(), durations.toNativeArray(), new LinearDiscretizer(1000));
 			try {
-				TXTWriter.writeMap(map, "Distance", "Traveltime", getOutputDirectory() + key + ".txt");
+				StatsWriter.writeHistogram(map, "Distance", "Traveltime", getOutputDirectory() + key + ".txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -176,16 +176,16 @@ public class CalcShares {
 		
 //		double[] samples = railVolumes.toNativeArray();
 //		TDoubleDoubleHashMap hist = Correlations.mean(samples, shareSimDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
-//		TXTWriter.writeMap(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/simVolDiff.txt");
+//		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/simVolDiff.txt");
 //		
 //		hist = Correlations.mean(samples, shareItpDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
-//		TXTWriter.writeMap(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/itpVolDiff.txt");
+//		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/itpVolDiff.txt");
 //		
 //		hist = Correlations.mean(refShares.toNativeArray(), simShares.toNativeArray());
-//		TXTWriter.writeMap(hist, "ref share", "sim share", "/home/johannes/gsv/matrices/analysis/marketShares/simShareCorrel.txt");
+//		TXTWriter.writeHistogram(hist, "ref share", "sim share", "/home/johannes/gsv/matrices/analysis/marketShares/simShareCorrel.txt");
 //		
 //		hist = Correlations.mean(refShares.toNativeArray(), itpShares.toNativeArray());
-//		TXTWriter.writeMap(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
+//		TXTWriter.writeHistogram(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
 	}
 
 	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {

@@ -22,7 +22,7 @@ package playground.johannes.coopsim.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class ActivityLoadTask extends TrajectoryAnalyzerTask {
 		for(String purpose : purposes) {
 			TDoubleDoubleHashMap load = activityLoad(trajectories, purpose);
 			try {
-				TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/actload.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(load, "t", "freq", String.format("%1$s/actload.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -58,7 +58,7 @@ public class ActivityLoadTask extends TrajectoryAnalyzerTask {
 
 		TDoubleDoubleHashMap load = activityLoad(trajectories, null);
 		try {
-			TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/actload.all.txt", getOutputDirectory()));
+			StatsWriter.writeHistogram(load, "t", "freq", String.format("%1$s/actload.all.txt", getOutputDirectory()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

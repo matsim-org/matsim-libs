@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
@@ -61,7 +61,7 @@ public class EducationTask extends ModuleAnalyzerTask<Education> {
 				Map<SocialVertex, String> values = module.values(graph.getVertices());
 				TObjectDoubleHashMap<String> hist = LinguisticHistogram.create(values.values());
 				
-				TXTWriter.writeMap(hist, "education", "n", String.format("%1$s/education.txt", getOutputDirectory()));
+				StatsWriter.writeLabeledHistogram(hist, "education", "n", String.format("%1$s/education.txt", getOutputDirectory()));
 				
 				SocioMatrix<String> m = module.countsMatrix(graph.getVertices());
 				m.toFile(String.format("%1$s/education.countsMatrix.txt", getOutputDirectory()));

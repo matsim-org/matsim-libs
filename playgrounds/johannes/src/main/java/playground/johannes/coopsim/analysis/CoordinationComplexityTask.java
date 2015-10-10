@@ -25,7 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
@@ -93,13 +93,13 @@ public class CoordinationComplexityTask extends TrajectoryAnalyzerTask {
 					purpose = "all";
 					
 				TDoubleDoubleHashMap correl = Correlations.mean(x, arrVals.toNativeArray());
-				TXTWriter.writeMap(correl, "members", "diff", String.format("%1$s/arrdiff_members.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(correl, "members", "diff", String.format("%1$s/arrdiff_members.%2$s.txt", getOutputDirectory(), purpose));
 				
 				correl = Correlations.mean(x, durVals.toNativeArray());
-				TXTWriter.writeMap(correl, "members", "diff", String.format("%1$s/durdiff_members.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(correl, "members", "diff", String.format("%1$s/durdiff_members.%2$s.txt", getOutputDirectory(), purpose));
 				
 				correl = Correlations.mean(x, typeVals.toNativeArray());
-				TXTWriter.writeMap(correl, "members", "diff", String.format("%1$s/typediff_members.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(correl, "members", "diff", String.format("%1$s/typediff_members.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -28,7 +28,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
@@ -98,11 +98,11 @@ public class MatrixCompare2 {
 
 		KeyMatrix itp_d = distanceMatrix(m1, zones);
 		TDoubleDoubleHashMap hist = writeDistanceHist(m1, itp_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/itp.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/itp.dist.txt");
 
 		KeyMatrix m_d = distanceMatrix(m2, zones);
 		hist = writeDistanceHist(m2, m_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.stat.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.stat.txt");
 		
 //		System.out.println(String.format("PKM Intraplan (> 100 KM): %s", pkm(m1, itp_d)));
 //		System.out.println(String.format("PKM matsim (> 100 KM): %s", pkm(m2, m_d)));

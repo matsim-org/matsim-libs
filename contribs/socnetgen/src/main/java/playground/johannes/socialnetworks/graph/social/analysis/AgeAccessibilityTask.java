@@ -25,7 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
@@ -68,11 +68,11 @@ public class AgeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
 					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
 
-				TXTWriter.writeMap(correl, "A", "age", getOutputDirectory() + "age_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "age", getOutputDirectory() + "age_mean_A.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> table = VertexPropertyCorrelation.statistics(yVals, xVals, new LinearDiscretizer(xVals.getValues(), 200));
-				TXTWriter.writeBoxplotStats(table, String.format("%1$s/age_A.table.txt", getOutputDirectory()));
-				TXTWriter.writeScatterPlot(table, String.format("%1$s/age_A.xy.txt", getOutputDirectory()));
+				StatsWriter.writeBoxplotStats(table, String.format("%1$s/age_A.table.txt", getOutputDirectory()));
+				StatsWriter.writeScatterPlot(table, String.format("%1$s/age_A.xy.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
