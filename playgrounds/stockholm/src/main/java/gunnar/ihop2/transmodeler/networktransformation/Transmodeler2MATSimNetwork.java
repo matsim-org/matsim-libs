@@ -1,7 +1,6 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -21,10 +20,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -45,11 +40,7 @@ public class Transmodeler2MATSimNetwork {
 
 	public static final String TMPATHID_ATTR = "TMPathID";
 
-	// public static final String TMPATHDIR_ATTR = "TMPathDir";
-
 	public static final String TMFROMNODEID_ATTR = "TMFromNodeID";
-
-	// public static final String TMTONODEID_ATTR = "TMToNodeID";
 
 	public static final String TMLINKDIRPREFIX_ATTR = "TMLinkDirPrefix";
 
@@ -89,17 +80,13 @@ public class Transmodeler2MATSimNetwork {
 
 	private final String tmLaneConnectorsFileName;
 
-	private final String matsimNetworkFileName;
+	private final boolean scaleUpIntersectionLinks;
+
+	private final String matsimPlainNetworkFileName;
+
+	private final String matsimExpandedNetworkFileName;
 
 	private final String linkAttributesFileName;
-
-	private final String nodesShapeFileName1;
-
-	private final String nodesShapeFileName2;
-
-	private final String linksShapeFileName1;
-
-	private final String linksShapeFileName2;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -107,21 +94,19 @@ public class Transmodeler2MATSimNetwork {
 			final String tmLinksFileName, final String tmSegmentsFileName,
 			final String tmLanesFileName,
 			final String tmLaneConnectorsFileName,
-			final String matsimNetworkFileName,
-			final String linkAttributesFileName,
-			final String nodesShapeFileName1, final String linksShapeFileName1,
-			final String nodesShapeFileName2, final String linksShapeFileName2) {
+			final boolean scaleUpIntersectionLinks,
+			final String matsimPlainNetworkFileName,
+			final String matsimExpandedNetworkFileName,
+			final String linkAttributesFileName) {
 		this.tmNodesFileName = tmNodesFileName;
 		this.tmLinksFileName = tmLinksFileName;
 		this.tmSegmentsFileName = tmSegmentsFileName;
 		this.tmLanesFileName = tmLanesFileName;
 		this.tmLaneConnectorsFileName = tmLaneConnectorsFileName;
-		this.matsimNetworkFileName = matsimNetworkFileName;
+		this.scaleUpIntersectionLinks = scaleUpIntersectionLinks;
+		this.matsimPlainNetworkFileName = matsimPlainNetworkFileName;
+		this.matsimExpandedNetworkFileName = matsimExpandedNetworkFileName;
 		this.linkAttributesFileName = linkAttributesFileName;
-		this.nodesShapeFileName1 = nodesShapeFileName1;
-		this.linksShapeFileName1 = linksShapeFileName1;
-		this.nodesShapeFileName2 = nodesShapeFileName2;
-		this.linksShapeFileName2 = linksShapeFileName2;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -198,7 +183,7 @@ public class Transmodeler2MATSimNetwork {
 		}
 
 		/*
-		 * (3) Create and add all MATSim links.
+		 * (2c) Create and add all MATSim links.
 		 */
 
 		final Set<String> unknownLinkTypes = new LinkedHashSet<String>();
@@ -250,6 +235,7 @@ public class Transmodeler2MATSimNetwork {
 		System.out
 				.println("------------------------------------------------------------");
 		System.out.println("RAW MATSIM NETWORK STATISTICS");
+		System.out.println("(This network is not saved to file.)");
 		System.out.println("Number of nodes: "
 				+ matsimNetwork.getNodes().size());
 		System.out.println("Number of links: "
@@ -261,16 +247,21 @@ public class Transmodeler2MATSimNetwork {
 		System.out.println();
 
 		/*
-		 * (3c) Clean up the network.
+		 * (2d) Clean up the network and save it to file.
 		 */
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(matsimNetwork);
 
+		NetworkWriter networkWriter = new NetworkWriter(matsimNetwork);
+		networkWriter.write(this.matsimPlainNetworkFileName);
+
 		System.out.println();
 		System.out
 				.println("------------------------------------------------------------");
 		System.out.println("MATSIM NETWORK STATISTICS AFTER NETWORK CLEANING");
+		System.out.println("(This network is saved as "
+				+ this.matsimPlainNetworkFileName + ".)");
 		System.out.println("Number of nodes: "
 				+ matsimNetwork.getNodes().size());
 		System.out.println("Number of links: "
@@ -279,30 +270,30 @@ public class Transmodeler2MATSimNetwork {
 				.println("------------------------------------------------------------");
 		System.out.println();
 
-		final double linkWidthCoefficient = 0.3;
-
-		{
-			final FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
-					matsimNetwork, StockholmTransformationFactory.WGS84);
-			builder.setWidthCoefficient(linkWidthCoefficient);
-			builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-			final Links2ESRIShape esriWriter = new Links2ESRIShape(
-					matsimNetwork, this.linksShapeFileName1, builder);
-			esriWriter.write();
-
-			final PrintWriter nodesWriter = new PrintWriter(
-					this.nodesShapeFileName1);
-			nodesWriter.println("x;y");
-			for (Node node : matsimNetwork.getNodes().values()) {
-				nodesWriter.println(node.getCoord().getX() + ";"
-						+ node.getCoord().getY());
-			}
-			nodesWriter.flush();
-			nodesWriter.close();
-		}
+		// final double linkWidthCoefficient = 0.3;
+		// {
+		// final FeatureGeneratorBuilderImpl builder = new
+		// FeatureGeneratorBuilderImpl(
+		// matsimNetwork, StockholmTransformationFactory.WGS84);
+		// builder.setWidthCoefficient(linkWidthCoefficient);
+		// builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		// final Links2ESRIShape esriWriter = new Links2ESRIShape(
+		// matsimNetwork, this.linksShapeFileName1, builder);
+		// esriWriter.write();
+		//
+		// final PrintWriter nodesWriter = new PrintWriter(
+		// this.nodesShapeFileName1);
+		// nodesWriter.println("x;y");
+		// for (Node node : matsimNetwork.getNodes().values()) {
+		// nodesWriter.println(node.getCoord().getX() + ";"
+		// + node.getCoord().getY());
+		// }
+		// nodesWriter.flush();
+		// nodesWriter.close();
+		// }
 
 		/*
-		 * (3d) Expand networks to allow for turning moves.
+		 * (3a) Expand networks to allow for turning moves.
 		 */
 
 		final Map<Id<Node>, Node> originalMATSimNodes = new LinkedHashMap<>();
@@ -312,8 +303,6 @@ public class Transmodeler2MATSimNetwork {
 
 		for (Map.Entry<Id<Node>, Node> matsimId2node : originalMATSimNodes
 				.entrySet()) {
-			// if ((matsimId2node.getValue().getInLinks().size() > 1)
-			// || (matsimId2node.getValue().getInLinks().size() > 1)) {
 			final ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
 			double maxTurnLength = 5.0;
 
@@ -333,31 +322,11 @@ public class Transmodeler2MATSimNetwork {
 					}
 				}
 			}
-
-			// for (TurnInfo turn : turns) {
-			// System.out.print(turn.getFromLinkId() + " -> "
-			// + turn.getToLinkId());
-			// System.out.print(" ... upstrFromNode = ");
-			// System.out.print(matsimNetwork.getLinks()
-			// .get(turn.getFromLinkId()).getFromNode().getId());
-			// System.out.print(", upstrToNode = ");
-			// System.out.print(matsimNetwork.getLinks()
-			// .get(turn.getFromLinkId()).getToNode().getId());
-			// System.out.print(", downstrFromNode = ");
-			// System.out.print(matsimNetwork.getLinks()
-			// .get(turn.getToLinkId()).getFromNode().getId());
-			// System.out.print(", downstrToNode = ");
-			// System.out.print(matsimNetwork.getLinks()
-			// .get(turn.getToLinkId()).getToNode().getId());
-			// System.out.println();
-			// }
-
-			final double radius = 10.0;
+			final double radius = 25.0;
 			final double offset = 5.0;
 			final NetworkExpandNode exp = new NetworkExpandNode(matsimNetwork,
 					radius, offset);
 			exp.expandNode(matsimId2node.getKey(), turns);
-			// }
 		}
 
 		System.out.println();
@@ -374,34 +343,16 @@ public class Transmodeler2MATSimNetwork {
 		System.out.println();
 
 		/*
-		 * Clean network once again.
+		 * (3b) Clean network once again.
 		 */
 
-		final boolean cleanAfterExpansion = true;
+		cleaner = new NetworkCleaner();
+		cleaner.run(matsimNetwork);
 
-		if (cleanAfterExpansion) {
-
-			cleaner = new NetworkCleaner();
-			cleaner.run(matsimNetwork);
-
-			System.out.println();
-			System.out
-					.println("------------------------------------------------------------");
-			System.out
-					.println("MATSIM NETWORK STATISTICS AFTER REPEATED NETWORK CLEANING");
-			System.out.println("Number of nodes: "
-					+ matsimNetwork.getNodes().size());
-			System.out.println("Number of links: "
-					+ matsimNetwork.getLinks().size());
-			System.out
-					.println("------------------------------------------------------------");
-			System.out.println();
-
-		}
-
-		// >>>>>>>>>>>>>>>>>>>> TODO >>>>>>>>>>>>>>>>>>>>
-		final boolean scaleUpIntersectionLinks = true;
-		if (scaleUpIntersectionLinks) {
+		/*
+		 * (3c) Scale up the additional intersection links.
+		 */
+		if (this.scaleUpIntersectionLinks) {
 			final Set<String> allKeys = new LinkedHashSet<>(
 					ObjectAttributeUtils2.allObjectKeys(linkAttributes));
 			for (Map.Entry<Id<Link>, ? extends Link> id2link : matsimNetwork
@@ -412,68 +363,82 @@ public class Transmodeler2MATSimNetwork {
 				}
 			}
 		}
-		// <<<<<<<<<<<<<<<<<<<< TODO <<<<<<<<<<<<<<<<<<<<
 
 		/*
-		 * (3e) Write the network and its attributes to file.
+		 * (3d) Write the network and its attributes to file.
 		 */
 
-		final NetworkWriter networkWriter = new NetworkWriter(matsimNetwork);
-		networkWriter.write(this.matsimNetworkFileName);
+		networkWriter = new NetworkWriter(matsimNetwork);
+		networkWriter.write(this.matsimExpandedNetworkFileName);
 
 		final ObjectAttributesXmlWriter linkAttributesWriter = new ObjectAttributesXmlWriter(
 				linkAttributes);
 		linkAttributesWriter.writeFile(this.linkAttributesFileName);
 
+		System.out.println();
+		System.out
+				.println("------------------------------------------------------------");
+		System.out
+				.println("MATSIM NETWORK STATISTICS AFTER REPEATED NETWORK CLEANING");
+		System.out.println("(This network is saved as "
+				+ this.matsimExpandedNetworkFileName + ".)");
+		System.out.println("Number of nodes: "
+				+ matsimNetwork.getNodes().size());
+		System.out.println("Number of links: "
+				+ matsimNetwork.getLinks().size());
+		System.out
+				.println("------------------------------------------------------------");
+		System.out.println();
+
 		/*
 		 * (4) Create shape file.
 		 */
-
-		{
-			final FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
-					matsimNetwork, TransformationFactory.WGS84);
-			builder.setWidthCoefficient(linkWidthCoefficient);
-			builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-			final Links2ESRIShape esriWriter = new Links2ESRIShape(
-					matsimNetwork, this.linksShapeFileName2, builder);
-			esriWriter.write();
-
-			final PrintWriter nodesWriter = new PrintWriter(
-					this.nodesShapeFileName2);
-			nodesWriter.println("x;y");
-			for (Node node : matsimNetwork.getNodes().values()) {
-				nodesWriter.println(node.getCoord().getX() + ";"
-						+ node.getCoord().getY());
-			}
-			nodesWriter.flush();
-			nodesWriter.close();
-		}
+		// {
+		// final FeatureGeneratorBuilderImpl builder = new
+		// FeatureGeneratorBuilderImpl(
+		// matsimNetwork, TransformationFactory.WGS84);
+		// builder.setWidthCoefficient(linkWidthCoefficient);
+		// builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		// final Links2ESRIShape esriWriter = new Links2ESRIShape(
+		// matsimNetwork, this.linksShapeFileName2, builder);
+		// esriWriter.write();
+		//
+		// final PrintWriter nodesWriter = new PrintWriter(
+		// this.nodesShapeFileName2);
+		// nodesWriter.println("x;y");
+		// for (Node node : matsimNetwork.getNodes().values()) {
+		// nodesWriter.println(node.getCoord().getX() + ";"
+		// + node.getCoord().getY());
+		// }
+		// nodesWriter.flush();
+		// nodesWriter.close();
+		// }
 	}
 
 	// -------------------- MAIN-FUNCTION --------------------
 
 	public static void main(String[] args) throws IOException {
 
-		final String path = "./data/transmodeler/";
-		final String nodesFile = path + "Nodes.csv";
-		final String segmentsFile = path + "Segments.csv";
-		final String lanesFile = path + "Lanes.csv";
-		final String laneConnectorsFile = path + "Lane Connectors.csv";
-		final String linksFile = path + "Links.csv";
-		final String nodesFile1 = path + "nodes1.txt";
-		final String nodesFile2 = path + "nodes2.txt";
-		final String linksFile1 = path + "links1.shp";
-		final String linksFile2 = path + "links3.shp";
+		final String inputPath = "./data/transmodeler/";
+		final String nodesFile = inputPath + "Nodes.csv";
+		final String segmentsFile = inputPath + "Segments.csv";
+		final String lanesFile = inputPath + "Lanes.csv";
+		final String laneConnectorsFile = inputPath + "Lane Connectors.csv";
+		final String linksFile = inputPath + "Links.csv";
 
-		final String matsimFile = "./data/run/network.xml";
-		final String linkAttributesFile = "./data/run/linkAttributes.xml";
+		final boolean scaleUpIntersectionLinks = false;
+
+		final String outputPath = "./data/run/";
+		final String matsimPlainFile = outputPath + "network-plain.xml";
+		final String matsimExpandedFile = outputPath + "network-expanded.xml";
+		final String linkAttributesFile = outputPath + "link-attributes.xml";
 
 		System.out.println("STARTED ...");
 
 		final Transmodeler2MATSimNetwork tm2MATSim = new Transmodeler2MATSimNetwork(
 				nodesFile, linksFile, segmentsFile, lanesFile,
-				laneConnectorsFile, matsimFile, linkAttributesFile, nodesFile1,
-				linksFile1, nodesFile2, linksFile2);
+				laneConnectorsFile, scaleUpIntersectionLinks, matsimPlainFile,
+				matsimExpandedFile, linkAttributesFile);
 		tm2MATSim.run();
 
 		System.out.println("... DONE");

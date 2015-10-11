@@ -34,7 +34,6 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import patryk.popgen2.Building;
 import patryk.utils.LinksRemover;
@@ -163,16 +162,18 @@ public class PopulationCreator {
 		}
 	}
 
-//	public void setNodeAttributeFileName(final String nodeAttributeFileName) {
-//		final ObjectAttributes nodeAttributes = new ObjectAttributes();
-//		for (Map.Entry<Id<Node>, ? extends Node> id2node : this.scenario
-//				.getNetwork().getNodes().entrySet()) {
-//			
-//		}
-//		final ObjectAttributesXmlWriter nodeAttributesWriter = new ObjectAttributesXmlWriter(
-//				nodeAttributes);
-//		nodeAttributesWriter.writeFile(nodeAttributeFileName);
-//	}
+	// public void setNodeAttributeFileName(final String nodeAttributeFileName)
+	// {
+	// final ObjectAttributes nodeAttributes = new ObjectAttributes();
+	// for (Map.Entry<Id<Node>, ? extends Node> id2node : this.scenario
+	// .getNetwork().getNodes().entrySet()) {
+	//
+	// }
+	// final ObjectAttributesXmlWriter nodeAttributesWriter = new
+	// ObjectAttributesXmlWriter(
+	// nodeAttributes);
+	// nodeAttributesWriter.writeFile(nodeAttributeFileName);
+	// }
 
 	// -------------------- INTERNALS --------------------
 
@@ -300,12 +301,12 @@ public class PopulationCreator {
 		// ((PersonImpl) person).setSex((String) this.scenario.getPopulation()
 		// .getPersonAttributes()
 		// .getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
-		PersonUtils.setEmployed(person, workZone != null);
-		PersonUtils.setAge(
-				person,
-				2015 - Integer.parseInt((String) this.scenario.getPopulation()
-						.getPersonAttributes()
-						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE)));
+//		PersonUtils.setEmployed(person, workZone != null);
+//		PersonUtils.setAge(
+//				person,
+//				2015 - (Integer) this.scenario.getPopulation()
+//						.getPersonAttributes()
+//						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE));
 
 		// if (this.scenario
 		// .getPopulation().getPersonAttributes()
@@ -367,8 +368,8 @@ public class PopulationCreator {
 
 	public void run(final String initialPlansFile) throws FileNotFoundException {
 
-		int processedCarDrivers = 0;
-		int everyXthPerson = (int) (1 / this.populationSampleFactor);
+		int processedPersons = 0;
+		int everyXthPerson = (int) (1.0 / this.populationSampleFactor);
 
 		// >>>>> TODO remove links where we do not want activities >>>>>
 		final LinksRemover linksRem = new LinksRemover(
@@ -407,24 +408,22 @@ public class PopulationCreator {
 
 			if (id2clippedZone.keySet().contains(homeZone)
 					&& id2clippedZone.keySet().contains(workZone) && (
-
 					// RegentPopulationReader.PT_ATTRIBUTEVALUE
 					// .equals(workTourMode) ||
-
 					RegentPopulationReader.CAR_ATTRIBUTEVALUE
 							.equals(workTourMode))) {
-				if (processedCarDrivers % everyXthPerson == 0) {
+				if (processedPersons % everyXthPerson == 0) {
 					System.out.print("Person " + personId + ": homeZone = "
 							+ homeZone + ", workZone = " + workZone
 							+ ", workTourMode = " + workTourMode);
-					System.out.println("; this is the " + processedCarDrivers
+					System.out.println("; this is the " + processedPersons
 							+ "th agent.");
 					final Person person = this.newPerson(personId, xy2links,
 							coordinateTransform);
 					this.scenario.getPopulation().addPerson(person);
 
 				}
-				processedCarDrivers++;
+				processedPersons++;
 			}
 		}
 
@@ -457,9 +456,9 @@ public class PopulationCreator {
 		final String buildingShapeFileName = "./data/shapes/by_full_EPSG3857_2.shp";
 		final String populationFileName = "./data/synthetic_population/150615_trips.xml";
 
-		final String networkFileName = "./data/run/network.xml";
-		final String linkAttributesFileName = "./data/run/linkAttributes.xml";
-		final String initialPlansFile = "./data/run/initial_plans.xml";
+		final String networkFileName = "./data/run/network-expanded.xml";
+		final String linkAttributesFileName = "./data/run/link-attributes.xml";
+		final String initialPlansFile = "./data/run/initial-plans.xml";
 
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
@@ -475,9 +474,8 @@ public class PopulationCreator {
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
 		pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
 		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
-		pc.setPopulationSampleFactor(0.01);
+		pc.setPopulationSampleFactor(0.05);
 		pc.setLinkAttributes(linkAttributes);
-//		pc.setNodeAttributeFileName(nodeAttributeFileName);
 
 		pc.run(initialPlansFile);
 

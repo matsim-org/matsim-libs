@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts;
 
 import floetteroed.utilities.math.Vector;
@@ -32,30 +32,19 @@ import floetteroed.utilities.math.Vector;
  * SimulatorState. The smaller the objective function value, the better the
  * state.
  * 
- * TODO The value function would be much easier to use if it accepted directly a
- * SimulatorState argument. But then the gradient evaluation at interpolated
- * simulator states would require to interpolate SimulatorState instances
- * instead of Vectors, which is complicated enough to be completely avoided.
- * 
  * @author Gunnar Flötteröd
  *
  */
 public interface VectorBasedObjectiveFunction {
 
-	public double value(final Vector state);
+	public double value(Vector state);
 
 	/**
-	 * If a gradient is not available, throw an UnsupportedOperationException.
-	 * 
 	 * @param state
 	 *            a vector representation of the a simulator state
 	 * @return the gradient of the objective function, evaluated at the point
 	 *         given by state
-	 * 
-	 * @throws UnsupportedOperationException
-	 *             if no gradient can be provided
 	 */
-	public Vector gradient(final Vector state)
-			throws UnsupportedOperationException;
+	public Vector gradient(Vector state);
 
 }

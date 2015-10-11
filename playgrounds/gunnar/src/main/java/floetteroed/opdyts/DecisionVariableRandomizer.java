@@ -21,12 +21,15 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts;
 
 /**
  * Creates random decision variables that are used as "innovations" in an
  * iterative, stochastic optimization process.
+ * 
+ * @param U
+ *            the decision variable type
  * 
  * @author Gunnar Flötteröd
  *
@@ -42,7 +45,6 @@ public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 	/**
 	 * @return a random variation of <code>decisionVariable</code>
 	 */
-	public U newRandomVariation(
-			final U decisionVariable);
+	public U newRandomVariation(final U decisionVariable);
 
 }
