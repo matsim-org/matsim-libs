@@ -20,7 +20,7 @@
 package playground.johannes.socialnetworks.snowball2.analysis;
 
 
-import playground.johannes.sna.math.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.socialnetworks.statistics.WeightedSampleMean;
 

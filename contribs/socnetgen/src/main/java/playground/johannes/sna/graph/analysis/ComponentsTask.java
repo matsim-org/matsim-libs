@@ -20,17 +20,15 @@
 package playground.johannes.sna.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.sna.graph.Graph;
 
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * An AnalyzerTask that counts the number of components in a graph.
@@ -71,7 +69,7 @@ public class ComponentsTask extends ModuleAnalyzerTask<Components> {
 		if(outputDirectoryNotNull()) {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(distr, new LinearDiscretizer(1.0), false);
 			try {
-				TXTWriter.writeMap(hist, "size", "n", String.format("%1$s/components.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(hist, "size", "n", String.format("%1$s/components.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

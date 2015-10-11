@@ -19,27 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TIntIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.FixedBordersDiscretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.*;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -51,9 +39,13 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -151,16 +143,16 @@ public class WebdiaryDistCalc {
 		Discretizer disc = new FixedBordersDiscretizer(new double[]{0,1,2,3,4,5,6,7,8,9,10,60});
 //		correl = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray(), FixedSampleSizeDiscretizer.create(xvals.toNativeArray(), 20, 20));
 		correl = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray(), disc);
-//		TXTWriter.writeMap(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members_k.txt");
-		TXTWriter.writeMap(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.txt");
+//		TXTWriter.writeHistogram(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members_k.txt");
+		StatsWriter.writeHistogram(correl, "members", "disr", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.txt");
 		
 		
 		TDoubleObjectHashMap<DescriptiveStatistics> correl2 = Correlations.statistics(xvals.toNativeArray(), yvals.toNativeArray(), disc);
 //		TXTWriter.writeBoxplotStats(correl2,"/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
-		TXTWriter.writeStatistics(correl2, "members", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
+		StatsWriter.writeStatistics(correl2, "members", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/d_members.stats.txt");
 		DescriptiveStatistics stats = new DescriptiveStatistics(xvals.toNativeArray());
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new DummyDiscretizer(), false);
-		TXTWriter.writeMap(hist, "members", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members.txt");
+		StatsWriter.writeHistogram(hist, "members", "n", "/Users/jillenberger/Work/socialnets/data/ivt2009/webdiary/members.txt");
 		
 		DescriptiveStatistics dists = new DescriptiveStatistics(yvals.toNativeArray());
 		System.out.println("Mean dist = " + dists.getMean());

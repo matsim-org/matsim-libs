@@ -19,16 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.studies.netgeneration;
 
-import java.io.IOException;
-
 import gnu.trove.TDoubleDoubleHashMap;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
 
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import java.io.IOException;
 
 /**
  * @author illenberger
@@ -51,11 +47,11 @@ public class CreatePowerLaw {
 //		Discretizer d = FixedSampleSizeDiscretizer.create(stats.getValues(), 10);
 //		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, d, true);
 		
-		TXTWriter.writeMap(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.txt");
+		StatsWriter.writeHistogram(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.txt");
 		
 		hist = Histogram.createCumulativeHistogram(hist);
 		
-		TXTWriter.writeMap(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.cum.txt");
+		StatsWriter.writeHistogram(hist, "x", "p", "/Users/jillenberger/Desktop/powerlaw/distr.cum.txt");
 	}
 
 }

@@ -23,40 +23,22 @@
  */
 package playground.johannes.socialnetworks.gis;
 
-import java.awt.Color;
-
-import net.opengis.kml._2.BoundaryType;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinearRingType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.PolyStyleType;
-import net.opengis.kml._2.PolygonType;
-import net.opengis.kml._2.StyleType;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.junit.experimental.max.MaxCore;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinLogDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.math.LogDiscretizer;
-import playground.johannes.socialnetworks.statistics.Normalizer;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.awt.*;
 
 /**
  * @author illenberger

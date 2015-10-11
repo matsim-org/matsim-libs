@@ -20,14 +20,12 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import gnu.trove.TIntDoubleHashMap;
-
 import org.apache.log4j.Logger;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;

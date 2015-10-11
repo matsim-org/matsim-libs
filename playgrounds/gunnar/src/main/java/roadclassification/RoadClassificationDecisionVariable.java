@@ -8,44 +8,34 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 class RoadClassificationDecisionVariable implements DecisionVariable {
 
+	private final List<LinkSettings> linkSettingses;
+	private final ObjectAttributes linkAttributes;
 	private Network network;
 
-	public RoadClassificationDecisionVariable(final Network network) {
+	public RoadClassificationDecisionVariable(final Network network, ObjectAttributes linkAttributes, List<LinkSettings> linkSettingses) {
 		this.network = network;
-	}
-
-	/**
-	 * This is where concrete implementations configure the osmNetworkReader.
-	 *
-	 */
-	void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
-
+		this.linkAttributes = linkAttributes;
+		this.linkSettingses = linkSettingses;
 	}
 
 	@Override
 	public final void implementInSimulation() {
-		
-//		for (Id<Link> linkId : new ArrayList<>(network.getLinks().keySet())) {
-//			network.removeLink(linkId);
-//		}
-//		for (Id<Node> nodeId : new ArrayList<>(network.getNodes().keySet())) {
-//			network.removeNode(nodeId);
-//		}
-//		OsmNetworkReader osmNetworkReader = new OsmNetworkReader(network, DownloadExampleData.COORDINATE_TRANSFORMATION);
-//		doSetHighwayDefaults(osmNetworkReader);
-//		try (InputStream is = new FileInputStream(DownloadExampleData.SIOUX_FALLS)) {
-//			osmNetworkReader.parse(is);
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
+		for (Link link : network.getLinks().values()) {
+			LinkSettings roadCategory = linkSettingses.get((int) linkAttributes.getAttribute(link.getId().toString(), "roadCategory"));
+			link.setFreespeed(roadCategory.getFreespeed());
+			link.setCapacity(roadCategory.getCapacity());
+			link.setNumberOfLanes(roadCategory.getNofLanes());
+		}
 	}
 
 }

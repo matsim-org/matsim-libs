@@ -39,19 +39,21 @@ import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import floetteroed.utilities.statisticslogging.Statistic;
+import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
 
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
-public class RandomSearch {
+public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
 	private final Simulator simulator;
 
-	private final DecisionVariableRandomizer randomizer;
+	private final DecisionVariableRandomizer<U> randomizer;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
@@ -87,14 +89,16 @@ public class RandomSearch {
 
 	private List<Double> equilibriumGapWeights = new ArrayList<Double>();
 
-	private List<Double> uniformityWeights = new ArrayList<Double>();
+	private List<Double> uniformityGapWeights = new ArrayList<Double>();
 
 	private List<Double> offsets = new ArrayList<Double>();
+
+	private StatisticsMultiWriter<RandomSearch<U>> statisticsWriter = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public RandomSearch(final Simulator system,
-			final DecisionVariableRandomizer randomizer,
+			final DecisionVariableRandomizer<U> randomizer,
 			final ConvergenceCriterion convergenceCriterion,
 			final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
@@ -118,7 +122,7 @@ public class RandomSearch {
 	}
 
 	public RandomSearch(final Simulator system,
-			final DecisionVariableRandomizer randomizer,
+			final DecisionVariableRandomizer<U> randomizer,
 			final ConvergenceCriterion convergenceCriterion,
 			final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
@@ -141,19 +145,90 @@ public class RandomSearch {
 		this.maxMemoryLength = maxMemoryLength;
 	}
 
+	// -------------------- SETTERS AND GETTERS --------------------
+
+	public void setLogFileName(final String logFileName) {
+		this.statisticsWriter = new StatisticsMultiWriter<>();
+		this.statisticsWriter.addStatistic(logFileName,
+				new Statistic<RandomSearch<U>>() {
+					@Override
+					public String label() {
+						return "transition_evaluations";
+					}
+
+					@Override
+					public String value(final RandomSearch<U> data) {
+						return Double.toString(data.transitionEvaluations
+								.get(data.transitionEvaluations.size() - 1));
+					}
+				});
+		this.statisticsWriter.addStatistic(logFileName,
+				new Statistic<RandomSearch<U>>() {
+					@Override
+					public String label() {
+						return "best_objective_function_value";
+					}
+
+					@Override
+					public String value(final RandomSearch<U> data) {
+						return Double.toString(data.bestObjectiveFunctionValues
+								.get(data.bestObjectiveFunctionValues.size() - 1));
+					}
+				});
+		this.statisticsWriter.addStatistic(logFileName,
+				new Statistic<RandomSearch<U>>() {
+					@Override
+					public String label() {
+						return "equilibrium_gap_weight";
+					}
+
+					@Override
+					public String value(final RandomSearch<U> data) {
+						return Double.toString(data.equilibriumGapWeights
+								.get(data.equilibriumGapWeights.size() - 1));
+					}
+				});
+		this.statisticsWriter.addStatistic(logFileName,
+				new Statistic<RandomSearch<U>>() {
+					@Override
+					public String label() {
+						return "uniformity_gap_weight";
+					}
+
+					@Override
+					public String value(final RandomSearch<U> data) {
+						return Double.toString(data.uniformityGapWeights
+								.get(data.uniformityGapWeights.size() - 1));
+					}
+				});
+		this.statisticsWriter.addStatistic(logFileName,
+				new Statistic<RandomSearch<U>>() {
+					@Override
+					public String label() {
+						return "objective_function_offsets";
+					}
+
+					@Override
+					public String value(final RandomSearch<U> data) {
+						return Double.toString(data.offsets.get(data.offsets
+								.size() - 1));
+					}
+				});
+
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
+
+	private int transitions = 0;
 
 	public void run() {
 
-		int transitions = 0;
-
-		DecisionVariable bestDecisionVariable = this.randomizer
-				.newRandomDecisionVariable();
+		U bestDecisionVariable = this.randomizer.newRandomDecisionVariable();
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
 
 		for (int it = 0; it < this.maxIterations
-				&& transitions < this.maxTransitions; it++) {
+				&& this.transitions < this.maxTransitions; it++) {
 
 			System.out.println("Iteration " + (it + 1) + " of "
 					+ this.maxIterations + ", transitions " + transitions
@@ -162,10 +237,10 @@ public class RandomSearch {
 			this.interpolatedObjectiveFunctionValueWeights.add(1.0);
 			this.equilibriumGapWeights.add(this.selfTuner
 					.getEquilibriumGapWeight());
-			this.uniformityWeights.add(this.selfTuner.getUniformityWeight());
+			this.uniformityGapWeights.add(this.selfTuner.getUniformityWeight());
 			this.offsets.add(this.selfTuner.getOffset());
 
-			final Set<DecisionVariable> candidates = new LinkedHashSet<DecisionVariable>();
+			final Set<U> candidates = new LinkedHashSet<U>();
 			if (this.keepBestSolution) {
 				candidates.add(bestDecisionVariable);
 			}
@@ -175,22 +250,19 @@ public class RandomSearch {
 			}
 
 			int transitionsPerIteration = 0;
+			U newBestDecisionVariable;
+			double newBestObjectiveFunctionValue;
 			if (this.interpolate) {
-				// final SamplingStrategy samplingStrategy = new
-				// FullInterpolationSamplingStrategy(
-				// 1.0, this.selfTuner.getEquilibriumGapWeight(),
-				// this.selfTuner.getUniformityWeight(),
-				// this.objectiveFunction);
 
-				final ParallelTrajectorySampler sampler;
+				final ParallelTrajectorySampler<U> sampler;
 				if (this.objectBasedObjectiveFunction != null) {
-					sampler = new ParallelTrajectorySampler(candidates,
+					sampler = new ParallelTrajectorySampler<>(candidates,
 							this.objectBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
 							this.selfTuner.getEquilibriumGapWeight(),
 							this.selfTuner.getUniformityWeight());
 				} else {
-					sampler = new ParallelTrajectorySampler(candidates,
+					sampler = new ParallelTrajectorySampler<>(candidates,
 							this.vectorBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
 							this.selfTuner.getEquilibriumGapWeight(),
@@ -200,34 +272,35 @@ public class RandomSearch {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
-				bestDecisionVariable = sampler.getConvergedDecisionVariables()
-						.iterator().next();
-				bestObjectiveFunctionValue = sampler
-						.getFinalObjectiveFunctionValue(bestDecisionVariable);
+				newBestDecisionVariable = sampler
+						.getConvergedDecisionVariables().iterator().next();
+				newBestObjectiveFunctionValue = sampler
+						.getFinalObjectiveFunctionValue(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
 				this.selfTuner.registerSamplingStageSequence(
 						sampler.getSamplingStages(),
-						bestObjectiveFunctionValue,
-						sampler.getInitialGradientNorm(), bestDecisionVariable);
+						newBestObjectiveFunctionValue,
+						sampler.getInitialGradientNorm(),
+						newBestDecisionVariable);
 
 			} else {
 
 				final SimulatorState thisRoundsInitialState = newInitialState;
 
-				bestDecisionVariable = null;
-				bestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
+				newBestDecisionVariable = null;
+				newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
 
-				for (DecisionVariable candidate : candidates) {
+				for (U candidate : candidates) {
 					this.convergenceCriterion.reset();
-					final SingleTrajectorySampler singleSampler;
+					final SingleTrajectorySampler<U> singleSampler;
 					if (this.objectBasedObjectiveFunction != null) {
-						singleSampler = new SingleTrajectorySampler(candidate,
-								this.objectBasedObjectiveFunction,
+						singleSampler = new SingleTrajectorySampler<>(
+								candidate, this.objectBasedObjectiveFunction,
 								this.convergenceCriterion);
 					} else {
-						singleSampler = new SingleTrajectorySampler(candidate,
-								this.vectorBasedObjectiveFunction,
+						singleSampler = new SingleTrajectorySampler<>(
+								candidate, this.vectorBasedObjectiveFunction,
 								this.convergenceCriterion);
 					}
 					final SimulatorState candidateInitialState = this.simulator
@@ -235,9 +308,9 @@ public class RandomSearch {
 					final double candidateObjectiveFunctionValue = singleSampler
 							.getDecisionVariable2finalObjectiveFunctionValue()
 							.get(candidate);
-					if (candidateObjectiveFunctionValue < bestObjectiveFunctionValue) {
-						bestDecisionVariable = candidate;
-						bestObjectiveFunctionValue = candidateObjectiveFunctionValue;
+					if (candidateObjectiveFunctionValue < newBestObjectiveFunctionValue) {
+						newBestDecisionVariable = candidate;
+						newBestObjectiveFunctionValue = candidateObjectiveFunctionValue;
 						newInitialState = candidateInitialState;
 					}
 					transitionsPerIteration += singleSampler
@@ -284,10 +357,18 @@ public class RandomSearch {
 				// }
 			}
 
+			if (bestObjectiveFunctionValue == null
+					|| newBestObjectiveFunctionValue < bestObjectiveFunctionValue) {
+				bestDecisionVariable = newBestDecisionVariable;
+				bestObjectiveFunctionValue = newBestObjectiveFunctionValue;
+			}
+
 			this.bestDecisionVariables.add(bestDecisionVariable);
 			this.bestObjectiveFunctionValues.add(bestObjectiveFunctionValue);
 			this.transitionEvaluations.add(transitionsPerIteration);
-			transitions += transitionsPerIteration;
+			this.transitions += transitionsPerIteration;
+
+			this.statisticsWriter.writeToFile(this);
 		}
 	}
 
@@ -315,7 +396,7 @@ public class RandomSearch {
 	}
 
 	public List<Double> getUniformityWeightsView() {
-		return Collections.unmodifiableList(this.uniformityWeights);
+		return Collections.unmodifiableList(this.uniformityGapWeights);
 	}
 
 	public List<Double> getOffsetsView() {

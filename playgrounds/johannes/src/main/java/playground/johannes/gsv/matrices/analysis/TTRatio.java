@@ -21,28 +21,21 @@ package playground.johannes.gsv.matrices.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.core.utils.collections.Tuple;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.Map.Entry;
-
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author johannes
@@ -121,7 +114,7 @@ public class TTRatio {
 		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50, 200);
 //		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
 		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), new LinearDiscretizer(0.02));
-		TXTWriter.writeMap(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
+		StatsWriter.writeHistogram(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
 	}
 
 	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {
