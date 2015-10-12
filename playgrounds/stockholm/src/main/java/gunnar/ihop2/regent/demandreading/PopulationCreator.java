@@ -1,6 +1,5 @@
 package gunnar.ihop2.regent.demandreading;
 
-import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.BIRTHYEAR_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOMEZONE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURMODE_ATTRIBUTE;
@@ -27,7 +26,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
@@ -44,6 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import floetteroed.utilities.math.Covariance;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
+import gunnar.ihop2.regent.RegentDictionary;
 
 /**
  * 
@@ -284,9 +283,10 @@ public class PopulationCreator {
 
 		// travel to work
 
-		final String workTourMode = (String) this.scenario.getPopulation()
-				.getPersonAttributes()
-				.getAttribute(personId, WORKTOURMODE_ATTRIBUTE);
+		final String workTourMode = RegentDictionary.regent2matsim
+				.get((String) this.scenario.getPopulation()
+						.getPersonAttributes()
+						.getAttribute(personId, WORKTOURMODE_ATTRIBUTE));
 
 		final Leg homeToWork = this.scenario.getPopulation().getFactory()
 				.createLeg(workTourMode);
@@ -301,12 +301,12 @@ public class PopulationCreator {
 		// ((PersonImpl) person).setSex((String) this.scenario.getPopulation()
 		// .getPersonAttributes()
 		// .getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
-//		PersonUtils.setEmployed(person, workZone != null);
-//		PersonUtils.setAge(
-//				person,
-//				2015 - (Integer) this.scenario.getPopulation()
-//						.getPersonAttributes()
-//						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE));
+		// PersonUtils.setEmployed(person, workZone != null);
+		// PersonUtils.setAge(
+		// person,
+		// 2015 - (Integer) this.scenario.getPopulation()
+		// .getPersonAttributes()
+		// .getAttribute(personId, BIRTHYEAR_ATTRIBUTE));
 
 		// if (this.scenario
 		// .getPopulation().getPersonAttributes()
@@ -383,8 +383,15 @@ public class PopulationCreator {
 						StockholmTransformationFactory.WGS84_EPSG3857,
 						StockholmTransformationFactory.WGS84_SWEREF99);
 
-		final Map<String, Zone> id2clippedZone = this.zonalSystem
-				.getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
+		// TODO >>>>> NEW >>>>>
+		final Map<String, Zone> id2clippedZone;
+		if (this.zonesBoundaryShapeFileName != null) {
+			id2clippedZone = this.zonalSystem
+					.getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
+		} else {
+			id2clippedZone = this.zonalSystem.id2zone;
+		}
+		// TODO <<<<< NEW <<<<<
 
 		final ObjectAttributes personAttributes = this.scenario.getPopulation()
 				.getPersonAttributes();
@@ -454,7 +461,7 @@ public class PopulationCreator {
 
 		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
 		final String buildingShapeFileName = "./data/shapes/by_full_EPSG3857_2.shp";
-		final String populationFileName = "./data/synthetic_population/150615_trips.xml";
+		final String populationFileName = "./data/synthetic_population/150911_trips.xml";
 
 		final String networkFileName = "./data/run/network-expanded.xml";
 		final String linkAttributesFileName = "./data/run/link-attributes.xml";
@@ -476,7 +483,6 @@ public class PopulationCreator {
 		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
 		pc.setPopulationSampleFactor(0.05);
 		pc.setLinkAttributes(linkAttributes);
-
 		pc.run(initialPlansFile);
 
 		System.out.println("NETWORK NODE COORDINATE STATISTICS");

@@ -1,23 +1,48 @@
 package gunnar.ihop2.integration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
+import gunnar.ihop2.regent.demandreading.PopulationCreator;
 
 public class MATSimDummy {
 
 	public static final String IHOP2_ELEMENT = "ihop2";
 
+	public static final String MATSIMCONFIG_FILENAME_ELEMENT = "matsimconfig";
+
+	public static final String ZONESHAPE_FILENAME_ELEMENT = "zoneshapefile";
+
+	public static final String BUILDINGSHAPE_FILENAME_ELEMENT = "buildingshapefile";
+
+	public static final String REGENTPOPULATIONSAMPLE_ELEMENT = "regentpopulationsample";
+
+	public static final String MATSIMPOPULATIONSUBSAMPLE_ELEMENT = "matsimpopulationsubsample";
+
 	public static final String POPULATION_ATTRIBUTE_FILENAME_ELEMENT = "population";
+
+	public static final String LINKATTRIBUTE_FILENAME_ELEMENT = "linkattributefile";
+
+	// TODO CONTINUE HERE
 
 	public static final String TRAVELTIME_MATRIX_FILENAME_ELEMENT = "traveltimes";
 
@@ -72,10 +97,52 @@ public class MATSimDummy {
 		final ConfigReader configReader = new ConfigReader();
 		final Config config = configReader.read(configFileName);
 
+		final String matsimConfigFileName = config.get(IHOP2_ELEMENT,
+				MATSIMCONFIG_FILENAME_ELEMENT);
+		checkNonNull(matsimConfigFileName, "matsimconfig file name");
+		checkFileExistence(matsimConfigFileName, "matsimconfig file");
+
+		final String zoneShapeFileName = config.get(IHOP2_ELEMENT,
+				ZONESHAPE_FILENAME_ELEMENT);
+		checkNonNull(zoneShapeFileName, "zone shapefile name");
+		checkFileExistence(zoneShapeFileName, "zone shapefile");
+
+		final String buildingShapeFileName = config.get(IHOP2_ELEMENT,
+				BUILDINGSHAPE_FILENAME_ELEMENT);
+		checkNonNull(buildingShapeFileName, "building shapefile name");
+		checkFileExistence(buildingShapeFileName, "building shapefile");
+
+		double regentPopulationSample;
+		try {
+			regentPopulationSample = Double.parseDouble(config.get(
+					IHOP2_ELEMENT, REGENTPOPULATIONSAMPLE_ELEMENT));
+		} catch (Exception e) {
+			regentPopulationSample = Double.NaN;
+			fatal("Could not read ihop2 configuration element "
+					+ REGENTPOPULATIONSAMPLE_ELEMENT);
+		}
+
+		double matsimPopulationSubSample;
+		try {
+			matsimPopulationSubSample = Double.parseDouble(config.get(
+					IHOP2_ELEMENT, MATSIMPOPULATIONSUBSAMPLE_ELEMENT));
+		} catch (Exception e) {
+			matsimPopulationSubSample = Double.NaN;
+			fatal("Could not read ihop2 configuration element "
+					+ MATSIMPOPULATIONSUBSAMPLE_ELEMENT);
+		}
+
 		final String populationFileName = config.get(IHOP2_ELEMENT,
 				POPULATION_ATTRIBUTE_FILENAME_ELEMENT);
 		checkNonNull(populationFileName, "population file name");
 		checkFileExistence(populationFileName, "population file");
+
+		final String linkAttributeFileName = config.get(IHOP2_ELEMENT,
+				LINKATTRIBUTE_FILENAME_ELEMENT);
+		checkNonNull(linkAttributeFileName, "linkattribute file name");
+		checkFileExistence(linkAttributeFileName, "linkattribute file");
+
+		// TODO CONTINUE HERE
 
 		final String traveltimesFileName = config.get(IHOP2_ELEMENT,
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT);
@@ -111,7 +178,7 @@ public class MATSimDummy {
 		System.out.println();
 
 		/*
-		 * -------------------- LOAD POPULATION --------------------
+		 * ==================== OUTER ITERATIONS ====================
 		 */
 
 		for (int iteration = 1; iteration <= maxIterations; iteration++) {
@@ -121,19 +188,44 @@ public class MATSimDummy {
 					+ " ----------");
 			System.out.println();
 
-			System.out.println("Loading population file: " + populationFileName
-					+ " ... ");
+			/*
+			 * -------------------- LOAD CONFIGURATION --------------------
+			 */
 
-			ObjectAttributes attrs = null;
+			System.out.println("Loading matsim configuration file: "
+					+ matsimConfigFileName + " ... ");
+			final org.matsim.core.config.Config matsimConfig = ConfigUtils
+					.loadConfig(matsimConfigFileName);
+			final String matsimNetworkFileName = matsimConfig.getModule(
+					"network").getValue("inputNetworkFile");
+			final String initialPlansFileName = matsimConfig.getModule("plans")
+					.getValue("inputPlansFile");
+
+			/*
+			 * -------------------- CREATE POPULATION --------------------
+			 */
+			final PopulationCreator populationCreator = new PopulationCreator(
+					matsimNetworkFileName, zoneShapeFileName,
+					StockholmTransformationFactory.WGS84_EPSG3857,
+					populationFileName);
+			populationCreator.setBuildingsFileName(buildingShapeFileName);
+			// pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
+			// pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
+			// pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
+			// pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
+			populationCreator
+					.setPopulationSampleFactor(matsimPopulationSubSample);
+			final ObjectAttributes linkAttributes = new ObjectAttributes();
+			final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+					linkAttributes);
+			reader.parse(linkAttributeFileName);
+			populationCreator.setLinkAttributes(linkAttributes);
 			try {
-				attrs = new ObjectAttributes();
-				final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
-						attrs);
-				reader.parse(populationFileName);
-			} catch (Exception e) {
-				fatal(e);
-			}			
-			
+				populationCreator.run(initialPlansFileName);
+			} catch (FileNotFoundException e1) {
+				throw new RuntimeException(e1);
+			}
+
 			System.out.println("... population data appears OK so far.");
 			System.out.println();
 
@@ -141,7 +233,14 @@ public class MATSimDummy {
 			 * -------------------- RUN MATSIM --------------------
 			 */
 
-			System.out.println("Pretending to run one MATSim simulation ...");
+			System.out.println("Running MATSim ...");
+			System.out.println();
+
+			// TODO erase output file
+
+			Controler controler = new Controler(matsimConfig);
+			controler.run();
+
 			System.out.println("... MATSim run completed.");
 			System.out.println();
 
@@ -151,6 +250,39 @@ public class MATSimDummy {
 
 			System.out
 					.println("Creating travel time matrix data structures ...");
+
+			// TODO take this out of the controler!?
+			final Scenario scenario = ScenarioUtils.loadScenario(matsimConfig);
+			final int timeBinSize = 15 * 60;
+			final int endTime = 12 * 3600;
+			final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
+					scenario.getNetwork(), timeBinSize, endTime, scenario
+							.getConfig().travelTimeCalculator());
+			final Set<String> relevantLinkIDs = new LinkedHashSet<String>(
+					ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+
+			// TODO CONTINUE HERE
+
+			// final String zonesShapeFileName =
+			// "./data/shapes/sverige_TZ_EPSG3857.shp";
+			// final ZonalSystem zonalSystem = new
+			// ZonalSystem(zonesShapeFileName,
+			// StockholmTransformationFactory.WGS84_EPSG3857);
+			// zonalSystem.addNetwork(scenario.getNetwork(),
+			// StockholmTransformationFactory.WGS84_SWEREF99);
+			//
+			// final TravelTimesWriter ttWriter = new TravelTimesWriter(
+			// scenario.getNetwork(), ttcalc);
+			//
+			// final String eventsFileName =
+			// "./data/run/output/ITERS/it.0/0.events.xml.gz";
+			// final String regentMatrixFileName = "./data/run/regent-tts.xml";
+			// ttWriter.run(eventsFileName, regentMatrixFileName,
+			// relevantLinkIDs,
+			// zonalSystem);
+
+			System.out.println("STOP");
+			System.exit(0);
 
 			final Matrices matrices = new Matrices();
 			final Matrix work = matrices.createMatrix("WORK",
