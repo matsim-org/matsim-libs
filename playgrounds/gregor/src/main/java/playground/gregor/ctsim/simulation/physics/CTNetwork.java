@@ -15,99 +15,115 @@ import java.util.Map;
 public class CTNetwork {
 
 
-    private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
+	private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
 
-    private Map<Id<Link>, CTLink> links = new HashMap<>();
-    private Map<Id<Node>, CTNode> nodes = new HashMap<>();
+	private Map<Id<Link>, CTLink> links = new HashMap<>();
+	private Map<Id<Node>, CTNode> nodes = new HashMap<>();
 
-    private Network network;
-    private EventsManager em;
+	private Network network;
+	private EventsManager em;
 
-    public CTNetwork(Network network, EventsManager em) {
-        this.network = network;
-        this.em = em;
-        init();
-    }
+	public CTNetwork(Network network, EventsManager em) {
+		this.network = network;
+		this.em = em;
+		init();
+	}
 
-    private void init() {
-        for (Node n : this.network.getNodes().values()) {
-            CTNode ct = new CTNode(n.getId(), n, this);
-            this.nodes.put(n.getId(), ct);
-        }
-        for (Link l : this.network.getLinks().values()) {
-            if (links.get(l.getId()) != null) {
-                continue;
-            }
-            Link rev = getRevLink(l);
-            CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
-            links.put(l.getId(), ct);
-            if (rev != null) {
-                links.put(rev.getId(), ct);
-            }
+	private void init() {
+		for (Node n : this.network.getNodes().values()) {
+			CTNode ct = new CTNode(n.getId(), n, this);
+			this.nodes.put(n.getId(), ct);
+		}
+		for (Link l : this.network.getLinks().values()) {
+			if (links.get(l.getId()) != null) {
+				continue;
+			}
+			Link rev = getRevLink(l);
+			CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
+			links.put(l.getId(), ct);
+			if (rev != null) {
+				links.put(rev.getId(), ct);
+			}
 
-        }
-        for (CTNode ctNode : this.nodes.values()) {
-            ctNode.getCTCell().debug(em);
-        }
-    }
+		}
+		for (CTNode ctNode : this.nodes.values()) {
+			ctNode.init();
+			ctNode.getCTCell().debug(em);
+		}
+	}
 
-    public void run() {
-        double time = 0;
-        while (events.peek() != null) {
+	private Link getRevLink(Link l) {
+		for (Link rev : l.getToNode().getOutLinks().values()) {
+			if (rev.getToNode() == l.getFromNode()) {
+				return rev;
+			}
+		}
+		return null;
+	}
 
-            CTEvent e = events.poll();
-            if (e.getExecTime() > time + 0.1) {
-                time = e.getExecTime();
-                draw(time);
+	public void run() {
+		double time = 0;
+		while (events.peek() != null) {
 
-            }
-            if (e.isInvalid()) {
-                continue;
-            }
-            e.execute();
-        }
+			CTEvent e = events.poll();
+			if (e.getExecTime() > time + 1) {
+				time = e.getExecTime();
+				draw(time);
 
-    }
+			}
+			if (e.isInvalid()) {
+				continue;
+			}
+			e.execute();
+		}
 
-    private void draw(double time) {
-        for (CTLink link : getLinks().values()) {
-            for (CTCell cell : link.getCells()) {
-                drawCell(cell, time);
-            }
-        }
-    }
+	}
 
-    private void drawCell(CTCell cell, double time) {
-        for (CTPed ped : cell.getPeds()) {
-            double oX = (5 - (ped.hashCode() % 10)) / 10.;
-            double oY = (5 - ((23 * ped.hashCode()) % 10)) / 10.;
+	private void draw(double time) {
+		for (CTLink link : getLinks().values()) {
+			Link ll = link.getDsLink();
+			double dx  = ll.getToNode().getCoord().getX()-ll.getFromNode().getCoord().getX();
+			double dy  = ll.getToNode().getCoord().getY()-ll.getFromNode().getCoord().getY();
+			dx /= ll.getLength();
+			dy /= ll.getLength();
+			for (CTCell cell : link.getCells()) {
+				drawCell(cell, time,dx,dy);
+			}
+		}
+	}
 
-            double x = cell.getX() + oX / 2.;
-            double y = cell.getY() + oY / 2.;
+	private void drawCell(CTCell cell, double time, double dx, double dy) {
+		for (CTPed ped : cell.getPeds()) {
+			double oX = (5 - (ped.hashCode() % 10)) / 10.;
+			double oY = (5 - ((23 * ped.hashCode()) % 10)) / 10.;
 
-            XYVxVyEventImpl e = new XYVxVyEventImpl(Id.createPersonId(ped.hashCode()), x, y, 0, 0, time);
-            this.em.processEvent(e);
-        }
-    }
+			double x = cell.getX() + oX / 2.;
+			double y = cell.getY() + oY / 2.;
 
-    public void addEvent(CTEvent e) {
-        this.events.add(e);
-    }
+			XYVxVyEventImpl e = new XYVxVyEventImpl(Id.createPersonId(ped.hashCode()), x, y, dx*ped.getDesiredDir(), dy*ped.getDesiredDir(), time);
+			this.em.processEvent(e);
+		}
+	}
 
-    private Link getRevLink(Link l) {
-        for (Link rev : l.getToNode().getOutLinks().values()) {
-            if (rev.getToNode() == l.getFromNode()) {
-                return rev;
-            }
-        }
-        return null;
-    }
+	public Map<Id<Link>, CTLink> getLinks() {
+		return this.links;
+	}
 
-    CTNode getCTNode(Id<Node> id) {
-        return this.nodes.get(id);
-    }
+	public void addEvent(CTEvent e) {
+		this.events.add(e);
+	}
 
-    public Map<Id<Link>, CTLink> getLinks() {
-        return this.links;
-    }
+	CTNode getCTNode(Id<Node> id) {
+		return this.nodes.get(id);
+	}
+
+	public void doSimStep(double time) {
+
+	}
+
+	public void afterSim() {
+
+	}
+
+
 }
