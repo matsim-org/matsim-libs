@@ -10,12 +10,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.gregor.ctsim.simulation.physics.CTCell;
-import playground.gregor.ctsim.simulation.physics.CTLink;
-import playground.gregor.ctsim.simulation.physics.CTNetwork;
-import playground.gregor.ctsim.simulation.physics.CTPed;
+import playground.gregor.ctsim.simulation.physics.*;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -67,7 +65,9 @@ public class Debugger {
 				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
 				for (int i = 0; i < rnd; i++) {
 					nrPeds++;
-					CTPed ped = new CTPed(cell, Math.PI / 2, links);
+					DriverAgent walker = new SimpleCTNetworkWalker(links);
+
+					CTPed ped = new CTPed(cell, walker);
 					cell.jumpOnPed(ped);
 				}
 				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);

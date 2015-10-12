@@ -5,6 +5,7 @@ import be.humphreys.simplevoronoi.Voronoi;
 import com.vividsolutions.jts.geom.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
@@ -327,8 +328,13 @@ public class CTLink implements CTNetworkEntity {
         return cells;
     }
 
-    public void letAgentDepart(CTVehicle veh, double now) {
+//    public void letAgentDepart(CTVehicle veh, double now) {
+//
+//    }
 
+    public void letAgentDepart(MobsimDriverAgent agent, CTLink link, double now) {
+        CTCell cell = null;
+        CTPed p = new CTPed(cell, agent);
     }
 
     private final class ProtoCell {

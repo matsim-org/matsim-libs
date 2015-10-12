@@ -21,44 +21,80 @@ package playground.gregor.ctsim.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * Created by laemmel on 12/10/15.
  */
-public class CTVehicle implements CTPed {
-	public CTVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent, CTLink link) {
+public class SimpleCTNetworkWalker implements DriverAgent {
 
+	private List<Id<Link>> links;
+	private int idx = 1;
+
+	public SimpleCTNetworkWalker(List<Id<Link>> links) {
+		this.links = links;
 	}
 
 	@Override
-	public double getDesiredDir() {
-		return 0;
+	public Id<Link> chooseNextLinkId() {
+		return links.get(idx);
 	}
 
 	@Override
-	public CTCell getNextCellAndJump() {
+	public void notifyMoveOverNode(Id<Link> newLinkId) {
+		idx++;
+		if (idx == links.size()) {
+			idx = 0;
+		}
+	}
+
+	@Override
+	public boolean isWantingToArriveOnCurrentLink() {
+		throw new RuntimeException("unimplemented method!");
+	}
+
+	@Override
+	public Id<Person> getId() {
 		return null;
 	}
 
 	@Override
-	public CTCell getTentativeNextCell() {
-		return null;
+	public Id<Link> getCurrentLinkId() {
+		if (idx == 0) {
+			return links.get(links.size() - 1);
+		}
+		return links.get(idx - 1);
 	}
 
 	@Override
-	public void setTentativeNextCell(CTCell tentativeNextCell) {
-
+	public Id<Link> getDestinationLinkId() {
+		throw new RuntimeException("unimplemented method!");
 	}
 
 	@Override
-	public void notifyMoveOverNode() {
-
+	public String getMode() {
+		throw new RuntimeException("unimplemented method!");
 	}
 
 	@Override
-	public Id<Link> getNextLinkId() {
-		return null;
+	public void setVehicle(MobsimVehicle veh) {
+		throw new RuntimeException("unimplemented method!");
 	}
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		throw new RuntimeException("unimplemented method!");
+	}
+
+	@Override
+	public Id<Vehicle> getPlannedVehicleId() {
+		throw new RuntimeException("unimplemented method!");
+	}
+
+
 }

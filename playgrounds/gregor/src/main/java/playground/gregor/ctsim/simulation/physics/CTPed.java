@@ -21,6 +21,7 @@ package playground.gregor.ctsim.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
 
 import java.util.List;
 
@@ -30,16 +31,29 @@ import java.util.List;
 public class CTPed {
 
 
-	private final List<Id<Link>> links;
+	private final DriverAgent driver;
+	private List<Id<Link>> links;
 	private CTCell currentCell;
 	private double dir;
 	private CTCell tentativeNextCell;
 	private int currentIdx = 1;
 
-	public CTPed(CTCell cell, double dir, List<Id<Link>> links) {
+	public CTPed(CTCell cell, DriverAgent driverAgent) {
 		this.currentCell = cell;
-		this.dir = dir;
-		this.links = links;
+		this.driver = driverAgent;
+		Id<Link> current = driverAgent.getCurrentLinkId();
+		CTLink l = (CTLink) cell.getParent();
+		if (l.getDsLink().getId() == current) {
+			this.dir = Math.PI / 2.;
+		}
+		else {
+			if (l.getUsLink().getId() == current) {
+				this.dir = -Math.PI / 2.;
+			}
+			else {
+				throw new RuntimeException("cell does not belong to current link");
+			}
+		}
 	}
 
 
@@ -70,21 +84,15 @@ public class CTPed {
 			CTLink ctLink = (CTLink) p;
 			Link us = ctLink.getUsLink();
 			Link ds = ctLink.getDsLink();
-			if (us.getId() == getNextLinkId()) {
+			if (us.getId() == driver.chooseNextLinkId()) {
 				this.dir = -Math.PI / 2.;
-				this.currentIdx++;
-				if (this.currentIdx == this.links.size()) {
-					this.currentIdx = 0;
-				}
+				driver.notifyMoveOverNode(driver.chooseNextLinkId());
 				return;
 			}
 			else {
-				if (ds.getId() == getNextLinkId()) {
+				if (ds.getId() == driver.chooseNextLinkId()) {
 					this.dir = Math.PI / 2.;
-					this.currentIdx++;
-					if (this.currentIdx == this.links.size()) {
-						this.currentIdx = 0;
-					}
+					driver.notifyMoveOverNode(driver.chooseNextLinkId());
 					return;
 				}
 			}
@@ -94,7 +102,8 @@ public class CTPed {
 
 	}
 
+
 	public Id<Link> getNextLinkId() {
-		return this.links.get(this.currentIdx);
+		return this.driver.chooseNextLinkId();
 	}
 }

@@ -28,7 +28,6 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.ctsim.simulation.physics.CTNetsimEngine;
-import playground.gregor.ctsim.simulation.physics.CTVehicle;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 public class CTWalkerDepatureHandler implements DepartureHandler {
@@ -61,8 +60,10 @@ public class CTWalkerDepatureHandler implements DepartureHandler {
 		CTLink link = this.engine.getCTNetwork().getLinks().get(linkId);
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId();
 
-		CTVehicle veh = new CTVehicle(vehicleId, agent, link);
-		link.letAgentDepart(veh, now);
+//		CTVehicle veh = new CTVehicle(vehicleId, agent, link);
+		link.letAgentDepart(agent, link, now);
+//		agent.notifyMoveOverNode();
+
 
 	}
 
