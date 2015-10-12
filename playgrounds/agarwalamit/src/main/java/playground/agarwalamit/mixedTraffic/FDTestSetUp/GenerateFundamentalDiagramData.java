@@ -73,14 +73,13 @@ public class GenerateFundamentalDiagramData {
 	static boolean SEEPAGE_ALLOWED = false;
 	private final boolean LIVE_OTFVis = false;
 	static boolean WITH_HOLES = false;
-	boolean WRITE_FD_DATA = true;
 	static String RUN_DIR ;
 	public boolean isPlottingDistribution = false;
 
 	static boolean writeInputFiles = true; // includes config,network and plans
 
-	static String[] TRAVELMODES;	//identification of the different modes
-	static Double[] MODAL_SPLIT; //modal split in PCU 
+	static String[] TRAVELMODES;	
+	static Double[] MODAL_SPLIT; 
 
 	private int reduceDataPointsByFactor = 1;
 
@@ -106,29 +105,41 @@ public class GenerateFundamentalDiagramData {
 	public static String HOLE_SPEED = "15";
 
 	public static void main(String[] args) {
-
-		String RUN_DIR = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312";
-
-		String OUTPUT_FOLDER ="/carBikePassing/";
-
-		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1.,1.}; // in pcu
-
+		
+		boolean isRunningOnCluster = false;
+		
+		if (args.length  > 0) isRunningOnCluster = true;
+		
+		if( ! isRunningOnCluster ) {
+			
+			args = new String [8];
+			
+			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
+			String outFolder ="/carBikePassing/";
+			
+			args[0] = my_dir + outFolder ;
+			args[1] = "car,bike"; // travel (main) modes
+			args[2] = "1.0,1.0"; // modal split in pcu
+			args[3] = "true"; // isPassingAllowed
+			args[4] = "false"; // isSeepageAllowed
+			args[5] = "false"; // isUsingHoles
+			args[6] = "10"; // reduce number of data points by this factor
+			args[7] = "false"; // is plotting modal split distribution
+		}
+		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
-
-		generateFDData.setTravelModes(travelModes);
-		generateFDData.setModalSplit(modalSplit);
-		generateFDData.setPassingAllowed(true);
-		generateFDData.setSeepageAllowed(false);
-		generateFDData.setIsWritingFinalFdData(true);
-		generateFDData.setWriteInputFiles(true);
-		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
-		generateFDData.setUseHoles(false);
-		generateFDData.setReduceDataPointsByFactor(10);
-		//		HOLE_SPEED = args[4];
-		generateFDData.setIsPlottingDistribution(false);
+		
+		generateFDData.setRunDirectory(args[0]);
+		generateFDData.setTravelModes(args[1].split(","));
+		generateFDData.setModalSplit(args[2].split(",")); //in pcu
+		generateFDData.setPassingAllowed(Boolean.valueOf(args[3]));
+		generateFDData.setSeepageAllowed(Boolean.valueOf(args[4]));
+		generateFDData.setUseHoles(Boolean.valueOf(args[5]));
+		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
+		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
+		
+		generateFDData.setWriteInputFiles(true); 
 		generateFDData.run();
-
 	}
 
 	private void consistencyCheckAndInitialize(){
@@ -145,7 +156,7 @@ public class GenerateFundamentalDiagramData {
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
 
 		if(writeInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
-		if(WRITE_FD_DATA && RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
 
 		flowUnstableWarnCount = new int [TRAVELMODES.length];
 		speedUnstableWarnCount = new int [TRAVELMODES.length];
@@ -164,13 +175,13 @@ public class GenerateFundamentalDiagramData {
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
-		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
+		openFileAndWriteHeader(RUN_DIR+"/data.txt");
 
 		if(isPlottingDistribution){
 			parametricRunAccordingToDistribution();	
 		} else parametricRunAccordingToGivenModalSplit();
 
-		if(WRITE_FD_DATA) closeFile();
+		closeFile();
 	}
 
 	public void setRunDirectory(String runDir) {
@@ -193,8 +204,11 @@ public class GenerateFundamentalDiagramData {
 		TRAVELMODES = travelModes;
 	}
 
-	public void setModalSplit(Double[] modalSplit) {
-		MODAL_SPLIT = modalSplit;
+	public void setModalSplit(String [] modalSplit) {
+		MODAL_SPLIT = new Double [modalSplit.length];
+		for (int ii = 0; ii <modalSplit.length; ii ++){
+			MODAL_SPLIT [ii] = Double.valueOf(modalSplit[ii]);
+		}
 	}
 
 	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
@@ -211,10 +225,6 @@ public class GenerateFundamentalDiagramData {
 
 	public Map<Double, Map<String, Tuple<Double, Double>>> getOutData() {
 		return outData;
-	}
-
-	public void setIsWritingFinalFdData(boolean isWritingFinalData) {
-		WRITE_FD_DATA = isWritingFinalData;
 	}
 
 	private void parametricRunAccordingToGivenModalSplit(){
@@ -421,7 +431,7 @@ public class GenerateFundamentalDiagramData {
 			if(globalLinkDensity > networkDensity/3+10) stableState =false; //+10; since we still need some points at max density to show zero speed.
 		}
 
-		if(WRITE_FD_DATA && stableState) {
+		if( stableState ) {
 			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
@@ -473,8 +483,7 @@ public class GenerateFundamentalDiagramData {
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
 		log.info("=======================");
-		log.info("Modifying AgentSource by modifying mobsim agents' next link so that, "
-				+ "agents keep moving on the track.");
+		log.info("Mobsim agents' are directly added to AgentSource.");
 		log.info("=======================");
 
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
