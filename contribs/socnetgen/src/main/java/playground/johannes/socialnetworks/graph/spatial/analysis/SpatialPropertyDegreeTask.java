@@ -19,30 +19,26 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -84,24 +80,24 @@ public class SpatialPropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 				TObjectDoubleHashMap<SpatialVertex> yVals = Distance.getInstance().vertexMean(graph.getVertices());
 				TObjectDoubleHashMap kVals =  module.values(graph.getVertices());
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
-				TXTWriter.writeMap(correl, "k", "d_mean", getOutputDirectory() + "d_mean_k.mean.txt");
+				StatsWriter.writeHistogram(correl, "k", "d_mean", getOutputDirectory() + "d_mean_k.mean.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(yVals, kVals, discretizer);
-				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "d_mean_k.boxplot.txt");
-				TXTWriter.writeStatistics(stat, "k", getOutputDirectory() + "d_k.stats.txt");
+				StatsWriter.writeBoxplotStats(stat, getOutputDirectory() + "d_mean_k.boxplot.txt");
+				StatsWriter.writeStatistics(stat, "k", getOutputDirectory() + "d_k.stats.txt");
 				
 				yVals = Distance.getInstance().vertexMedian(graph.getVertices());
 				correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
-				TXTWriter.writeMap(correl, "k", "d_median", getOutputDirectory() + "d_median_k.mean.txt");
+				StatsWriter.writeHistogram(correl, "k", "d_median", getOutputDirectory() + "d_median_k.mean.txt");
 				
 				stat = VertexPropertyCorrelation.statistics(yVals, kVals, discretizer);
-				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "d_median_k.boxplot.txt");
+				StatsWriter.writeBoxplotStats(stat, getOutputDirectory() + "d_median_k.boxplot.txt");
 				/*
 				 * accessibility-degree correlation
 				 */
 //				yVals = Accessibility.getInstance().values(graph.getVertices(), costFunction, opportunities);
 //				correl = VertexPropertyCorrelation.mean(yVals, kVals, discretizer);
-//				TXTWriter.writeMap(correl, "k", "A", getOutputDirectory() + "A_k.mean.txt");
+//				TXTWriter.writeHistogram(correl, "k", "A", getOutputDirectory() + "A_k.mean.txt");
 //				stat = VertexPropertyCorrelation.statistics(yVals, kVals, discretizer);
 //				TXTWriter.writeStatistics(stat, "k", getOutputDirectory() + "A_k.stats.txt");
 				

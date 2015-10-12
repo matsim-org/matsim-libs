@@ -22,22 +22,20 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -78,7 +76,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
 //			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, new LinearDiscretizer(5.0));
 			try {
-				TXTWriter.writeMap(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -95,7 +93,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
 
 			try {
-				TXTWriter.writeMap(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

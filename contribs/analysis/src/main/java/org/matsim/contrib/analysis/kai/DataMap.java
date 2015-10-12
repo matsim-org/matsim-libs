@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 /**
  * Data structure that memorizes double values as a function of String keys.  Typically, the key is an aggregation type.  If there 
- * are also bins, we need something else ({@link DatabinsMap}) . 
+ * are also bins, we need something else ({@link org.matsim.contrib.analysis.kai.Databins} for several keys that collect for the same bins).   
  * 
  * @author nagel
  */

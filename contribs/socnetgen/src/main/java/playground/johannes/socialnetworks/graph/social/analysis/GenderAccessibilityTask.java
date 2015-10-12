@@ -21,19 +21,17 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -68,7 +66,7 @@ public class GenderAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 50));
 
 			try {
-				TXTWriter.writeMap(correl, "A", "gender", getOutputDirectory() + "gender_mean_A.txt");
+				StatsWriter.writeHistogram(correl, "A", "gender", getOutputDirectory() + "gender_mean_A.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -33,7 +33,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  *
  */
 public class InterpolatedObjectiveFunctionValue implements
-		Statistic<SamplingStage> {
+		Statistic<SamplingStage<?>> {
 
 	@Override
 	public String label() {
@@ -41,7 +41,7 @@ public class InterpolatedObjectiveFunctionValue implements
 	}
 
 	@Override
-	public String value(final SamplingStage samplingStage) {
+	public String value(final SamplingStage<?> samplingStage) {
 		return Double.toString(samplingStage
 				.getOriginalObjectiveFunctionValue());
 	}

@@ -70,40 +70,30 @@ public class ScenarioUtils {
 			scenario.addScenarioElement(name, o); 
 			return this ;
 		}
-		// households:
-
 		public ScenarioBuilder setHouseholds( Households households ) {
 			scenario.setHouseholds(households);
 			return this ;
 		}
-		// transit schedule:
-
 		public ScenarioBuilder setTransitSchedule( TransitSchedule schedule ) {
 			scenario.setTransitSchedule(schedule);
 			return this ;
 		}
-		// vehicles:
-
 		public ScenarioBuilder setVehicles( Vehicles vehicles ) {
 			scenario.setTransitVehicles(vehicles);
 			return this;
 		}
-		// network (always there):
 		public ScenarioBuilder setNetwork( Network network ) {
 			scenario.setNetwork(network);
 			return this ;
 		}
-		// population (always there):
 		public ScenarioBuilder setPopulation( Population population ) {
 			scenario.setPopulation(population);
 			return this ;
 		}
-		// facilities (always there, although that does not make a lot of sense):
 		public ScenarioBuilder setActivityFacilities( ActivityFacilities facilities ) {
 			scenario.setActivityFacilities(facilities);
 			return this ;
 		}
-		// lanes:
 		public ScenarioBuilder setLanes( LaneDefinitions20 lanes ) {
 			scenario.setLanes(lanes);
 			return this ;

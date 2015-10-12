@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.sna.math.Discretizer;
+import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;

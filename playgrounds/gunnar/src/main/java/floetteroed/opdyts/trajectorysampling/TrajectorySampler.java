@@ -34,7 +34,7 @@ import floetteroed.opdyts.SimulatorState;
  * @author Gunnar Flötteröd
  *
  */
-public interface TrajectorySampler {
+public interface TrajectorySampler<U extends DecisionVariable> {
 
 	/**
 	 * Indicates if there is (no) need to further continue the iterations.
@@ -43,11 +43,11 @@ public interface TrajectorySampler {
 	 */
 	public boolean foundSolution();
 
-	public DecisionVariable getCurrentDecisionVariable();
+	public U getCurrentDecisionVariable();
 
 	public int getTotalTransitionCnt();
 	
-	public Map<DecisionVariable, Double> getDecisionVariable2finalObjectiveFunctionValue();
+	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue();
 
 	/**
 	 * Call once before the simulation is started. This implements a randomly

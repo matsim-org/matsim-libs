@@ -21,17 +21,15 @@ package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.Degree;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.analysis.Transitivity;
-import playground.johannes.sna.util.TXTWriter;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -45,10 +43,10 @@ public class PropertyDegreeTask extends ModuleAnalyzerTask<Degree> {
 		if (outputDirectoryNotNull()) {
 			try {
 				TDoubleDoubleHashMap map = VertexPropertyCorrelation.mean(Transitivity.getInstance(), module, graph.getVertices());
-				TXTWriter.writeMap(map, "k", "c_local", getOutputDirectory() + "/c_k.mean.txt");
+				StatsWriter.writeHistogram(map, "k", "c_local", getOutputDirectory() + "/c_k.mean.txt");
 				
 				TDoubleObjectHashMap<DescriptiveStatistics> stat = VertexPropertyCorrelation.statistics(Transitivity.getInstance(), module, graph.getVertices());
-				TXTWriter.writeBoxplotStats(stat, getOutputDirectory() + "/c_k.table.txt");
+				StatsWriter.writeBoxplotStats(stat, getOutputDirectory() + "/c_k.table.txt");
 				
 			} catch (IOException e) {
 				e.printStackTrace();

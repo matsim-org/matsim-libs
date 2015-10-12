@@ -20,6 +20,8 @@
 package playground.johannes.sna.math;
 
 
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+
 /**
  * A factory for creating pre-configured instance of
  * {@link DescriptivePiStatistics}.

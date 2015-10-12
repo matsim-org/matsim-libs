@@ -19,29 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleIntIterator;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
@@ -53,7 +42,9 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -149,7 +140,7 @@ public class EpsilonTask extends AnalyzerTask {
 			 * dump histogram
 			 */
 			try {
-				TXTWriter.writeMap(epsilon_d, "d", "epsilon", String.format("%1$s/epsilon.cat%2$s.txt", getOutputDirectory(), A_cat));
+				StatsWriter.writeHistogram(epsilon_d, "d", "epsilon", String.format("%1$s/epsilon.cat%2$s.txt", getOutputDirectory(), A_cat));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
