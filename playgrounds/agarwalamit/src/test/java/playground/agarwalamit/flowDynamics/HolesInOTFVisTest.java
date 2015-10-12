@@ -57,7 +57,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  */
 public class HolesInOTFVisTest {
 
-	private final boolean useOTFVis = true;
+	private final boolean useOTFVis = false;
 	
 	@Test 
 	public void test(){

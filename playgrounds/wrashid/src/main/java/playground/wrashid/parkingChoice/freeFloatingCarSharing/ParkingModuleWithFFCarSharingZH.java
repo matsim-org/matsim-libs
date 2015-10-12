@@ -1,5 +1,6 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
@@ -22,6 +23,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 
@@ -43,7 +45,6 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		super(controler);
 		this.initialDesiredVehicleCoordinates = initialDesiredVehicleCoordinates;
 		//TODO: initialize parkings car to parking
-		
 		SetupParkingForZHScenario.prepare(this,controler);
 		
 		//resetForNewIterationStart();
@@ -97,15 +98,16 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		
 		String groupName = getAcceptableParkingGroupName();
 		PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
-		currentVehicleLocation.put(vehicleId, parking);
+	//	currentVehicleLocation.put(vehicleId, parking);
 	//	vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
 		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate()).getId(), parking
 				);
 	}
+		
 	@Override
 	public void makeFFVehicleAvailable(Id vehicleId, PC2Parking parking) {
-		
+		this.currentVehicleLocation.put(vehicleId, parking);
 		this.vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
 	}
