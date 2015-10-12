@@ -21,80 +21,44 @@ package playground.gregor.ctsim.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import java.util.List;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * Created by laemmel on 07/10/15.
+ * Created by laemmel on 12/10/15.
  */
-public class CTPed {
+public class CTVehicle implements CTPed {
+	public CTVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent, CTLink link) {
 
-
-	private final List<Id<Link>> links;
-	private CTCell currentCell;
-	private double dir;
-	private CTCell tentativeNextCell;
-	private int currentIdx = 1;
-
-	public CTPed(CTCell cell, double dir, List<Id<Link>> links) {
-		this.currentCell = cell;
-		this.dir = dir;
-		this.links = links;
 	}
 
-
+	@Override
 	public double getDesiredDir() {
-		return this.dir;
+		return 0;
 	}
 
-
+	@Override
 	public CTCell getNextCellAndJump() {
-		this.currentCell.jumpOffPed(this);
-		this.currentCell = tentativeNextCell;
-		this.currentCell.jumpOnPed(this);
-		this.tentativeNextCell = null;
-		return this.currentCell;
+		return null;
 	}
 
+	@Override
 	public CTCell getTentativeNextCell() {
-		return tentativeNextCell;
+		return null;
 	}
 
+	@Override
 	public void setTentativeNextCell(CTCell tentativeNextCell) {
-		this.tentativeNextCell = tentativeNextCell;
+
 	}
 
+	@Override
 	public void notifyMoveOverNode() {
-		CTNetworkEntity p = tentativeNextCell.getParent();
-		if (p instanceof CTLink) {
-			CTLink ctLink = (CTLink) p;
-			Link us = ctLink.getUsLink();
-			Link ds = ctLink.getDsLink();
-			if (us.getId() == getNextLinkId()) {
-				this.dir = -Math.PI / 2.;
-				this.currentIdx++;
-				if (this.currentIdx == this.links.size()) {
-					this.currentIdx = 0;
-				}
-				return;
-			}
-			else {
-				if (ds.getId() == getNextLinkId()) {
-					this.dir = Math.PI / 2.;
-					this.currentIdx++;
-					if (this.currentIdx == this.links.size()) {
-						this.currentIdx = 0;
-					}
-					return;
-				}
-			}
-		}
-		throw new RuntimeException("error in node-link plan logic");
-
 
 	}
 
+	@Override
 	public Id<Link> getNextLinkId() {
-		return this.links.get(this.currentIdx);
+		return null;
 	}
 }

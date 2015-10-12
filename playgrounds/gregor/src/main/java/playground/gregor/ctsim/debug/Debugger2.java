@@ -27,7 +27,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Debugger {
+public class Debugger2 {
 
 	public static void main(String[] args) {
 
@@ -58,10 +58,13 @@ public class Debugger {
 		CTNetwork net = new CTNetwork(sc.getNetwork(), em);
 
 		int nrPeds = 0;
-		for (CTLink link : net.getLinks().values()) {
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("0"));
 			List<Id<Link>> links = new ArrayList<>();
-			links.add(link.getDsLink().getId());
-			links.add(link.getUsLink().getId());
+			links.add(Id.createLinkId(0));
+			links.add(Id.createLinkId(1));
+			links.add(Id.createLinkId(2));
+			links.add(Id.createLinkId(3));
 			for (CTCell cell : link.getCells()) {
 				int n = cell.getN();
 				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
@@ -72,6 +75,26 @@ public class Debugger {
 				}
 				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
 			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("7"));
+			List<Id<Link>> links = new ArrayList<>();
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
+				for (int i = 0; i < rnd; i++) {
+					nrPeds++;
+					CTPed ped = new CTPed(cell, -Math.PI / 2, links);
+					cell.jumpOnPed(ped);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
 		}
 		System.out.println(nrPeds);
 		net.run();
@@ -98,41 +121,67 @@ public class Debugger {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		double x1 = 20;
-		double y1 = 0;
 		double length = 30;
-		double offset = 15;
 		double width = 6;
+
 		int id = 0;
-		for (double rot = 0; rot < 2 * Math.PI; rot += Math.PI / 4)
-
+		Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, 0));
+		Node n1 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length, 0));
+		Node n2 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length, length));
+		Node n3 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, length));
+		net.addNode(n0);
+		net.addNode(n1);
+		net.addNode(n2);
+		net.addNode(n3);
+		id = 0;
 		{
-			double cs = Math.cos(rot);
-			double sn = Math.sin(rot);
-			double xx = x1 * cs - y1 * sn;
-			double yy = x1 * sn + y1 * cs;
-
-			double dx = (xx - x1) / length;
-			double dy = (yy - y1) / length;
-
-			Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(offset * dx, offset * dy));
-			net.addNode(n0);
-			Node n1 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(xx + offset * dx, yy + offset * dy));
-			net.addNode(n1);
-			{
-				Link l0 = fac.createLink(Id.createLinkId(id++), n0, n1);
-				net.addLink(l0);
-				l0.setCapacity(width);
-				l0.setLength(length);
-			}
-			{
-				Link l0 = fac.createLink(Id.createLinkId(id++), n1, n0);
-				net.addLink(l0);
-				l0.setCapacity(width);
-				l0.setLength(length);
-			}
+			Link l0 = fac.createLink(Id.createLinkId(id++), n0, n1);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
 		}
-
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n1, n2);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n2, n3);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n3, n0);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n1, n0);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n2, n1);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n3, n2);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
+		{
+			Link l0 = fac.createLink(Id.createLinkId(id++), n0, n3);
+			net.addLink(l0);
+			l0.setCapacity(width);
+			l0.setLength(length);
+		}
 
 	}
 
