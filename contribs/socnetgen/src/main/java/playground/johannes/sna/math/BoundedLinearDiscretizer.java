@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.sna.math;
 
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+
 /**
  * @author illenberger
  *

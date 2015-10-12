@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.searchalgorithms;
 
 import java.io.BufferedWriter;
@@ -57,7 +57,7 @@ public class TrajectorySamplingSelfTuner {
 
 	// TODO
 	private final double terminationPrecision = 1e-6;
-	
+
 	// -------------------- CONSTANTS --------------------
 
 	private final int equilibriumGapWeightIndex = 0;
@@ -85,8 +85,7 @@ public class TrajectorySamplingSelfTuner {
 	public TrajectorySamplingSelfTuner(
 			final double initialEquilibriumGapWeight,
 			final double initialUniformityWeight, final double initialOffset,
-			final double regressionInertia, final double initialValueWeight)
-			{
+			final double regressionInertia, final double initialValueWeight) {
 
 		try {
 			this.log = new PrintWriter("./predvsreal.txt");
@@ -129,13 +128,12 @@ public class TrajectorySamplingSelfTuner {
 
 	// -------------------- OPTIMIZATION --------------------
 
-	public void registerSamplingStageSequence(
-			final List<SamplingStage> samplingStages,
+	public <U extends DecisionVariable> void registerSamplingStageSequence(
+			final List<SamplingStage<U>> samplingStages,
 			final double finalObjectiveFunctionValue,
-			final double gradientNorm,
-			final DecisionVariable finalDecisionVariable) {
+			final double gradientNorm, final U finalDecisionVariable) {
 
-		final SamplingStage stage = samplingStages.get(0);
+		final SamplingStage<U> stage = samplingStages.get(0);
 		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
 		final Vector input = new Vector(4);
 		input.set(this.equilibriumGapWeightIndex,
@@ -254,15 +252,19 @@ public class TrajectorySamplingSelfTuner {
 		this.run();
 	}
 
+	private double[] initialPoint = new double[] { 1.0, 1.0, 1.0, 1.0 };
+
 	private void run() {
 		final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
 				NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-				new SimpleValueChecker(terminationPrecision, terminationPrecision));
+				new SimpleValueChecker(this.terminationPrecision,
+						this.terminationPrecision));
 		final PointValuePair result = solver.optimize(new ObjectiveFunction(
 				new MyObjectiveFunction()), new ObjectiveFunctionGradient(
 				new MyGradient()), GoalType.MINIMIZE, new InitialGuess(
-				new double[] { 1.0, 1.0, 1.0, 1.0 }), new MaxEval(
-				Integer.MAX_VALUE), new MaxIter(Integer.MAX_VALUE));
+				this.initialPoint), new MaxEval(Integer.MAX_VALUE),
+				new MaxIter(Integer.MAX_VALUE));
+		this.initialPoint = result.getPoint();
 		this.coeffs = point2coeffs(result.getPoint());
 	}
 

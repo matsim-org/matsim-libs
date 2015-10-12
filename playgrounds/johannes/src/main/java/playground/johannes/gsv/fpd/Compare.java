@@ -21,13 +21,9 @@ package playground.johannes.gsv.fpd;
 
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.*;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
@@ -133,13 +129,13 @@ public class Compare {
 
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
 		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
 
 		hist = calcDistDistribution(zones, model, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
 
 		hist = calcDistDistribution(zones, sim, iais);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
 	}
 
 	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, KeyMatrix m, KeyMatrix relations) {

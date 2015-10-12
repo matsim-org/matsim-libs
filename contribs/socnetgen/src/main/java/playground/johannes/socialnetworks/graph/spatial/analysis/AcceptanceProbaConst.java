@@ -19,28 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.*;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
@@ -58,8 +49,9 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

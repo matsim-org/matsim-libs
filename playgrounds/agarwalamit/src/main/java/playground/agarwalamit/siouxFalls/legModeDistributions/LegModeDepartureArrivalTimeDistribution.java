@@ -35,6 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.legMode.distributions.LegModeDepartureArrivalTimeHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -46,8 +47,8 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisMod
 
 	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
 	private LegModeDepartureArrivalTimeHandler lmdah;
-	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2DepartureTime;
-	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2ArrivalTime;
+	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2DepartureTime;
+	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2ArrivalTime;
 	private List<Integer> timeStepClasses;
 	private List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2DepartureTimeClasses2LegCount;
@@ -108,14 +109,14 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisMod
 		this.mode2ArrivalTimeClasses2LegCount = calculateMode2DepOrArrTimeClases2LegCount(this.mode2PersonId2ArrivalTime);
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id<Person>, double[]>> mode2personId2DepOrArrTime) {
+	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id<Person>, List<Double> >> mode2personId2DepOrArrTime) {
 		SortedMap<String, Map<Integer, Integer>> mode2DepOrArrTime2LegCount= new TreeMap<String, Map<Integer,Integer>>();
 		for(String mode:this.travelModes){
 			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
 			for(int i=0;i<this.timeStepClasses.size()-1;i++){
 				int legCount =0;
 				for(Id<Person> id:mode2personId2DepOrArrTime.get(mode).keySet()){
-					double tt [] = mode2personId2DepOrArrTime.get(mode).get(id);
+					List<Double> tt = mode2personId2DepOrArrTime.get(mode).get(id);
 					for(double d:tt){
 						d=d/(3600);
 						if(d > this.timeStepClasses.get(i) && d < this.timeStepClasses.get(i+1)){

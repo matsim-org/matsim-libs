@@ -20,18 +20,16 @@
 package playground.johannes.mz2005.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
@@ -64,7 +62,7 @@ public class ActivityChainsTask extends TrajectoryAnalyzerTask {
 		
 		if(outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/actchains.txt", true);
+				StatsWriter.writeLabeledHistogram(chains, "chain", "n", getOutputDirectory() + "/actchains.txt", true);
 				
 				writeHistograms(stats, new DummyDiscretizer(), KEY, false);
 			} catch (IOException e) {

@@ -71,19 +71,19 @@ class Talk_2015_09_03 {
 		final Random rnd = new Random();
 		final double demand = 500;
 		final double capacity = 1000;
-		final int linkCnt = 40;
+		final int linkCnt = 800;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
 		final int transitionBinSize = 100;
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
-		final int replications = 1;
+		final int replications = 3;
 		final boolean keepBestSolution = true;
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.1;
 
-		for (Integer populationSize : new Integer[] { 32 }) { // 2, 4, 8, 16,
+		for (Integer populationSize : new Integer[] { 2 }) { // 2, 4, 8, 16,
 																// 32, 64, 128,
 																// 256}) {
 
@@ -245,9 +245,9 @@ class Talk_2015_09_03 {
 			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8, 5);
 			writer.setLabelX("transitions [$10^3$]");
 			writer.setLabelY("Q [$10^3$]");
-			writer.setYMin(20.0);
-			writer.setYMax(50.0);
-			writer.setYDelta(5.0);
+			writer.setYMin(20.0 * ((double) linkCnt) / 40.0);
+			writer.setYMax(50.0 * ((double) linkCnt) / 40.0);
+			writer.setYDelta(5.0 * ((double) linkCnt) / 40.0);
 			writer.setXMin(0.0);
 			writer.setXMax(25.0);
 			writer.setXDelta(5.0);

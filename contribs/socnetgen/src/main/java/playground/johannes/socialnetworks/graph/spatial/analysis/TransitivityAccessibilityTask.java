@@ -21,20 +21,18 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.sna.graph.analysis.Transitivity;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -64,7 +62,7 @@ public class TransitivityAccessibilityTask extends ModuleAnalyzerTask<Accessibil
 		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(localClustering, accessValues,	discretizer);
 		
 		try {
-			TXTWriter.writeMap(correl, "A", "c_local_mean", getOutputDirectory() + "c_local_mean_A.txt");
+			StatsWriter.writeHistogram(correl, "A", "c_local_mean", getOutputDirectory() + "c_local_mean_A.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

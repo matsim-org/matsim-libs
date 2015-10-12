@@ -4,6 +4,7 @@ import java.util.List;
 
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
+import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 

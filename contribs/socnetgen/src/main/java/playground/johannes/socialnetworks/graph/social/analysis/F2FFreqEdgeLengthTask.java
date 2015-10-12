@@ -21,20 +21,18 @@ package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -53,7 +51,7 @@ public class F2FFreqEdgeLengthTask extends AnalyzerTask {
 		
 		TDoubleDoubleHashMap hist = VertexPropertyCorrelation.mean(F2FFrequency.getInstance(), len, graph.getEdges(), discretizer);
 		try {
-			TXTWriter.writeMap(hist, "d", "f", getOutputDirectory() + "/f2ffreq_d.txt");
+			StatsWriter.writeHistogram(hist, "d", "f", getOutputDirectory() + "/f2ffreq_d.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

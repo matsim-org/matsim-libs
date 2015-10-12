@@ -40,19 +40,18 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public class TransitionSequence {
+public class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final LinkedList<Transition> transitions = new LinkedList<Transition>();
+	private final LinkedList<Transition<U>> transitions = new LinkedList<Transition<U>>();
 
 	private SimulatorState lastState = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequence(final SimulatorState fromState,
-			final DecisionVariable decisionVariable,
-			final SimulatorState toState,
+			final U decisionVariable, final SimulatorState toState,
 			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
 			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
 		this.addTransition(fromState, decisionVariable, toState,
@@ -62,8 +61,7 @@ public class TransitionSequence {
 	// -------------------- SETTERS --------------------
 
 	void addTransition(final SimulatorState fromState,
-			final DecisionVariable decisionVariable,
-			final SimulatorState toState,
+			final U decisionVariable, final SimulatorState toState,
 			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
 			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
 
@@ -102,7 +100,7 @@ public class TransitionSequence {
 		}
 
 		// new transitions are added at the end
-		this.transitions.add(new Transition(decisionVariable, delta,
+		this.transitions.add(new Transition<>(decisionVariable, delta,
 				toStateVectorRepresentation, toStateObjectiveFunctionValue));
 		this.lastState = toState;
 	}
@@ -124,7 +122,7 @@ public class TransitionSequence {
 		return this.lastState;
 	}
 
-	List<Transition> getTransitions() {
+	List<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 
@@ -134,7 +132,7 @@ public class TransitionSequence {
 
 	public List<Double> getObjectiveFunctionValues() {
 		final List<Double> result = new ArrayList<Double>(this.size());
-		for (Transition transition : this.transitions) {
+		for (Transition<U> transition : this.transitions) {
 			// result.add(objectiveFunction.value(transition.getToState()));
 			result.add(transition.getToStateObjectiveFunctionValue());
 		}

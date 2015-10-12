@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.sna.graph.Graph;
+
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * An AnalyzerTaks that calculated degree related measurements.

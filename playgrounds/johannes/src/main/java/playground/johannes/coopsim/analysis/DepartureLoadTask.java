@@ -70,7 +70,7 @@ public class DepartureLoadTask extends TransitionLoadTask {
 //			
 //			if(!samples.isEmpty()) {
 //				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 50), true);
-//				TXTWriter.writeMap(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
+//				TXTWriter.writeHistogram(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
 //			}
 //			
 //		} catch (IOException e) {
