@@ -20,12 +20,6 @@
 
 package org.matsim.core.utils.gis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStore;
@@ -41,6 +35,12 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author glaemmel
@@ -64,48 +64,21 @@ public class ShapeFileReader implements MatsimSomeReader {
 
 	private CoordinateReferenceSystem crs;
 
-	/**
-	 * <em>VERY IMPORTANT NOTE</em><br>
-	 * 
-	 * There are many ways to use that class in a wrong way. The safe way is the following:
-	 * 
-	 * <pre> ShapeFileReader shapeFileReader = new ShapeFileReader();
-	 * shapeFileReader.readFileAndInitialize(zonesShapeFile); </pre>
-	 * 
-	 * Then, get the features by
-	 * 
-	 * <pre> Set<{@link Feature}> features = shapeFileReader.getFeatureSet(); </pre>
-	 * 
-	 * If you need metadata you can use
-	 * 
-	 * <pre> FeatureSource fs = shapeFileReader.getFeatureSource(); </pre>
-	 * 
-	 * to get access to the feature source.<br>
-	 * <em>BUT NEVER CALL <code>fs.getFeatures();</code> !!! It can happen that you will read from disk again!!! </em>
-	 * 
-	 * <p>
-	 * Actually, the whole class must be fixed. But since it is anyway necessary to move to a more recent version of the geotools only this javadoc is added instead.
-	 * </p>
-	 * 
-	 * <p>
-	 * The following old doc is kept here:
-	 * </p>
-	 * 
-	 * Provides access to a shape file and returns a <code>FeatureSource</code> containing all features.
-	 * Take care access means on disk access, i.e. the FeatureSource is only a pointer to the information 
-	 * stored in the file. This can be horribly slow if invoked many times and throw exceptions if two many read
-	 * operations to the same file are performed. In those cases it is recommended to use the method readDataFileToMemory
-	 * of this class.
-	 *
-	 * @param filename File name of a shape file (ending in <code>*.shp</code>)
-	 * @return FeatureSource containing all features.
-	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
-	 */
-	public static SimpleFeatureSource readDataFile(final String filename) throws UncheckedIOException {
+	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
 		try {
 			File dataFile = new File(filename);
 			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
-			return store.getFeatureSource();
+			SimpleFeatureSource featureSource = store.getFeatureSource();
+
+			SimpleFeatureIterator it = featureSource.getFeatures().features();
+			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				featureSet.add(ft);
+			}
+			it.close();
+			store.dispose();
+			return featureSet;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -131,6 +104,54 @@ public class ShapeFileReader implements MatsimSomeReader {
 			cnt.printCounter();
 			it.close();
 			return this.featureSet;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * <em>VERY IMPORTANT NOTE</em><br>
+	 * <p/>
+	 * There are many ways to use that class in a wrong way. The safe way is the following:
+	 * <p/>
+	 * <pre> ShapeFileReader shapeFileReader = new ShapeFileReader();
+	 * shapeFileReader.readFileAndInitialize(zonesShapeFile); </pre>
+	 * <p/>
+	 * Then, get the features by
+	 * <p/>
+	 * <pre> Set<{@link Feature}> features = shapeFileReader.getFeatureSet(); </pre>
+	 * <p/>
+	 * If you need metadata you can use
+	 * <p/>
+	 * <pre> FeatureSource fs = shapeFileReader.getFeatureSource(); </pre>
+	 * <p/>
+	 * to get access to the feature source.<br>
+	 * <em>BUT NEVER CALL <code>fs.getFeatures();</code> !!! It can happen that you will read from disk again!!! </em>
+	 * <p/>
+	 * <p>
+	 * Actually, the whole class must be fixed. But since it is anyway necessary to move to a more recent version of the geotools only this javadoc is added instead.
+	 * </p>
+	 * <p/>
+	 * <p>
+	 * The following old doc is kept here:
+	 * </p>
+	 * <p/>
+	 * Provides access to a shape file and returns a <code>FeatureSource</code> containing all features.
+	 * Take care access means on disk access, i.e. the FeatureSource is only a pointer to the information
+	 * stored in the file. This can be horribly slow if invoked many times and throw exceptions if two many read
+	 * operations to the same file are performed. In those cases it is recommended to use the method readDataFileToMemory
+	 * of this class.
+	 *
+	 * @param filename File name of a shape file (ending in <code>*.shp</code>)
+	 * @return FeatureSource containing all features.
+	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
+	 */
+	public static SimpleFeatureSource readDataFile(final String filename) throws UncheckedIOException {
+		try {
+			log.warn("Unsafe method! store.dispose() is not called from within this method");
+			File dataFile = new File(filename);
+			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+			return store.getFeatureSource();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -171,29 +192,9 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public Collection<SimpleFeature> getFeatureSet() {
 		return featureSet;
 	}
-
+	
 	public CoordinateReferenceSystem getCoordinateSystem(){
 		return this.crs;
-	}
-	
-	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
-		try {
-			File dataFile = new File(filename);
-			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
-			SimpleFeatureSource featureSource = store.getFeatureSource();
-			
-			SimpleFeatureIterator it = featureSource.getFeatures().features();
-			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
-			while (it.hasNext()) {
-				SimpleFeature ft = it.next();
-				featureSet.add(ft);
-			}
-			it.close();
-			store.dispose();
-			return featureSet;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
 	}
 
 
