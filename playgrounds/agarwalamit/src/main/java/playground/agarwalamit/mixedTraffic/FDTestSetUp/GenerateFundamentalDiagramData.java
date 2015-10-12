@@ -136,7 +136,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setSeepageAllowed(Boolean.valueOf(args[4]));
 		generateFDData.setUseHoles(Boolean.valueOf(args[5]));
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
-		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
+		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
 		
 		generateFDData.setWriteInputFiles(true); 
 		generateFDData.run();
@@ -162,9 +162,6 @@ public class GenerateFundamentalDiagramData {
 		speedUnstableWarnCount = new int [TRAVELMODES.length];
 	}
 
-	/**
-	 * @param outputFile final data will be written to this file
-	 */
 	public void run(){
 
 		consistencyCheckAndInitialize();
