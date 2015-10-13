@@ -158,11 +158,11 @@ public class IterativeAlgorithmDC {
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonDistribution("gumbel");
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setFlexibleTypes(actTypes);
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonScaleFactors("1, 1, 1, 1, 1, 1, 1, 1, 1");
-		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setDestinationSamplePercent(args[9]);
-		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAnalysisBoundary("0.25");
-		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setScaleFactor("0.25");
-		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_car("9");
-		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_pt("5");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setDestinationSamplePercent(Double.parseDouble(args[9]));
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAnalysisBoundary(0.25);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setScaleFactor(0.25);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_car(9);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_pt(5);
 		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		events.addHandler(travelTimeCalculator);

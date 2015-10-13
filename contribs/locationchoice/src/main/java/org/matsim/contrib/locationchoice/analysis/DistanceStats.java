@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -32,7 +33,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class DistanceStats implements IterationEndsListener {	
-	private Config config; 
+
+	private DestinationChoiceConfigGroup dccg;
 	private double analysisBoundary;
 	private Bins bins;
 	private String bestOrSelected = "selected";
@@ -40,15 +42,15 @@ public class DistanceStats implements IterationEndsListener {
 	private ActTypeConverter actTypeConverter;
 	private String mode;
 	
-	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {	
-		this.analysisBoundary = Double.parseDouble(config.findParam("locationchoice", "analysisBoundary")); 
-		this.config = config;
+	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {
+		
+		this.dccg = (DestinationChoiceConfigGroup) config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.analysisBoundary = this.dccg.getAnalysisBoundary(); 
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
 		this.actTypeConverter = actTypeConverter;
 		this.mode = mode;
-		this.bins = new Bins(Double.parseDouble(config.findParam("locationchoice", "analysisBinSize")),
-				analysisBoundary, type + "_" + mode + "_distance");
+		this.bins = new Bins(this.dccg.getAnalysisBinSize(), analysisBoundary, type + "_" + mode + "_distance");
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
@@ -57,8 +59,8 @@ public class DistanceStats implements IterationEndsListener {
         for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
-			if (this.config.findParam("locationchoice", "idExclusion") == null || !this.isLong(p.getId().toString()) ||
-					Long.parseLong(p.getId().toString()) > Long.parseLong(this.config.findParam("locationchoice", "idExclusion"))) continue;
+			if (this.dccg.getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
+					Long.parseLong(p.getId().toString()) > this.dccg.getIdExclusion()) continue;
 					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			

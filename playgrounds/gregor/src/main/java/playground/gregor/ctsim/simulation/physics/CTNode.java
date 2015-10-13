@@ -27,4 +27,6 @@ public class CTNode implements CTNetworkEntity {
 	public Node getNode() {
 		return n;
 	}
+
+
 }

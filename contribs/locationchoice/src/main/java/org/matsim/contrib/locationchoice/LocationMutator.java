@@ -47,11 +47,13 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	protected final Random random;
 
 	protected final Scenario scenario;
+	protected final DestinationChoiceConfigGroup dccg;
 
 	// ----------------------------------------------------------
 
 	public LocationMutator(final Scenario scenario, Random random) {
-		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.scenario = scenario;
@@ -61,8 +63,8 @@ public abstract class LocationMutator implements PlanAlgorithm {
 
 	public LocationMutator(Scenario scenario, TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-
-		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
@@ -71,8 +73,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.scenario = scenario;
 		this.random = random;
 	}
-
-
+	
 	private void initLocal(final Network network) {
 
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
