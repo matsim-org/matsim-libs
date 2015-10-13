@@ -3,22 +3,22 @@ package playground.gregor.ctsim.simulation.physics;
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
 import com.vividsolutions.jts.geom.*;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.utils.collections.QuadTree;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CTLink implements CTNetworkEntity {
 
 
     static final double WIDTH = 1;
+    private static final Logger log = Logger.getLogger(CTLink.class);
     private static final double EPSILON = 0.00001;
     private final CTNetwork network;
     private final CTNode dsNode;
@@ -27,6 +27,8 @@ public class CTLink implements CTNetworkEntity {
     private Link dsLink;
     private Link usLink;
     private EventsManager em;
+    private CTLinkCell dsJumpOn;
+    private CTLinkCell usJumpOn;
 
     public CTLink(Link l, Link rev, EventsManager em, CTNetwork ctNetwork, CTNode from, CTNode to) {
         this.dsLink = l;
@@ -37,6 +39,7 @@ public class CTLink implements CTNetworkEntity {
         this.network = ctNetwork;
         init();
     }
+
 
     private void init() {
 
@@ -87,12 +90,18 @@ public class CTLink implements CTNetworkEntity {
             Geometry ch = mp.convexHull();
             geoMap.put(pt, ch);
         }
+        Envelope e = new Envelope(bounds[0]);
+        e.expandToInclude(bounds[1]);
+        e.expandToInclude(bounds[2]);
+        e.expandToInclude(bounds[3]);
+        QuadTree<CTCell> qt = new QuadTree<>(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
 
         for (ProtoCell pt : cells) {
             CTCell cell = cellsMap.get(pt);
             Geometry ch = geoMap.get(pt);
             if (p.covers(ch)) {
                 this.cells.add(cell);
+                qt.put(cell.getX(), cell.getY(), cell);
                 for (GraphEdge ge : pt.edges) {
                     debugGe(ge);
                     ProtoCell protoNeighbor = pt.nb.get(ge);
@@ -126,7 +135,54 @@ public class CTLink implements CTNetworkEntity {
         }
 
 
+        //identify cells
+        Set<CTCell> dsJumpOns = new HashSet<>();
+        Set<CTCell> usJumpOns = new HashSet<>();
+        for (double incr = 0; incr <= this.dsLink.getCapacity(); incr += WIDTH / 2.) {
+            double x = bounds[0].x + dy * incr;
+            double dsY = bounds[0].y - dx * incr + WIDTH * dy / 2.;
+            double usY = bounds[1].y - dx * incr - WIDTH * dy / 2.;
+            CTCell dsJumpOn = qt.getClosest(x, dsY);
+            dsJumpOns.add(dsJumpOn);
+            CTCell usJumpOn = qt.getClosest(x, usY);
+            usJumpOns.add(usJumpOn);
+
+
+        }
+
+
+        //create pseudo cells
+        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this);
+        double dir = Math.PI / 2.;
+        for (CTCell ctCell : dsJumpOns) {
+            CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
+            this.dsJumpOn.addFace(face);
+            ctCell.addNeighbor(this.dsJumpOn);
+        }
+        this.usJumpOn = new CTLinkCell(0, 0, this.network, this);
+        dir = -Math.PI / 2.;
+        for (CTCell ctCell : usJumpOns) {
+            CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
+            this.usJumpOn.addFace(face);
+            ctCell.addNeighbor(this.usJumpOn);
+        }
+
+        //append cells
+
+
         for (CTCell c : this.cells) {
+            c.debug(this.em);
+        }
+
+        for (CTCell c : dsJumpOns) {
+            c.g = 255;
+            c.debug(this.em);
+        }
+
+        for (CTCell c : usJumpOns) {
+            c.r = 255;
+            c.g = 0;
+            c.b = 0;
             c.debug(this.em);
         }
     }
@@ -333,8 +389,23 @@ public class CTLink implements CTNetworkEntity {
 //    }
 
     public void letAgentDepart(MobsimDriverAgent agent, CTLink link, double now) {
-        CTCell cell = null;
+        //TODO wait2link
+        log.warn("wait2link not implemented!!");
+        CTCell cell;
+        if (agent.getCurrentLinkId() == this.dsLink.getId()) {
+            cell = this.dsJumpOn;
+        }
+        else {
+            if (agent.getCurrentLinkId() == this.usLink.getId()) {
+                cell = this.usJumpOn;
+            }
+            else {
+                throw new RuntimeException("agent tries to depart on wrong link");
+            }
+        }
         CTPed p = new CTPed(cell, agent);
+        cell.jumpOnPed(p, now);
+        cell.updateIntendedCellJumpTimeAndChooseNextJumper(now);
     }
 
     private final class ProtoCell {

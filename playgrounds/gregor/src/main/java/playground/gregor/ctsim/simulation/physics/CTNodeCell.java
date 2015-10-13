@@ -23,7 +23,12 @@ package playground.gregor.ctsim.simulation.physics;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Created by laemmel on 12/10/15.
@@ -53,9 +58,63 @@ public class CTNodeCell extends CTCell {
 	}
 
 	@Override
-	public void jumpOffPed(CTPed ctPed) {
+	public void jumpOnPed(CTPed ctPed, double time) {
+		DriverAgent driver = ctPed.getDriver();
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		this.em.processEvent(e);
+		if (ctPed.getNextLinkId() == null) {
+			CTNetsimEngine en = this.net.getEngine();
+			en.letPedArrive(ctPed);
+		} else {
+			super.jumpOnPed(ctPed, time);
+		}
+
+	}
+
+	@Override
+	public void jumpOnPed(CTPed ctPed, double time) {
+		DriverAgent driver = ctPed.getDriver();
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		this.em.processEvent(e);
+		if (ctPed.getNextLinkId() == null) {
+			CTNetsimEngine en = this.net.getEngine();
+			en.letPedArrive(ctPed);
+		} else {
+			super.jumpOnPed(ctPed, time);
+		}
+
+	}		@Override
+	public void jumpOnPed(CTPed ctPed, double time) {
+		DriverAgent driver = ctPed.getDriver();
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		this.em.processEvent(e);
+		if (ctPed.getNextLinkId() == null) {
+			CTNetsimEngine en = this.net.getEngine();
+			en.letPedArrive(ctPed);
+		} else {
+			super.jumpOnPed(ctPed, time);
+		}
+
+	}	@Override
+	public void jumpOnPed(CTPed ctPed, double time) {
+		DriverAgent driver = ctPed.getDriver();
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		this.em.processEvent(e);
+		if (ctPed.getNextLinkId() == null) {
+			CTNetsimEngine en = this.net.getEngine();
+			en.letPedArrive(ctPed);
+		} else {
+			super.jumpOnPed(ctPed, time);
+		}
+
+	}@Override
+	public void jumpOffPed(CTPed ctPed, double time) {
 		ctPed.notifyMoveOverNode();
-		super.jumpOffPed(ctPed);
+		DriverAgent driver = ctPed.getDriver();
+		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(),Id.create(driver.getId(),Vehicle.class));
+
+		em.processEvent(e);
+		super.jumpOffPed(ctPed, time);
 	}
 
 	public void init() {

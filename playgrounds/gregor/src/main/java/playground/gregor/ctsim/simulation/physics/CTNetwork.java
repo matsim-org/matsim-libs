@@ -16,6 +16,7 @@ public class CTNetwork {
 
 
 	private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
+	private final CTNetsimEngine engine;
 
 	private Map<Id<Link>, CTLink> links = new HashMap<>();
 	private Map<Id<Node>, CTNode> nodes = new HashMap<>();
@@ -23,9 +24,10 @@ public class CTNetwork {
 	private Network network;
 	private EventsManager em;
 
-	public CTNetwork(Network network, EventsManager em) {
+	public CTNetwork(Network network, EventsManager em, CTNetsimEngine engine) {
 		this.network = network;
 		this.em = em;
+		this.engine = engine;
 		init();
 	}
 
@@ -61,22 +63,24 @@ public class CTNetwork {
 		return null;
 	}
 
-	public void run() {
-		double time = 0;
-		while (events.peek() != null) {
+	public CTNetsimEngine getEngine() {
+		return this.engine;
+	}
 
+	public EventsManager getEventsManager() {
+		return this.em;
+	}
+
+	public void doSimStep(double time) {
+		draw(time);
+		while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
 			CTEvent e = events.poll();
-			if (e.getExecTime() > time + 1) {
-				time = e.getExecTime();
-				draw(time);
 
-			}
 			if (e.isInvalid()) {
 				continue;
 			}
 			e.execute();
 		}
-
 	}
 
 	private void draw(double time) {
@@ -109,6 +113,24 @@ public class CTNetwork {
 		return this.links;
 	}
 
+	public void run() {
+		double time = 0;
+		while (events.peek() != null) {
+
+			CTEvent e = events.poll();
+			if (e.getExecTime() > time + 1) {
+				time = e.getExecTime();
+				draw(time);
+
+			}
+			if (e.isInvalid()) {
+				continue;
+			}
+			e.execute();
+		}
+
+	}
+
 	public void addEvent(CTEvent e) {
 		this.events.add(e);
 	}
@@ -117,9 +139,7 @@ public class CTNetwork {
 		return this.nodes.get(id);
 	}
 
-	public void doSimStep(double time) {
 
-	}
 
 	public void afterSim() {
 
