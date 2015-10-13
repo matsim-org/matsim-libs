@@ -19,22 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger

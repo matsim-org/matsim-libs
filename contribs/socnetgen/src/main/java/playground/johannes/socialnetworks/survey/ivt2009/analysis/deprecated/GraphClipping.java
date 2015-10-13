@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import java.io.IOException;
-
+import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
@@ -39,7 +37,7 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
 
 /**
  * @author illenberger
@@ -59,7 +57,7 @@ public class GraphClipping {
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph(args[0]);
 		
-		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		GraphFilter<SpatialGraph> filter = new SpatialFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);

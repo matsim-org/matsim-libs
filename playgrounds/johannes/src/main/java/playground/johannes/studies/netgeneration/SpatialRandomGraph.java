@@ -19,39 +19,27 @@
  * *********************************************************************** */
 package playground.johannes.studies.netgeneration;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.io.Population2SocialGraph;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.CachedAccessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.DegreeAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
+import playground.johannes.socialnetworks.graph.spatial.analysis.*;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger

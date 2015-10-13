@@ -17,12 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.util;
+package org.matsim.contrib.common.util;
 
 import java.text.NumberFormat;
 
 
 /**
+ * Prints a simple progress bar to stdout:
+ * <br>
+ * <tt>0%....50%....100%</tt>
+ *
  * @author jillenberger
  *
  */
@@ -37,7 +41,13 @@ public class ProgressLogger {
 	private static long majorTickVal;
 	
 	private static long counter;
-	
+
+	/**
+	 * Initializes the progress logger.
+	 * @param max the total number of steps
+	 * @param minorTick the number of steps after that a dot is printed
+	 * @param majorTick the number of steps after that the percentage is printed
+	 */
 	public static void init(long max, long minorTick, long majorTick) {
 		maxVal = max;
 		minorTickVal = (long) Math.ceil(max/100.0 * minorTick);
@@ -45,7 +55,10 @@ public class ProgressLogger {
 		counter = 0;
 		System.out.print("\tProgress: 0%");
 	}
-	
+
+	/**
+	 * Moves the internal counter one step forward and prints a dot or the percentage respectively.
+	 */
 	public static void step() {
 		counter++;
 		if(counter == maxVal) {
@@ -58,7 +71,11 @@ public class ProgressLogger {
 		}
 		
 	}
-	
+
+	/**
+	 * Terminates the logger. Use this function to abort logging before the number of {@code #step()} calls has
+	 * reached the total number of steps.
+	 */
 	public static void termiante() {
 		if(counter != maxVal) {
 			System.out.println(NumberFormat.getPercentInstance().format(counter/(double)maxVal));

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.util;
+package org.matsim.contrib.common.collections;
 
 import java.util.ArrayList;
 import java.util.List;

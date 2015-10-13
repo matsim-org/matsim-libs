@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.*;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
@@ -36,7 +37,6 @@ import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexPropertyWriter;
@@ -132,7 +132,7 @@ public class AcceptanceProbaConst extends AbstractVertexProperty {
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.005.xml");
 		
 		g.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
-		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		GraphFilter<SpatialGraph> filter = new SpatialFilter(new SocialSparseGraphBuilder(g.getDelegate().getCoordinateReferenceSysten()), geometry);

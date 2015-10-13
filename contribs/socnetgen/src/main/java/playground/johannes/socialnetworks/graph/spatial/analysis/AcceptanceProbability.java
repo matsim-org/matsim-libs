@@ -27,10 +27,10 @@ import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.sna.graph.spatial.SpatialEdge;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 

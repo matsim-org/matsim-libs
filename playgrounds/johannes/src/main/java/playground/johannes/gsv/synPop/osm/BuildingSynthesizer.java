@@ -19,21 +19,15 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.index.quadtree.Quadtree;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -41,18 +35,12 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
