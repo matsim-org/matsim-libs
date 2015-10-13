@@ -19,9 +19,10 @@ public abstract class CTCell {
 		Q = (V_0 * RHO_M) / ((V_0 / GAMMA) + 1);
 	}
 
-
+	protected final CTNetwork net;
+	protected final EventsManager em;
 	private final List<CTCellFace> faces = new ArrayList<>();
-	private final CTNetwork net;
+	private final List<CTCell> neighbors = new ArrayList<>();
 	private final HashSet<CTPed> peds = new HashSet<>();
 	private final CTNetworkEntity parent;
 	int r = 0;
@@ -34,9 +35,7 @@ public abstract class CTCell {
 	private double rho; //current density
 	private CTPed next = null;
 	private double nextCellJumpTime;
-
 	private CTEvent currentEvent = null;
-
 	private int pedCnt = 0;
 
 	public CTCell(double x, double y, CTNetwork net, CTNetworkEntity parent) {
@@ -44,11 +43,17 @@ public abstract class CTCell {
 		this.y = y;
 		this.net = net;
 		this.parent = parent;
+		this.em = net.getEventsManager();
 	}
 
 
 	public void addFace(CTCellFace face) {
 		faces.add(face);
+		neighbors.add(face.nb);
+	}
+
+	public void addNeighbor(CTCell nb) {
+		this.neighbors.add(nb);
 	}
 
 	public void debug(EventsManager em) {
@@ -109,17 +114,17 @@ public abstract class CTCell {
 
 	public void jumpAndUpdateNeighbors(double now) {
 
-		CTCell nb = next.getNextCellAndJump();
+		CTCell nb = next.getNextCellAndJump(now);
 		next = null;
 		this.nextCellJumpTime = Double.NaN;
 
 
 		Set<CTCell> affectedCells = new HashSet<>();
-		for (CTCellFace face : this.faces) {
-			affectedCells.add(face.nb);
+		for (CTCell ctCell : this.neighbors) {
+			affectedCells.add(ctCell);
 		}
-		for (CTCellFace face : nb.faces) {
-			affectedCells.add(face.nb);
+		for (CTCell ctCell : nb.neighbors) {
+			affectedCells.add(ctCell);
 		}
 		for (CTCell cell : affectedCells) {
 			cell.updateIntendedCellJumpTimeAndChooseNextJumper(now);
@@ -196,18 +201,19 @@ public abstract class CTCell {
 		return faces;
 	}
 
-	public void jumpOffPed(CTPed ctPed) {
+	public void jumpOffPed(CTPed ctPed, double time) {
 		this.peds.remove(ctPed);
 		this.rho = this.peds.size() / alpha;
 		Collections.shuffle(faces, MatsimRandom.getRandom());
 
 	}
 
-	public void jumpOnPed(CTPed ctPed) {
+	public void jumpOnPed(CTPed ctPed, double time) {
 		this.peds.add(ctPed);
 		this.rho = this.peds.size() / alpha;
 		this.pedCnt++;
 	}
+
 
 	public HashSet<CTPed> getPeds() {
 		return peds;

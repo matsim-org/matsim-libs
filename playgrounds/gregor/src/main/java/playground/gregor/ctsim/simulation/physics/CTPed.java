@@ -56,16 +56,19 @@ public class CTPed {
 		}
 	}
 
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
 
 	public double getDesiredDir() {
 		return this.dir;
 	}
 
 
-	public CTCell getNextCellAndJump() {
-		this.currentCell.jumpOffPed(this);
+	public CTCell getNextCellAndJump(double time) {
+		this.currentCell.jumpOffPed(this, time);
 		this.currentCell = tentativeNextCell;
-		this.currentCell.jumpOnPed(this);
+		this.currentCell.jumpOnPed(this, time);
 		this.tentativeNextCell = null;
 		return this.currentCell;
 	}
@@ -105,5 +108,6 @@ public class CTPed {
 
 	public Id<Link> getNextLinkId() {
 		return this.driver.chooseNextLinkId();
+
 	}
 }

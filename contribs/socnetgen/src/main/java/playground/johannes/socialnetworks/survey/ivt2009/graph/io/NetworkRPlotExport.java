@@ -19,17 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import com.vividsolutions.jts.geom.Geometry;
 import gnu.trove.TIntArrayList;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.graph.GraphUtils;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.sna.graph.matrix.Dijkstra;
@@ -40,7 +33,6 @@ import playground.johannes.sna.snowball.SampledEdge;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.io.PajekAttributes;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -50,7 +42,8 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger
@@ -64,7 +57,7 @@ public class NetworkRPlotExport {
 	public static void main(String args[]) throws IOException {
 		SpatialGraph g = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/graph.graphml");
 		
-		Collection<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
+		Collection<SimpleFeature> features = EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
 		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		geometry.setSRID(21781);
 		

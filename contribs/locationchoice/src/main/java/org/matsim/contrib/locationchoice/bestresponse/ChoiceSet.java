@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.config.Config;
@@ -92,7 +93,8 @@ public class ChoiceSet {
 //					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
 //			}
 //		}
-		this.numberOfAlternatives = Integer.parseInt(config.findParam("locationchoice", "probChoiceSetSize") );
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.numberOfAlternatives = dccg.getProbChoiceSetSize();
 	}
 	
 	public void addDestination(Id<ActivityFacility> facilityId) {

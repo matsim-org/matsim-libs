@@ -19,22 +19,20 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.gis.PointUtils;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.gis.PointUtils;
+import playground.johannes.socialnetworks.gis.SpatialCostFunction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger

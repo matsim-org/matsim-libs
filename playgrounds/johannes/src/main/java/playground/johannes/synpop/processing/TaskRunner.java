@@ -20,8 +20,8 @@
 package playground.johannes.synpop.processing;
 
 import org.apache.log4j.Logger;
-import playground.johannes.coopsim.LoggerUtils;
-import playground.johannes.sna.util.ProgressLogger;
+import org.matsim.contrib.common.util.LoggerUtils;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Episode;

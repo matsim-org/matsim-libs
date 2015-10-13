@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.synpop.processing.EpisodeTask;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.Collection;
 import java.util.List;

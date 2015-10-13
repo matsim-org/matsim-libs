@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.util.Composite;
 
 
 /**

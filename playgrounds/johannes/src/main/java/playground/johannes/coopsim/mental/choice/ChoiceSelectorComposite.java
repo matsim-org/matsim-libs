@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.Map;
+import org.matsim.contrib.common.collections.Composite;
 
-import playground.johannes.sna.util.Composite;
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -53,6 +54,7 @@ public class PlanTimesAdapter {
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final Network network;
 	private final Config config;
+	private final DestinationChoiceConfigGroup dccg;
 	private final TripRouter router;
 	
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
@@ -65,6 +67,7 @@ public class PlanTimesAdapter {
 		this.network = scenario.getNetwork();
 		this.router = router;
 		this.config = scenario.getConfig();
+		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 	}
 	
 	/* package */ double adaptTimesAndScorePlan(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionFactory scoringFunctionFactory) {	
@@ -237,10 +240,10 @@ public class PlanTimesAdapter {
 		
 		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
 		// I do not want users having to set dc parameters in other config modules!
-		double speed = Double.parseDouble(this.config.findParam("locationchoice", "travelSpeed_car"));	// seems to be overwritten in any case? cdobler, oct'14
+		double speed = this.dccg.getTravelSpeed_car();	// seems to be overwritten in any case? cdobler, oct'14
 		
 		if (mode.equals(TransportMode.pt)) {
-			speed = Double.parseDouble(this.config.findParam("locationchoice", "travelSpeed_pt"));	
+			speed = this.dccg.getTravelSpeed_pt();	
 		} else if (mode.equals(TransportMode.bike)) {
 			speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {

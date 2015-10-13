@@ -20,9 +20,8 @@
 package playground.johannes.coopsim.analysis;
 
 import org.matsim.api.core.v01.population.PlanElement;
-
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes

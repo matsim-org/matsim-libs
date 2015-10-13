@@ -1,5 +1,21 @@
 package playground.johannes.gsv.demand.tasks;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.demand.PopulationTask;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,24 +24,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class PlanPrimaryActivity2 implements PopulationTask {
 

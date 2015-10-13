@@ -19,26 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis;
 
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.GraphBuilder;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.sna.graph.spatial.io.Colorizable;
 import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
@@ -48,12 +39,10 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
+import java.awt.*;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author illenberger
@@ -233,7 +222,7 @@ public class DynamicSpatialGrid {
 		
 		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		
-		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
 		Geometry chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		

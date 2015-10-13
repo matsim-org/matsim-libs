@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.*;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
@@ -39,7 +40,6 @@ import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.*;
 import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
@@ -103,7 +103,7 @@ public class Accessibility {
 		
 		logger.info("Loading data...");
 		Set<Point> points = loadPoints(popfile);
-		Geometry boundary = (Geometry) FeatureSHP.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) EsriShapeIO.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
 		boundary.setSRID(21781);
 		
 		ZoneLayer<Double> startZones;

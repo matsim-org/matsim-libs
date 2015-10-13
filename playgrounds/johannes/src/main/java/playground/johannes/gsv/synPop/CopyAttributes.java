@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.*;
 
 import java.util.HashMap;
 import java.util.Map;

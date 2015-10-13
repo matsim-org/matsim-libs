@@ -83,7 +83,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.bestResponse);
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("100.0");
-		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed("4711");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed(4711);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config);
