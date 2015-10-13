@@ -23,7 +23,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -71,9 +71,9 @@ public class HomeActChainTask extends AnalyzerTask {
 		
 		if (outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/homeactchains.txt", true);
+				StatsWriter.writeLabeledHistogram(chains, "chain", "n", getOutputDirectory() + "/homeactchains.txt", true);
 				
-				TXTWriter.writeMap(tripCounts, "nTrips", "n", getOutputDirectory() + "/hometripcounts.txt", true);
+				StatsWriter.writeHistogram(tripCounts, "nTrips", "n", getOutputDirectory() + "/hometripcounts.txt", true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

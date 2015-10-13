@@ -20,19 +20,17 @@
 package playground.johannes.sna.snowball.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.sna.snowball.SampledEdge;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
+
+import java.util.Set;
 
 
 /**

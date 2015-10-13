@@ -21,12 +21,12 @@ package playground.johannes.gsv.matrices.analysis;
 
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
@@ -79,7 +79,7 @@ public class SingleZoneDistances {
 		}
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(20000), true);
-		TXTWriter.writeMap(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
+		StatsWriter.writeHistogram(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
 	}
 
 }

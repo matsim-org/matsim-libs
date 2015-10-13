@@ -38,10 +38,10 @@ public class ZonalSystem {
 
 	private final String zonalCoordinateSystem;
 
-	private final Map<String, Zone> id2zone = new LinkedHashMap<String, Zone>();
-
-	private Map<Node, Zone> node2zone = null;
-	private Map<Zone, Set<Node>> zone2nodes = null;
+	// TODO encapsulate
+	public final Map<String, Zone> id2zone = new LinkedHashMap<String, Zone>();
+	public Map<Node, Zone> node2zone = null;
+	public Map<Zone, Set<Node>> zone2nodes = null;
 
 	// -------------------- CONSTRUCTION --------------------
 

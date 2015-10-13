@@ -26,13 +26,14 @@ package playground.johannes.sna.math;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleFunction;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Representation of an empirical discrete distribution. Allows to apply weights

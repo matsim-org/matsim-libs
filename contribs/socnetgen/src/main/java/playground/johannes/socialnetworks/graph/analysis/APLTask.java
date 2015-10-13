@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.graph.matrix.MatrixAPL;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger

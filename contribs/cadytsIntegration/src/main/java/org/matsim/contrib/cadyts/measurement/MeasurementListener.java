@@ -70,13 +70,12 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 		this.measurements = measurements ;
 		this.scenario = scenario;
 		
-		this.databins = new Databins<Measurement>( "travel times for measurement facility at each hour" ) ;
 		double[] dataBoundaries = new double[24] ;
 		for ( int ii=0 ; ii<dataBoundaries.length; ii++ ) {
 			dataBoundaries[ii] = ii * 3600. ;
 			// hourly bins, not connected to anything; this might be improved ...
 		}
-		this.databins.setDataBoundaries( dataBoundaries );
+		this.databins = new Databins<Measurement>( "travel times for measurement facility at each hour" , dataBoundaries ) ;
 	}
 
 	private long plansFound = 0;

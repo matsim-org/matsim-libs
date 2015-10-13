@@ -19,10 +19,23 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinLogDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,22 +43,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinLogDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -135,7 +132,7 @@ public class EdgeLengthCategoryTask extends ModuleAnalyzerTask<Accessibility> {
 			TDoubleDoubleHashMap histogram = entry.getValue();
 			Histogram.normalize(histogram, sum);
 			try {
-				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), key));
+				StatsWriter.writeHistogram(histogram, "d", "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), key));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -144,7 +141,7 @@ public class EdgeLengthCategoryTask extends ModuleAnalyzerTask<Accessibility> {
 			histogram = Histogram.createCumulativeHistogram(histogram);
 			Histogram.complementary(histogram);
 			try {
-				TXTWriter.writeMap(histogram, "d", "p", String.format("%1$s/%2$s.cum.txt", getOutputDirectory(), key));
+				StatsWriter.writeHistogram(histogram, "d", "p", String.format("%1$s/%2$s.cum.txt", getOutputDirectory(), key));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

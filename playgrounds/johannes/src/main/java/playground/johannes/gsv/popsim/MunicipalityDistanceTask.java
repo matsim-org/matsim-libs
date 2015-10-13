@@ -22,14 +22,14 @@ package playground.johannes.gsv.popsim;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.CommonKeys;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -66,10 +66,10 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
                 double[] y = yVals.toNativeArray();
 //                Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                 TDoubleDoubleHashMap corr = Correlations.mean(x, y);
-                TXTWriter.writeMap(corr, "munic", "distance", filename);
+                StatsWriter.writeHistogram(corr, "munic", "distance", filename);
 
                 filename = String.format("%s/munic.dist.scatter.txt", getOutputDirectory());
-                TXTWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
+                StatsWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
             } catch (IOException e) {
                 e.printStackTrace();
             }

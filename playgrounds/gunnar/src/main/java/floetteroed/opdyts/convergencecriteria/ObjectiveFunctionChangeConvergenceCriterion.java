@@ -96,4 +96,9 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 		return this.finalObjectiveFunctionValue;
 	}
 
+	@Override
+	public void reset() {
+		this.finalObjectiveFunctionValue = null;
+	}
+	
 }

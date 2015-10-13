@@ -27,35 +27,35 @@ public class DemandAnalyzer {
 				+ ObjectAttributeUtils2.allAttributeKeys(personAttributes));
 		System.out.println();
 
-		final Set<String> birthyears = new LinkedHashSet<String>();
-		final Set<String> sexes = new LinkedHashSet<String>();
-		final Set<String> incomes = new LinkedHashSet<String>();
-		final Set<String> housingtypes = new LinkedHashSet<String>();
-		final Set<String> homezones = new LinkedHashSet<String>();
-		final Set<String> workzones = new LinkedHashSet<String>();
-		final Set<String> otherzones = new LinkedHashSet<String>();
-		final Set<String> worktourmodes = new LinkedHashSet<String>();
-		final Set<String> othertourmodes = new LinkedHashSet<String>();
+		final Set birthyears = new LinkedHashSet();
+		final Set sexes = new LinkedHashSet();
+		final Set incomes = new LinkedHashSet();
+		final Set housingtypes = new LinkedHashSet();
+		final Set homezones = new LinkedHashSet();
+		final Set workzones = new LinkedHashSet();
+		final Set otherzones = new LinkedHashSet();
+		final Set worktourmodes = new LinkedHashSet();
+		final Set othertourmodes = new LinkedHashSet();
 
 		for (String personId : ObjectAttributeUtils2
 				.allObjectKeys(personAttributes)) {
-			birthyears.add((String) personAttributes.getAttribute(personId,
+			birthyears.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.BIRTHYEAR_ATTRIBUTE));
-			sexes.add((String) personAttributes.getAttribute(personId,
+			sexes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.SEX_ATTRIBUTE));
-			incomes.add((String) personAttributes.getAttribute(personId,
+			incomes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.INCOME_ATTRIBUTE));
-			housingtypes.add((String) personAttributes.getAttribute(personId,
+			housingtypes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE));
-			homezones.add((String) personAttributes.getAttribute(personId,
+			homezones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.HOMEZONE_ATTRIBUTE));
-			workzones.add((String) personAttributes.getAttribute(personId,
+			workzones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.WORKZONE_ATTRIBUTE));
-			otherzones.add((String) personAttributes.getAttribute(personId,
+			otherzones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERZONE_ATTRIBUTE));
-			worktourmodes.add((String) personAttributes.getAttribute(personId,
+			worktourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.WORKTOURMODE_ATTRIBUTE));
-			othertourmodes.add((String) personAttributes.getAttribute(personId,
+			othertourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE));
 		}
 
@@ -74,7 +74,8 @@ public class DemandAnalyzer {
 
 	public static void main(String[] args) {
 
-		run("./data/synthetic_population/trips.xml");
+		// run("./data/synthetic_population/150615_trips.xml");
+		run("./data/synthetic_population/150911_trips.xml");
 
 	}
 

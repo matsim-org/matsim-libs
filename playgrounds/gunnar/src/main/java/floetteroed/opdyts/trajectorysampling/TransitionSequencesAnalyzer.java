@@ -51,20 +51,20 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class TransitionSequencesAnalyzer {
+public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
-	private final List<Transition> transitions;
+	private final List<Transition<U>> transitions;
 
-	private final SurrogateObjectiveFunction surrogateObjectiveFunction;
+	private final SurrogateObjectiveFunction<U> surrogateObjectiveFunction;
 
 	private final int maxIterations = 10 * 1000; // TODO make configurable
 
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequencesAnalyzer(
-			final List<Transition> transitions,
+			final List<Transition<U>> transitions,
 			final double equilibriumGapWeight,
 			final double uniformityWeight,
 			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
@@ -76,7 +76,7 @@ public class TransitionSequencesAnalyzer {
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
-		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction(
+		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
 				// objectBasedObjectiveFunction,
 				vectorBasedObjectiveFunction, transitions,
 				equilibriumGapWeight, uniformityWeight, initialGradientNorm);
@@ -93,7 +93,7 @@ public class TransitionSequencesAnalyzer {
 	// }
 
 	TransitionSequencesAnalyzer(
-			final Map<DecisionVariable, TransitionSequence> decisionVariable2transitionSequence,
+			final Map<U, TransitionSequence<U>> decisionVariable2transitionSequence,
 			final double equilibriumWeight,
 			final double uniformityWeight,
 			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
@@ -106,10 +106,10 @@ public class TransitionSequencesAnalyzer {
 				vectorBasedObjectiveFunction, initialGradientNorm);
 	}
 
-	static List<Transition> map2list(
-			final Map<DecisionVariable, TransitionSequence> decisionVariable2transitionSequence) {
-		final List<Transition> result = new ArrayList<Transition>();
-		for (TransitionSequence transitionSequence : decisionVariable2transitionSequence
+	static <V extends DecisionVariable> List<Transition<V>> map2list(
+			final Map<V, TransitionSequence<V>> decisionVariable2transitionSequence) {
+		final List<Transition<V>> result = new ArrayList<Transition<V>>();
+		for (TransitionSequence<V> transitionSequence : decisionVariable2transitionSequence
 				.values()) {
 			result.addAll(transitionSequence.getTransitions());
 		}
@@ -169,11 +169,10 @@ public class TransitionSequencesAnalyzer {
 		return this.surrogateObjectiveFunction.value(alphas);
 	}
 
-	public Map<DecisionVariable, Double> decisionVariable2alphaSum(
-			final Vector alphas) {
-		final Map<DecisionVariable, Double> result = new LinkedHashMap<DecisionVariable, Double>();
+	public Map<U, Double> decisionVariable2alphaSum(final Vector alphas) {
+		final Map<U, Double> result = new LinkedHashMap<U, Double>();
 		for (int i = 0; i < alphas.size(); i++) {
-			final DecisionVariable decisionVariable = this.transitions.get(i)
+			final U decisionVariable = this.transitions.get(i)
 					.getDecisionVariable();
 			final Double sum = result.get(decisionVariable);
 			result.put(decisionVariable, sum == null ? alphas.get(i) : sum

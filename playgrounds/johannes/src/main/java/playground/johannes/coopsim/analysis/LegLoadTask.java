@@ -20,19 +20,17 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
@@ -58,7 +56,7 @@ public class LegLoadTask extends TrajectoryAnalyzerTask {
 		for(Entry<String, ? extends PlanElementCondition<Leg>> entry : conditions.entrySet()) {
 			TDoubleDoubleHashMap load = legLoad(trajectories, entry.getValue());
 			try {
-				TXTWriter.writeMap(load, "t", "freq", String.format("%1$s/legload.%2$s.txt", getOutputDirectory(), entry.getKey()));
+				StatsWriter.writeHistogram(load, "t", "freq", String.format("%1$s/legload.%2$s.txt", getOutputDirectory(), entry.getKey()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

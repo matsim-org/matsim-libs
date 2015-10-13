@@ -5,6 +5,7 @@ import be.humphreys.simplevoronoi.Voronoi;
 import com.vividsolutions.jts.geom.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
@@ -72,7 +73,7 @@ public class CTLink implements CTNetworkEntity {
         Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
         Map<ProtoCell, Geometry> geoMap = new HashMap<>();
         for (ProtoCell pt : cells) {
-            CTCell c = new CTCell(pt.x, pt.y, this.network, this);
+            CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this);
             c.setArea(1.5 * Math.sqrt(3) * WIDTH * WIDTH);
 
             cellsMap.put(pt, c);
@@ -141,50 +142,6 @@ public class CTLink implements CTNetworkEntity {
         }
 //        debugAngle(alpha,frX,frY,toX1,toY1);
         return alpha;
-    }
-
-    private void debugAngle(double alpha, double frX, double frY, double toX1, double toY1) {
-        int sect = (int) Math.round(10 * (Math.PI / alpha));
-        LineSegment ls = new LineSegment();
-        ls.x0 = frX;
-        ls.y0 = frY;
-        ls.x1 = toX1;
-        ls.y1 = toY1;
-        if (sect == 60) {
-            LineEvent le = new LineEvent(0, ls, true, 192, 0, 0, 255, 0);
-            em.processEvent(le);
-        }
-        else {
-            if (sect == 20) {
-                LineEvent le = new LineEvent(0, ls, true, 192, 192, 0, 255, 0);
-                em.processEvent(le);
-            }
-            else {
-                if (sect == 12) {
-                    LineEvent le = new LineEvent(0, ls, true, 0, 192, 0, 255, 0);
-                    em.processEvent(le);
-                }
-                else {
-                    if (sect == -12) {
-                        LineEvent le = new LineEvent(0, ls, true, 0, 192, 192, 255, 0);
-                        em.processEvent(le);
-                    }
-                    else {
-                        if (sect == -20) {
-                            LineEvent le = new LineEvent(0, ls, true, 0, 0, 192, 255, 0);
-                            em.processEvent(le);
-                        }
-                        else {
-                            if (sect == -60) {
-                                LineEvent le = new LineEvent(0, ls, true, 192, 0, 192, 255, 0);
-                                em.processEvent(le);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     private List<ProtoCell> computeProtoCells(double dx, double dy) {
@@ -273,7 +230,6 @@ public class CTLink implements CTNetworkEntity {
         em.processEvent(le);
     }
 
-
     private void debugBound(double dx, double dy) {
 
 
@@ -316,8 +272,69 @@ public class CTLink implements CTNetworkEntity {
 
     }
 
+    public Link getDsLink() {
+        return this.dsLink;
+    }
+
+    public Link getUsLink() {
+        return this.usLink;
+    }
+
+    private void debugAngle(double alpha, double frX, double frY, double toX1, double toY1) {
+        int sect = (int) Math.round(10 * (Math.PI / alpha));
+        LineSegment ls = new LineSegment();
+        ls.x0 = frX;
+        ls.y0 = frY;
+        ls.x1 = toX1;
+        ls.y1 = toY1;
+        if (sect == 60) {
+            LineEvent le = new LineEvent(0, ls, true, 192, 0, 0, 255, 0);
+            em.processEvent(le);
+        }
+        else {
+            if (sect == 20) {
+                LineEvent le = new LineEvent(0, ls, true, 192, 192, 0, 255, 0);
+                em.processEvent(le);
+            }
+            else {
+                if (sect == 12) {
+                    LineEvent le = new LineEvent(0, ls, true, 0, 192, 0, 255, 0);
+                    em.processEvent(le);
+                }
+                else {
+                    if (sect == -12) {
+                        LineEvent le = new LineEvent(0, ls, true, 0, 192, 192, 255, 0);
+                        em.processEvent(le);
+                    }
+                    else {
+                        if (sect == -20) {
+                            LineEvent le = new LineEvent(0, ls, true, 0, 0, 192, 255, 0);
+                            em.processEvent(le);
+                        }
+                        else {
+                            if (sect == -60) {
+                                LineEvent le = new LineEvent(0, ls, true, 192, 0, 192, 255, 0);
+                                em.processEvent(le);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     public List<CTCell> getCells() {
         return cells;
+    }
+
+//    public void letAgentDepart(CTVehicle veh, double now) {
+//
+//    }
+
+    public void letAgentDepart(MobsimDriverAgent agent, CTLink link, double now) {
+        CTCell cell = null;
+        CTPed p = new CTPed(cell, agent);
     }
 
     private final class ProtoCell {

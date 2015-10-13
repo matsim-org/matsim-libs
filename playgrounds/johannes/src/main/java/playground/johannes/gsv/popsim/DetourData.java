@@ -21,9 +21,9 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedReader;
@@ -55,6 +55,6 @@ public class DetourData {
 
         Discretizer d = FixedSampleSizeDiscretizer.create(xvals.toNativeArray(), 50, 100);
         TDoubleDoubleHashMap corel = Correlations.mean(xvals.toNativeArray(), yvals.toNativeArray(), 20000);
-        TXTWriter.writeMap(corel, "route", "geo", "/home/johannes/sge/prj/synpop/run/962/output/detours.mean.txt");
+        StatsWriter.writeHistogram(corel, "route", "geo", "/home/johannes/sge/prj/synpop/run/962/output/detours.mean.txt");
     }
 }

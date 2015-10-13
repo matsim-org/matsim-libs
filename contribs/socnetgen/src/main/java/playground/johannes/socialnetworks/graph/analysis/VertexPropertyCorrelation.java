@@ -19,23 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.util.HashSet;
-import java.util.Set;
-
+import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.VertexProperty;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.DummyDiscretizer;
 import playground.johannes.socialnetworks.statistics.Correlations;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

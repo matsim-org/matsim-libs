@@ -2,4 +2,5 @@
 .project
 .settings
 target
-testdata
+input
+output

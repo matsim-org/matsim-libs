@@ -21,24 +21,22 @@ package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.collections.bidimap.DualHashBidiMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.facilities.ActivityFacilities;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 /**
  * @author illenberger
@@ -86,7 +84,7 @@ public class TripDistanceDegreeTask extends TrajectoryAnalyzerTask {
 				purpose = "all";
 			
 			try {
-				TXTWriter.writeMap(correl, "k", "d", String.format("%1$s/d_mean_k.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeHistogram(correl, "k", "d", String.format("%1$s/d_mean_k.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
