@@ -30,11 +30,11 @@ public class FractionalIterator<E> implements Iterator<E> {
 		while (this.iterator.hasNext() && this.cumulative < 1.0) {
 			this.next = this.iterator.next();
 			this.cumulative += this.fraction;
-			if (this.cumulative < 1.0) {
-				System.out.print(".");
-			} else {
-				System.out.print("X");				
-			}
+			// if (this.cumulative < 1.0) {
+			// System.out.print(".");
+			// } else {
+			// System.out.print("X");
+			// }
 		}
 		if (this.cumulative >= 1.0) {
 			this.cumulative -= 1.0;
@@ -72,8 +72,8 @@ public class FractionalIterator<E> implements Iterator<E> {
 				it.next();
 				cnt++;
 			}
-			System.out
-					.println(" should be: " + f + "; is " + (cnt / all.size()));
+			System.out.println(" should be: " + f + "; is "
+					+ (cnt / all.size()));
 		}
 	}
 }
