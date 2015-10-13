@@ -58,63 +58,28 @@ public class CTNodeCell extends CTCell {
 	}
 
 	@Override
-	public void jumpOnPed(CTPed ctPed, double time) {
+	public void jumpOffPed(CTPed ctPed, double time) {
+		ctPed.notifyMoveOverNode();
 		DriverAgent driver = ctPed.getDriver();
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
-		this.em.processEvent(e);
-		if (ctPed.getNextLinkId() == null) {
-			CTNetsimEngine en = this.net.getEngine();
-			en.letPedArrive(ctPed);
-		} else {
-			super.jumpOnPed(ctPed, time);
-		}
+		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
 
+		em.processEvent(e);
+		super.jumpOffPed(ctPed, time);
 	}
 
 	@Override
 	public void jumpOnPed(CTPed ctPed, double time) {
 		DriverAgent driver = ctPed.getDriver();
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
 		this.em.processEvent(e);
 		if (ctPed.getNextLinkId() == null) {
 			CTNetsimEngine en = this.net.getEngine();
 			en.letPedArrive(ctPed);
-		} else {
+		}
+		else {
 			super.jumpOnPed(ctPed, time);
 		}
 
-	}		@Override
-	public void jumpOnPed(CTPed ctPed, double time) {
-		DriverAgent driver = ctPed.getDriver();
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
-		this.em.processEvent(e);
-		if (ctPed.getNextLinkId() == null) {
-			CTNetsimEngine en = this.net.getEngine();
-			en.letPedArrive(ctPed);
-		} else {
-			super.jumpOnPed(ctPed, time);
-		}
-
-	}	@Override
-	public void jumpOnPed(CTPed ctPed, double time) {
-		DriverAgent driver = ctPed.getDriver();
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
-		this.em.processEvent(e);
-		if (ctPed.getNextLinkId() == null) {
-			CTNetsimEngine en = this.net.getEngine();
-			en.letPedArrive(ctPed);
-		} else {
-			super.jumpOnPed(ctPed, time);
-		}
-
-	}@Override
-	public void jumpOffPed(CTPed ctPed, double time) {
-		ctPed.notifyMoveOverNode();
-		DriverAgent driver = ctPed.getDriver();
-		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time),driver.getId(),driver.getCurrentLinkId(),Id.create(driver.getId(),Vehicle.class));
-
-		em.processEvent(e);
-		super.jumpOffPed(ctPed, time);
 	}
 
 	public void init() {
