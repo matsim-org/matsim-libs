@@ -582,10 +582,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// (continue only if HOLES)
 
-		if ( !storageOk ) { 
-			// this is not necessary and only next statement is sufficient.
-			return false ;
-		}
+//		if ( !storageOk ) { 
+//			// this is not necessary and only next statement is sufficient.
+//			return false ;
+//		}
 		// at this point, storage is ok, so start checking holes:
 		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
