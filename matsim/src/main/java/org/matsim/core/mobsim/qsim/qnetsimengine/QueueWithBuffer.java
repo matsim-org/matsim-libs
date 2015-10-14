@@ -551,10 +551,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	public final boolean isActive() {
 		if(this.fastCapacityUpdate){
 		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
-					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+					|| (!this.vehQueue.isEmpty()) // vehicles are queued, thus active 
+					|| (!this.isNotOfferingVehicle()) // still accumulating, thus active
+					|| ( !this.holes.isEmpty() ) // need to process arrival of holes
+					;
 		}
 	}
 
@@ -579,7 +582,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// (continue only if HOLES)
 
-		if ( !storageOk ) {
+		if ( !storageOk ) { 
+			// this is not necessary and only next statement is sufficient.
 			return false ;
 		}
 		// at this point, storage is ok, so start checking holes:
