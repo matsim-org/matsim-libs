@@ -167,7 +167,9 @@ public class OutputDirectoryHierarchy {
 						// files!
 						throw new RuntimeException(
 								"The output directory " + outputPath
-								+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+								+ " already exists and is not empty!"
+								+ " Please either delete or empty the directory or"
+								+ " configure the controler via setOverwriteFileSetting().");
 					case overwriteExistingFiles:
 						System.out.flush();
 						log.warn("###########################################################");
