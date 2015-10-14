@@ -707,6 +707,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		buffer.clear();
 		usedBufferStorageCapacity = 0;
+		
+		holes.clear();
+		this.remainingHolesStorageCapacity = this.storageCapacity;
 	}
 
 	@Override
