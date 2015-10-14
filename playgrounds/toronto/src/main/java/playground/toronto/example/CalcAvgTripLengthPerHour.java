@@ -71,10 +71,10 @@ public class CalcAvgTripLengthPerHour implements PersonDepartureEventHandler, Pe
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {
-		Double distance = this.travelDistancePerAgent.get(event.getPersonId());
+		Double distance = this.travelDistancePerAgent.get(event.getDriverId());
 		Link link = this.network.getLinks().get(event.getLinkId());
 		distance = distance + link.getLength();
-		this.travelDistancePerAgent.put(event.getPersonId(), distance);
+		this.travelDistancePerAgent.put(event.getDriverId(), distance);
 	}
 
 	public void reset(final int iteration) {

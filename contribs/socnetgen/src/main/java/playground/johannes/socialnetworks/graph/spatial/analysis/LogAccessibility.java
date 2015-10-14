@@ -19,18 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.PlacemarkType;
-
-
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
@@ -40,7 +34,6 @@ import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
 import playground.johannes.sna.graph.spatial.io.KMLPartitions;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
@@ -53,7 +46,10 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger

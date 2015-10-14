@@ -151,7 +151,7 @@ public class CppEventFileParser {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
-			if (Integer.parseInt(((LinkEnterEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
+			if (Integer.parseInt(((LinkEnterEvent) personEvent).getDriverId().toString()) != deqSimEvent.getVehicleId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -166,7 +166,7 @@ public class CppEventFileParser {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
-			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
+			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getDriverId().toString()) != deqSimEvent.getVehicleId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}

@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.sna.util.ProgressLogger;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LocationChoiceConfigGroup.java
+ * DestinationChoiceConfigGroup.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,7 +27,8 @@ import org.matsim.core.config.ConfigGroup;
 
 public class DestinationChoiceConfigGroup extends ConfigGroup {
 
-	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct }
+	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
+	
 	public static final String GROUP_NAME = "locationchoice";
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
@@ -65,38 +66,50 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private static final String DESTINATIONSAMPLE_PCT = "destinationSamplePercent";
 
 	//default values
-	private String restraintFcnFactor = "0.0";
-	private String restraintFcnExp = "0.0";
-	private String scaleFactor = "1";
-	private String recursionTravelSpeedChange = "0.1";
-	private String travelSpeed_car = "8.5";
-	private String travelSpeed_pt = "5.0";
-	private String maxRecursions = "1";
-	private String centerNode = "null";
-	private String radius = "null";
-	private String flexible_types = "null";
-		
-	private Algotype algorithm = Algotype.bestResponse ;
-	private String tt_approximationLevel = "1";
-	private String maxDistanceDCScore = "-1.0";
+	private static final double defaultScaleFactor = 1.0;
+	private static final double defaultRecursionTravelSpeedChange = 0.1;
+	private static final double defaultCarSpeed = 8.5;
+	private static final double defaultPtSpeed = 5.0;
+	private static final int defaultMaxRecursions = 10; 
+	private static final int defaultTt_approximationLevel = 1;
+	private static final long defaultRandomSeed = 221177;
+	private static final int defaultProbChoiceSetSize = 5;
+	private static final double defaultAnalysisBoundary = 200000;
+	private static final double defaultAnalysisBinSize = 20000;
+	
+	private double restraintFcnFactor = 0.0;
+	private double restraintFcnExp = 0.0;
+	private double scaleFactor = 1;
+	private double recursionTravelSpeedChange = 0.1;
+	private double travelSpeed_car = 8.5;
+	private double travelSpeed_pt = 5.0;
+	private int maxRecursions = 1;
+	private String centerNode = null;
+	private Double radius = null;
+	private String flexible_types = "null";	// TODO !!
+	
+	private Algotype algorithm = Algotype.bestResponse;
+	private int tt_approximationLevel = 1;
+	private double maxDistanceDCScore = -1.0;
 	private String planSelector = "SelectExpBeta";
 	
-	private String randomSeed = "221177";
+	private long randomSeed = 221177;
 	private String epsilonDistribution = "gumbel";
-	private String epsilonScaleFactors = "null";
-	private String probChoiceSetSize = "5";	
-	private String pkValuesFile = "null";
-	private String fkValuesFile = "null";
-	private String pBetasFile = "null";
-	private String fAttributesFile = "null";
-	private String maxDCScoreFile = "null";
-	private String prefsFile = "null";
+	private String epsilonScaleFactors = null;
+	private int probChoiceSetSize = 5;	
+	private String pkValuesFile = null;
+	private String fkValuesFile = null;
+	private String pBetasFile = null;
+	private String fAttributesFile = null;
+	private String maxDCScoreFile = null;
+	private String prefsFile = null;
 	
-	private String analysisBoundary = "200000";
-	private String analysisBinSize = "20000";
-	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
+	private double analysisBoundary = 200000;
+	private double analysisBinSize = 20000;
+//	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
+	private Long idExclusion = null;
 	
-	private String destinationSamplePercent = "100.0";
+	private double destinationSamplePercent = 100.0;
 
 	private final static Logger log = Logger.getLogger(DestinationChoiceConfigGroup.class);
 
@@ -108,31 +121,31 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	@Override
 	public String getValue(final String key) {
 		if (RESTR_FCN_FACTOR.equals(key)) {
-			return getRestraintFcnFactor();
+			return String.valueOf(getRestraintFcnFactor());
 		}
 		if (RESTR_FCN_EXP.equals(key)) {
-			return getRestraintFcnExp();
+			return String.valueOf(getRestraintFcnExp());
 		}
 		if (SCALEFACTOR.equals(key)) {
-			return getScaleFactor();
+			return String.valueOf(getScaleFactor());
 		}
 		if (GLOBALTRAVELSPEEDCHANGE.equals(key)) {
-			return getRecursionTravelSpeedChange();
+			return String.valueOf(getRecursionTravelSpeedChange());
 		}
 		if (GLOBALTRAVELSPEED_CAR.equals(key)) {
-			return getTravelSpeed_car();
+			return String.valueOf(getTravelSpeed_car());
 		}
 		if (GLOBALTRAVELSPEED_PT.equals(key)) {
-			return getTravelSpeed_pt();
+			return String.valueOf(getTravelSpeed_pt());
 		}
 		if (MAX_RECURSIONS.equals(key)) {
-			return getMaxRecursions();
+			return String.valueOf(getMaxRecursions());
 		}
 		if (CENTER_NODE.equals(key)) {
 			return getCenterNode();
 		}
 		if (RADIUS.equals(key)) {
-			return getRadius();
+			return String.valueOf(getRadius());
 		}
 		if (FLEXIBLE_TYPES.equals(key)) {
 			return getFlexibleTypes();
@@ -141,16 +154,16 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			throw new RuntimeException("getValue access disabled; used direct getter. kai, jan'13") ;
 		}
 		if (TT_APPROX_LEVEL.equals(key)) {
-			return getTravelTimeApproximationLevel();
+			return String.valueOf(getTravelTimeApproximationLevel());
 		}
 		if (MAXDISTANCEDCSCORE.equals(key)) {
-			return getMaxDistanceDCScore();
+			return String.valueOf(getMaxDistanceDCScore());
 		}
 		if (PLANSELECTOR.equals(key)) {
 			return getPlanSelector();
 		}
 		if (RANDOMSEED.equals(key)) {
-			return getRandomSeed();
+			return String.valueOf(getRandomSeed());
 		}
 		if (EPSDISTR.equals(key)) {
 			return getEpsilonDistribution();
@@ -159,7 +172,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			return getEpsilonScaleFactors();
 		}
 		if (PROBCHOICESETSIZE.equals(key)) {
-			return getProbChoiceSetSize();
+			return String.valueOf(getProbChoiceSetSize());
 		}
 		if (PKVALS_FILE.equals(key)) {
 			return getpkValuesFile();
@@ -180,16 +193,16 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			return getPrefsFile();
 		}
 		if (ANALYSIS_BOUNDARY.equals(key)) {
-			return getAnalysisBoundary();
+			return String.valueOf(getAnalysisBoundary());
 		}
 		if (ANALYSIS_BINSIZE.equals(key)) {
-			return getAnalysisBinSize();
+			return String.valueOf(getAnalysisBinSize());
 		}
 		if (IDEXCLUSION.equals(key)) {
-			return getIdExclusion();
+			return String.valueOf(getIdExclusion());
 		}
 		if (DESTINATIONSAMPLE_PCT.equals(key)) {
-			return getDestinationSamplePercent();
+			return String.valueOf(getDestinationSamplePercent());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -200,64 +213,75 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		if ( "null".equalsIgnoreCase( value ) ) return;
 		
 		if (RESTR_FCN_FACTOR.equals(key)) {
-			if (Double.parseDouble(value) < 0.0) {
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 0.0) {
 				log.warn("Restraint function factor is negative! " +
 						"This means: The more people are in a facility, the more attractive the facility is expected to be");
 			}
-			setRestraintFcnFactor(value);
+			this.setRestraintFcnFactor(doubleValue);
 		} else if (RESTR_FCN_EXP.equals(key)) {
-			if (Double.parseDouble(value) < 0.0) {
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 0.0) {
 				log.warn("Restraint function exponent is negative! " +
 						"This means: The penalty gets smaller the more people are in a facility.");
 			}
-			setRestraintFcnExp(value);
+			this.setRestraintFcnExp(doubleValue);
 		} else if (SCALEFACTOR.equals(key)) {
-			if (Double.parseDouble(value) < 1) {
-				log.warn("Scale factor must be greater than 1! Scale factor is set to default value 1");
-				setScaleFactor("1");
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 1) {
+				log.warn("Scale factor must be greater than 1! Scale factor is set to default value " + defaultScaleFactor);
+				this.setScaleFactor(defaultScaleFactor);
 			}
 			else {
-				setScaleFactor(value);
+				this.setScaleFactor(doubleValue);
 			}
 		} else if (GLOBALTRAVELSPEEDCHANGE.equals(key)) {
-			if (Double.parseDouble(value) < 0.0 || Double.parseDouble(value) > 1.0 ) {
-				log.warn("'recursionTravelSpeedChange' must be [0..1]! Set to default value 0.1");
-				setRecursionTravelSpeedChange("0.1");
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 0.0 || doubleValue > 1.0 ) {
+				log.warn("'recursionTravelSpeedChange' must be [0..1]! Set to default value " + defaultRecursionTravelSpeedChange);
+				this.setRecursionTravelSpeedChange(defaultRecursionTravelSpeedChange);
 			}
 			else {
-				setRecursionTravelSpeedChange(value);
+				this.setRecursionTravelSpeedChange(doubleValue);
 			}
 		} else if (GLOBALTRAVELSPEED_CAR.equals(key)) {
-			if (Double.parseDouble(value) < 0.0 ) {
-				log.warn("'travelSpeed' must be positive! Set to default value 8.5");
-				setTravelSpeed_car("8.5");
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 0.0 ) {
+				log.warn("'travelSpeed' must be positive! Set to default value " + defaultCarSpeed);
+				this.setTravelSpeed_car(defaultCarSpeed);
 			}
 			else {
-				setTravelSpeed_car(value);
+				this.setTravelSpeed_car(doubleValue);
 			}
 		} else if (GLOBALTRAVELSPEED_PT.equals(key)) {
-			if (Double.parseDouble(value) < 0.0 ) {
-				log.warn("'travelSpeed' must be positive! Set to default value 5.0");
-				setTravelSpeed_pt("5.0");
+			double doubleValue = Double.parseDouble(value);
+			if (doubleValue < 0.0 ) {
+				log.warn("'travelSpeed' must be positive! Set to default value " + defaultPtSpeed);
+				this.setTravelSpeed_pt(defaultPtSpeed);
 			}
 			else {
-				setTravelSpeed_pt(value);
+				this.setTravelSpeed_pt(doubleValue);
 			}
 		} else if (MAX_RECURSIONS.equals(key)) {
-			if (Double.parseDouble(value) < 0.0) {
-				log.warn("'max_recursions' must be greater than 0! Set to default value 10");
-				setMaxRecursions("10");
+			int intValue = Integer.parseInt(value);
+			if (intValue < 0) {
+				log.warn("'max_recursions' must be greater than 0! Set to default value " + defaultMaxRecursions);
+				this.setMaxRecursions(defaultMaxRecursions);
 			}
 			else {
-				setMaxRecursions(value);
+				this.setMaxRecursions(intValue);
 			}
 		} else if (CENTER_NODE.equals(key)) {
-			setCenterNode(value);
+			if (value.equals("null")) this.setCenterNode(null);
+			else this.setCenterNode(value);
 		} else if (RADIUS.equals(key)) {
-			setRadius(value);
+			if (value.equals("null")) {
+				Double d = null;
+				this.setRadius(d);
+			} else setRadius(Double.parseDouble(value));
 		} else if (FLEXIBLE_TYPES.equals(key)) {
 			if (value.length() == 0) {
-				setFlexibleTypes("null");
+				this.setFlexibleTypes("null");
 			}
 			else {
 				setFlexibleTypes(value);
@@ -274,17 +298,20 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 					}
 				}
 				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Setting to default value 'bestResponse' now");
-				setAlgorithm(Algotype.bestResponse) ;
+				setAlgorithm(Algotype.bestResponse);
 //			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
-			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
-				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '1' now");
+			int intValue = Integer.parseInt(value);
+			if (intValue != 0 && intValue != 1 && intValue != 2) {
+				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '" + defaultTt_approximationLevel + "' now");
+				this.setTravelTimeApproximationLevel(defaultTt_approximationLevel);
 			}
 			else {
-				setTravelTimeApproximationLevel(value);
+				this.setTravelTimeApproximationLevel(intValue);
 			}
 		} else if (MAXDISTANCEDCSCORE.equals(key)) {
-			setMaxDistanceDCScore(value);
+			double doubleValue = Double.parseDouble(value);
+			this.setMaxDistanceDCScore(doubleValue);
 		} else if (PLANSELECTOR.equals(key)) {
 			if (!(value.equals("BestScore") || value.equals("SelectExpBeta") || value.equals("ChangeExpBeta") || value.equals("SelectRandom"))) {
 				log.warn("set a valid plan selector for location choice. Set to default value 'SelectExpBeta' now");
@@ -294,10 +321,12 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			}
 		} else if (RANDOMSEED.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("set a random seed. Set to default value '221177' now");
+				log.warn("set a random seed. Set to default value '" + defaultRandomSeed + "' now");
+				this.setRandomSeed(defaultRandomSeed);
 			}
 			else {
-				setRandomSeed(value);
+				long longValue = Long.parseLong(value);
+				this.setRandomSeed(longValue);
 			}
 		} else if (EPSDISTR.equals(key)) {
 			if (!(value.equals("gumbel") || value.equals("gaussian"))) {
@@ -310,85 +339,122 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			if (value.length() == 0) {
 				log.warn("set scaling factors for random error terms.");
 			}
+			else if (value.equals("null")) {
+				this.setEpsilonScaleFactors(null);
+			}
 			else {
-				setEpsilonScaleFactors(value);
+				this.setEpsilonScaleFactors(value);
 			}
 		} else if (PROBCHOICESETSIZE.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("define size of canditate set for probabilistic choice. Set to default value '5' now");
+				log.warn("define size of canditate set for probabilistic choice. Set to default value '" + defaultProbChoiceSetSize + "' now");
+				this.setProbChoiceSetSize(defaultProbChoiceSetSize);
 			}
 			else {
-				setProbChoiceSetSize(value);
+				int intValue = Integer.parseInt(value);
+				this.setProbChoiceSetSize(intValue);
 			}
 		} else if (PROBCHOICEEXP.equals(key)) {
 			log.error("location choice key " + PROBCHOICEEXP + " is no longer used.  Please remove.  This will be enforced more strictly in the future.  kai, jan'13") ;
 		} else if (PKVALS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a persons k values file if available. Set to default value 'null' now");
+				this.setpkValuesFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setpkValuesFile(null);
 			}
 			else {
-				setpkValuesFile(value);
+				this.setpkValuesFile(value);
 			}
 		} else if (FKVALS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a facilities k values file if available. Set to default value 'null' now");
+				this.setfkValuesFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setfkValuesFile(null);
 			}
 			else {
-				setfkValuesFile(value);
+				this.setfkValuesFile(value);
 			}
 		} else if (FATTRS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a facilities attributess file if available. Set to default value 'null' now");
+				this.setfAttributesFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setfAttributesFile(null);
 			}
 			else {
-				setfAttributesFile(value);
+				this.setfAttributesFile(value);
 			}
 		} else if (PBETAS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a person betas file if available. Set to default value 'null' now");
+				this.setpBetasFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setpBetasFile(null);
 			}
 			else {
-				setpBetasFile(value);
+				this.setpBetasFile(value);
 			}
 			
 		} else if (MAXDCS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a max eps file if available. Set to default value 'null' now");
+				this.setMaxEpsFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setMaxEpsFile(null);
 			}
 			else {
-				setMaxEpsFile(value);
+				this.setMaxEpsFile(value);
 			}
 		} else if (PREFS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a prefs file if available. Set to default value 'null' now");
+				this.setPrefsFile(null);
+			}
+			else if (value.equals("null")) {
+				this.setPrefsFile(null);
 			}
 			else {
-				setPrefsFile(value);
+				this.setPrefsFile(value);
 			}
 		} else if (ANALYSIS_BOUNDARY.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("define an analysis region. Set to default value '200km' now");
+				log.warn("define an analysis region. Set to default value '" + defaultAnalysisBoundary + "' now");
+				this.setAnalysisBoundary(defaultAnalysisBoundary);
 			}
 			else {
-				setAnalysisBoundary(value);
+				int intValue = Integer.parseInt(value);
+				this.setAnalysisBoundary(intValue);
 			}
 		} else if (ANALYSIS_BINSIZE.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("define an analysis bin size. Set to default value '20km' now");
+				log.warn("define an analysis bin size. Set to default value '" + defaultAnalysisBinSize + "' now");
+				this.setAnalysisBinSize(defaultAnalysisBinSize);
 			}
 			else {
-				setAnalysisBinSize(value);
+				int intValue = Integer.parseInt(value);
+				setAnalysisBinSize(intValue);
 			}
 		} else if (IDEXCLUSION.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define the highest id to be included in analysis. Set to default value 'maxint' now");
 			}
+			else if (value.equals("null")) {
+				this.setIdExclusion(null);
+			}
 			else {
-				setIdExclusion(value);
+				long longValue = Long.parseLong(value);
+				this.setIdExclusion(longValue);
 			}
 		} else if (DESTINATIONSAMPLE_PCT.equals(key)) {
 			if (value.length() > 0) {
-				this.setDestinationSamplePercent(value);
+				this.setDestinationSamplePercent(Double.parseDouble(value));
 			}
 		} else
 		{
@@ -409,7 +475,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
-		map.put(ALGO, this.getAlgorithm().toString()  ) ;
+		map.put(ALGO, this.getAlgorithm().toString());
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
 		this.addParameterToMap(map, MAXDISTANCEDCSCORE);
 		this.addParameterToMap(map, PLANSELECTOR);
@@ -430,46 +496,46 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-	public String getRestraintFcnFactor() {
+	public double getRestraintFcnFactor() {
 		return this.restraintFcnFactor;
 	}
-	public void setRestraintFcnFactor(final String restraintFcnFactor) {
+	public void setRestraintFcnFactor(final double restraintFcnFactor) {
 		this.restraintFcnFactor = restraintFcnFactor;
 	}
-	public String getRestraintFcnExp() {
+	public double getRestraintFcnExp() {
 		return this.restraintFcnExp;
 	}
-	public void setRestraintFcnExp(final String restraintFcnExp) {
+	public void setRestraintFcnExp(final double restraintFcnExp) {
 		this.restraintFcnExp = restraintFcnExp;
 	}
-	public String getScaleFactor() {
+	public double getScaleFactor() {
 		return this.scaleFactor;
 	}
-	public void setScaleFactor(final String scaleFactor) {
+	public void setScaleFactor(final double scaleFactor) {
 		this.scaleFactor = scaleFactor;
 	}
-	public String getRecursionTravelSpeedChange() {
+	public double getRecursionTravelSpeedChange() {
 		return this.recursionTravelSpeedChange;
 	}
-	public void setRecursionTravelSpeedChange(final String recursionTravelSpeedChange) {
+	public void setRecursionTravelSpeedChange(final double recursionTravelSpeedChange) {
 		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
 	}
-	public String getMaxRecursions() {
+	public int getMaxRecursions() {
 		return this.maxRecursions;
 	}
-	public void setMaxRecursions(final String maxRecursions) {
+	public void setMaxRecursions(final int maxRecursions) {
 		this.maxRecursions = maxRecursions;
 	}
-	public String getTravelSpeed_car() {
+	public double getTravelSpeed_car() {
 		return this.travelSpeed_car;
 	}
-	public void setTravelSpeed_car(final String travelSpeed_car) {
+	public void setTravelSpeed_car(final double travelSpeed_car) {
 		this.travelSpeed_car = travelSpeed_car;
 	}
-	public String getTravelSpeed_pt() {
+	public double getTravelSpeed_pt() {
 		return this.travelSpeed_pt;
 	}
-	public void setTravelSpeed_pt(final String travelSpeed_pt) {
+	public void setTravelSpeed_pt(final double travelSpeed_pt) {
 		this.travelSpeed_pt = travelSpeed_pt;
 	}
 	public String getCenterNode() {
@@ -478,10 +544,10 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setCenterNode(final String centerNode) {
 		this.centerNode = centerNode;
 	}
-	public String getRadius() {
+	public Double getRadius() {
 		return this.radius;
 	}
-	public void setRadius(final String radius) {
+	public void setRadius(final Double radius) {
 		this.radius = radius;
 	}
 	public String getFlexibleTypes() {
@@ -503,37 +569,37 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.fAttributesFile = fAttributesFile;
 	}
 	public Algotype getAlgorithm() {
-		return algorithm;
+		return this.algorithm;
 	}
 	public void setAlgorithm(Algotype algorithm) {
 		this.algorithm = algorithm;
 	}
-	public String getTravelTimeApproximationLevel() {
-		return tt_approximationLevel;
+	public int getTravelTimeApproximationLevel() {
+		return this.tt_approximationLevel;
 	}
-	public void setTravelTimeApproximationLevel(String tt_approximationLevel) {
+	public void setTravelTimeApproximationLevel(int tt_approximationLevel) {
 		this.tt_approximationLevel = tt_approximationLevel;
 	}
-	public String getMaxDistanceDCScore() {
-		return maxDistanceDCScore;
+	public double getMaxDistanceDCScore() {
+		return this.maxDistanceDCScore;
 	}
-	public void setMaxDistanceDCScore(String maxSearchSpaceRadius) {
+	public void setMaxDistanceDCScore(double maxSearchSpaceRadius) {
 		this.maxDistanceDCScore = maxSearchSpaceRadius;
 	}
 	public String getPlanSelector() {
-		return planSelector;
+		return this.planSelector;
 	}
 	public void setPlanSelector(String planSelector) {
 		this.planSelector = planSelector;
 	}
-	public String getRandomSeed() {
-		return randomSeed;
+	public long getRandomSeed() {
+		return this.randomSeed;
 	}
-	public void setRandomSeed(String randomSeed) {
+	public void setRandomSeed(long randomSeed) {
 		this.randomSeed = randomSeed;
 	}
 	public String getEpsilonDistribution() {
-		return epsilonDistribution;
+		return this.epsilonDistribution;
 	}
 	public void setEpsilonDistribution(String epsilonDistribution) {
 		this.epsilonDistribution = epsilonDistribution;
@@ -541,17 +607,17 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public String getEpsilonScaleFactors() {
 		return this.epsilonScaleFactors;
 	}
-	public void setEpsilonScaleFactors(String epsilonScaleFactors){
+	public void setEpsilonScaleFactors(String epsilonScaleFactors) {
 		this.epsilonScaleFactors = epsilonScaleFactors;
 	}
-	public String getProbChoiceSetSize() {
-		return probChoiceSetSize;
+	public int getProbChoiceSetSize() {
+		return this.probChoiceSetSize;
 	}
-	public void setProbChoiceSetSize(String probChoiceSetSize) {
+	public void setProbChoiceSetSize(int probChoiceSetSize) {
 		this.probChoiceSetSize = probChoiceSetSize;
 	}
 	public String getpkValuesFile() {
-		return pkValuesFile;
+		return this.pkValuesFile;
 	}
 	public void setpkValuesFile(String kValuesFile) {
 		this.pkValuesFile = kValuesFile;
@@ -563,39 +629,43 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.fkValuesFile = kValuesFile;
 	}
 	public String getMaxEpsFile() {
-		return maxDCScoreFile;
+		return this.maxDCScoreFile;
 	}
 	public void setMaxEpsFile(String maxEpsFile) {
 		this.maxDCScoreFile = maxEpsFile;
 	}
 	public String getPrefsFile() {
-		return prefsFile;
+		return this.prefsFile;
 	}
 	public void setPrefsFile(String prefsFile) {
 		this.prefsFile = prefsFile;
 	}
-	public String getAnalysisBoundary() {
+	public double getAnalysisBoundary() {
 		return this.analysisBoundary;
 	}
-	public void setAnalysisBoundary(String analysisBoundary) {
+	public void setAnalysisBoundary(double analysisBoundary) {
 		this.analysisBoundary = analysisBoundary;
 	}
-	public String getAnalysisBinSize() {
+	public double getAnalysisBinSize() {
 		return this.analysisBinSize;
 	}
-	public void setAnalysisBinSize(String analysisBinSize) {
+	public void setAnalysisBinSize(double analysisBinSize) {
 		this.analysisBinSize = analysisBinSize;
 	}
-	public String getIdExclusion() {
+	public Long getIdExclusion() {
 		return this.idExclusion;
 	}
-	public void setIdExclusion(String idExclusion) {
+	public void setIdExclusion(Long idExclusion) {
 		this.idExclusion = idExclusion;
 	}
-	public String getDestinationSamplePercent() {
-		return destinationSamplePercent;
+	public double getDestinationSamplePercent() {
+		return this.destinationSamplePercent;
 	}
+	@Deprecated
 	public void setDestinationSamplePercent(String destinationSamplePercent) {
+		this.setDestinationSamplePercent(Double.parseDouble(destinationSamplePercent));
+	}
+	public void setDestinationSamplePercent(double destinationSamplePercent) {
 		this.destinationSamplePercent = destinationSamplePercent;
 	}	
 }

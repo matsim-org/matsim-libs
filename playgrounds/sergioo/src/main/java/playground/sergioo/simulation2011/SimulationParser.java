@@ -59,7 +59,7 @@ public class SimulationParser implements TransitDriverStartsEventHandler, LinkEn
 		if(event.getTime()>86400 && event.getLinkId().equals(Id.createLinkId("22003_0")))
 			try {
 				printWriter = new PrintWriter(new FileWriter("./data/depsTarde.txt",true));
-				printWriter.println(event.getTime()+" "+event.getPersonId());
+				printWriter.println(event.getTime()+" "+event.getDriverId());
 				printWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();

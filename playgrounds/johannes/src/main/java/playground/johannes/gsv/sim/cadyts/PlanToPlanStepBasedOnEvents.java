@@ -111,13 +111,13 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getPersonId())) return;
+		if (!driverAgents.contains(event.getDriverId())) return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		if (calibratedLinks != null && !calibratedLinks.contains(event.getLinkId())) return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

@@ -213,7 +213,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 	@Override
 	// TODO: remove method after debugging is over.
 	public void handleEvent(PersonStuckEvent event) {
-		//DebugLib.traceAgent(event.getPersonId());
+		//DebugLib.traceAgent(event.getDriverId());
         Person person = controler.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		if (parkingManager.considerForParking(event.getPersonId())){
 			parkingManager.initializePersonForParking(person);

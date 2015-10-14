@@ -21,22 +21,16 @@ package playground.johannes.socialnetworks.graph.generators;
 
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.sna.graph.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.analysis.UnivariateRealFunction;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.GraphUtils;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author illenberger

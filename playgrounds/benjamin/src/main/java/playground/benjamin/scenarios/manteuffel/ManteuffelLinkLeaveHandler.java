@@ -58,7 +58,7 @@ public class ManteuffelLinkLeaveHandler implements LinkLeaveEventHandler, Transi
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 //		Id<Vehicle> vehicleId = event.getVehicleId();
-//		Id<Person> personId = event.getPersonId();
+//		Id<Person> personId = event.getDriverId();
 //		Id<Vehicle> vehId = Id.create(personId.toString(), Vehicle.class); //TODO: this should be rather the vehicle, not the person; re-think EmissionModule!
 //		if(!vehiclesFromPlans.getVehicles().containsKey(vehId)){
 ////			logger.warn(vehId);

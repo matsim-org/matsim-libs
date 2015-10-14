@@ -200,7 +200,8 @@ class MultiRunTaxiLauncher
             params = TaxiLauncherParams.readParams(paramFile, inputDir, outputDir);
         }
         else if (args.length == 2) {
-            params = TaxiLauncherParams.readParams(paramFile);
+            String dir = new File(paramFile).getParent() + '/';
+            params = TaxiLauncherParams.readParams(paramFile, dir, dir);
         }
         else {
             throw new IllegalArgumentException();

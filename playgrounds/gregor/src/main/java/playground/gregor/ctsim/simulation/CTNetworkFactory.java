@@ -1,10 +1,11 @@
+package playground.gregor.ctsim.simulation;
 /* *********************************************************************** *
  * project: org.matsim.*
- * Composite.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +18,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
+import playground.gregor.ctsim.simulation.physics.CTNetsimEngine;
+import playground.gregor.ctsim.simulation.physics.CTNetwork;
 
 /**
- * Abstract base class for composite object structures.
- * 
- * @author illenberger
- * 
+ * Created by laemmel on 12/10/15.
  */
-public abstract class Composite<T> {
-
-	protected List<T> components = new ArrayList<T>();
-
-	/**
-	 * Adds a component to the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void addComponent(T component) {
-		components.add(component);
-	}
-
-	/**
-	 * Removes a component from the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void removeComponent(T component) {
-		components.remove(component);
+public class CTNetworkFactory {
+	public CTNetwork createCTNetwork(Network network, EventsManager eventsManager, CTNetsimEngine ctNetsimEngine) {
+		return new CTNetwork(network, eventsManager, ctNetsimEngine);
 	}
 }

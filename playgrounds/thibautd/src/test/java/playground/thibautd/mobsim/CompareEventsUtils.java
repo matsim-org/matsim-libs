@@ -295,7 +295,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getPersonId(),
+				event.getDriverId(),
 				event );
 		}
 
@@ -304,7 +304,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getPersonId(),
+				event.getDriverId(),
 				event );
 		}
 

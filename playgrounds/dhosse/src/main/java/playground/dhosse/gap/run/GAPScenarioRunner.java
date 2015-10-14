@@ -229,7 +229,7 @@ public class GAPScenarioRunner {
 		dccg.setEpsilonScaleFactors(epsilons.toString());
 		dccg.setpkValuesFile("/home/danielhosse/run9a/personsKValues.xml");
 		dccg.setfkValuesFile("/home/danielhosse/run9a/facilitiesKValues.xml");
-		dccg.setScaleFactor("1");
+		dccg.setScaleFactor(1);
 		
 		controler.getConfig().addModule(dccg);
 		DestinationChoiceBestResponseContext dcbr = new DestinationChoiceBestResponseContext(controler.getScenario());

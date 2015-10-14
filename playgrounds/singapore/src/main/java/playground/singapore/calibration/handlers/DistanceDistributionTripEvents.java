@@ -109,15 +109,15 @@ public class DistanceDistributionTripEvents implements TransitDriverStartsEventH
 	}
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (pIdsToExclude.contains(event.getPersonId())) { return; }
+		if (pIdsToExclude.contains(event.getDriverId())) { return; }
 		if(event.getVehicleId().toString().startsWith("tr"))
 			ptVehicles.get(event.getVehicleId()).in = true;
 		else
-			chains.get(event.getPersonId()).in = true;
+			chains.get(event.getDriverId()).in = true;
 	}
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (pIdsToExclude.contains(event.getPersonId())) { return; }
+		if (pIdsToExclude.contains(event.getDriverId())) { return; }
 		if(event.getVehicleId().toString().startsWith("tr")) {
 			PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 			if(vehicle.in) {
@@ -126,10 +126,10 @@ public class DistanceDistributionTripEvents implements TransitDriverStartsEventH
 			}
 		}
 		else  {
-			TravellerChain chain = chains.get(event.getPersonId());
+			TravellerChain chain = chains.get(event.getDriverId());
 			if(chain == null) {
 				chain = new TravellerChain();
-				chains.put(event.getPersonId(), chain);
+				chains.put(event.getDriverId(), chain);
 				chain.modes.add("car");
 				chain.distances.add(0.0);
 			}

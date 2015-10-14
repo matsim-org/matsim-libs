@@ -64,7 +64,7 @@ public class CordonLineCrossingLog {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 			Coord prevLink=previousLinkCoordinate.get(personId);
 			Coord curLink=getLinkCoordinate(event.getLinkId());
 			

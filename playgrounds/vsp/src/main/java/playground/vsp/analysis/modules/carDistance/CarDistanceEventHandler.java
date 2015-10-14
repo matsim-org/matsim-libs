@@ -76,7 +76,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Id linkId = event.getLinkId();
 		Double linkLength_m = this.network.getLinks().get(linkId).getLength();
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){

@@ -65,8 +65,8 @@ public class WaitToLinkCalculator implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (carAgents.remove(event.getPersonId())) {
-			double waitToLinkEventTime = waitToLinkEventTimes.remove(event.getPersonId());
+		if (carAgents.remove(event.getDriverId())) {
+			double waitToLinkEventTime = waitToLinkEventTimes.remove(event.getDriverId());
 			double waitToLinkTime = event.getTime() - waitToLinkEventTime;
 			
 			WaitToLinkData waitToLinkData = new WaitToLinkData();

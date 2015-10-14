@@ -19,46 +19,98 @@ package playground.gregor.ctsim.simulation.physics;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
+
+import java.util.List;
+
 /**
  * Created by laemmel on 07/10/15.
  */
 public class CTPed {
 
 
-    private CTCell currentCell;
-    private double dir;
-    private CTCell tentativeNextCell;
+	private final DriverAgent driver;
+	private List<Id<Link>> links;
+	private CTCell currentCell;
+	private double dir;
+	private CTCell tentativeNextCell;
+	private int currentIdx = 1;
 
-    public CTPed(CTCell cell, double dir) {
-        this.currentCell = cell;
-        this.dir = dir;
-    }
+	public CTPed(CTCell cell, DriverAgent driverAgent) {
+		this.currentCell = cell;
+		this.driver = driverAgent;
+		Id<Link> current = driverAgent.getCurrentLinkId();
+		CTLink l = (CTLink) cell.getParent();
+		if (l.getDsLink().getId() == current) {
+			this.dir = Math.PI / 2.;
+		}
+		else {
+			if (l.getUsLink().getId() == current) {
+				this.dir = -Math.PI / 2.;
+			}
+			else {
+				throw new RuntimeException("cell does not belong to current link");
+			}
+		}
+	}
 
-    public double chooseNextCellAndReturnJumpRate() {
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
 
-        CTCell bestNB = null;
-        double maxFlowFactor = 0;
-        for (CTCellFace face : this.currentCell.getFaces()) {
-            double flowFactor = (1 + Math.cos(dir - face.h_i)) * currentCell.getJ(face.nb);
-            if (flowFactor > maxFlowFactor) {
-                maxFlowFactor = flowFactor;
-                bestNB = face.nb;
-
-            }
-        }
-        if (bestNB == null) {
-            return Double.NaN;
-        }
-        this.tentativeNextCell = bestNB;
-        return currentCell.getJ(this.tentativeNextCell) * maxFlowFactor;
-    }
+	public double getDesiredDir() {
+		return this.dir;
+	}
 
 
-    public CTCell getNextCellAndJump() {
-        this.currentCell.jumpOffPed(this);
-        this.currentCell = tentativeNextCell;
-        this.currentCell.jumpOnPed(this);
-        this.tentativeNextCell = null;
-        return this.currentCell;
-    }
+	public CTCell getNextCellAndJump(double time) {
+		if (this.tentativeNextCell.jumpOnPed(this, time)) {
+			this.currentCell.jumpOffPed(this, time);
+			this.currentCell = tentativeNextCell;
+
+			this.tentativeNextCell = null;
+
+		}
+		return this.currentCell;
+	}
+
+	public CTCell getTentativeNextCell() {
+		return tentativeNextCell;
+	}
+
+	public void setTentativeNextCell(CTCell tentativeNextCell) {
+		this.tentativeNextCell = tentativeNextCell;
+	}
+
+	public void notifyMoveOverNode() {
+		CTNetworkEntity p = tentativeNextCell.getParent();
+		if (p instanceof CTLink) {
+			CTLink ctLink = (CTLink) p;
+			Link us = ctLink.getUsLink();
+			Link ds = ctLink.getDsLink();
+			if (us != null && us.getId() == driver.chooseNextLinkId()) {
+				this.dir = -Math.PI / 2.;
+				driver.notifyMoveOverNode(driver.chooseNextLinkId());
+				return;
+			}
+			else {
+				if (ds.getId() == driver.chooseNextLinkId()) {
+					this.dir = Math.PI / 2.;
+					driver.notifyMoveOverNode(driver.chooseNextLinkId());
+					return;
+				}
+			}
+		}
+		throw new RuntimeException("error in node-link plan logic");
+
+
+	}
+
+
+	public Id<Link> getNextLinkId() {
+		return this.driver.chooseNextLinkId();
+
+	}
 }

@@ -259,7 +259,7 @@ public class LinkVolumeAnalyzer {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (GeneralLib.isInZHCityRectangle(network.getLinks().get(event.getLinkId()).getCoord())) {
-				Id personId = event.getPersonId();
+				Id personId = event.getDriverId();
 				if (!stopFollowingAgent.containsKey(personId) && ParkingManager.considerForParking(personId)) {
 					if ((event.getTime() > 16 * 3600 && event.getTime() < 19 * 3600)) {
 						this.peakHourTravellingAgentLinkIds.put(event.getLinkId(), personId);

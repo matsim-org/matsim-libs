@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.sna.snowball.sim;
 
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.util.Composite;
 
 /**
  * A composite of multiple sampler listeners.

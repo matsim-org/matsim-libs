@@ -124,15 +124,15 @@ public class EventsToXYData implements BasicEventHandler {
 		// store link enter events of observed agents
 		else if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			if (observedAgents.containsKey(linkEnterEvent.getPersonId())) {
-				linkEnterEvents.put(linkEnterEvent.getPersonId(), linkEnterEvent);
+			if (observedAgents.containsKey(linkEnterEvent.getDriverId())) {
+				linkEnterEvents.put(linkEnterEvent.getDriverId(), linkEnterEvent);
 			}
 		}
 		
 		// create xy data for link trips of observed agents
 		else if (event instanceof LinkLeaveEvent) {
 			LinkLeaveEvent linkLeaveEvent = (LinkLeaveEvent) event;
-			Id personId = linkLeaveEvent.getPersonId();
+			Id personId = linkLeaveEvent.getDriverId();
 			LinkEnterEvent linkEnterEvent = linkEnterEvents.remove(personId);
 			
 			if (linkEnterEvent != null) {

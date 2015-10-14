@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.calibration;
 
 import java.io.File;
 
@@ -30,14 +30,14 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class MunichAnalyzer {
+public class MunichDistanceAndTravelTimeDistribution {
 
 	public static void main(String[] args) {
 		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String [] runs = {"baseCaseCtd","ei","ci","eci"};
 		
 		for(String str:runs){
-			MunichAnalyzer ana = new MunichAnalyzer();
+			MunichDistanceAndTravelTimeDistribution ana = new MunichDistanceAndTravelTimeDistribution();
 //			ana.runRoutesDistance(runDir, str);
 			ana.runTravelTimeDistribution(runDir, str);
 		}

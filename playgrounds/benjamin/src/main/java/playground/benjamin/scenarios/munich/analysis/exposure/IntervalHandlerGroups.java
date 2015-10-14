@@ -117,7 +117,7 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 				currentTimeBin++;
 			}
 		}else{ // person not yet recognised --- actiity start event missing
-//			recognisedPersons.add(event.getPersonId());
+//			recognisedPersons.add(event.getDriverId());
 			int tb = 0;
 			// time bins prior to events time bin
 			while(tb < currentTimeBin){

@@ -79,13 +79,13 @@
 //
 //		//links 3, 8, 10
 //		public void handleEvent(LinkEnterEvent e) {
-//			if (e.getLinkId().equals(id3) && e.getPersonId().equals(id2)) {
+//			if (e.getLinkId().equals(id3) && e.getDriverId().equals(id2)) {
 //				link3Ok = true;
 //			}
-//			else if (e.getLinkId().equals(id8) && e.getPersonId().equals(id1)) {
+//			else if (e.getLinkId().equals(id8) && e.getDriverId().equals(id1)) {
 //				link8Ok = true;
 //			}
-//			else if (e.getLinkId().equals(id10) && e.getPersonId().equals(id3)) {
+//			else if (e.getLinkId().equals(id10) && e.getDriverId().equals(id3)) {
 //				link10Ok = true;
 //			}
 //		}
@@ -128,7 +128,7 @@
 //
 //		//link 10
 //		public void handleEvent(LinkEnterEvent e) {
-//			if (e.getLinkId().equals(id10) && e.getPersonId().equals(id1)) {
+//			if (e.getLinkId().equals(id10) && e.getDriverId().equals(id1)) {
 //				link10Ok = true;
 //			}
 //		}

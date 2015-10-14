@@ -124,7 +124,7 @@ public class AgentModeScoreAnalysis {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (links.containsKey(event.getLinkId())){
-				getAgentWhoEnteredCordon().add(event.getPersonId());
+				getAgentWhoEnteredCordon().add(event.getDriverId());
 			}
 		}
 

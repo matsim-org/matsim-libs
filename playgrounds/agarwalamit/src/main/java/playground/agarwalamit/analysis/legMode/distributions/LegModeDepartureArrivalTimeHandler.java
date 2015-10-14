@@ -16,12 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.legModeDistributions;
+package playground.agarwalamit.analysis.legMode.distributions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -36,14 +37,8 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeHandler.class);
-	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2ArrivalTime;
-	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2DepartureTime;
-
-	public LegModeDepartureArrivalTimeHandler() {
-		this.mode2PersonId2ArrivalTime = new HashMap<String, Map<Id<Person>,double[]>>();
-		this.mode2PersonId2DepartureTime = new HashMap<String, Map<Id<Person>,double[]>>();
-	}
+	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2ArrivalTime = new HashMap<>();
+	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2DepartureTime = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {
@@ -58,18 +53,19 @@ public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventH
 		double departureTime =event.getTime();
 
 		if(this.mode2PersonId2DepartureTime.containsKey(legMode)){
-			Map<Id<Person>, double[]> personId2DepartureTime = this.mode2PersonId2DepartureTime.get(legMode);
+			Map<Id<Person>, List<Double>> personId2DepartureTime = this.mode2PersonId2DepartureTime.get(legMode);
 			if(personId2DepartureTime.containsKey(personId)){
-				double departureTimes [] = {personId2DepartureTime.get(personId)[0],0};
-				departureTimes[1] = departureTime;
-				personId2DepartureTime.put(personId, departureTimes);
+				List<Double> departureTimes  = personId2DepartureTime.get(personId);
+				departureTimes.add(departureTime);
 			} else {
-				double departureTimes [] = {departureTime,0};
-				personId2DepartureTime.put(personId,departureTimes );
+				List<Double> departureTimes = new ArrayList<Double>();
+				departureTimes.add(departureTime);
+				personId2DepartureTime.put(personId, departureTimes );
 			}
 		} else {
-			Map<Id<Person>, double[]> personId2DepartureTime = new HashMap<Id<Person>, double[]>();
-			double departureTimes [] = {departureTime,0};
+			Map<Id<Person>, List<Double> > personId2DepartureTime = new HashMap<>();
+			List<Double>   departureTimes  = new ArrayList<Double>();
+			departureTimes.add(departureTime);
 			personId2DepartureTime.put(personId, departureTimes);
 			this.mode2PersonId2DepartureTime.put(legMode, personId2DepartureTime);
 		}
@@ -82,27 +78,28 @@ public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventH
 		double arrivalTime =event.getTime();
 
 		if(this.mode2PersonId2ArrivalTime.containsKey(legMode)){
-			Map<Id<Person>, double[]> personId2ArrivalTime = this.mode2PersonId2ArrivalTime.get(legMode);
+			Map<Id<Person>, List<Double>> personId2ArrivalTime = this.mode2PersonId2ArrivalTime.get(legMode);
 			if(personId2ArrivalTime.containsKey(personId)){
-				double arrivalTimes [] = {personId2ArrivalTime.get(personId)[0],0};
-				arrivalTimes[1] = arrivalTime;
-				personId2ArrivalTime.put(personId, arrivalTimes);
+				List<Double> arrivalTimes = personId2ArrivalTime.get(personId);
+				arrivalTimes.add(arrivalTime);
 			} else {
-				double arrivalTimes [] = {arrivalTime,0};
+				List<Double> arrivalTimes  = new ArrayList<Double>();
+				arrivalTimes.add(arrivalTime);
 				personId2ArrivalTime.put(personId,arrivalTimes );
 			}
 		} else {
-			Map<Id<Person>, double[]> personId2ArrivalTime = new HashMap<Id<Person>, double[]>();
-			double arrivalTimes [] = {arrivalTime,0};
+			Map<Id<Person>, List<Double> > personId2ArrivalTime = new HashMap<>();
+			List<Double> arrivalTimes  = new ArrayList<Double>();
+			arrivalTimes.add(arrivalTime);
 			personId2ArrivalTime.put(personId, arrivalTimes);
 			this.mode2PersonId2ArrivalTime.put(legMode, personId2ArrivalTime);
 		}
 	}
 
-	public Map<String, Map<Id<Person>, double[]>> getLegMode2PersonId2DepartureTime(){
+	public Map<String, Map<Id<Person>, List<Double> >> getLegMode2PersonId2DepartureTime(){
 		return this.mode2PersonId2DepartureTime;
 	}
-	public Map<String, Map<Id<Person>, double[]>> getLegMode2PersonId2ArrivalTime(){
+	public Map<String, Map<Id<Person>, List<Double> >> getLegMode2PersonId2ArrivalTime(){
 		return this.mode2PersonId2ArrivalTime;
 	}
 }

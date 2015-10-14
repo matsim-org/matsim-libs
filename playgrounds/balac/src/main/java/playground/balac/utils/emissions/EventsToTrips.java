@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -160,20 +159,20 @@ public class EventsToTrips {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			// TODO Auto-generated method stub
-			if (inVehicle.containsKey(event.getPersonId()) && inVehicle.get(event.getPersonId()) == true)
-				if (travelTimes.containsKey(event.getPersonId())) {
-					if (routes.containsKey(event.getPersonId())) {
+			if (inVehicle.containsKey(event.getDriverId()) && inVehicle.get(event.getDriverId()) == true)
+				if (travelTimes.containsKey(event.getDriverId())) {
+					if (routes.containsKey(event.getDriverId())) {
 						
-						routes.get(event.getPersonId()).get(routes.get(event.getPersonId()).size() - 1).addNewLink(event.getLinkId(), -travelTimes.get(event.getPersonId()) + event.getTime());
-						travelTimes.remove(event.getPersonId());
+						routes.get(event.getDriverId()).get(routes.get(event.getDriverId()).size() - 1).addNewLink(event.getLinkId(), -travelTimes.get(event.getDriverId()) + event.getTime());
+						travelTimes.remove(event.getDriverId());
 					}
 					else {
 						System.out.println("this should never happen");
 						ArrayList<RouteInfo> newPoint = new ArrayList<RouteInfo>();
 						RouteInfo newRoute = new RouteInfo();
-						newRoute.addNewLink(event.getLinkId(), travelTimes.get(event.getPersonId()));
+						newRoute.addNewLink(event.getLinkId(), travelTimes.get(event.getDriverId()));
 						newPoint.add(newRoute);
-						this.routes.put(event.getPersonId(), newPoint);
+						this.routes.put(event.getDriverId(), newPoint);
 					}
 				}
 					
@@ -183,8 +182,8 @@ public class EventsToTrips {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			// TODO Auto-generated method stub
-			if (inVehicle.containsKey(event.getPersonId()) && inVehicle.get(event.getPersonId()) == true)
-				travelTimes.put(event.getPersonId(), event.getTime());
+			if (inVehicle.containsKey(event.getDriverId()) && inVehicle.get(event.getDriverId()) == true)
+				travelTimes.put(event.getDriverId(), event.getTime());
 		}
 		
 		

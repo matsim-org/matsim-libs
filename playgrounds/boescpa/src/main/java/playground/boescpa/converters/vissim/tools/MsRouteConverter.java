@@ -85,11 +85,11 @@ public class MsRouteConverter extends AbstractRouteConverter {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 				if (geographicEventAnalyzer.eventInArea(event)) {
-					Trip currentTrip = currentTrips.get(event.getPersonId());
+					Trip currentTrip = currentTrips.get(event.getDriverId());
 					if (currentTrip == null) {
-						Id<Trip> tripId = Id.create(event.getPersonId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
+						Id<Trip> tripId = Id.create(event.getDriverId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
 						currentTrip = new Trip(tripId, event.getTime());
-						currentTrips.put(event.getPersonId(),currentTrip);
+						currentTrips.put(event.getDriverId(),currentTrip);
 					}
 					currentTrip.links.add(event.getLinkId());
 					currentTrip.endTime = event.getTime();

@@ -19,38 +19,29 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Utility class to read and write zone layers into shape (.shp) files.
@@ -135,7 +126,7 @@ public class ZoneLayerSHP {
 	 */
 	public static ZoneLayer<Map<String, Object>> read(String filename) throws IOException {
 		Set<Zone<Map<String, Object>>> zones = new HashSet<Zone<Map<String, Object>>>();
-		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
+		for(SimpleFeature feature : EsriShapeIO.readFeatures(filename)) {
 			Zone<Map<String, Object>> zone = new Zone<Map<String, Object>>((Geometry) feature.getDefaultGeometry());
 			Map<String, Object> map = new HashMap<String, Object>(feature.getAttributeCount());
 			for(Property prop : feature.getProperties()) {
@@ -150,7 +141,7 @@ public class ZoneLayerSHP {
 	
 	public static ZoneLayer<Double> read(String filename, String key) throws IOException {
 		Set<Zone<Double>> zones = new HashSet<Zone<Double>>();
-		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
+		for(SimpleFeature feature : EsriShapeIO.readFeatures(filename)) {
 			Zone<Double> zone = new Zone<Double>((Geometry) feature.getDefaultGeometry());
 //			feature.getFeatureType().
 			Object obj = feature.getAttribute(key);

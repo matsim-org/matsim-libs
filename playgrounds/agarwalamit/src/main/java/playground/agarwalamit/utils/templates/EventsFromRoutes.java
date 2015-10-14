@@ -118,10 +118,10 @@ public class EventsFromRoutes {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			System.out.println(event.toString());
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getDriverId());
 			if (travelTimes == null) {
 				travelTimes = new HashMap<>();
-				this.personLinkTravelTimes.put(event.getPersonId(), travelTimes);
+				this.personLinkTravelTimes.put(event.getDriverId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
@@ -129,7 +129,7 @@ public class EventsFromRoutes {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			System.out.println(event.toString());
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getDriverId());
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {

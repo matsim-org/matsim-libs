@@ -21,12 +21,11 @@ package playground.johannes.gsv.qlik;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

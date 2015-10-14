@@ -261,12 +261,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getPersonId().toString().contains("veh"))
+		if (event.getDriverId().toString().contains("veh"))
 			return;
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -301,7 +301,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);

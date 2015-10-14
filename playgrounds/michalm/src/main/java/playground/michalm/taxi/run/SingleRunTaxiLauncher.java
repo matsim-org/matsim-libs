@@ -1,6 +1,7 @@
 package playground.michalm.taxi.run;
 
 import java.io.PrintWriter;
+import java.util.Map;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
@@ -16,7 +17,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.util.MovingAgentsRegister;
+import playground.michalm.util.*;
 
 
 class SingleRunTaxiLauncher
@@ -80,7 +81,8 @@ class SingleRunTaxiLauncher
         pw.println("m\t" + context.getVrpData().getVehicles().size());
         pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
+        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
+                .getStats();
         pw.println(stats);
         pw.flush();
 
@@ -97,8 +99,8 @@ class SingleRunTaxiLauncher
             VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);
         }
     }
-    
-    
+
+
     static void run(TaxiLauncherParams params)
     {
         SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
@@ -108,6 +110,7 @@ class SingleRunTaxiLauncher
 
     public static void main(String... args)
     {
-        SingleRunTaxiLauncher.run(TaxiLauncherParams.readParams(args[0]));
+        Map<String, String> params = ParameterFileReader.readParametersToMap(args[0]);
+        SingleRunTaxiLauncher.run(new TaxiLauncherParams(params));
     }
 }

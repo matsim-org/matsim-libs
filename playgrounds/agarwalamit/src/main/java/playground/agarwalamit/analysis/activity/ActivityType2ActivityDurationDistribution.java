@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.analysis.activity;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -31,8 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
-import playground.agarwalamit.analysis.activity.ActivityType2DurationHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;

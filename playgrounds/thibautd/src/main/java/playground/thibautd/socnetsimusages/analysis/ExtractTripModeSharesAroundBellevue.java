@@ -104,7 +104,7 @@ public class ExtractTripModeSharesAroundBellevue {
 	private static final double CROW_FLY_FACTOR = 1;
 	private static final boolean USE_NET_DIST = false;
 
-	private static enum Filtering {od, homeCoord;}
+	private enum Filtering {od, homeCoord;}
 
 	public static void main(final String[] args) throws IOException {
 		final ArgParser parser = new ArgParser();
@@ -225,7 +225,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		return dist;
 	}
 
-	private static interface Filter {
+	private interface Filter {
 		public boolean acceptPlan(final Plan plan);
 		public boolean acceptTrip(final Trip trip);
 	}

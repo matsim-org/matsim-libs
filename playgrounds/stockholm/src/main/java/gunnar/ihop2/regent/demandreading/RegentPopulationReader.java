@@ -29,9 +29,9 @@ public class RegentPopulationReader {
 
 	public static final String OTHERTOURMODE_ATTRIBUTE = "othertourmode";
 
-	public static final String CAR_ATTRIBUTEVALUE = "car";
+	public static final String CAR_ATTRIBUTEVALUE = "Car";
 
-	public static final String PT_ATTRIBUTEVALUE = "pt";
+	public static final String PT_ATTRIBUTEVALUE = "PublicTransport";
 
 	// MEMBERS
 

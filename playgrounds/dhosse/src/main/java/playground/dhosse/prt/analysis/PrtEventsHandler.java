@@ -19,12 +19,6 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 public class PrtEventsHandler implements ActivityEndEventHandler,
 	ActivityStartEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
@@ -143,18 +137,18 @@ public class PrtEventsHandler implements ActivityEndEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
-		if(this.scenario.getPopulation().getPersons().containsKey(event.getPersonId())){
+		if(this.scenario.getPopulation().getPersons().containsKey(event.getDriverId())){
 			
-			if(!this.travelDistancesWalkPerPerson.containsKey(event.getPersonId().toString())){
+			if(!this.travelDistancesWalkPerPerson.containsKey(event.getDriverId().toString())){
 					
-				this.travelDistancesWalkPerPerson.put(event.getPersonId(), 0.);
+				this.travelDistancesWalkPerPerson.put(event.getDriverId(), 0.);
 					
 			}
 				
-			double d = this.travelDistancesWalkPerPerson.get(event.getPersonId()) +
+			double d = this.travelDistancesWalkPerPerson.get(event.getDriverId()) +
 					this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 				
-			this.travelDistancesWalkPerPerson.put(event.getPersonId(), d);
+			this.travelDistancesWalkPerPerson.put(event.getDriverId(), d);
 				
 		} else{
 

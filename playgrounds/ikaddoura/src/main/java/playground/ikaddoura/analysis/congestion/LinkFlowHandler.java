@@ -30,19 +30,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
@@ -99,7 +88,7 @@ public class LinkFlowHandler implements LinkLeaveEventHandler {
 				} else {
 										
 					System.out.println("----------------------------");
-					System.out.println("personId: " + event.getPersonId() + " // linkId: " + event.getLinkId() + " // flowDelay: " + flowDelay + " // gap: " + gap);
+					System.out.println("personId: " + event.getDriverId() + " // linkId: " + event.getLinkId() + " // flowDelay: " + flowDelay + " // gap: " + gap);
 					System.out.println(event.toString());
 
 				}

@@ -117,7 +117,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 		
 		else if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			Id<Person> personId = linkEnterEvent.getPersonId();
+			Id<Person> personId = linkEnterEvent.getDriverId();
 			String mode = observedAgents.get(personId);
 			
 			if (mode != null) {
@@ -130,7 +130,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 		// create xy data for link trips of observed agents
 		else if (event instanceof LinkLeaveEvent) {
 			LinkLeaveEvent linkLeaveEvent = (LinkLeaveEvent) event;
-			Id<Person> personId = linkLeaveEvent.getPersonId();
+			Id<Person> personId = linkLeaveEvent.getDriverId();
 			String mode = observedAgents.get(personId);
 			
 			if (mode != null) {
