@@ -371,7 +371,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	public void handleEvent(LinkEnterEvent event) {
 		super.handleEvent(event);
 
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 
 		Integer currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agents.get(personId)) ;
 		
@@ -489,7 +489,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		// DebugLib.traceAgent(event.getPersonId());
+		// DebugLib.traceAgent(event.getDriverId());
 
 		super.handleEvent(event);
 
@@ -916,7 +916,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			if (nextAct.getType().equalsIgnoreCase("parking")) {
 				// if current parking activity linkId==next parking activity
 				// link Id => change link Id of next parking activity!
-				// updateNextParkingActivityIfNeeded(event.getPersonId());
+				// updateNextParkingActivityIfNeeded(event.getDriverId());
 			}
 
 		}

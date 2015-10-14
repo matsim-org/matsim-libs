@@ -22,8 +22,6 @@ package org.matsim.contrib.evacuation.scenariogenerator;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +58,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Evacuation scenario generator workflow: GIS Metaformat --> ScenarioGenertor -->
@@ -218,11 +215,17 @@ public class ScenarioGenerator {
 
 	}
 
-	@SuppressWarnings("unused")
-	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
-		throw new RuntimeException(
-				"This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
+	@Deprecated
+	// call this w/origin parameter
+	public EvacuationConfigModule getEvacuationConfig(Config c) {
 
+		ConfigGroup m = c.getModule("evacuation");
+		if (m instanceof EvacuationConfigModule) {
+			return (EvacuationConfigModule) m;
+		}
+		EvacuationConfigModule gcm = new EvacuationConfigModule(m);
+		c.getModules().put("evacuation", gcm);
+		return gcm;
 	}
 
 	protected void generatePopulation(Scenario sc) {
@@ -353,35 +356,23 @@ public class ScenarioGenerator {
 		// evacuation area consists of one and only one
 		// polygon
 		@SuppressWarnings("rawtypes")
-		FeatureSource fs = ShapeFileReader.readDataFile(gcm.getEvacuationAreaFileName());
-		SimpleFeature ft = null;
-		try {
-			ft = (SimpleFeature) fs.getFeatures().features().next();
-			FeatureTransformer.transform(ft, fs.getSchema()
-					.getCoordinateReferenceSystem(), this.matsimConfig);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (FactoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (TransformException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (IllegalAttributeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-
+		ShapeFileReader r = new ShapeFileReader();
+		r.readFileAndInitialize(gcm.getEvacuationAreaFileName());
+		for (SimpleFeature ft : r.getFeatureSet()) {
+			try {
+				FeatureTransformer.transform(ft, r.getCoordinateSystem(), this.matsimConfig);
+			} catch (FactoryException e1) {
+				e1.printStackTrace();
+			} catch (TransformException e1) {
+				e1.printStackTrace();
+				System.exit(-2);
+			}
+			MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
+			Polygon p = (Polygon) mp.getGeometryN(0);
+			// 2b) generate network
+			new EvacuationNetworkGenerator(sc, p, this.safeLinkId).run();
+			log.info("done generating network file");
 		}
-		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
-		Polygon p = (Polygon) mp.getGeometryN(0);
-		// 2b) generate network
-		new EvacuationNetworkGenerator(sc, p, this.safeLinkId).run();
-		log.info("done generating network file");
-
 	}
 
 	public EvacuationConfigModule getEvacuationConfig() {
@@ -394,17 +385,11 @@ public class ScenarioGenerator {
 		return gcm;
 	}
 
-	@Deprecated
-	// call this w/origin parameter
-	public EvacuationConfigModule getEvacuationConfig(Config c) {
+	@SuppressWarnings("unused")
+	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
+		throw new RuntimeException(
+				"This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
 
-		ConfigGroup m = c.getModule("evacuation");
-		if (m instanceof EvacuationConfigModule) {
-			return (EvacuationConfigModule) m;
-		}
-		EvacuationConfigModule gcm = new EvacuationConfigModule(m);
-		c.getModules().put("evacuation", gcm);
-		return gcm;
 	}
 
 	public String getPathToMatsimConfigXML() {

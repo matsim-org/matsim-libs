@@ -49,6 +49,8 @@ public class FastAStarLandmarks extends AStarLandmarks {
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
+	private BinaryMinHeap<ArrayRoutingNetworkNode> heap = null;
+	private int maxSize = -1;
 
 	public FastAStarLandmarks(final RoutingNetwork routingNetwork, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
@@ -57,7 +59,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 
 		this.routingNetwork = routingNetwork;
 		this.fastRouter = fastRouterFactory.createFastRouterDelegate(this, new AStarNodeDataFactory(), routingNetwork);
-		
+				
 		this.nodeData.clear();
 	}
 
@@ -85,9 +87,22 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	
 	@Override
 	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		/*
+		 * Re-use existing BinaryMinHeap instead of creating a new one. For large networks (> 10^6 nodes and links) this reduced
+		 * the computation time by 40%! cdobler, oct'15
+		 */
 		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
-			int maxSize = this.routingNetwork.getNodes().size();
-			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+			int size = this.routingNetwork.getNodes().size();
+			if (this.heap == null || this.maxSize != size) {
+				this.maxSize = size;
+				this.heap = new BinaryMinHeap<>(maxSize);
+				return this.heap;
+			} else {
+				this.heap.reset();
+				return this.heap;
+			}
+//			int maxSize = this.routingNetwork.getNodes().size();
+//			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
 		} else {
 			return super.createRouterPriorityQueue();
 		}

@@ -128,8 +128,8 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	public final void handleEvent(LinkEnterEvent event) {
 		delegate.handleEvent(event);
 
-		int linkNr = this.personId2linkNr.get( event.getPersonId() ) ;
-		this.personId2linkNr.put( event.getPersonId(), linkNr + 1 ) ;
+		int linkNr = this.personId2linkNr.get( event.getDriverId() ) ;
+		this.personId2linkNr.put( event.getDriverId(), linkNr + 1 ) ;
 
 	}
 
@@ -169,7 +169,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			// fails tests, dunno why. kai, sep'15
 
-			linkInfo.getAgentsOnLink().remove( event.getPersonId() ) ;
+			linkInfo.getAgentsOnLink().remove( event.getDriverId() ) ;
 		}
 	}
 
@@ -252,7 +252,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	}
 
 	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink, DelayInfo affectedAgentDelayInfo){
-		Id<Person> affectedPersonId = event.getPersonId();
+		Id<Person> affectedPersonId = event.getDriverId();
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.delegate.getLinkId2congestionInfo().get(spillbackCausingLink);

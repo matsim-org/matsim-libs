@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -40,22 +41,24 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.balac.freefloating.scoring.FreeFloatingParkingScoringFunctionFactory;
+import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 
 public class SetupParkingForZHScenario {
-	
-	
-	
+
 
 	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Controler controler){
+		
+		
 		Config config = controler.getConfig();
 		
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
@@ -118,7 +121,8 @@ public class SetupParkingForZHScenario {
 	}
 	
 	public static void appendScoringFactory(ParkingModuleWithFFCarSharingZH parkingModule){
-		parkingModule.getControler().setScoringFunctionFactory(new FreeFloatingParkingScoringFunctionFactory (parkingModule.getControler() ,parkingModule.getParkingScoreManager()));
+
+		parkingModule.getControler().setScoringFunctionFactory(new FreeFloatingParkingScoringFunctionFactory (parkingModule.getControler().getScenario() ,parkingModule.getParkingScoreManager()));
 	}
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {

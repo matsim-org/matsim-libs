@@ -52,9 +52,9 @@ public class FacilityPenalty {
 		this.capacity = minCapacity;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
-		this.restraintFcnFactor = Double.parseDouble(config.getRestraintFcnFactor());
-		this.restraintFcnExp = Double.parseDouble(config.getRestraintFcnExp());
-		}
+		this.restraintFcnFactor = config.getRestraintFcnFactor();
+		this.restraintFcnExp = config.getRestraintFcnExp();
+	}
 
 	private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 

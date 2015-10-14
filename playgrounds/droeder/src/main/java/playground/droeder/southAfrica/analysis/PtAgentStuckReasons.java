@@ -144,7 +144,7 @@ class PtAgentStuckReasons {//extends AbstractAnalyisModule {
 //
 //		@Override
 //		public void handleEvent(PersonEntersVehicleEvent event) {
-//			this.personsWaiting.remove(event.getPersonId());
+//			this.personsWaiting.remove(event.getDriverId());
 //		}
 //
 //		@Override
@@ -186,14 +186,14 @@ class PtAgentStuckReasons {//extends AbstractAnalyisModule {
 //		@Override
 //		public void handleEvent(AgentWaitingForPtEvent event) {
 //			// store persons waiting for pt
-//			this.personsWaiting.put(event.getPersonId(),	new WaitingPerson(event));
+//			this.personsWaiting.put(event.getDriverId(),	new WaitingPerson(event));
 //		}
 //		
 //
 //		@Override
 //		public void handleEvent(PersonStuckEvent event) {
-//			if(this.personsWaiting.containsKey(event.getPersonId())){
-//				this.stuck.put(event.getPersonId(), this.personsWaiting.remove(event.getPersonId()));
+//			if(this.personsWaiting.containsKey(event.getDriverId())){
+//				this.stuck.put(event.getDriverId(), this.personsWaiting.remove(event.getDriverId()));
 //			}
 //		}
 //
@@ -212,7 +212,7 @@ class PtAgentStuckReasons {//extends AbstractAnalyisModule {
 //			this.stopToGo = event.getDestinationStopId();
 //			this.waitingAt =  event.getWaitingAtStopId();
 //			this.time = event.getTime();
-//			this.agentId = event.getPersonId();
+//			this.agentId = event.getDriverId();
 //		}
 //		
 //		/**

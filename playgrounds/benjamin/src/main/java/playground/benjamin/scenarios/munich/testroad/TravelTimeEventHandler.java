@@ -55,9 +55,9 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if(event.getLinkId().equals(this.enterLinkId)){
-			String id = event.getPersonId().toString();
+			String id = event.getDriverId().toString();
 			if(id.contains("testVehicle")){
-				Id personId = event.getPersonId();
+				Id personId = event.getDriverId();
 				Double enterTime = event.getTime();
 
 				this.personId2enterTimesPerIteration.put(personId, enterTime);
@@ -68,9 +68,9 @@ public class TravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveE
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if(event.getLinkId().equals(this.leaveLinkId)){
-			String id = event.getPersonId().toString();
+			String id = event.getDriverId().toString();
 			if(id.contains("testVehicle")){
-				Id personId = event.getPersonId();
+				Id personId = event.getDriverId();
 				Double leaveTime = event.getTime();
 				Double enterTime = this.personId2enterTimesPerIteration.get(personId);
 

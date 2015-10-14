@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -43,7 +44,6 @@ import org.matsim.vehicles.Vehicle;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,7 +102,7 @@ public class TimeOverDist {
 		// travelTime);
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost);
 		LeastCostPathCalculator router = factory.createPathCalculator(network, travelCost, travelTime);
-		Geometry g = (Geometry) FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
+		Geometry g = (Geometry) EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
 
 		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 		DistanceCalculator calc = new CartesianDistanceCalculator();

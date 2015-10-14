@@ -21,10 +21,11 @@
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -34,13 +35,13 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 public class ReadOrCreateKVals {
 	
 	private static final Logger log = Logger.getLogger(ReadOrCreateKVals.class);
-	private ScenarioImpl scenario;	
+	private Scenario scenario;	
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
 	private Config config;	
 	private RandomFromVarDistr rnd;
 	
-	public ReadOrCreateKVals(long seed, ScenarioImpl scenario) {
+	public ReadOrCreateKVals(long seed, Scenario scenario) {
 		this.scenario = scenario;
 		this.config = scenario.getConfig();
 		this.rnd = new RandomFromVarDistr();
@@ -52,10 +53,11 @@ public class ReadOrCreateKVals {
 	 * This is important to know for reading (case 0) or computation of maxDCScore (case 1)
 	 */
 	public int run() {
-		String pkValuesFileName = this.scenario.getConfig().findParam("locationchoice", "pkValuesFile");
-		String fkValuesFileName = this.scenario.getConfig().findParam("locationchoice", "fkValuesFile");
-		String maxEpsValuesFileName = this.scenario.getConfig().findParam("locationchoice", "maxDCScoreFile");
-		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {			
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		String pkValuesFileName = dccg.getpkValuesFile();
+		String fkValuesFileName = dccg.getfkValuesFile();
+		String maxEpsValuesFileName = dccg.getMaxEpsFile();
+		if (pkValuesFileName != null && fkValuesFileName != null && maxEpsValuesFileName != null) {			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
 			try {

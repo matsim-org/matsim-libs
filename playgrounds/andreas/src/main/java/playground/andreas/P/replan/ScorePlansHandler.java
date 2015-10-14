@@ -81,8 +81,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(this.personId2ScoreMap.get(event.getPersonId()) != null){
-			this.personId2ScoreMap.get(event.getPersonId()).handleLinkTravelled(this.net.getLinks().get(event.getLinkId()));
+		if(this.personId2ScoreMap.get(event.getDriverId()) != null){
+			this.personId2ScoreMap.get(event.getDriverId()).handleLinkTravelled(this.net.getLinks().get(event.getLinkId()));
 		}
 	}
 

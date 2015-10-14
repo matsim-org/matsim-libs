@@ -97,13 +97,13 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		super.handleEvent(event);
-		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getDriverId()));
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		super.handleEvent(event);
-		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getDriverId()));
 	}
 	
 	@Override

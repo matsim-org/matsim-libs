@@ -43,7 +43,7 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
 	}
 	
 	@Override
@@ -57,10 +57,10 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId())!=null) {
-			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())){
+		if (lastEnteredLink.containsKey(event.getDriverId()) && lastEnteredLink.get(event.getDriverId())!=null) {
+			if (lastEnteredLink.get(event.getDriverId()).equals(event.getLinkId())){
 				linkLeave(event.getLinkId(), event.getTime());
-				lastEnteredLink.put(event.getPersonId(),null); //reset value
+				lastEnteredLink.put(event.getDriverId(),null); //reset value
 			}
 		}
 	}

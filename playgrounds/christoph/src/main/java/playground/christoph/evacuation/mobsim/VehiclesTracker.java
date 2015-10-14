@@ -109,7 +109,7 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		String transportMode = this.transportModeProvider.getTransportMode(event.getDriverId());
 		boolean isDriver = transportMode != null && transportMode.equals(TransportMode.car);
 		if (isDriver) {
 			reservedCapacities.put(event.getVehicleId(), new AtomicInteger(0));
@@ -128,7 +128,7 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		String transportMode = this.transportModeProvider.getTransportMode(event.getDriverId());
 		boolean isDriver = transportMode != null && transportMode.equals(TransportMode.car);
 		if (isDriver) {
 			AtomicInteger reservedCapacity = reservedCapacities.get(event.getVehicleId());

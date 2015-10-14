@@ -24,8 +24,7 @@ package playground.johannes.gsv.demand;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
-
-import playground.johannes.sna.util.Composite;
+import org.matsim.contrib.common.collections.Composite;
 
 /**
  * @author johannes

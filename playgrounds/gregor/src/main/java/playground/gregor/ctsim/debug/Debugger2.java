@@ -53,7 +53,7 @@ public class Debugger2 {
 		em.addHandler(qDbg);
 		em.addHandler(dbg);
 
-		CTNetwork net = new CTNetwork(sc.getNetwork(), em);
+		CTNetwork net = new CTNetwork(sc.getNetwork(), em, null);
 
 		int nrPeds = 0;
 		{
@@ -71,7 +71,7 @@ public class Debugger2 {
 					DriverAgent walker = new SimpleCTNetworkWalker(links);
 
 					CTPed ped = new CTPed(cell, walker);
-					cell.jumpOnPed(ped);
+					cell.jumpOnPed(ped, 0);
 				}
 				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
 			}
@@ -92,7 +92,7 @@ public class Debugger2 {
 					DriverAgent walker = new SimpleCTNetworkWalker(links);
 
 					CTPed ped = new CTPed(cell, walker);
-					cell.jumpOnPed(ped);
+					cell.jumpOnPed(ped, 0);
 				}
 				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
 			}

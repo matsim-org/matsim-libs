@@ -71,7 +71,7 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 			return;
 		}
 		li.agentsOnLink--;
-		AgentInfo ai = li.ais.remove(event.getPersonId());
+		AgentInfo ai = li.ais.remove(event.getDriverId());
 		ai.leftTime = event.getTime();
 		double att = event.getTime() - ai.enterTime;
 		if (li.agentsOnLink == 0 || att <= li.freespeedTT) {
@@ -101,7 +101,7 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 		li.agentsOnLink++;
 		AgentInfo ai = new AgentInfo();
 		ai.enterTime = event.getTime();
-		ai.p = event.getPersonId();
+		ai.p = event.getDriverId();
 		li.ais.put(ai.p, ai);
 	}
 	

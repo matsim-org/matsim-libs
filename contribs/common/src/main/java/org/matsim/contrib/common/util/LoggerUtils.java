@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim;
+package org.matsim.contrib.common.util;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -25,6 +25,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 /**
+ * Utility functions for logging.
+ *
  * @author illenberger
  *
  */
@@ -33,11 +35,24 @@ public class LoggerUtils {
 	private static boolean disallowVerbose = true;
 
 	private static PatternLayout defaultLayout;
-	
-	public static void setDisallowVerbose(boolean disallow) {
-		disallowVerbose = disallow;
+
+	/**
+	 * Debugging purpose: Allows to disable the effect of {@link #setVerbose(boolean)}. Use this function to ensure
+	 * that all messages are logged.
+	 *
+	 * @param disable if <tt>true</tt> {@code #setVerbose(false)} will have no effect
+	 */
+	public static void setDisableVerbose(boolean disable) {
+		disallowVerbose = disable;
 	}
-	
+
+	/**
+	 * Allows to quickly switch between logging at all levels and logging only from warn-level. Use this function to
+	 * temporary suppress extensive logging.
+	 *
+	 * @param verbose if <tt>true</tt> logger level is set to {@link Level#ALL}, otherwise level is set to {@link
+	 * Level#WARN}.
+	 */
 	public static void setVerbose(boolean verbose) {
 		if(verbose)
 			Logger.getRootLogger().setLevel(Level.ALL);
@@ -47,6 +62,9 @@ public class LoggerUtils {
 			
 	}
 
+	/**
+	 * Remove the line break form the logger pattern. Subsequent writes to stdout are printed to the same line.
+	 */
 	public static void disableNewLine() {
 		Appender appender = Logger.getRootLogger().getAppender("stdout");
 		defaultLayout = (PatternLayout)appender.getLayout();
@@ -54,6 +72,9 @@ public class LoggerUtils {
 		appender.setLayout(newLayout);
 	}
 
+	/**
+	 * Appends a line break to the logger pattern (default behavior).
+	 */
 	public static void enableNewLine() {
 		Appender appender = Logger.getRootLogger().getAppender("stdout");
 		appender.setLayout(defaultLayout);

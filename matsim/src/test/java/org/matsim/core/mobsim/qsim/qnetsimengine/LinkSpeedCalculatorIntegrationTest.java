@@ -70,12 +70,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// by default, the link takes 10 seconds to travel along, plus 1 second in the buffer, makes total of 11 seconds
@@ -96,12 +96,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// with 5 per second, the link takes 20 seconds to travel along, plus 1 second in the buffer, makes total of 21 seconds
@@ -121,12 +121,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds

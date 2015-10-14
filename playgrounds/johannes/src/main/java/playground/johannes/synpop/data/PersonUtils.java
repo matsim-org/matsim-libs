@@ -20,7 +20,7 @@
 package playground.johannes.synpop.data;
 
 import gnu.trove.TObjectDoubleHashMap;
-import playground.johannes.sna.util.ProgressLogger;
+import org.matsim.contrib.common.util.ProgressLogger;
 
 import java.util.*;
 

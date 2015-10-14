@@ -17,7 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis.io;
+package org.matsim.contrib.common.gis;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,22 +33,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
-import org.opengis.feature.simple.SimpleFeature;
-
 /**
  * Utility class for reading shape (.shp) files.
  * 
  * @author illenberger
  * 
  */
-public class FeatureSHP {
+public class EsriShapeIO {
 
 	/**
-	 * Calls {@link FeatureSHP#readFeatures(String, String)} with <tt>null</tt>
+	 * Calls {@link EsriShapeIO#readFeatures(String, String)} with <tt>null</tt>
 	 * as feature type indicating to read all features.
 	 * 
 	 * @param filename
@@ -51,7 +51,7 @@ public class FeatureSHP {
 	 * @throws IOException
 	 */
 	public static Set<SimpleFeature> readFeatures(String filename) throws IOException {
-		return FeatureSHP.readFeatures(filename, null);
+		return EsriShapeIO.readFeatures(filename, null);
 	}
 
 	/**

@@ -19,19 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.graph.Graph;
@@ -42,7 +40,6 @@ import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.FilteredAnalyzerTask;
@@ -56,8 +53,9 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -101,11 +99,11 @@ public class SnowballAnalyzer {
 		Set<Point> choiceSet = new HashSet<Point>();
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read(config.getParam(MODULE_NAME, "plansfile"));
 		
-		SimpleFeature feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "chzone")).iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures(config.getParam(MODULE_NAME, "chzone")).iterator().next();
 		chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		
-		feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "zrhzone")).iterator().next();
+		feature = EsriShapeIO.readFeatures(config.getParam(MODULE_NAME, "zrhzone")).iterator().next();
 		zrhBorder = (Geometry) feature.getDefaultGeometry();
 		zrhBorder.setSRID(21781);
 		

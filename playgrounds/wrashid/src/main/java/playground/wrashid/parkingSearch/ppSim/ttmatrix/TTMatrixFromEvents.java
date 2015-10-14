@@ -112,10 +112,10 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if (agentEnterLinkTime.containsKey(event.getPersonId())) {
-				int timeBinIndex = (int) (Math.round(GeneralLib.projectTimeWithin24Hours(agentEnterLinkTime.get(event.getPersonId()))) / ttMatrix.timeBinSizeInSeconds);
+			if (agentEnterLinkTime.containsKey(event.getDriverId())) {
+				int timeBinIndex = (int) (Math.round(GeneralLib.projectTimeWithin24Hours(agentEnterLinkTime.get(event.getDriverId()))) / ttMatrix.timeBinSizeInSeconds);
 
-				double travelTime=event.getTime()-agentEnterLinkTime.get(event.getPersonId());
+				double travelTime=event.getTime()-agentEnterLinkTime.get(event.getDriverId());
 				
 				if (!linkTravelTimes.containsKey(event.getLinkId())){
 					int numberOfBins = ttMatrix.getNumberOfBins();
@@ -128,13 +128,13 @@ public class TTMatrixFromEvents extends TTMatrix {
 				int[] ns = numberOfSamples.get(event.getLinkId());
 				ns[timeBinIndex]++;
 				
-				agentEnterLinkTime.remove(event.getPersonId());
+				agentEnterLinkTime.remove(event.getDriverId());
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			agentEnterLinkTime.put(event.getPersonId(), event.getTime());
+			agentEnterLinkTime.put(event.getDriverId(), event.getTime());
 		}
 
 		@Override

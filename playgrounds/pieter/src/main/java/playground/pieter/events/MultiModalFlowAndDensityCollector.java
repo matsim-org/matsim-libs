@@ -495,7 +495,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
 		if (ptVehicles.containsKey(event.getVehicleId()))
 			ptVehicles.get(event.getVehicleId()).setLastLinkId(event.getLinkId());
 

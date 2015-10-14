@@ -28,7 +28,7 @@ import playground.gregor.ctsim.simulation.physics.CTNetwork;
  * Created by laemmel on 12/10/15.
  */
 public class CTNetworkFactory {
-	public CTNetwork createCANetwork(Network network, EventsManager eventsManager, CTNetsimEngine ctNetsimEngine) {
-		throw new RuntimeException("implement me!");
+	public CTNetwork createCTNetwork(Network network, EventsManager eventsManager, CTNetsimEngine ctNetsimEngine) {
+		return new CTNetwork(network, eventsManager, ctNetsimEngine);
 	}
 }
