@@ -555,7 +555,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( event.getPersonId(), 1., CERTAIN_LINKS_CNT );
+			add( event.getDriverId(), 1., CERTAIN_LINKS_CNT );
 		}
 		
 	}

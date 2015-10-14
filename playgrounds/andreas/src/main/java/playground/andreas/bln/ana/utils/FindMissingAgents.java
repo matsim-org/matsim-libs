@@ -73,7 +73,7 @@ public class FindMissingAgents implements EventHandler, PersonDepartureEventHand
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-//		if(!event.getPersonId().toString().contains("pt_veh_")){
+//		if(!event.getDriverId().toString().contains("pt_veh_")){
 			if(this.agentsOnTour.get(event.getPersonId().toString()) == null){
 				this.agentsOnTour.put(event.getPersonId().toString(), event);
 			} else {

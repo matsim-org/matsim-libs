@@ -189,7 +189,7 @@ public class PtDistanceHandler implements ActivityStartEventHandler,
 		
 		// AN Had to replace this line
 		legMode.remove(event.getPersonId());
-//		legMode.put(event.getPersonId(), null);
+//		legMode.put(event.getDriverId(), null);
 		// END of replacement
 	}
 	

@@ -160,7 +160,7 @@ public class SrVTripParser {
 				
 				trip.setWeight(weight);
 				
-//				System.out.println("personId = " + trip.getPersonId());
+//				System.out.println("personId = " + trip.getDriverId());
 //				System.out.println("tripId = " + trip.getTripId());
 //				System.out.println("tripActivityEndType = " + trip.getActivityEndActType());
 //				System.out.println("departureZoneId = " + trip.getDepartureZoneId());

@@ -161,14 +161,14 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
+		if(event.getDriverId().equals(this.agentId)){
 			queue.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
+		if(event.getDriverId().equals(this.agentId)){
 			queue.add(event);
 		}
 	}

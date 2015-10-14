@@ -202,9 +202,9 @@ public class CSShapeFileWriter extends CSWriter {
 			RandomAccessFile shx = null;
 			try {
 				shp = new RandomAccessFile(
-						new File(outdir + "/persontrips/" + "person" + choiceSet.getPersonId()+".trip.shp"), "rw");
+						new File(outdir + "/persontrips/" + "person" + choiceSet.getDriverId()+".trip.shp"), "rw");
 				shx = new RandomAccessFile(
-						new File(outdir + "/persontrips/" + "person" + choiceSet.getPersonId()+".trip.shx"), "rw"); 
+						new File(outdir + "/persontrips/" + "person" + choiceSet.getDriverId()+".trip.shx"), "rw");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} 

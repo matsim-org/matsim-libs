@@ -64,11 +64,11 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (linkEntranceTime.get(event.getPersonId())==null){
+		if (linkEntranceTime.get(event.getDriverId())==null){
 			return;
 		}
 		
-		double linkTravelTime=event.getTime() - linkEntranceTime.get(event.getPersonId());
+		double linkTravelTime=event.getTime() - linkEntranceTime.get(event.getDriverId());
 		
 		System.out.println("link travel time:" + linkTravelTime);
 		
@@ -77,7 +77,7 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 
     @Override
 	public void handleEvent(LinkEnterEvent event) {
-		linkEntranceTime.put(event.getPersonId(), event.getTime());
+		linkEntranceTime.put(event.getDriverId(), event.getTime());
 	}
 
 	@Override

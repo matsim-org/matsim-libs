@@ -69,7 +69,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 	public void handleEvent(LinkLeaveEvent event) {
 		Set<Id<Person>> pids = freqs.get(event.getLinkId());
 		if (pids == null) { return; }
-		if (pids.add(event.getPersonId())) { entryCnt++; }
+		if (pids.add(event.getDriverId())) { entryCnt++; }
 		// logging info
 		if ((entryCnt != 0) && (entryCnt % freqs.size() == 0)) {
 			log.info(entryCnt+" entries added to the frequency map.");

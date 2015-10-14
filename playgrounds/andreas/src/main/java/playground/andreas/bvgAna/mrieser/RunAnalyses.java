@@ -418,7 +418,7 @@ public class RunAnalyses {
 //		Set<Id> agentIds = new HashSet<Id>(1000);
 //		for (List<PersonEntersVehicleEvent> events : enterLeave.getStopId2PersonEnterEventMap().values()) {
 //			for (PersonEntersVehicleEvent event : events) {
-//				agentIds.add(event.getPersonId());
+//				agentIds.add(event.getDriverId());
 //			}
 //		}
 

@@ -189,9 +189,9 @@ public class TravelTimeCollector implements TravelTime,
 		 * If only some modes are analyzed, we check whether the agent
 		 * performs a trip with one of those modes. if not, we skip the event.
 		 */
-		if (filterModes && agentsToFilter.contains(event.getPersonId())) return;
+		if (filterModes && agentsToFilter.contains(event.getDriverId())) return;
 		
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
@@ -203,7 +203,7 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		double time = event.getTime();
 
 		TripBin tripBin = this.regularActiveTrips.remove(personId);

@@ -110,13 +110,13 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getPersonId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getDriverId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getPersonId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getDriverId(), event.getTime()));
 	}
 
 	@Override

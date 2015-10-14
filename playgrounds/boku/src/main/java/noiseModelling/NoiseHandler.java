@@ -1,6 +1,5 @@
 package noiseModelling;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,7 +32,7 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 	public void handleEvent(LinkLeaveEvent event) {
 		// System.out.println("leaveEvent");
 		/*-------*/
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Id linkId = event.getLinkId();
 		/*-------*/
 		double time = event.getTime();

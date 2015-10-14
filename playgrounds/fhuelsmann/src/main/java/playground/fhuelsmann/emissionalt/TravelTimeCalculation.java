@@ -19,7 +19,6 @@
  * *********************************************************************** */
 
 package playground.fhuelsmann.emissionalt;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -70,7 +69,7 @@ PersonArrivalEventHandler,PersonDepartureEventHandler {
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkenter.put(event.getPersonId(), event.getTime());
+		this.linkenter.put(event.getDriverId(), event.getTime());
 	}
 	
 	public void handleEvent(PersonArrivalEvent event) {
@@ -82,9 +81,9 @@ PersonArrivalEventHandler,PersonDepartureEventHandler {
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {		
-		Id personId= event.getPersonId();
+		Id personId= event.getDriverId();
 		Id linkId = event.getLinkId();
-		if (this.linkenter.containsKey(event.getPersonId())) {
+		if (this.linkenter.containsKey(event.getDriverId())) {
 			//mit Aktivität
 			if (this.agentarrival.containsKey(personId)) {
 				double enterTime = this.linkenter.get(personId);

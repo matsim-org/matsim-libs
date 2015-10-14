@@ -165,7 +165,7 @@ public class AnalyzeMZ {
 				PersonTripActs personTripActs = personActTrips_it.next();
 				
 				if (personTripActs.isValid() && personTripActs.getActDurationPerTypeAggregated("leisure").get(modes[i]) > 0.0) {
-					out.write(personTripActs.getPersonId() + "\t" +
+					out.write(personTripActs.getDriverId() + "\t" +
 							personTripActs.getDurationAllActsAllModesAggregated() + "\t" +
 							formatter.format(personTripActs.getTripDistancesAllTypesAggregated().get(modes[i])/1000.0) +"\t" +
 							personTripActs.getActDurationPerTypeAggregated("leisure").get(modes[i]) + "\t" +

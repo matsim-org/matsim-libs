@@ -36,7 +36,6 @@ import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnaly
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -111,13 +110,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.linkenter.put(event.getPersonId(), linkId2Time);
+		this.linkenter.put(event.getDriverId(), linkId2Time);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		linkLeaveCnt++;
-		Id<Person> personId= event.getPersonId();
+		Id<Person> personId= event.getDriverId();
 		Id<Link> linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);

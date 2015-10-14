@@ -57,7 +57,7 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 	public void handleEvent(LinkLeaveEvent event) {
 		// System.out.println("leaveEvent");
 		/*-------*/
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Id linkId = event.getLinkId();
 		/*-------*/
 		double time = event.getTime();

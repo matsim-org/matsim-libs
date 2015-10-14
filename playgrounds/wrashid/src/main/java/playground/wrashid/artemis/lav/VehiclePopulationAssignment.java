@@ -271,7 +271,7 @@ public class VehiclePopulationAssignment {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			totalTripLengths.incrementBy(event.getPersonId(), network.getLinks().get(event.getLinkId()).getLength());
+			totalTripLengths.incrementBy(event.getDriverId(), network.getLinks().get(event.getLinkId()).getLength());
 		}
 	}
 	

@@ -46,14 +46,14 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (!event.getPersonId().toString().contains("pt")) {
+		if (!event.getDriverId().toString().contains("pt")) {
 			double tollDisutility;
 			
-//			if (!VehicleInitializer.hasElectricVehicle.containsKey(event.getPersonId())){
-//				Plan plan=controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
-//				System.out.println(VehicleInitializer.hasElectricVehicle.containsKey(event.getPersonId()));
+//			if (!VehicleInitializer.hasElectricVehicle.containsKey(event.getDriverId())){
+//				Plan plan=controler.getPopulation().getPersons().get(event.getDriverId()).getSelectedPlan();
+//				System.out.println(VehicleInitializer.hasElectricVehicle.containsKey(event.getDriverId()));
 //			}
-            Person person= controler.getScenario().getPopulation().getPersons().get(event.getPersonId());
+            Person person= controler.getScenario().getPopulation().getPersons().get(event.getDriverId());
 			
 			if (!VehicleInitializer.hasElectricVehicle.containsKey(person.getSelectedPlan())){
 				VehicleInitializer.initialize(person.getSelectedPlan());
@@ -66,16 +66,16 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 			}
 
 			Coord coordinatesQuaiBridgeZH = new Coord(683423.0, 246819.0);
-			Link prevLink = network.getLinks().get(previousLinks.get(event.getPersonId()));
+			Link prevLink = network.getLinks().get(previousLinks.get(event.getDriverId()));
 			Link currentLink = network.getLinks().get(event.getLinkId());
 			double radiusInMeters = GlobalTESFParameters.tollAreaRadius;
 			
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters && GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters){
-				tollTimeOfEntry.put(event.getPersonId(), event.getTime());				
+				tollTimeOfEntry.put(event.getDriverId(), event.getTime());
 			}
 			
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) > radiusInMeters && GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) < radiusInMeters){
-				tollTimeOfExit.put(event.getPersonId(), event.getTime());				
+				tollTimeOfExit.put(event.getDriverId(), event.getTime());
 			}
 			
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters
@@ -84,10 +84,10 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 							|| (GlobalTESFParameters.eveningTollStart < event.getTime() && GlobalTESFParameters.eveningTollEnd > event.getTime())
 						)
 				) {
-				tollDisutilities.put(event.getPersonId(), tollDisutility);
+				tollDisutilities.put(event.getDriverId(), tollDisutility);
 
 			}
-			previousLinks.put(event.getPersonId(), event.getLinkId());
+			previousLinks.put(event.getDriverId(), event.getLinkId());
 		}
 	}
 

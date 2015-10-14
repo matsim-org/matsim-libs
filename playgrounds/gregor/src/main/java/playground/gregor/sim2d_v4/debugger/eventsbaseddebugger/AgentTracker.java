@@ -54,7 +54,7 @@ public class AgentTracker implements VisDebuggerAdditionalDrawer,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getPersonId().equals(this.id)) {
+		if (event.getDriverId().equals(this.id)) {
 			if (event.getLinkId().toString().contains("el")) {
 				this.x = 0;
 				this.y = 0;

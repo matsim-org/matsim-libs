@@ -153,8 +153,8 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 		// get new agents' positions
 		else if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			if (observedAgents.containsKey(linkEnterEvent.getPersonId())) {
-				observedAgents.put(linkEnterEvent.getPersonId(), linkEnterEvent.getLinkId());
+			if (observedAgents.containsKey(linkEnterEvent.getDriverId())) {
+				observedAgents.put(linkEnterEvent.getDriverId(), linkEnterEvent.getLinkId());
 			}
 		}
 	}

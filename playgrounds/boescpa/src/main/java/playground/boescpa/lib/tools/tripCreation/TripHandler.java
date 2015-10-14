@@ -167,7 +167,7 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		ArrayList<LinkedList<Id>> al = path.getValues(event.getPersonId());
+		ArrayList<LinkedList<Id>> al = path.getValues(event.getDriverId());
 		LinkedList<Id> currentPath = al.get(al.size()-1);
 		currentPath.add(event.getLinkId());
 	}

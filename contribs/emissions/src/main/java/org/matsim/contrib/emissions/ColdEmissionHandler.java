@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -79,7 +78,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
 
     @Override
     public void handleEvent(LinkLeaveEvent event) {
-        Id<Person> personId = event.getPersonId();
+        Id<Person> personId = event.getDriverId();
         Id<Link> linkId = event.getLinkId();
         Link link = this.network.getLinks().get(linkId);
         double linkLength = link.getLength();

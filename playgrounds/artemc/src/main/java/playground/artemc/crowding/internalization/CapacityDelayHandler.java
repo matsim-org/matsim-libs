@@ -168,7 +168,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			throw new RuntimeException("Unknown method for the identfication of the causing agent(s). Aborting...");
 		}
 		
-//		System.out.println("Affected agent: " + event.getPersonId());
+//		System.out.println("Affected agent: " + event.getDriverId());
 //		System.out.println("Causing agents: " + causingAgents.toString());
 
 		this.affectedAgent2boardingDeniedTime.put(event.getPersonId(), event.getTime());

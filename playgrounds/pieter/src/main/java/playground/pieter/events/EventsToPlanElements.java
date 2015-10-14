@@ -502,7 +502,7 @@ class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				ptVehicle.in = true;
 				ptVehicle.setLinkEnterTime(event.getTime());
 			} else {
-				chains.get(event.getPersonId()).setLinkEnterTime(
+				chains.get(event.getDriverId()).setLinkEnterTime(
 						event.getTime());
 			}
 
@@ -526,7 +526,7 @@ class EventsToPlanElements implements TransitDriverStartsEventHandler,
 						.getLength());
 
 			} else {
-				TravellerChain chain = chains.get(event.getPersonId());
+				TravellerChain chain = chains.get(event.getDriverId());
 				if (chain.inCar) {
 					Journey journey = chain.getJourneys().getLast();
 					journey.incrementCarDistance(network.getLinks()

@@ -152,7 +152,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
-				// log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
+				// log.warn("A delay of " + this.agentId2storageDelay.get(event.getDriverId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
 				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
