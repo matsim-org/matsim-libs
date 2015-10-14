@@ -21,23 +21,24 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
 
+import javax.inject.Provider;
+
 public class DropOffAgentReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	private final AgentsToDropOffIdentifier agentsToDropOffIdentifier;
 	
 	public DropOffAgentReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext, 
+										Provider<TripRouter> tripRouterFactory, RoutingContext routingContext,
 			AgentsToDropOffIdentifier agentsToDropOffIdentifier) {
 		super(withinDayEngine);
 		this.scenario = scenario;
@@ -50,7 +51,7 @@ public class DropOffAgentReplannerFactory extends WithinDayDuringLegReplannerFac
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new DropOffAgentReplanner(super.getId(), this.scenario,
 				this.getWithinDayEngine().getActivityRescheduler(),
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext), 
+				this.tripRouterFactory.get(),
 				agentsToDropOffIdentifier);
 		return replanner;
 	}

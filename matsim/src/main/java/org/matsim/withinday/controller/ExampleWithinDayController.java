@@ -25,12 +25,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -51,6 +49,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
@@ -127,10 +126,11 @@ public class ExampleWithinDayController implements StartupListener {
 	}
 
 	@Inject
-	ExampleWithinDayController(Scenario scenario) {
+	ExampleWithinDayController(Scenario scenario, Provider<TripRouter> tripRouterFactory) {
 		this.scenario = scenario;
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
 	}
 
 	@Override
@@ -143,17 +143,13 @@ public class ExampleWithinDayController implements StartupListener {
 	}
 	
 	private final void initReplanners() {
-		
-		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory()
-				.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
-		
+
 		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.withinDayControlerListener.getMobsimDataProvider());
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
 		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
 		this.initialIdentifier = initialIdentifierFactory.createIdentifier();
 		this.initialReplannerFactory = new InitialReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
@@ -162,7 +158,7 @@ public class ExampleWithinDayController implements StartupListener {
 		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
 		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
 		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
@@ -172,7 +168,7 @@ public class ExampleWithinDayController implements StartupListener {
 		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
 		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
 		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

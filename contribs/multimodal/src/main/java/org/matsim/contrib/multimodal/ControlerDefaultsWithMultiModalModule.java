@@ -33,11 +33,10 @@ import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.*;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -66,7 +65,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
         install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
             public void install() {
-                bind(TripRouterFactory.class).toProvider(MultiModalTripRouterFactoryProvider.class).in(Singleton.class);
+                bind(TripRouter.class).toProvider(MultiModalTripRouterFactoryProvider.class).in(Singleton.class);
             }
         }));
 
@@ -107,7 +106,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
         this.linkSlopes = linkSlopes;
     }
 
-    private static class MultiModalTripRouterFactoryProvider implements Provider<TripRouterFactory> {
+    private static class MultiModalTripRouterFactoryProvider implements Provider<TripRouter> {
 
         private Scenario scenario;
         private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
@@ -136,11 +135,11 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
 		 * - only "fast" router implementations handle sub-networks correct
 		 * - AStarLandmarks uses link speed information instead of agent speeds
 		 */
-        public TripRouterFactory get() {
-            TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-            TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-            TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, transitRouterFactory);
-            return transitTripRouterFactory;
+        public TripRouter get() {
+            Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+            Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
+            Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, transitRouterFactory);
+            return transitTripRouterFactory.get();
         }
 
     }

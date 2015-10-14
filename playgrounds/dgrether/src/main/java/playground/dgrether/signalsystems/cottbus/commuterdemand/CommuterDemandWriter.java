@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.utils.collections.Tuple;
@@ -126,10 +125,8 @@ public class CommuterDemandWriter {
 		PlanAlgorithm router = 
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-								new RoutingContextImpl(
-										timeCostCalc,
-										timeCostCalc ) ) );
+						scenario ).get(
+				) );
 		this.pp4s = new PersonPrepareForSim(router, scenario);
 
 		int pnr = 0;

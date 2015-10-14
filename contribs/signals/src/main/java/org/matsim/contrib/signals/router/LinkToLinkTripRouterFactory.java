@@ -23,10 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
@@ -39,11 +36,11 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class LinkToLinkTripRouterFactory implements TripRouterFactory {
+public class LinkToLinkTripRouterFactory implements Provider<TripRouter> {
 	private static final Logger log =
 		Logger.getLogger(LinkToLinkTripRouterFactory.class);
 
-	private final TripRouterFactory delegate;
+	private final Provider<TripRouter> delegate;
 	private final Scenario scenario;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -61,13 +58,16 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 		this.travelDisutilityFactory = travelDisutilityFactory.get(TransportMode.car);
 		this.travelTimes = travelTimes;
 		this.populationFactory = scenario.getPopulation().getFactory();
-		this.delegate = new DefaultTripRouterFactoryImpl(scenario, leastCostAlgoFactory, transitRouterFactory);
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		builder.setLeastCostPathCalculatorFactory(leastCostAlgoFactory);
+		builder.setTransitRouterFactory(transitRouterFactory);
+		this.delegate = builder.build(this.scenario);
         this.leastCostAlgoFactory = leastCostAlgoFactory;
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
-		TripRouter instance = delegate.instantiateAndConfigureTripRouter(iterationContext);
+	public TripRouter get() {
+		TripRouter instance = delegate.get();
 
 		instance.setRoutingModule(
 				TransportMode.car,

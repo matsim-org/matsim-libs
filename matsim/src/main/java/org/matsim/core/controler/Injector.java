@@ -24,6 +24,12 @@ package org.matsim.core.controler;
 
 import com.google.inject.*;
 
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
+import com.google.inject.spi.DefaultElementVisitor;
+import com.google.inject.spi.Element;
+import com.google.inject.spi.Elements;
+import com.google.inject.util.Modules;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -34,12 +40,11 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.inject.Named;
+import java.util.*;
 
 public class Injector {
 
@@ -68,7 +73,7 @@ public class Injector {
             bootstrapInjector.injectMembers(module);
             guiceModules.add(module);
         }
-        com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
+        com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(insertMapBindings(guiceModules));
         System.out.flush() ; System.err.flush(); 
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.INFO ;
@@ -94,6 +99,30 @@ public class Injector {
       	  }
         }
         return fromGuiceInjector(realInjector);
+    }
+
+    private static Module insertMapBindings(List<Module> guiceModules) {
+        final Set<String> modes = new HashSet<>();
+        for (Element element : Elements.getElements(guiceModules)) {
+            element.acceptVisitor(new DefaultElementVisitor<Object>() {
+                @Override
+                public <T> Object visit(Binding<T> binding) {
+                    if (binding.getKey().getTypeLiteral().getRawType().equals(RoutingModule.class)) {
+                        modes.add(((com.google.inject.name.Named) binding.getKey().getAnnotation()).value());
+                    }
+                    return null;
+                }
+            });
+        }
+        return Modules.combine(Modules.combine(guiceModules), new com.google.inject.AbstractModule() {
+            @Override
+            protected void configure() {
+                MapBinder<String, RoutingModule> routingModuleMultibinder = MapBinder.newMapBinder(binder(), String.class, RoutingModule.class);
+                for (String mode : modes) {
+                    routingModuleMultibinder.addBinding(mode).to(Key.get(RoutingModule.class, Names.named(mode)));
+                }
+            }
+        });
     }
 
     public static Injector fromGuiceInjector(com.google.inject.Injector injector) {

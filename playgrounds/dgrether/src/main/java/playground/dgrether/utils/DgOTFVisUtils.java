@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -52,10 +51,8 @@ public class DgOTFVisUtils {
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												timeCostCalc,
-												timeCostCalc ) ) ) );
+								scenario ).get(
+						) ) );
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 	}
 	
@@ -64,10 +61,8 @@ public class DgOTFVisUtils {
 		PlanAlgorithm router = 
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												timeCostCalc,
-												timeCostCalc ) ) );
+								scenario ).get(
+						) );
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			pp4s.run(p);

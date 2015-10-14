@@ -36,9 +36,7 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -53,15 +51,17 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.utils.SoftCache;
 
+import javax.inject.Provider;
+
 /**
  * @author thibautd
  */
-public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactory {
+public class AccessEgressMultimodalTripRouterFactory implements Provider<TripRouter> {
 	private final Scenario scenario;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	private final Map<String, TravelDisutilityFactory> disutilityFactories = new HashMap< >();
-	private final TripRouterFactory delegateFactory;
+	private final Provider<TripRouter> delegateFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
@@ -71,7 +71,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			final Scenario scenario,
 			final Map<String, TravelTime> multimodalTravelTimes,
 			final TravelDisutilityFactory travelDisutilityFactory,
-			final TripRouterFactory delegateFactory) {
+			final Provider<TripRouter> delegateFactory) {
 		this.scenario = scenario;
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.travelDisutilityFactory = travelDisutilityFactory;
@@ -79,8 +79,8 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-		final TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter(routingContext);
+	public TripRouter get() {
+		final TripRouter instance = this.delegateFactory.get();
 		
 		final Network network = this.scenario.getNetwork();
 

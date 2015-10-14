@@ -22,10 +22,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-public class CTTripRouterFactory implements TripRouterFactory {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
+
+public class CTTripRouterFactory implements Provider<TripRouter> {
 
 	private static final Logger log = Logger
 			.getLogger(CTTripRouterFactory.class);
@@ -35,20 +42,30 @@ public class CTTripRouterFactory implements TripRouterFactory {
 	private Scenario scenario;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
+	@Inject
 	public CTTripRouterFactory(Scenario sc,
 							   LeastCostPathCalculatorFactory leastCostPathClaculatorFactory) {
 		this.scenario = sc;
 		this.leastCostPathCalculatorFactory = leastCostPathClaculatorFactory;
 	}
 
+	@Inject
+	Map<String, TravelTime> travelTimes;
+
+	@Inject
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
+
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(
-			RoutingContext routingContext) {
+	public TripRouter get() {
+
+		TravelTime travelTime = travelTimes.get("car");
+		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
 
 		LeastCostPathCalculator routeAlgo = leastCostPathCalculatorFactory
 				.createPathCalculator(scenario.getNetwork(),
-						routingContext.getTravelDisutility(),
-						routingContext.getTravelTime());
+						travelDisutility,
+						travelTime);
 
 		TripRouter tr = new TripRouter();
 

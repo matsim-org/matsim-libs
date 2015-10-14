@@ -28,9 +28,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -61,10 +59,8 @@ public class RunTest {
 		new PersonPrepareForSim(
 				new PlanRouter(
 					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-							new RoutingContextImpl(
-									new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), config.planCalcScore()),
-								travelTime.getLinkTravelTimes() ) )
+						scenario ).get(
+					)
 				),
 				scenario).run( scenario.getPopulation() );
 

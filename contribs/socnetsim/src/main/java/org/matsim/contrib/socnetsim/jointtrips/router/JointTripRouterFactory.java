@@ -24,17 +24,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouter;
 import com.google.inject.Inject;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
 import javax.inject.Provider;
-import java.util.Map;
 
 /**
  * @author thibautd
@@ -54,19 +51,15 @@ public class JointTripRouterFactory implements Provider<TripRouter> {
 	@Inject
 	public JointTripRouterFactory(
 			final Scenario scenario,
-			final Map<String, TravelDisutilityFactory> disutilityFactory,
-			final Map<String, TravelTime> travelTime,
 			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final Provider<TransitRouter> transitRouterFactory) {
 		this(
-			new TripRouterProviderImpl(
-					scenario,
-					disutilityFactory.get( TransportMode.car ),
-					travelTime.get( TransportMode.car ),
-					leastCostAlgoFactory,
-					transitRouterFactory),
+				TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(
+						scenario,
+						leastCostAlgoFactory,
+						transitRouterFactory),
 			scenario.getPopulation().getFactory() );
-		log.warn( getClass().getName()+" uses "+TripRouterProviderImpl.class.getName()+" with travel time for car. This is not anymore the default." );
+		log.warn( getClass().getName()+" uses trip router with travel time for car. This is not anymore the default." );
 	}
 
 	@Override

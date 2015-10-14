@@ -31,18 +31,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -52,7 +46,6 @@ import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -148,19 +141,6 @@ public class JointTripRouterFactoryTest {
 	private static JointTripRouterFactory createFactory( final Scenario scenario ) {
 		return new JointTripRouterFactory(
 				scenario,
-				Collections.<String,TravelDisutilityFactory>singletonMap(
-						TransportMode.car,
-						new TravelDisutilityFactory () {
-							@Override
-							public TravelDisutility createTravelDisutility(
-									TravelTime timeCalculator,
-									PlanCalcScoreConfigGroup cnScoringGroup) {
-								return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
-							}
-						} ),
-				Collections.<String,TravelTime>singletonMap(
-						TransportMode.car,
-						new FreeSpeedTravelTime() ),
 				new DijkstraFactory(),
 				null);
 	}

@@ -32,11 +32,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.mobsim.CompareEventsUtils;
@@ -78,9 +75,9 @@ public class JointPseudoSimTest {
 						scenario.getNetwork(),
 						scenario.getConfig().travelTimeCalculator());
 
-		final TripRouterFactory defFact =
+		final Provider<TripRouter> defFact =
 				new TripRouterFactoryBuilderWithDefaults().build(
-							scenario );
+						scenario);
 		CompareEventsUtils.testEventsSimilarToQsim(
 				createTestScenario(),
 				new JointPlanRouter(
@@ -88,10 +85,8 @@ public class JointPseudoSimTest {
 						new Provider<TripRouter>() {
 							@Override
 							public TripRouter get() {
-								return defFact.instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
-											travelTime.getLinkTravelTimes() ) );
+								return defFact.get(
+								);
 							}
 						},
 						scenario.getPopulation().getFactory()
@@ -117,9 +112,9 @@ public class JointPseudoSimTest {
 					scenario.getNetwork(),
 					scenario.getConfig().travelTimeCalculator());
 
-		final TripRouterFactory defFact =
+		final Provider<TripRouter> defFact =
 				new TripRouterFactoryBuilderWithDefaults().build(
-							scenario );
+						scenario);
 		CompareEventsUtils.testEventsSimilarToQsim(
 				createTestScenario(),
 				new JointPlanRouter(
@@ -127,10 +122,8 @@ public class JointPseudoSimTest {
 						new Provider<TripRouter>() {
 							@Override
 							public TripRouter get() {
-								return defFact.instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
-											travelTime.getLinkTravelTimes() ) );
+								return defFact.get(
+								);
 							}
 						},
 						scenario.getPopulation().getFactory()

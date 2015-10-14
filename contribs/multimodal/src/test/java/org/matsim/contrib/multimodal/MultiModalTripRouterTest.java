@@ -41,15 +41,17 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.*;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -98,14 +100,11 @@ public class MultiModalTripRouterTest {
 		 * - only "fast" router implementations handle sub-networks correct
 		 * - AStarLandmarks uses link speed information instead of agent speeds
 		 */
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-		
-		TravelTime travelTime = new FreeSpeedTravelTime();
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutilityFactory.createTravelDisutility(
-				travelTime, config.planCalcScore()), travelTime);
-		TripRouter tripRouter = multiModalTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+
+		TripRouter tripRouter = multiModalTripRouterFactory.get();
 		PlanRouter planRouter = new PlanRouter(tripRouter);
 		
 		/*

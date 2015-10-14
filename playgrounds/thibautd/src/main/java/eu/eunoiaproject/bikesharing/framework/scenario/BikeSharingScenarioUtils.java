@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -56,6 +56,8 @@ import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportati
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
+
+import javax.inject.Provider;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -150,7 +152,7 @@ public class BikeSharingScenarioUtils {
 		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingRoute.class , new BikeSharingRouteFactory() );
 	}
 
-	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
+	public static Provider<TripRouter> createTripRouterFactoryAndConfigureRouteFactories(
 			final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
 			final LinkSlopeScorer scorer,

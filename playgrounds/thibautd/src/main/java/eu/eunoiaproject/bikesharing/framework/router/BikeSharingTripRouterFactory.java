@@ -30,12 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.Facility;
 
@@ -44,15 +39,17 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
+import javax.inject.Provider;
+
 /**
  * Builds a standard trip router factory for bike sharing simulations.
  * @author thibautd
  */
-public class BikeSharingTripRouterFactory implements TripRouterFactory {
+public class BikeSharingTripRouterFactory implements Provider<TripRouter> {
 	
 	private boolean routePtUsingSchedule = false;
 
-	private final TripRouterFactory delegate;
+	private final Provider<TripRouter> delegate;
 	private final Scenario scenario;
 	private final LinkSlopeScorer slopeScorer;
 
@@ -60,7 +57,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 
 	public BikeSharingTripRouterFactory(
 			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
-			final TripRouterFactory delegate,
+			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this.delegate = delegate;
@@ -70,7 +67,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	}
 
 	public BikeSharingTripRouterFactory(
-			final TripRouterFactory delegate,
+			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this( scenario.getConfig().transit().isUseTransit() ?
@@ -86,7 +83,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this( routingData,
-				DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,
+				TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
 				scenario,
 				slopeScorer );
 	}
@@ -94,14 +91,14 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	public BikeSharingTripRouterFactory(
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
-		this( DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,
+		this(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
 				scenario,
 				slopeScorer );
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(final RoutingContext iterationContext) {
-		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
+	public TripRouter get() {
+		final TripRouter router = delegate.get();
 
 		final BikeSharingConfigGroup configGroup = (BikeSharingConfigGroup)
 			scenario.getConfig().getModule( BikeSharingConfigGroup.GROUP_NAME );
