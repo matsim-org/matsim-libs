@@ -203,7 +203,7 @@ public class RunNationalFreight {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("newPlan").toProvider(newPlanStrategyFactory);
-				addTravelTimeBinding("commercial").to(carTravelTimeKey());
+				addTravelTimeBinding("commercial").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});
