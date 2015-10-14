@@ -554,10 +554,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
-					|| (!this.vehQueue.isEmpty()) // vehicles are queued, thus active 
-					|| (!this.isNotOfferingVehicle()) // still accumulating, thus active
-					|| ( !this.holes.isEmpty() ) // need to process arrival of holes
-					;
+					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
+					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
+					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
 
