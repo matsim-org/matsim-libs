@@ -20,11 +20,19 @@ public class HandleStuckVehicles implements PersonStuckEventHandler, TransitDriv
 		persons+= event.getPersonId() + ", ";
 		
 	}
+	void initiate(){
+		count = 0;
+		countveh=0;
+		persons="Stuck Persons Are: ";
+		vehicles="Vehicles Are: ";
+	}
 	public void printStuckPersonsAndVehicles(){
 		System.out.println(persons);
 		System.out.println("Total Stuck Persons Are: "+ count);
-		System.out.println(vehicles);
+		//System.out.println(vehicles);
 		System.out.println("Total Vehicles Are: "+ countveh);
+		initiate();
+		
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		if(event.getLinkId().equals(this.linkId)){
 			double nowPCU = MixedTrafficVehiclesUtils.getPCU(this.personId2LegMode.get(personId));
 			this.localDensity -= nowPCU;
@@ -81,7 +81,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
@@ -116,7 +116,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		//enter time of car is more than bike enter time and leave time of bike is not reached yet
 		// if end time of bike will reach, it won't be in linkEnterList 
 		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
-			if(this.personId2LinkEnterTime.get(event.getPersonId()) > this.personId2LinkEnterTime.get(personId)){
+			if(this.personId2LinkEnterTime.get(event.getDriverId()) > this.personId2LinkEnterTime.get(personId)){
 				overtakenBicycles++;
 			}
 		}

@@ -124,12 +124,12 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 		}
 		
 		if ( event instanceof LinkEnterEvent ) {
-			final Id id = ((LinkEnterEvent) event).getPersonId();
+			final Id id = ((LinkEnterEvent) event).getDriverId();
 			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LinkLeaveEvent ) {
-			final Id id = ((LinkLeaveEvent) event).getPersonId();
+			final Id id = ((LinkLeaveEvent) event).getDriverId();
 			if ( !filter.accept( id ) ) return;
 		}
 		

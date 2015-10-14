@@ -237,7 +237,7 @@ public class AnalyzeNetwork implements PersonDepartureEventHandler, PersonArriva
 		if (event.getTime() < EvacuationConfig.evacuationTime) return;
 		
 		if (affectedLinkIds.contains(event.getLinkId())) {
-			if (this.enRouteCarAgents.contains(event.getPersonId())) {
+			if (this.enRouteCarAgents.contains(event.getDriverId())) {
 				affectedCarTripLength += this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 			}			
 		}

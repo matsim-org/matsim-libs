@@ -151,8 +151,8 @@ if ( true ) {
 			
 	Map<Id<Person>, Double> id2Toll = tollCollectHandler.getPersonId2TollMap();
 //	for (DgPersonData data : ana.getPersonData().values()){
-//		if (id2Toll.containsKey(data.getPersonId())){
-//			data.setToll(id2Toll.get(data.getPersonId()));
+//		if (id2Toll.containsKey(data.getDriverId())){
+//			data.setToll(id2Toll.get(data.getDriverId()));
 //		}
 //		else {
 //			data.setToll(0.0);

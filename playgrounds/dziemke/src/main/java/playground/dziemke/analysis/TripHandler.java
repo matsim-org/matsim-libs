@@ -137,7 +137,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		//String eventType = event.getEventType();
 		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		//double time = event.getTime();
 		//Id vehicleId = event.getVehicleId();
 		

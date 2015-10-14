@@ -258,53 +258,22 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		return data;
 	}
 	
-	@Deprecated
-	/**
-	 * @deprecated Use getLinkTravelTimes()
-	 * 
-	 */
 	public double getLinkTravelTime(final Id<Link> linkId, final double time) {
-		return doGetLinkTravelTime(linkId, time);
-	}
-
-	@Deprecated
-	private double doGetLinkTravelTime(final Id<Link> linkId, final double time) {
 		if (this.calculateLinkTravelTimes) {
 			DataContainer data = this.dataContainerProvider.getTravelTimeData(linkId, true);
 			if (data.needsConsolidation) {
 				consolidateData(data);
 			}
-			return this.aggregator.getTravelTime(data.ttData, time); 
+			return this.aggregator.getTravelTime(data.ttData, time);
 		}
 		throw new IllegalStateException("No link travel time is available " +
 				"if calculation is switched off by config option!");
 	}
 
-	private double doGetLinkTravelTime(final Link link, final double time) {
-		if (this.calculateLinkTravelTimes) {
-			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
-			if (data.needsConsolidation) {
-				consolidateData(data);
-			}
-			return this.aggregator.getTravelTime(data.ttData, time); 
-		}
-		throw new IllegalStateException("No link travel time is available " +
-				"if calculation is switched off by config option!");
-	}
-	
-	@Deprecated
-	/**
-	 * 
-	 * @deprecated Use getLinkToLinkTravelTimes()
-	 */
 	public double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
-		return doGetLinkToLinkTravelTime(fromLinkId, toLinkId, time);
-	}
-
-	private double doGetLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
-					"if calculation is switched off by config option!");      
+					"if calculation is switched off by config option!");
 		}
 		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<>(fromLinkId, toLinkId), true);
 		if (data.needsConsolidation) {
@@ -418,7 +387,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return TravelTimeCalculator.this.doGetLinkTravelTime(link, time);
+				return TravelTimeCalculator.this.getLinkTravelTime(link.getId(), time);
 			}
 
 		};
@@ -430,7 +399,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 			@Override
 			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-				return TravelTimeCalculator.this.doGetLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+				return TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
 			}
 		};
 	}

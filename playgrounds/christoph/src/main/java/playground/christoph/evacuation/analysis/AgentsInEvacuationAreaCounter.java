@@ -158,10 +158,10 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
 
-		String transportMode = currentTransportMode.get(event.getPersonId());
+		String transportMode = currentTransportMode.get(event.getDriverId());
 		Set<Id> set = legAgentsInEvacuationArea.get(transportMode);
 
-		Id vehicleId = driverVehicleMap.get(event.getPersonId());
+		Id vehicleId = driverVehicleMap.get(event.getDriverId());
 		List<Id> passengers = null;
 		Set<Id> passengerSet = null;
 		if (vehicleId != null) {
@@ -169,30 +169,30 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			passengerSet = legAgentsInEvacuationArea.get(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		}
 		
-		boolean wasAffected = set.contains(event.getPersonId()); 
+		boolean wasAffected = set.contains(event.getDriverId());
 		
 		if (this.coordAnalyzer.isLinkAffected(link)) {
-			set.add(event.getPersonId());
+			set.add(event.getDriverId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) passengerSet.add(passengerId);
 			}
 			
 			// if the agent just entered the evacuation area, reset its left mode
 			if (!wasAffected && event.getTime() >= EvacuationConfig.evacuationTime) {
-				this.leftByMode.remove(event.getPersonId());
+				this.leftByMode.remove(event.getDriverId());
 				if (passengers != null) {
 					for (Id passengerId : passengers) this.leftByMode.remove(passengerId);
 				}
 			}
 		} else {
-			set.remove(event.getPersonId());
+			set.remove(event.getDriverId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) passengerSet.remove(passengerId);
 			}
 			
 			// if the agents just left the evacuation area set its left mode
 			if (wasAffected && event.getTime() >= EvacuationConfig.evacuationTime) {
-				this.leftByMode.put(event.getPersonId(), new Tuple<String, Double>(transportMode, event.getTime()));
+				this.leftByMode.put(event.getDriverId(), new Tuple<String, Double>(transportMode, event.getTime()));
 				if (passengers != null) {
 					for (Id passengerId : passengers) {
 						this.leftByMode.put(passengerId, new Tuple<String, Double>(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE, event.getTime()));

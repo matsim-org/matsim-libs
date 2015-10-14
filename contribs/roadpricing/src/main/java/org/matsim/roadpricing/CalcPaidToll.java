@@ -192,13 +192,13 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), event.getPersonId(), event.getVehicleId());
+					event.getTime(), event.getDriverId(), event.getVehicleId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
+				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getDriverId());
 				if (info == null) {
 					info = new AgentTollInfo();
-					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					CalcPaidToll.this.agents.put(event.getDriverId(), info);
 				}
 				info.toll += newToll;
 			}
@@ -209,10 +209,10 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
 			if (cost != null) {
 
-				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
+				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getDriverId());
 				if (info == null) {
 					// (the agent is not yet "registered"):
 
@@ -220,7 +220,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 					info = new AgentTollInfo();
 
 					// register it:
-					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					CalcPaidToll.this.agents.put(event.getDriverId(), info);
 				}
 				info.toll += cost.amount;
 			}
@@ -238,9 +238,9 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
 			if (cost != null) {
-				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
+				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getDriverId());
 				if (info == null) {
 					// (the agent is not yet "registered")
 
@@ -248,7 +248,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 					info = new AgentTollInfo();
 
 					// register it:
-					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					CalcPaidToll.this.agents.put(event.getDriverId(), info);
 
 					// the toll amount comes from the current link, but should be the same for all links:
 					info.toll = cost.amount;
@@ -264,13 +264,13 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
 			if (cost != null) {
 				// this is a link inside the toll area.
 				// [[I guess this assumes that all links inside the cordon are listed in the toll scheme, similar to an area
 				// toll.  Conventionally, one would not do it in this way, but one would just name those links where
 				// the cordon toll is charged.  kai, mar'12]]
-				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
+				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getDriverId());
 				if (info == null) {
 					// (the agent is not yet "registered")
 					// [[yyyy this would refer to any toll, so if we have two cordons, it does not work.  kai, mar'12]]
@@ -279,7 +279,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 					info = new AgentTollInfo();
 
 					// register it:
-					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					CalcPaidToll.this.agents.put(event.getDriverId(), info);
 
 					// we start in the area, do not toll:
 					info.toll = 0.0;
@@ -294,7 +294,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
 			} else {
 				// this is a link outside the toll area; just need to memorize that the agent is outside the toll area.
-				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
+				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getDriverId());
 				if (info == null) {
 					// (the agent is not yet "registered")
 
@@ -302,7 +302,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 					info = new AgentTollInfo();
 
 					// register it:
-					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					CalcPaidToll.this.agents.put(event.getDriverId(), info);
 				}
 				// memorize that agent is outside toll area:
 				info.insideCordonArea = false;

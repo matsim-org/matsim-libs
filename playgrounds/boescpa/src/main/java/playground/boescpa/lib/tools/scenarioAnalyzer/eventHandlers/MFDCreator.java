@@ -74,14 +74,14 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (!EXCLUDEPT || !event.getPersonId().toString().contains(TransportMode.pt)) {
+		if (!EXCLUDEPT || !event.getDriverId().toString().contains(TransportMode.pt)) {
 			incDensity(event.getLinkId(), event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (!EXCLUDEPT || !event.getPersonId().toString().contains(TransportMode.pt)) {
+		if (!EXCLUDEPT || !event.getDriverId().toString().contains(TransportMode.pt)) {
 			decDensity(event.getLinkId(), event.getTime());
 			incFlow(event.getLinkId(), event.getTime());
 		}

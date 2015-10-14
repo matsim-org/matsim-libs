@@ -92,7 +92,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #4", 4, this.eventCounter);
 			assertEquals(21640.0, event.getTime(), 0.0);
-			assertEquals("4", event.getPersonId().toString());
+			assertEquals("4", event.getDriverId().toString());
 			assertEquals("5", event.getLinkId().toString());
 		}
 
@@ -101,7 +101,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #5", 5, this.eventCounter);
 			assertEquals(21650.0, event.getTime(), 0.0);
-			assertEquals("5", event.getPersonId().toString());
+			assertEquals("5", event.getDriverId().toString());
 			assertEquals("6", event.getLinkId().toString());
 		}
 

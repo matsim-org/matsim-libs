@@ -132,7 +132,8 @@ public class TravelTimesWriter {
 
 	public void run(final String eventsFileName,
 			final String regentMatrixFileName,
-			final Set<String> relevantLinkIDs, final ZonalSystem zonalSystem) {
+			final Set<String> relevantLinkIDs,
+			final List<String> relevantZoneIDs, final ZonalSystem zonalSystem) {
 
 		final Random rnd = new Random();
 
@@ -144,6 +145,39 @@ public class TravelTimesWriter {
 		reader.readFile(eventsFileName);
 		final TravelTime linkTTs = this.ttcalc.getLinkTravelTimes();
 
+		// identify all zones that are relevant and contain at least one node
+
+		final ArrayList<String> relevantAndFeasibleZoneIDs = new ArrayList<>();
+		if (relevantZoneIDs == null) {
+			// if no relevant zone IDs were defined then identify them self
+			System.err
+					.println("no relevant zone ids given, using all zones in "
+							+ "zonal system that contain at least one node");
+			for (Zone zone : zonalSystem.id2zone.values()) {
+				if (zonalSystem.zone2nodes.get(zone) != null
+						&& zonalSystem.zone2nodes.get(zone).size() > 0) {
+					relevantAndFeasibleZoneIDs.add(zone.getId());
+				}
+			}
+		} else {
+			// make sure that all relevant zones exist and contain nodes
+			for (String zoneId : relevantZoneIDs) {
+				final Zone zone = zonalSystem.getZone(zoneId);
+				if (zone == null) {
+					System.err.println("zonal system does not contain zone id "
+							+ zoneId);
+				} else {
+					if (zonalSystem.zone2nodes.get(zone) != null
+							&& zonalSystem.zone2nodes.get(zone).size() > 0) {
+						relevantAndFeasibleZoneIDs.add(zoneId);
+					} else {
+						System.err.println("zone with id " + zoneId
+								+ " does not contain any nodes");
+					}
+				}
+			}
+		}
+
 		// create a single high-noon matrix
 
 		final Map<Tuple<Zone, Zone>, Tuple<Double, Integer>> zonePair2ttCntPair = new LinkedHashMap<>();
@@ -152,38 +186,39 @@ public class TravelTimesWriter {
 
 		int cnt = 0;
 		final int time_s = 7 * 3600;
-		for (Zone fromZone : zonalSystem.id2zone.values()) {
-			if (zonalSystem.zone2nodes.get(fromZone) != null) {
-				System.out
-						.println((++cnt) + " / " + zonalSystem.id2zone.size());
-				final Node fromNode = MathHelpers.draw(
-						zonalSystem.zone2nodes.get(fromZone), rnd);
-				lcpt.calculate(this.network, fromNode, time_s);
+		for (String fromZoneID : relevantAndFeasibleZoneIDs) {
+			final Zone fromZone = zonalSystem.id2zone.get(fromZoneID);
+			// for (Zone fromZone : zonalSystem.id2zone.values()) {
+			// if (zonalSystem.zone2nodes.get(fromZone) != null) {
+			System.out.println((++cnt) + " / "
+					+ relevantAndFeasibleZoneIDs.size());
+			final Node fromNode = MathHelpers.draw(
+					zonalSystem.zone2nodes.get(fromZone), rnd);
+			lcpt.calculate(this.network, fromNode, time_s);
 
-				for (Zone toZone : zonalSystem.id2zone.values()) {
-					if (zonalSystem.zone2nodes.get(toZone) != null) {
-						for (Node toNode : zonalSystem.zone2nodes.get(toZone))
-						// final Node toNode = MathHelpers.draw(
-						// zonalSystem.zone2nodes.get(toZone), rnd);
-						{
-							final Tuple<Zone, Zone> odPair = new Tuple<>(
-									fromZone, toZone);
-							final Tuple<Double, Integer> tt_sum_cnt = zonePair2ttCntPair
-									.get(odPair);
-							final double tt = lcpt.getTree()
-									.get(toNode.getId()).getCost();
-							zonePair2ttCntPair
-									.put(odPair,
-											(tt_sum_cnt == null) ? new Tuple<Double, Integer>(
-													tt, 1)
-													: new Tuple<Double, Integer>(
-															tt_sum_cnt.getA()
-																	+ tt,
-															tt_sum_cnt.getB() + 1));
-						}
-					}
+			for (String toZoneID : relevantAndFeasibleZoneIDs) {
+				final Zone toZone = zonalSystem.id2zone.get(toZoneID);
+				// for (Zone toZone : zonalSystem.id2zone.values()) {
+				// if (zonalSystem.zone2nodes.get(toZone) != null) {
+				for (Node toNode : zonalSystem.zone2nodes.get(toZone))
+				// final Node toNode = MathHelpers.draw(
+				// zonalSystem.zone2nodes.get(toZone), rnd);
+				{
+					final Tuple<Zone, Zone> odPair = new Tuple<>(fromZone,
+							toZone);
+					final Tuple<Double, Integer> tt_sum_cnt = zonePair2ttCntPair
+							.get(odPair);
+					final double tt = lcpt.getTree().get(toNode.getId())
+							.getCost();
+					zonePair2ttCntPair.put(odPair,
+							(tt_sum_cnt == null) ? new Tuple<Double, Integer>(
+									tt, 1) : new Tuple<Double, Integer>(
+									tt_sum_cnt.getA() + tt,
+									tt_sum_cnt.getB() + 1));
 				}
 			}
+			// }
+			// }
 		}
 
 		// Write the result to file.
@@ -213,7 +248,7 @@ public class TravelTimesWriter {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data/run/network-plain.xml";
+		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -224,7 +259,7 @@ public class TravelTimesWriter {
 				scenario.getNetwork(), timeBinSize, endTime, scenario
 						.getConfig().travelTimeCalculator());
 
-		final String linkAttributesFileName = "./data/run/link-attributes.xml";
+		final String linkAttributesFileName = "./data_ZZZ/run/link-attributes.xml";
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				linkAttributes);
@@ -232,7 +267,7 @@ public class TravelTimesWriter {
 		final Set<String> relevantLinkIDs = new LinkedHashSet<String>(
 				ObjectAttributeUtils2.allObjectKeys(linkAttributes));
 
-		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
+		final String zonesShapeFileName = "./data_ZZZ/shapes/sverige_TZ_EPSG3857.shp";
 		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
 				StockholmTransformationFactory.WGS84_EPSG3857);
 		zonalSystem.addNetwork(scenario.getNetwork(),
@@ -241,10 +276,10 @@ public class TravelTimesWriter {
 		final TravelTimesWriter ttWriter = new TravelTimesWriter(
 				scenario.getNetwork(), ttcalc);
 
-		final String eventsFileName = "./data/run/output/ITERS/it.0/0.events.xml.gz";
-		final String regentMatrixFileName = "./data/run/regent-tts.xml";
+		final String eventsFileName = "./data_ZZZ/run/output/ITERS/it.0/0.events.xml.gz";
+		final String regentMatrixFileName = "./data_ZZZ/run/regent-tts.xml";
 		ttWriter.run(eventsFileName, regentMatrixFileName, relevantLinkIDs,
-				zonalSystem);
+				null, zonalSystem);
 
 		System.out.println("... DONE");
 	}

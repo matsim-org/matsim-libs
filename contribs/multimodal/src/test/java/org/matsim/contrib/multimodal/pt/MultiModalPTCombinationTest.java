@@ -182,14 +182,14 @@ public class MultiModalPTCombinationTest {
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = this.network.getLinks().get(event.getLinkId());
 			
-			if (!link.getAllowedModes().contains(this.modes.get(event.getPersonId()))) {
-				log.error("Found mode " + this.modes.get(event.getPersonId()) + " on link " + link.getId());
+			if (!link.getAllowedModes().contains(this.modes.get(event.getDriverId()))) {
+				log.error("Found mode " + this.modes.get(event.getDriverId()) + " on link " + link.getId());
 			}
 			
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(event.getPersonId())));
+			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(event.getDriverId())));
 			
-			String mode = this.modes.get(event.getPersonId());
+			String mode = this.modes.get(event.getDriverId());
 			int count = this.leftCountPerMode.get(mode);
 			this.leftCountPerMode.put(mode, count + 1);
 		}

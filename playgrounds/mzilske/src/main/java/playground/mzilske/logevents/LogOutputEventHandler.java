@@ -72,13 +72,13 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
 	public void handleEvent(LinkEnterEvent event) {
-		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getDriverId() + " link id " + event.getLinkId());
 	}
 
 	public void reset(int iteration) {}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
+		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getDriverId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
@@ -106,7 +106,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	}
 
 	public void handleEvent(Event event) {
-//		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getPersonId());
+//		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getDriverId());
 	}
 
 	public void handleEvent(Wait2LinkEvent event) {

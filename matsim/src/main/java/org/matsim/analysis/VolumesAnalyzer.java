@@ -96,7 +96,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 				modeVolumes = new HashMap<>();
 				this.linksPerMode.put(event.getLinkId(), modeVolumes);
 			}
-			String mode = enRouteModes.get(event.getPersonId());
+			String mode = enRouteModes.get(event.getDriverId());
 			volumes = modeVolumes.get(mode);
 			if (volumes == null) {
 				volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

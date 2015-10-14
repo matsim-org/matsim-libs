@@ -166,10 +166,10 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (carLegAgents.contains(event.getPersonId())) {
-			if (!searchingAgents.contains(event.getPersonId())) {
+		if (carLegAgents.contains(event.getDriverId())) {
+			if (!searchingAgents.contains(event.getDriverId())) {
 				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-				ActivityFacility facility = nextActivityFacilityMap.get(event.getPersonId());
+				ActivityFacility facility = nextActivityFacilityMap.get(event.getDriverId());
 				double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
 
 				/*
@@ -181,13 +181,13 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 				 */
 				
 				if (shouldStartSearchParking(event.getLinkId(), facility.getLinkId(), distanceToNextActivity)) {
-					searchingAgents.add(event.getPersonId());
-					linkEnteredAgents.add(event.getPersonId());
+					searchingAgents.add(event.getDriverId());
+					linkEnteredAgents.add(event.getDriverId());
 				}
 			}
 			// the agent is already searching: update its position
 			else {
-				linkEnteredAgents.add(event.getPersonId());
+				linkEnteredAgents.add(event.getDriverId());
 			}
 		}
 	}

@@ -66,7 +66,7 @@ public class HolesInOTFVisTest {
 
 		Scenario sc = net.scenario;
 
-		for (int i=0;i<1000;i++){
+		for (int i=0;i<100;i++){
 			Id<Person> id = Id.createPersonId(i);
 			Person p = net.population.getFactory().createPerson(id);
 			Plan plan = net.population.getFactory().createPlan();
@@ -119,7 +119,7 @@ public class HolesInOTFVisTest {
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			config = scenario.getConfig();
 			config.qsim().setFlowCapFactor(1.0);
-			config.qsim().setStorageCapFactor(0.001);
+			config.qsim().setStorageCapFactor(0.05);
 
 			config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
@@ -134,9 +134,9 @@ public class HolesInOTFVisTest {
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
 
-			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 10000, 25, 36000, 1, null, "22"); 
-			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 10000, 15, 360, 1, null, "22");	//flow capacity is 1 PCU per min.
-			link3 = network.createAndAddLink(Id.createLinkId("3"), node3, node4, 10000, 25, 36000, 1, null, "22");
+			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 10000, 25, 3600, 1, null, "22"); 
+			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 1000, 15, 360, 1, null, "22");	//flow capacity is 1 PCU per min.
+			link3 = network.createAndAddLink(Id.createLinkId("3"), node3, node4, 10000, 25, 3600, 1, null, "22");
 
 			population = scenario.getPopulation();
 		}

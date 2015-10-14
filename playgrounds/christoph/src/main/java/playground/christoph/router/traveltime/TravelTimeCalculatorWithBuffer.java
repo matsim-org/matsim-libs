@@ -177,7 +177,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
 	 */
 	@Override
 	public void handleEvent(final LinkEnterEvent e) {
-		if (!nonCarAgents.contains(e.getPersonId())) {
+		if (!nonCarAgents.contains(e.getDriverId())) {
 			super.handleEvent(e);
 		}
 	}
@@ -187,7 +187,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
 	 */
 	@Override
 	public void handleEvent(final LinkLeaveEvent e) {
-		if (!nonCarAgents.contains(e.getPersonId())) {
+		if (!nonCarAgents.contains(e.getDriverId())) {
 			super.handleEvent(e);
 		}
 	}

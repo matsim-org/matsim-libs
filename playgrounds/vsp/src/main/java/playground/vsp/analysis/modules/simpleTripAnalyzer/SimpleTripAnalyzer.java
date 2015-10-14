@@ -104,7 +104,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Traveller t = this.traveller.get(event.getPersonId());
+		Traveller t = this.traveller.get(event.getDriverId());
 		if(t == null){
 			return;
 		}

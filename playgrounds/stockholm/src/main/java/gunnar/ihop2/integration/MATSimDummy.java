@@ -12,9 +12,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
-import org.matsim.matrices.Matrix;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -22,7 +19,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
+import gunnar.ihop2.regent.costwriting.TravelTimesWriter;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 public class MATSimDummy {
 
@@ -42,9 +41,9 @@ public class MATSimDummy {
 
 	public static final String LINKATTRIBUTE_FILENAME_ELEMENT = "linkattributefile";
 
-	// TODO CONTINUE HERE
-
 	public static final String TRAVELTIME_MATRIX_FILENAME_ELEMENT = "traveltimes";
+
+	// TODO CONTINUE HERE
 
 	public static final String REGENT_FOLDER_ELEMENT = "regentfolder";
 
@@ -165,14 +164,15 @@ public class MATSimDummy {
 			fatal("could not read the " + ITERATIONS_ELEMENT + " XML element.");
 		}
 
-		final List<String> zones = config.getList(IHOP2_ELEMENT, ZONE_ELEMENT);
-		if (zones == null) {
+		final List<String> zoneIDs = config
+				.getList(IHOP2_ELEMENT, ZONE_ELEMENT);
+		if (zoneIDs == null) {
 			fatal("could not read the " + ZONE_ELEMENT + " XML element.");
 			System.exit(-1);
-		} else if (zones.size() == 0) {
+		} else if (zoneIDs.size() == 0) {
 			fatal("there are no zones defined in the xml file.");
 		}
-		Collections.sort(zones, new StringAsIntegerComparator());
+		Collections.sort(zoneIDs, new StringAsIntegerComparator());
 
 		System.out.println("... program parameters appear OK so far.");
 		System.out.println();
@@ -239,6 +239,14 @@ public class MATSimDummy {
 			// TODO erase output file
 
 			Controler controler = new Controler(matsimConfig);
+			matsimConfig.getModule("qsim").addParam(
+					"flowCapacityFactor",
+					Double.toString(regentPopulationSample
+							* matsimPopulationSubSample));
+			matsimConfig.getModule("qsim").addParam(
+					"storageCapacityFactor",
+					Double.toString(regentPopulationSample
+							* matsimPopulationSubSample));
 			controler.run();
 
 			System.out.println("... MATSim run completed.");
@@ -260,65 +268,31 @@ public class MATSimDummy {
 							.getConfig().travelTimeCalculator());
 			final Set<String> relevantLinkIDs = new LinkedHashSet<String>(
 					ObjectAttributeUtils2.allObjectKeys(linkAttributes));
-
-			// TODO CONTINUE HERE
-
 			// final String zonesShapeFileName =
 			// "./data/shapes/sverige_TZ_EPSG3857.shp";
-			// final ZonalSystem zonalSystem = new
-			// ZonalSystem(zonesShapeFileName,
-			// StockholmTransformationFactory.WGS84_EPSG3857);
-			// zonalSystem.addNetwork(scenario.getNetwork(),
-			// StockholmTransformationFactory.WGS84_SWEREF99);
-			//
-			// final TravelTimesWriter ttWriter = new TravelTimesWriter(
-			// scenario.getNetwork(), ttcalc);
-			//
-			// final String eventsFileName =
-			// "./data/run/output/ITERS/it.0/0.events.xml.gz";
-			// final String regentMatrixFileName = "./data/run/regent-tts.xml";
-			// ttWriter.run(eventsFileName, regentMatrixFileName,
-			// relevantLinkIDs,
-			// zonalSystem);
+			// TODO this was already created in the population generation
+			final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName,
+					StockholmTransformationFactory.WGS84_EPSG3857);
+			zonalSystem.addNetwork(scenario.getNetwork(),
+					StockholmTransformationFactory.WGS84_SWEREF99);
+			final TravelTimesWriter ttWriter = new TravelTimesWriter(
+					scenario.getNetwork(), ttcalc);
+			final String lastIteration = matsimConfig.getModule("controler")
+					.getValue("lastIteration");
+			final String eventsFileName = matsimConfig.getModule("controler")
+					.getValue("outputDirectory")
+					+ "ITERS/it."
+					+ lastIteration
+					+ "/" + lastIteration + ".events.xml.gz";
+			ttWriter.run(eventsFileName, traveltimesFileName, relevantLinkIDs,
+					zoneIDs, zonalSystem);
+
+			System.out
+					.println("... succeeded to write traveltime matrices to file: "
+							+ traveltimesFileName);
 
 			System.out.println("STOP");
 			System.exit(0);
-
-			final Matrices matrices = new Matrices();
-			final Matrix work = matrices.createMatrix("WORK",
-					"random work tour travel times");
-			final Matrix other = matrices.createMatrix("OTHER",
-					"random other tour travel times");
-
-			try {
-				for (String fromZone : zones) {
-					for (String toZone : zones) {
-						work.createEntry(fromZone, toZone, Math.random());
-						other.createEntry(fromZone, toZone, Math.random());
-					}
-				}
-			} catch (Exception e) {
-				fatal(e);
-			}
-
-			System.out
-					.println("... succeeded to create travel time matrix data structures.");
-			System.out.println();
-
-			System.out.println("Writing traveltime matrices: "
-					+ traveltimesFileName + " ... ");
-
-			try {
-				final MatricesWriter writer = new MatricesWriter(matrices);
-				writer.setIndentationString("  ");
-				writer.setPrettyPrint(true);
-				writer.write(traveltimesFileName);
-			} catch (Exception e) {
-				fatal(e);
-			}
-
-			System.out.println("... succeded to write travel time matrices.");
-			System.out.println();
 
 			/*
 			 * -------------------- RUN REGENT --------------------

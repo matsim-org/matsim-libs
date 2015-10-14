@@ -597,11 +597,11 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	}
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		enterLink(event.getTime(), event.getLinkId(), event.getPersonId());
+		enterLink(event.getTime(), event.getLinkId(), event.getDriverId());
 	}
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		exitLink(event.getTime(), event.getLinkId(), event.getPersonId());
+		exitLink(event.getTime(), event.getLinkId(), event.getDriverId());
 	}
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {

@@ -128,7 +128,7 @@ public class ModelIterator {
 					GoalType.MINIMIZE,
 					new MaxEval( maxIterations ),
 					new InitialGuess( new double[]{ x , y } ),
-					new ObjectiveFunction( new Function( runner ) ),
+					new ObjectiveFunction( new Function( 1 , runner ) ),
 					new CMAESOptimizer.Sigma( new double[]{ 5 , 500 } ),
 					new CMAESOptimizer.PopulationSize( 7 ),
 					new SimpleBounds(
@@ -175,9 +175,13 @@ public class ModelIterator {
 	}
 
 	private class Function implements MultivariateFunction {
+		private final double nDistance;
 		private final ModelRunner runner;
 
-		public Function( ModelRunner runner ) {
+		public Function(
+				final int nDistance,
+				final ModelRunner runner ) {
+			this.nDistance = nDistance;
 			this.runner = runner;
 		}
 
@@ -186,8 +190,12 @@ public class ModelIterator {
 			final Thresholds thr = new Thresholds( args[ 0 ] , args[ 1 ] );
 	 		generate( runner , thr );
 
-			final double fitness = Math.pow( distDegree( thr ) / precisionDegree , 10 )+
-				Math.pow( distClustering( thr ) / precisionClustering , 10 );
+			// use the "distance n" (distance 1 is manhatan, distance 2 is euclidean distance)
+			final double fitness =
+					Math.pow(
+						Math.pow( distDegree( thr ) / precisionDegree , nDistance ) +
+							Math.pow( distClustering( thr ) / precisionClustering , nDistance ),
+						1 / nDistance );
 
 			for ( EvolutionListener l : listeners ) l.handleMove( thr , fitness );
 
