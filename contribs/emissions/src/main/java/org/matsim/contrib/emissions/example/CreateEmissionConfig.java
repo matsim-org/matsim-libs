@@ -72,6 +72,7 @@ public class CreateEmissionConfig {
 			ccg.setOutputDirectory(outputPath);
 			ccg.setFirstIteration(0);
 			ccg.setLastIteration(numberOfIterations-1);
+			ccg.setWriteEventsInterval(numberOfIterations-1);
 			
 		// planCalcScoreConfigGroup
 			PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
