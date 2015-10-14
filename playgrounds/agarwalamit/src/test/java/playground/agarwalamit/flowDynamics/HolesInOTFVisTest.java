@@ -47,7 +47,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -57,7 +56,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  */
 public class HolesInOTFVisTest {
 
-	private final boolean useOTFVis = false;
+	private final boolean useOTFVis = true;
 	
 	@Test 
 	public void test(){
@@ -66,7 +65,7 @@ public class HolesInOTFVisTest {
 
 		Scenario sc = net.scenario;
 
-		for (int i=0;i<100;i++){
+		for (int i=0;i<20;i++){
 			Id<Person> id = Id.createPersonId(i);
 			Person p = net.population.getFactory().createPerson(id);
 			Plan plan = net.population.getFactory().createPlan();
@@ -120,12 +119,13 @@ public class HolesInOTFVisTest {
 			config = scenario.getConfig();
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(0.05);
+			
+			config.qsim().setStuckTime(24*3600); // in order to let agents wait instead of forced entry.
 
 			config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
 			network = (NetworkImpl) scenario.getNetwork();
-			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 
 			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord(-100., -100.0));
 			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
