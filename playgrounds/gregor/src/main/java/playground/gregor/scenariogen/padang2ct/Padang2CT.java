@@ -1,4 +1,4 @@
-package playground.gregor.ctsim.example;
+package playground.gregor.scenariogen.padang2ct;
 /* *********************************************************************** *
  * project: org.matsim.*
  *
@@ -20,37 +20,33 @@ package playground.gregor.ctsim.example;
  * *********************************************************************** */
 
 import org.apache.commons.io.FileUtils;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import playground.gregor.ctsim.run.CTRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by laemmel on 13/10/15.
  */
-public class RunExample {
-	private static final String OUT_DIR = "/Users/laemmel/devel/ctsim/";
-	private static final int NR_AGENTS = 2;
+public class Padang2CT {
+	private static final String PDG_INPUT = "/Users/laemmel/svn/runs-svn/run1010/output/";
+	private static final String OUT_DIR = "/Users/laemmel/devel/padang/";
+	private static final int NR_AGENTS = 1000;
 
 	public static void main(String[] args) throws IOException {
 		FileUtils.deleteDirectory(new File(OUT_DIR));
@@ -63,7 +59,7 @@ public class RunExample {
 		c.global().setCoordinateSystem("EPSG:3395");
 		Scenario sc = ScenarioUtils.createScenario(c);
 
-		int destination = createNetwork(sc);
+		loadAndModifyNetwork(sc);
 		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
 		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
@@ -113,144 +109,58 @@ public class RunExample {
 		c.controler().setMobsim("ctsim");
 		c.global().setCoordinateSystem("EPSG:3395");
 
-		c.qsim().setEndTime(30 * 60);
+		c.qsim().setEndTime(6 * 3600);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
 		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
 
-		createPopulation(sc, destination);
+		loadPopulation(sc);
 
 		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork()).write(c.plans()
+		new PopulationWriter(pop, sc.getNetwork(), 1).write(c.plans()
 				.getInputFile());
 
-		CTRunner.main(new String[]{inputDir + "/config.xml", "true"});
+//		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
 
 	}
 
-	private static void createPopulation(Scenario sc, int destination) {
-		Population pop = sc.getPopulation();
-		pop.getPersons().clear();
-		PopulationFactory fac = pop.getFactory();
-		double t = 0;
-		for (int i = 0; i < NR_AGENTS / 2; i++) {
-			Person pers = fac.createPerson(Id.create("b" + i, Person.class));
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin",
-					Id.create("0", Link.class));
-			act0.setEndTime(t);
-			plan.addActivity(act0);
-			Leg leg = fac.createLeg("walkct");
-			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination",
-					Id.create(destination, Link.class));
-			plan.addActivity(act1);
-			pop.addPerson(pers);
+	private static void loadAndModifyNetwork(Scenario sc) {
+		new MatsimNetworkReader(sc).readFile(PDG_INPUT + "/output_network.xml.gz");
+		Set<String> mode = new HashSet<>();
+		mode.add("walkct");
+		for (Link l : sc.getNetwork().getLinks().values()) {
+			if (l.getId().toString().contains("el")) {
+				l.setCapacity(100 * 1.33);
+			}
+			l.setAllowedModes(mode);
 		}
-//		for (int i = NR_AGENTS / 2; i < NR_AGENTS; i++) {
-//			Person pers = fac.createPerson(Id.create("b" + i, Person.class));
-//			Plan plan = fac.createPlan();
-//			pers.addPlan(plan);
-//			Activity act0;
-//			act0 = fac.createActivityFromLinkId("origin",
-//					Id.create(destination + 1, Link.class));
-//			act0.setEndTime(t);
-//			plan.addActivity(act0);
-//			Leg leg = fac.createLeg("walkct");
-//			plan.addLeg(leg);
-//			Activity act1 = fac.createActivityFromLinkId("destination",
-//					Id.create(1, Link.class));
-//			plan.addActivity(act1);
-//			pop.addPerson(pers);
-//		}
 	}
 
-
-	private static int createNetwork(Scenario sc) {
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		double length = 30;
-		double width = 20;
-
-		int id = 0;
-		Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, 0));
-		Node n1 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-
-		List<Node> someNodes = new ArrayList<>();
-		for (double y = -30; y <= 30; y += 10) {
-			Node n = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length * 3, y));
-			net.addNode(n);
-			someNodes.add(n);
-		}
-		Node n2 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length * 4, 0));
-		Node n3 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(length * 5, 0));
-		net.addNode(n2);
-		net.addNode(n3);
-		id = 0;
-		{
-			Link l0 = fac.createLink(Id.createLinkId(id++), n0, n1);
-			net.addLink(l0);
-			l0.setCapacity(width);
-			l0.setLength(length);
-			Link l0Rev = fac.createLink(Id.createLinkId(id++), n1, n0);
-			net.addLink(l0Rev);
-			l0Rev.setCapacity(width);
-			l0Rev.setLength(length);
-		}
-		int cnt = 0;
-		for (Node n : someNodes) {
-			{
-				Link l0 = fac.createLink(Id.createLinkId(id++), n1, n);
-				net.addLink(l0);
-				l0.setCapacity(width / someNodes.size());
-				l0.setLength(length * 2);//?check!!
-				if (cnt++ % 2 != 0) {
-					Link l0Rev = fac.createLink(Id.createLinkId(id++), n, n1);
-					net.addLink(l0Rev);
-					l0Rev.setCapacity(width / someNodes.size());
-					l0Rev.setLength(length * 2);
+	private static void loadPopulation(Scenario sc) {
+		new MatsimPopulationReader(sc).readFile(PDG_INPUT + "/output_plans.xml.gz");
+		for (Person pers : sc.getPopulation().getPersons().values()) {
+			for (Plan plan : pers.getPlans()) {
+				boolean flipFlop = true;
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Leg) {
+						((Leg) pe).setMode("walkct");
+					}
+					else {
+						if (pe instanceof Activity) {
+							if (flipFlop) {
+								((Activity) pe).setType("origin");
+							}
+							else {
+								((Activity) pe).setType("destination");
+							}
+							flipFlop = !flipFlop;
+						}
+					}
 				}
 			}
-
-			{
-				Link l0 = fac.createLink(Id.createLinkId(id++), n, n2);
-				net.addLink(l0);
-				l0.setCapacity(width / someNodes.size());
-				l0.setLength(length);//?check!!
-				Link l0Rev = fac.createLink(Id.createLinkId(id++), n2, n);
-				net.addLink(l0Rev);
-				l0Rev.setCapacity(width / someNodes.size());
-				l0Rev.setLength(length);
-			}
 		}
-		int ret;
-		{
-			ret = id++;
-			Link l0 = fac.createLink(Id.createLinkId(ret), n2, n3);
-			net.addLink(l0);
-			l0.setCapacity(width);
-			l0.setLength(length);
-		}
-		{
-			Link l0 = fac.createLink(Id.createLinkId(id++), n3, n2);
-			net.addLink(l0);
-			l0.setCapacity(width);
-			l0.setLength(length);
-		}
-
-		Set<String> modes = new HashSet<>();
-		modes.add("walkct");
-		for (Link l : net.getLinks().values()) {
-			l.setAllowedModes(modes);
-			l.setFreespeed(20);
-		}
-		return ret;
-
 	}
+
+
 }

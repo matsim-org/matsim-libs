@@ -9,10 +9,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.physics.*;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -29,6 +29,7 @@ public class Debugger2 {
 
 	public static void main(String[] args) {
 
+		CTRunner.DEBUG = false;
 
 		Config c = ConfigUtils.createConfig();
 
@@ -36,22 +37,25 @@ public class Debugger2 {
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		createNetwork(sc);
-
-		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-
-
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
-		EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
-		InfoBox iBox = new InfoBox(dbg, sc);
-		dbg.addAdditionalDrawer(iBox);
-		//		dbg.addAdditionalDrawer(new Branding());
-		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-		dbg.addAdditionalDrawer(qDbg);
-
 		EventsManagerImpl em = new EventsManagerImpl();
-		em.addHandler(qDbg);
-		em.addHandler(dbg);
+
+		if (CTRunner.DEBUG) {
+			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+
+
+			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+			InfoBox iBox = new InfoBox(dbg, sc);
+			dbg.addAdditionalDrawer(iBox);
+			//		dbg.addAdditionalDrawer(new Branding());
+			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			dbg.addAdditionalDrawer(qDbg);
+
+
+			em.addHandler(qDbg);
+			em.addHandler(dbg);
+		}
 
 		CTNetwork net = new CTNetwork(sc.getNetwork(), em, null);
 
@@ -65,7 +69,7 @@ public class Debugger2 {
 			links.add(Id.createLinkId(3));
 			for (CTCell cell : link.getCells()) {
 				int n = cell.getN();
-				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
+				int rnd = n / 2;//(int) (MatsimRandom.getRandom().nextInt(n) * 1);
 				for (int i = 0; i < rnd; i++) {
 					nrPeds++;
 					DriverAgent walker = new SimpleCTNetworkWalker(links);
@@ -77,30 +81,32 @@ public class Debugger2 {
 			}
 
 		}
-		{
-			CTLink link = net.getLinks().get(Id.createLinkId("7"));
-			List<Id<Link>> links = new ArrayList<>();
-			links.add(Id.createLinkId(7));
-			links.add(Id.createLinkId(6));
-			links.add(Id.createLinkId(5));
-			links.add(Id.createLinkId(4));
-			for (CTCell cell : link.getCells()) {
-				int n = cell.getN();
-				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
-				for (int i = 0; i < rnd; i++) {
-					nrPeds++;
-					DriverAgent walker = new SimpleCTNetworkWalker(links);
-
-					CTPed ped = new CTPed(cell, walker);
-					cell.jumpOnPed(ped, 0);
-				}
-				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
-			}
-
-		}
+//		{
+//			CTLink link = net.getLinks().get(Id.createLinkId("7"));
+//			List<Id<Link>> links = new ArrayList<>();
+//			links.add(Id.createLinkId(7));
+//			links.add(Id.createLinkId(6));
+//			links.add(Id.createLinkId(5));
+//			links.add(Id.createLinkId(4));
+//			for (CTCell cell : link.getCells()) {
+//				int n = cell.getN();
+//				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
+//				for (int i = 0; i < rnd; i++) {
+//					nrPeds++;
+//					DriverAgent walker = new SimpleCTNetworkWalker(links);
+//
+//					CTPed ped = new CTPed(cell, walker);
+//					cell.jumpOnPed(ped, 0);
+//				}
+//				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+//			}
+//
+//		}
 		System.out.println(nrPeds);
+		long start = System.nanoTime();
 		net.run();
-		System.out.println("done.");
+		long stop = System.nanoTime();
+		System.out.println("sim took:" + ((stop - start) / 1000. / 1000.) + " ms");
 //		LineSegment ls = new LineSegment();
 //		ls.x0 = 0;
 //		ls.x1 = 0;
@@ -109,12 +115,6 @@ public class Debugger2 {
 //		LineEvent le = new LineEvent(0,ls,true,0,128,128,255,0);
 //		em.processEvent(le);
 
-		try {
-			Thread.sleep(10000000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 
 	}

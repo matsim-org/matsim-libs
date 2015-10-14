@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.CTEvent;
 import playground.gregor.ctsim.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
@@ -33,7 +34,19 @@ public class CTNetwork {
 
 	private void init() {
 		for (Node n : this.network.getNodes().values()) {
-			CTNode ct = new CTNode(n.getId(), n, this);
+			double mxCap = 0;
+			for (Link l : n.getInLinks().values()) {
+				if (l.getCapacity() > mxCap) {
+					mxCap = l.getCapacity();
+				}
+			}
+			for (Link l : n.getOutLinks().values()) {
+				if (l.getCapacity() > mxCap) {
+					mxCap = l.getCapacity();
+				}
+			}
+
+			CTNode ct = new CTNode(n.getId(), n, this, mxCap / 1.33);
 			this.nodes.put(n.getId(), ct);
 		}
 		for (Link l : this.network.getLinks().values()) {
@@ -72,7 +85,10 @@ public class CTNetwork {
 	}
 
 	public void doSimStep(double time) {
-		draw(time);
+		if (CTRunner.DEBUG) {
+			draw(time);
+		}
+
 		while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
 			CTEvent e = events.poll();
 
@@ -115,10 +131,10 @@ public class CTNetwork {
 
 	public void run() {
 		double time = 0;
-		while (events.peek() != null) {
+		while (events.peek() != null && events.peek().getExecTime() < 3600) {
 
 			CTEvent e = events.poll();
-			if (e.getExecTime() > time + 1) {
+			if (CTRunner.DEBUG && e.getExecTime() > time + 1) {
 				time = e.getExecTime();
 				draw(time);
 

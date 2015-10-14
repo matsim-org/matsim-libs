@@ -46,6 +46,8 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class CTRunner implements IterationStartsListener {
 
+	public static boolean DEBUG = false;
+
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
 
@@ -57,6 +59,7 @@ public class CTRunner implements IterationStartsListener {
 		String qsimConf = args[0];
 
 		boolean vis = Boolean.parseBoolean(args[1]);
+		DEBUG = vis;
 
 		Config c = ConfigUtils.loadConfig(qsimConf);
 

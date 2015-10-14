@@ -23,11 +23,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.CTNetworkFactory;
 import playground.gregor.ctsim.simulation.CTWalkerDepatureHandler;
 
@@ -80,6 +82,11 @@ public class CTNetsimEngine implements MobsimEngine {
 	public void letPedArrive(CTPed veh) {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		PersonDriverAgentImpl driver = (PersonDriverAgentImpl) veh.getDriver();
+		internalInterface
+				.getMobsim()
+				.getEventsManager()
+				.processEvent(
+						new VehicleLeavesTrafficEvent(now, driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class), "walkct", 0));
 		internalInterface
 				.getMobsim()
 				.getEventsManager()
