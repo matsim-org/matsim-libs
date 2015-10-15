@@ -51,10 +51,10 @@ public class InputsForFDTestSetUp {
 
 	public static final int SUBDIVISION_FACTOR=1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
-	public static final double NO_OF_LANES = 1;//in m, length of one the triangle sides.
-	private  final int LINK_CAPACITY = 2700;//in PCU/h
+	public static final double NO_OF_LANES = 1;
+	private  final int LINK_CAPACITY = 2700; //in PCU/h
 	private  final double END_TIME = 24*3600;
-	private final  double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
+	private final  double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
 	private final  double STUCK_TIME = 10;
 	
 	private Scenario scenario;
@@ -75,13 +75,14 @@ public class InputsForFDTestSetUp {
 
 		config.qsim().setMainModes(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
 		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
-		config.qsim().setEndTime(END_TIME);//allows to set agents to abort after getting the wanted data.
+		config.qsim().setEndTime(END_TIME);
+		
 		if(GenerateFundamentalDiagramData.PASSING_ALLOWED){
 			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		}
+		
 		if(GenerateFundamentalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-			config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles );
 			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
 		}
 		
@@ -90,10 +91,13 @@ public class InputsForFDTestSetUp {
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 		}
+		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario = ScenarioUtils.createScenario(config);
+		
 		if(GenerateFundamentalDiagramData.writeInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
+	
 	/**
 	 * It will generate a triangular network. 
 	 * Each link is subdivided in number of sub division factor.
@@ -101,8 +105,6 @@ public class InputsForFDTestSetUp {
 	private void createTriangularNetwork(){
 		GenerateFundamentalDiagramData.log.info("==========Creating network=========");
 		Network network = scenario.getNetwork();
-		int capMax = 100*LINK_CAPACITY;
-
 		//nodes of the equilateral triangle base starting, left node at (0,0)
 		for (int i = 0; i<SUBDIVISION_FACTOR+1; i++){
 			double x=0, y=0;
@@ -144,6 +146,8 @@ public class InputsForFDTestSetUp {
 		Node endNode = scenario.getNetwork().getFactory().createNode(endNodeId, coord);
 		network.addNode(endNode);
 
+		Set<String> allowedModes = new HashSet<>(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
+		
 		// triangle links
 		for (int i = 0; i<3*SUBDIVISION_FACTOR; i++){
 			Id<Node> idFrom = Id.createNodeId(i);
@@ -158,31 +162,30 @@ public class InputsForFDTestSetUp {
 			Link link =scenario.getNetwork().getFactory().createLink(Id.createLinkId(i), from, to);
 			link.setCapacity(LINK_CAPACITY);
 			link.setFreespeed(FREESPEED/3.6);
-			link.setLength(calculateLength(from,to));
+			link.setLength(LINK_LENGTH);
 			link.setNumberOfLanes(NO_OF_LANES);
-			Set<String> allowedModes = new HashSet<>();
-			for(String mode : GenerateFundamentalDiagramData.TRAVELMODES){
-				allowedModes.add(mode);
-			}
-
 			link.setAllowedModes(allowedModes);
+			
 			network.addLink(link);
 		}
+		
 		//additional startLink and endLink for home and work activities
 		Id<Link> startLinkId = Id.createLinkId("home");
-		Link startLink = scenario.getNetwork().getFactory().createLink(startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
-		startLink.setCapacity(capMax);
+		Link startLink = scenario.getNetwork().getFactory().createLink( startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
+		startLink.setCapacity(100*LINK_CAPACITY);
 		startLink.setFreespeed(FREESPEED);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
+		startLink.setAllowedModes(allowedModes);
 		network.addLink(startLink);
 		
 		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
-		endLink.setCapacity(capMax);
+		endLink.setCapacity(100*LINK_CAPACITY);
 		endLink.setFreespeed(FREESPEED);
 		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
+		endLink.setAllowedModes(allowedModes);
 		network.addLink(endLink);
 
 		if(GenerateFundamentalDiagramData.writeInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
@@ -199,7 +202,6 @@ public class InputsForFDTestSetUp {
 			vehicle2TravelModesData.put(modeId, modeData);
 		}
 	}
-
 	
 	Scenario getScenario(){
 		return scenario;
@@ -207,13 +209,5 @@ public class InputsForFDTestSetUp {
 	
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
-	}
-
-	private double calculateLength(Node from, Node to){
-		double x1 = from.getCoord().getX();
-		double y1 = from.getCoord().getY();
-		double x2 = to.getCoord().getX();
-		double y2 = to.getCoord().getY();
-		return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 	}
 }
