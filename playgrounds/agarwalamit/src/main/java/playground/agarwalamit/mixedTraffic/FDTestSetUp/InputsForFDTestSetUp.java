@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,6 +84,7 @@ public class InputsForFDTestSetUp {
 		
 		if(GenerateFundamentalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
+			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
 			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
 		}
 		

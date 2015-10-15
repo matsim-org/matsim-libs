@@ -76,7 +76,7 @@ public class GenerateFundamentalDiagramData {
 	static String RUN_DIR ;
 	public boolean isPlottingDistribution = false;
 
-	static boolean writeInputFiles = true; // includes config,network and plans
+	static boolean writeInputFiles = true; // includes config, network 
 
 	static String[] TRAVELMODES;	
 	static Double[] MODAL_SPLIT; 
@@ -98,10 +98,6 @@ public class GenerateFundamentalDiagramData {
 	private Integer [] MAX_AGENT_DISTRIBUTION;
 	private Integer [] Step_Size;
 
-	/**
-	 * Overall density to vehicular flow and speed.
-	 */
-	private Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
 	public static String HOLE_SPEED = "15";
 
 	public static void main(String[] args) {
@@ -114,16 +110,16 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
-			String outFolder ="/carBikePassing/";
+			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312/";
+			String outFolder ="/singleModes/holes/motorbike/";
 			
 			args[0] = my_dir + outFolder ;
-			args[1] = "car,bike"; // travel (main) modes
-			args[2] = "1.0,1.0"; // modal split in pcu
-			args[3] = "true"; // isPassingAllowed
+			args[1] = "motorbike"; // travel (main) modes
+			args[2] = "1.0"; // modal split in pcu
+			args[3] = "false"; // isPassingAllowed
 			args[4] = "false"; // isSeepageAllowed
-			args[5] = "false"; // isUsingHoles
-			args[6] = "10"; // reduce number of data points by this factor
+			args[5] = "true"; // isUsingHoles
+			args[6] = "1"; // reduce number of data points by this factor
 			args[7] = "false"; // is plotting modal split distribution
 		}
 		
@@ -218,10 +214,6 @@ public class GenerateFundamentalDiagramData {
 
 	public void setIsPlottingDistribution(boolean isPlottingDistribution) {
 		this.isPlottingDistribution = isPlottingDistribution;
-	}
-
-	public Map<Double, Map<String, Tuple<Double, Double>>> getOutData() {
-		return outData;
 	}
 
 	private void parametricRunAccordingToGivenModalSplit(){
@@ -460,7 +452,6 @@ public class GenerateFundamentalDiagramData {
 					new Tuple<Double, Double>(this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow(),
 							this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
 			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
-			outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 		}
 
 		if(writeInputFiles) eventWriter.closeFile();
