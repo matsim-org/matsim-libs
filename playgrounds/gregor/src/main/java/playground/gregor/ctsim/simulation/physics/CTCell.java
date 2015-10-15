@@ -26,15 +26,13 @@ public abstract class CTCell {
 	}
 
 	protected final CTNetwork net;
-	protected final EventsManager em;
+	//	protected final EventsManager em;
 	protected final double width;
 	private final List<CTCellFace> faces = new ArrayList<>();
 	//	private final HashSet<CTPed> peds = new HashSet<>();
 //	private final Map<Double,LinkedList<CTPed>> pop = new ArrayMap<>();//TODO is this faster than HashMap?
 	private final List<CTCell> neighbors = new ArrayList<>();
 	private final CTNetworkEntity parent;
-	protected double alpha; //area
-	protected double rho; //current density
 	protected CTPed next = null;
 	protected double nextCellJumpTime;
 	protected CTEvent currentEvent = null;
@@ -42,6 +40,8 @@ public abstract class CTCell {
 	int r = 0;
 	int g = 0;
 	int b = 192;
+	private double alpha; //area
+	private double rho; //current density
 	private double x;
 	private double y;
 	private int N; //max number of peds
@@ -52,7 +52,6 @@ public abstract class CTCell {
 		this.y = y;
 		this.net = net;
 		this.parent = parent;
-		this.em = net.getEventsManager();
 		this.width = width;
 //		pop.put(Math.PI/6., new LinkedList<CTPed>());
 //		pop.put(Math.PI/2., new LinkedList<CTPed>());
@@ -65,11 +64,15 @@ public abstract class CTCell {
 
 	public void addFace(CTCellFace face) {
 		faces.add(face);
-		neighbors.add(face.nb);
+		getNeighbors().add(face.nb);
+	}
+
+	public List<CTCell> getNeighbors() {
+		return neighbors;
 	}
 
 	public void addNeighbor(CTCell nb) {
-		this.neighbors.add(nb);
+		this.getNeighbors().add(nb);
 	}
 
 	public void debug(EventsManager em) {
@@ -101,18 +104,18 @@ public abstract class CTCell {
 		}
 	}
 
-	public double getIntendedNextCellJumpTime() {
-		return this.nextCellJumpTime;
-	}
-
 	public void setArea(double a) {
 		this.alpha = a;
-		this.N = (int) (RHO_M * this.alpha + 0.5);
+		this.N = (int) (RHO_M * this.getAlpha() + 0.5);
 	}
 
 //	protected double getFHHi(CTPed ped, CTCellFace face) {
 //		return 1 + Math.cos(ped.getDesiredDir() - face.h_i);
 //	}
+
+	public double getAlpha() {
+		return this.alpha;
+	}
 
 	public double getX() {
 		return this.x;
@@ -130,10 +133,6 @@ public abstract class CTCell {
 		return this.parent;
 	}
 
-	private double getRho() { //current density
-		return this.rho;
-	}
-
 	public void jumpAndUpdateNeighbors(double now) {
 
 		CTCell nb = next.getNextCellAndJump(now);
@@ -142,10 +141,10 @@ public abstract class CTCell {
 
 
 		Set<CTCell> affectedCells = new HashSet<>();
-		for (CTCell ctCell : this.neighbors) {
+		for (CTCell ctCell : this.getNeighbors()) {
 			affectedCells.add(ctCell);
 		}
-		for (CTCell ctCell : nb.neighbors) {
+		for (CTCell ctCell : nb.getNeighbors()) {
 			affectedCells.add(ctCell);
 		}
 		for (CTCell cell : affectedCells) {
@@ -182,11 +181,19 @@ public abstract class CTCell {
 	}
 
 	private double getDelta() { //demand function
-		return Math.min(Q, V_0 * this.rho);
+		return Math.min(Q, V_0 * this.getRho());
+	}
+
+	public double getRho() { //current density
+		return this.rho;
+	}
+
+	public void setRho(double rho) {
+		this.rho = rho;
 	}
 
 	private double getSigma() { //supply function
-		return Math.min(Q, GAMMA * (RHO_M - this.rho));
+		return Math.min(Q, GAMMA * (RHO_M - this.getRho()));
 	}
 
 	public List<CTCellFace> getFaces() {
@@ -196,7 +203,6 @@ public abstract class CTCell {
 	abstract void jumpOffPed(CTPed ctPed, double time);
 
 	public abstract boolean jumpOnPed(CTPed ctPed, double time);
-
 
 	abstract HashSet<CTPed> getPeds();
 }
