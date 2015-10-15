@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package playground.ivt.analysis;
+package playground.ivt.analysis.activityhistogram;
 
 import com.google.inject.Singleton;
 import org.jfree.chart.ChartFactory;
@@ -32,10 +32,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.analysis.LegHistogram;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.media.jai.Histogram;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;

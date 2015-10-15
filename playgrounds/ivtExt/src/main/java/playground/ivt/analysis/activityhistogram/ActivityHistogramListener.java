@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ivt.analysis;
+package playground.ivt.analysis.activityhistogram;
 
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.analysis.LegHistogramChart;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -32,7 +31,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
 import javax.inject.Inject;
-import javax.media.jai.Histogram;
 
 /**
  * Integrates the {@link LegHistogram} into the

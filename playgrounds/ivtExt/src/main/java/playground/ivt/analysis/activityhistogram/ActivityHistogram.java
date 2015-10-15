@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ivt.analysis;
+package playground.ivt.analysis.activityhistogram;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.events.*;

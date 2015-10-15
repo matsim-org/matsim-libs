@@ -93,7 +93,6 @@ public class RunSocialScenarioWithEquity {
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
 						install(new IvtAnalysisModule() );
-						install(new TripStatisticsModule() );
 					}
 				});
 		controller.addOverridingModule(
