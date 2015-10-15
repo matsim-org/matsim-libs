@@ -121,7 +121,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 						//Checking global stability
 						if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
 							//log.info("Global permanent regime attained");
-							GenerateFundamentalDiagramData.log.info("========== Global permanent regime is attained");
+							GenerateFundamentalDiagramData.LOG.info("========== Global permanent regime is attained");
 							for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 								this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).saveDynamicVariables();
 							}

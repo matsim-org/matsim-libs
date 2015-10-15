@@ -67,19 +67,21 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 public class GenerateFundamentalDiagramData {
 
-	static final Logger log = Logger.getLogger(GenerateFundamentalDiagramData.class);
+	static final Logger LOG = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
+	static String RUN_DIR ;
+	static boolean DUMP_INPUT_FILES = true; // includes config, network
+	
+	static String[] TRAVELMODES;	
+	
 	static boolean PASSING_ALLOWED = false;
 	static boolean SEEPAGE_ALLOWED = false;
-	private final boolean LIVE_OTFVis = false;
 	static boolean WITH_HOLES = false;
-	static String RUN_DIR ;
-	public boolean isPlottingDistribution = false;
+	static String HOLE_SPEED = "15";
 
-	static boolean writeInputFiles = true; // includes config, network 
-
-	static String[] TRAVELMODES;	
-	static Double[] MODAL_SPLIT; 
+	private Double[] modalSplit;
+	private final boolean liveOTFVis = false;
+	private boolean isPlottingDistribution = false;
 
 	private int reduceDataPointsByFactor = 1;
 
@@ -94,11 +96,9 @@ public class GenerateFundamentalDiagramData {
 	static PassingEventsUpdator passingEventsUpdator;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 
-	private Integer[] STARTING_POINT;
-	private Integer [] MAX_AGENT_DISTRIBUTION;
-	private Integer [] Step_Size;
-
-	public static String HOLE_SPEED = "15";
+	private Integer[] startingPoint;
+	private Integer [] maxAgentDistribution;
+	private Integer [] stepSize;
 
 	public static void main(String[] args) {
 		
@@ -139,19 +139,19 @@ public class GenerateFundamentalDiagramData {
 	}
 
 	private void consistencyCheckAndInitialize(){
-		if(writeInputFiles) {
+		if(DUMP_INPUT_FILES) {
 			createLogFile();
 		}
 
-		if (TRAVELMODES.length != MODAL_SPLIT.length){
+		if (TRAVELMODES.length != modalSplit.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
-		if(PASSING_ALLOWED) log.info("=======Passing is allowed.========");
-		if(SEEPAGE_ALLOWED) log.info("=======Seepage is allowed.========");
-		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
+		if(PASSING_ALLOWED) LOG.info("=======Passing is allowed.========");
+		if(SEEPAGE_ALLOWED) LOG.info("=======Seepage is allowed.========");
+		if(WITH_HOLES) LOG.info("======= Using double ended queue.=======");
 
-		if(writeInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
+		if(DUMP_INPUT_FILES && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
 		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
 
 		flowUnstableWarnCount = new int [TRAVELMODES.length];
@@ -190,7 +190,7 @@ public class GenerateFundamentalDiagramData {
 	}
 
 	public void setWriteInputFiles(boolean writeInputFiles) {
-		GenerateFundamentalDiagramData.writeInputFiles = writeInputFiles;
+		GenerateFundamentalDiagramData.DUMP_INPUT_FILES = writeInputFiles;
 	}
 
 	public void setTravelModes(String[] travelModes) {
@@ -198,9 +198,9 @@ public class GenerateFundamentalDiagramData {
 	}
 
 	public void setModalSplit(String [] modalSplit) {
-		MODAL_SPLIT = new Double [modalSplit.length];
+		this.modalSplit = new Double [modalSplit.length];
 		for (int ii = 0; ii <modalSplit.length; ii ++){
-			MODAL_SPLIT [ii] = Double.valueOf(modalSplit[ii]);
+			this.modalSplit [ii] = Double.valueOf(modalSplit[ii]);
 		}
 	}
 
@@ -226,7 +226,7 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		List<Integer> minSteps = new ArrayList<Integer>();
-		for (double modalSplit : Arrays.asList(MODAL_SPLIT)){
+		for (double modalSplit : Arrays.asList(modalSplit)){
 			minSteps.add(new Integer((int) (modalSplit*100)));
 		}
 
@@ -253,10 +253,10 @@ public class GenerateFundamentalDiagramData {
 
 		// for a faster simulation or to have less points on FD, minSteps is increased
 		if(reduceDataPointsByFactor!=1) {
-			log.info("===============");
-			log.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
+			LOG.info("===============");
+			LOG.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
 					"Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
-			log.info("===============");
+			LOG.info("===============");
 			for(int index=0;index<minSteps.size();index++){
 				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);
 			}
@@ -276,37 +276,37 @@ public class GenerateFundamentalDiagramData {
 			for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 				pointToRun.add(minSteps.get(i)*m);
 			}
-			log.info("Number of Agents - \t"+pointToRun);
+			LOG.info("Number of Agents - \t"+pointToRun);
 			pointsToRun.add(pointToRun);
 		}
 
 		//Effective iteration over all points 
 		for ( int i=0; i<pointsToRun.size(); i++){
 			List<Integer> pointToRun = pointsToRun.get(i);
-			log.info("Going into run where number of Agents are - \t"+pointToRun);
+			LOG.info("Going into run where number of Agents are - \t"+pointToRun);
 			this.singleRun(pointToRun);
 		}
 	}
 
 	private void parametricRunAccordingToDistribution(){
 
-		this.STARTING_POINT = new Integer [TRAVELMODES.length];
-		this.Step_Size = new Integer [TRAVELMODES.length];
+		this.startingPoint = new Integer [TRAVELMODES.length];
+		this.stepSize = new Integer [TRAVELMODES.length];
 
 		for(int ii=0;ii<TRAVELMODES.length;ii++){
-			this.STARTING_POINT [ii] =0;
-			this.Step_Size [ii] = this.reduceDataPointsByFactor*1;
+			this.startingPoint [ii] =0;
+			this.stepSize [ii] = this.reduceDataPointsByFactor*1;
 		}
-		this.STARTING_POINT = new Integer[] {1,1};
+		this.startingPoint = new Integer[] {1,1};
 
-		MAX_AGENT_DISTRIBUTION = new Integer [TRAVELMODES.length];
+		maxAgentDistribution = new Integer [TRAVELMODES.length];
 		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
-		for(int ii=0;ii<MAX_AGENT_DISTRIBUTION.length;ii++){
+		for(int ii=0;ii<maxAgentDistribution.length;ii++){
 			double pcu = this.mode2FlowData.get(Id.create(TRAVELMODES[ii],VehicleType.class)).getVehicleType().getPcuEquivalents();
 			int maxNumberOfVehicle = (int) Math.floor(networkDensity/pcu)+1;
-			MAX_AGENT_DISTRIBUTION[ii] = maxNumberOfVehicle;
+			maxAgentDistribution[ii] = maxNumberOfVehicle;
 		}
 
 		List<List<Integer>> pointsToRun = this.createPointsToRun();
@@ -331,23 +331,23 @@ public class GenerateFundamentalDiagramData {
 		int numberOfPoints = 1; 
 
 		for(int jj=0;jj<TRAVELMODES.length;jj++){
-			numberOfPoints *= (int) Math.floor((MAX_AGENT_DISTRIBUTION[jj]-STARTING_POINT[jj])/Step_Size[jj])+1;
+			numberOfPoints *= (int) Math.floor((maxAgentDistribution[jj]-startingPoint[jj])/stepSize[jj])+1;
 		}
 
-		if(numberOfPoints > 1000) log.warn("Total number of points to run is "+numberOfPoints+". This may take long time. "
+		if(numberOfPoints > 1000) LOG.warn("Total number of points to run is "+numberOfPoints+". This may take long time. "
 				+ "For lesser time to get the data reduce data points by some factor.");
 
 		//Actually going through the n-dimensional grid
-		BinaryAdditionModule iterationModule = new BinaryAdditionModule(Arrays.asList(MAX_AGENT_DISTRIBUTION), Arrays.asList(Step_Size), STARTING_POINT);
+		BinaryAdditionModule iterationModule = new BinaryAdditionModule(Arrays.asList(maxAgentDistribution), Arrays.asList(stepSize), startingPoint);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
 		for (int i=0; i<numberOfPoints; i++){
-			Integer[] newPoint = new Integer[MAX_AGENT_DISTRIBUTION.length];
+			Integer[] newPoint = new Integer[maxAgentDistribution.length];
 			for (int j=0; j<newPoint.length; j++){
 				newPoint[j] = (iterationModule.getPoint())[j];
 			}
 			pointsToRun.add(Arrays.asList(newPoint));
 			String point = Arraytostring(iterationModule.getPoint());
-			log.info("Just added point "+point+" to the collection.");
+			LOG.info("Just added point "+point+" to the collection.");
 			if (i<numberOfPoints-1){
 				iterationModule.add1();
 			}
@@ -378,7 +378,7 @@ public class GenerateFundamentalDiagramData {
 		events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = new EventWriterXML(RUN_DIR+"/events.xml");
-		if(writeInputFiles){
+		if(DUMP_INPUT_FILES){
 			events.addHandler(eventWriter);
 		}
 
@@ -394,7 +394,7 @@ public class GenerateFundamentalDiagramData {
 				stableState = false;
 				int existingCount = flowUnstableWarnCount[index]; existingCount++;
 				flowUnstableWarnCount[index] = existingCount;
-				log.warn("Flow stability is not reached for travel mode "+veh.toString()
+				LOG.warn("Flow stability is not reached for travel mode "+veh.toString()
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
 				//				log.warn("Increasing simulation time could be a possible solution to avoid it.");
@@ -404,7 +404,7 @@ public class GenerateFundamentalDiagramData {
 				stableState = false;
 				int existingCount = speedUnstableWarnCount[index]; existingCount++;
 				speedUnstableWarnCount[index] = existingCount;
-				log.warn("Speed stability is not reached for travel mode "+veh.toString()
+				LOG.warn("Speed stability is not reached for travel mode "+veh.toString()
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + speedUnstableWarnCount[index]+ "th warning.");
 			}
@@ -454,7 +454,7 @@ public class GenerateFundamentalDiagramData {
 			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
 		}
 
-		if(writeInputFiles) eventWriter.closeFile();
+		if(DUMP_INPUT_FILES) eventWriter.closeFile();
 	}
 
 	static final Map<Id<Person>, String> person2Mode = new HashMap<Id<Person>, String>();
@@ -470,9 +470,9 @@ public class GenerateFundamentalDiagramData {
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-		log.info("=======================");
-		log.info("Mobsim agents' are directly added to AgentSource.");
-		log.info("=======================");
+		LOG.info("=======================");
+		LOG.info("Mobsim agents' are directly added to AgentSource.");
+		LOG.info("=======================");
 
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
@@ -506,7 +506,7 @@ public class GenerateFundamentalDiagramData {
 
 		qSim.addAgentSource(agentSource);
 
-		if ( LIVE_OTFVis ) {
+		if ( liveOTFVis ) {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
@@ -603,7 +603,7 @@ public class GenerateFundamentalDiagramData {
 		} catch (IOException e1) {
 			throw new RuntimeException("File not found.");
 		}
-		log.addAppender(appender);
+		LOG.addAppender(appender);
 	}
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {

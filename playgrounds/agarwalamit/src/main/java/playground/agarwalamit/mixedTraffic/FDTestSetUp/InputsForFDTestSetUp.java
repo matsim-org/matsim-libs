@@ -71,7 +71,7 @@ public class InputsForFDTestSetUp {
 	}
 
 	private void setUpConfig(){
-		GenerateFundamentalDiagramData.log.info("==========Creating config ============");
+		GenerateFundamentalDiagramData.LOG.info("==========Creating config ============");
 		Config config = ConfigUtils.createConfig();
 
 		config.qsim().setMainModes(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
@@ -97,7 +97,7 @@ public class InputsForFDTestSetUp {
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario = ScenarioUtils.createScenario(config);
 		
-		if(GenerateFundamentalDiagramData.writeInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
+		if(GenerateFundamentalDiagramData.DUMP_INPUT_FILES) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
 	
 	/**
@@ -105,7 +105,7 @@ public class InputsForFDTestSetUp {
 	 * Each link is subdivided in number of sub division factor.
 	 */
 	private void createTriangularNetwork(){
-		GenerateFundamentalDiagramData.log.info("==========Creating network=========");
+		GenerateFundamentalDiagramData.LOG.info("==========Creating network=========");
 		Network network = scenario.getNetwork();
 		//nodes of the equilateral triangle base starting, left node at (0,0)
 		for (int i = 0; i<SUBDIVISION_FACTOR+1; i++){
@@ -190,7 +190,7 @@ public class InputsForFDTestSetUp {
 		endLink.setAllowedModes(allowedModes);
 		network.addLink(endLink);
 
-		if(GenerateFundamentalDiagramData.writeInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
+		if(GenerateFundamentalDiagramData.DUMP_INPUT_FILES) new NetworkWriter(network).write(outputFolder+"/network.xml");
 	}
 
 	private void fillTravelModeData(){
