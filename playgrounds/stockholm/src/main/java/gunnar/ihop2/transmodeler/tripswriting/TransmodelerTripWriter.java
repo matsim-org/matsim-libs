@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -71,6 +72,10 @@ public class TransmodelerTripWriter {
 
 	public void writeTrips(final String pathFileName, final String tripFileName)
 			throws FileNotFoundException {
+
+		Logger.getLogger(this.getClass())
+				.warn("Recently added directional information (\"-\") to "
+						+ "origin and destination link has not been tested within Regent.");
 
 		final Map<List<Id<Link>>, Integer> linkIds2pathId = new LinkedHashMap<List<Id<Link>>, Integer>();
 		int tripCnt = 0;
@@ -175,16 +180,32 @@ public class TransmodelerTripWriter {
 								tripWriter.setValue(OriType, Node);
 								tripWriter.setValue(DesType, Node);
 								tripWriter.setValue(Class, PC1);
-								tripWriter.setValue(OriLink,
-										this.linkAttributes.getAttribute(
-												linkIds.get(0).toString(),
-												TMPATHID_ATTR));
-								tripWriter.setValue(Path, pathId);
-								tripWriter.setValue(EndLink,
-										this.linkAttributes.getAttribute(
-												linkIds.get(linkIds.size() - 1)
+								tripWriter.setValue(
+										OriLink,
+										(String) this.linkAttributes
+												.getAttribute(linkIds.get(0)
 														.toString(),
-												TMPATHID_ATTR));
+														TMLINKDIRPREFIX_ATTR)
+												+ (String) this.linkAttributes
+														.getAttribute(linkIds
+																.get(0)
+																.toString(),
+																TMPATHID_ATTR));
+								tripWriter.setValue(Path, pathId);
+								tripWriter
+										.setValue(
+												EndLink,
+												(String) this.linkAttributes.getAttribute(
+														linkIds.get(
+																linkIds.size() - 1)
+																.toString(),
+														TMLINKDIRPREFIX_ATTR)
+														+ (String) this.linkAttributes
+																.getAttribute(
+																		linkIds.get(
+																				linkIds.size() - 1)
+																				.toString(),
+																		TMPATHID_ATTR));
 								tripWriter.setValue(DepTime,
 										leg.getDepartureTime());
 								tripWriter.writeValues();
@@ -207,12 +228,12 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data/run/network.xml";
-		final String plansFileName = "./data/run/output/ITERS/it.0/0.plans.xml.gz";
-		final String linkAttributesFileName = "./data/run/linkAttributes.xml";
+		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+		final String plansFileName = "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
+		final String linkAttributesFileName = "./data_ZZZ/run/link-attributes.xml";
 
-		final String pathFileName = "./data/run/paths.csv";
-		final String tripFileName = "./data/run/trips.csv";
+		final String pathFileName = "./data_ZZZ/run/paths.csv";
+		final String tripFileName = "./data_ZZZ/run/trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
