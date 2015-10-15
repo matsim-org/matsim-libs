@@ -108,7 +108,7 @@ public class GenerateFundamentalDiagramData {
 		
 		if( ! isRunningOnCluster ) {
 			
-			args = new String [8];
+			args = new String [9];
 			
 			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312/";
 			String outFolder ="/singleModes/holes/motorbike/";
@@ -121,6 +121,9 @@ public class GenerateFundamentalDiagramData {
 			args[5] = "true"; // isUsingHoles
 			args[6] = "1"; // reduce number of data points by this factor
 			args[7] = "false"; // is plotting modal split distribution
+			
+			// will remove them eventually
+			args [8] = "1";// number of lanes
 		}
 		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
@@ -134,7 +137,10 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
 		
-		generateFDData.setWriteInputFiles(true); 
+		generateFDData.setWriteInputFiles(true);
+		
+		InputsForFDTestSetUp.NO_OF_LANES = Double.valueOf( args[8] );
+		
 		generateFDData.run();
 	}
 
