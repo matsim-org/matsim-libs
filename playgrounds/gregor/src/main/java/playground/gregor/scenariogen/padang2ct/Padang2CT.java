@@ -34,6 +34,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.gregor.ctsim.run.CTRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,8 @@ public class Padang2CT {
 	private static final int NR_AGENTS = 1000;
 
 	public static void main(String[] args) throws IOException {
+
+
 		FileUtils.deleteDirectory(new File(OUT_DIR));
 		String inputDir = OUT_DIR + "/input";
 		String outputDir = OUT_DIR + "/output";
@@ -118,10 +121,12 @@ public class Padang2CT {
 		loadPopulation(sc);
 
 		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork(), 1).write(c.plans()
+		new PopulationWriter(pop, sc.getNetwork(), 0.01).write(c.plans()
 				.getInputFile());
 
-//		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
+		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
+
+
 
 	}
 

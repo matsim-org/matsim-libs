@@ -29,7 +29,7 @@ public class Debugger2 {
 
 	public static void main(String[] args) {
 
-		CTRunner.DEBUG = false;
+		CTRunner.DEBUG = true;
 
 		Config c = ConfigUtils.createConfig();
 

@@ -42,11 +42,11 @@ public class CTLink implements CTNetworkEntity {
 		this.usLink = rev;
 		this.em = em;
 		this.network = ctNetwork;
-		init();
+
 	}
 
-
-	private void init() {
+	@Override
+	public void init() {
 
 		//this requires a planar coordinate system
 		double dx = (this.dsLink.getToNode().getCoord().getX() - this.dsLink.getFromNode().getCoord().getX()); // this.dsLink.getLength();
