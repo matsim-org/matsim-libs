@@ -79,7 +79,7 @@ public class GenerateFundamentalDiagramData {
 	static boolean WITH_HOLES = false;
 	static String HOLE_SPEED = "15";
 
-	private Double[] modalSplit;
+	private Double[] modalSplitInPCU;
 	private final boolean liveOTFVis = false;
 	private boolean isPlottingDistribution = false;
 
@@ -143,7 +143,7 @@ public class GenerateFundamentalDiagramData {
 			createLogFile();
 		}
 
-		if (TRAVELMODES.length != modalSplit.length){
+		if (TRAVELMODES.length != modalSplitInPCU.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
@@ -198,9 +198,9 @@ public class GenerateFundamentalDiagramData {
 	}
 
 	public void setModalSplit(String [] modalSplit) {
-		this.modalSplit = new Double [modalSplit.length];
+		this.modalSplitInPCU = new Double [modalSplit.length];
 		for (int ii = 0; ii <modalSplit.length; ii ++){
-			this.modalSplit [ii] = Double.valueOf(modalSplit[ii]);
+			this.modalSplitInPCU [ii] = Double.valueOf(modalSplit[ii]);
 		}
 	}
 
@@ -226,7 +226,7 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		List<Integer> minSteps = new ArrayList<Integer>();
-		for (double modalSplit : Arrays.asList(modalSplit)){
+		for (double modalSplit : Arrays.asList(modalSplitInPCU)){
 			minSteps.add(new Integer((int) (modalSplit*100)));
 		}
 
