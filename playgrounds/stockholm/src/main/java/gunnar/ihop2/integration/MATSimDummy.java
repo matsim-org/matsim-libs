@@ -2,10 +2,15 @@ package gunnar.ihop2.integration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -17,6 +22,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import cadyts.utilities.misc.StreamFlushHandler;
+import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
 import gunnar.ihop2.regent.costwriting.TravelTimesWriter;
@@ -54,12 +61,14 @@ public class MATSimDummy {
 	public static final String ZONE_ELEMENT = "zone";
 
 	private static void fatal(final String msg) {
-		System.out.println("FATAL ERROR: " + msg);
+		Logger.getLogger(MATSimDummy.class.getName()).severe(
+				"FATAL ERROR: " + msg);
 		System.exit(-1);
 	}
 
 	private static void fatal(final Exception e) {
-		System.out.println("FATAL ERROR. Stack trace:");
+		Logger.getLogger(MATSimDummy.class.getName()).severe(
+				"FATAL ERROR: " + e);
 		e.printStackTrace();
 		System.exit(-1);
 	}
@@ -67,14 +76,16 @@ public class MATSimDummy {
 	private static void checkNonNull(final String fileName,
 			final String definition) {
 		if (fileName == null) {
-			fatal(definition + " is null.");
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					definition + " is null.");
 		}
 	}
 
 	private static void checkFileExistence(final String fileName,
 			final String definition) {
 		if (!(new File(fileName)).exists()) {
-			fatal(definition + " \"" + fileName + "\" could not be found.");
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					definition + " \"" + fileName + "\" could not be found.");
 		}
 	}
 
@@ -84,10 +95,42 @@ public class MATSimDummy {
 		System.out.println();
 
 		/*
+		 * -------------------- INITIALIZE LOGGING --------------------
+		 */
+
+		final Logger logger = Logger.getLogger("");
+		logger.setUseParentHandlers(false);
+		for (Handler h : logger.getHandlers()) {
+			h.flush();
+			if (h instanceof FileHandler) { // don't close the console stream
+				h.close();
+			}
+			logger.removeHandler(h);
+		}
+
+		final StreamFlushHandler stdOutHandler = new StreamFlushHandler(
+				System.out, new SimpleLogFormatter("IHOP2 "));
+		logger.addHandler(stdOutHandler);
+
+		try {
+			final FileHandler fileHandler = new FileHandler("./log.txt", false);
+			fileHandler.setFormatter(new SimpleLogFormatter(null));
+			logger.addHandler(fileHandler);
+		} catch (IOException e) {
+			logger.warning("unable to create integration log file");
+		}
+
+		logger.setLevel(Level.INFO);
+		for (Handler h : logger.getHandlers()) {
+			h.setLevel(Level.INFO);
+		}
+
+		/*
 		 * -------------------- CONFIGURE --------------------
 		 */
 
-		System.out.println("Checking program parameters ... ");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Checking program parameters ... ");
 
 		final String configFileName = args[0];
 		checkNonNull(configFileName, "config");
@@ -174,8 +217,32 @@ public class MATSimDummy {
 		}
 		Collections.sort(zoneIDs, new StringAsIntegerComparator());
 
-		System.out.println("... program parameters appear OK so far.");
-		System.out.println();
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"... program parameters appear OK so far.");
+
+		/*
+		 * -------------------- PERMANENT CONFIGURATIONS --------------------
+		 */
+
+		// TODO CONTINUE HERE
+
+//		Logger.getLogger(MATSimDummy.class.getName()).info(
+//				"Creating zonal system ...");
+//
+//		final ZonalSystem zonalSystem;
+//		{
+//			final org.matsim.core.config.Config matsimConfig = ConfigUtils
+//					.loadConfig(matsimConfigFileName);
+//			final Scenario scenario = ScenarioUtils.loadScenario(matsimConfig);
+//			zonalSystem = new ZonalSystem(zoneShapeFileName,
+//					StockholmTransformationFactory.WGS84_EPSG3857);
+//			zonalSystem.addNetwork(scenario.getNetwork(),
+//					StockholmTransformationFactory.WGS84_SWEREF99);
+//			zonalSystem.addBuildings(buildingShapeFileName);
+//		}
+//
+//		Logger.getLogger(MATSimDummy.class.getName()).info(
+//				"... succeeded to create zonal system.");
 
 		/*
 		 * ==================== OUTER ITERATIONS ====================
@@ -183,17 +250,17 @@ public class MATSimDummy {
 
 		for (int iteration = 1; iteration <= maxIterations; iteration++) {
 
-			System.out.println();
-			System.out.println("Starting iteration " + iteration
-					+ " ----------");
-			System.out.println();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"---------- STARTING ITERATION " + iteration
+							+ " ----------");
 
 			/*
 			 * -------------------- LOAD CONFIGURATION --------------------
 			 */
 
-			System.out.println("Loading matsim configuration file: "
-					+ matsimConfigFileName + " ... ");
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Loading matsim configuration file: "
+							+ matsimConfigFileName + " ... ");
 			final org.matsim.core.config.Config matsimConfig = ConfigUtils
 					.loadConfig(matsimConfigFileName);
 			final String matsimNetworkFileName = matsimConfig.getModule(
@@ -204,6 +271,9 @@ public class MATSimDummy {
 			/*
 			 * -------------------- CREATE POPULATION --------------------
 			 */
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Creating MATSim population ... ");
+
 			final PopulationCreator populationCreator = new PopulationCreator(
 					matsimNetworkFileName, zoneShapeFileName,
 					StockholmTransformationFactory.WGS84_EPSG3857,
@@ -226,15 +296,15 @@ public class MATSimDummy {
 				throw new RuntimeException(e1);
 			}
 
-			System.out.println("... population data appears OK so far.");
-			System.out.println();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"... succeeded to create population.");
 
 			/*
 			 * -------------------- RUN MATSIM --------------------
 			 */
 
-			System.out.println("Running MATSim ...");
-			System.out.println();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Running MATSim ...");
 
 			// TODO erase output file
 
@@ -249,15 +319,15 @@ public class MATSimDummy {
 							* matsimPopulationSubSample));
 			controler.run();
 
-			System.out.println("... MATSim run completed.");
-			System.out.println();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"... MATSim run completed.");
 
 			/*
 			 * -------------------- WRITE TRAVELTIME MATRIX --------------------
 			 */
 
-			System.out
-					.println("Creating travel time matrix data structures ...");
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Creating travel time matrix data structures ...");
 
 			// TODO take this out of the controler!?
 			final Scenario scenario = ScenarioUtils.loadScenario(matsimConfig);
@@ -287,18 +357,16 @@ public class MATSimDummy {
 			ttWriter.run(eventsFileName, traveltimesFileName, relevantLinkIDs,
 					zoneIDs, zonalSystem);
 
-			System.out
-					.println("... succeeded to write traveltime matrices to file: "
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"... succeeded to write traveltime matrices to file: "
 							+ traveltimesFileName);
-
-			System.out.println("STOP");
-			System.exit(0);
 
 			/*
 			 * -------------------- RUN REGENT --------------------
 			 */
 
-			System.out.println("Running Regent: " + regentCommand + " ...");
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Running Regent: " + regentCommand + " ...");
 
 			final Process proc;
 			final int exitVal;
@@ -313,11 +381,12 @@ public class MATSimDummy {
 				fatal(e);
 			}
 
-			System.out.println("... succeeded to run Regent");
-			System.out.println();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"... succeeded to run Regent");
 
 		}
 
-		System.out.println("DONE");
+		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
+		System.out.println("... DONE");
 	}
 }
