@@ -52,8 +52,8 @@ public class InputsForFDTestSetUp {
 
 	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
-	public static double NO_OF_LANES = 1;
-	private final int LINK_CAPACITY = 2700; //in PCU/h
+	public static final double NO_OF_LANES = 1;
+	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
 	private final double STUCK_TIME = 10;

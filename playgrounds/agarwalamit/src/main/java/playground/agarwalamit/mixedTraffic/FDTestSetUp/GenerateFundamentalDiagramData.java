@@ -108,22 +108,19 @@ public class GenerateFundamentalDiagramData {
 		
 		if( ! isRunningOnCluster ) {
 			
-			args = new String [9];
+			args = new String [8];
 			
 			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312/";
-			String outFolder ="/singleModes/holes/motorbike/";
+			String outFolder ="/singleModes/holes/2lanes/car/";
 			
 			args[0] = my_dir + outFolder ;
-			args[1] = "motorbike"; // travel (main) modes
+			args[1] = "car"; // travel (main) modes
 			args[2] = "1.0"; // modal split in pcu
 			args[3] = "false"; // isPassingAllowed
 			args[4] = "false"; // isSeepageAllowed
 			args[5] = "true"; // isUsingHoles
 			args[6] = "1"; // reduce number of data points by this factor
 			args[7] = "false"; // is plotting modal split distribution
-			
-			// will remove them eventually
-			args [8] = "1";// number of lanes
 		}
 		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
@@ -136,10 +133,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setUseHoles(Boolean.valueOf(args[5]));
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
-		
 		generateFDData.setWriteInputFiles(true);
-		
-		InputsForFDTestSetUp.NO_OF_LANES = Double.valueOf( args[8] );
 		
 		generateFDData.run();
 	}
