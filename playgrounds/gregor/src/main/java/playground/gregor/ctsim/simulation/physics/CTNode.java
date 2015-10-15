@@ -9,10 +9,10 @@ public class CTNode implements CTNetworkEntity {
 	private final Node n;
 	private Id<Node> id;
 
-	public CTNode(Id<Node> id, Node n, CTNetwork net) {
+	public CTNode(Id<Node> id, Node n, CTNetwork net, double width) {
 		this.id = id;
 		this.n = n;
-		this.cell = new CTNodeCell(n.getCoord().getX(), n.getCoord().getY(), net, this);
+		this.cell = new CTNodeCell(n.getCoord().getX(), n.getCoord().getY(), net, this, width);
 		this.cell.r = 192;
 	}
 
@@ -20,6 +20,7 @@ public class CTNode implements CTNetworkEntity {
 		return this.cell;
 	}
 
+	@Override
 	public void init() {
 		cell.init();
 	}

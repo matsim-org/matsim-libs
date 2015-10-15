@@ -1,49 +1,65 @@
 package playground.gregor.ctsim.simulation.physics;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.MatsimRandom;
+import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.CTEvent;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class CTCell {
 
-	private static final double RHO_M = 6.6687;
+	protected static final Logger log = Logger.getLogger(CTCell.class);
+
+	private static final double RHO_M = 6.667;
 	private static final double V_0 = 1.5;
 	private static final double GAMMA = 0.3;
 	private static double Q;
 
 	static {
-		Q = (V_0 * RHO_M) / ((V_0 / GAMMA) + 1);
+		Q = (V_0 * RHO_M) / (V_0 / GAMMA + 1);
 	}
 
 	protected final CTNetwork net;
 	protected final EventsManager em;
+	protected final double width;
 	private final List<CTCellFace> faces = new ArrayList<>();
+	//	private final HashSet<CTPed> peds = new HashSet<>();
+//	private final Map<Double,LinkedList<CTPed>> pop = new ArrayMap<>();//TODO is this faster than HashMap?
 	private final List<CTCell> neighbors = new ArrayList<>();
-	private final HashSet<CTPed> peds = new HashSet<>();
 	private final CTNetworkEntity parent;
+	protected double alpha; //area
+	protected double rho; //current density
+	protected CTPed next = null;
+	protected double nextCellJumpTime;
+	protected CTEvent currentEvent = null;
+	protected int n = 0; //nr peds
 	int r = 0;
 	int g = 0;
 	int b = 192;
 	private double x;
 	private double y;
-	private double alpha; //area
 	private int N; //max number of peds
-	private double rho; //current density
-	private CTPed next = null;
-	private double nextCellJumpTime;
-	private CTEvent currentEvent = null;
-	private int pedCnt = 0;
 
-	public CTCell(double x, double y, CTNetwork net, CTNetworkEntity parent) {
+
+	public CTCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width) {
 		this.x = x;
 		this.y = y;
 		this.net = net;
 		this.parent = parent;
 		this.em = net.getEventsManager();
+		this.width = width;
+//		pop.put(Math.PI/6., new LinkedList<CTPed>());
+//		pop.put(Math.PI/2., new LinkedList<CTPed>());
+//		pop.put(5*Math.PI/6., new LinkedList<CTPed>());
+//		pop.put(-5*Math.PI/6., new LinkedList<CTPed>());
+//		pop.put(-Math.PI/2., new LinkedList<CTPed>());
+//		pop.put(-Math.PI/6., new LinkedList<CTPed>());
 	}
 
 
@@ -57,6 +73,9 @@ public abstract class CTCell {
 	}
 
 	public void debug(EventsManager em) {
+		if (!CTRunner.DEBUG) {
+			return;
+		}
 		for (CTCellFace f : faces) {
 			debug(f, em);
 		}
@@ -64,6 +83,9 @@ public abstract class CTCell {
 	}
 
 	private void debug(CTCellFace f, EventsManager em) {
+		if (!CTRunner.DEBUG) {
+			return;
+		}
 //		if (MatsimRandom.getRandom().nextDouble() > 0.1 ){
 //			return;
 //		}
@@ -131,39 +153,9 @@ public abstract class CTCell {
 		}
 	}
 
-	public void updateIntendedCellJumpTimeAndChooseNextJumper(double now) {
-		if (this.currentEvent != null) {
-			this.currentEvent.invalidate();
-		}
-		if (peds.size() == 0) {
-			this.nextCellJumpTime = Double.NaN;
-			return;
-		}
-		double minJumpTime = Double.POSITIVE_INFINITY;
-		CTPed nextJumper = null;
-		for (CTPed ped : peds) {
-			double rate = chooseNextCellAndReturnJumpRate(ped);
+	public abstract void updateIntendedCellJumpTimeAndChooseNextJumper(double now);
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
-				nextJumper = ped;
-			}
-		}
-
-		if (nextJumper == null) {
-			return;
-		}
-		this.next = nextJumper;
-
-		this.nextCellJumpTime = minJumpTime;
-		CTEvent e = new CTEvent(this, nextCellJumpTime);
-		this.currentEvent = e;
-		this.net.addEvent(e);
-	}
-
-	private double chooseNextCellAndReturnJumpRate(CTPed ped) {
+	protected double chooseNextCellAndReturnJumpRate(CTPed ped) {
 		CTCell bestNB = null;
 		double maxFlowFactor = 0;
 		for (CTCellFace face : this.getFaces()) {
@@ -186,7 +178,7 @@ public abstract class CTCell {
 	public double getJ(CTCell n_i) { //flow to cell n_i
 		double demand = getDelta();
 		double supply = n_i.getSigma();
-		return CTLink.WIDTH * Math.min(demand, supply);
+		return width * Math.min(demand, supply);
 	}
 
 	private double getDelta() { //demand function
@@ -201,21 +193,10 @@ public abstract class CTCell {
 		return faces;
 	}
 
-	public void jumpOffPed(CTPed ctPed, double time) {
-		this.peds.remove(ctPed);
-		this.rho = this.peds.size() / alpha;
-		Collections.shuffle(faces, MatsimRandom.getRandom());
+	abstract void jumpOffPed(CTPed ctPed, double time);
 
-	}
-
-	public void jumpOnPed(CTPed ctPed, double time) {
-		this.peds.add(ctPed);
-		this.rho = this.peds.size() / alpha;
-		this.pedCnt++;
-	}
+	public abstract boolean jumpOnPed(CTPed ctPed, double time);
 
 
-	public HashSet<CTPed> getPeds() {
-		return peds;
-	}
+	abstract HashSet<CTPed> getPeds();
 }

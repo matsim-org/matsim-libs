@@ -23,4 +23,6 @@ package playground.gregor.ctsim.simulation.physics;
  * Created by laemmel on 07/10/15.
  */
 public interface CTNetworkEntity { //marker interface
+
+	void init();
 }

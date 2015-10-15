@@ -838,7 +838,7 @@ public class ControlerTest {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.qsim().setSnapshotPeriod(10);
-		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
+		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -867,6 +867,31 @@ public class ControlerTest {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "T.veh.gz")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
+	}
+
+	/**
+	 * This might sound (or be) silly, but we had this problem in zurich when using a mix of old code and Guice-based code:
+	 * old code wrapped into Guice modules eventually called Controler.setScoringFunctionFactory(),
+	 * which itself adds a Guice module... but too late.
+	 *
+	 * @thibautd
+	 */
+	@Test( expected = RuntimeException.class )
+	public void testGuiceModulesCannotAddModules() {
+		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration( 0 );
+		final Controler controler = new Controler( config );
+
+		controler.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						controler.setScoringFunctionFactory( null );
+					}
+				}
+		);
+
+		controler.run();
 	}
 
 	/*package*/ static class FakeMobsim implements Mobsim {

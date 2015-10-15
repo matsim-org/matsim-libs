@@ -23,12 +23,11 @@
 package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Singleton;
-import com.google.inject.binder.LinkedBindingBuilder;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -56,8 +55,10 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // The Controler will wire it into the EventsManager later.
         // (Again, there is a second method to add an instance directly.)
         addEventHandlerBinding().to(TravelTimeCalculator.class);
-        addTravelTimeBinding(TransportMode.car).to(carTravelTimeKey());
-        bindCarTravelTime().toProvider(FromTravelTimeCalculator.class);
+        bindNetworkTravelTime().toProvider(FromTravelTimeCalculator.class);
+        for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+            addTravelTimeBinding(mode).to(networkTravelTime());
+        }
         bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
     }
 
