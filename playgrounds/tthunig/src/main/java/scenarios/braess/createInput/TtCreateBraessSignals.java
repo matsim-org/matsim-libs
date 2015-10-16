@@ -59,6 +59,13 @@ public class TtCreateBraessSignals {
 	private boolean middleLinkExists = true;
 	private LaneType laneType;
 	private SignalControlType signalType;
+	
+	// travel time for the middle link
+	private int linkTTMid;
+	// travel time for the middle route links
+	private int linkTTSmall; // [s]
+	// travel time for the two remaining outer route links
+	private int linkTTBig; // [s]
 
 	public TtCreateBraessSignals(Scenario scenario) {
 		this.scenario = scenario;
@@ -74,6 +81,25 @@ public class TtCreateBraessSignals {
 		// check whether the network contains the middle link
 		if (!this.scenario.getNetwork().getLinks().containsKey(Id.createLinkId("3_4")))
 			this.middleLinkExists = false;
+		
+		// calculate link travel times (necessary for green wave settings)
+		Link currentLink;
+		// get link travel time of the middle link
+		currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("3_4"));
+		linkTTMid = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
+		// get link travel time of the middle route links besides the middle link (add inflow link travel time if inflow link exists)
+		if (scenario.getNetwork().getLinks().containsKey(Id.createLinkId("2_3"))){
+			currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("2_3"));
+			linkTTSmall = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
+		} else { // inflow link exists
+			currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("2_23"));
+			linkTTSmall = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
+			currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("23_3"));
+			linkTTSmall += (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
+		}		
+		// get link travel time of the two remaining outer route links
+		currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("3_5"));
+		linkTTBig = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
 	}
 
 	public void createSignals() {
@@ -464,35 +490,35 @@ public class TtCreateBraessSignals {
 		case "signal2_3.1": // signals for turning right (middle route) at node 3
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 10;
+			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
 		case "signal2_32": // signals for going straight on (upper route) at node 3
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 10;
+			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal3_4.1": // signal at link 3_4 (middle route at node 4)
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 11;
+			signalSystemOffset = linkTTSmall + linkTTMid;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signals at link 2_4 (lower route at node 4)
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 11;
+			signalSystemOffset = linkTTSmall + linkTTMid;
 			break;
 		case "signal45_5.1":
 		case "signal4_5.1": // signals at link 4_5 (lower or middle route at node 5)
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 21;
+			signalSystemOffset = linkTTSmall + linkTTMid + linkTTSmall;
 			break;
 		case "signal3_5.1": // signal at link 3_5 (upper route at node 5)
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 21;
+			signalSystemOffset = linkTTSmall + linkTTMid + linkTTSmall;
 			break;
 		default:
 			log.error("Signal group id " + signalGroupId + " is not known.");
@@ -523,35 +549,35 @@ public class TtCreateBraessSignals {
 		case "signal2_3.1": // signals for turning right (middle route) at node 3
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 10;
+			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
 		case "signal2_32": // signals for going straight on (upper route) at node 3
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 10;
+			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal3_4.1": // signal at link 3_4 (middle route at node 4)
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 20;
+			signalSystemOffset = linkTTBig;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signals at link 2_4 (lower route at node 4)
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 20;
+			signalSystemOffset = linkTTBig;
 			break;
 		case "signal45_5.1":
 		case "signal4_5.1": // signals at link 4_5 (lower or middle route at node 5)
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
-			signalSystemOffset = 30;
+			signalSystemOffset = linkTTSmall + linkTTBig;
 			break;
 		case "signal3_5.1": // signal at link 3_5 (upper route at node 5)
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
-			signalSystemOffset = 30;
+			signalSystemOffset = linkTTSmall + linkTTBig;
 			break;
 		default:
 			log.error("Signal group id " + signalGroupId + " is not known.");

@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * @author johannes
  */
-public class MunicipalityDistanceTask extends AnalyzerTask {
+public class GeoDistLau2ClassTask extends AnalyzerTask {
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList xVals = new TDoubleArrayList();
@@ -49,7 +49,7 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
             for(Episode plan : person.getEpisodes()) {
                 for(Attributable leg : plan.getLegs()) {
 
-                    String yStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
+                    String yStr = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 
                     if(xStr != null && yStr != null) {
                         xVals.add(Double.parseDouble(xStr));
@@ -68,8 +68,8 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
                 TDoubleDoubleHashMap corr = Correlations.mean(x, y);
                 StatsWriter.writeHistogram(corr, "munic", "distance", filename);
 
-                filename = String.format("%s/munic.dist.scatter.txt", getOutputDirectory());
-                StatsWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
+//                filename = String.format("%s/munic.dist.scatter.txt", getOutputDirectory());
+//                StatsWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
             } catch (IOException e) {
                 e.printStackTrace();
             }

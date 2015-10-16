@@ -25,6 +25,7 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
@@ -45,6 +46,9 @@ import playground.johannes.synpop.processing.LegAttributeRemover;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.CachedPerson;
+import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.DoubleConverter;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.*;
@@ -109,6 +113,7 @@ public class Simulator {
 
 		final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
+		task.addTask(new GeoDistLau2ClassTask());
 
 		ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
 
@@ -119,13 +124,17 @@ public class Simulator {
         UnivariatFrequency distance = buildDistanceHamiltonian(refPersons, simPersons);
         hamiltonians.addComponent(distance, 1e6);
 
+		BivariatMean distanceLau2Class = buildDistanceLau2Hamiltonian(refPersons, simPersons);
+		hamiltonians.addComponent(distanceLau2Class, 2.0);
 
         FacilityMutatorBuilder fBuilder = new FacilityMutatorBuilder(dataPool, random);
         fBuilder.addToBlacklist(ActivityTypes.HOME);
 
         AttributeChangeListenerComposite listeners = new AttributeChangeListenerComposite();
-        listeners.addComponent(new GeoDistanceUpdater(distance));
-//        listeners.addComponent(distance);
+		AttributeChangeListenerComposite distListeners = new AttributeChangeListenerComposite();
+		distListeners.addComponent(distance);
+		distListeners.addComponent(distanceLau2Class);
+        listeners.addComponent(new GeoDistanceUpdater(distListeners));
         fBuilder.setListener(listeners);
         mutators.addMutator(fBuilder.build());
 
@@ -191,6 +200,30 @@ public class Simulator {
 		return legs;
 	}
 
+	private static BivariatMean buildDistanceLau2Hamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson> simPersons) {
+		copyLau2ClassAttribute(refPersons);
+		copyLau2ClassAttribute(simPersons);
+
+		Set<Attributable> refLegs = getLegs(refPersons);
+		Set<Attributable> simLegs = getLegs(simPersons);
+
+		Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
+		BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,
+				new LinearDiscretizer(1.0));
+
+		return bm;
+	}
+
+	private static void copyLau2ClassAttribute(Set<PlainPerson> persons) {
+		for(Person p : persons) {
+			String lau2Class = p.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
+			for(Episode e : p.getEpisodes()) {
+				for(Segment leg : e.getLegs()) {
+					leg.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
+				}
+			}
+		}
+	}
 	private static class Route2GeoDistFunction implements UnivariateRealFunction {
 
 		@Override

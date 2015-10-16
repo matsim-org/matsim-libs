@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class LongLinkSplitterTest {
@@ -122,10 +122,10 @@ public class LongLinkSplitterTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network nw = NetworkUtils.createNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node a = nf.createNode(Id.createNodeId("A"), new CoordImpl(0.0, 0.0)); nw.addNode(a);
-		Node b = nf.createNode(Id.createNodeId("B"), new CoordImpl(100.0, 100.0)); nw.addNode(b);
-		Node c = nf.createNode(Id.createNodeId("C"), new CoordImpl(300.0, 0.0)); nw.addNode(c);
-		Node d = nf.createNode(Id.createNodeId("D"), new CoordImpl(100.0, -100.0)); nw.addNode(d);
+		Node a = nf.createNode(Id.createNodeId("A"), new Coord(0.0, 0.0)); nw.addNode(a);
+		Node b = nf.createNode(Id.createNodeId("B"), new Coord(100.0, 100.0)); nw.addNode(b);
+		Node c = nf.createNode(Id.createNodeId("C"), new Coord(300.0, 0.0)); nw.addNode(c);
+		Node d = nf.createNode(Id.createNodeId("D"), new Coord(100.0, -100.0)); nw.addNode(d);
 		
 		double lengthShort = Math.sqrt(Math.pow(100.0, 2.0)+ Math.pow(100.0, 2.0)); 
 		double lengthLong = Math.sqrt(Math.pow(200.0, 2.0)+ Math.pow(100.0, 2.0)); 
