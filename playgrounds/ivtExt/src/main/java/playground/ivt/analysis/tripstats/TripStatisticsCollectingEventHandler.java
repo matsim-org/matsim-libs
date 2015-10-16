@@ -29,9 +29,11 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -62,6 +64,7 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 
 	private final Set<Id<Person>> personsToTrack;
 	private final Scenario scenario;
+	private EventsToActivities e2a;
 
 	@Inject
 	public TripStatisticsCollectingEventHandler(
@@ -106,14 +109,13 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 		if ( record == null )  return;
 		record.destination = activity;
 
-		final String mode = modeIdentifier.identifyMainMode( record.trip );
 		try {
 			writer.newLine();
 			writer.write(agentId.toString());
 			writer.write( "\t" );
 			writer.write( ""+record.origin.getEndTime() );
 			writer.write( "\t" );
-			writer.write( mode );
+			writer.write( modeIdentifier.identifyMainMode( record.trip ) );
 			writer.write( "\t" );
 			writer.write( record.origin.getType() );
 			writer.write( "\t" );
@@ -129,6 +131,10 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
+		}
+		catch (RuntimeException e) {
+			log.error( "got exception handling "+activity+" for agent "+agentId , e );
+			throw e;
 		}
 	}
 
@@ -158,7 +164,10 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		try {
+			// This is dirty, but has to be done somehow
+			e2a.finish();
 			writer.close();
+			currentTrips.clear();
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
@@ -191,6 +200,13 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
+	}
+
+	/**
+	 * used to call "finish"
+	 */
+	public void setEventsToActivities(EventsToActivities e2a) {
+		this.e2a = e2a;
 	}
 
 	private static class Record {
