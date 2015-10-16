@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.analysis.activityhistogram;
+package playground.ivt.analysis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
@@ -25,11 +25,9 @@ import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scoring.EventsToActivities;
 import playground.ivt.utils.TripModeShares;
 
 import javax.inject.Inject;
@@ -38,22 +36,31 @@ import javax.inject.Provider;
 /**
  * @author thibautd
  */
-public class ActivityHistogramModule extends AbstractModule {
+public class TripModeSharesModule extends AbstractModule {
 	@Override
 	public void install() {
-		bind(ActivityHistogram.class);
-		addEventHandlerBinding().to(ActivityHistogram.class);
-		addEventHandlerBinding().toProvider(
-				new Provider<EventHandler>() {
-					@Inject ActivityHistogram hist;
+
+		this.addControlerListenerBinding().toProvider(
+				new Provider<ControlerListener>() {
+					@Inject
+					OutputDirectoryHierarchy controlerIO;
+					@Inject
+					Scenario scenario;
+					@Inject
+					TripRouter tripRouter;
 
 					@Override
-					public EventHandler get() {
-						final EventsToActivities e2a = new EventsToActivities();
-						e2a.setActivityHandler( hist );
-						return e2a;
+					public ControlerListener get() {
+						final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
+						actTypesForAnalysis.addActivityTypes(tripRouter.getStageActivityTypes());
+						actTypesForAnalysis.addActivityTypes(JointActingTypes.JOINT_STAGE_ACTS);
+						return new TripModeShares(
+								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
+								controlerIO,
+								scenario,
+								new JointMainModeIdentifier(new MainModeIdentifierImpl()),
+								actTypesForAnalysis);
 					}
 				});
-		addControlerListenerBinding().to(ActivityHistogramListener.class);
 	}
 }

@@ -28,6 +28,7 @@ import playground.ivt.analysis.tripstats.TripStatisticsModule;
 public class IvtAnalysisModule extends AbstractModule {
 	@Override
 	public void install() {
+		install( new TripModeSharesModule() );
 		install( new ActivityHistogramModule() );
 		install( new TripStatisticsModule() );
 	}
