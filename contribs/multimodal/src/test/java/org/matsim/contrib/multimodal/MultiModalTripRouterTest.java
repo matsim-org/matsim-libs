@@ -22,6 +22,7 @@ package org.matsim.contrib.multimodal;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -199,17 +200,19 @@ public class MultiModalTripRouterTest {
 		/*
 		 * create nodes
 		 */
-		Node startNode = scenario.getNetwork().getFactory().createNode(Id.create("startNode", Node.class), scenario.createCoord(0.0, 0.0));
-		Node splitNode = scenario.getNetwork().getFactory().createNode(Id.create("splitNode", Node.class), scenario.createCoord(1.0, 0.0));
-		
-		Node carNode = scenario.getNetwork().getFactory().createNode(Id.create("carNode", Node.class), scenario.createCoord(2.0, 2.0));
-		Node ptNode = scenario.getNetwork().getFactory().createNode(Id.create("ptNode", Node.class), scenario.createCoord(2.0, 1.0));
-		Node walkNode = scenario.getNetwork().getFactory().createNode(Id.create("walkNode", Node.class), scenario.createCoord(2.0, 0.0));
-		Node bikeNode = scenario.getNetwork().getFactory().createNode(Id.create("bikeNode", Node.class), scenario.createCoord(2.0, -1.0));
-		Node rideNode = scenario.getNetwork().getFactory().createNode(Id.create("rideNode", Node.class), scenario.createCoord(2.0, -2.0));
-		
-		Node joinNode = scenario.getNetwork().getFactory().createNode(Id.create("joinNode", Node.class), scenario.createCoord(1.0, 0.0));
-		Node endNode = scenario.getNetwork().getFactory().createNode(Id.create("endNode", Node.class), scenario.createCoord(0.0, 0.0));
+		Node startNode = scenario.getNetwork().getFactory().createNode(Id.create("startNode", Node.class), new Coord(0.0, 0.0));
+		Node splitNode = scenario.getNetwork().getFactory().createNode(Id.create("splitNode", Node.class), new Coord(1.0, 0.0));
+
+		Node carNode = scenario.getNetwork().getFactory().createNode(Id.create("carNode", Node.class), new Coord(2.0, 2.0));
+		Node ptNode = scenario.getNetwork().getFactory().createNode(Id.create("ptNode", Node.class), new Coord(2.0, 1.0));
+		Node walkNode = scenario.getNetwork().getFactory().createNode(Id.create("walkNode", Node.class), new Coord(2.0, 0.0));
+		double y1 = -1.0;
+		Node bikeNode = scenario.getNetwork().getFactory().createNode(Id.create("bikeNode", Node.class), new Coord(2.0, y1));
+		double y = -2.0;
+		Node rideNode = scenario.getNetwork().getFactory().createNode(Id.create("rideNode", Node.class), new Coord(2.0, y));
+
+		Node joinNode = scenario.getNetwork().getFactory().createNode(Id.create("joinNode", Node.class), new Coord(1.0, 0.0));
+		Node endNode = scenario.getNetwork().getFactory().createNode(Id.create("endNode", Node.class), new Coord(0.0, 0.0));
 		
 		/*
 		 * create links

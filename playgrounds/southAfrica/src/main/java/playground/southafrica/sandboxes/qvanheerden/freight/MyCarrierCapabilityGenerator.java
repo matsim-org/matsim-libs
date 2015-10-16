@@ -10,7 +10,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import playground.southafrica.utilities.Header;
@@ -22,7 +21,7 @@ public class MyCarrierCapabilityGenerator {
 		String networkFile = args[0];
 		Double depotLong = Double.parseDouble(args[1]);
 		Double depotLat = Double.parseDouble(args[2]);
-		Coord depotCoord = new CoordImpl(depotLong, depotLat);
+		Coord depotCoord = new Coord(depotLong, depotLat);
 
 		String outputDir = args[3];
 

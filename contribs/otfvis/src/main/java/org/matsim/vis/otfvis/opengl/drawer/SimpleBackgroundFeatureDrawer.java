@@ -20,27 +20,18 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.vividsolutions.jts.geom.*;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * SimpleBackgroundDrawer can draw a geotools feature (e.g. shape file?) on screen.

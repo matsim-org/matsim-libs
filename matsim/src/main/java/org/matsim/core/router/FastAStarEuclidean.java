@@ -50,6 +50,8 @@ public class FastAStarEuclidean extends AStarEuclidean {
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
+	private BinaryMinHeap<ArrayRoutingNetworkNode> heap = null;
+	private int maxSize = -1;
 	
 	public FastAStarEuclidean(final RoutingNetwork routingNetwork, final PreProcessEuclidean preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
@@ -80,9 +82,22 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	
 	@Override
 	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		/*
+		 * Re-use existing BinaryMinHeap instead of creating a new one. For large networks (> 10^6 nodes and links) this reduced
+		 * the computation time by 40%! cdobler, oct'15
+		 */
 		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
-			int maxSize = this.routingNetwork.getNodes().size();
-			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+			int size = this.routingNetwork.getNodes().size();
+			if (this.heap == null || this.maxSize != size) {
+				this.maxSize = size;
+				this.heap = new BinaryMinHeap<>(maxSize);
+				return this.heap;
+			} else {
+				this.heap.reset();
+				return this.heap;
+			}
+//			int maxSize = this.routingNetwork.getNodes().size();
+//			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
 		} else {
 			return super.createRouterPriorityQueue();
 		}

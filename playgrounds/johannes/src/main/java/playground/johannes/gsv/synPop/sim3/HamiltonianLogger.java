@@ -22,11 +22,10 @@ package playground.johannes.gsv.synPop.sim3;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -131,7 +130,7 @@ public class HamiltonianLogger implements SamplerListener {
 			File afile = new File(file);
 			afile.mkdirs();
 			try {
-				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
+				StatsWriter.writeHistogram(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+	<!-- ====================================================================== -->
+
+	<person id="1" employed="no">
+		<plan selected="yes">
+			<act type="h" link="1" />
+			<leg mode="walk" trav_time="00:03:21">
+				<route type="generic" start_link="1" end_link="2"></route>
+			</leg>
+			<leg mode="car">
+				<route type="links">2 3 4</route>
+			</leg>
+			<leg mode="walk" trav_time="00:04:32">
+				<route type="generic" start_link="4" end_link="6"></route>
+			</leg>
+			<act type="h" link="6" />
+		</plan>
+
+	</person>
+
+	<!-- ====================================================================== -->
+
+</population>

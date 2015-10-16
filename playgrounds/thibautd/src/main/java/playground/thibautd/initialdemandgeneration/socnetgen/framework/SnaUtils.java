@@ -58,7 +58,6 @@ public class SnaUtils {
 
 	/**
 	 * Uses wedge-sampling to estimate clustering coefficient.
-	 * Could  be parallelized for even better performance.
 	 * see http://onlinelibrary.wiley.com/doi/10.1002/sam.11224/full
 	 *
 	 * @param precision the result is guaranteed to fall at least so close to the exact value

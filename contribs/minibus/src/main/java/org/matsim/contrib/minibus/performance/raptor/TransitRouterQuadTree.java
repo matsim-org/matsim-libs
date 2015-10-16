@@ -69,11 +69,11 @@ public final class TransitRouterQuadTree {
 	}
 
 	public Collection<TransitStopFacility> getNearestTransitStopFacilities(final Coord coord, final double distance) {
-		return this.quadTree.get(coord.getX(), coord.getY(), distance);
+		return this.quadTree.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public TransitStopFacility getNearestTransitStopFacility(final Coord coord) {
-		return this.quadTree.get(coord.getX(), coord.getY());
+		return this.quadTree.getClosest(coord.getX(), coord.getY());
 	}
 	
 	public RaptorSearchData getSearchData(){
@@ -229,7 +229,7 @@ public final class TransitRouterQuadTree {
 		for (TransitStopFacility sourceStop : transitStopFacilities2RouteIdsServed.keySet()) {
 			HashMap<WrappedTransitRouteStop, TransferEntryPointer> transfersFromThis = new HashMap<WrappedTransitRouteStop, TransferEntryPointer>();
 			
-			for (WrappedTransitRouteStop destinationStop : transitRouteStopQuadTree.get(sourceStop.getCoord().getX(), sourceStop.getCoord().getY(), maxBeelineWalkConnectionDistance)) {
+			for (WrappedTransitRouteStop destinationStop : transitRouteStopQuadTree.getDisk(sourceStop.getCoord().getX(), sourceStop.getCoord().getY(), maxBeelineWalkConnectionDistance)) {
 				double transferTime = this.raptorDisutility.getTransferTime(sourceStop.getCoord(), destinationStop.transitRouteStop.getStopFacility().getCoord());
 				transfersFromThis.put(destinationStop, new TransferEntryPointer(-1, transferTime, destinationStop, routeStop2routeId.get(destinationStop)));
 			}

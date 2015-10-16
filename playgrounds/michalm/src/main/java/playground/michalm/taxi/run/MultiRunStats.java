@@ -2,7 +2,7 @@ package playground.michalm.taxi.run;
 
 import java.io.PrintWriter;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.descriptive.*;
 import org.matsim.contrib.dvrp.data.VrpData;
 
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
@@ -17,7 +17,7 @@ public class MultiRunStats
     private final SummaryStatistics driveWithPassengerTime = new SummaryStatistics();
     private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
 
-    private final SummaryStatistics computationTime = new SummaryStatistics();
+    private final DescriptiveStatistics computationTime = new DescriptiveStatistics();
 
 
     void updateStats(TaxiStats singleRunStats, long computationTimeInMillis)
@@ -29,7 +29,7 @@ public class MultiRunStats
         driveWithPassengerTime.addValue(singleRunStats.getDriveWithPassengerTimes().getMean());
         driveEmptyRatio.addValue(singleRunStats.getDriveEmptyRatio());
 
-        computationTime.addValue(0.001 * (computationTimeInMillis));
+        computationTime.addValue(0.001 * computationTimeInMillis);
     }
 
 
@@ -39,7 +39,8 @@ public class MultiRunStats
             + "PassWait_max\t"//
             + "PassDrive\t"//
             + "EmptyRatio\t"//
-            + "Comp";
+            + "Comp\t"//
+            + "Comp_p50";
 
 
     void printStats(PrintWriter pw, String cfg, VrpData data)
@@ -51,6 +52,7 @@ public class MultiRunStats
                         + "%.0f\t"//
                         + "%.0f\t"//
                         + "%.2f\t"//
+                        + "%.1f\t"//
                         + "%.1f\n", //
                 cfg, //
                 data.getRequests().size(), //
@@ -63,6 +65,7 @@ public class MultiRunStats
                 driveWithPassengerTime.getMean(), //
                 driveEmptyRatio.getMean() * 100, //in [%]
                 //
-                computationTime.getMean());
+                computationTime.getMean(),
+                computationTime.getPercentile(50));
     }
 }

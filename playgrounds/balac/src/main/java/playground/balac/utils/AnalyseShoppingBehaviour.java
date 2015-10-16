@@ -1,6 +1,7 @@
 package playground.balac.utils;
 
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -11,7 +12,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
@@ -31,7 +31,7 @@ public class AnalyseShoppingBehaviour {
 		new FacilitiesReaderMatsimV1(scenario1).readFile(facilitiesfilePath1);
 		double centerX = 683217.0; 
 	    double centerY = 247300.0;
-	    CoordImpl coord = new CoordImpl(centerX, centerY);
+		Coord coord = new Coord(centerX, centerY);
 		int group1 = 0;
 		int group2 = 0;
 		int group3 = 0;

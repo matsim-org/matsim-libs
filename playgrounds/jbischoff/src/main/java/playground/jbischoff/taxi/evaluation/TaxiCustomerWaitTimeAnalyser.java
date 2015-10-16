@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 
-import playground.michalm.taxi.TaxiRequestCreator;
+import com.google.common.math.DoubleMath;
 
 
 /**
@@ -48,6 +48,12 @@ public class TaxiCustomerWaitTimeAnalyser
 
 
     public TaxiCustomerWaitTimeAnalyser(Scenario scen)
+	{
+		this(scen, Double.MAX_VALUE);
+	}
+
+
+	public TaxiCustomerWaitTimeAnalyser(Scenario scen, double upperLimit)
     {
         this.scenario = scen;
         this.taxicalltime = new HashMap<Id, Double>();
@@ -56,6 +62,7 @@ public class TaxiCustomerWaitTimeAnalyser
         this.linkAg = new HashMap<Id, Id>();
         this.totalWaitTime = new ArrayList<Double>();
         this.waitTimes = new ArrayList<WaitTimeLogRow>();
+        
     }
 
 
@@ -147,13 +154,8 @@ public class TaxiCustomerWaitTimeAnalyser
 
     public double calculateAverageWaitTime()
     {
-        double totalWt = 0;
-        for (Double d : this.totalWaitTime) {
-            totalWt = totalWt + d;
-        }
 
-        double averageWt = totalWt / this.totalWaitTime.size();
-        return averageWt;
+    	return  DoubleMath.mean(this.totalWaitTime);
 
     }
 

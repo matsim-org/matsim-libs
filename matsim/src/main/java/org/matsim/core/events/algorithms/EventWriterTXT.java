@@ -185,11 +185,11 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getDriverId(), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getDriverId(), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
 	}
 }

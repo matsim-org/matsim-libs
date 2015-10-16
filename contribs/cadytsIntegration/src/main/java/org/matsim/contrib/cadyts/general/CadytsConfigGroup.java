@@ -65,7 +65,7 @@ public class CadytsConfigGroup extends ConfigGroup {
 	private int endTime = (int)Time.MIDNIGHT-1;
 	private int timeBinSize = 3600 ;
 
-	private final Set<Id<Link>> calibratedItems = new HashSet<>();
+	private final Set<String> calibratedItems = new HashSet<>();
 
 	public CadytsConfigGroup() {
 		super(GROUP_NAME);
@@ -99,7 +99,7 @@ public class CadytsConfigGroup extends ConfigGroup {
 		} else if (CALIBRATED_LINKS.equals(paramName) || CALIBRATED_LINES.equals(paramName) || CALIBRATED_ITEMS.equals(paramName) ) {
 			this.calibratedItems.clear();
 			for (String linkId : CollectionUtils.stringToArray(value)) {
-				this.calibratedItems.add(Id.create(linkId, Link.class));
+				this.calibratedItems.add( linkId );
 			}
 		} else {
 			throw new IllegalArgumentException("Parameter '" + paramName + "' is not supported by config group '" + GROUP_NAME + "'.");
@@ -136,7 +136,7 @@ public class CadytsConfigGroup extends ConfigGroup {
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
 		params.put(START_TIME, Integer.toString(getStartTime()));
 		params.put(END_TIME, Integer.toString(getEndTime()));
-		params.put(CALIBRATED_ITEMS, CollectionUtils.idSetToString((Set) this.calibratedItems));
+		params.put(CALIBRATED_ITEMS, CollectionUtils.setToString(this.calibratedItems));
 		params.put(TIME_BIN_SIZE, Integer.toString(getTimeBinSize())) ;
 
 		return params;
@@ -214,11 +214,11 @@ public class CadytsConfigGroup extends ConfigGroup {
 		return this.endTime;
 	}
 
-	public final Set<Id<Link>> getCalibratedItems() {
+	public final Set<String> getCalibratedItems() {
 		return Collections.unmodifiableSet(this.calibratedItems);
 	}
 
-	public final void setCalibratedItems(final Set<Id<Link>> links) {
+	public final void setCalibratedItems(final Set<String> links) {
 		this.calibratedItems.clear();
 		this.calibratedItems.addAll(links);
 	}

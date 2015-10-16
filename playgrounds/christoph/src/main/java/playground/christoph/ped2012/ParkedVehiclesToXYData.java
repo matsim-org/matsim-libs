@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -154,8 +153,8 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 		// get new agents' positions
 		else if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			if (observedAgents.containsKey(linkEnterEvent.getPersonId())) {
-				observedAgents.put(linkEnterEvent.getPersonId(), linkEnterEvent.getLinkId());
+			if (observedAgents.containsKey(linkEnterEvent.getDriverId())) {
+				observedAgents.put(linkEnterEvent.getDriverId(), linkEnterEvent.getLinkId());
 			}
 		}
 	}

@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -216,13 +215,12 @@ import org.matsim.facilities.ActivityOptionImpl;
 	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route>");
 
-		if (route instanceof GenericRoute) {
-			out.write(((GenericRoute) route).getRouteDescription());
-		}
-		else if (route instanceof NetworkRoute) {
+		if (route instanceof NetworkRoute) {
 			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
 				out.write(n.getId() + " ");
 			}
+		} else {
+			out.write(route.getRouteDescription());
 		}
 	}
 

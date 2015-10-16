@@ -2,23 +2,17 @@ package playground.southafrica.sandboxes.qvanheerden.freight;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 public class MyDemandGenerator {
@@ -109,7 +103,7 @@ public class MyDemandGenerator {
 				double earliestStart = Double.parseDouble(array[5]);
 				double latestEnd = Double.parseDouble(array[6]);
 
-				CoordImpl coord = new CoordImpl(longi, lati);
+				Coord coord = new Coord(longi, lati);
 				Tuple<Double, Double> timeWindow = new Tuple<Double, Double>(earliestStart, latestEnd);
 				Tuple<Coord, Tuple<Double, Double>> entry = new Tuple<Coord, Tuple<Double,Double>>(coord, timeWindow);
 				

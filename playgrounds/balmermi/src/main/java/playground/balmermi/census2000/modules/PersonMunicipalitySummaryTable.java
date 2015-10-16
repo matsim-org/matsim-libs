@@ -29,7 +29,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -108,7 +108,7 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 
 	@Override
 	public void run(Person pp) {
-		PersonImpl person = (PersonImpl) pp;
+		Person person = pp;
 		playground.balmermi.census2000.data.MyPerson p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
@@ -125,14 +125,14 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 		v[0]++;
 		if (!this.hhs.contains(hh)) { v[1]++; this.hhs.add(hh); }
 
-		if (person.getAge() < 18) { v[2]++; }
-		else if (person.getAge() < 66) { v[3]++; }
+		if (PersonUtils.getAge(person) < 18) { v[2]++; }
+		else if (PersonUtils.getAge(person) < 66) { v[3]++; }
 		else { v[4]++; }
 
 		if (p.isMale()) { v[5]++; }
 		if (p.isSwiss()) { v[6]++; }
-		if (person.isEmployed()) { v[7]++; }
-		if (YES.equals(person.getLicense())) { v[8]++; }
+		if (PersonUtils.isEmployed(person)) { v[7]++; }
+		if (YES.equals(PersonUtils.getLicense(person))) { v[8]++; }
 	}
 
 	public void run(Plan plan) {

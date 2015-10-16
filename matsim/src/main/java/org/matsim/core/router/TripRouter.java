@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
@@ -48,9 +49,9 @@ import org.matsim.facilities.Facility;
  *
  * @author thibautd
  */
-public final class TripRouter {
-	private final Map<String, RoutingModule> routingModules =
-		new HashMap<>();
+public final class TripRouter implements MatsimExtensionPoint {
+	private final Map<String, RoutingModule> routingModules = new HashMap<>();
+	
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -148,6 +149,7 @@ public final class TripRouter {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {

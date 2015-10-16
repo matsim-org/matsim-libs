@@ -13,10 +13,7 @@ public class ControlerWithOTFVis {
 		Config config = ConfigUtils.loadConfig("examples/tutorial/config/example5-config.xml");
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new OTFVisModule());
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 	}
 

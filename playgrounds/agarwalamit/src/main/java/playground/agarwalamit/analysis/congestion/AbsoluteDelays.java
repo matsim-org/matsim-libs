@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -70,7 +71,7 @@ public class AbsoluteDelays  {
 		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFile);
 
-		double vtts_car = ((config.planCalcScore().getTraveling_utils_hr()/3600) + 
+		double vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 		return vtts_car;

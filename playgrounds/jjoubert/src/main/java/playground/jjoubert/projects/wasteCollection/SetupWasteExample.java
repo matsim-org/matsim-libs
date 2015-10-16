@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +48,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -153,23 +153,23 @@ public class SetupWasteExample {
 		NetworkFactory nf = network.getFactory();
 		
 		/* Nodes */
-		Node a = nf.createNode(Id.createNodeId("a"), new CoordImpl(0.0, 0.0)); network.addNode(a);
-		Node b = nf.createNode(Id.createNodeId("b"), new CoordImpl(200.0, 0.0)); network.addNode(b);
-		Node c = nf.createNode(Id.createNodeId("c"), new CoordImpl(400.0, 0.0)); network.addNode(c);
-		Node d = nf.createNode(Id.createNodeId("d"), new CoordImpl(600.0, 0.0)); network.addNode(d);
-		Node e = nf.createNode(Id.createNodeId("e"), new CoordImpl(800.0, 0.0)); network.addNode(e);
-		Node f = nf.createNode(Id.createNodeId("f"), new CoordImpl(200.0, 200.0)); network.addNode(f);
-		Node g = nf.createNode(Id.createNodeId("g"), new CoordImpl(400.0, 200.0)); network.addNode(g);
-		Node h = nf.createNode(Id.createNodeId("h"), new CoordImpl(600.0, 200.0)); network.addNode(h);
-		Node i = nf.createNode(Id.createNodeId("i"), new CoordImpl(800.0, 200.0)); network.addNode(i);
-		Node j = nf.createNode(Id.createNodeId("j"), new CoordImpl(200.0, 400.0)); network.addNode(j);
-		Node k = nf.createNode(Id.createNodeId("k"), new CoordImpl(400.0, 400.0)); network.addNode(k);
-		Node l = nf.createNode(Id.createNodeId("l"), new CoordImpl(600.0, 400.0)); network.addNode(l);
-		Node m = nf.createNode(Id.createNodeId("m"), new CoordImpl(800.0, 400.0)); network.addNode(m);
-		Node n = nf.createNode(Id.createNodeId("n"), new CoordImpl(200.0, 600.0)); network.addNode(n);
-		Node o = nf.createNode(Id.createNodeId("o"), new CoordImpl(400.0, 600.0)); network.addNode(o);
-		Node p = nf.createNode(Id.createNodeId("p"), new CoordImpl(600.0, 600.0)); network.addNode(p);
-		Node q = nf.createNode(Id.createNodeId("q"), new CoordImpl(800.0, 600.0)); network.addNode(q);
+		Node a = nf.createNode(Id.createNodeId("a"), new Coord(0.0, 0.0)); network.addNode(a);
+		Node b = nf.createNode(Id.createNodeId("b"), new Coord(200.0, 0.0)); network.addNode(b);
+		Node c = nf.createNode(Id.createNodeId("c"), new Coord(400.0, 0.0)); network.addNode(c);
+		Node d = nf.createNode(Id.createNodeId("d"), new Coord(600.0, 0.0)); network.addNode(d);
+		Node e = nf.createNode(Id.createNodeId("e"), new Coord(800.0, 0.0)); network.addNode(e);
+		Node f = nf.createNode(Id.createNodeId("f"), new Coord(200.0, 200.0)); network.addNode(f);
+		Node g = nf.createNode(Id.createNodeId("g"), new Coord(400.0, 200.0)); network.addNode(g);
+		Node h = nf.createNode(Id.createNodeId("h"), new Coord(600.0, 200.0)); network.addNode(h);
+		Node i = nf.createNode(Id.createNodeId("i"), new Coord(800.0, 200.0)); network.addNode(i);
+		Node j = nf.createNode(Id.createNodeId("j"), new Coord(200.0, 400.0)); network.addNode(j);
+		Node k = nf.createNode(Id.createNodeId("k"), new Coord(400.0, 400.0)); network.addNode(k);
+		Node l = nf.createNode(Id.createNodeId("l"), new Coord(600.0, 400.0)); network.addNode(l);
+		Node m = nf.createNode(Id.createNodeId("m"), new Coord(800.0, 400.0)); network.addNode(m);
+		Node n = nf.createNode(Id.createNodeId("n"), new Coord(200.0, 600.0)); network.addNode(n);
+		Node o = nf.createNode(Id.createNodeId("o"), new Coord(400.0, 600.0)); network.addNode(o);
+		Node p = nf.createNode(Id.createNodeId("p"), new Coord(600.0, 600.0)); network.addNode(p);
+		Node q = nf.createNode(Id.createNodeId("q"), new Coord(800.0, 600.0)); network.addNode(q);
 		
 		/* Links */
 		Link ab = nf.createLink(Id.createLinkId("ab"), a, b); network.addLink(ab);

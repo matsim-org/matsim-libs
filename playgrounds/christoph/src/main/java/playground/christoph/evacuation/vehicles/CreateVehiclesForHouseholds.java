@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -95,7 +95,7 @@ public class CreateVehiclesForHouseholds {
 		int alwaysCarAvailable = 0;
 		for (Id id : household.getMemberIds()) {
 			Person person = scenario.getPopulation().getPersons().get(id);
-			String carAvailability = ((PersonImpl) person).getCarAvail();
+			String carAvailability = PersonUtils.getCarAvail(person);
 			if (carAvailability != null && carAvailability.equals("always")) alwaysCarAvailable++;
 		}
 		for (int i = numVehicles + 1; i <= alwaysCarAvailable; i++) {

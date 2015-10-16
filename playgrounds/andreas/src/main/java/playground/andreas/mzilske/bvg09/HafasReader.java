@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -195,7 +194,7 @@ public class HafasReader {
 				facilities.put(idImpl, facility);
 				log.info("Added coords for stop " + idImpl + " " + this.stopNameMap.get(idImpl));
 			} else {
-				facility = transitScheduleFactory.createTransitStopFacility(idImpl, new CoordImpl(0.0, 0.0), false);
+				facility = transitScheduleFactory.createTransitStopFacility(idImpl, new Coord(0.0, 0.0), false);
 				facilities.put(idImpl, facility);
 				log.info("Could not find coords for stop " + idImpl);
 			}

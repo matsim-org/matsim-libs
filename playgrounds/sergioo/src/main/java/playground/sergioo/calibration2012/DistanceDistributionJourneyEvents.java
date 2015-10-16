@@ -133,7 +133,7 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 		if(event.getVehicleId().toString().startsWith("tr"))
 			ptVehicles.get(event.getVehicleId()).in = true;
 		else
-			chains.get(event.getPersonId()).in = true;
+			chains.get(event.getDriverId()).in = true;
 	}
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
@@ -145,10 +145,10 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 			}
 		}
 		else  {
-			TravellerChain chain = chains.get(event.getPersonId());
+			TravellerChain chain = chains.get(event.getDriverId());
 			if(chain == null) {
 				chain = new TravellerChain();
-				chains.put(event.getPersonId(), chain);
+				chains.put(event.getDriverId(), chain);
 				chain.modes.add("car");
 				chain.distances.add(0.0);
 			}

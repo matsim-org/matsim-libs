@@ -25,12 +25,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactory;
 
-
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
 	@Override
 	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return new ExperimentalTransitRoute(startLinkId, endLinkId);
+	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return ExperimentalTransitRoute.ROUTE_TYPE;
 	}
 
 }

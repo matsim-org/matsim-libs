@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 
 public class BZReader {
@@ -70,7 +69,7 @@ public class BZReader {
 				String[] entries = curr_line.split(";", -1);				
 				String x = entries[1].trim();
 				String y = entries[2].trim();
-				Hectare hectare = new Hectare(new CoordImpl(x,y));
+				Hectare hectare = new Hectare(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				
 				for (int i = 3; i < entries.length; i++) {					
 					if (i >= 408 && i <= 422 && i != 414 && i != 420 && Double.parseDouble(entries[i].trim()) > 0.0) {

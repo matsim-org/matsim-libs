@@ -57,7 +57,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -169,7 +168,7 @@ public class GTFS2MATSimTransitSchedule {
 			String line = reader.readLine();
 			while(line!=null) {
 				Id<Node> id = Id.create(line, Node.class);
-				network.addNode(network.getFactory().createNode(id, new CoordImpl(Double.parseDouble(reader.readLine()), Double.parseDouble(reader.readLine()))));
+				network.addNode(network.getFactory().createNode(id, new Coord(Double.parseDouble(reader.readLine()), Double.parseDouble(reader.readLine()))));
 				line = reader.readLine();
 			}
 			reader.close();
@@ -297,7 +296,7 @@ public class GTFS2MATSimTransitSchedule {
 	 * @param indices
 	 */
 	public void processStop(String[] parts, int[] indices, int publicSystemNumber) {
-		stops[publicSystemNumber].put(parts[indices[0]],new Stop(new CoordImpl(Double.parseDouble(parts[indices[1]]),Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
+		stops[publicSystemNumber].put(parts[indices[0]],new Stop(new Coord(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),parts[indices[3]],true));
 	}
 	public void processCalendar(String[] parts, int[] indices, int publicSystemNumber) {
 		boolean[] days = new boolean[7];
@@ -318,7 +317,7 @@ public class GTFS2MATSimTransitSchedule {
 			actual = new Shape(parts[indices[0]]);
 			shapes[publicSystemNumber].put(parts[indices[0]], actual);
 		}
-		actual.addPoint(new CoordImpl(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),Integer.parseInt(parts[indices[3]]));
+		actual.addPoint(new Coord(Double.parseDouble(parts[indices[1]]), Double.parseDouble(parts[indices[2]])),Integer.parseInt(parts[indices[3]]));
 	}
 	public void processRoute(String[] parts, int[] indices, int publicSystemNumber) {
 		routes[publicSystemNumber].put(parts[indices[0]], new Route(parts[indices[1]], RouteTypes.values()[Integer.parseInt(parts[indices[2]])]));

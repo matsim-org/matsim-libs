@@ -36,7 +36,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -275,7 +274,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private TransitStopFacility getStopFacility(final BHaltepunkt hp) {
 		TransitStopFacility facility = this.schedule.getFacilities().get(hp.id);
 		if (facility == null) {
-			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
+			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new Coord(hp.x / 1000.0, hp.y / 1000.0)));
 			facility = this.schedule.getFactory().createTransitStopFacility(hp.id, coord, false);
 			this.schedule.addStopFacility(facility);
 		}

@@ -38,7 +38,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.XY2Links;
 
 public class PopulationGenerator {
@@ -65,7 +64,7 @@ public class PopulationGenerator {
 
 			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
-			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900*r.nextDouble()), (int) (baseY - 450 + 900*r.nextDouble()));
+			Coord homeCoord = new Coord((double) (int) (baseX - 450 + 900 * r.nextDouble()), (double) (int) (baseY - 450 + 900 * r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);
 			person.addPlan(plan);
 			pop.addPerson(person);
@@ -79,7 +78,7 @@ public class PopulationGenerator {
 
 			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
-			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900*r.nextDouble()), (int) (baseY - 450 + 900*r.nextDouble()));
+			Coord homeCoord = new Coord((double) (int) (baseX - 450 + 900 * r.nextDouble()), (double) (int) (baseY - 450 + 900 * r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);
 			person.addPlan(plan);
 			pop.addPerson(person);
@@ -93,7 +92,7 @@ public class PopulationGenerator {
 
 			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
-			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900.0*r.nextDouble()), (int) (baseY - 450 + 900.0*r.nextDouble()));
+			Coord homeCoord = new Coord((double) (int) (baseX - 450 + 900.0 * r.nextDouble()), (double) (int) (baseY - 450 + 900.0 * r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);
 			person.addPlan(plan);
 			pop.addPerson(person);
@@ -117,9 +116,9 @@ public class PopulationGenerator {
 
 		Coord workCoord;
 		if (r.nextDouble() < 0.5) {
-			workCoord = new CoordImpl((int) (loc1X - 450 + 900.0*r.nextDouble()), (int) (loc1Y - 450 + 900.0*r.nextDouble()));
+			workCoord = new Coord((double) (int) (loc1X - 450 + 900.0 * r.nextDouble()), (double) (int) (loc1Y - 450 + 900.0 * r.nextDouble()));
 		} else {
-			workCoord = new CoordImpl((int) (loc2X - 450 + 900.0*r.nextDouble()), (int) (loc2Y - 450 + 900.0*r.nextDouble()));
+			workCoord = new Coord((double) (int) (loc2X - 450 + 900.0 * r.nextDouble()), (double) (int) (loc2Y - 450 + 900.0 * r.nextDouble()));
 		}
 		Activity w = pf.createActivityFromCoord("w", workCoord);
 		w.setEndTime(17.0*3600 + r.nextDouble()*3600.0);
@@ -132,9 +131,9 @@ public class PopulationGenerator {
 			// add shop activity
 			Coord shopCoord;
 			if (r.nextDouble() < 0.5) {
-				shopCoord = new CoordImpl((int) (loc1X - 450 + 900.0*r.nextDouble()), (int) (loc1Y - 450 + 900.0*r.nextDouble()));
+				shopCoord = new Coord((double) (int) (loc1X - 450 + 900.0 * r.nextDouble()), (double) (int) (loc1Y - 450 + 900.0 * r.nextDouble()));
 			} else {
-				shopCoord = new CoordImpl((int) (loc2X - 450 + 900.0*r.nextDouble()), (int) (loc2Y - 450 + 900.0*r.nextDouble()));
+				shopCoord = new Coord((double) (int) (loc2X - 450 + 900.0 * r.nextDouble()), (double) (int) (loc2Y - 450 + 900.0 * r.nextDouble()));
 			}
 			Activity s = pf.createActivityFromCoord("s", shopCoord);
 			s.setEndTime(w.getEndTime() + r.nextDouble()*3600.0);

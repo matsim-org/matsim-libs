@@ -1,6 +1,6 @@
 package org.matsim.vis.otfvis.opengl.gl;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 public class DrawingUtils {
 	

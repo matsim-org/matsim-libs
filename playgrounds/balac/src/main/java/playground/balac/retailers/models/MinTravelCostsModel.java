@@ -52,7 +52,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
       for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-      PersonImpl pi = (PersonImpl)p;
+      Person pi = p;
       this.persons.put(pi.getId(), pi);
     }
   }
@@ -65,8 +65,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
     log.info("Initial solution = " + getInitialSolution());
     findScenarioShops(this.controlerFacilities.getFacilities().values());
     Gbl.printMemoryUsage();
-    for (PersonImpl pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl(pi);
+    for (Person pi : this.persons.values()) {
+      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));
@@ -78,7 +78,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       String linkId = this.first.get(i);
       double scoreSum = 0.0D;
         LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
       for (PersonPrimaryActivity ppa : primaryActivities)

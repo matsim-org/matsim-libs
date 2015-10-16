@@ -66,7 +66,7 @@ public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
 	public void handleEvent(LinkEnterEvent event) {
 		
 		// ignore non-car travelers
-		if (!this.carAgents.contains(event.getPersonId())) return;
+		if (!this.carAgents.contains(event.getDriverId())) return;
 				
 		// call from NetworkReadExample
 		enterLink(event.getLinkId(), event.getTime());

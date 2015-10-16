@@ -120,6 +120,11 @@ public class MarginalCongestionHandlerV3Test {
 			System.out.println("Person: " + personId + " // total caused delay: " + personId2causedDelay.get(personId) + " // total affected delay: " + personId2affectedDelay.get(personId));		
 		}
 		
+		double outflowRate = 3.; // 1200 veh / h --> 1 veh every 3 sec
+		double inflowRate = 1.; // 1 veh every 1 sec
+		int demand = 20;
+		Assert.assertEquals("wrong total delay", (outflowRate - inflowRate) * (demand * demand - demand) / 2, totalDelay, MatsimTestUtils.EPSILON);
+		
 		// assert
 		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong values for testAgent7", 12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);

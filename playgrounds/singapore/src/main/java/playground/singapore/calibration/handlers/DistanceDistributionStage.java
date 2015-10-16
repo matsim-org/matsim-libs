@@ -1,13 +1,31 @@
 package playground.singapore.calibration.handlers;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -19,10 +37,6 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * 
@@ -80,7 +94,9 @@ public class DistanceDistributionStage {
 					}
 					else if(leg.getMode().equals("pt")) {
 						ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) factory.createRoute(leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
-						eRoute.setRouteDescription(leg.getRoute().getStartLinkId(), ((GenericRoute)leg.getRoute()).getRouteDescription(), leg.getRoute().getEndLinkId());
+						eRoute.setStartLinkId(leg.getRoute().getStartLinkId());
+						eRoute.setEndLinkId(leg.getRoute().getEndLinkId());
+						eRoute.setRouteDescription((leg.getRoute()).getRouteDescription());
 						TransitLine line = transitSchedule.getTransitLines().get(eRoute.getLineId());
 						chain.distances.add(lastLinkLenght+RouteUtils.calcDistance(line.getRoutes().get(eRoute.getRouteId()).getRoute().getSubRoute(eRoute.getStartLinkId(), eRoute.getEndLinkId()), network));
 						chain.modes.add(getMode(line.getRoutes().get(eRoute.getRouteId()).getTransportMode(), line.getId()));

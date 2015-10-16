@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -78,12 +78,12 @@ public class InpNetworkMapper extends AbstractNetworkMapper {
 					if (fromPattern.matcher(line).matches()) {
 						String[] lineVals = line.split(" +");
 						network.addNode(networkFactory.createNode(Id.create(linkId.toString() + "FROM", Node.class),
-								new CoordImpl(Double.parseDouble(lineVals[2]), Double.parseDouble(lineVals[3]))));
+								new Coord(Double.parseDouble(lineVals[2]), Double.parseDouble(lineVals[3]))));
 					}
 					if (toPattern.matcher(line).matches()) {
 						String[] lineVals = line.split(" +");
 						network.addNode(networkFactory.createNode(Id.create(linkId.toString() + "TO", Node.class),
-								new CoordImpl(Double.parseDouble(lineVals[2]), Double.parseDouble(lineVals[3]))));
+								new Coord(Double.parseDouble(lineVals[2]), Double.parseDouble(lineVals[3]))));
 						// Add link:
 						Node fromNode = network.getNodes().get(Id.create(linkId.toString() + "FROM", Link.class));
 						Node toNode = network.getNodes().get(Id.create(linkId.toString() + "TO", Link.class));

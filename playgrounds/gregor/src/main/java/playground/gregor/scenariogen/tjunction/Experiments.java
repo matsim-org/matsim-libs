@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +48,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
@@ -268,11 +268,17 @@ public class Experiments {
 		}
 
 
-		NodeImpl n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(-5,-Bcor1/2));
-		NodeImpl n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(-Bcor2/2,0));
-		NodeImpl n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(4,-Bcor1/2));
-		NodeImpl n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(-Bcor2/2,4));
-		NodeImpl n9 = fac.createNode(Id.create("n9", Node.class), new CoordImpl(24,-2));
+		final double x2 = -5;
+		final double y2 = -Bcor1 / 2;
+		NodeImpl n2 = fac.createNode(Id.create("n2", Node.class), new Coord(x2, y2));
+		final double x1 = -Bcor2 / 2;
+		NodeImpl n3 = fac.createNode(Id.create("n3", Node.class), new Coord(x1, (double) 0));
+		final double y1 = -Bcor1 / 2;
+		NodeImpl n4 = fac.createNode(Id.create("n4", Node.class), new Coord((double) 4, y1));
+		final double x = -Bcor2 / 2;
+		NodeImpl n5 = fac.createNode(Id.create("n5", Node.class), new Coord(x, (double) 4));
+		final double y = -2;
+		NodeImpl n9 = fac.createNode(Id.create("n9", Node.class), new Coord((double) 24, y));
 
 		net.addNode(n2);
 		net.addNode(n3);
@@ -330,15 +336,27 @@ public class Experiments {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(-40,-Bcor1/2));
-		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(-10,-Bcor1/2+0.001));
-		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(-5,-Bcor1/2));
-		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(4,-Bcor1/2));
-		Node n6 = fac.createNode(Id.create("n6", Node.class), new CoordImpl(9,-Bcor1/2-0.001));
-		Node n7 = fac.createNode(Id.create("n7", Node.class), new CoordImpl(39,-Bcor1/2));
-		Node n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(-Bcor2/2,4));
-		Node n8 = fac.createNode(Id.create("n8", Node.class), new CoordImpl(-Bcor2/2+0.001,9));
-		Node n9 = fac.createNode(Id.create("n9", Node.class), new CoordImpl(-Bcor2/2,39));
+		final double x5 = -40;
+		final double y5 = -Bcor1 / 2;
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new Coord(x5, y5));
+		final double x4 = -10;
+		final double y4 = -Bcor1 / 2 + 0.001;
+		Node n1 = fac.createNode(Id.create("n1", Node.class), new Coord(x4, y4));
+		final double x3 = -5;
+		final double y3 = -Bcor1 / 2;
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new Coord(x3, y3));
+		final double y2 = -Bcor1 / 2;
+		Node n4 = fac.createNode(Id.create("n4", Node.class), new Coord((double) 4, y2));
+		final double y1 = -Bcor1 / 2 - 0.001;
+		Node n6 = fac.createNode(Id.create("n6", Node.class), new Coord((double) 9, y1));
+		final double y = -Bcor1 / 2;
+		Node n7 = fac.createNode(Id.create("n7", Node.class), new Coord((double) 39, y));
+		final double x2 = -Bcor2 / 2;
+		Node n5 = fac.createNode(Id.create("n5", Node.class), new Coord(x2, (double) 4));
+		final double x1 = -Bcor2 / 2 + 0.001;
+		Node n8 = fac.createNode(Id.create("n8", Node.class), new Coord(x1, (double) 9));
+		final double x = -Bcor2 / 2;
+		Node n9 = fac.createNode(Id.create("n9", Node.class), new Coord(x, (double) 39));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);

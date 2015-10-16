@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -77,7 +76,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		if(controler.getConfig().transit().isUseTransit())
 			modes.add("pt");
         for(Person person: controler.getScenario().getPopulation().getPersons().values())
-			toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson((PersonImpl) person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
+			toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson(person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
 		for(Person person:toBeAdded) {
             controler.getScenario().getPopulation().getPersons().remove(person.getId());
             controler.getScenario().getPopulation().addPerson(person);

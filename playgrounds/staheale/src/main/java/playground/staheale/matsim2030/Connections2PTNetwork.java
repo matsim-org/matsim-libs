@@ -127,7 +127,7 @@ public class Connections2PTNetwork {
 			// add district as a node to network
 			double x = Double.parseDouble(bezirkXAchse);
 			double y = Double.parseDouble(bezirkYAchse);
-			Coord coords = sc.createCoord(x, y);
+			Coord coords = new Coord(x, y);
 			Node bezirkNode = factory.createNode(bezirkNodeId, coords);
 			PTnetwork.addNode(bezirkNode);
 
@@ -175,7 +175,7 @@ public class Connections2PTNetwork {
 				// add lines between district and node to schedule
 				double xNode = Double.parseDouble(knotenXAchse);
 				double yNode = Double.parseDouble(knotenYAchse);
-				Coord coordsNode = sc.createCoord(xNode, yNode);
+				Coord coordsNode = new Coord(xNode, yNode);
 				Id<TransitStopFacility> existingNodeId2 = Id.create(knotenNummer+bezirkNummer, TransitStopFacility.class);
 				TransitStopFacility newNodeStop = scheduleFactory.createTransitStopFacility(existingNodeId2, coordsNode, false);
 				newNodeStop.setName(bezirkName+"_Anbindung");

@@ -1,7 +1,6 @@
 package playground.artemc.hits;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.artemc.utils.DataBaseAdmin;
@@ -206,12 +205,12 @@ public class activitiesAnalyzerHITS_beta1 {
 					endTime= agentTrips.getTime(11);
 					endDate= agentTrips.getDate(11);
 
-					Coord coordStart = new CoordImpl(startLon, startLat);
+					Coord coordStart = new Coord(startLon, startLat);
 					Coord UTMStart = ct.transform(coordStart);
 					startLon=UTMStart.getX();
-					startLat=UTMStart.getY();	
-						  
-					Coord coordEnd = new CoordImpl(endLon, endLat);
+					startLat=UTMStart.getY();
+
+					Coord coordEnd = new Coord(endLon, endLat);
 					Coord UTMEnd = ct.transform(coordEnd);
 					endLon=UTMEnd.getX();
 					endLat=UTMEnd.getY();
@@ -276,13 +275,13 @@ public class activitiesAnalyzerHITS_beta1 {
 							System.out.println("ERROR: "+agentTrips.getString("t11_boardsvcstn")+" "+pax);
 						if(row1==0)
 							System.out.println("ERROR 1: "+agentTrips.getString("t12_alightstn")+" "+pax);
-					  
-						Coord coordStartPt = new CoordImpl(startLon, startLat);
+
+						Coord coordStartPt = new Coord(startLon, startLat);
 						Coord UTMStartPt = ct.transform(coordStartPt);
 						startLon=UTMStartPt.getX();
-						startLat=UTMStartPt.getY();	
-							  
-						Coord coordEndPt = new CoordImpl(endLon, endLat);
+						startLat=UTMStartPt.getY();
+
+						Coord coordEndPt = new Coord(endLon, endLat);
 						Coord UTMEndPt = ct.transform(coordEndPt);
 						endLon=UTMEndPt.getX();
 						endLat=UTMEndPt.getY();
@@ -329,13 +328,13 @@ public class activitiesAnalyzerHITS_beta1 {
 					startLon = agentTrips.getDouble(7);
 					endLat = agentTrips.getDouble(8);
 					endLon = agentTrips.getDouble(9);
-			
-					Coord coordStart =new CoordImpl(startLon, startLat);
+
+					Coord coordStart = new Coord(startLon, startLat);
 					Coord UTMStart = ct.transform(coordStart);
 					startLon=UTMStart.getX();
-					startLat=UTMStart.getY();	
-					
-					Coord coordEnd = new CoordImpl(endLon, endLat);
+					startLat=UTMStart.getY();
+
+					Coord coordEnd = new Coord(endLon, endLat);
 					Coord UTMEnd = ct.transform(coordEnd);
 					endLon=UTMEnd.getX();
 					endLat=UTMEnd.getY();
@@ -388,13 +387,13 @@ public class activitiesAnalyzerHITS_beta1 {
 							System.out.println("ERROR: "+agentTrips.getString("t11_boardsvcstn")+" "+pax);
 						if(row1==0)
 							System.out.println("ERROR 1: "+agentTrips.getString("t12_alightstn")+" "+pax);
-						
-						Coord coordStartPt =new CoordImpl(startLon, startLat);
+
+						Coord coordStartPt = new Coord(startLon, startLat);
 						Coord UTMStartPt = ct.transform(coordStartPt);
 						startLon=UTMStartPt.getX();
-						startLat=UTMStartPt.getY();	
-							  
-						Coord coordEndPt = new CoordImpl(endLon, endLat);
+						startLat=UTMStartPt.getY();
+
+						Coord coordEndPt = new Coord(endLon, endLat);
 						Coord UTMEndPt = ct.transform(coordEndPt);
 						endLon=UTMEndPt.getX();
 						endLat=UTMEndPt.getY();

@@ -43,7 +43,6 @@ import javax.swing.JPanel;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import GTFS2PTSchedule.PathEditor.gui.Window.Option;
 
@@ -220,7 +219,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		else {
 			if(wait) {
-				window.add(new CoordImpl(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY())));
+				window.add(new Coord(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY())));
 				wait=false;
 			}
 			else

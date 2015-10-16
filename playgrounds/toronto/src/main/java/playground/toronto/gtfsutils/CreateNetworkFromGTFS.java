@@ -18,7 +18,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.toronto.demand.util.TableReader;
@@ -49,7 +48,7 @@ public class CreateNetworkFromGTFS{
 		
 		while (rdStops.next()){
 			Id<Node> StopID = Id.create(rdStops.current().get("stop_id").toString(), Node.class);
-			CoordImpl StopCoord = new CoordImpl(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
+			Coord StopCoord = new Coord(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
 			network.createAndAddNode(StopID, StopCoord);
 			StopAndCoordinates.put(StopID, StopCoord);	
 		}//end of while loop

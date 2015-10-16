@@ -28,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -39,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
-	private PersonImpl person = null;
+	private Person person = null;
 	private PlanImpl plan = null;
 	private ActivityFacilities facilities = null;
 
@@ -50,7 +49,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		// create facilities, activities in it and open times
 		this.facilities = new ActivityFacilitiesImpl();
 
-		Coord defaultCoord = new CoordImpl(0.0, 0.0);
+		Coord defaultCoord = new Coord(0.0, 0.0);
 		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(Id.create(0, ActivityFacility.class), defaultCoord);
 
 		ActivityOptionImpl ao = testFacility.createActivityOption("shop");
@@ -59,7 +58,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
-		this.person = new PersonImpl(Id.create(1, Person.class));
+		this.person = PersonImpl.createPerson(Id.create(1, Person.class));
 		this.plan = new PlanImpl();
 		this.person.addPlan(this.plan);
 
@@ -81,7 +80,12 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		final Config config = loadConfig(null);
 		Activity act = this.plan.getFirstActivity();
 
-		CharyparNagelOpenTimesActivityScoring testee = new CharyparNagelOpenTimesActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), this.facilities);
+		CharyparNagelOpenTimesActivityScoring testee =
+				new CharyparNagelOpenTimesActivityScoring(
+						CharyparNagelScoringParameters.getBuilder(
+								config.planCalcScore(),
+								config.planCalcScore().getScoringParameters( null ),
+								config.scenario()).create(), this.facilities);
 
 		double[] openInterval = null;
 

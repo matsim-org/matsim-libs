@@ -17,11 +17,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -77,8 +76,8 @@ public class MembershipAssigner {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 		
 		double access = 0.0;
-		
-		Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+
+			Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements())
 	    {
 	      if ((pe instanceof Activity))
@@ -93,7 +92,7 @@ public class MembershipAssigner {
 
 	    }
 		
-	    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().get(c.getX(), c.getY() , 5000.0D);
+	    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 	    for (TwoWayCSStation station : nearbyStations) {
 	      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
 	    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
@@ -119,8 +118,8 @@ public class MembershipAssigner {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
 			double access = 0.0;
-			
-			Coord c = new CoordImpl((1.0D / 0.0D), (1.0D / 0.0D));
+
+			Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements())
 		    {
 		      if ((pe instanceof Activity))
@@ -135,7 +134,7 @@ public class MembershipAssigner {
 
 		    }
 			
-		    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().get(c.getX(), c.getY() , 5000.0D);
+		    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 		    for (TwoWayCSStation station : nearbyStations) {
 		      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
 		    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
@@ -162,7 +161,7 @@ public class MembershipAssigner {
 		int count = 0;
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
-			if (((PersonImpl)p).getLicense().equals("yes")) {
+			if (PersonUtils.getLicense(p).equals("yes")) {
 				
 				int x = calcMembership(p);
 				if (x == 0) {
@@ -210,8 +209,8 @@ public class MembershipAssigner {
 	protected final double calcNoUtil(Person pi) {
 	  double util = 0.0D;
 	  util += 5.23D * 0.924;
-	  if (((((PersonImpl)pi).getAge() <= 30 ? 1 : 0) & (((PersonImpl)pi).getAge() >= 18 ? 1 : 0)) != 0) util += 0.791D;
-	  if (((PersonImpl)pi).getAge() >= 60) util += 0.43D;
+	  if (((PersonUtils.getAge(pi) <= 30 ? 1 : 0) & (PersonUtils.getAge(pi) >= 18 ? 1 : 0)) != 0) util += 0.791D;
+	  if (PersonUtils.getAge(pi) >= 60) util += 0.43D;
 
 	  return util;
 	}
@@ -223,10 +222,10 @@ public class MembershipAssigner {
 	  util += 0.0563D * this.accessWork.get(pi.getId());
 	  util += 0.0D;
 
-	  if (((((PersonImpl)pi).getAge() <= 45 ? 1 : 0) & (((PersonImpl)pi).getAge() >= 31 ? 1 : 0)) != 0) util += 0.436D;
-	  if (((PersonImpl)pi).getCarAvail().equals( "never")) util += 1.14D;
-	  if (((PersonImpl)pi).getCarAvail().equals( "sometimes")) util += 2.56D;
-	  if (((PersonImpl)pi).getSex().equals( "m")) util += 0.197D;
+	  if (((PersonUtils.getAge(pi) <= 45 ? 1 : 0) & (PersonUtils.getAge(pi) >= 31 ? 1 : 0)) != 0) util += 0.436D;
+	  if (PersonUtils.getCarAvail(pi).equals( "never")) util += 1.14D;
+	  if (PersonUtils.getCarAvail(pi).equals( "sometimes")) util += 2.56D;
+	  if (PersonUtils.getSex(pi).equals( "m")) util += 0.197D;
 
 	  return util;
 	}

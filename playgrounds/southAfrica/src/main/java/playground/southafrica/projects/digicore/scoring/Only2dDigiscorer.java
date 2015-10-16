@@ -127,7 +127,7 @@ public class Only2dDigiscorer implements DigiScorer {
 				double x = Double.parseDouble(sa[5]);
 				double y = Double.parseDouble(sa[6]);
 				
-				Point closestCell = this.grid.getGrid().get(x, y);
+				Point closestCell = this.grid.getGrid().getClosest(x, y);
 				double oldValue = countMap.get(closestCell);
 				countMap.put(closestCell, oldValue + 1.0);
 				pointsConsidered += 1.0; /* We assume the weight of each point is 1.0 */
@@ -227,7 +227,7 @@ public class Only2dDigiscorer implements DigiScorer {
 		double y = Double.parseDouble(sa[6]);
 
 		/* Get the closest cell to this point. */
-		Point cell = grid.getGrid().get(x, y);
+		Point cell = grid.getGrid().getClosest(x, y);
 		int risk = mapRating.get(cell);
 		switch (risk) {
 		case 0:

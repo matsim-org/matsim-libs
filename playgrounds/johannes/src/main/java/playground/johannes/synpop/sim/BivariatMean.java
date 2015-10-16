@@ -22,16 +22,15 @@ package playground.johannes.synpop.sim;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.math.Discretizer;
+import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.data.CachedElement;
+import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
 import playground.johannes.synpop.sim.util.DynamicIntArray;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -57,10 +56,8 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private double hamiltonianValue;
 
-    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends CachedElement> simElements, String
+    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
-//        this.xDataKey = Converters.getObjectKey(xAttrKey);
-//        this.yDataKey = Converters.getObjectKey(yAttrKey);
         this.xAttrKey = xAttrKey;
         this.yAttrKey = yAttrKey;
         this.xDataDiscr = xDataDiscr;
@@ -93,7 +90,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void initSimulationValues(Set<? extends CachedElement> elements, String xAttrKey, String yAttrKey) {
+    private void initSimulationValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey) {
         bucketSums = new DynamicDoubleArray(100, Double.NaN);
         bucketCounts = new DynamicIntArray(100, -1);
 
@@ -190,7 +187,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
     }
 
     @Override
-    public double evaluate(Person person) {
+    public double evaluate(Collection<CachedPerson> population) {
         return hamiltonianValue;
     }
 

@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -102,8 +101,9 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 			for (Link l : network.getLinks().values()) {
 				Node f = l.getFromNode();
 				Node t = l.getToNode();
-				
-				Coord offsetVector = new CoordImpl(t.getCoord().getY()-f.getCoord().getY(),-t.getCoord().getX()+f.getCoord().getX());
+
+				final double y = -t.getCoord().getX() + f.getCoord().getX();
+				Coord offsetVector = new Coord(t.getCoord().getY() - f.getCoord().getY(), y);
 				offsetVector = CoordUtils.scalarMult(offset/CoordUtils.length(offsetVector),offsetVector);
 				Coord fc = CoordUtils.plus(f.getCoord(),offsetVector);
 				Coord tc = CoordUtils.plus(t.getCoord(),offsetVector);

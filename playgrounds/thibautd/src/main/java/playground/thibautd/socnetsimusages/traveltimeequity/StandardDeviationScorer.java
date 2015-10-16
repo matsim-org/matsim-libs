@@ -21,6 +21,7 @@ package playground.thibautd.socnetsimusages.traveltimeequity;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -37,6 +38,7 @@ import java.util.Set;
  * @author thibautd
  */
 public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEventScoring {
+	private static final Logger log = Logger.getLogger(StandardDeviationScorer.class);
 	private final TravelTimesRecord travelTimesRecord;
 	private final Set<String> activityType;
 
@@ -64,25 +66,25 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 	private void handleActivityStartEvent(final ActivityStartEvent event) {
 		if ( activityType.contains( event.getActType() ) ) {
-			isInActivity = true;
 			currentActivityValues = new ActivityValues();
 			activityValues.add( currentActivityValues );
 
 			currentActivityValues.addArrival( event.getPersonId() , event.getTime() );
 		}
+		else currentActivityValues = null;
 	}
 
 	private void handleActivityEndEvent(final ActivityEndEvent event) {
-		isInActivity = false;
+		//isInActivity = false;
 
 		if ( currentActivityValues != null ) {
 			currentActivityValues.addDeparture( event.getPersonId() , event.getTime() );
-			currentActivityValues = null;
+			//currentActivityValues = null;
 		}
 	}
 
 	private void handleCourtesyEvent(final CourtesyEvent event) {
-		if ( !isInActivity ) return;
+		if ( currentActivityValues == null ) return;
 
 		switch ( event.getType() ) {
 			case sayHelloEvent:
@@ -102,7 +104,13 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 	@Override
 	public double getScore() {
 		double sumStdDevs = 0;
-		for ( ActivityValues values : activityValues ) sumStdDevs += values.calcStdDev();
+		for ( ActivityValues values : activityValues ) sumStdDevs += values.calcNormalizedStdDev();
+
+		assert sumStdDevs >= 0;
+		if ( log.isTraceEnabled() && sumStdDevs > 0 ) {
+			log.trace( "got sum of standard deviations of "+sumStdDevs );
+		}
+
 		return betaStdDev * sumStdDevs;
 	}
 
@@ -114,17 +122,20 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 		private final List<Id<Person>> departurePersons = new ArrayList<>();
 
 		public void addArrival( final Id<Person> person , final double time ) {
+			if ( log.isTraceEnabled() ) log.trace( "remember arrival for "+person+" at "+time );
 			arrivalPersons.add( person );
 			arrivalTimes.add( time );
 		}
 
 		public void addDeparture( final Id<Person> person , final double time ) {
+			if ( log.isTraceEnabled() ) log.trace( "remember departure for "+person+" at "+time );
 			departurePersons.add( person );
 			departureTimes.add( time );
 		}
 
-		public double calcStdDev() {
-			assert departureTimes.size() == arrivalTimes.size();
+		public double calcNormalizedStdDev() {
+			// assert departureTimes.size() == arrivalTimes.size();
+			// not the case before activity ends (which might never happen)
 			// for each person, sum the travel times: we do not want to enforce that access and egress of an agent have
 			// the same length, but similarity across agents.
 			final TObjectDoubleHashMap<Id<Person>> travelTimes = new TObjectDoubleHashMap<>();
@@ -143,20 +154,30 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 			assert departureTimes.size() == departurePersons.size();
 			for ( int i=0; i < departureTimes.size(); i++ ) {
+				// For several reasons, there might not (yet) be any subsequent trip:
+				// - some parts of the code ask for "partial" score, possibly before the trip is completed
+				// - an agent might fail to complete its plan
+				// In those cases, estimate the total travel time using 2x the access travel time
 				final double tt =
-						travelTimesRecord.getTravelTimeBefore(
+						travelTimesRecord.alreadyKnowsTravelTimeAfter(
 								departurePersons.get( i ),
-								departureTimes.get( i ) );
+								departureTimes.get( i ) ) ?
+							travelTimesRecord.getTravelTimeAfter(
+									departurePersons.get( i ),
+									departureTimes.get( i ) ) :
+							travelTimesRecord.getTravelTimeBefore(
+									departurePersons.get( i ),
+									departureTimes.get( i ) );
 
 				travelTimes.adjustOrPutValue(
 						departurePersons.get(i),
 						tt, tt);
 			}
 
-			return calcStdDev( travelTimes.valueCollection() );
+			return calcNormalizedStdDev(travelTimes.valueCollection());
 		}
 
-		private double calcStdDev( final TDoubleCollection travelTimes ) {
+		private double calcNormalizedStdDev(final TDoubleCollection travelTimes) {
 			double avg = 0;
 			for ( double tt : travelTimes.toArray() ) avg += tt;
 			avg /= travelTimes.size();

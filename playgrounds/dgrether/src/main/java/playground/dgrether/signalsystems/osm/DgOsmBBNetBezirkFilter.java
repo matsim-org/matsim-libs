@@ -38,11 +38,11 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dgrether.visualization.KmlNetworkVisualizer;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
+import playground.dgrether.visualization.KmlNetworkVisualizer;
 
 
 /**
@@ -99,7 +99,7 @@ public class DgOsmBBNetBezirkFilter {
 						nn = n.getFactory().createNode(toNode.getId(), toNode.getCoord());
 						n.addNode(nn);
 					}
-					Link nl = n.getFactory().createLink(orgLink.getId(), fromNode.getId(), toNode.getId());
+					Link nl = n.getFactory().createLink(orgLink.getId(), n.getNodes().get(fromNode.getId()), n.getNodes().get(toNode.getId()));
 					nl.setCapacity(orgLink.getCapacity());
 					nl.setFreespeed(orgLink.getFreespeed());
 					nl.setLength(orgLink.getLength());

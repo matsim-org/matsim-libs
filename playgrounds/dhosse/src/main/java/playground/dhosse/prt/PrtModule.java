@@ -3,9 +3,8 @@ package playground.dhosse.prt;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -69,9 +68,9 @@ public class PrtModule {
 		controler.getConfig().plansCalcRoute().getModeRoutingParams().put(PrtRequestCreator.MODE, pars);
 		
 		LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tdis, ttime);
-		LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(router, new TimeDiscretizer(30*4, 15, false));
+		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, new TimeDiscretizer(30*4, 15, false));
 		
-		calculator = new VrpPathCalculatorImpl(routerWithCache, ttime, tdis);
+		calculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(ttime, tdis));
 		
 		context = new MatsimVrpContextImpl();
 		context.setScenario(scenario);

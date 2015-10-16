@@ -1,11 +1,13 @@
 package playground.kai.run;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -25,12 +27,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 class MyControler {
 	
@@ -38,7 +36,12 @@ class MyControler {
 		Logger.getLogger("blabla").warn("here") ;
 		
 		// prepare the config:
-		Config config = ConfigUtils.loadConfig( args[0] ) ;
+		Config config ;
+		if ( args.length>0 ) {
+			config = ConfigUtils.loadConfig( args[0] ) ;
+		} else {
+			config = ConfigUtils.loadConfig("examples/equil/config.xml") ;
+		}
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 		
 		// prepare the scenario
@@ -46,12 +49,9 @@ class MyControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-		controler.addOverridingModule(new OTFVisModule());
+//		controler.addOverridingModule(new OTFVisModule());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
 
 		// run everything:

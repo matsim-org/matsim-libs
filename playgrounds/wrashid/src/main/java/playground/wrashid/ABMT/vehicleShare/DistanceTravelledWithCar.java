@@ -1,18 +1,14 @@
 package playground.wrashid.ABMT.vehicleShare;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.controler.Controler;
 
 /**
  * 
@@ -36,7 +32,7 @@ public class DistanceTravelledWithCar implements LinkEnterEventHandler, PersonAr
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		double linkLength = network.getLinks().get(event.getLinkId()).getLength();
-		distanceTravelled.incrementBy(event.getPersonId(), linkLength);
+		distanceTravelled.incrementBy(event.getDriverId(), linkLength);
 	}
 
 	@Override

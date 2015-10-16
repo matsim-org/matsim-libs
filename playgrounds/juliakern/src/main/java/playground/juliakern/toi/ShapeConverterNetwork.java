@@ -81,7 +81,7 @@ public class ShapeConverterNetwork {
 				// create from node (if it doesnt exist yet)
 				Double fromNodeX = (Double) sf.getAttribute("X_fra");
 				Double fromNodeY = (Double) sf.getAttribute("Y_fra");
-				Coord fromCoord = scenario.createCoord(fromNodeX, fromNodeY);
+				Coord fromCoord = new Coord(fromNodeX, fromNodeY);
 				Long fromNodeLong = (Long) sf.getAttribute("FNODE_");
 				String fromNode = Long.toString(fromNodeLong);
 				Node node1;
@@ -96,7 +96,7 @@ public class ShapeConverterNetwork {
 				// create to node (if it does not exist yet)
 				Double toNodeX = (Double) sf.getAttribute("X_til");
 				Double toNodeY = (Double) sf.getAttribute("Y_til");
-				Coord toCoord = scenario.createCoord(toNodeX, toNodeY);
+				Coord toCoord = new Coord(toNodeX, toNodeY);
 				Long toNodeLong = (Long) sf.getAttribute("TNODE_");
 				String toNode = Long.toString(toNodeLong);
 				Node node2;

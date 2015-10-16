@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -70,9 +69,9 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 			// too many individual plans?
 			if ( plansPerComposition.getIndividualPlans().size() > maxPlansPerComposition ) {
 				assert plansPerComposition.getIndividualPlans().size() == maxPlansPerComposition + 1;
-				((PersonImpl) person).removePlan( 
-						identifyWorst( 
-							plansPerComposition.getIndividualPlans() ) );
+				person.removePlan(
+						identifyWorst(
+								plansPerComposition.getIndividualPlans()));
 				somethingDone = true;
 			}
 
@@ -82,7 +81,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					final JointPlan toRemove = identifyWorst( maxRank , structure );
 
 					for ( Plan p : toRemove.getIndividualPlans().values() ) {
-						((PersonImpl) p.getPerson()).removePlan( p );
+						p.getPerson().removePlan(p);
 					}
 					jointPlans.removeJointPlan( toRemove );
 					somethingDone = true;
@@ -107,12 +106,12 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 
 				if ( jpToRemove != null ) {
 					for ( Plan p : jpToRemove.getIndividualPlans().values() ) {
-						((PersonImpl) p.getPerson()).removePlan( p );
+						p.getPerson().removePlan(p);
 					}
 					jointPlans.removeJointPlan( jpToRemove );
 				}
 				else {
-					((PersonImpl) person).removePlan( toRemove );
+					person.removePlan(toRemove);
 				}
 
 				somethingDone = true;

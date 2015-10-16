@@ -22,7 +22,6 @@
 package playground.mrieser;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
@@ -103,7 +102,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  }
 
 	  public Coord bl2rh(final double b, final double l){
-	  	Coord p = new CoordImpl(0, 0);
+		  Coord p = new Coord((double) 0, (double) 0);
 	    if (!this.ell.isSoldner()) {
 	      int kz = (int)((l+(this.ell.getDEG()==3?0.5:1)*this.ell.getDEG())/this.ell.getDEG());
 	      //int kz = (int)((P.getLongitude()+0.5*this.Ell.getDEG())/this.Ell.getDEG());
@@ -153,7 +152,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  }
 
 	  public Coord rh2bl(final double r, final double h){
-	  	Coord p = new CoordImpl(0, 0);
+		  Coord p = new Coord((double) 0, (double) 0);
 
 	    if (!this.ell.isSoldner()) {
 	      int kz;

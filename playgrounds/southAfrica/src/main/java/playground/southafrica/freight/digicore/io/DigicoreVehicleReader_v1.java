@@ -25,8 +25,8 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.TimeZone;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
@@ -121,7 +121,7 @@ public class DigicoreVehicleReader_v1 extends MatsimXmlParser {
 		String link = atts.getValue(ATTR_LINK);
 		
 		currentActivity = new DigicoreActivity(type, timeZone, locale);
-		currentActivity.setCoord(new CoordImpl(x, y));
+		currentActivity.setCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 		currentActivity.setStartTime(parseDate(startTime));
 		currentActivity.setEndTime(parseDate(endTime));
 		currentActivity.setType(type);

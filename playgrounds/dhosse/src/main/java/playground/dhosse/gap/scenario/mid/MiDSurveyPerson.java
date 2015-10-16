@@ -1,5 +1,6 @@
 package playground.dhosse.gap.scenario.mid;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -8,7 +9,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.dhosse.utils.EgapHashGenerator;
@@ -72,7 +72,7 @@ public class MiDSurveyPerson {
 		
 		plan.addLeg(leg);
 		
-		Activity act = new ActivityImpl(activityType, new CoordImpl(0., 0.));
+		Activity act = new ActivityImpl(activityType, new Coord(0., 0.));
 		
 		if(plan.getPlanElements().size() > 1){
 			

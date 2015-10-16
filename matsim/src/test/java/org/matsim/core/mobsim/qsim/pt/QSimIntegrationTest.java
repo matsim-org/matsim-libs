@@ -19,11 +19,23 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,20 +48,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.testcases.utils.SelectiveEventsCollector;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author mrieser
@@ -94,7 +98,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -153,7 +157,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -228,7 +232,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -310,7 +314,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -384,7 +388,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -413,12 +417,12 @@ public class QSimIntegrationTest {
 
 			// setup: network
 			Network network = this.scenario.getNetwork();
-			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.scenario.createCoord(   0, 0));
-			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.scenario.createCoord(1000, 0));
-			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.scenario.createCoord(2000, 0));
-			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), this.scenario.createCoord(3000, 0));
-			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), this.scenario.createCoord(4000, 0));
-			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), this.scenario.createCoord(5000, 0));
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000, 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(2000, 0));
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new Coord(3000, 0));
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new Coord(4000, 0));
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new Coord(5000, 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
@@ -440,8 +444,6 @@ public class QSimIntegrationTest {
 			network.addLink(link3);
 			network.addLink(link4);
 			network.addLink(link5);
-
-			((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 			// setup: vehicles
 			String vehiclesXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

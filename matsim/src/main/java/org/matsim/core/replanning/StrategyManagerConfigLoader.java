@@ -43,74 +43,76 @@ import java.util.Map;
  * @author mrieser
  */
 public final class StrategyManagerConfigLoader {
+	private StrategyManagerConfigLoader(){} // container for static methods only, do not instantiate
 
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
 
+	@Deprecated // try to use "load" with inject syntax, see below.  kai, aug'15
 	public static void load(final Controler controler, final StrategyManager manager) {
 		load(controler.getInjector(), controler.getInjector().getPlanStrategies(), controler.getInjector().getPlanSelectorsForRemoval(), manager);
 	}
 
-    public static void load(Injector injector, Map<String, PlanStrategy> planStrategies, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval, StrategyManager manager) {
-        Config config = injector.getInstance(Config.class);
-        manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
+	public static void load(Injector injector, Map<String, PlanStrategy> planStrategies, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval, StrategyManager manager) {
+		Config config = injector.getInstance(Config.class);
+		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
-        int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration())
-                * config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
-        log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
+		int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration())
+				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
+		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-        manager.setSubpopulationAttributeName(
-                config.plans().getSubpopulationAttributeName());
-        for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
-            String strategyName = settings.getStrategyName();
+		manager.setSubpopulationAttributeName( config.plans().getSubpopulationAttributeName());
+		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+			PlanStrategy strategy = loadStrategy(settings, planStrategies, injector);
 
-            PlanStrategy strategy = loadStrategy(strategyName, settings, planStrategies, injector);
+			if (strategy == null) {
+				throw new RuntimeException("Strategy named " + settings.getStrategyName() + " not found.");
+			}
 
-            if (strategy == null) {
-                throw new RuntimeException("Strategy named " + strategyName + " not found.");
-            }
+			manager.addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
 
-            manager.addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
+			// now check if this modules should be disabled after some iterations
+			int maxIter = settings.getDisableAfter();
+			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
+				if (!PlanStrategies.isOnlySelector(strategy)) {
+					maxIter = globalInnovationDisableAfter ;
+				}
+			}
 
-            // now check if this modules should be disabled after some iterations
-            int maxIter = settings.getDisableAfter();
-            if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-                if (!PlanStrategies.isOnlySelector(strategy)) {
-                    maxIter = globalInnovationDisableAfter ;
-                }
-            }
+			if (maxIter >= 0) {
+				if (maxIter >= config.controler().getFirstIteration()) {
+					manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation(), 0.0);
+				} else {
+					/* The controler starts at a later iteration than this change request is scheduled for.
+					 * make the change right now.					 */
+					manager.changeWeightOfStrategy(strategy, settings.getSubpopulation(), 0.0);
+				}
+			}
+		}
+		
+		// plan selectors for removal:
+		String name = config.strategy().getPlanSelectorForRemoval();
+		if ( name != null ) {
+			// ``manager'' has a default setting.
+			GenericPlanSelector<Plan, Person> planSelectorForRemoval = planSelectorsForRemoval.get(name);
+			if (planSelectorForRemoval == null) {
+				throw new RuntimeException("Plan selector for removal named " + name + " not found.");
+			}
+			manager.setPlanSelectorForRemoval(planSelectorForRemoval) ;
+		}
+	}
 
-            if (maxIter >= 0) {
-                if (maxIter >= config.controler().getFirstIteration()) {
-                    manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation(), 0.0);
-                } else {
-                    /* The controler starts at a later iteration than this change request is scheduled for.
-                     * make the change right now.					 */
-                    manager.changeWeightOfStrategy(strategy, settings.getSubpopulation(), 0.0);
-                }
-            }
-        }
-        String name = config.strategy().getPlanSelectorForRemoval();
-        if ( name != null ) {
-            // ``manager'' has a default setting.
-            GenericPlanSelector<Plan, Person> planSelectorForRemoval = planSelectorsForRemoval.get(name);
-            if (planSelectorForRemoval == null) {
-                throw new RuntimeException("Plan selector for removal named " + name + " not found.");
-            }
-            manager.setPlanSelectorForRemoval(planSelectorForRemoval) ;
-        }
-    }
-
-    private static PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Map<String, PlanStrategy> planStrategyFactoryRegister, Injector injector) {
+	private static PlanStrategy loadStrategy(final StrategyConfigGroup.StrategySettings settings, Map<String, PlanStrategy> planStrategyFactoryRegister, Injector injector) {
+		String name = settings.getStrategyName() ;
 		if (name.equals("ExternalModule")) {
 			externalCounter++;
-            String exePath = settings.getExePath();
-            PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
-            builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, injector.getInstance(OutputDirectoryHierarchy.class), injector.getInstance(Scenario.class)));
+			String exePath = settings.getExePath();
+			PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+			builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, injector.getInstance(OutputDirectoryHierarchy.class), injector.getInstance(Scenario.class)));
 			return builder.build();
 		} else if (name.contains(".")) {
-            return tryToLoadPlanStrategyByName(name, injector);
+			return tryToLoadPlanStrategyByName(name, injector);
 		} else {
 			return planStrategyFactoryRegister.get(name);
 		}
@@ -124,12 +126,12 @@ public final class StrategyManagerConfigLoader {
 		} else {
 			try {
 				Class<?> klas = Class.forName(name);
-                // Instantiates the class and injects it.
-                strategy = (PlanStrategy) injector.getJITInstance(klas);
+				// Instantiates the class and injects it.
+				strategy = (PlanStrategy) injector.getJITInstance(klas);
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
-        }
+		}
 		return strategy;
 	}
 

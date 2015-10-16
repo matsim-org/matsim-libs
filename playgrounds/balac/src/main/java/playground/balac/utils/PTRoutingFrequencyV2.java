@@ -2,6 +2,7 @@ package playground.balac.utils;
 
 import com.google.inject.Provider;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,11 +15,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -154,11 +153,12 @@ public class PTRoutingFrequencyV2 {
 		//config.scenario().setUseKnowledge(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		
-		config.planCalcScore().setTravelingWalk_utils_hr(-12.0); // setting 2 times higher disutility of walking according to SImon's analysis
-		
-		
+
+
+		final double travelingWalk = -12.0;
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+
+
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
 
@@ -199,9 +199,9 @@ public class PTRoutingFrequencyV2 {
 			
 			String[] arr = s.split("\\s");
 			if (arr[1].equals("1")) {
-			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
+				Coord coordStart = new Coord(Double.parseDouble(arr[3]), Double.parseDouble(arr[4]));
 			Link lStart = lUtils.getClosestLink(coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
+				Coord coordEnd = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 			Link lEnd = lUtils.getClosestLink(coordEnd);
 
 			

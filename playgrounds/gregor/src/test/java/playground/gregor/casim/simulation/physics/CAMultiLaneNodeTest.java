@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -34,7 +35,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -777,9 +777,9 @@ public class CAMultiLaneNodeTest extends MatsimTestCase {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		NetworkFactory fac = sc.getNetwork().getFactory();
-		Node n0 = fac.createNode(Id.createNodeId("n0"), new CoordImpl(0, 0));
-		Node n1 = fac.createNode(Id.createNodeId("n1"), new CoordImpl(10, 0));
-		Node n2 = fac.createNode(Id.createNodeId("n2"), new CoordImpl(20, 0));
+		Node n0 = fac.createNode(Id.createNodeId("n0"), new Coord((double) 0, (double) 0));
+		Node n1 = fac.createNode(Id.createNodeId("n1"), new Coord((double) 10, (double) 0));
+		Node n2 = fac.createNode(Id.createNodeId("n2"), new Coord((double) 20, (double) 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);

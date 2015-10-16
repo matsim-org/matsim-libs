@@ -28,8 +28,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -998,10 +998,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
             // setup: network
             NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-            Node node1 = network.createAndAddNode(nodeId1, scenario.createCoord(   0, 0));
-            Node node2 = network.createAndAddNode(nodeId2, scenario.createCoord(1000, 0));
-            Node node3 = network.createAndAddNode(nodeId3, scenario.createCoord(2000, 0));
-            Node node4 = network.createAndAddNode(nodeId4, scenario.createCoord(3000, 0));
+            Node node1 = network.createAndAddNode(nodeId1, new Coord((double) 0, (double) 0));
+            Node node2 = network.createAndAddNode(nodeId2, new Coord((double) 1000, (double) 0));
+            Node node3 = network.createAndAddNode(nodeId3, new Coord((double) 2000, (double) 0));
+            Node node4 = network.createAndAddNode(nodeId4, new Coord((double) 3000, (double) 0));
             Link[] links = new Link[4];
             links[1] = network.createAndAddLink(linkId1, node1, node2, 1000.0, 10.0, 3600.0, 1);
             links[2] = network.createAndAddLink(linkId2, node2, node3, 1000.0, 10.0, 3600.0, 1);
@@ -1028,12 +1028,12 @@ public class TransitQueueNetworkTest extends TestCase {
             // setup: transit schedule
             TransitSchedule schedule = scenario.getTransitSchedule();
             TransitScheduleFactory builder = schedule.getFactory();
-            TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(0, 0), firstStopisBlocking);
+            TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 0, (double) 0), firstStopisBlocking);
             schedule.addStopFacility(stop1);
             stop1.setLinkId(links[firstStopLocation].getId());
             TransitStopFacility stop2 = null;
             if (secondStopLocation > 0) {
-                stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(100, 0), secondStopIsBlocking);
+                stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 100, (double) 0), secondStopIsBlocking);
                 schedule.addStopFacility(stop2);
                 stop2.setLinkId(links[secondStopLocation].getId());
             }

@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -278,7 +277,7 @@ public class OsmNetworkReaderJohan {
 	 * @param hierarchy Layer specifying the hierarchy of the layers starting with 1 as the top layer.
 	 */
 	public void setHierarchyLayer(final double coordNWLat, final double coordNWLon, final double coordSELat, final double coordSELon, final int hierarchy) {
-		this.hierarchyLayers.add(new OsmFilter(this.transform.transform(new CoordImpl(coordNWLon, coordNWLat)), this.transform.transform(new CoordImpl(coordSELon, coordSELat)), hierarchy));
+		this.hierarchyLayers.add(new OsmFilter(this.transform.transform(new Coord(coordNWLon, coordNWLat)), this.transform.transform(new Coord(coordSELon, coordSELat)), hierarchy));
 	}
 
 	/**
@@ -626,14 +625,14 @@ public class OsmNetworkReaderJohan {
 					long id = Long.parseLong(idString);
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(id, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
+					this.nodes.put(id, new OsmNode(id, this.transform.transform(new Coord(lon, lat))));
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
 					OsmNode node = this.nodes.get(atts.getValue("id"));
 					if (node != null) {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
-						Coord c = this.transform.transform(new CoordImpl(lon, lat));
+						Coord c = this.transform.transform(new Coord(lon, lat));
 						node.coord.setXY(c.getX(), c.getY());
 						this.nodeCounter.incCounter();
 					}
@@ -690,7 +689,7 @@ public class OsmNetworkReaderJohan {
 				if (used) {
 					if (this.collectNodes) {
 						for (Long id : this.currentWay.nodes) {
-							this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
+							this.nodes.put(id, new OsmNode(id, new Coord((double) 0, (double) 0)));
 						}
 					} else if (this.loadWays) {
 						this.ways.put(this.currentWay.id, this.currentWay);

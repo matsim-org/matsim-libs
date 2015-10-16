@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +44,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 		new NetworkWriter(network).write(path+"network.xml");
 		
 		//a dummy population of one person is created and written into the output directory
-		Population population = CreateTestPopulation.createTestPtPopulation(1,new CoordImpl(0,0),new CoordImpl(0,200));
+		Population population = CreateTestPopulation.createTestPtPopulation(1, new Coord((double) 0, (double) 0), new Coord((double) 0, (double) 200));
 		new PopulationWriter(population, network).write(path+"plans.xml");
 		
 		//dummy csv files for pt stops, travel times and travel distances fitting into the dummy network are created
@@ -130,7 +130,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 		controler.run();
 		
 		// compute the travel time from home to work activity
-		double ttime = ptMatrix.getTotalTravelTime_seconds(new CoordImpl(0,0), new CoordImpl(0,200));
+		double ttime = ptMatrix.getTotalTravelTime_seconds(new Coord((double) 0, (double) 0), new Coord((double) 0, (double) 200));
 
 		// get the actual travel time from the person's plan
 		Person person = controler.getScenario().getPopulation().getPersons().values().iterator().next();

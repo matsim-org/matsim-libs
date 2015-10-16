@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -174,7 +173,7 @@ public class SpatialAveragingUtils {
 	Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);
 		double yCentroid = findBinCenterY(yIndex);
-		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
+		Coord cellCentroid = new Coord(xCentroid, yCentroid);
 		return cellCentroid;
 	}
 

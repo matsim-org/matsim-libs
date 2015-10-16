@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -113,7 +114,7 @@ public class Frames2Counts {
 	}
 
 	private void handleVehicle(SensorDataVehicle veh) {
-		Link tentativeLink = net.getNearestLinkExactly(sc.createCoord(veh.getX(), veh.getY()));
+		Link tentativeLink = net.getNearestLinkExactly(new Coord(veh.getX(), veh.getY()));
 		LinkInfo li = this.lis.get(tentativeLink.getId());
 		if (li == null) {
 			li = new LinkInfo(tentativeLink);

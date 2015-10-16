@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>playgrounds</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.8.0-SNAPSHOT</version>
 	<name>MATSim-Playgrounds</name>
 
 	<scm>
@@ -90,15 +90,15 @@
 		<module>dziemke</module>
 		<!--<module>fhuelsmann</module>-->
 		<module>gregor</module>
-		<!--<module>gunnar</module>-->
-		<!--<module>hbecker</module>-->
+		<module>gunnar</module>
+		<module>hbecker</module>
 		<module>ikaddoura</module>
 		<module>imob</module>
 		<module>ivtExt</module>
 		<module>jbischoff</module>
 		<module>jjoubert</module>
 		<module>johannes</module>
-		<!--<module>juliakern</module>-->
+		<module>juliakern</module>
 		<module>kai</module>
 		<module>kturner</module>
 		<!--<module>lcrociani</module>-->
@@ -114,7 +114,7 @@
 		<module>nmviljoen</module>
 		<module>pbouman</module>
 		<module>pieter</module>
-		<!--<module>boescpa</module>-->
+		<module>boescpa</module>
 		<module>run</module>
 		<module>sschroeder</module>
 		<module>sergioo</module>
@@ -123,14 +123,14 @@
 		<module>smetzler</module>
 		<module>southAfrica</module>
 		<!--<module>staheale</module>-->
-		<!--<module>stockholm</module>-->
+		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tobiqui</module>
 		<module>tthunig</module>
 		<module>toronto</module>
 		<module>wisinee</module>
-		<!--<module>wrashid</module>-->
+		<module>wrashid</module>
 		<module>yalcin</module>
 		<module>ucsb</module>
 		<module>vsptelematics</module>
@@ -153,7 +153,12 @@
 		<repository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>
@@ -162,21 +167,21 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
+			<version>4.12</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

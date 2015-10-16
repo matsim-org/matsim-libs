@@ -20,7 +20,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -126,8 +125,8 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		String outPlansFile = "./subset_pop.xml.gz";
 		String ptLinesToKeep = "D:/Berlin/BVG/berlin-bvg09/net/pt/linien_im_untersuchungsgebiet.txt";
 
-		Coord xyMin = new CoordImpl(4590999.0, 5805999.0);
-		Coord xyMax = new CoordImpl(4606021.0, 5822001.0);
+		Coord xyMin = new Coord(4590999.0, 5805999.0);
+		Coord xyMax = new Coord(4606021.0, 5822001.0);
 
 //		String wholeBigNetworkFile = "./network.multimodal.xml.gz";
 //		String unroutedWholePlansFile = "./baseplan_10x_900s.xml.gz";

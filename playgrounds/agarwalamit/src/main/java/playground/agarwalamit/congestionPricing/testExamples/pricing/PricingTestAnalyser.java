@@ -69,7 +69,7 @@ class PricingTestAnalyser {
 		}
 	}
 
-	void writeLinkTravelTimes (String congestionImpl){
+	private void writeLinkTravelTimes (String congestionImpl){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(outputDir+"/input/input_plans.xml.gz", outputDir+"/input/input_network.xml", outputDir+"/input/input_config.xml.gz");
 
 		int lastIt = sc.getConfig().controler().getLastIteration();
@@ -92,7 +92,7 @@ class PricingTestAnalyser {
 						count ++;
 					}
 				}
-				writer.write(linkId+"\t"+count+"\t"+sum+"\t"+(Double) sum/count+"\n");
+				writer.write(linkId+"\t"+count+"\t"+sum+"\t"+sum/count+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -101,7 +101,7 @@ class PricingTestAnalyser {
 
 	}
 
-	public String analyseAndWriteData (String congestionImpl) {
+	private String analyseAndWriteData (String congestionImpl) {
 
 		String out = "";
 		DecimalFormat df = new DecimalFormat();

@@ -1,6 +1,7 @@
 package playground.artemc.heterogeneity;
 
 import com.google.inject.Singleton;
+import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -8,6 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.gbl.MatsimRandom;
 import playground.artemc.utils.MapWriter;
 
 import javax.inject.Inject;
@@ -15,6 +17,8 @@ import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.apache.commons.math.special.Erf.erf;
 
 /**
  * Created by artemc on 28/1/15.
@@ -114,12 +118,33 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeAlphaFactor);
 					population.getPersons().get(personId).getCustomAttributes().put("incomeAlphaFactor", incomeAlphaFactor);
 
-					double sdBetaFactor = (double) population.getPersonAttributes().getAttribute(personId.toString(),"betaFactor");
-					population.getPersons().get(personId).getCustomAttributes().put("sdBetaFactor",sdBetaFactor);
+					double betaFactor = (double) population.getPersonAttributes().getAttribute(personId.toString(),"betaFactor");
+					population.getPersons().get(personId).getCustomAttributes().put("betaFactor",betaFactor);
 
-					double incomeGammaFactor = incomeCostSensitivityFactors.get(personId)/factorMean;
-					population.getPersonAttributes().putAttribute(personId.toString(),"incomeGammaFactor",incomeGammaFactor);
-					population.getPersons().get(personId).getCustomAttributes().put("incomeGammaFactor", incomeGammaFactor);
+					double normalizedCSFactor = incomeCostSensitivityFactors.get(personId)/factorMean;
+					population.getPersonAttributes().putAttribute(personId.toString(),"normalizedCSFactor",normalizedCSFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("normalizedCSFactor", normalizedCSFactor);
+
+					/*Random double*/
+					double rnd = MatsimRandom.getRandom().nextDouble();
+					double n = incomeHeterogeneityImpl.getLambda_income() / (-0.1697);
+
+					/*VOT deviations -15 to +15*/
+					//Double votDeviation = ((sdBetaFactor - 1) / 0.6 ) * n * 3;
+					double votDeviation = (rnd- 0.5) *  6 * n;
+					population.getPersonAttributes().putAttribute(personId.toString(), "votDeviation", votDeviation);
+					population.getPersons().get(personId).getCustomAttributes().put("votDeviation", votDeviation);
+
+					/*0.1 - 0.9, mean=0.5*/
+					double uniformSdBetaFactor = (rnd- 0.5) * 2 *  0.08 * n + 0.5;
+					population.getPersonAttributes().putAttribute(personId.toString(), "uniformSdBetaFactor", uniformSdBetaFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("uniformSdBetaFactor", uniformSdBetaFactor);
+
+					/*1 - 6.8, mean=3.9*/
+					double uniformSdGammaFactor = (rnd - 0.5) *  1.16 * n + 3.9;
+					population.getPersonAttributes().putAttribute(personId.toString(), "uniformSdGammaFactor", uniformSdGammaFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("uniformSdGammaFactor", uniformSdGammaFactor);
+
 
 					//TODO remove incomeHeterogeneityImpl
 					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeAlphaFactor);
@@ -131,8 +156,8 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 					factors.put(personId, new ArrayList<String>());
 					factors.get(personId).add(incomeCostSensitivityFactors.get(personId).toString());
 					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("incomeAlphaFactor")).toString());
-					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("sdBetaFactor")).toString());
-					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("incomeGammaFactor")).toString());
+					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("betaFactor")).toString());
+					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("normalizedCSFactor")).toString());
 				}
 
 				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeCostSensitivityFactors.csv");
@@ -140,8 +165,8 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 				head.add("PersonId");
 				head.add("incomeCostSensitivity");
 				head.add("incomeAlpha");
-				head.add("sdBetaFactor");
-				head.add("incomeGamma");
+				head.add("betaFactor");
+				head.add("normalizedCSFactor");
 				writer.writeArray(factors, head);
 
 			}

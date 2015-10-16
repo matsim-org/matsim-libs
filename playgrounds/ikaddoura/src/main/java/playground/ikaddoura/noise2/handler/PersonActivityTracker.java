@@ -137,11 +137,11 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 				
 				if (this.consideredActivityTypes.contains(event.getActType())) {
 //					Logger.getLogger(this.getClass()).warn( "event:" + event ) ;
-//					Logger.getLogger(this.getClass()).warn( "personId:" + event.getPersonId() ) ;
+//					Logger.getLogger(this.getClass()).warn( "personId:" + event.getDriverId() ) ;
 //					Logger.getLogger(this.getClass()).warn( "map:" + this.personId2currentActNr ) ;
-//					Logger.getLogger(this.getClass()).warn( "nr:" + this.personId2currentActNr.get( event.getPersonId() ) ) ;
+//					Logger.getLogger(this.getClass()).warn( "nr:" + this.personId2currentActNr.get( event.getDriverId() ) ) ;
 					
-//					int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
+//					int newActNr = this.personId2currentActNr.get(event.getDriverId()) + 1;
 					// I had null pointer exceptions with the previous line.  Presumably, some agents were not initialized.  Thus
 					// replacing it with the following lines. kai, jul'15
 					int newActNr = 0 ;

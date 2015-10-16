@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -170,8 +169,8 @@ public class MyShoppingSink implements Sink {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		
@@ -238,8 +237,8 @@ public class MyShoppingSink implements Sink {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		
@@ -264,7 +263,7 @@ public class MyShoppingSink implements Sink {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be returned in the transformed CRS. */
 		return ct.transform(c);
@@ -287,7 +286,7 @@ public class MyShoppingSink implements Sink {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be in the transformed CRS. */
 		return ct.transform(c);

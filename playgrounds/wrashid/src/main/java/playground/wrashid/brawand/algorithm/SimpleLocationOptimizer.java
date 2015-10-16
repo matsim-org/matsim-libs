@@ -4,9 +4,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.facilities.ActivityFacility;
 
 
 public class SimpleLocationOptimizer {
@@ -74,7 +72,7 @@ public class SimpleLocationOptimizer {
 		double score=0;
 		
 		for (WeightedDemand wd : demand) {
-			Coord supply = quadTree.get(wd.coord.getX(), wd.coord.getY());
+			Coord supply = quadTree.getClosest(wd.coord.getX(), wd.coord.getY());
 			score+= GeneralLib.getDistance(supply, wd.coord)*wd.demandCount;
 		}
 		

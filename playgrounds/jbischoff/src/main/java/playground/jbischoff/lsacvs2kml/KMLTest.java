@@ -14,7 +14,6 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -34,7 +33,7 @@ public class KMLTest  {
 		CoordinateTransformation ct = 
 			TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM33N,TransformationFactory.WGS84);
 		for (LSA ampel:lsaliste){
-			Coord current = new CoordImpl(ampel.getXcord(),ampel.getYcord());
+			Coord current = new Coord(ampel.getXcord(), ampel.getYcord());
 			current=ct.transform(current);
 			ampel.setXcord(current.getX());
 			ampel.setYcord(current.getY());

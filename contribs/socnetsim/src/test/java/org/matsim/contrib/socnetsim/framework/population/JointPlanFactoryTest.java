@@ -38,10 +38,10 @@ public class JointPlanFactoryTest {
 	@Test
 	public void testAddAtIndividualLevel() throws Exception {
 		final Id<Person> id1 = Id.createPersonId( 1 );
-		final Person person1 = new PersonImpl( id1 );
+		final Person person1 = PersonImpl.createPerson(id1);
 
 		final Id id2 = Id.createPersonId( 2 );
-		final Person person2 = new PersonImpl( id2 );
+		final Person person2 = PersonImpl.createPerson(id2);
 
 		final Map<Id<Person>, Plan> jp = new LinkedHashMap< >( );
 		jp.put( id1 , new PlanImpl( person1 ) );
@@ -67,10 +67,10 @@ public class JointPlanFactoryTest {
 	@Test
 	public void testDoNotAddAtIndividualLevel() throws Exception {
 		final Id id1 = Id.createPersonId( 1 );
-		final Person person1 = new PersonImpl( id1 );
+		final Person person1 = PersonImpl.createPerson(id1);
 
 		final Id id2 = Id.createPersonId( 2 );
-		final Person person2 = new PersonImpl( id2 );
+		final Person person2 = PersonImpl.createPerson(id2);
 
 		final Map<Id<Person>, Plan> jp = new LinkedHashMap< >( );
 		jp.put( id1 , new PlanImpl( person1 ) );

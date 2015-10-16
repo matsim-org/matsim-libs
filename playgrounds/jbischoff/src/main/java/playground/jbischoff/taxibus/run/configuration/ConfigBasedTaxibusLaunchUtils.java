@@ -29,7 +29,6 @@ import org.matsim.core.router.TripRouterFactory;
 
 import playground.jbischoff.taxibus.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.sim.TaxibusTripRouterFactory;
-import playground.michalm.taxi.run.TaxiLauncherUtils;
 
 /**
  * @author jbischoff

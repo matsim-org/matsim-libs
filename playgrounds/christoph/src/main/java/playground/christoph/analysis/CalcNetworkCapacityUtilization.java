@@ -178,7 +178,7 @@ public class CalcNetworkCapacityUtilization {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		double radius = 15000.0;
-		Coord center = scenario.createCoord(683518.0,246836.0);		
+		Coord center = new Coord(683518.0, 246836.0);
 		Set<Id<Link>> linkIds = new TreeSet<Id<Link>>();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			double distance = CoordUtils.calcDistance(center, link.getCoord());

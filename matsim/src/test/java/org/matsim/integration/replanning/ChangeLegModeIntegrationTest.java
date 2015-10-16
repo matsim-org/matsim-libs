@@ -20,6 +20,7 @@
 
 package org.matsim.integration.replanning;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,10 +36,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerModule;
@@ -52,7 +50,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.Arrays;
@@ -74,20 +71,20 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+        Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+        Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+		ActivityImpl act = plan.createAndAddActivity("home", new Coord(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);
-		act = plan.createAndAddActivity("work", new CoordImpl(0, 500));
+        act = plan.createAndAddActivity("work", new Coord((double) 0, (double) 500));
 		act.setLinkId(link.getId());
 
         Injector injector = Injector.createInjector(config, new AbstractModule() {

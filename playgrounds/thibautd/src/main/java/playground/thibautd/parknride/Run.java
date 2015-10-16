@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.analysis.listeners.ActivityTypesAnalysis;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
@@ -37,7 +36,7 @@ import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
  * @author thibautd
  */
 public class Run {
-	private static final Coord center = new CoordImpl( 0 , 0 );
+	private static final Coord center = new Coord((double) 0, (double) 0);
 	private static final double radius = 100;
 	private static final double costPerSecondAtCenter = 100;
 

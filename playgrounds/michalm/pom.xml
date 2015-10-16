@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.8.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -64,7 +64,14 @@
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>mrieser</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>andreas</artifactId>
+			<version>0.8.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 

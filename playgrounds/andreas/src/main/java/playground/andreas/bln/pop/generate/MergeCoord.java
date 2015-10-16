@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +42,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 
 /**
@@ -63,7 +64,7 @@ public class MergeCoord {
 			MergeCoord myMergeCoord = new MergeCoord();
 
 			ArrayList<String[]> tripMap = myMergeCoord.readTrips("Z:/population/input/WEGE.csv");
-			HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap = myMergeCoord.readCoord("Z:/population/input/coord32");
+			HashMap<Integer, HashMap<Integer, Coord>> coordMap = myMergeCoord.readCoord("Z:/population/input/coord32");
 
 			// 1 Renew coordinates if within perimeter of old ones
 			myMergeCoord.nearOldCoord(tripMap, coordMap, 5000.0);
@@ -90,7 +91,7 @@ public class MergeCoord {
 		}
 	}
 
-	private void nearOldCoord(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap, double perimeter_radius){
+	private void nearOldCoord(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, Coord>> coordMap, double perimeter_radius){
 		// Copy every new coord if inbetween 5km of the old one
 		int unchanged = 0;
 		int changed = 0;
@@ -102,10 +103,10 @@ public class MergeCoord {
 			Integer wayId  = Integer.valueOf(trip[2]);
 
 			try {
-				CoordImpl oldCoord = new CoordImpl(Double.parseDouble(trip[11]), Double.parseDouble(trip[12]));
-				CoordImpl newCoord = coordMap.get(personId).get(wayId);
+				Coord oldCoord = new Coord(Double.parseDouble(trip[11]), Double.parseDouble(trip[12]));
+				Coord newCoord = coordMap.get(personId).get(wayId);
 
-				double distance = newCoord.calcDistance(oldCoord);
+				double distance = CoordUtils.calcDistance(newCoord, oldCoord);
 
 				if(distance < perimeter_radius){
 					trip[11] = String.valueOf(newCoord.getX());
@@ -123,7 +124,7 @@ public class MergeCoord {
 		log.info("Finished merging coord. " + unchanged + " unchanged + " + changed + " changed entries + " + tripsTooFarAway + " too far away = " + (changed + unchanged + tripsTooFarAway));
 	}
 
-	private void getCoordForLateArrivals(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap, String filename) throws IOException{
+	private void getCoordForLateArrivals(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, Coord>> coordMap, String filename) throws IOException{
 
 		int unchanged = 0;
 		int changed = 0;
@@ -142,7 +143,7 @@ public class MergeCoord {
 
 				try {
 //					CoordImpl oldCoord = new CoordImpl(Double.parseDouble(trip[11]), Double.parseDouble(trip[12]));
-					CoordImpl newCoord = coordMap.get(personId).get(wayId);
+					Coord newCoord = coordMap.get(personId).get(wayId);
 
 					if(Integer.parseInt(trip[48]) == 3 || Integer.parseInt(trip[48]) == 0 || Integer.parseInt(trip[48]) == 1 || Integer.parseInt(trip[48]) == 2
 							|| Integer.parseInt(trip[48]) == 4 || Integer.parseInt(trip[48]) == 5 || Integer.parseInt(trip[48]) == 6 || Integer.parseInt(trip[48]) == 7){
@@ -171,7 +172,7 @@ public class MergeCoord {
 		log.info("Finished merging coord. " + unchanged + " unchanged + " + changed + " changed entries + " + tripNonWalking + " non walking = " + (changed + unchanged + tripNonWalking));
 	}
 
-	private void getCoordForWalkingTooMuch(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap, String networkFilename, String plansFilename){
+	private void getCoordForWalkingTooMuch(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, Coord>> coordMap, String networkFilename, String plansFilename){
 
 		TreeSet<Integer> agentIds = new TreeSet<Integer>();
 
@@ -222,7 +223,7 @@ public class MergeCoord {
 
 				try {
 //					CoordImpl oldCoord = new CoordImpl(Double.parseDouble(trip[11]), Double.parseDouble(trip[12]));
-					CoordImpl newCoord = coordMap.get(personId).get(wayId);
+					Coord newCoord = coordMap.get(personId).get(wayId);
 
 //					if(Integer.parseInt(trip[48]) == 3 || Integer.parseInt(trip[48]) == 0 || Integer.parseInt(trip[48]) == 1 || Integer.parseInt(trip[48]) == 2
 //							|| Integer.parseInt(trip[48]) == 4 || Integer.parseInt(trip[48]) == 5 || Integer.parseInt(trip[48]) == 6 || Integer.parseInt(trip[48]) == 7){
@@ -250,7 +251,7 @@ public class MergeCoord {
 		log.info("Walking too much: Finished merging coord. " + unchanged + " unchanged + " + changed + " changed entries + " + tripNonWalking + " non walking = " + (changed + unchanged + tripNonWalking));
 	}
 
-	private void setAllstillWalkingTooMuchToCar(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, CoordImpl>> coordMap, String networkFilename, String plansFilename){
+	private void setAllstillWalkingTooMuchToCar(ArrayList<String[]> tripMap, HashMap<Integer, HashMap<Integer, Coord>> coordMap, String networkFilename, String plansFilename){
 
 		TreeSet<Integer> agentIds = new TreeSet<Integer>();
 
@@ -319,9 +320,9 @@ public class MergeCoord {
 		return unsortedTripData;
 	}
 
-	private HashMap<Integer,HashMap<Integer,CoordImpl>> readCoord(String filename) throws IOException{
+	private HashMap<Integer,HashMap<Integer,Coord>> readCoord(String filename) throws IOException{
 
-		HashMap<Integer, HashMap<Integer, CoordImpl>> coordData = new HashMap<Integer, HashMap<Integer, CoordImpl>>();
+		HashMap<Integer, HashMap<Integer, Coord>> coordData = new HashMap<Integer, HashMap<Integer, Coord>>();
 		int withoutCoord = 0;
 
 		log.info("Start reading file " + filename);
@@ -331,9 +332,9 @@ public class MergeCoord {
 		for (String[] coordDataString : unsortedCoordData) {
 			Integer personId = Integer.valueOf(coordDataString[0]);
 			Integer wayId = Integer.valueOf(coordDataString[1]);
-			CoordImpl coord = null;
+			Coord coord = null;
 			try {
-				coord = new CoordImpl(Double.parseDouble(coordDataString[2]), Double.parseDouble(coordDataString[3]));
+				coord = new Coord(Double.parseDouble(coordDataString[2]), Double.parseDouble(coordDataString[3]));
 			} catch (Exception e) {
 				withoutCoord++;
 			}
@@ -345,7 +346,7 @@ public class MergeCoord {
 //						log.warn("Already coord Object saved for " + personId + " " + wayId);
 //					}
 			} else {
-				HashMap<Integer, CoordImpl> newCoordMap = new HashMap<Integer, CoordImpl>();
+				HashMap<Integer, Coord> newCoordMap = new HashMap<Integer, Coord>();
 				newCoordMap.put(wayId, coord);
 				coordData.put(personId, newCoordMap);
 			}

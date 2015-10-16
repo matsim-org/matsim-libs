@@ -62,8 +62,7 @@ public class RunKtiScenario {
 				new KtiLikeActivitiesScoringFunctionFactory(
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
-					config.planCalcScore(),
-					scenario) );
+						scenario) );
 
 		// we're done!
 		controler.run();

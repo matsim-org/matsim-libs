@@ -26,32 +26,33 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 public class DgEventsByLinkIdCollector implements LinkLeaveEventHandler {
-	// person -> linkId -> LinkLeaveEvent
-	private Map<Id, Map<Id, LinkLeaveEvent>> events = new HashMap<Id, Map<Id, LinkLeaveEvent>>();
-	private Set<Id> linkIds;
+	private Map<Id<Vehicle>, Map<Id<Link>, LinkLeaveEvent>> events = new HashMap<>();
+	private Set<Id<Link>> linkIds;
 	
-	public DgEventsByLinkIdCollector(Set<Id> linkIds) {
+	public DgEventsByLinkIdCollector(Set<Id<Link>> linkIds) {
 		this.linkIds  = linkIds;
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.linkIds.contains(event.getLinkId())){
-			Map<Id, LinkLeaveEvent> map = this.events.get(event.getPersonId());
+			Map<Id<Link>, LinkLeaveEvent> map = this.events.get(event.getVehicleId());
 			if (map == null){
-				map = new HashMap<Id, LinkLeaveEvent>();
-				events.put(event.getPersonId(), map);
+				map = new HashMap<Id<Link>, LinkLeaveEvent>();
+				events.put(event.getVehicleId(), map);
 			}
 			map.put(event.getLinkId(), event);
 		}
 	}
 
-	public LinkLeaveEvent getLinkLeaveEvent(Id personId, Id linkId){
-		Map<Id, LinkLeaveEvent> m = this.events.get(personId);
+	public LinkLeaveEvent getLinkLeaveEvent(Id<Vehicle> vehicleId, Id<Link> linkId){
+		Map<Id<Link>, LinkLeaveEvent> m = this.events.get(vehicleId);
 		if (m == null){
-			throw new IllegalArgumentException("Cannot find link leave events for person " + personId);
+			throw new IllegalArgumentException("Cannot find link leave events for vehicle " + vehicleId);
 		}
 		return m.get(linkId);
 	}

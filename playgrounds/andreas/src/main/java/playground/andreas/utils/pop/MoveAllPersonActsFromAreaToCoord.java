@@ -38,7 +38,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
 import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
@@ -171,14 +170,14 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		String networkFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/network.final.xml.gz";
 		String inPlansFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioPopulation.xml.gz";
 		String outPlansFile = "scenarioPopulation_movedToTXL.xml.gz";
-		
-		
-		Coord targetCoord = new CoordImpl(4587780.0, 5825320.0); // TXL
+
+
+		Coord targetCoord = new Coord(4587780.0, 5825320.0); // TXL
 //		Coord targetCoord = new CoordImpl(4603511.0, 5807250.0); // SXF
 //		Coord minSourceCoord = new CoordImpl(4586900.000, 5824500.000);
 //		Coord maxSourceCoord = new CoordImpl(4588800.000, 5826300.000);
-		Coord minSourceCoord = new CoordImpl(4586000.000, 5824700.000); // TXL bounding box
-		Coord maxSourceCoord = new CoordImpl(4588900.000, 5825900.000); // TXL bounding box
+		Coord minSourceCoord = new Coord(4586000.000, 5824700.000); // TXL bounding box
+		Coord maxSourceCoord = new Coord(4588900.000, 5825900.000); // TXL bounding box
 				
 		// Move all acts from area to the given coordinates
 		MoveAllPersonActsFromAreaToCoord.filterPersonActs(networkFile, inPlansFile, outputDir + outPlansFile, minSourceCoord, maxSourceCoord, targetCoord, outputDir, "movedActs.kmz");		

@@ -5,14 +5,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesWriter;
 
@@ -68,15 +68,15 @@ public class Matsim4Urbansim {
 		}
 
 		// parse the config arguments so we have a config.  generate scenario data from this
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		Config config = loader.getScenario().getConfig();
-		loader.loadScenario();
-		Scenario scenarioData = loader.getScenario();
-
+		
+		Config config = ConfigUtils.loadConfig(args[0]);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		Network network = scenarioData.getNetwork() ;
+		Network network = scenario.getNetwork() ;
 
 		log.info("") ;
 		log.info("cleaning network ...");
@@ -98,7 +98,7 @@ public class Matsim4Urbansim {
 		if ( config.plans().getInputFile() != null ) {
 			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
 			log.info("Persons not found in pre-existing pop file are added; persons no longer in urbansim persons file are removed." ) ;
-			oldPop = scenarioData.getPopulation() ;
+			oldPop = scenario.getPopulation() ;
 			log.info("Note that the `continuation of iterations' will only work if you set this up via different config files for") ;
 			log.info(" every year and know what you are doing.") ;
 		} else {
@@ -117,8 +117,8 @@ public class Matsim4Urbansim {
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 
-		((ScenarioImpl) scenarioData).setPopulation(newPop);
-		Controler controler = new Controler(scenarioData) ;
+		((ScenarioImpl) scenario).setPopulation(newPop);
+		Controler controler = new Controler(scenario) ;
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

@@ -14,7 +14,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -72,7 +71,7 @@ public class DetermineZonesWithInfeasiblePT {
 		tr.open();
 		while (tr.next()){
 			Id<Node> zid = Id.create(tr.current().get("zone_id"), Node.class);
-			CoordImpl coord = new CoordImpl(tr.current().get("x"), tr.current().get("y"));
+			Coord coord = new Coord(Double.parseDouble(tr.current().get("x")), Double.parseDouble(tr.current().get("y")));
 			NodeImpl n = new NodeImpl(zid);
 			n.setCoord(coord);
 			zones.add(n);

@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -125,11 +125,16 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 			for(Stats s:owcsRentals) {
 			
 				distance += s.distance;
-				time += (s.endTime - s.startTime);
+				//imposing minimum rental time of 20min
+				if (s.endTime - s.startTime < 1200)
+					time += 1200;
+				else
+					time += (s.endTime - s.startTime);
 
 			}
 			
 			score += distance * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("distanceFeeOneWayCarsharing"));
+			
 			score += time * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeFeeOneWayCarsharing"));
 			score += walkingOW * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeParkingFeeOneWayCarsharing"));
 
@@ -318,7 +323,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet<String> travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet<String> travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 		
 		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;

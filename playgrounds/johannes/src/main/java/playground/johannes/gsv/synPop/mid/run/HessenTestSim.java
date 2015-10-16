@@ -22,19 +22,19 @@ package playground.johannes.gsv.synPop.mid.run;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
-import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
@@ -82,8 +82,8 @@ public class HessenTestSim {
 		logger.info("Done.");
 
 		logger.info("Validation data...");
-		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);
-		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 1);
+		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
+		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
 		logger.info("Done.");
 
 		
@@ -121,7 +121,7 @@ public class HessenTestSim {
 		 */
 		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
 		factory.addFactory(new SwitchHomeLocationFactory(random));
-		factory.addFactory(new ActivityLocationMutatorFactory(dataPool, ActivityType.HOME, random));
+		factory.addFactory(new ActivityLocationMutatorFactory(dataPool, ActivityTypes.HOME, random));
 
 		Sampler sampler = new Sampler(persons, H, factory, random);
 		/*

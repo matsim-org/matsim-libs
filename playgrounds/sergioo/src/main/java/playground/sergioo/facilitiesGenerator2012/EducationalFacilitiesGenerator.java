@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -19,7 +18,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.OpeningTime.DayType;
 
@@ -42,7 +40,7 @@ public class EducationalFacilitiesGenerator {
 		Map<Integer, Coord> allPostalCodes = new HashMap<Integer, Coord>();
 		ResultSet resultZone = dataBasePostalCodes.executeQuery("SELECT zip,lng,lat FROM postal_codes");
 		while(resultZone.next())
-			allPostalCodes.put(resultZone.getInt(1), new CoordImpl(resultZone.getDouble(2),resultZone.getDouble(3)));
+			allPostalCodes.put(resultZone.getInt(1), new Coord(resultZone.getDouble(2), resultZone.getDouble(3)));
 		resultZone.close();
 		dataBasePostalCodes.close();
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("Educational facilities Singapore");
@@ -56,11 +54,11 @@ public class EducationalFacilitiesGenerator {
 				int postalCode = educationalFacilitiesResult.getInt(1);
 				Coord coord = null;
 				if(postalCode==0)
-					postalCode = getPostalCode(allPostalCodes, new CoordImpl(lon,lat));
+					postalCode = getPostalCode(allPostalCodes, new Coord(lon, lat));
 				ActivityFacility facility = facilities.getFacilities().get(Id.create(postalCode, ActivityFacility.class));
 				if(facility==null) {
 					if(educationalFacilitiesResult.getDouble(4)!=0)
-						coord = new CoordImpl(lon,lat);
+						coord = new Coord(lon, lat);
 					else
 						coord = allPostalCodes.get(postalCode);
 					if(coord!=null)

@@ -21,16 +21,17 @@ package playground.johannes.gsv.synPop.invermo;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.processing.ValidateNoPlans;
 import playground.johannes.synpop.source.mid2008.generator.InsertActivitiesTask;
 import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
 import playground.johannes.synpop.source.mid2008.generator.RowHandler;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 
 import java.io.IOException;
 import java.util.*;
@@ -285,9 +286,9 @@ public class TXTReader {
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
 		
 		logger.info("Deleting plans with out of bounds trips.");
-		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
-		TaskRunner.runAndDeleteEpisode(new DeleteOutOfBounds(bounds), persons);
-		persons = TaskRunner.runAndDeletePerson(new DeleteNoPlans(), persons);
+		Geometry bounds = (Geometry) EsriShapeIO.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
+		TaskRunner.validateEpisodes(new DeleteOutOfBounds(bounds), persons);
+		TaskRunner.validatePersons(new ValidateNoPlans(), persons);
 		logger.info("Population size = " + persons.size());
 		
 //		logger.info("Cloning persons...");
@@ -296,7 +297,7 @@ public class TXTReader {
 //		logger.info("Population size = " + persons.size());
 				
 		logger.info("Deleting person with no legs...");
-		persons = TaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info("Population size = " + persons.size());
 		
 		logger.info("Initializing target distances...");
@@ -305,7 +306,7 @@ public class TXTReader {
 		writer.write("/home/johannes/gsv/invermo/pop.de.xml", persons);
 		
 		logger.info("Deleting persons with no car legs...");
-		persons = TaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
+		TaskRunner.validatePersons(new DeleteModes("car"), persons);
 		logger.info("Population size = " + persons.size());
 		
 		

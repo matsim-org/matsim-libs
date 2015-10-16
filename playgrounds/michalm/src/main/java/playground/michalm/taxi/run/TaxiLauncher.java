@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -33,7 +34,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
 
@@ -76,7 +76,7 @@ class TaxiLauncher
         }
 
         if (params.zonesXmlFile != null && params.zonesShpFile != null) {
-            zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
+            zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
             System.err.println("No conversion of SRS is done");
         }
         else {
@@ -93,6 +93,7 @@ class TaxiLauncher
                 params.algorithmConfig.ttimeSource, params.algorithmConfig.tdisSource);
 
         if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            //works for TimeVariantLinks
             travelTime = new FreeSpeedTravelTime();
         }
         else {// TravelTimeSource.EVENTS
@@ -107,11 +108,18 @@ class TaxiLauncher
         TravelDisutility travelDisutility = VrpLauncherUtils
                 .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
 
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
-                travelTime);
+        boolean useTree = !true;//TODO move this switch to TaxiLauncherParams
+        if (useTree) {
+            routerWithCache = new DijkstraWithDijkstraTreeCache(scenario.getNetwork(),
+                    travelDisutility, travelTime, timeDiscretizer);
+        }
+        else {
+            LeastCostPathCalculator router = new DijkstraWithThinPath(scenario.getNetwork(), travelDisutility,
+                    travelTime);
+            routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, timeDiscretizer);
+        }
 
-        routerWithCache = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
-        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
+        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
     }
 
 

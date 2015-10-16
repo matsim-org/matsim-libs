@@ -31,4 +31,9 @@ public class PassengerRouteFactory implements RouteFactory {
 		final Id e) {
 		return new PassengerRoute( s , e );
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return "passenger";
+	}
 }

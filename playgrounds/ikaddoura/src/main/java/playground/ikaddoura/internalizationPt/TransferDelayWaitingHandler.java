@@ -143,12 +143,12 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			}
 			
 			
-//			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId()) - 1.0; // TODO!
+//			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getDriverId()) - 1.0; // TODO!
 			
 			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId());
 			double vehicleDelay = this.vehicleId2delay.get(event.getVehicleId());
 			
-//			System.out.println("++++ AgentId: " + event.getPersonId());
+//			System.out.println("++++ AgentId: " + event.getDriverId());
 //			System.out.println("WaitingTime: " + waitingTime);
 //			System.out.println("VehicleDelay: " + vehicleDelay);
 			
@@ -162,7 +162,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 				// calculate the affectedAgentUnits
 				affectedAgentUnits = waitingTime / vehicleDelay;
 				
-//				System.out.println("++++ AgentId: " + event.getPersonId());
+//				System.out.println("++++ AgentId: " + event.getDriverId());
 //				System.out.println("WaitingTime: " + waitingTime);
 //				System.out.println("VehicleDelay: " + vehicleDelay);
 //				System.out.println("affectedAgentUnits: " + affectedAgentUnits);

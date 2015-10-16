@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraCountry;
@@ -40,7 +41,6 @@ import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraLinkT
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNode;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNodeCluster;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraTrack;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -226,7 +226,7 @@ public class NEMOInfraParser extends MatsimXmlParser {
 		
 		NEMOInfraNode node = new NEMOInfraNode(bscode);
 		node.name = name;
-		node.coord = new CoordImpl(xkoord,ykoord);
+		node.coord = new Coord((double) xkoord, (double) ykoord);
 		node.countryId = Integer.toString(land);
 		node.isStation = bahnhof;
 		node.isValid = gueltig;

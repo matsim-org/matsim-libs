@@ -2,9 +2,11 @@ package playground.tschlenther.TotalDelay;
 
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -62,8 +64,8 @@ public class TtTotalDelayTest {
 	private static Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
 	
 	//optionally to be modified
-	private boolean writeOutput = false;
-	private int numberOfPersons = 5;
+	private static final boolean WRITE_OUTPUT = false;
+	private static final int NUMBER_OF_PERSONS = 5;
 	
 	@Test
 	public void testGetTotalDelayOnePerson(){
@@ -88,15 +90,15 @@ public class TtTotalDelayTest {
 		QSim QSim = QSimUtils.createDefaultQSim(scenario, events);
 		QSim.run();
 
-		Assert.assertEquals("Total Delay of one agent is not correct", 0.0, handler.getTotalDelay());
-		if(writeOutput){
+		Assert.assertEquals("Total Delay of one agent is not correct", 0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
+		if(WRITE_OUTPUT){
 			generateOutput(scenario, eventslist);
 		}
 	}
 
 	@Test
 	public void testGetTotalDelaySeveralPerson(){
-		Scenario scenario = prepareTest(numberOfPersons);
+		Scenario scenario = prepareTest(NUMBER_OF_PERSONS);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		TtTotalDelay handler = new TtTotalDelay(scenario.getNetwork());
@@ -116,17 +118,17 @@ public class TtTotalDelayTest {
 		
 		QSim QSim = QSimUtils.createDefaultQSim(scenario, events);
 		QSim.run();
-		
-		//expectedDelay = inserting delay as a result of capacity of first link being 3600 vh/h
-		Double expectedDelay = 0.0;
-		for(Double i=0.0; i<numberOfPersons; i++){
-			expectedDelay +=  i;
-		}
-		Assert.assertEquals("Total Delay of " + numberOfPersons + " is not correct", expectedDelay, handler.getTotalDelay());
 
-		if(writeOutput){
+		if(WRITE_OUTPUT){
 			generateOutput(scenario, eventslist);
 		}
+		
+		//expectedDelay = inserting delay as a result of capacity of first link being 3600 vh/h
+		int expectedDelay = 0;
+		for(int i=0; i<NUMBER_OF_PERSONS; i++){
+			expectedDelay +=  i;
+		}
+		Assert.assertEquals("Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.", expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON);
 	}
 
 	private void generateOutput(Scenario scenario, final List<Event> eventslist) {		
@@ -139,23 +141,23 @@ public class TtTotalDelayTest {
 			nw.write(utils.getOutputDirectory() + "network");
 	}
 
-	private Scenario prepareTest(int persons) {
+	private Scenario prepareTest(int numberOfPersons) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createNetwork(scenario);
-		createPopulation(scenario, persons);
+		createPopulation(scenario, numberOfPersons);
 		return scenario;
 	}
 	
 	static void createNetwork(Scenario scenario){
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
-		
-		Node node1 = factory.createNode(Id.createNodeId("1"), scenario.createCoord(0, 0));
-		Node node2 = factory.createNode(Id.createNodeId("2"), scenario.createCoord(0, 1000));
-		Node node3 = factory.createNode(Id.createNodeId("3"), scenario.createCoord(0, 2000));
-		Node node4 = factory.createNode(Id.createNodeId("4"), scenario.createCoord(0, 3000));
-		Node node5 = factory.createNode(Id.createNodeId("5"), scenario.createCoord(0, 4000));
+
+		Node node1 = factory.createNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+		Node node2 = factory.createNode(Id.createNodeId("2"), new Coord((double) 0, (double) 1000));
+		Node node3 = factory.createNode(Id.createNodeId("3"), new Coord((double) 0, (double) 2000));
+		Node node4 = factory.createNode(Id.createNodeId("4"), new Coord((double) 0, (double) 3000));
+		Node node5 = factory.createNode(Id.createNodeId("5"), new Coord((double) 0, (double) 4000));
 
 		network.addNode(node1);
 		network.addNode(node2);
@@ -188,33 +190,32 @@ public class TtTotalDelayTest {
 		network.addLink(link4);	
 	}
 	
-	private static void createPopulation(Scenario scenario, int persons) {
-		for (int i= 1; i <= persons; i++){
-		
+	private static void createPopulation(Scenario scenario, int numberOfPersons) {
 		Population population = scenario.getPopulation();
         PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
-		Activity workAct = popFactory.createActivityFromLinkId("work", LINK_ID4);
-		
-		Leg leg = popFactory.createLeg("car");
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-		linkIds.add(LINK_ID2);
-		linkIds.add(LINK_ID3);
-		
-		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(LINK_ID1, LINK_ID4);
-		route.setLinkIds(LINK_ID1, linkIds, LINK_ID4);
-		leg.setRoute(route);
-		
-		Person person = popFactory.createPerson(Id.createPersonId(i));
-		Plan plan = popFactory.createPlan();
-		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", LINK_ID1);
-		homeActLink1_1.setEndTime(100);
-		plan.addActivity(homeActLink1_1);
-		plan.addLeg(leg);
-		plan.addActivity(workAct);
-		person.addPlan(plan);
-		population.addPerson(person);
+		for (int i= 1; i <= numberOfPersons; i++){
+			Activity workAct = popFactory.createActivityFromLinkId("work", LINK_ID4);
+
+			Leg leg = popFactory.createLeg("car");
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+			linkIds.add(LINK_ID2);
+			linkIds.add(LINK_ID3);
+
+			NetworkRoute route = (NetworkRoute) routeFactory.createRoute(LINK_ID1, LINK_ID4);
+			route.setLinkIds(LINK_ID1, linkIds, LINK_ID4);
+			leg.setRoute(route);
+
+			Person person = popFactory.createPerson(Id.createPersonId(i));
+			Plan plan = popFactory.createPlan();
+			Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", LINK_ID1);
+			homeActLink1_1.setEndTime(100);
+			plan.addActivity(homeActLink1_1);
+			plan.addLeg(leg);
+			plan.addActivity(workAct);
+			person.addPlan(plan);
+			population.addPerson(person);
 		}
 	}
 }

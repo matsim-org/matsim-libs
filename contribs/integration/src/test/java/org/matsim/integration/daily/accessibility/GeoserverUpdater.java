@@ -5,6 +5,8 @@ import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Transaction;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -13,7 +15,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -30,6 +31,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 	@Override
 	public void setAndProcessSpatialGrids(Map<Modes4Accessibility, SpatialGrid> spatialGrids) {
+		log.info("starting setAndProcessSpatialGrids ...");
 		GeometryFactory fac = new GeometryFactory();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("accessibilities");
@@ -50,7 +52,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax(); y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
+				Coord saAlbersCoord = new Coord(x + 0.5 * spatialGrid.getResolution(), y + 0.5 * spatialGrid.getResolution());
 				Coord wgs84Coord = transformation.transform(saAlbersCoord);
 				featureBuilder.add(fac.createPoint(MGC.coord2Coordinate(wgs84Coord)));
 				featureBuilder.add(x);
@@ -86,11 +88,28 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 			}
 			dataStore.createSchema(featureType);
 			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource("accessibilities");
+			// ---
+			Transaction t = new DefaultTransaction(); // new
+			featureStore.setTransaction(t); // new
+			// ---
 			featureStore.addFeatures(collection);
+			// ---
+			// new below this line
+			try {
+				t.commit();
+			} catch ( IOException ex ) {
+				// something went wrong;
+				ex.printStackTrace();
+				t.rollback();
+			} finally {
+				t.close();
+			}
+			dataStore.dispose() ;
+			// new above this line
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		log.info("ending setAndProcessSpatialGrids.");
 	}
 
 }

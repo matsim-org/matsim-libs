@@ -1,7 +1,7 @@
 package playground.michalm.taxi.optimizer.mip;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.TaxiRequest;

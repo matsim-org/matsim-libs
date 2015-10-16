@@ -21,7 +21,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 
@@ -66,8 +65,8 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 		    	Link l = linkUtils.getClosestLink(coordStart);			    	
 				ArrayList<String> vehIDs = new ArrayList<String>();
 		    	
@@ -75,7 +74,7 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-				TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]), vehIDs);
+				TwoWayCSStation f = new TwoWayCSStation(l, l.getCoord(), Integer.parseInt(arr[6]), vehIDs);
 		    	
 				twvehiclesLocation.add(f);
 		    	s = reader.readLine();

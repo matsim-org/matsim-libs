@@ -20,7 +20,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -370,8 +369,8 @@ public class MainEventAnalyzer {
 		int i=0;
 		while(line!=null) {
 			String[] parts=line.split(",");
-			Coord start = coordinateTransformation.transform(new CoordImpl(parts[2], parts[3]));
-			Coord end = coordinateTransformation.transform(new CoordImpl(parts[4], parts[5]));
+			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3])));
+			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[4]), Double.parseDouble(parts[5])));
 			double distance = 0;
 			List<Leg> legs = transitRouter.calcRoute(start, end, new Double(parts[6]), null);
 			double distancePT = 0, timePT = 0;

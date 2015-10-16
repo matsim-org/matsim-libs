@@ -45,7 +45,6 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicles;
 
 /**
@@ -190,7 +189,7 @@ public class PtDistanceHandler implements ActivityStartEventHandler,
 		
 		// AN Had to replace this line
 		legMode.remove(event.getPersonId());
-//		legMode.put(event.getPersonId(), null);
+//		legMode.put(event.getDriverId(), null);
 		// END of replacement
 	}
 	

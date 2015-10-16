@@ -19,8 +19,7 @@
 
 package playground.anhorni.surprice.scoring;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -31,12 +30,12 @@ public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 
 	protected double score;
 	private static final double INITIAL_SCORE = 0.0;
-	private PersonImpl person;
+	private Person person;
 	private String day;
 	protected final CharyparNagelScoringParameters params;
 	private double dudm;
 
-	public SupriceTollScoringFunction(final CharyparNagelScoringParameters params, PersonImpl person, String day, double dudm) {
+	public SupriceTollScoringFunction(final CharyparNagelScoringParameters params, Person person, String day, double dudm) {
 		this.params = params;
 		this.person = person;
 		this.day = day;

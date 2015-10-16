@@ -22,6 +22,7 @@ package playground.gregor.sim2d_v4.simulation.physics;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -172,11 +172,12 @@ public class PhysicalSim2DSectionTest {
 		Config mc = ConfigUtils.createConfig();
 		Scenario msc = ScenarioUtils.createScenario(mc );
 		NetworkImpl net = (NetworkImpl) msc.getNetwork();
-		Node n0 = net.createAndAddNode(Id.create(0, Node.class), new CoordImpl(1,1));
-		Node n1 = net.createAndAddNode(Id.create(1, Node.class), new CoordImpl(4.5,5));
-		Node n2 = net.createAndAddNode(Id.create(2, Node.class), new CoordImpl(4.5,6.5));
-		Node n3 = net.createAndAddNode(Id.create(3, Node.class), new CoordImpl(0,6.5));
-		Node n4 = net.createAndAddNode(Id.create(4, Node.class), new CoordImpl(-3,5));
+		Node n0 = net.createAndAddNode(Id.create(0, Node.class), new Coord((double) 1, (double) 1));
+		Node n1 = net.createAndAddNode(Id.create(1, Node.class), new Coord(4.5, (double) 5));
+		Node n2 = net.createAndAddNode(Id.create(2, Node.class), new Coord(4.5, 6.5));
+		Node n3 = net.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, 6.5));
+		final double x = -3;
+		Node n4 = net.createAndAddNode(Id.create(4, Node.class), new Coord(x, (double) 5));
 		Link l0a = net.createAndAddLink(Id.create("0a", Link.class), n0, n1, 0, 0, 0, 0);
 		Link l0b = net.createAndAddLink(Id.create("0b", Link.class), n1, n0, 0, 0, 0, 0);
 		Link l1a = net.createAndAddLink(Id.create("1a", Link.class), n1, n2, 0, 0, 0, 0);

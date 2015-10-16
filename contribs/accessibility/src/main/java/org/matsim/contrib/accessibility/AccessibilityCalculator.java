@@ -142,10 +142,10 @@ import java.util.concurrent.ConcurrentHashMap;
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
 			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
 		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceCostRate() != 0.) {
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
 			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
 		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0.) {
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
@@ -154,8 +154,8 @@ import java.util.concurrent.ConcurrentHashMap;
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 
-		betaWalkTT = planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD = planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 	}
 
@@ -325,7 +325,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				}
 
 				for (ZoneDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					log.info("here");
+					//log.info("here");
 					zoneDataExchangeInterface.setZoneAccessibilities(origin, fromNode, accessibilities);
 				}
 			}

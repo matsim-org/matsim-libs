@@ -1,6 +1,6 @@
 .classpath
 .project
-test/output
+*/test/output
 bin
 .settings
 bin
@@ -10,3 +10,4 @@ matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
 .gitignore
 .gitignore
+

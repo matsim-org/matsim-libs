@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -95,16 +94,26 @@ public class ZoneCompleteness {
 
 		QuadTree<Tuple<Id<Polygon>, Polygon>> zoneQT = new QuadTree<Tuple<Id<Polygon>, Polygon>>(minX, minY, maxX, maxY);
 
-		Coord centroid1 = new CoordImpl(130048.2549,-3685018.8482);
-		Coord centroid2 = new CoordImpl(148048.2549,-3702339.3562);
-		Coord centroid3 = new CoordImpl(148798.2549,-3704504.4197);
-		Coord centroid4 = new CoordImpl(149548.2549,-3706669.4833);
-		Coord centroid5 = new CoordImpl(151048.2549,-3706669.4833);
-		Coord centroid6 = new CoordImpl(148048.2549,-3701473.3308);
-		Coord centroid7 = new CoordImpl(146548.2549,-3697143.2038);
-		Coord centroid8 = new CoordImpl(146548.2549,-3704937.4325);
-		Coord centroid9 = new CoordImpl(148048.2549,-3705803.4579);
-		Coord centroid10 = new CoordImpl(130048.2549,-3684152.8228);
+		final double y10 = -3685018.8482;
+		Coord centroid1 = new Coord(130048.2549, y10);
+		final double y9 = -3702339.3562;
+		Coord centroid2 = new Coord(148048.2549, y9);
+		final double y8 = -3704504.4197;
+		Coord centroid3 = new Coord(148798.2549, y8);
+		final double y7 = -3706669.4833;
+		Coord centroid4 = new Coord(149548.2549, y7);
+		final double y6 = -3706669.4833;
+		Coord centroid5 = new Coord(151048.2549, y6);
+		final double y5 = -3701473.3308;
+		Coord centroid6 = new Coord(148048.2549, y5);
+		final double y4 = -3697143.2038;
+		Coord centroid7 = new Coord(146548.2549, y4);
+		final double y3 = -3704937.4325;
+		Coord centroid8 = new Coord(146548.2549, y3);
+		final double y2 = -3705803.4579;
+		Coord centroid9 = new Coord(148048.2549, y2);
+		final double y1 = -3684152.8228;
+		Coord centroid10 = new Coord(130048.2549, y1);
 		Coord[] centroidList = {centroid1,centroid2,centroid3,centroid4,centroid5,centroid6,centroid7,centroid8,centroid9,centroid10};
 
 		/* Set up distances for hexagon and create each zone's hexagon */
@@ -287,8 +296,8 @@ public class ZoneCompleteness {
 					Coordinate coordinate = new Coordinate(x,y);
 					Point point = gf.createPoint(coordinate);
 
-					Id closestPolygonId = qt.get(x, y).getFirst();
-					Polygon closestPolygon = qt.get(x, y).getSecond();
+					Id closestPolygonId = qt.getClosest(x, y).getFirst();
+					Polygon closestPolygon = qt.getClosest(x, y).getSecond();
 
 					/* Check if activity is in closest polygon. */
 					if(closestPolygon.covers(point)){

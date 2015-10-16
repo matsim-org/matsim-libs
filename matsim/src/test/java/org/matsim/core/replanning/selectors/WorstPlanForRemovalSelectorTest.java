@@ -40,7 +40,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testRemoveWorstPlans_nullType() {
 		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 
 		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
 		plan1.setScore(15.0);
@@ -88,7 +88,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
 
 		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
 		plan1.setScore(15.0);

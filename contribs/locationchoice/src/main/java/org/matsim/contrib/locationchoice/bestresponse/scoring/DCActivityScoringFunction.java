@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -34,6 +35,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.OpeningTime;
+import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import java.util.*;
@@ -50,6 +52,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
 	private DestinationChoiceBestResponseContext dcContext;
+	private DestinationChoiceConfigGroup dccg;
 	private List<ScoringPenalty> penalty = null;
 
 	// needs to be re-designed with delegation instead of inheritance. kai, oct'14
@@ -62,6 +65,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
 		this.dcContext = dcContext;
+		this.dccg = (DestinationChoiceConfigGroup) this.dcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.penalty = new Vector<ScoringPenalty>();
 	}
 	
@@ -89,7 +93,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	protected final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
-		if (act.getType().equals("pt interaction")) return 0.0;
+		if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) return 0.0;
 
 		double tmpScore = 0.0;
 
@@ -193,8 +197,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 				
 				if (this.dcContext.getScaleEpsilon().isFlexibleType(this.converter.convertType(act.getType())) &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
+						this.dccg.getRestraintFcnExp() > 0.0 &&
+						this.dccg.getRestraintFcnFactor() > 0.0) {
 					
 						/* Penalty due to facility load: --------------------------------------------
 						 * Store the temporary score to reduce it in finish() proportionally

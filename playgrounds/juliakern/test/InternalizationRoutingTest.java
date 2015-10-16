@@ -22,6 +22,7 @@ package playground.benjamin.internalization;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,6 +51,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -95,7 +97,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		emissionCostModule = new EmissionCostModule(1.0);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6.000);
+		final double traveling = -6.000;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
@@ -131,7 +134,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(0.0);
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
@@ -163,7 +166,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6000.0);
+		final double traveling = -6000.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(1.0);
 		//pcs.setMonetaryDistanceCostRateCar(-0.0001);
 		pcs.setMonetaryDistanceCostRateCar(0.000);
@@ -190,7 +194,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissiondcf);
+				bindCarTravelDisutilityFactory().toInstance(emissiondcf);
 			}
 		});
 	}
@@ -242,7 +246,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.addActivityParams(act2Params);
 
 		pcs.setBrainExpBeta(1.0);
-		pcs.setTraveling_utils_hr(-6.0);
+		final double traveling = -6.0;
+		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		pcs.setMarginalUtilityOfMoney(0.6);
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
@@ -275,17 +280,17 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void createPassiveAgents() {
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
-			PersonImpl person = new PersonImpl (new IdImpl(i));
-			PlanImpl plan = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(new IdImpl(i));
+			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
 			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
 			home.setEndTime(6 * 3600);
-			home.setCoord(scenario.createCoord(0.0, 0.0));
+			home.setCoord(new Coord(0.0, 0.0));
 
 			plan.createAndAddLeg(TransportMode.walk);
 
 			ActivityImpl home2 = plan.createAndAddActivity("home", scenario.createId("11"));
-			home2.setCoord(scenario.createCoord(0.0, 0.0));
+			home2.setCoord(new Coord(0.0, 0.0));
 
 			scenario.getPopulation().addPerson(person);
 		}
@@ -329,16 +334,29 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void createNetwork() {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-20000.0,     0.0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(-17500.0,     0.0));
-		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(-15500.0,     0.0));
-		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( -2500.0,     0.0));
-		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(     0.0,     0.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord( -5000.0, -8660.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-15000.0, -8660.0));
-		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord( -7500.0,  2500.0));
-		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord( -7500.0, -2500.0));
-		Node node10 = network.createAndAddNode(scenario.createId("10"), scenario.createCoord( -7500.0, -5000.0));
+		double x8 = -20000.0;
+		Node node1 = network.createAndAddNode(scenario.createId("1"), new Coord(x8, 0.0));
+		double x7 = -17500.0;
+		Node node2 = network.createAndAddNode(scenario.createId("2"), new Coord(x7, 0.0));
+		double x6 = -15500.0;
+		Node node3 = network.createAndAddNode(scenario.createId("3"), new Coord(x6, 0.0));
+		double x5 = -2500.0;
+		Node node4 = network.createAndAddNode(scenario.createId("4"), new Coord(x5, 0.0));
+		Node node5 = network.createAndAddNode(scenario.createId("5"), new Coord(0.0, 0.0));
+		double x4 = -5000.0;
+		double y3 = -8660.0;
+		Node node6 = network.createAndAddNode(scenario.createId("6"), new Coord(x4, y3));
+		double x3 = -15000.0;
+		double y2 = -8660.0;
+		Node node7 = network.createAndAddNode(scenario.createId("7"), new Coord(x3, y2));
+		double x2 = -7500.0;
+		Node node8 = network.createAndAddNode(scenario.createId("8"), new Coord(x2, 2500.0));
+		double x1 = -7500.0;
+		double y1 = -2500.0;
+		Node node9 = network.createAndAddNode(scenario.createId("9"), new Coord(x1, y1));
+		double x = -7500.0;
+		double y = -5000.0;
+		Node node10 = network.createAndAddNode(scenario.createId("10"), new Coord(x, y));
 
 
 		network.createAndAddLink(scenario.createId("1"), node1, node2, 1000, 27.78, 3600, 1, null, "22");

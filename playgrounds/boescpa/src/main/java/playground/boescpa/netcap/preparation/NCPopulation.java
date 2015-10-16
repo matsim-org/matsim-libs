@@ -29,7 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
@@ -96,10 +95,11 @@ public class NCPopulation {
 		final PersonImpl oldPersonImpl = (PersonImpl) oldPerson;
 		final Person person = popFactory.createPerson(Id.create(oldPerson.getId().toString(), Person.class));
 		final PersonImpl personImpl = (PersonImpl) person;
-		personImpl.setSex(oldPersonImpl.getSex());
-		personImpl.setAge(oldPersonImpl.getAge());
-		personImpl.setLicence(oldPersonImpl.getLicense());
-		personImpl.setEmployed(oldPersonImpl.isEmployed());
+
+		PersonUtils.setSex(personImpl, PersonUtils.getSex(oldPersonImpl));
+		PersonUtils.setAge(personImpl, PersonUtils.getAge(oldPersonImpl));
+		PersonUtils.setLicence(personImpl, PersonUtils.getLicense(oldPersonImpl));
+		PersonUtils.setEmployed(personImpl, PersonUtils.isEmployed(oldPersonImpl));
 		final Plan plan = popFactory.createPlan();
 		person.addPlan(plan);
 		boolean lastWasLeg = false;
@@ -109,7 +109,7 @@ public class NCPopulation {
 				if (oldActivity.getType().equals("pt interaction")) {
 					//continue;
 				}
-				final Coord actCoord = new CoordImpl(oldActivity.getCoord().getX(), oldActivity.getCoord().getY());
+				final Coord actCoord = new Coord(oldActivity.getCoord().getX(), oldActivity.getCoord().getY());
 				final Activity activity = popFactory.createActivityFromCoord(oldActivity.getType(), actCoord);
 				activity.setEndTime(oldActivity.getEndTime());
 				activity.setMaximumDuration(oldActivity.getMaximumDuration());

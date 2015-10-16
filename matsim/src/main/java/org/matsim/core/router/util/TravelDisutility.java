@@ -53,7 +53,7 @@ public interface TravelDisutility {
 	// kai, oct'13
 	
 	/**
-	 * @param the link for which the minimal travel disutility over all time slots is calculated
+	 * @param link the link for which the minimal travel disutility over all time slots is calculated
 	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
 	 */
 	public double getLinkMinimumTravelDisutility(final Link link);

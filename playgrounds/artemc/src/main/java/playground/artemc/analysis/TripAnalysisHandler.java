@@ -138,7 +138,7 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 
 		//		if (event.getLegMode().toString().equals(TransportMode.car)) {
 		//
-		//			if(!event.getPersonId().toString().startsWith("pt")){
+		//			if(!event.getDriverId().toString().startsWith("pt")){
 		//				totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
 		//				this.carLegs++;
 		//			}

@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -35,7 +34,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
       for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-      PersonImpl pi = (PersonImpl)p;
+      Person pi = p;
       this.persons.put(pi.getId(), pi);
     }
   }
@@ -63,7 +62,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
       String linkId = this.first.get(i);
       //double scoreSum = 0.0D;
         LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
       /*for (PersonPrimaryActivity ppa : primaryActivities)
@@ -108,7 +107,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 
           LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	      
-	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	      int numberShops = facilities.size();
 	      
 	      if (numberShops == 1 || numberShops == 0)

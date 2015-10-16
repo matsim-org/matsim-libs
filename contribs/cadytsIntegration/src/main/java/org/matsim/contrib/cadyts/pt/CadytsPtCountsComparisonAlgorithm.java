@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -47,7 +48,7 @@ class CadytsPtCountsComparisonAlgorithm {
 	/**
 	 * The counts object
 	 */
-	Counts counts;
+	Counts <Link>counts;
 	// needed in CadytsErrorPlot
 
 	/**
@@ -67,7 +68,7 @@ class CadytsPtCountsComparisonAlgorithm {
 
 	StringBuffer content = new StringBuffer();
 
-	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzer oa, final Counts counts, final Network network, final double countsScaleFactor) {
+	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzer oa, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();

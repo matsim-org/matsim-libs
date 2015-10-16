@@ -144,7 +144,7 @@ public class RunMunichZone30Controller extends AbstractController {
 		throw new RuntimeException("This doesn't work anymore. Come to MZ, who will gladly help you repair it.");
 	}
 	private PlansScoring buildPlansScoring() {
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( scenario );
 //		final PlansScoring plansScoring = new PlansScoringImpl( this.scenario, this.eventsManager, getControlerIO(), scoringFunctionFactory );
 		return null;
 

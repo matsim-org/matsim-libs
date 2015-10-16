@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +31,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -947,8 +947,8 @@ public class CAMultiLaneLinkTest extends MatsimTestCase {
 			double width) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkFactory fac = sc.getNetwork().getFactory();
-		Node n0 = fac.createNode(Id.createNodeId("n0"), new CoordImpl(0, 0));
-		Node n1 = fac.createNode(Id.createNodeId("n1"), new CoordImpl(10, 0));
+		Node n0 = fac.createNode(Id.createNodeId("n0"), new Coord((double) 0, (double) 0));
+		Node n1 = fac.createNode(Id.createNodeId("n1"), new Coord((double) 10, (double) 0));
 		Link l0 = fac.createLink(Id.createLinkId("l0"), n0, n1);
 		Link l0rev = fac.createLink(Id.createLinkId("l0rev"), n1, n0);
 		l0.setLength(10);

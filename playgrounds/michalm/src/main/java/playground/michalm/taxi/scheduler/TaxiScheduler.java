@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -266,7 +267,7 @@ public class TaxiScheduler
 
         OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
         LinkTimePair stopPoint = tracker.getDiversionPoint();
-        tracker.divertPath(new VrpPathImpl(stopPoint.time, 0, 0, new Link[] { stopPoint.link },
+        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0, 0, new Link[] { stopPoint.link },
                 new double[] { 0 }));
 
         appendStayTask(schedule);

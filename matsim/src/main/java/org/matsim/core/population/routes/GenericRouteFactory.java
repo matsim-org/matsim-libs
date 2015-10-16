@@ -30,5 +30,10 @@ public class GenericRouteFactory implements RouteFactory {
 	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return new GenericRouteImpl(startLinkId, endLinkId);
 	}
+	
+	@Override
+	public String getCreatedRouteType() {
+		return GenericRouteImpl.ROUTE_TYPE;
+	}
 
 }

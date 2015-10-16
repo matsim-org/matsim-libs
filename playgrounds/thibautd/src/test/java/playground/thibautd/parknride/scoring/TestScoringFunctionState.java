@@ -38,7 +38,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.parknride.ParkAndRideConstants;
 
@@ -105,9 +104,9 @@ public class TestScoringFunctionState {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		network = scenario.getNetwork();
 
-		
-		Node node1 = network.getFactory().createNode( Id.create( 1 , Node.class ) , new CoordImpl( 0 , 0 ) );
-		Node node2 = network.getFactory().createNode( Id.create( 2 , Node.class ) , new CoordImpl( 2 , 2 ) );
+
+		Node node1 = network.getFactory().createNode( Id.create( 1 , Node.class ) , new Coord((double) 0, (double) 0));
+		Node node2 = network.getFactory().createNode( Id.create( 2 , Node.class ) , new Coord((double) 2, (double) 2));
 		network.addNode( node1 );
 		network.addNode( node2 );
 		uniqueLink = network.getFactory().createLink( Id.create( "toto" , Link.class ) , node1 , node2 );

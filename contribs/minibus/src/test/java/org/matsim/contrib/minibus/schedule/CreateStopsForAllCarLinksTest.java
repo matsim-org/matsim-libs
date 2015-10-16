@@ -22,14 +22,13 @@ package org.matsim.contrib.minibus.schedule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -66,7 +65,7 @@ public class CreateStopsForAllCarLinksTest {
 		TransitScheduleFactoryImpl tSF = new TransitScheduleFactoryImpl();
 		
 		TransitSchedule realTransitSchedule = tSF.createTransitSchedule();
-		TransitStopFacility stop1 = tSF.createTransitStopFacility(Id.create("1314", TransitStopFacility.class), new CoordImpl(0.0, 0.0), false);
+		TransitStopFacility stop1 = tSF.createTransitStopFacility(Id.create("1314", TransitStopFacility.class), new Coord(0.0, 0.0), false);
 		stop1.setLinkId(Id.create("1314", Link.class));
 		realTransitSchedule.addStopFacility(stop1);
 		

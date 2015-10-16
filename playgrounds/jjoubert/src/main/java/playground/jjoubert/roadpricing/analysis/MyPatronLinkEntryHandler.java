@@ -77,23 +77,23 @@ public class MyPatronLinkEntryHandler implements LinkEnterEventHandler{
 			boolean found = false;
 			int breakIndex = 0;
 			while(!found && breakIndex < breaks.size()){
-				if(Long.parseLong(event.getPersonId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
+				if(Long.parseLong(event.getDriverId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
 					found = true;
 					/* Check if the person entering the link is already contained
 					 * in the map. If so, increment its number of tolled links
 					 * entered. If not, add it to the map with initial value 1.
 					 */
-					if(maps.get(breakIndex).containsKey(event.getPersonId())){
-						maps.get(breakIndex).put(event.getPersonId(), maps.get(breakIndex).get(event.getPersonId())+1);
+					if(maps.get(breakIndex).containsKey(event.getDriverId())){
+						maps.get(breakIndex).put(event.getDriverId(), maps.get(breakIndex).get(event.getDriverId())+1);
 					} else{
-						maps.get(breakIndex).put(event.getPersonId(), new Integer(1));
+						maps.get(breakIndex).put(event.getDriverId(), new Integer(1));
 					}
 				} else{
 					breakIndex++;
 				}
 			}
 			if(!found){
-				log.warn("Could not identify a category (bracket) for agent " + event.getPersonId().toString());
+				log.warn("Could not identify a category (bracket) for agent " + event.getDriverId().toString());
 			}
 		}
 	}

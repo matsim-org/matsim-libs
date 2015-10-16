@@ -2,13 +2,14 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
   <artifactId>gunnar</artifactId>
   <name>gunnar</name>
   <dependencies>
+	<!--
      <dependency>
   		<groupId>gunnarutilities</groupId>
   		<artifactId>gunnarutilities</artifactId>
@@ -16,7 +17,8 @@
   		<scope>system</scope>
   		<systemPath>${basedir}/libs/utilities.jar</systemPath>	
   	</dependency>
-     <dependency>
+  	-->
+    <dependency>
      	<groupId>org.apache.commons</groupId>
      	<artifactId>commons-math3</artifactId>
      	<version>3.4.1</version>

@@ -26,6 +26,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -205,10 +206,10 @@ public class FacilitiesFromPopulationTest {
 		private void createNetwork() {
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
-			
-			Node a = factory.createNode(Id.create("A", Node.class), this.scenario.createCoord(0, 0));
-			Node b = factory.createNode(Id.create("B", Node.class), this.scenario.createCoord(1000, 0));
-			Node c = factory.createNode(Id.create("C", Node.class), this.scenario.createCoord(500, 600));
+
+			Node a = factory.createNode(Id.create("A", Node.class), new Coord((double) 0, (double) 0));
+			Node b = factory.createNode(Id.create("B", Node.class), new Coord((double) 1000, (double) 0));
+			Node c = factory.createNode(Id.create("C", Node.class), new Coord((double) 500, (double) 600));
 			
 			network.addNode(a);
 			network.addNode(b);
@@ -251,11 +252,11 @@ public class FacilitiesFromPopulationTest {
 			Person person = factory.createPerson(Id.create(id, Person.class));
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
-			Activity home1 = factory.createActivityFromCoord("home", scenario.createCoord(homeX, homeY));
+			Activity home1 = factory.createActivityFromCoord("home", new Coord(homeX, homeY));
 			home1.setEndTime(8*3600);
-			Activity work = factory.createActivityFromCoord("work", scenario.createCoord(workX, workY));
+			Activity work = factory.createActivityFromCoord("work", new Coord(workX, workY));
 			work.setEndTime(17*3600);
-			Activity home2 = factory.createActivityFromCoord("home", scenario.createCoord(homeX, homeY));
+			Activity home2 = factory.createActivityFromCoord("home", new Coord(homeX, homeY));
 			
 			plan.addActivity(home1);
 			plan.addLeg(factory.createLeg("car"));

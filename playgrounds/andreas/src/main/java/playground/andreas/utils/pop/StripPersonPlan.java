@@ -19,6 +19,7 @@
 
 package playground.andreas.utils.pop;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -27,13 +28,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Reset all "personal" attributes of a person
@@ -57,18 +54,18 @@ public class StripPersonPlan extends NewPopulation {
 		this.personshandled++;
 
 		person.setId(Id.create("p" + personshandled, Person.class));
-		person.setAge(Integer.MIN_VALUE);
-		person.setCarAvail(null);
-		person.setEmployed((Boolean) null);
-		person.setLicence(null);
-		person.setSex(null);
+		PersonUtils.setAge(person, Integer.MIN_VALUE);
+		PersonUtils.setCarAvail(person, null);
+		PersonUtils.setEmployed(person, (Boolean) null);
+		PersonUtils.setLicence(person, null);
+		PersonUtils.setSex(person, null);
 		
 		for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
 			if (pE instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pE;
 				int x = (int) (act.getCoord().getX() / 100.0);
 				int y = (int) (act.getCoord().getY() / 100.0);
-				act.setCoord(new CoordImpl(x * 100.0, y * 100.0));
+				act.setCoord(new Coord(x * 100.0, y * 100.0));
 			}
 		}
 

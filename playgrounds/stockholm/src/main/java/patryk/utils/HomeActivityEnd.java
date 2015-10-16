@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
 public class HomeActivityEnd implements ActivityEndEventHandler {

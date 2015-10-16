@@ -35,7 +35,6 @@ import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -51,7 +50,8 @@ public class ProcessNoiseImmissions {
 	private final double startTime = 3600.;
 	private final double timeBinSize = 3600.;
 	private final double endTime = 24. * 3600.;
-		
+	
+	private final double receiverPointGap;
 	private final String workingDirectory;
 	private String receiverPointsFile;
 		
@@ -63,17 +63,18 @@ public class ProcessNoiseImmissions {
 	private BufferedWriter bw;
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
 	
-	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile) {
+	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile, double receiverPointGap) {
 		this.workingDirectory = workingDirectory;
 		this.receiverPointsFile = receiverPointsFile;
+		this.receiverPointGap = receiverPointGap;
 		this.outputPath = workingDirectory;
 	}
 
 	public static void main(String[] args) {
-		String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/immissions/";
-		String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/receiverPoints/receiverPoints.csv";
+		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/immissions/";
+		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
 
-		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile);
+		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, 100);
 		readNoiseFile.run();
 	}
 	
@@ -157,7 +158,7 @@ public class ProcessNoiseImmissions {
 				}
 				
 				lineCounter++;
-				rp2Coord.put(rpId, new CoordImpl(x, y));
+				rp2Coord.put(rpId, new Coord(x, y));
 				
 			}
 			
@@ -249,7 +250,7 @@ public class ProcessNoiseImmissions {
 		noiseLayer.setXField("x");
 		noiseLayer.setYField("y");
 		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
+		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, this.receiverPointGap);
 		renderer.setRenderingAttribute("Lden");
 		
 		writer.addLayer(noiseLayer);

@@ -35,7 +35,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -227,7 +227,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
 		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(type)).
-				get(midPointX, midPointY, radius);
+				getDisk(midPointX, midPointY, radius);
 	}
 
 	// for test cases:

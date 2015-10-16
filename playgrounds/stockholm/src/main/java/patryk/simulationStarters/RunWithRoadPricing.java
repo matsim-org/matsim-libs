@@ -17,6 +17,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -128,7 +130,7 @@ public final class RunWithRoadPricing {
 		 * Patryk, jag har tittat på den nya versionen av RunCadyts4CarExample.
 		 * Det ser ut som om man helt enkelt inte behöver den nedanstående koden
 		 * längre och istället skulle nu lägga till en normal ExpBetaPlanChanger
-		 * i config filen. Vore det mögligt att du tästa om jag har rätt med
+		 * i config filen. Vore det mögligt att du testar om jag har rätt med
 		 * detta? Gunnar
 		 */
 
@@ -149,10 +151,11 @@ public final class RunWithRoadPricing {
 		// include cadyts into the plan scoring (this will add the cadyts
 		// corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction

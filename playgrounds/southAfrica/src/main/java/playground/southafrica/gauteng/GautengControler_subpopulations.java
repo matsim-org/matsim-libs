@@ -37,7 +37,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -289,8 +288,6 @@ public class GautengControler_subpopulations {
 	 */
 	private static void createVehiclePerPerson(final Scenario sc) {
 
-		((ScenarioImpl)sc).createVehicleContainer() ;
-		
 		/* Create vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		LOG.info("Creating vehicle types.");

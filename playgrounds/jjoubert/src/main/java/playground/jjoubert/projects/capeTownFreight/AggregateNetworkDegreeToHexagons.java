@@ -39,14 +39,11 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -149,7 +146,7 @@ public class AggregateNetworkDegreeToHexagons {
 			Coord coord = node.getCoord();
 			Point nodePoint = gf.createPoint(new Coordinate(coord.getX(), coord.getY()));
 
-			Point zonePoint = grid.get(coord.getX(), coord.getY());
+			Point zonePoint = grid.getClosest(coord.getX(), coord.getY());
 			Polygon zone = polyMap.get(zonePoint);
 			int degree = 0;
 			if(zone.contains(nodePoint)){
@@ -231,12 +228,12 @@ public class AggregateNetworkDegreeToHexagons {
 		double w = WIDTH/2.0;
 		double h = HEIGHT/2.0;
 		List<Coord> cl = new ArrayList<Coord>();
-		cl.add(new CoordImpl(x-w, y));
-		cl.add(new CoordImpl(x-0.5*w, y+h));
-		cl.add(new CoordImpl(x+0.5*w, y+h));
-		cl.add(new CoordImpl(x+w, y));
-		cl.add(new CoordImpl(x+0.5*w, y-h));
-		cl.add(new CoordImpl(x-0.5*w, y-h));
+		cl.add(new Coord(x - w, y));
+		cl.add(new Coord(x - 0.5 * w, y + h));
+		cl.add(new Coord(x + 0.5 * w, y + h));
+		cl.add(new Coord(x + w, y));
+		cl.add(new Coord(x + 0.5 * w, y - h));
+		cl.add(new Coord(x - 0.5 * w, y - h));
 		List<Coordinate> clc = new ArrayList<Coordinate>();
 		for(Coord c : cl){
 			Coord cc = ct.transform(c);

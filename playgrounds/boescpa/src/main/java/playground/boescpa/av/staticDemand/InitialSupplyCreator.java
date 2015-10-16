@@ -25,13 +25,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.geometry.CoordUtils;
 import playground.boescpa.lib.tools.tripReader.Trip;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * WHAT IS IT FOR?
@@ -40,47 +37,48 @@ import java.util.Random;
  * @author boescpa
  */
 public class InitialSupplyCreator {
-	private static Logger log = Logger.getLogger(InitialSupplyCreator.class);
+    private static Logger log = Logger.getLogger(InitialSupplyCreator.class);
 
-	private static Random random = MatsimRandom.getRandom();
+    private static Random random = MatsimRandom.getRandom();
 
-	public static List<AutonomousVehicle> createInitialAVSupply(double share, StaticDemand staticDemand) {
-		if (staticDemand == null) {
-			throw new IllegalArgumentException("demand was null");
-		}
+    public static List<AutonomousVehicle> createInitialAVSupply(double shareOfOriginalFleetReplacedByAV, StaticDemand staticDemand) {
+        if (staticDemand == null) {
+            throw new IllegalArgumentException("demand was null");
+        }
 
-		List<AutonomousVehicle> autonomousVehicles = new ArrayList<>();
-		List<Trip> demand = staticDemand.getFilteredDemand();
-		List<Integer> agents = filterDemandForAgents(demand);
+        List<AutonomousVehicle> autonomousVehicles = new ArrayList<>();
+        List<Trip> demand = staticDemand.getFilteredDemand();
+        List<Integer> agents = filterDemandForAgents(demand);
 
-		log.info("Create initial supply of AVs...");
-		Counter counter = new Counter(" AV ");
-		for (int i = 0; i < Math.round(share*agents.size()); i++) {
-			Trip referenceTrip = demand.get(agents.get(random.nextInt(agents.size())));
-			Coord initialPosition = new CoordImpl(referenceTrip.startXCoord, referenceTrip.startYCoord);
-			autonomousVehicles.add(new AutonomousVehicle(initialPosition));
-			counter.incCounter();
-		}
-		counter.printCounter();
-		log.info("Create initial supply of AVs... done.");
+        log.info("Create initial supply of AVs...");
+        long shareToServe = Math.round(shareOfOriginalFleetReplacedByAV*agents.size());
+        for (int i = 0; i < shareToServe; i++) {
+            int agentToServe =  random.nextInt(agents.size());
+            Trip referenceTrip = demand.get(agents.get(agentToServe));
+            Coord initialPosition = CoordUtils.createCoord(referenceTrip.startXCoord, referenceTrip.startYCoord);
+            autonomousVehicles.add(new AutonomousVehicle(initialPosition));
+            agents.remove(agentToServe);
+        }
+        log.info("Create initial supply of AVs... done.");
+        log.info(autonomousVehicles.size() + " AVs supplied.");
 
-		return autonomousVehicles;
-	}
+        return autonomousVehicles;
+    }
 
-	private static List<Integer> filterDemandForAgents(List<Trip> demand) {
-		log.info("Filter demand for agents...");
-		List<Integer> firstAgentPositions = new ArrayList<>();
-		Id currentAgent = null;
-		for (int i = 0; i < demand.size(); i++) {
-			Id runningAgent = demand.get(i).agentId;
-			if (currentAgent == null || !runningAgent.toString().equals(currentAgent.toString())) {
-				currentAgent = runningAgent;
-				firstAgentPositions.add(i);
-			}
-		}
-		log.info("Filter demand for agents... done.");
-		log.info(firstAgentPositions.size() + " driving agents found.");
-		return firstAgentPositions;
-	}
+    private static List<Integer> filterDemandForAgents(List<Trip> demand) {
+        log.info("Filter demand for agents...");
+        List<Integer> firstAgentPositions = new ArrayList<>();
+        Set<Id> agentsSet = new HashSet<>();
+        for (int i = 0; i < demand.size(); i++) {
+            Id runningAgent = demand.get(i).agentId;
+            if (!agentsSet.contains(runningAgent)) {
+                agentsSet.add(runningAgent);
+                firstAgentPositions.add(i);
+            }
+        }
+        log.info("Filter demand for agents... done.");
+        log.info(firstAgentPositions.size() + " driving agents in sample found.");
+        return firstAgentPositions;
+    }
 
 }

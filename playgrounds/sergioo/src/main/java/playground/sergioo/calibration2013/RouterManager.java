@@ -9,11 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -79,7 +76,7 @@ public class RouterManager {
 						Activity prev = (Activity) plan.getPlanElements().get(i-1);
 						Activity next = (Activity) plan.getPlanElements().get(i+1);
 						Path path = null;
-						if(((PersonImpl)plan.getPerson()).getCarAvail().equals("never")) {
+						if(PersonUtils.getCarAvail(plan.getPerson()).equals("never")) {
 							costs[CAR_POSITION] = Double.POSITIVE_INFINITY;
 							distances[CAR_POSITION] = Double.POSITIVE_INFINITY;
 						}
@@ -106,13 +103,13 @@ public class RouterManager {
 							double endDistance = CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-1).getCoord(), next.getCoord());
 							distances[PT_POSITION] += startDistance;
 							distances[PT_POSITION] += endDistance;
-							costs[PT_POSITION] += startDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);
-							costs[PT_POSITION] += endDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);	
+							costs[PT_POSITION] += startDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
+							costs[PT_POSITION] += endDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
 						}
 						else
 							distances[PT_POSITION] = Double.POSITIVE_INFINITY;
 						distances[WALK_POSITION] = CoordUtils.calcDistance(prev.getCoord(), next.getCoord());
-						costs[WALK_POSITION] = distances[WALK_POSITION]/walkSpeed * (0 - scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr()/3600.0);
+						costs[WALK_POSITION] = distances[WALK_POSITION]/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
 						int bestPosition = getBestPosition(costs);
 						for(int p = 0; p<NUM_MODES; p++)
 							if(costs[p]<costs[bestPosition])

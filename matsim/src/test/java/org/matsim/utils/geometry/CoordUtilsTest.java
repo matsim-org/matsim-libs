@@ -23,7 +23,6 @@ package org.matsim.utils.geometry;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -37,8 +36,8 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testPlus() {
-		Coord coord1 = new CoordImpl( 1., 2. ) ;
-		Coord coord2 = new CoordImpl( 3., 4. ) ;
+		Coord coord1 = new Coord(1., 2.);
+		Coord coord2 = new Coord(3., 4.);
 		Coord result = CoordUtils.plus( coord1, coord2 ) ;
 		Assert.assertEquals( 4., result.getX(), delta) ;
 		Assert.assertEquals( 6., result.getY(), delta) ;
@@ -49,8 +48,8 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testMinus() {
-		Coord coord1 = new CoordImpl( 1., 2. ) ;
-		Coord coord2 = new CoordImpl( 3., 5. ) ;
+		Coord coord1 = new Coord(1., 2.);
+		Coord coord2 = new Coord(3., 5.);
 		Coord result = CoordUtils.minus( coord1, coord2 ) ;
 		Assert.assertEquals( -2., result.getX(), delta) ;
 		Assert.assertEquals( -3., result.getY(), delta) ;
@@ -61,7 +60,7 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testScalarMult() {
-		Coord coord1 = new CoordImpl( 1., 2. ) ;
+		Coord coord1 = new Coord(1., 2.);
 		Coord result = CoordUtils.scalarMult( -0.33 , coord1 ) ;
 		Assert.assertEquals( -0.33, result.getX(), delta) ;
 		Assert.assertEquals( -0.66, result.getY(), delta) ;
@@ -72,8 +71,8 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testGetCenter() {
-		Coord coord1 = new CoordImpl( 1., 2. ) ;
-		Coord coord2 = new CoordImpl( 3., 5. ) ;
+		Coord coord1 = new Coord(1., 2.);
+		Coord coord2 = new Coord(3., 5.);
 		Coord result = CoordUtils.getCenter( coord1, coord2 ) ;
 		Assert.assertEquals( 2., result.getX(), delta) ;
 		Assert.assertEquals( 3.5, result.getY(), delta) ;
@@ -84,7 +83,7 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testLength() {
-		Coord coord1 = new CoordImpl( 3., 2. ) ;
+		Coord coord1 = new Coord(3., 2.);
 		double result = CoordUtils.length( coord1 ) ;
 		Assert.assertEquals( Math.sqrt( 9. + 4. ), result, delta) ;
 	}
@@ -94,7 +93,7 @@ public class CoordUtilsTest {
 	 */
 	@Test
 	public void testRotateToRight() {
-		Coord coord1 = new CoordImpl( 3., 2. ) ;
+		Coord coord1 = new Coord(3., 2.);
 
 		Coord result = CoordUtils.rotateToRight( coord1 ) ;
 		Assert.assertEquals(  2., result.getX(), delta ) ;

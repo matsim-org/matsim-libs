@@ -25,11 +25,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.Facility;
 
 /**
@@ -44,25 +44,25 @@ public class TestActivityWrapperFacility {
 
 		Activity act = new ActivityImpl(
 				"type",
-				new CoordImpl( 1 , 2 ),
+				new Coord((double) 1, (double) 2),
 				Id.create( "bouh", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"another_type",
-				new CoordImpl( 5 , 2 ),
+				new Coord((double) 5, (double) 2),
 				Id.create( "an_id", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"h2g2",
-				new CoordImpl( 42 , 42 ),
+				new Coord((double) 42, (double) 42),
 				Id.create( "42", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"nothing",
-				new CoordImpl( 0 , 0 ),
+				new Coord((double) 0, (double) 0),
 				Id.create( "0", Link.class ));
 		activities.add( act );
 

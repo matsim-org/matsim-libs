@@ -30,10 +30,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.TripRouter;
@@ -50,9 +47,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.telaviv.config.XMLParameterParser;
 import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.Emme2Zone;
@@ -218,7 +213,7 @@ public class PopulationCreator {
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
+		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
 		final TripRouterProviderImpl tripRouterFactory = new TripRouterProviderImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
 		ReplanningContext context = new ReplanningContext() {
 			@Override
@@ -271,21 +266,21 @@ public class PopulationCreator {
 	/*
 	 * Set some basic person parameters like age, sex, license and car availability.
 	 */
-	private void setBasicParameters(PersonImpl person, ParsedPerson emme2Person) {
-		person.setAge(emme2Person.AGE);
+	private void setBasicParameters(Person person, ParsedPerson emme2Person) {
+		PersonUtils.setAge(person, emme2Person.AGE);
 
-		if (emme2Person.GENDER == 1) person.setSex("m");
-		else person.setSex("f");
+		if (emme2Person.GENDER == 1) PersonUtils.setSex(person, "m");
+		else PersonUtils.setSex(person, "f");
 
 		if (emme2Person.LICENSE == 1) {
-			person.setLicence("yes");
-			if (emme2Person.NUMVEH == 0) person.setCarAvail("never");
-			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) person.setCarAvail("always");
-			else person.setCarAvail("sometimes");
+			PersonUtils.setLicence(person, "yes");
+			if (emme2Person.NUMVEH == 0) PersonUtils.setCarAvail(person, "never");
+			else if (emme2Person.NUMVEH >= emme2Person.HHLICENSES) PersonUtils.setCarAvail(person, "always");
+			else PersonUtils.setCarAvail(person, "sometimes");
 		}
 		else {
-			person.setLicence("no");
-			person.setCarAvail("sometimes");
+			PersonUtils.setLicence(person, "no");
+			PersonUtils.setCarAvail(person, "sometimes");
 		}
 	}
 
@@ -301,12 +296,13 @@ public class PopulationCreator {
 	 */
 	private boolean createAndAddInitialPlan(PersonImpl person, ParsedPerson emme2Person, Scenario scenario,
 			Map<Integer, List<ActivityFacility>> facilitiesToZoneMap, Map<Integer, Emme2Zone> zonalAttributes) {
+		if ( true ) throw new RuntimeException( "desires do not exist anymore. Please find a way to do another way or contact the core team." );
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		Plan plan = populationFactory.createPlan();
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
-		Desires desires = person.createDesires("");
+		//Desires desires = person.createDesires("");
 
 		LegImpl leg;
 		ActivityImpl activity;
@@ -397,7 +393,7 @@ public class PopulationCreator {
 
 		// If we have no activity chains we have nothing left to do.
 		if (!hasPrimaryActivity && !hasSecondaryActivity) {
-			desires.accumulateActivityDuration("home", 86400);
+			//desires.accumulateActivityDuration("home", 86400);
 			return true;
 		}
 
@@ -440,7 +436,7 @@ public class PopulationCreator {
 				 * 0.0 seconds, which results in crashes in the scoring function (typical duration is 0.0
 				 * which leads to a divide by zero problem). 
 				 */
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = primaryPreFacility;
@@ -473,7 +469,7 @@ public class PopulationCreator {
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_1_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_1_MAIN);
-			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+			//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousFacility = primaryFacility;
@@ -507,7 +503,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_AFT);
 				activity.setEndTime(time + emme2Person.DUR_1_AFT);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = primaryPostFacility;
@@ -577,7 +573,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_BEF);
 				activity.setEndTime(time + emme2Person.DUR_2_BEF);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = secondaryPreFacility;
@@ -610,7 +606,7 @@ public class PopulationCreator {
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_2_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_2_MAIN);
-			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+			//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousFacility = secondaryFacility;
@@ -643,7 +639,7 @@ public class PopulationCreator {
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_AFT);
 				activity.setEndTime(time + emme2Person.DUR_2_AFT);
-				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
+				//desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousFacility = secondaryPostFacility;
@@ -673,14 +669,14 @@ public class PopulationCreator {
 		 * Finally add a home desire that has a duration of 86400 - all other activities.
 		 */
 		double otherDurations = 0.0;
-		for (double duration : desires.getActivityDurations().values()) {
-			otherDurations = otherDurations + duration;
-		}
-		if (otherDurations < 86400) {
-			// make desired home duration not longer than 12 hours
-			double homeDuration = Math.min(12*3600, 86400 - otherDurations);
-			desires.accumulateActivityDuration("home", homeDuration);
-		}
+		//for (double duration : desires.getActivityDurations().values()) {
+		//	otherDurations = otherDurations + duration;
+		//}
+		//if (otherDurations < 86400) {
+		//	// make desired home duration not longer than 12 hours
+		//	double homeDuration = Math.min(12*3600, 86400 - otherDurations);
+		//	desires.accumulateActivityDuration("home", homeDuration);
+		//}
 		
 		// no errors have been found, so return true
 		return true;

@@ -82,10 +82,10 @@ public class CNControler {
 		}
 				
 		CNControler noiseImmissionControler = new CNControler();
-		noiseImmissionControler.run(configFile);
+		noiseImmissionControler.run(configFile, congestionPricing, noisePricing);
 	}
 
-	private void run(String configFile) {
+	public void run(String configFile, boolean congestionPricing, boolean noisePricing) {
 		
 		Controler controler = new Controler(configFile);
 	
@@ -100,7 +100,7 @@ public class CNControler {
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 				
-		gridParameters.setReceiverPointGap(1000.);
+		gridParameters.setReceiverPointGap(100.);
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
@@ -163,6 +163,8 @@ public class CNControler {
 			noiseParameters.setInternalizeNoiseDamages(false);
 		}
 		
+		noiseParameters.setWriteOutputIteration(10);
+		
 		noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
 
 		// congestion
@@ -184,7 +186,7 @@ public class CNControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
 			
@@ -202,7 +204,7 @@ public class CNControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
 			
@@ -220,7 +222,7 @@ public class CNControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
 			

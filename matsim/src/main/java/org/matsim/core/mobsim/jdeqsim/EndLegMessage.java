@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.population.ActivityImpl;
 
@@ -110,9 +110,14 @@ public class EndLegMessage extends EventMessage {
 			SimulationParameters.getProcessEventThread().processEvent(event);
 		}
 
+		// schedule VehicleLeavesTrafficEvent
+		Id<org.matsim.vehicles.Vehicle> vehicleId = Id.create( this.vehicle.getOwnerPerson().getId() , org.matsim.vehicles.Vehicle.class ) ;
+		event = new VehicleLeavesTrafficEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), 
+				vehicleId, this.vehicle.getCurrentLeg().getMode(), 1.0 );
+		SimulationParameters.getProcessEventThread().processEvent(event);
+
 		// schedule AgentArrivalEvent
 		event = new PersonArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
-
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent

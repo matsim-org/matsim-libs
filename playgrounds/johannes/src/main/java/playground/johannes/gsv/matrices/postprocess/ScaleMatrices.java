@@ -26,7 +26,10 @@ import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.CommonValues;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +40,7 @@ public class ScaleMatrices {
 
     private static final Logger logger = Logger.getLogger(ScaleMatrices.class);
 
-    private static final double SCALE_FACTOR = 11.3;
+    private static final double SCALE_FACTOR = 11.8;
 
     private static final double DIAGONAL_FACTOR = 1.3;
 
@@ -79,6 +82,8 @@ public class ScaleMatrices {
                 KeyMatrixTxtIO.read(m, file.getAbsolutePath());
 
                 double factor = getFactor(file.getName(), upscaleFactors, dayFactors);
+
+                MatrixOperations.symetrize(m);
 
                 MatrixOperations.applyFactor(m, SCALE_FACTOR);
                 MatrixOperations.applyDiagonalFactor(m, DIAGONAL_FACTOR);

@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +36,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.staheale.preprocess.AgentMemories;
@@ -65,9 +65,9 @@ public class CreatePopulation {
 						
 		for (String day : CreateNetwork.days) {
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {	
-				DecisionModel decisionModel = this.decisionModelCreator.createDecisionModelForAgent((PersonImpl)p, this.memories.getMemory(p.getId()));
+				DecisionModel decisionModel = this.decisionModelCreator.createDecisionModelForAgent(p, this.memories.getMemory(p.getId()));
 				this.decisionModels.addDecisionModelForAgent(decisionModel, p.getId());
-				this.createDemandForPerson((PersonImpl)p, day);	
+				this.createDemandForPerson(p, day);
 			}
 		}
 		for (String day : CreateNetwork.days) {
@@ -75,8 +75,8 @@ public class CreatePopulation {
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 				// set plan and remove it from memory
 				Plan plan = this.memories.getMemory(person.getId()).getRandomPlanAndRemove(day, this.random);
-				((PersonImpl)person).addPlan(plan);
-				((PersonImpl)person).setSelectedPlan(plan);
+				person.addPlan(plan);
+				person.setSelectedPlan(plan);
 				((PersonImpl)person).createDesires("desired activity durations");
             	((PersonImpl)person).getDesires().putActivityDuration("work", 8*3600);
             	((PersonImpl)person).getDesires().putActivityDuration("home", 8*3600);
@@ -92,7 +92,7 @@ public class CreatePopulation {
 			
 			// clear plan for day from persons
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				((PersonImpl)person).getPlans().clear();
+				person.getPlans().clear();
 			}
 		}
 	}
@@ -108,16 +108,16 @@ public class CreatePopulation {
 	
 	private void createPersons() {
 		double sideLength = Double.parseDouble(config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "sideLength"));
-		Zone centerZone = new Zone("centerZone", new CoordImpl(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 2000.0, 2000.0);	
+		Zone centerZone = new Zone("centerZone", new Coord(sideLength / 2.0 - 500.0, sideLength / 2.0 + 500.0), 2000.0, 2000.0);
 		this.initZone(centerZone);
-		
-		Zone topLeftZone =  new Zone("topLeftZone", new CoordImpl(0.0, sideLength), 2000.0, 2000.0); 
+
+		Zone topLeftZone =  new Zone("topLeftZone", new Coord(0.0, sideLength), 2000.0, 2000.0);
 		this.initZone(topLeftZone);
-		Zone bottomLeftZone =  new Zone("bottomLeftZone", new CoordImpl(0.0, 2000.0), 2000.0, 2000.0); 
+		Zone bottomLeftZone =  new Zone("bottomLeftZone", new Coord(0.0, 2000.0), 2000.0, 2000.0);
 		this.initZone(bottomLeftZone);
-		Zone bottomRightZone =  new Zone("bottomRightZone", new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
-		this.initZone(bottomRightZone);		
-		Zone topRightZone = new Zone("topRightZone", new CoordImpl(sideLength - 2000.0, sideLength), 2000.0, 2000.0);
+		Zone bottomRightZone =  new Zone("bottomRightZone", new Coord(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
+		this.initZone(bottomRightZone);
+		Zone topRightZone = new Zone("topRightZone", new Coord(sideLength - 2000.0, sideLength), 2000.0, 2000.0);
 		this.initZone(topRightZone);
 //		Zone bottomRightLargeZone = new Zone("bottomRightLargeZone", (Coord) new CoordImpl(sideLength - 2000.0, 2000.0), 2000.0, 2000.0);
 //		this.initZone(bottomRightLargeZone);
@@ -135,7 +135,7 @@ public class CreatePopulation {
 		int personsPerLocation = Integer.parseInt(config.findParam(CreateNetwork.AGENT_INTERACTION_PREPROCESS, "personsPerZone"));
 		int personCnt = 0;
 		for (int j = 0; j < personsPerLocation; j++) {
-			PersonImpl p = new PersonImpl(Id.create(personCnt + offset, Person.class));			
+			Person p = PersonImpl.createPerson(Id.create(personCnt + offset, Person.class));
 			personCnt++;
 			this.scenario.getPopulation().addPerson(p);	
 			//TreeMap<Id, ActivityFacility> facilitiesHome = this.scenario.getActivityFacilities().getFacilitiesForActivityType("home");
@@ -170,7 +170,7 @@ public class CreatePopulation {
 		return personCnt;
 	}
 	
-	private void createDemandForPerson(PersonImpl person, String day) {
+	private void createDemandForPerson(Person person, String day) {
 		PlanImpl plan = new PlanImpl();
 		ActivityFacility home = this.homeLocations.get(person.getId());
 		
@@ -188,7 +188,7 @@ public class CreatePopulation {
 		this.memories.getMemory(person.getId()).addPlan(plan, day);
 	}
 	
-	private double addOtherActs(PlanImpl plan, PersonImpl person, String day, double endTime) {
+	private double addOtherActs(PlanImpl plan, Person person, String day, double endTime) {
 		int offset = this.random.nextInt();
 		Random rand = new Random(4711+offset);
 		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
@@ -259,7 +259,7 @@ public class CreatePopulation {
 		return endTime;
 	}
 	
-	private double addWorkingAct(PlanImpl plan, PersonImpl person, String day, double endTime) {
+	private double addWorkingAct(PlanImpl plan, Person person, String day, double endTime) {
 		DecisionModel decisionModel = this.decisionModels.getDecisionModelForAgent(person.getId());
 		
 		if (decisionModel.doesAct("work", day)) {
@@ -274,7 +274,7 @@ public class CreatePopulation {
 		return endTime;
 	}
 	
-	private void finishPlan(PlanImpl plan, PersonImpl person) {			
+	private void finishPlan(PlanImpl plan, Person person) {
 		plan.addLeg(new LegImpl("car"));
 		ActivityFacility home = this.homeLocations.get(person.getId());
 		ActivityImpl homeAct = new ActivityImpl("home", home.getCoord());

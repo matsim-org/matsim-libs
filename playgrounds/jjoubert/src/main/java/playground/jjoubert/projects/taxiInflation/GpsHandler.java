@@ -27,12 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -188,7 +185,7 @@ public class GpsHandler {
 					 * alighting. */
 					double x = Double.parseDouble(sa[2]);
 					double y = Double.parseDouble(sa[1]);
-					Coord c = new CoordImpl(x, y);
+					Coord c = new Coord(x, y);
 					List<Coord> list = transactions.get(tripName);
 					if(list == null){
 						list = new ArrayList<Coord>();
@@ -257,14 +254,14 @@ public class GpsHandler {
 				/* It is the first record. Set the origin coordinate*/
 				double lon = Double.parseDouble(sa[2]);
 				double lat = Double.parseDouble(sa[1]);
-				Coord c = new CoordImpl(lon, lat);
+				Coord c = new Coord(lon, lat);
 				lastCoordinate = ct.transform(c);
 				
 				records.add(new Tuple<String[], Double>(sa, new Double(0.0)));
 			} else{
 				double lon = Double.parseDouble(sa[2]);
 				double lat = Double.parseDouble(sa[1]);
-				Coord c = new CoordImpl(lon, lat);
+				Coord c = new Coord(lon, lat);
 				Coord thisCoordinate = ct.transform(c);
 				
 				/* Convert distance (m) to distance (km). */

@@ -12,30 +12,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
 
 
 public class GtfsConverter {
@@ -69,8 +76,7 @@ public class GtfsConverter {
 
 
 	private TransitSchedule ts;
-
-
+	
 	public GtfsConverter(String filepath, Scenario scenario, CoordinateTransformation transform) {
 		this.filepath = filepath;
 		this.transform = transform;
@@ -332,11 +338,30 @@ public class GtfsConverter {
 			double startTime = Time.parseTime(entries[startTimeIndex].trim());
 			double endTime = Time.parseTime(entries[endTimeIndex].trim());
 			double step = Double.parseDouble(entries[stepIndex]);
+			// ---
+			final Id<TransitLine> key = routeToTripAssignments.get(tripId);
+			Assert.assertNotNull(key);
+			final Id<TransitRoute> key2 = this.matsimRouteIdToGtfsTripIdAssignments.get(tripId);
+			Assert.assertNotNull(key2);
+			final TransitLine transitLine = ts.getTransitLines().get(key);
+			Assert.assertNotNull( transitLine );
+			final TransitRoute transitRoute = transitLine.getRoutes().get(key2);
+			if ( transitRoute==null ) {
+				for ( Id<TransitRoute> key3 : transitLine.getRoutes().keySet() ) {
+					System.err.println(  key3 ) ;
+				}
+				System.err.println( "key=" + key ) ;
+				System.err.println( "key2=" + key2 ) ;
+				System.err.println( "transitLine=" + transitLine ) ;
+				System.err.println("does not exist; skipping ...") ;
+				continue ;
+			}
+			// ---
 			if((!(entries[tripIdIndex].equals(oldTripId))) && (usedTripIds.contains(tripId))){
-				departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures().size();
+				departureCounter = transitRoute.getDepartures().size();
 			}
 			if(usedTripIds.contains(tripId)){
-				Map<Id<Departure>, Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures();
+				Map<Id<Departure>, Departure> depatures = transitRoute.getDepartures();
 				double latestDeparture = 0;
 				for(Departure d: depatures.values()){
 					if(latestDeparture < d.getDepartureTime()){
@@ -348,8 +373,8 @@ public class GtfsConverter {
 					if(time>startTime){
 						Departure d = ts.getFactory().createDeparture(Id.create(tripId.toString() + "." + departureCounter, Departure.class), time);
 						d.setVehicleId(Id.create(tripId.toString() + "." + departureCounter, Vehicle.class));
-						this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.lineToVehicleType.get(routeToTripAssignments.get(tripId)));
-						ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).addDeparture(d);
+						this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.lineToVehicleType.get(key));
+						transitRoute.addDeparture(d);
 						departureCounter++;
 					}						
 					time = time + step;
@@ -491,7 +516,7 @@ public class GtfsConverter {
 		int stopLatitudeIndex = stopsSource.getContentIndex("stop_lat");
 		int stopLongitudeIndex = stopsSource.getContentIndex("stop_lon");
 		for(String[] entries: stopsSource.getContent()){
-			TransitStopFacility t = this.ts.getFactory().createTransitStopFacility(Id.create(entries[stopIdIndex], TransitStopFacility.class), transform.transform(new CoordImpl(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
+			TransitStopFacility t = this.ts.getFactory().createTransitStopFacility(Id.create(entries[stopIdIndex], TransitStopFacility.class), transform.transform(new Coord(Double.parseDouble(entries[stopLongitudeIndex]), Double.parseDouble(entries[stopLatitudeIndex]))), false);
 			t.setName(entries[stopNameIndex]);
 			ts.addStopFacility(t);
 		}		
@@ -696,7 +721,7 @@ public class GtfsConverter {
 		Id<Node> dummyId = Id.create("dN_" + toNodeId, Node.class);
 		if(!(network.getNodes().containsKey(dummyId))){
 			NodeImpl n = new NodeImpl(dummyId);
-			n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+1,nodes.get(toNodeId).getCoord().getY()+1));
+			n.setCoord(new Coord(nodes.get(toNodeId).getCoord().getX() + 1, nodes.get(toNodeId).getCoord().getY() + 1));
 			network.addNode(n);
 			double length = 50;
 			Link link = network.getFactory().createLink(Id.create("dL1_" + toNodeId, Link.class), n, nodes.get(toNodeId));
@@ -848,17 +873,17 @@ public class GtfsConverter {
 				for(String[] shapeCoord: shapes){
 					double dist = Double.parseDouble(shapeCoord[0].trim());
 					if((shapeDistStart <= dist) && (shapeDistEnd >= dist)){
-						coord.add(transform.transform(new CoordImpl(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2]))));
+						coord.add(transform.transform(new Coord(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2]))));
 					}
 				}
 			}else{
-				Coord fromCoord = new CoordImpl(params[1], params[2]);
-				Coord toCoord = new CoordImpl(params[3], params[4]);
+				Coord fromCoord = new Coord(Double.parseDouble(params[1]), Double.parseDouble(params[2]));
+				Coord toCoord = new Coord(Double.parseDouble(params[3]), Double.parseDouble(params[4]));
 				String shapeId = this.shapeIdToTripIdAssignments.get(tripId);
 				List<String[]> shapes = this.shapes.get(Id.create(shapeId, Shape.class));
 				boolean add = false;
 				for(String[] shapeCoord: shapes){
-					Coord c = transform.transform(new CoordImpl(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2])));
+					Coord c = transform.transform(new Coord(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2])));
 					if(CoordUtils.calcDistance(c, fromCoord) <= this.toleranceInM){
 						add = true;						 
 					}else if(CoordUtils.calcDistance(c, toCoord) <= this.toleranceInM){

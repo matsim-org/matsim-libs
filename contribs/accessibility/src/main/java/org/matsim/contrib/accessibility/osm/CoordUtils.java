@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
@@ -26,7 +25,7 @@ class CoordUtils {
 	private final static Logger log = Logger.getLogger(CoordUtils.class);
 
 
-	public static Coord getCoord(
+	public static Coord getCentroidCoord(
 			Entity entity,
 			CoordinateTransformation ct,			
 			Map<Long, NodeContainer> nodeMap,
@@ -45,7 +44,7 @@ class CoordUtils {
 	
 	
 	private static Coord getNodeCoord(Node node, CoordinateTransformation ct){
-		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+		return ct.transform(new Coord(node.getLongitude(), node.getLatitude()));
 	}
 	
 		
@@ -66,7 +65,7 @@ class CoordUtils {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be returned in the transformed CRS. */
 		return ct.transform(c);
@@ -90,7 +89,7 @@ class CoordUtils {
 		Double y = ymin + (ymax - ymin)/2;
 		
 		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
+		Coord c = new Coord(x, y);
 		
 		/* This should be in the transformed CRS. */
 		return ct.transform(c);
@@ -119,8 +118,8 @@ class CoordUtils {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		
@@ -128,14 +127,14 @@ class CoordUtils {
 	}
 	
 	
-	static Coord[] getWayCoords(Way way, CoordinateTransformation ct, Map<Long, NodeContainer> nodeMap){
+	public static Coord[] getAllWayCoords(Way way, CoordinateTransformation ct, Map<Long, NodeContainer> nodeMap){
 		List<Coord> list = new ArrayList<Coord>(); 
 		
 		for(WayNode wayNode : way.getWayNodes()){
 			double xNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLongitude();
 			double yNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLatitude();
 
-			Coord coord = new CoordImpl(xNode, yNode);
+			Coord coord = new Coord(xNode, yNode);
 			
 			list.add(ct.transform(coord));
 		}		
@@ -210,8 +209,8 @@ class CoordUtils {
 		}
 
 		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
+		Coord bottomLeft = new Coord(xmin, ymin);
+		Coord topRight = new Coord(xmax, ymax);
 		list.add(bottomLeft);
 		list.add(topRight);
 		

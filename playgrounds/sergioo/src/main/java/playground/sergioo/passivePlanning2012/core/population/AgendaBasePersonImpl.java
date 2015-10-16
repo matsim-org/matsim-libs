@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -29,28 +29,28 @@ public class AgendaBasePersonImpl extends BasePersonImpl implements	AgendaBasePe
 		this.agendaDecisionMaker = agendaDecisionMaker;
 	}
 
-	public static AgendaBasePersonImpl convertToAgendaBasePerson(PersonImpl person, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
+	public static AgendaBasePersonImpl convertToAgendaBasePerson(Person person, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
 		AgendaDecisionMaker agendaDecisionMaker = new AgendaDecisionMaker(facilities, getCarAvailability(mainModes, person), modes, createAgenda(person), simulationEndTime);
 		setInitialKnownPlaces(agendaDecisionMaker, person);
 		AgendaBasePersonImpl newPerson = new AgendaBasePersonImpl(person.getId(), agendaDecisionMaker);
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonUtils.setAge(newPerson, PersonUtils.getAge(person));
+		PersonUtils.setCarAvail(newPerson, PersonUtils.getCarAvail(person));
+		PersonUtils.setEmployed(newPerson, PersonUtils.isEmployed(person));
+		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
+		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
 		BasePlanImpl.convertToBasePlan(newPerson, person.getSelectedPlan());
 		return newPerson;
 	}
 	
-	public static AgendaBasePersonImpl createAgendaBasePerson(boolean fixedTypes, String[] types, PersonImpl person, TripRouter tripRouter, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
+	public static AgendaBasePersonImpl createAgendaBasePerson(boolean fixedTypes, String[] types, Person person, TripRouter tripRouter, ActivityFacilities facilities, Set<String> mainModes, Set<String> modes, double simulationEndTime) {
 		AgendaDecisionMaker agendaDecisionMaker = new AgendaDecisionMaker(facilities, getCarAvailability(mainModes, person), modes, createAgenda(person), simulationEndTime);
 		setInitialKnownPlaces(agendaDecisionMaker, person);
 		AgendaBasePersonImpl newPerson = new AgendaBasePersonImpl(person.getId(), agendaDecisionMaker);
-		newPerson.setAge(person.getAge());
-		newPerson.setCarAvail(person.getCarAvail());
-		newPerson.setEmployed(person.isEmployed());
-		newPerson.setLicence(person.getLicense());
-		newPerson.setSex(person.getSex());
+		PersonUtils.setAge(newPerson, PersonUtils.getAge(person));
+		PersonUtils.setCarAvail(newPerson, PersonUtils.getCarAvail(person));
+		PersonUtils.setEmployed(newPerson, PersonUtils.isEmployed(person));
+		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
+		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
 		newPerson.addPlan(person.getSelectedPlan());
 		BasePlanImpl.createBasePlan(fixedTypes, types, newPerson, person.getSelectedPlan(), tripRouter, facilities);
 		return newPerson;

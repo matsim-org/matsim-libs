@@ -22,6 +22,7 @@ package org.matsim.core.network.algorithms;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -148,10 +149,10 @@ public class NetworkMergeDoubleLinksTest {
 			}
 
 			NetworkFactory factory = this.network.getFactory();
-			Node n0 = factory.createNode(this.nodeIds[0], this.scenario.createCoord(0, 0));
-			Node n1 = factory.createNode(this.nodeIds[1], this.scenario.createCoord(300, 0));
-			Node n2 = factory.createNode(this.nodeIds[2], this.scenario.createCoord(200, 100));
-			Node n3 = factory.createNode(this.nodeIds[3], this.scenario.createCoord(100, 400));
+			Node n0 = factory.createNode(this.nodeIds[0], new Coord((double) 0, (double) 0));
+			Node n1 = factory.createNode(this.nodeIds[1], new Coord((double) 300, (double) 0));
+			Node n2 = factory.createNode(this.nodeIds[2], new Coord((double) 200, (double) 100));
+			Node n3 = factory.createNode(this.nodeIds[3], new Coord((double) 100, (double) 400));
 			this.network.addNode(n0);
 			this.network.addNode(n1);
 			this.network.addNode(n2);

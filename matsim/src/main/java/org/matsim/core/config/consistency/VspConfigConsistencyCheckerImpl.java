@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -33,7 +33,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 
 /**
  * @author nagel
@@ -97,13 +96,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 
-		if ( config.planCalcScore().getMonetaryDistanceCostRateCar() > 0 ) {
+		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate car > 0.  You probably want a value < 0 here.  " +
 					"This is a bug and may be changed eventually.  kai, jun'11") ;
 		}
-		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
+		if ( config.planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +

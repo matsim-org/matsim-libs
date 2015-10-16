@@ -33,7 +33,7 @@ import org.matsim.core.utils.io.UnicodeInputStream;
 /**
  * @author mrieser / Senozon AG
  */
-public class PopulationSampler extends JFrame {
+public final class PopulationSampler extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -178,7 +178,7 @@ public class PopulationSampler extends JFrame {
 		
 	}
 	
-	private void createSample(final File inputPopulationFile, final File networkFile, final double samplesize, final File outputPopulationFile) throws RuntimeException, IOException {
+	private static void createSample(final File inputPopulationFile, final File networkFile, final double samplesize, final File outputPopulationFile) throws RuntimeException, IOException {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		if (networkFile != null) {

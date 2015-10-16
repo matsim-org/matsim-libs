@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -53,7 +53,7 @@ public class PTLRFastAStarLandmarksWeighting implements PTLRouter {
     private final static double FACTOR_LINKTYPE = 100.0;
     private final static double FACTOR_NOMATCH = 100000.0;
 
-    private final IntermodalLeastCostPathCalculator pathCalculator;
+    private final Dijkstra pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
     private String currentLine;
 
@@ -79,7 +79,7 @@ public class PTLRFastAStarLandmarksWeighting implements PTLRouter {
 
     public PTLRFastAStarLandmarksWeighting(Network network) {
         LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
-        this.pathCalculator = (IntermodalLeastCostPathCalculator) factory.createPathCalculator(network, this, this);
+        this.pathCalculator = (Dijkstra) factory.createPathCalculator(network, this, this);
 		// Suppress "no route found" statements...
 		Logger.getLogger( org.matsim.core.router.Dijkstra.class ).setLevel( Level.ERROR );
     }

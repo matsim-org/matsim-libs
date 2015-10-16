@@ -31,6 +31,14 @@ public class OsmObjectsToFacilitiesParser {
 	private final Set<String> keysOfInterest;
 	
 	private final String file;
+	
+	public ActivityFacilities getFacilities() {
+		return facilities;
+	}
+
+	public ObjectAttributes getFacilityAttributes() {
+		return facilityAttributes;
+	}
 
 	public OsmObjectsToFacilitiesParser(String file, CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap, Set<String> keysOfInterest){
 		
@@ -83,9 +91,13 @@ public class OsmObjectsToFacilitiesParser {
 			bw.newLine();
 			for(Id<ActivityFacility> id : this.facilities.getFacilities().keySet()){
 				ActivityFacility facility = this.facilities.getFacilities().get(id);
+				String ao = "";
+				for(String s : facility.getActivityOptions().keySet()){
+					ao += s + "_";
+				}
 				bw.write(id.toString());
 				bw.write(",");
-				bw.write(String.format("%.0f,%.0f\n", facility.getCoord().getX(), facility.getCoord().getY()));
+				bw.write(String.format("%.0f,%.0f", facility.getCoord().getX(), facility.getCoord().getY()) + "," + ao + "\n");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Could not write to BufferedWriter " + out);

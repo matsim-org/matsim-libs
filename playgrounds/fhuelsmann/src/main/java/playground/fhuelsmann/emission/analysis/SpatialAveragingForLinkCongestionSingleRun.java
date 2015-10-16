@@ -40,7 +40,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -177,7 +176,7 @@ public class SpatialAveragingForLinkCongestionSingleRun {
 	private Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);
 		double yCentroid = findBinCenterY(yIndex);
-		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
+		Coord cellCentroid = new Coord(xCentroid, yCentroid);
 		return cellCentroid;
 	}
 

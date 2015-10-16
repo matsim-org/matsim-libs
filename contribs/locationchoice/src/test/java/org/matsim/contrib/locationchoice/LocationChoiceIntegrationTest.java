@@ -63,7 +63,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -84,7 +83,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.bestResponse);
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("100.0");
-		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed("4711");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed(4711);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -236,10 +235,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	private void createExampleNetwork(final Scenario scenario, final double scale, final double speed) {
 		Network network = scenario.getNetwork() ;
 
-		Node node0 = network.getFactory().createNode(Id.create(0, Node.class), new CoordImpl(-scale,0) ) ;
+		final double x = -scale;
+		Node node0 = network.getFactory().createNode(Id.create(0, Node.class), new Coord(x, (double) 0)) ;
 		network.addNode(node0) ;
 
-		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(10,0) ) ;
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 10, (double) 0)) ;
 		network.addNode(node1) ;
 
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), node0, node1 );
@@ -251,7 +251,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Random random = new Random(4711) ;
 		for ( int ii=2 ; ii<nNodes+2 ; ii++ ) {
 			double tmp = Math.PI*(ii-1)/nNodes ;
-			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
+			Coord coord = new Coord(scale * Math.sin(tmp), scale * Math.cos(tmp));
 
 			Node node = network.getFactory().createNode(Id.create(ii, Node.class), coord ) ;
 			network.addNode(node) ;
@@ -278,7 +278,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}
 
 		// create one additional facility for the initial activity:
-		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(1, ActivityFacility.class), new CoordImpl(scale,0) );
+		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(scale, (double) 0));
 		scenario.getActivityFacilities().addActivityFacility(facility1);
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
@@ -291,14 +291,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
-		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(0, 500));
+		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 0, (double) 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
-		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(0, 400));
+		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 0, (double) 400));
 		facility2.addActivityOption(new ActivityOptionImpl("work"));
-		ActivityFacilityImpl facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(0, 300));
+		ActivityFacilityImpl facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 0, (double) 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
@@ -354,7 +354,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		person.addPlan(plan) ;
 
 		{
-			Activity act = population.getFactory().createActivityFromCoord("home", new CoordImpl(0,0)) ;
+			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0)) ;
 			//		act.setLinkId(link.getId());
 			act.setEndTime(8.0 * 3600);
 			plan.addActivity(act) ;
@@ -370,7 +370,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		{
 			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 			//		act.setLinkId(link.getId());
-			Activity act = population.getFactory().createActivityFromCoord("home", new CoordImpl(0,0)) ;
+			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0)) ;
 			plan.addActivity(act) ;
 		}
 

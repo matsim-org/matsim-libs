@@ -20,6 +20,7 @@
 
 package playground.gregor.bidirpeds.bidq;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -53,10 +53,10 @@ public class BiDQ {
 		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(0,0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(10,0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(10,10));
-		Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(0,10));
+		Node n0 = fac.createNode(Id.create("0", Node.class), new Coord((double) 0, (double) 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), new Coord((double) 10, (double) 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), new Coord((double) 10, (double) 10));
+		Node n3 = fac.createNode(Id.create("3", Node.class), new Coord((double) 0, (double) 10));
 		net.addNode(n0);net.addNode(n1);net.addNode(n2);net.addNode(n3);
 		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
 		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n2);

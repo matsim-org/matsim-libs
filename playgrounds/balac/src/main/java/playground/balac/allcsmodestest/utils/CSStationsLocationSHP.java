@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -46,7 +46,7 @@ public class CSStationsLocationSHP {
 		reader.readLine();
 		while ((line = reader.readLine()) != null) {
 		      String[] parts = StringUtils.explode(line, '\t');
-		      CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+			Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 		      
 		      SimpleFeature ft = nodeFactory.createPoint(coord, new Object[] {Integer.toString(i)}, null);
   			//if (!scenario1.getActivityFacilities().getFacilities().containsKey(f1.getId()))
@@ -55,7 +55,7 @@ public class CSStationsLocationSHP {
 	    	
 	    }
 		
-        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/stations_greaterzurich_unlimited.shp");
+        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/TRB2016/stations_zurich_service_area.shp");
 
 		
 	}

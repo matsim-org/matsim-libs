@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -174,9 +173,7 @@ public class ParkingManagerZH {
 	}
 
 	public void addParkings(Collection<PParking> parkingCollection) {
-		RectangularArea rectangularArea = new RectangularArea(new CoordImpl(nonFullPublicParkingFacilities.getMinEasting(),
-				nonFullPublicParkingFacilities.getMinNorthing()), new CoordImpl(nonFullPublicParkingFacilities.getMaxEasting(),
-				nonFullPublicParkingFacilities.getMaxNorthing()));
+		RectangularArea rectangularArea = new RectangularArea(new Coord(nonFullPublicParkingFacilities.getMinEasting(), nonFullPublicParkingFacilities.getMinNorthing()), new Coord(nonFullPublicParkingFacilities.getMaxEasting(), nonFullPublicParkingFacilities.getMaxNorthing()));
 
 		for (PParking parking : parkingCollection) {
 
@@ -353,14 +350,14 @@ public class ParkingManagerZH {
 	 */
 	public Id<PParking> getClosestFreeParkingFacilityNotOnLink(Coord coord, Id<Link> linkId) {
 		LinkedList<PParking> tmpList = new LinkedList<PParking>();
-		PParking parkingFacility = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+		PParking parkingFacility = nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 
 		// if parking full or on specified link, try finding other free parkings
 		// in the quadtree
 		while (getFreeCapacity(parkingFacility.getId()) <= 0
 				|| parkingIdToLinkIdMapping.get(parkingFacility.getId()).equals(linkId)) {
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility = nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		}
 
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -394,18 +391,18 @@ public class ParkingManagerZH {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 
-		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY()).getId();
+		return nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY()).getId();
 	}
 
 	public synchronized Id<PParking> getClosestParkingFacilityNotOnLink(Coord coord, Id<Link> linkId) {
 		LinkedList<PParking> tmpList = new LinkedList<PParking>();
-		PParking parkingFacility = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+		PParking parkingFacility = nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 
 		// if parking full or on specified link, try finding other free parkings
 		// in the quadtree
 		while (parkingIdToLinkIdMapping.get(parkingFacility.getId()).equals(linkId)) {
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility = nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		}
 
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -426,7 +423,7 @@ public class ParkingManagerZH {
 	}
 
 	private Collection<PParking> getAllParkingWithinDistance(double distance, Coord coord) {
-		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+		return nonFullPublicParkingFacilities.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public Collection<PParking> getParkingFacilities() {
@@ -593,7 +590,7 @@ public class ParkingManagerZH {
 
 		double distance = 100;
 		while (true) {
-			Collection<PParking> collection = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+			Collection<PParking> collection = nonFullPublicParkingFacilities.getDisk(coord.getX(), coord.getY(), distance);
 
 			for (PParking p : collection) {
 				if (!p.getId().toString().contains("illegal")) {
@@ -652,7 +649,7 @@ public class ParkingManagerZH {
 		if (GeneralLib.getDistance(coordinatesLindenhofZH, coord) < 8000) {
 			double distance = 100;
 			while (true) {
-				Collection<PParking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
+				Collection<PParking> collection = garageParkings.getDisk(coord.getX(), coord.getY(), distance);
 
 				for (PParking p : collection) {
 					if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0 && !parkingIdToLinkIdMapping.get(p.getId()).equals(linkId)) {
@@ -680,7 +677,7 @@ public class ParkingManagerZH {
 	}
 
 	public Collection<PParking> getParkingWithinDistance(Coord coord, double distance) {
-		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+		return nonFullPublicParkingFacilities.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public IntegerValueHashMap<Id<PParking>> getOccupiedParking() {

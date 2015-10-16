@@ -23,6 +23,7 @@ package playground.yalcin;
 import net.opengis.kml._2.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -41,7 +42,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -118,10 +118,11 @@ public class NetworkDistance {
 		// set the config to only look at distance costs, not travel time costs
 		Config config = new Config();
 		config.addCoreModules();
-		config.planCalcScore().setTraveling_utils_hr(0.0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
 
 //		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
-		config.planCalcScore().setMonetaryDistanceCostRateCar(-0.001) ;
+		double monetaryDistanceRateCar = -0.001;
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm
@@ -155,8 +156,8 @@ public class NetworkDistance {
 				 * parts[8]: ToX
 				 * parts[9]: ToY
 				 */
-				Coord fromCoord = new CoordImpl(parts[4], parts[5]);
-				Coord toCoord = new CoordImpl(parts[8], parts[9]);
+				Coord fromCoord = new Coord(Double.parseDouble(parts[4]), Double.parseDouble(parts[5]));
+				Coord toCoord = new Coord(Double.parseDouble(parts[8]), Double.parseDouble(parts[9]));
 				Node fromNode = network.getNearestNode(fromCoord);
 				Node toNode = network.getNearestNode(toCoord);
 

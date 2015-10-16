@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -48,23 +49,24 @@ public final class TtCreateBraessNetworkAndLanes {
 	private boolean middleLinkExists = true;
 	private LaneType laneType = LaneType.NONE; 
 	private boolean btuRun = false;
+	private int numberOfPersons;
 	
 	// capacity at the links that all agents have to use
-	private long capFirstLast = 3600; // [veh/h]
+	private long capFirstLast; // [veh/h]
 	// capacity at all other links
-	private long capMain = 1800; // [veh/h]
+	private long capMain; // [veh/h]
 	// link length for the inflow links
-	private double inflowLinkLength = 7.5 * 1; // [m]
+	private double inflowLinkLength; // [m]
 	// link length for all other links
-	private long linkLength = 10000; // [m]
+	private long linkLength; // [m]
 	// travel time for the middle link
-	private double linkTTMid = 1;
+	private double linkTTMid;
 	// travel time for the middle route links
-	private double linkTTSmall = 1*60; // [s]
+	private double linkTTSmall; // [s]
 	// travel time for the two remaining outer route links (choose at least 3*LINK_TT_SMALL!)
-	private double linkTTBig = 10*60; // [s]
+	private double linkTTBig; // [s]
 	// travel time for inflow links and links that all agents have to use
-	private double minimalLinkTT = 1; // [s]
+	private double minimalLinkTT; // [s]
 
 	public TtCreateBraessNetworkAndLanes(Scenario scenario) {		
 		this.scenario = scenario;
@@ -89,22 +91,22 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	private void initNetworkParams() {
 		if (btuRun){
-			capFirstLast = 9000; 
-			capMain = 9000; 
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 200;
 			linkTTMid = 1;
 			linkTTSmall = 10;
 			linkTTBig = 20;
 			minimalLinkTT = 1;
-		}else{
-			capFirstLast = 3600; 
-			capMain = 1800; 
+		} else {
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons / 2;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 10000;
-			linkTTMid = 1*60;
-			linkTTSmall = 1*60;
-			linkTTBig = 10*60;
+			linkTTMid = 1 * 60;
+			linkTTSmall = 1 * 60;
+			linkTTBig = 10 * 60;
 			minimalLinkTT = 1;
 		}
 	}
@@ -114,28 +116,29 @@ public final class TtCreateBraessNetworkAndLanes {
 		NetworkFactory fac = net.getFactory();
 
 		// create nodes
+		double x = -200;
 		net.addNode(fac.createNode(Id.createNodeId(0),
-				scenario.createCoord(-200, 200)));
+				new Coord(x, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(1),
-				scenario.createCoord(0, 200)));
+				new Coord((double) 0, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(2),
-				scenario.createCoord(200, 200)));
+				new Coord((double) 200, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(3),
-				scenario.createCoord(400, 400)));
+				new Coord((double) 400, (double) 400)));
 		net.addNode(fac.createNode(Id.createNodeId(4),
-				scenario.createCoord(400, 0)));
+				new Coord((double) 400, (double) 0)));
 		net.addNode(fac.createNode(Id.createNodeId(5),
-				scenario.createCoord(600, 200)));
+				new Coord((double) 600, (double) 200)));
 		net.addNode(fac.createNode(Id.createNodeId(6),
-				scenario.createCoord(800, 200)));
+				new Coord((double) 800, (double) 200)));
 		
 		if (simulateInflowCap){
 			net.addNode(fac.createNode(Id.createNodeId(23),
-					scenario.createCoord(250, 250)));
+					new Coord((double) 250, (double) 250)));
 			net.addNode(fac.createNode(Id.createNodeId(24),
-					scenario.createCoord(250, 150)));
-			net.addNode(fac.createNode(Id.createNodeId(45), 
-					scenario.createCoord(450, 50)));
+					new Coord((double) 250, (double) 150)));
+			net.addNode(fac.createNode(Id.createNodeId(45),
+					new Coord((double) 450, (double) 50)));
 		}
 		
 		// create links
@@ -285,25 +288,25 @@ public final class TtCreateBraessNetworkAndLanes {
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
 				Id.create("1_2.ol", Lane.class), capFirstLast,
 				linkLength, 0, 1, null, 
-				Arrays.asList(Id.create("1_2.1", Lane.class),
-				Id.create("1_2.2", Lane.class)));
+				Arrays.asList(Id.create("1_2.l", Lane.class),
+				Id.create("1_2.r", Lane.class)));
 		
 		if (simulateInflowCap) {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.1", Lane.class), capFirstLast,
+					Id.create("1_2.l", Lane.class), capFirstLast,
 					linkLength / 2, -1, 1, 
 					Arrays.asList(Id.createLinkId("2_23")),	null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.2", Lane.class), capFirstLast,
+					Id.create("1_2.r", Lane.class), capFirstLast,
 					linkLength / 2, 1, 1,  
 					Arrays.asList(Id.createLinkId("2_24")), null);
 		} else {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.1", Lane.class), capFirstLast,
+					Id.create("1_2.l", Lane.class), capFirstLast,
 					linkLength / 2, -1, 1, 
 					Arrays.asList(Id.createLinkId("2_3")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.2", Lane.class), capFirstLast,
+					Id.create("1_2.r", Lane.class), capFirstLast,
 					linkLength / 2, 1, 1,  
 					Arrays.asList(Id.createLinkId("2_4")), null);
 		}	
@@ -321,16 +324,16 @@ public final class TtCreateBraessNetworkAndLanes {
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.ol", Lane.class), capMain,
 						linkLength, 0,	1, null,
-						Arrays.asList(Id.create("23_3.1", Lane.class),
-								Id.create("23_3.2", Lane.class)));
+						Arrays.asList(Id.create("23_3.f", Lane.class),
+								Id.create("23_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("23_3.1", Lane.class), capMain,
+						Id.create("23_3.f", Lane.class), capMain,
 						linkLength / 2, 0, 1,
 						Arrays.asList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("23_3.2", Lane.class), capMain,
+						Id.create("23_3.r", Lane.class), capMain,
 						linkLength / 2, 1, 1,
 						Arrays.asList(Id.createLinkId("3_4")), null);
 
@@ -342,16 +345,16 @@ public final class TtCreateBraessNetworkAndLanes {
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.ol", Lane.class), capMain,
 						linkLength, 0,	1, null,
-						Arrays.asList(Id.create("2_3.1", Lane.class),
-								Id.create("2_3.2", Lane.class)));
+						Arrays.asList(Id.create("2_3.f", Lane.class),
+								Id.create("2_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("2_3.1", Lane.class), capMain,
+						Id.create("2_3.f", Lane.class), capMain,
 						linkLength / 2, 0, 1,
 						Arrays.asList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("2_3.2", Lane.class), capMain,
+						Id.create("2_3.r", Lane.class), capMain,
 						linkLength / 2, 1, 1,
 						Arrays.asList(Id.createLinkId("3_4")), null);
 
@@ -388,6 +391,10 @@ public final class TtCreateBraessNetworkAndLanes {
 	public void writeNetworkAndLanes(String directory) {
 		new NetworkWriter(scenario.getNetwork()).write(directory + "network.xml");
 		if (!laneType.equals(LaneType.NONE)) new LaneDefinitionsWriter20(scenario.getLanes()).write(directory + "lanes.xml");
+	}
+
+	public void setNumberOfPersons(int numberOfPersons) {
+		this.numberOfPersons = numberOfPersons;
 	}
 
 }

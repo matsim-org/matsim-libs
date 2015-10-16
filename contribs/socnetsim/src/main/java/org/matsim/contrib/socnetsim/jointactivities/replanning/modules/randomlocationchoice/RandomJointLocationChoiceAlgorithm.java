@@ -37,7 +37,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
@@ -237,9 +236,7 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 			sumY += fac.getCoord().getY();
 		}
 
-		return new CoordImpl(
-				sumX / activitiesToMutate.size(),
-				sumY / activitiesToMutate.size() );
+		return new Coord(sumX / activitiesToMutate.size(), sumY / activitiesToMutate.size());
 	}
 
 	/* package (tests) */
@@ -251,7 +248,7 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 		final double xLoc = coordBarycenter.getX() + distance * Math.cos( angle );
 		final double yLoc = coordBarycenter.getY() + distance * Math.sin( angle );
 
-		return quadTreePerType.get( type ).get( xLoc , yLoc );
+		return quadTreePerType.get( type ).getClosest(xLoc, yLoc);
 	}
 
 	private double cachedNormalDouble = Double.NaN;

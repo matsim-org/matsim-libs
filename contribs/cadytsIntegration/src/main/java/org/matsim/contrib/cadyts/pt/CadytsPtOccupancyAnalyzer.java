@@ -197,7 +197,7 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 		return this.occupancies.keySet();
 	}
 
-	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
 		final String TAB = "\t";

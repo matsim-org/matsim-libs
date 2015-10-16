@@ -19,39 +19,34 @@
 
 package playground.johannes.gsv.matrices.misc;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.ObjectKeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.studies.gis.SpanningTree;
+import playground.johannes.studies.gis.SpanningTree.NodeData;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ObjectKeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.studies.gis.SpanningTree;
-import playground.johannes.studies.gis.SpanningTree.NodeData;
-
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.concurrent.*;
 
 /**
  * @author johannes
@@ -141,7 +136,7 @@ public class TTMatrixGenerator {
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 		Set<Future<Worker>> futures = new HashSet<>();
 		
-		for(Zone zone : zones.zoneSet()) {
+		for(Zone zone : zones.getZones()) {
 			Worker worker = new Worker(zone.getAttribute(zoneIdKey));
 			futures.add(executor.submit(worker, worker));
 		}
@@ -241,7 +236,7 @@ public class TTMatrixGenerator {
 		reader.parse(netFile);
 		
 		logger.info("Loading zones...");
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zoneFile, zoneIdKey);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey);
 		
 		TTMatrixGenerator generator = new TTMatrixGenerator();
 		KeyMatrix m = generator.generate(scenario.getNetwork(), zones, zoneIdKey, nThreads);

@@ -79,7 +79,7 @@ public class ShoppingScoreAdditionals {
 
 			if (act.getType().startsWith("shop")) {
 				int numberOfCloseByShopLocations =
-					this.shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY(), 750.0).size();
+					this.shopQuadTree.getDisk(act.getCoord().getX(), act.getCoord().getY(), 750.0).size();
 					additionalScore += Math.min(20.0, numberOfCloseByShopLocations);
 			}
 		}

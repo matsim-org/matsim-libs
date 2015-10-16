@@ -52,4 +52,6 @@ public interface CommonValues {
     String LEG_MODE_CAR = "car";
     String LEG_MODE_RIDE = "ride";
     String LEG_MODE_PT = "pt";
+
+    String TRUE = "true";
 }

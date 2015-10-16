@@ -18,18 +18,22 @@
  * *********************************************************************** */
 package playground.southafrica.sandboxes.kai.freight;
 
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.box.SchrimpfFactory;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.util.Solutions;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -72,7 +76,11 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import java.util.Collection;
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.box.SchrimpfFactory;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
 
 /**
  * @author nagel
@@ -323,9 +331,9 @@ public class KNFreight4 {
 			public ScoringFunction createScoringFunction(final Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
-				sum.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create(),
+				sum.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create(),
 						scenario.getNetwork() ) ) ;
-				sum.addScoringFunction( new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create()) ) ;
+				sum.addScoringFunction( new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create()) ) ;
 				ActivityScoring scoringFunction = new ActivityScoring() {
 					private double score = 0. ;
 					private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;

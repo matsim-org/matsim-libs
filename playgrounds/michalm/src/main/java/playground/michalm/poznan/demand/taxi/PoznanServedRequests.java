@@ -25,52 +25,50 @@ import com.google.common.base.*;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-import playground.michalm.poznan.demand.taxi.ServedRequests.WeekDay;
+import playground.michalm.demand.taxi.ServedRequests;
 import playground.michalm.poznan.zone.PoznanZones;
 
 
 public class PoznanServedRequests
 {
+    public static final int ZERO_HOUR = 4;
+
+
     //e.g. months = "234"
-    public static List<ServedRequest> readRequests(int... months)
+    public static List<PoznanServedRequest> readRequests(int... months)
     {
-        List<ServedRequest> requests = new ArrayList<>();
+        List<PoznanServedRequest> requests = new ArrayList<>();
         String path = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/Zlecenia_obsluzone_2014-0";
 
         for (int m : months) {
-            new ServedRequestsReader(requests).readFile(path + m + ".csv");
+            new PoznanServedRequestsReader(requests).readFile(path + m + ".csv");
         }
 
         return requests;
     }
 
 
-    public static Iterable<ServedRequest> filterRequestsWithinAgglomeration(
-            Iterable<ServedRequest> requests)
+    public static Iterable<PoznanServedRequest> filterRequestsWithinAgglomeration(
+            Iterable<PoznanServedRequest> requests)
     {
         MultiPolygon area = PoznanZones.readAgglomerationArea();
         return Iterables.filter(requests, ServedRequests.createWithinAreaPredicate(area));
     }
 
 
-    public static Iterable<ServedRequest> filterNormalPeriods(Iterable<ServedRequest> requests)
+    public static Iterable<PoznanServedRequest> filterNormalPeriods(
+            Iterable<PoznanServedRequest> requests)
     {
         //February - 1-28 (4 full weeks)
         //March - 2-29 (4 full weeks) - exclude: 1, 30-31 (daylight saving time shift)
         //April - 1-14 + 23-29 (3 full weeks), exclude: 15-22, 30 (Easter and May's long weekend)
 
         @SuppressWarnings("unchecked")
-        //TODO WEIRD JAVAC COMPILER PROBLEM:
-        //necessary casting from Predicate<ServedRequest> to Predicate<? super ServedRequest>
-        Predicate<? super ServedRequest> orPredicate = Predicates.or(
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
-                (Predicate<? super ServedRequest>)ServedRequests
-                        .createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
+        Predicate<PoznanServedRequest> orPredicate = Predicates.or(
+                ServedRequests.createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
+                ServedRequests.createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
+                ServedRequests.createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
+                ServedRequests.createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
 
         return Iterables.filter(requests, Predicates.not(orPredicate));
     }
@@ -79,45 +77,12 @@ public class PoznanServedRequests
     private static Date midnight(String date)
     {
         //format: "dd-MM-yyyy HH:mm:ss"
-        return ServedRequestsReader.parseDate(date + "-2014 00:00:00");
+        return PoznanServedRequestsReader.parseDate(date + "-2014 00:00:00");
     }
 
 
-    public static Iterable<ServedRequest> filterWorkDaysPeriods(Iterable<ServedRequest> requests)
-    {
-        Predicate<ServedRequest> predicate = new Predicate<ServedRequest>() {
-            public boolean apply(ServedRequest request)
-            {
-                WeekDay wd = WeekDay.getWeekDay(request.assigned);
-
-                switch (wd) {
-                    case MON:
-                        return request.assigned.getHours() >= 4;
-
-                    case TUE:
-                    case WED:
-                    case THU:
-                        return true;
-
-                    case SAT:
-                    case SUN:
-                        return false;
-
-                    case FRI:
-                        return request.assigned.getHours() < 4;
-
-                    default:
-                        throw new IllegalArgumentException();
-                }
-            }
-        };
-
-        return Iterables.filter(requests, predicate);
-    }
-
-
-    public static Iterable<ServedRequest> filterNext24Hours(Iterable<ServedRequest> requests,
-            Date fromDate)
+    public static Iterable<PoznanServedRequest> filterNext24Hours(
+            Iterable<PoznanServedRequest> requests, Date fromDate)
     {
         Date toDate = new Date(fromDate.getTime() + 24 * 3600 * 1000);
         return Iterables.filter(requests,

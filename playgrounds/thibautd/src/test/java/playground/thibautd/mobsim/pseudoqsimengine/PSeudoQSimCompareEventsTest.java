@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +65,7 @@ import java.util.Random;
  */
 //@Ignore( "fails since refactoring in DriverAgent. to fix!!!" )
 public class PSeudoQSimCompareEventsTest {
-	private static final boolean DUMP_EVENTS = true;
+	private static final boolean DUMP_EVENTS = false;
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();

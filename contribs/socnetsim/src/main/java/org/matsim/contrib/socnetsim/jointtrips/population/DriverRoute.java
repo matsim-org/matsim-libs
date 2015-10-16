@@ -30,14 +30,14 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author thibautd
  */
-public class DriverRoute implements GenericRoute , NetworkRoute {
+public class DriverRoute implements Route , NetworkRoute {
 	private final NetworkRoute netRoute;
 	private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
 
@@ -166,9 +166,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 
 	@Override
 	public void setRouteDescription(
-			final Id<Link> startLinkId,
-			final String routeDescription,
-			final Id<Link> endLinkId) {
+			final String routeDescription) {
 		String[] info = routeDescription.trim().split( " " );
 		String[] ps = info[0].split( "," );
 
@@ -180,7 +178,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 		for (int i=1; i < info.length; i++) {
 			ls.add( Id.create( info[i] , Link.class ) );
 		}
-		setLinkIds( startLinkId , ls , endLinkId );
+		setLinkIds( getStartLinkId() , ls , getEndLinkId() );
 	}
 
 	@Override
@@ -194,7 +192,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 			d.append( ps.next() );
 		}
 
-		for (Id l : getLinkIds()) {
+		for (Id<Link> l : getLinkIds()) {
 			d.append( " " );
 			d.append( l );
 		}
@@ -206,7 +204,7 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 	public String getRouteType() {
 		return "driver";
 	}
-
+	
 	@Override
 	public String toString() {
 		return "[DriverRoute: delegate="+netRoute+"; passengers="+passengers+"]";

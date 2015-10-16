@@ -22,6 +22,8 @@ package playground.dziemke.analysis.srv;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -29,6 +31,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +46,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -89,13 +97,13 @@ public class SrVTripAnalyzer {
 	    
 	    
 		// Input and output files
-		String inputFileTrips = "../../data/srv/input/W2008_Berlin_Weekday.dat";
-		String inputFilePersons = "../../data/srv/input/P2008_Berlin2.dat";
+	    String inputFileTrips = "/Users/dominik/Workspace/data/srv/input/W2008_Berlin_Weekday.dat";
+		String inputFilePersons = "/Users/dominik/Workspace/data/srv/input/P2008_Berlin2.dat";
 		
-		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		String shapeFile = "../../data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
+		String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 				
-		String outputDirectory = "../../data/srv/output/wd_neu";
+		String outputDirectory = "/Users/dominik/Workspace/data/srv/output/wd_neu_7";
 		
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
@@ -144,9 +152,11 @@ public class SrVTripAnalyzer {
 		
 		// create objects
 		
-		// new ones...
+		// for writing plans files (newer ones...)
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
 		
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
@@ -154,15 +164,15 @@ public class SrVTripAnalyzer {
 		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
 		networkReader.parse(networkFile);
 		
+		List<Event> events = new ArrayList<Event>();
+//		TreeMap<Double, Event> eventsMap = new TreeMap<Double, Event>();
+		
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCRS, toCRS);
 		
 		
-		
-		
-		
-		// existing ones...
+		// for calculations and storage of these calculation to files (older ones...)
     	int tripCounter = 0;
     	
     	Map <Integer, Double> tripDurationMap = new TreeMap <Integer, Double>();
@@ -281,45 +291,24 @@ public class SrVTripAnalyzer {
 	    	// use all filtered trips to construct plans and do calculations 
 	    	if (considerTrip == true) {		    		
 	    		
-	    		// create plans
+	    		
+	    		// collect and store information to create plans later
 	    		Id<Person> id = Id.create(personId, Person.class);
-	    		
-	    		if (!population.getPersons().containsKey(id)) {
-	    			Person person = populationFactory.createPerson(id);
-	    			Plan plan = populationFactory.createPlan();
-	    			person.addPlan(plan);
-	    			population.addPerson(person);
-	    		}
-	    	
-	    		Person person = population.getPersons().get(id);
-	    		System.out.println(person.getPlans().size());
-	    		Plan plan = person.getPlans().get(0);
-	    		
-	    		// TODO substitute zone by something better
-	    		// Id<Zone> departureZoneId = trip.getDepartureZoneId();
-	    				    		
-	    		// TODO create coordinates
-	    		double x = 4590000;
-	    		double y = 5820000;
-	    		Coord departureCoordinates = scenario.createCoord(x, y);
-	    		
-	    		// TODO add appropriate coordinate transformation
-	    		// TODO give activity proper name
-	    		Activity activity = populationFactory.createActivityFromCoord("", ct.transform(departureCoordinates));
 	    		double departureTimeInMinutes = trip.getDepartureTime();
-	    		activity.setEndTime(departureTimeInMinutes * 60);
-	    		plan.addActivity(activity);
 	    		
-	    		// TODO make mode adjustable
-	    		Leg leg = populationFactory.createLeg("car");
-	    		plan.addLeg(leg);
+		    	if (!personTripsMap.containsKey(id)) {
+		    		TreeMap<Double, Trip> tripsMap = new TreeMap<Double, Trip>();
+		    		personTripsMap.put(id, tripsMap);
+		    	}
+
+	    		double departureTimeInSeconds = 60 * departureTimeInMinutes;
+	    		if (personTripsMap.get(id).containsKey(departureTimeInSeconds)) {
+	    			new RuntimeException("Person may not have to activites ending at the exact same time.");
+	    		} else {
+	    			personTripsMap.get(id).put(departureTimeInSeconds, trip);
+	    		}
 	    		
-	    		// TODO add last activity
-	    		
-	    		
-	    		
-	    		
-	    		
+
 	    		// do calculations
 	    		tripCounter++;
 
@@ -464,19 +453,108 @@ public class SrVTripAnalyzer {
 	    log.warn("Number of trips that have no calculable speed is: " + numberOfTripsWithNoCalculableSpeed);
 	    
 	    
-	    // add final activity to plans
-	    for (Person person : population.getPersons().values()) {
-	    	Plan plan = person.getPlans().get(0);
-	    	Activity firstActivity = (Activity) plan.getPlanElements().get(0);
-	    	Coord homeCoord = firstActivity.getCoord();
-	    	Activity lastActivity = populationFactory.createActivityFromCoord("", ct.transform(homeCoord));
-	    	plan.addActivity(lastActivity);	    	
+	    // add activities from map to plans
+	    int tripMapEntryCounter = 0;
+	    
+	    for (Id<Person> personId : personTripsMap.keySet()) {
+	    	
+	    	// add person to population
+	    	if (!population.getPersons().containsKey(personId)) {
+	    		Person person = populationFactory.createPerson(personId);
+	    		Plan plan = populationFactory.createPlan();
+    			person.addPlan(plan);
+    			population.addPerson(person);
+    		}
+	    	
+	    	TreeMap<Double, Trip> tripsMap = personTripsMap.get(personId);
+	    	Person person = population.getPersons().get(personId);
+	    	
+	    	// TODO exclude trip if first activity is not "home"
+	    	
+	    	for (double departureTime : tripsMap.keySet()) {
+	    		tripMapEntryCounter++;
+	    		
+	    		// plans
+	    		Plan plan = person.getPlans().get(0);
+	    		
+	    		Trip trip = tripsMap.get(departureTime);
+
+	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
+	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
+	    		double y = x;
+	    		// TODO add appropriate coordinate transformation
+				Coord departureCoordinates = new Coord(x, y);
+	    		
+
+				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
+				
+				String activityTypeEndingActivity = trip.getActivityEndActType();	
+				if (personId == idToBeChecked) {
+					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "	+ activityTypeEndingActivity);
+				}
+				
+				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
+	    		double departureTimeInMinutes = trip.getDepartureTime();
+	    		double departureTimeInSeconds = departureTimeInMinutes * 60;
+				endingActivity.setEndTime(departureTimeInSeconds);
+				
+				plan.addActivity(endingActivity);
+	    		
+	    		// TODO make mode adjustable; right now its okay since non-car trips are excluded anyways
+	    		Leg leg = populationFactory.createLeg("car");
+	    		plan.addLeg(leg);
+	    		
+	    		// last activity
+	    		String activityTypeStartingActivity = trip.getActivityStartActType();
+	    		
+	    		if (departureTime == tripsMap.lastKey()) {
+		    		double x2 = Double.parseDouble(trip.getArrivalZoneId().toString());
+		    		double y2 = x2;
+		    		Coord arrivalCoordinates = new Coord(x2, y2);
+		    		Activity startingActivity = populationFactory.createActivityFromCoord(activityTypeStartingActivity, ct.transform(arrivalCoordinates));
+		    		plan.addActivity(startingActivity);
+	    		}
+				
+	    		
+				// events
+				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTimeInSeconds, personId, null, null, activityTypeEndingActivity);
+				events.add(activityEndEvent);
+//				eventsMap.put(departureTimeInSeconds, activityEndEvent);
+				// TODO make mode adjustable
+				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTimeInSeconds, personId, null, "car");
+				events.add(personDepartureEvent);
+//				eventsMap.put(departureTimeInSeconds, personDepartureEvent);
+				
+				double arrivalTimeInMinutes = trip.getArrivalTime();
+				double arrivalTimeInSeconds = arrivalTimeInMinutes * 60;
+				// TODO make mode adjustable
+				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTimeInSeconds, personId, null, "car");
+				events.add(personArrivalEvent);
+//				eventsMap.put(arrivalTimeInSeconds, personArrivalEvent);
+				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTimeInSeconds, personId, null, null, activityTypeStartingActivity);
+				events.add(activityStartEvent);	
+//				eventsMap.put(arrivalTimeInSeconds, activityStartEvent);
+	    	}  	
 	    }	    
 	    
 	    // write population
 	    MatsimWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 	    popWriter.write(outputDirectory + "plans.xml");
-
+	    
+	    //  write events
+	    // TODO have events sorted by time
+	    int eventsCounter = 0;
+	    EventWriterXML eventWriter = new EventWriterXML(outputDirectory + "events.xml");
+//	    for (Event event : eventsMap.values()) {
+	    for (Event event : events) {
+	    	eventWriter.handleEvent(event);
+	    	eventsCounter++;
+	    }
+	    eventWriter.closeFile();
+	    
+	    // print counters
+	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
+	    System.out.println("events added: " + eventsCounter);
 	}
 
 

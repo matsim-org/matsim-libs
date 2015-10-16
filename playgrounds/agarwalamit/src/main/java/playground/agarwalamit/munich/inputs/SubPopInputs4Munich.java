@@ -130,7 +130,7 @@ public class SubPopInputs4Munich {
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setConstant(-0.3);
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfDistance(ptParams.getMarginalUtilityOfDistance());
 		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfTraveling(ptParams.getMarginalUtilityOfTraveling());
-		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMonetaryDistanceCostRate(ptParams.getMonetaryDistanceCostRate());
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMonetaryDistanceRate(ptParams.getMonetaryDistanceRate());
 
 		// teleportation speeds for different pts
 		config.plansCalcRoute().getOrCreateModeRoutingParams("pt_".concat("COMMUTER_REV_COMMUTER")).setTeleportedModeSpeed(50/3.6);

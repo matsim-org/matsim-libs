@@ -24,10 +24,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -42,13 +42,13 @@ public class ReRoutePersons {
 	public void run (
 			Map<Id<ActivityFacility>,ActivityFacility> movedFacilities,
 			Network network,
-			Map<Id, PersonImpl> persons,
+			Map<Id, Person> persons,
 			PersonAlgorithm pcrl,
 			ActivityFacilities facilities){
 		log.info("movedFacilities= " + movedFacilities);
 		int counterPlans = 0;
 		int counterPersons = 0;
-		for (PersonImpl p : persons.values()) {
+		for (Person p : persons.values()) {
 			boolean routeIt = false;
 			for (Plan plan:p.getPlans()) {
 

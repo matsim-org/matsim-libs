@@ -83,7 +83,7 @@ public class AdvancedDemandPerLinkHandler implements LinkEnterEventHandler, Link
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.linkenter.put(event.getPersonId(), linkId2Time);
+		this.linkenter.put(event.getDriverId(), linkId2Time);
 	}
 	
 	@Override
@@ -114,8 +114,8 @@ public class AdvancedDemandPerLinkHandler implements LinkEnterEventHandler, Link
 		}
 		
 		
-		Id personId = event.getPersonId();
-		if(!this.linkenter.containsKey(event.getPersonId())){
+		Id personId = event.getDriverId();
+		if(!this.linkenter.containsKey(event.getDriverId())){
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
 				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
 				"Thus, no emissions are calculated for this link leave event.");

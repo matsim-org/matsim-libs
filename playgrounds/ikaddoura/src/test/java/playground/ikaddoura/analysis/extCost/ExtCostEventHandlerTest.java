@@ -29,6 +29,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -218,11 +219,11 @@ public class ExtCostEventHandlerTest {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
-		
-		Node node1 = network.getFactory().createNode(Id.create("nodeId1", Node.class), scenario.createCoord(0., 0.));
-		Node node2 = network.getFactory().createNode(Id.create("nodeId2", Node.class), scenario.createCoord(1000., 0.));
-		Node node3 = network.getFactory().createNode(Id.create("nodeId3", Node.class), scenario.createCoord(1000., 1000.));
-		Node node4 = network.getFactory().createNode(Id.create("nodeId4", Node.class), scenario.createCoord(0., 1000.));
+
+		Node node1 = network.getFactory().createNode(Id.create("nodeId1", Node.class), new Coord(0., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("nodeId2", Node.class), new Coord(1000., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("nodeId3", Node.class), new Coord(1000., 1000.));
+		Node node4 = network.getFactory().createNode(Id.create("nodeId4", Node.class), new Coord(0., 1000.));
 		
 		Link link1 = network.getFactory().createLink(this.link1, node1, node2);
 		Link link2 = network.getFactory().createLink(this.link2, node2, node3);

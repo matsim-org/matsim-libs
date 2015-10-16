@@ -38,7 +38,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -235,14 +234,14 @@ public class IatbrPlanBuilder {
 		Iterator<Id<Person>> iterator = population.getPersons().keySet().iterator();
 		while(iterator.hasNext()){
 			Id<Person> id = iterator.next();
-			PersonImpl person = (PersonImpl) population.getPersons().get(id);
+			Person person = population.getPersons().get(id);
 			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
 			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
 			if(firstActivity.getType().startsWith("h") && lastActivity.getType().startsWith("h")){
 
 				/* Check for home activity */
 				ActivityFacilityImpl home = null;
-				Coord closestBuilding = spot5QT.get(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
+				Coord closestBuilding = spot5QT.getClosest(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
 				if(!facilityIdMap.containsKey(closestBuilding)){
 					Id<ActivityFacility> newFacility = Id.create("spot_" + spotId++, ActivityFacility.class);
 					home = activityFacilities.createAndAddFacility(newFacility, closestBuilding);
@@ -269,21 +268,21 @@ public class IatbrPlanBuilder {
 							act.setFacilityId(home.getId());
 						} else if(act.getType().startsWith("w")){
 							/* Check for work activity */
-							ActivityFacilityImpl closestMall = sacscQT.get(act.getCoord().getX(), act.getCoord().getY());
+							ActivityFacilityImpl closestMall = sacscQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 							/* First check closest mall, and choose if it is within the threshold. */
 							if(closestMall.calcDistance(act.getCoord()) <= workAtShoppingThreshold){
 								act.setFacilityId(closestMall.getId());
 								act.setCoord(closestMall.getCoord());
 							} else{
 								/* Second, check closest amenity, and choose if it is within the threshold. */
-								ActivityFacilityImpl closestAmenity = amenityQT.get(act.getCoord().getX(), act.getCoord().getY());
+								ActivityFacilityImpl closestAmenity = amenityQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 								if(closestAmenity.calcDistance(act.getCoord()) <= workAtAmenityThreshold){
 									act.setFacilityId(closestAmenity.getId());
 									act.setCoord(closestAmenity.getCoord());
 								} else{
 									/* Just choose the closest Spot 5 building */
 									ActivityFacilityImpl work;
-									Coord closestBuildingCoord = spot5QT.get(act.getCoord().getX(), act.getCoord().getY());
+									Coord closestBuildingCoord = spot5QT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 									if(!facilityIdMap.containsKey(closestBuildingCoord)){
 										Id<ActivityFacility> newFacility = Id.create("spot_" + spotId++, ActivityFacility.class);
 										ActivityFacilityImpl afi = activityFacilities.createAndAddFacility(newFacility, closestBuildingCoord);
@@ -299,17 +298,17 @@ public class IatbrPlanBuilder {
 							}
 						} else if(act.getType().startsWith("e")){
 							/* Education activity. */
-							ActivityFacilityImpl closestSchool = educationQT.get(act.getCoord().getX(), act.getCoord().getY());
+							ActivityFacilityImpl closestSchool = educationQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestSchool.getId());
 							act.setCoord(closestSchool.getCoord());
 						} else if(act.getType().startsWith("s")){
 							/* Pick the closest shopping facility */
-							ActivityFacilityImpl closestShop = shoppingQT.get(act.getCoord().getX(), act.getCoord().getY());
+							ActivityFacilityImpl closestShop = shoppingQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestShop.getId());
 							act.setCoord(closestShop.getCoord());			
 						} else if(act.getType().startsWith("l")){
 							/* Pick the closest leisure facility. */
-							ActivityFacilityImpl closestLeisure = leisureQT.get(act.getCoord().getX(), act.getCoord().getY());
+							ActivityFacilityImpl closestLeisure = leisureQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestLeisure.getId());
 							act.setCoord(closestLeisure.getCoord());	
 						} else{
@@ -317,7 +316,7 @@ public class IatbrPlanBuilder {
 							 * I (JWJ Jun '12) realized that the LocationChoice 
 							 * algorithm NEEDS all activities to be assigned a
 							 * facility.*/
-							ActivityFacilityImpl closestAmenity = amenityQT.get(act.getCoord().getX(), act.getCoord().getY());
+							ActivityFacilityImpl closestAmenity = amenityQT.getClosest(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestAmenity.getId());
 							act.setCoord(closestAmenity.getCoord());
 						}
@@ -363,10 +362,10 @@ public class IatbrPlanBuilder {
 		double amenityToShoppingCentreThreshold = 100;
 		for(Id<ActivityFacility> id: sc.getActivityFacilities().getFacilities().keySet()){
 			ActivityFacilityImpl af = (ActivityFacilityImpl) sc.getActivityFacilities().getFacilities().get(id);
-			ActivityFacilityImpl closestMall = sacscQT.get(af.getCoord().getX(), af.getCoord().getY());
+			ActivityFacilityImpl closestMall = sacscQT.getClosest(af.getCoord().getX(), af.getCoord().getY());
 			if(af.calcDistance(closestMall.getCoord()) > amenityToShoppingCentreThreshold){
 				/* Add it as an independent amenity. */
-				Coord closestBuildingCoord = spot5QT.get(af.getCoord().getX(), af.getCoord().getY());
+				Coord closestBuildingCoord = spot5QT.getClosest(af.getCoord().getX(), af.getCoord().getY());
 				ActivityFacilityImpl afNew;
 				if(!facilityIdMap.containsKey(closestBuildingCoord)){
 					afNew = activityFacilities.createAndAddFacility(Id.create("osm_" + id.toString(), ActivityFacility.class), closestBuildingCoord);

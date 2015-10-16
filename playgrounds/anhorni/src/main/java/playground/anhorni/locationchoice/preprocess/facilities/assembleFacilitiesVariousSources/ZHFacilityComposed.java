@@ -19,7 +19,7 @@
 
 package playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 public class ZHFacilityComposed {
 	
@@ -123,8 +123,8 @@ public class ZHFacilityComposed {
 		this.y = y;
 	}
 
-	public CoordImpl getCoords() {
-		return new CoordImpl(this.x,this.y);
+	public Coord getCoords() {
+		return new Coord(this.x, this.y);
 	}
 
 

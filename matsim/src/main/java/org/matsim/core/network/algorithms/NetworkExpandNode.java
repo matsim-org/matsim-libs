@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
@@ -207,7 +206,7 @@ public class NetworkExpandNode {
 		for (Link inlink : inlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = inlink.getFromNode().getCoord();
-			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
+			Coord cp = new Coord(p.getX() - c.getX(), p.getY() - c.getY());
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			if (Math.abs(lcp) < 1e-8) {
 				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
@@ -217,8 +216,8 @@ public class NetworkExpandNode {
 			double dy = cp.getY() / lcp;
 			double x = c.getX() + d * dx - e * dy;
 			double y = c.getY() + d * dy + e * dx;
-			
-			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new CoordImpl(x,y));
+
+			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new Coord(x, y));
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
@@ -237,7 +236,7 @@ public class NetworkExpandNode {
 		for (Link outlink : outlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = outlink.getToNode().getCoord();
-			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
+			Coord cp = new Coord(p.getX() - c.getX(), p.getY() - c.getY());
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			if (Math.abs(lcp) < 1e-8) {
 				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
@@ -247,7 +246,7 @@ public class NetworkExpandNode {
 			double dy = cp.getY() / lcp;
 			double x = c.getX() + d * dx + e * dy;
 			double y = c.getY() + d * dy - e * dx;
-			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new CoordImpl(x,y));
+			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new Coord(x, y));
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;

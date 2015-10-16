@@ -13,6 +13,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
+import playground.dhosse.gap.Global;
+import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.EgapPopulationUtilsV2;
+import playground.dhosse.utils.EgapHashGenerator;
+
 public class MiDCSVReader {
 
 	private final int idxPersonId = 0;
@@ -32,6 +37,131 @@ public class MiDCSVReader {
 	
 	public MiDCSVReader(){
 		this.persons = new HashMap<>();
+	}
+	
+	public void readV2(String file, MiDPersonGroupTemplates templates){
+		
+		BufferedReader reader = IOUtils.getBufferedReader(file);
+		
+		String pId = null; //current person id
+		String previousPId = null; //person id read in previous line
+		
+		String acts = null;
+		String legs = null;
+		String times = null;
+		String distance = null;
+		
+		String pHash = null;
+		
+		try{
+			
+			String line = reader.readLine();
+			
+			while((line = reader.readLine()) != null){
+				
+				String[] parts = line.split("\t");
+				
+				pId = parts[idxPersonId];
+				
+				if(previousPId != null){
+					
+					if(!pId.equals(previousPId)){
+						
+						if(!times.contains("NULL")){
+							
+							MiDTravelChain tChain = new MiDTravelChain(previousPId, legs.split("_"), acts.split("_"), times.split("_"), distance.split("_"));
+							templates.addTravelChainToPattern(pHash, acts, tChain);
+							
+						}
+						
+						acts = null;
+						legs = null;
+						times = null;
+						pHash = null;
+						
+					}
+					
+				}
+
+				if(pHash == null){
+
+					String age = parts[idxAge];
+					int sex = parts[idxSex].equals("male") ? 0 : 1;
+					String employed = parts[idxEmployment];
+					String license = parts[idxLicense];
+					String carAvail = parts[idxCarAvailability].equals("never") ? "false" : "true";
+					if(license.equals("false")){
+						carAvail = "false";
+					}
+					
+					pHash = EgapHashGenerator.generatePersonHash(Integer.parseInt(age), sex, Boolean.parseBoolean(carAvail), Boolean.parseBoolean(license), Boolean.parseBoolean(employed));
+					
+				}
+				
+				String nextAct = parts[idxPurpose];
+				String mode = parts[idxMode];
+				String departure = parts[idxStart];
+				String arrival = parts[idxEnd];
+				String d = parts[idxDistance];
+				
+				if(acts == null){
+					
+					if(nextAct.equals(Global.ActType.home.name())){
+						
+						acts = Global.ActType.other.name();
+						
+					} else{
+						
+						acts = Global.ActType.home.name();
+						
+					}
+					
+				}
+				acts += "_" + nextAct;
+				
+				if(legs == null){
+					
+					legs = mode;
+					
+				} else {
+					
+					legs += "_" + mode;
+					
+				}
+				
+				if(times == null){
+					
+					times = departure + "-" + arrival;
+					
+				} else{
+					
+					times += "_" + departure + "-" + arrival;
+					
+				}
+				
+				if(distance == null){
+					
+					distance = d;
+					
+				} else{
+					
+					distance += "_" + d;
+					
+				}
+				
+				previousPId = pId;
+				
+			}
+			
+			reader.close();
+			
+			
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		
+		}
+		
 	}
 	
 	public Map<String, List<MiDData>> read(String file){

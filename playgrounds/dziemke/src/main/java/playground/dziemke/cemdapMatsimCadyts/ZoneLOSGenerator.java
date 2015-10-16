@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -83,7 +82,7 @@ public class ZoneLOSGenerator {
 			Coordinate coordinate = point.getCoordinate();
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
-			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
+			Coord coord = new Coord(Double.parseDouble(xcoordinate.toString()), Double.parseDouble(ycoordinate.toString()));
 			Zone zone = new Zone(key, coord);
 			zonesMap.put(key, zone);
 		}

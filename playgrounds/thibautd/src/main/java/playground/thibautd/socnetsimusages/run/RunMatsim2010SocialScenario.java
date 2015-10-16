@@ -22,6 +22,7 @@ package playground.thibautd.socnetsimusages.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
@@ -78,19 +79,32 @@ public class RunMatsim2010SocialScenario {
 					@Override
 					public void install() {
 						install(new JointDecisionProcessModule());
+					}
+				} );
+		controller.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install( new ConfigConfiguredPlanLinkIdentifierModule());
 						install(new SocnetsimDefaultAnalysisModule());
 						install(new JointActivitiesScoringModule());
 						install(new DefaultGroupStrategyRegistryModule());
 						install(new JointTripsModule());
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
-						install(new KtiScoringWithEquityModule() );
 					}
 				});
+		controller.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install(new KtiScoringWithEquityModule());
+					}
+				} );
 
 
-		controller.run();
-	}
+					controller.run();
+				}
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );

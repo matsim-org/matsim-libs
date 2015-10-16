@@ -232,13 +232,13 @@ public class ParkingInfrastructure  {
 	
 	public ActivityFacility getClosestFreeParkingFacility(Coord coord) {
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		
 		// if parking full, try finding other free parkings in the quadtree
 		
 		while (getFreeCapacity(parkingFacility.getId())<=0){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -248,12 +248,12 @@ public class ParkingInfrastructure  {
 	
 	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
 		while (getFreeCapacity(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -288,17 +288,17 @@ public class ParkingInfrastructure  {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 		
-		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY()).getId();
+		return nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY()).getId();
 	}
 	
 	public synchronized Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
 		while (parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullPublicParkingFacilities.getClosest(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -319,7 +319,7 @@ public class ParkingInfrastructure  {
 	}
 
 	private Collection<ActivityFacility> getAllParkingWithinDistance(double distance, Coord coord) {
-		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(),distance);
+		return nonFullPublicParkingFacilities.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public IntegerValueHashMap<Id> getFacilityCapacities() {

@@ -24,8 +24,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
-public class GenericRouteImpl extends AbstractRoute implements GenericRoute, Cloneable {
+public class GenericRouteImpl extends AbstractRoute implements Cloneable {
 
+	/*package*/ final static String ROUTE_TYPE = "generic";
+	
 	private String routeDescription = null;
 
 	public GenericRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
@@ -43,15 +45,13 @@ public class GenericRouteImpl extends AbstractRoute implements GenericRoute, Clo
 	}
 
 	@Override
-	public void setRouteDescription(final Id<Link> startLinkId, final String routeDescription, final Id<Link> endLinkId) {
-		setStartLinkId(startLinkId);
+	public void setRouteDescription(final String routeDescription) {
 		this.routeDescription = routeDescription;
-		setEndLinkId(endLinkId);
 	}
 
 	@Override
 	public String getRouteType() {
-		return "generic";
+		return ROUTE_TYPE;
 	}
 
 }

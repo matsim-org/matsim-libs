@@ -40,13 +40,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
 
@@ -179,14 +177,14 @@ public class PlansCreateFromMZ {
 				int departure = Integer.parseInt(entries[4].trim())*60;
 				entries[4] = Integer.toString(departure);
 
-				Coord from = new CoordImpl(entries[9].trim(),entries[10].trim());
+				Coord from = new Coord(Double.parseDouble(entries[9].trim()), Double.parseDouble(entries[10].trim()));
 				entries[9] = Double.toString(from.getX());
 				entries[10] = Double.toString(from.getY());
 				int fromPLZ = -99;
 				if (!entries[12].trim().isEmpty()) {
 					fromPLZ = Integer.parseInt(entries[12].trim());
 				}
-				Coord to = new CoordImpl(entries[15].trim(),entries[16].trim());
+				Coord to = new Coord(Double.parseDouble(entries[15].trim()), Double.parseDouble(entries[16].trim()));
 				entries[15] = Double.toString(to.getX());
 				entries[16] = Double.toString(to.getY());
 				int toPLZ = -99;
@@ -366,7 +364,7 @@ public class PlansCreateFromMZ {
 				int departure = Integer.parseInt(entries[4].trim())*60;
 				entries[4] = Integer.toString(departure);
 
-				Coord from = new CoordImpl(entries[14].trim(), entries[15].trim());
+				Coord from = new Coord(Double.parseDouble(entries[14].trim()), Double.parseDouble(entries[15].trim()));
 				entries[14] = Double.toString(from.getX());
 				entries[15] = Double.toString(from.getY());
 				int fromPLZ = -99;
@@ -374,7 +372,7 @@ public class PlansCreateFromMZ {
 					fromPLZ = Integer.parseInt(entries[17].trim());
 				}
 
-				Coord to = new CoordImpl(entries[21].trim(), entries[22].trim());
+				Coord to = new Coord(Double.parseDouble(entries[21].trim()), Double.parseDouble(entries[22].trim()));
 				entries[21] = Double.toString(to.getX());
 				entries[22] = Double.toString(to.getY());
 				int toPLZ = -99;
@@ -923,7 +921,7 @@ public class PlansCreateFromMZ {
 			if (has_changed) { cnt_p++; }
 			p.getPlans().clear();
 			p.addPlan(plan2);
-			((PersonImpl) p).setSelectedPlan(plan2);
+			p.setSelectedPlan(plan2);
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {

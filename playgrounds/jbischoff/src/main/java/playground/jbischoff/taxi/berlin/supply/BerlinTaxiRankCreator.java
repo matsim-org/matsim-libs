@@ -11,7 +11,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -149,7 +148,7 @@ class RankReader
         double xc = 13. + Double.parseDouble("0." + xcoordString);
         String ycoordString = y.substring(2);
         double yc = 52. + Double.parseDouble("0." + ycoordString);
-        Coord coord = new CoordImpl(xc, yc);
+        Coord coord = new Coord(xc, yc);
         Coord trans = ct.transform(coord);
         //		System.out.println("Read x"+ x + " Read y "+ y + " coord read "+ coord + " transformed "+trans );
         return trans;

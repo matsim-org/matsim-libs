@@ -325,7 +325,7 @@
 //		
 //		@Override
 //		public void handleEvent(AgentDepartureEvent event) {
-//			Id personId = event.getPersonId();
+//			Id personId = event.getDriverId();
 //			
 //			activeTrips.put(personId, event.getTime());
 //			justDeparted.add(personId);
@@ -336,7 +336,7 @@
 //
 //		@Override
 //		public void handleEvent(AgentArrivalEvent event) {
-//			Id personId = event.getPersonId();
+//			Id personId = event.getDriverId();
 //			
 //			double travelTime = event.getTime() - activeTrips.remove(personId);
 //			double sumTravelTime = data.travelTimes.get(personId) + travelTime;
@@ -357,12 +357,12 @@
 //
 //		@Override
 //		public void handleEvent(LinkEnterEvent event) {
-//			activeTrips.put(event.getPersonId(), event.getTime());
+//			activeTrips.put(event.getDriverId(), event.getTime());
 //		}
 //
 //		@Override
 //		public void handleEvent(LinkLeaveEvent event) {
-//			Id personId = event.getPersonId();
+//			Id personId = event.getDriverId();
 //
 //			double travelTime = event.getTime() - activeTrips.get(personId);
 //			
@@ -418,7 +418,7 @@
 //			positionInfo.id = linkId;
 //			positionInfo.isLink = true;
 //			positionInfo.coord = link.getCoord();
-//			data.positions.put(event.getPersonId(), positionInfo);
+//			data.positions.put(event.getDriverId(), positionInfo);
 //		}
 //
 //		@Override
@@ -432,7 +432,7 @@
 //				positionInfo.id = facilityId;
 //				positionInfo.isFacility = true;
 //				positionInfo.coord = facility.getCoord();
-//				data.positions.put(event.getPersonId(), positionInfo);
+//				data.positions.put(event.getDriverId(), positionInfo);
 //			} 
 //			else {
 //				Id linkId = event.getLinkId();
@@ -441,7 +441,7 @@
 //				positionInfo.id = linkId;
 //				positionInfo.isLink = true;
 //				positionInfo.coord = link.getCoord();
-//				data.positions.put(event.getPersonId(), positionInfo);
+//				data.positions.put(event.getDriverId(), positionInfo);
 //			}
 //		}
 //
@@ -455,7 +455,7 @@
 //			positionInfo.id = linkId;
 //			positionInfo.isLink = true;
 //			positionInfo.coord = link.getCoord();
-//			data.positions.put(event.getPersonId(), positionInfo);
+//			data.positions.put(event.getDriverId(), positionInfo);
 //		}
 //		
 //		@Override

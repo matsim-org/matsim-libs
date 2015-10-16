@@ -19,6 +19,8 @@
 
 package playground.andreas.mzilske.bvg09;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,14 +59,18 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
-import playground.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
-import java.util.Collection;
+import playground.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
 public class DataPrepare {
 
@@ -201,7 +207,7 @@ public class DataPrepare {
 			visNet.addNode(node);
 		}
 		for (Link link : routerNet.getLinks().values()) {
-			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
+			Link l = visNet.getFactory().createLink(link.getId(), visNet.getNodes().get(link.getFromNode().getId()), visNet.getNodes().get(link.getToNode().getId()));
 			l.setLength(link.getLength());
 			l.setFreespeed(link.getFreespeed());
 			l.setCapacity(link.getCapacity());
@@ -213,7 +219,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(visScenario, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(visScenario.getConfig(), visScenario, events, otfVisQSim);
 		OTFClientLive.run(visScenario.getConfig(), server);
 		otfVisQSim.run();

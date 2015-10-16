@@ -23,9 +23,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -181,8 +180,9 @@ private static Provider<TransitRouter> transitRouterFactory;
 
     TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 100.0D);
     ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setUtilityOfLineSwitch(-2.0D);
-    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setTravelingWalk_utils_hr(-12.0D);
-    
+    final double travelingWalk = -12.0D;
+    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+
     PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
     routeConfigGroup.getModeRoutingParams().get("walk").setBeelineDistanceFactor(1.2);
     routeConfigGroup.getModeRoutingParams().get("walk").setTeleportedModeSpeed(4.2 / 3.6);
@@ -228,17 +228,17 @@ private static Provider<TransitRouter> transitRouterFactory;
 
       if ((!arr[1].startsWith("-")) && (!arr[2].startsWith("-")) && (!arr[3].startsWith("-")) && (!arr[4].startsWith("-")))
       {
-        Coord coordStartT = new CoordImpl(arr[2], arr[1]);
+        Coord coordStartT = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[1]));
 
-        CoordImpl coordStart = (CoordImpl)transformation.transform(coordStartT);
+        Coord coordStart = transformation.transform(coordStartT);
 
         System.out.println(coordStart.getX());
 
         Link lStart = lUtils.getClosestLink(coordStart);
 
-        Coord coordEndT = new CoordImpl(arr[4], arr[3]);
+        Coord coordEndT = new Coord(Double.parseDouble(arr[4]), Double.parseDouble(arr[3]));
 
-        CoordImpl coordEnd = (CoordImpl)transformation.transform(coordEndT);
+        Coord coordEnd = transformation.transform(coordEndT);
 
         Link lEnd = lUtils.getClosestLink(coordEnd);
 

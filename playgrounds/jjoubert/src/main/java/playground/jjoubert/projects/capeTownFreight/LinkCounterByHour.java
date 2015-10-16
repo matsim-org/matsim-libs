@@ -40,7 +40,6 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -151,7 +150,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, Wait2LinkEventH
 			builder.add(linkTotal);
 
 			/* Build and add the feature. */
-			SimpleFeature feature = builder.buildFeature(null);
+			SimpleFeature feature = builder.buildFeature(linkId.toString());
 			collection.add(feature);
 			counter.incCounter();
 		}
@@ -167,7 +166,8 @@ public class LinkCounterByHour implements LinkEnterEventHandler, Wait2LinkEventH
 		builder.setCRS(DefaultGeographicCRS.WGS84);
 		
 		/* Add the attributes in order. */
-		builder.add("Link", LineString.class);
+//		builder.add("Link", LineString.class);
+		builder.add("the_geom", LineString.class);
 		builder.length(6).add("Id", String.class);
 		builder.length(6).add("h00", Integer.class);
 		builder.length(6).add("h01", Integer.class);

@@ -55,11 +55,11 @@ public class SimSimShapefileWriter {
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimCompMap){
+	public void writeShape(String outfile, Map<Id<Link>, List<CountSimComparison>> countSimCompMap){
 		this.writeShape(outfile, countSimCompMap, "sim", "count");
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimCompMap,
+	public void writeShape(String outfile, Map<Id<Link>, List<CountSimComparison>> countSimCompMap,
 			String runId, String runId2) {
 		PolygonFeatureFactory factory = createFeatureType(this.crs, runId, runId2);
 		GeometryFactory geofac = new GeometryFactory();

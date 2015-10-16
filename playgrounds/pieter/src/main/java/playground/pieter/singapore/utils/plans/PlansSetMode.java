@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 
 class PlansSetMode {
 
@@ -19,7 +18,7 @@ class PlansSetMode {
 		int countCarPlans=0;
 		while (pid_it.hasNext()) {
 			Id<Person> personId = pid_it.next();
-			PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 			for (int i = person.getPlans().size() - 1; i >= 0; i--) {
 				Plan plan = person.getPlans().get(i);

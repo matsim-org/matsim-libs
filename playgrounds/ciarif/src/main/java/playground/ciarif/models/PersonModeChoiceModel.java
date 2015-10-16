@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -47,7 +46,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	private static final String W = "w";
 	private static final String S = "s";
 	private static final String H = "h";
-	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
+	private static final Coord ZERO = new Coord(0.0, 0.0);
 
 	private ModelModeChoice model;
 	private final Persons persons;
@@ -115,7 +114,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 
 		// choose mode choice model based on main purpose
-		if (((PersonImpl) person).getAge()>=18)
+		if (PersonUtils.getAge(person)>=18)
 			if (mainpurpose == 0) {model = new ModelModeChoiceWork18Plus();}
 			else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
 			else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
@@ -130,13 +129,13 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		if (MatsimRandom.getRandom().nextDouble() < 0.44) { has_bike = false; }
 
 		// setting parameters
-		model.setAge(((PersonImpl) person).getAge());
+		model.setAge(PersonUtils.getAge(person));
 		model.setDistanceHome2Work(distance);
 		model.setHHDimension(p.getHousehold().getPersonCount());
-		model.setLicenseOwnership(((PersonImpl) person).hasLicense());
+		model.setLicenseOwnership(PersonUtils.hasLicense(person));
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		model.setCar(p.getCarAvail());
-		model.setTickets(((PersonImpl) person).getTravelcards());
+		model.setTickets(PersonUtils.getTravelcards(person));
 		model.setDistanceTour(plan_dist/1000.0); // model needs meters!
 		model.setLicenseOwnership(p.hasLicense());
 		model.setMainPurpose(mainpurpose);

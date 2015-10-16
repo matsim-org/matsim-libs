@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 
+import org.matsim.core.population.PersonUtils;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 import playground.johannes.sna.gis.Zone;
@@ -62,7 +62,7 @@ public class PersonEmployed implements PopulationTask {
 			double p = zone.getAttribute();
 			
 			if(random.nextDouble() < p)
-				((PersonImpl)person).setEmployed(true);
+				PersonUtils.setEmployed(person, true);
 		}
 	}
 

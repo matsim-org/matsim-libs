@@ -9,10 +9,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
@@ -104,8 +101,8 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 				}
 				averageX/=linkedList.size();
 				averageY/=linkedList.size();
-				
-				PrivateParking privateParking=new PrivateParking(new CoordImpl(averageX, averageY), linkedList.get(0).getActInfo());
+
+				PrivateParking privateParking=new PrivateParking(new Coord(averageX, averageY), linkedList.get(0).getActInfo());
 				privateParking.setCapacity(totalCapacity);
 				reducedPrivatParkingSet.add(privateParking);
 			}
@@ -122,10 +119,10 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		
 		for (Coord coord:clusteredParkingCapacities.keySet()){
 			Collection<ActivityFacilityImpl> actFacilities = new LinkedList<ActivityFacilityImpl>();
-			actFacilities.addAll(facilitiesQuadTree.get(coord.getX(), coord.getY(), maxFacilityDistanceInMeters));
+			actFacilities.addAll(facilitiesQuadTree.getDisk(coord.getX(), coord.getY(), maxFacilityDistanceInMeters));
 			
 			if (actFacilities.size()==0){
-				actFacilities.add(facilitiesQuadTree.get(coord.getX(), coord.getY()));
+				actFacilities.add(facilitiesQuadTree.getClosest(coord.getX(), coord.getY()));
 			}
 			
 			double totalCapacityOfFacilitiesAttachedToCluster=0;
@@ -152,7 +149,7 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		HashMap<Coord,Double> clusteredCapacities=new HashMap<Coord, Double>();
 		for (String id:parkingCapacities.keySet()){
 			String[] idParts=id.split(",");
-			Coord coord=new CoordImpl(idParts[0],idParts[1]);
+			Coord coord= new Coord(Double.parseDouble(idParts[0]), Double.parseDouble(idParts[1]));
 			clusteredCapacities.put(coord, parkingCapacities.get(id));
 		}
 		

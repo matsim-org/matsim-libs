@@ -21,27 +21,7 @@
 
 package org.matsim.contrib.evacuation.control;
 
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EventListener;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,16 +29,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
 import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
-import org.matsim.contrib.evacuation.control.helper.OSMCenterCoordinateParser;
 import org.matsim.contrib.evacuation.io.EvacuationConfigReader;
 import org.matsim.contrib.evacuation.io.EvacuationConfigWriter;
 import org.matsim.contrib.evacuation.io.ShapeIO;
 import org.matsim.contrib.evacuation.model.AbstractModule;
 import org.matsim.contrib.evacuation.model.AbstractToolBox;
 import org.matsim.contrib.evacuation.model.Constants;
-import org.matsim.contrib.evacuation.model.ModuleChain;
 import org.matsim.contrib.evacuation.model.Constants.ModuleType;
 import org.matsim.contrib.evacuation.model.Constants.SelectionMode;
+import org.matsim.contrib.evacuation.model.ModuleChain;
 import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.model.imagecontainer.ImageContainerInterface;
 import org.matsim.contrib.evacuation.model.locale.Locale;
@@ -80,49 +59,31 @@ import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
-import com.vividsolutions.jts.geom.Envelope;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventListener;
 
 public class Controller {
 
 	private final ArrayList<Shape> shapes;
-	private Visualizer visualizer;
-	private Point mousePosition;
-	private SelectionMode selectionMode;
-
-	private ImageContainerInterface imageContainer;
-
-	private boolean hoveringOverPoint;
-	private boolean editMode;
-	private Component parentComponent;
-
-	// slippy map event listener
-	private ArrayList<MouseListener> mouseListener;
-	private ArrayList<MouseMotionListener> mouseMotionListener;
-	private ArrayList<MouseWheelListener> mouseWheelListener;
-	private ArrayList<KeyListener> keyListener;
-	private boolean slippyListenersAdded;
-
-	private AbstractListener listener;
-	private String currentOSMFile;
-
-	private EvacuationConfigModule evacuationConfigModule;
-	private Config matsimConfig;
-
 	// private String configCoordinateSystem = Constants.getEPSG();
 	private final String sourceCoordinateSystem = "EPSG:4326"; // WGS 84
-	private String targetCoordinateSystem = null;
-	private Scenario scenario;
-	private Point2D centerPosition;
-	private CoordinateTransformation ctTarget2Osm;
-	private CoordinateTransformation ctOsm2Target;
-	private Double boundingBox;
-
+	private final ShapeUtils shapeUtils;
 	// these are transient variables used by most modules
 	public Point2D c0;
 	public Point2D c1;
@@ -130,12 +91,32 @@ public class Controller {
 	public Point p1;
 	public Id<Link> linkID1;
 	public Id<Link> linkID2;
+	private Visualizer visualizer;
+	private Point mousePosition;
+	private SelectionMode selectionMode;
+	private ImageContainerInterface imageContainer;
+	private boolean hoveringOverPoint;
+	private boolean editMode;
+	private Component parentComponent;
+	// slippy map event listener
+	private ArrayList<MouseListener> mouseListener;
+	private ArrayList<MouseMotionListener> mouseMotionListener;
+	private ArrayList<MouseWheelListener> mouseWheelListener;
+	private ArrayList<KeyListener> keyListener;
+	private boolean slippyListenersAdded;
+	private AbstractListener listener;
+	private String currentOSMFile;
+	private EvacuationConfigModule evacuationConfigModule;
+	private Config matsimConfig;
+	private String targetCoordinateSystem = "EPSG:3395"; //World Mercator
+	private Scenario scenario;
+	private Point2D centerPosition;
+	private CoordinateTransformation ctTarget2Osm;
+	private CoordinateTransformation ctOsm2Target;
+	private Double boundingBox;
 	private JPanel mainPanel;
 	private Rectangle mainPanelBounds;
 	private boolean inSelection;
-
-	private final ShapeUtils shapeUtils;
-
 	private AbstractToolBox activeToolBox;
 	private ArrayList<AbstractModule> modules;
 
@@ -215,30 +196,8 @@ public class Controller {
 
 	}
 
-	private static final class Runner implements Runnable {
-		private final Controller controller;
-
-		public Runner(Controller controller) {
-			this.controller = controller;
-		}
-
-		@Override
-		public void run() {
-			try {
-				this.controller.setVisualizer(new Visualizer(this.controller));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	public ArrayList<Shape> getActiveShapes() {
 		return this.shapes;
-	}
-
-	public void setVisualizer(Visualizer visualizer) {
-		this.visualizer = visualizer;
-
 	}
 
 	public void addRenderLayer(AbstractRenderLayer layer) {
@@ -247,6 +206,11 @@ public class Controller {
 
 	public Visualizer getVisualizer() {
 		return this.visualizer;
+	}
+
+	public void setVisualizer(Visualizer visualizer) {
+		this.visualizer = visualizer;
+
 	}
 
 	public void resetRenderer(boolean leaveMapRenderer) {
@@ -319,12 +283,12 @@ public class Controller {
 
 	}
 
-	public void setParentComponent(Component parentComponent) {
-		this.parentComponent = parentComponent;
-	}
-
 	public Component getParentComponent() {
 		return this.parentComponent;
+	}
+
+	public void setParentComponent(Component parentComponent) {
+		this.parentComponent = parentComponent;
 	}
 
 	public void repaintParent() {
@@ -370,12 +334,12 @@ public class Controller {
 		return this.slippyListenersAdded;
 	}
 
-	public void setListener(AbstractListener listener) {
-		this.listener = listener;
-	}
-
 	public AbstractListener getListener() {
 		return this.listener;
+	}
+
+	public void setListener(AbstractListener listener) {
+		this.listener = listener;
 	}
 
 	public boolean hasMapRenderer() {
@@ -465,11 +429,6 @@ public class Controller {
 		return rv;
 	}
 
-	private void setPopDensFilename(String popDensFilename) {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void setLayer(String layer) {
 		this.layer = layer;
 	}
@@ -484,12 +443,20 @@ public class Controller {
 
 	public boolean openEvacuationConfig() {
 		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", this.locale.infoEvacuationFile(), false);
+
+		try {
+			Thread.sleep(100);//workaround for OS X, without which JFileChooser sometimes does not come up
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
-		if (returnValue == JFileChooser.APPROVE_OPTION)
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			return evacuationEvacuationConfig(openDialog.getSelectedFile());
-		else
+		}
+		else {
 			return false;
+		}
 
 	}
 
@@ -512,9 +479,8 @@ public class Controller {
 			// if (matsimConfig==null)
 			{
 				this.matsimConfig = ConfigUtils.createConfig();
-				
-				determineTargetCoordinateSystem(networkFileName);
-				
+
+
 				this.matsimConfig.global().setCoordinateSystem(this.targetCoordinateSystem);
 
 				this.scenario = ScenarioUtils.createScenario(this.matsimConfig);
@@ -531,34 +497,40 @@ public class Controller {
 				OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), this.ctOsm2Target, true);
 				reader.setKeepPaths(true);
 				reader.parse(networkFileName);
-			} else if (gcm.getMainTrafficType().equals("pedestrian")) {
-				OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), this.ctOsm2Target, false);
-				reader.setKeepPaths(true);
-				
-				double laneCap = 2808 * 2; // 2 lanes
+			}
+			else {
+				if (gcm.getMainTrafficType().equals("pedestrian")) {
+					OsmNetworkReader reader = new OsmNetworkReader(this.scenario.getNetwork(), this.ctOsm2Target, false);
+					reader.setKeepPaths(true);
 
-				reader.setHighwayDefaults(2, "trunk", 2, 1.34, 1., laneCap);
-				reader.setHighwayDefaults(2, "trunk_link", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(3, "primary", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(3, "primary_link", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(4, "secondary", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(5, "tertiary", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "minor", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "unclassified", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "residential", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "living_street", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
-				reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
+					double laneCap = 2808 * 2; // 2 lanes
 
-				// max density is set to 5.4 p/m^2
-				((NetworkImpl) this.scenario.getNetwork()).setEffectiveLaneWidth(.6);
-				((NetworkImpl) this.scenario.getNetwork()).setEffectiveCellSize(.31);
-				reader.parse(networkFileName);
-			} else if (gcm.getMainTrafficType().equals("mixed")) {
-				throw new RuntimeException("not implemented yet!");
+					reader.setHighwayDefaults(2, "trunk", 2, 1.34, 1., laneCap);
+					reader.setHighwayDefaults(2, "trunk_link", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(3, "primary", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(3, "primary_link", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(4, "secondary", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(5, "tertiary", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "minor", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "unclassified", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "residential", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "living_street", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
+
+					// max density is set to 5.4 p/m^2
+					((NetworkImpl) this.scenario.getNetwork()).setEffectiveLaneWidth(.6);
+					((NetworkImpl) this.scenario.getNetwork()).setEffectiveCellSize(.31);
+					reader.parse(networkFileName);
+				}
+				else {
+					if (gcm.getMainTrafficType().equals("mixed")) {
+						throw new RuntimeException("not implemented yet!");
+					}
+				}
 			}
 
 			processNetwork(false);
@@ -569,17 +541,6 @@ public class Controller {
 			return false;
 		}
 
-	}
-
-	private void determineTargetCoordinateSystem(String networkFileName) {
-		OSMCenterCoordinateParser parser = new OSMCenterCoordinateParser();
-		parser.setValidating(false);
-		parser.parse(networkFileName);
-		double lat = parser.getCenterLat();
-		double lon = parser.getCenterLon();
-		String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-		this.targetCoordinateSystem = epsg;
-		
 	}
 
 	private void checkGeoTransformationTools() {
@@ -595,16 +556,17 @@ public class Controller {
 		Envelope e = new Envelope();
 		for (Node node : this.scenario.getNetwork().getNodes().values()) {
 			// ignore end nodes
-			if (node.getId().toString().contains("en"))
+			if (node.getId().toString().contains("en")) {
 				continue;
+			}
 
 			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
 		}
 
 		// calculate center and bounding box
-		Coord centerC = new CoordImpl((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
-		Coord min = new CoordImpl(e.getMinX(), e.getMinY());
-		Coord max = new CoordImpl(e.getMaxX(), e.getMaxY());
+		Coord centerC = new Coord((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
+		Coord min = new Coord(e.getMinX(), e.getMinY());
+		Coord max = new Coord(e.getMaxX(), e.getMaxY());
 
 		// also process links (to link quad tree)
 		if (processLinks) {
@@ -613,8 +575,9 @@ public class Controller {
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
 			for (Link link : net.getLinks().values()) {
 				// ignore end links
-				if (link.getId().toString().contains("el"))
+				if (link.getId().toString().contains("el")) {
 					continue;
+				}
 				this.links.put(link);
 				this.linkList.add(link);
 			}
@@ -648,8 +611,9 @@ public class Controller {
 
 	public void setMainPanelListeners(boolean removeAllExistingListeners) {
 		if (this.mainPanel != null) {
-			if (removeAllExistingListeners)
+			if (removeAllExistingListeners) {
 				removeAllPanelEventListeners();
+			}
 
 			this.mainPanel.addMouseListener(getListener());
 			this.mainPanel.addMouseMotionListener(getListener());
@@ -666,24 +630,28 @@ public class Controller {
 			MouseWheelListener[] mws = this.mainPanel.getMouseWheelListeners();
 			KeyListener[] ks = this.mainPanel.getKeyListeners();
 
-			for (MouseListener l : ms)
+			for (MouseListener l : ms) {
 				this.mainPanel.removeMouseListener(l);
-			for (MouseMotionListener m : mms)
+			}
+			for (MouseMotionListener m : mms) {
 				this.mainPanel.removeMouseMotionListener(m);
-			for (MouseWheelListener mw : mws)
+			}
+			for (MouseWheelListener mw : mws) {
 				this.mainPanel.removeMouseWheelListener(mw);
-			for (KeyListener k : ks)
+			}
+			for (KeyListener k : ks) {
 				this.mainPanel.removeKeyListener(k);
+			}
 		}
 
 	}
 
 	/**
 	 * Add a shape. Since no specific layer is given:
-	 * 
+	 * <p/>
 	 * - scans for shapes - creates a new shape, if no shape found or replaces
 	 * the old shape with the same id
-	 * 
+	 *
 	 * @param shape
 	 */
 	public void addShape(Shape shape) {
@@ -699,9 +667,11 @@ public class Controller {
 	}
 
 	public Shape getShapeById(String id) {
-		for (Shape shape : this.shapes)
-			if (shape.getId().equals(id))
+		for (Shape shape : this.shapes) {
+			if (shape.getId().equals(id)) {
 				return shape;
+			}
+		}
 
 		return null;
 	}
@@ -716,10 +686,17 @@ public class Controller {
 	}
 
 	public int getZoom() {
-		if (this.visualizer.getActiveMapRenderLayer() != null)
+		if (this.visualizer.getActiveMapRenderLayer() != null) {
 			return this.visualizer.getActiveMapRenderLayer().getZoom();
+		}
 
 		return 0;
+	}
+
+	public void setZoom(int zoom) {
+		if (this.visualizer.getActiveMapRenderLayer() != null) {
+			this.visualizer.getActiveMapRenderLayer().setZoom(zoom);
+		}
 	}
 
 	public Scenario getScenario() {
@@ -749,7 +726,7 @@ public class Controller {
 	/**
 	 * Transform geometric coordinates to pixels -respecting the origin of
 	 * computer graphic coordinates
-	 * 
+	 *
 	 * @param rectangle
 	 * @return
 	 */
@@ -788,11 +765,6 @@ public class Controller {
 
 	public Point2D pixelToGeo(Point2D point) {
 		return this.visualizer.getActiveMapRenderLayer().pixelToGeo(point);
-	}
-
-	public void setZoom(int zoom) {
-		if (this.visualizer.getActiveMapRenderLayer() != null)
-			this.visualizer.getActiveMapRenderLayer().setZoom(zoom);
 	}
 
 	public void validateRenderLayers() {
@@ -862,10 +834,7 @@ public class Controller {
 	}
 
 	public boolean hasEvacuationConfig() {
-		if (this.evacuationConfigModule != null)
-			return true;
-		else
-			return false;
+		return this.evacuationConfigModule != null;
 	}
 
 	public AbstractToolBox getActiveToolBox() {
@@ -883,7 +852,7 @@ public class Controller {
 	}
 
 	public boolean openEvacuationShape(String id) {
-		
+
 		//check if evac area is from file (if not: reopen!)
 		if (this.getShapeById(id) != null) {
 			if (this.getShapeById(id).isFromFile())
@@ -891,7 +860,7 @@ public class Controller {
 			else
 				this.removeShape(id);
 		}
-		
+
 
 		ShapeStyle evacShapeStyle = Constants.SHAPESTYLE_EVACAREA;
 		String dest;
@@ -968,8 +937,9 @@ public class Controller {
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
 			return openMastimConfig(openDialog.getSelectedFile());
-		else
+		else {
 			return false;
+		}
 	}
 
 	public boolean openMastimConfig(File file) {
@@ -986,8 +956,6 @@ public class Controller {
 				e.printStackTrace();
 			}
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
-
-			this.targetCoordinateSystem = this.matsimConfig.global().getCoordinateSystem();
 
 			// check if geo tranformation tools are available
 			checkGeoTransformationTools();
@@ -1011,10 +979,6 @@ public class Controller {
 		return this.scenarioPath;
 	}
 
-	// public void setConfigCoordinateSystem(String configCoordinateSystem) {
-	// this.configCoordinateSystem = configCoordinateSystem;
-	// }
-
 	public void setScenarioPath(String scenarioPath) {
 		this.scenarioPath = scenarioPath;
 	}
@@ -1022,6 +986,10 @@ public class Controller {
 	public boolean hasGridRenderer() {
 		return this.visualizer.hasGridRenderer();
 	}
+
+	// public void setConfigCoordinateSystem(String configCoordinateSystem) {
+	// this.configCoordinateSystem = configCoordinateSystem;
+	// }
 
 	public LinkQuadTree getLinks() {
 		return this.links;
@@ -1053,17 +1021,17 @@ public class Controller {
 			dest = this.evacuationConfigModule.getPopulationFileName();
 
 		ArrayList<PolygonShape> popShapes = ShapeIO.getShapesFromFile(this, dest, Constants.SHAPESTYLE_POPAREA);
-		
+
 		//remove existing shapes that were loaded from a file
 		ArrayList<Shape> shapesToRemove = new ArrayList<Shape>();
 		for (Shape shape : this.shapes)
 		{
 			if ((shape.getMetaData(Constants.POPULATION)!=null) && (shape.isFromFile()))
 				shapesToRemove.add(shape);
-		}	
+		}
 		for (Shape shape : shapesToRemove)
 			this.shapes.remove(shape);
-		
+
 		for (PolygonShape shape : popShapes)
 			addShape(shape);
 
@@ -1216,27 +1184,30 @@ public class Controller {
 		return this.layer;
 	}
 
-	public void setModuleChain(ModuleChain moduleChain) {
-		this.moduleChain = moduleChain;
-	}
-
 	public ModuleChain getModuleChain() {
 		return this.moduleChain;
 	}
 
+	public void setModuleChain(ModuleChain moduleChain) {
+		this.moduleChain = moduleChain;
+	}
+
 	public ArrayList<ModuleType> getNextModules(ModuleType moduleType) {
-		if (this.moduleChain == null)
+		if (this.moduleChain == null) {
 			return null;
-		else
+		}
+		else {
 			return this.moduleChain.getNextModules(moduleType);
+		}
 
 	}
 
 	public ArrayList<ModuleType> getPastModules(ModuleType moduleType) {
 		if (this.moduleChain == null)
 			return null;
-		else
+		else {
 			return this.moduleChain.getPastModules(moduleType);
+		}
 	}
 
 	public boolean isInSelection() {
@@ -1250,21 +1221,24 @@ public class Controller {
 	public int getPopAreaCount() {
 
 		for (AbstractModule module : this.modules) {
-			if (module instanceof PopAreaSelector)
+			if (module instanceof PopAreaSelector) {
 				return ((PopAreaSelector) module).getPopAreaCount();
+			}
 		}
 		return -1;
 	}
 
 	public void deselectShapes() {
-		for (Shape shape : getActiveShapes())
+		for (Shape shape : getActiveShapes()) {
 			shape.setSelected(false);
+		}
 	}
 
 	public void deselectShapesByMetaData(String string) {
 		for (Shape shape : getActiveShapes()) {
-			if (shape.getMetaData(string) != null)
+			if (shape.getMetaData(string) != null) {
 				shape.setSelected(false);
+			}
 		}
 
 	}
@@ -1272,8 +1246,10 @@ public class Controller {
 	public boolean writeEvacuationConfig() {
 		if ((this.evacuationConfigModule != null) && (this.evacuationFile != null)) {
 			return writeEvacuationConfig(this.evacuationConfigModule, this.evacuationFile);
-		} else
+		}
+		else {
 			return false;
+		}
 
 	}
 
@@ -1290,7 +1266,8 @@ public class Controller {
 			}
 
 			return true;
-		} else
+		}
+		else
 			return false;
 	}
 
@@ -1300,6 +1277,28 @@ public class Controller {
 
 	public String getPopDensFilename() {
 		return this.getEvacuationConfigModule().getPopDensFilename();
+	}
+
+	private void setPopDensFilename(String popDensFilename) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private static final class Runner implements Runnable {
+		private final Controller controller;
+
+		public Runner(Controller controller) {
+			this.controller = controller;
+		}
+
+		@Override
+		public void run() {
+			try {
+				this.controller.setVisualizer(new Visualizer(this.controller));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

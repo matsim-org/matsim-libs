@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 
 public class IncreaseNumberOfCarsAtStation {
@@ -20,8 +20,8 @@ public class IncreaseNumberOfCarsAtStation {
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
-	    
-	    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+			Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 	    	for (int i = 0; i < 6; i++  )
 	    		output.write(arr[i] + "\t");
 	    	

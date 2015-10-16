@@ -125,7 +125,7 @@ public class ChainComparator {
 			} else{
 				/* The activity doesn't have a facility Id, so we should get 
 				 * the Id from the QuadTree using the activity's coordinate. */
-				Id<ActivityFacility> artificialId = this.qt.get(activity.getCoord().getX(), activity.getCoord().getY());
+				Id<ActivityFacility> artificialId = this.qt.getClosest(activity.getCoord().getX(), activity.getCoord().getY());
 				if( artificialId.toString().equalsIgnoreCase(facilityId.toString()) ){
 					found = true;
 					i = index;

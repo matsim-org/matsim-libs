@@ -14,10 +14,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -166,7 +165,7 @@ public class PopulationBuilder2011 {
 						/* Give it a home coordinate. Currently this does not 
 						 * take facilities and their building types into account. */
 						Point homePoint = thisZone.sampleRandomInteriorPoint();
-						Coord homeCoord = new CoordImpl(homePoint.getX(), homePoint.getY());
+						Coord homeCoord = new Coord(homePoint.getX(), homePoint.getY());
 						householdAttributes.putAttribute(household.getId().toString(), "homeCoord", homeCoord);
 						
 						/* Add the household attributes. */
@@ -188,9 +187,9 @@ public class PopulationBuilder2011 {
 					/* Set the hard coded attributes. This will, however, be 
 					 * duplicated in the person attributes to be more 
 					 * consistent with the direction of future MATSim work. */
-					((PersonImpl)person).setAge(age);
-					((PersonImpl)person).setSex(Gender2011.getMatsimGender(Gender2011.getGender(gender)));
-					((PersonImpl)person).setEmployed(employment == 1 ? true : false);
+					PersonUtils.setAge(person, age);
+					PersonUtils.setSex(person, Gender2011.getMatsimGender(Gender2011.getGender(gender)));
+					PersonUtils.setEmployed(person, employment == 1 ? true : false);
 					
 					/* Set person attributes. */
 					personAttributes.putAttribute(person.getId().toString(), "population", PopulationGroup2011.getType(population).toString());
@@ -237,7 +236,7 @@ public class PopulationBuilder2011 {
 		HouseholdsWriterV10 hw = new HouseholdsWriterV10(households);
 		hw.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "households.xml.gz");
 		ObjectAttributesXmlWriter householdsAttributeWriter = new ObjectAttributesXmlWriter(householdAttributes);
-		householdsAttributeWriter.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		householdsAttributeWriter.putAttributeConverter(Coord.class, new CoordConverter());
 		householdsAttributeWriter.writeFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz");
 		
 		/* Try and conserve memory. Don't know if it does, though. */

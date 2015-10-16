@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -152,7 +152,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		double score = 0.0D;
 
 		double distanceCost = 0.0D;
-		TreeSet travelCards = ((PersonImpl)this.plan.getPerson()).getTravelcards();
+		TreeSet travelCards = PersonUtils.getTravelcards(this.plan.getPerson());
 		if (travelCards == null)
 			distanceCost = this.ftConfigGroup.getDistanceCostPtNoTravelCard();
 		else if (travelCards.contains("unknown"))

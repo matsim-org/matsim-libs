@@ -139,9 +139,9 @@ public class Person2ActivityPerformingWriter {
 		writeActType2UtilPerforming(outputFilesDir+"/analysis/");
 	}
 
-	private void storeUtilOfPerforming(final Scenario sc, Person p, final Activity activity) {
+	private void storeUtilOfPerforming(final Scenario sc, final Person p, final Activity activity) {
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(sc.getConfig().planCalcScore()).create();
+			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(sc, p.getId() ).create();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

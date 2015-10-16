@@ -42,6 +42,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -68,7 +69,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class DTVAnalyzer implements IterationEndsListener, IterationStartsListener {
 
-	private final Counts obsCounts;
+	private final Counts<Link> obsCounts;
 	
 	private LinkOccupancyCalculator simCounts;
 	

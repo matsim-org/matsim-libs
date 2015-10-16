@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Random;
-
-import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
-import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.processing.EpisodeTask;
+
+import java.util.Random;
 
 /**
  * @author johannes

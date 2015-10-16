@@ -87,11 +87,10 @@ public class TreesBuilder {
 		double radius = 0.0;
 		Node centerNode = null;
 
-		if (!config.getCenterNode().equals("null") &&
-				!config.getRadius().equals("null")) {
+		if (this.config.getCenterNode() != null && this.config.getRadius() != null) {
 			regionalScenario = true;
 			centerNode = this.network.getNodes().get(Id.create(config.getCenterNode(), Node.class));
-			radius = Double.parseDouble(config.getRadius());
+			radius = config.getRadius();
 			log.info("Building trees regional scenario");
 		}
 		else {

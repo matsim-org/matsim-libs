@@ -22,8 +22,7 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.router.tree.DijkstraWithDijkstraTreeCache;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;

@@ -134,7 +134,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//				bindCarTravelDisutilityFactory().toInstance(costCalculatorFactory);
 //			}
 //		});
 //

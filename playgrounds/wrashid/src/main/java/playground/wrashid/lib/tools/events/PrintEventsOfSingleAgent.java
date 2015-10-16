@@ -66,7 +66,7 @@ public class PrintEventsOfSingleAgent {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
+			if (event.getDriverId().equals(filterEventsForAgentId)){
 				System.out.println(event.toString());
 			}
 		}
@@ -74,7 +74,7 @@ public class PrintEventsOfSingleAgent {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
+			if (event.getDriverId().equals(filterEventsForAgentId)){
 				System.out.println(event.toString());
 			}
 		}

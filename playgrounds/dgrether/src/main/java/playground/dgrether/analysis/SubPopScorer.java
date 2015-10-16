@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,8 +33,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -53,15 +56,18 @@ public class SubPopScorer {
 
 	private List<String> linkIds;
 
-	private ScenarioLoaderImpl scenario;
+	private Scenario scenario;
 
 
-	public SubPopScorer(final String config, final List<String> linkIds) {
-		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
-		this.scenario.loadScenario();
+	public SubPopScorer(final String configFilename, final List<String> linkIds) {
+		Config config = ConfigUtils.loadConfig(configFilename);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		this.scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		this.linkIds = linkIds;
-		Set<Id<Person>> idSet = filterPlans(this.scenario.getScenario().getPopulation());
-		calculateScore(idSet, this.scenario.getScenario().getConfig());
+		Set<Id<Person>> idSet = filterPlans(this.scenario.getPopulation());
+		calculateScore(idSet, this.scenario.getConfig());
 
 	}
 
@@ -73,7 +79,7 @@ public class SubPopScorer {
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario.getScenario(), new CharyparNagelScoringFunctionFactory(config.planCalcScore(), this.scenario.getScenario().getNetwork()), config.planCalcScore().getLearningRate());
+  	EventsToScore scorer = new EventsToScore(this.scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);

@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop.data;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
-
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.synpop.gis.DataLoader;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author johannes

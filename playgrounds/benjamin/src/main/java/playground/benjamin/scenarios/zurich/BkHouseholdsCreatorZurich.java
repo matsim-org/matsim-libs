@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -51,9 +50,9 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.benjamin.BkPaths;
-
 import com.vividsolutions.jts.geom.Geometry;
+
+import playground.benjamin.BkPaths;
 
 
 /**
@@ -109,8 +108,7 @@ public class BkHouseholdsCreatorZurich {
 		scenario.getConfig().network().setInputFile(BkPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
 		scenario.getConfig().scenario().setUseHouseholds(true);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 
 		Households households = (scenario).getHouseholds();
 

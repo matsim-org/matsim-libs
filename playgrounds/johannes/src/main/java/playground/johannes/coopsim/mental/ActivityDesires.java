@@ -30,10 +30,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.population.Desires;
+import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -46,14 +47,17 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  * @author illenberger
  *
  */
-public class ActivityDesires extends Desires {
+public class ActivityDesires {
 
+	private final static Logger log = Logger.getLogger(ActivityDesires.class);
 	private final Map<String, Double> startTimes;
 	
 	private String activityType;
-	
+	private String desc = null;
+	private Map<String,Double> act_durs = null;
+
 	public ActivityDesires() {
-		super(null);
+		this.desc = null;
 		startTimes = new HashMap<String, Double>();
 	}
 	
@@ -91,7 +95,67 @@ public class ActivityDesires extends Desires {
 		
 		return reader.getVertexDesires();
 	}
-	
+
+	@Deprecated
+	public final boolean accumulateActivityDuration(final String act_type, final double duration) {
+		if (this.act_durs == null) { return this.putActivityDuration(act_type,duration); }
+		if (this.act_durs.get(act_type) == null)  { return this.putActivityDuration(act_type,duration); }
+		double dur = this.act_durs.get(act_type);
+		dur += duration;
+		if (dur <= 0.0) { return false; }
+		return this.putActivityDuration(act_type,dur);
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final boolean putActivityDuration(final String act_type, final double duration) {
+		if (duration <= 0.0) { log.fatal("duration=" + duration + " not allowed!"); return false; }
+		if (this.act_durs == null) { this.act_durs = new HashMap<String, Double>(); }
+		this.act_durs.put(act_type,duration);
+		return true;
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final boolean putActivityDuration(final String act_type, final String duration) {
+		double dur = Time.parseTime(duration);
+		return this.putActivityDuration(act_type,dur);
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final boolean removeActivityDuration(final String act_type) {
+		if (this.act_durs.remove(act_type) == null) { return false; }
+		if (this.act_durs.isEmpty()) { this.act_durs = null; }
+		return true;
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final String getDesc() {
+		return this.desc;
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final double getActivityDuration(final String act_type) {
+		if (this.act_durs == null) { return Time.UNDEFINED_TIME; }
+		Double d = this.act_durs.get(act_type);
+		if (d == null) { return Time.UNDEFINED_TIME; }
+		return d;
+	}
+
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final Map<String,Double> getActivityDurations() {
+		return this.act_durs;
+	}
+
+	@Override
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
+	public final String toString() {
+		return "[desc=" + this.desc + "]" + "[nof_act_durs=" + this.act_durs.size() + "]";
+	}
+
 	private static class XMLWriter extends MatsimXmlWriter {
 		
 		public void write(Map<Person, ActivityDesires> personDesires, String file) {

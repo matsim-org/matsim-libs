@@ -22,6 +22,7 @@ package org.matsim.contrib.parking.run;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
@@ -37,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+
 /**
  * @author jbischoff
  * Sample main file for setting up an Matsim run with parking. Check the output events for Parking events and the scores.
@@ -66,10 +67,11 @@ public class RunParkingExample {
 		{
 			LinkedList<PublicParking> publicParkings = new LinkedList<PublicParking>();
 			//parking 1: we place this near the workplace
-			publicParkings.add(new PublicParking(Id.create("workPark", PC2Parking.class), 98, new CoordImpl(10000,0), 
+			publicParkings.add(new PublicParking(Id.create("workPark", PC2Parking.class), 98, new Coord((double) 10000, (double) 0),
 					new ParkingCostCalculatorExample(1), "park"));
 			//parking 2: we place this at home
-			publicParkings.add(new PublicParking(Id.create("homePark", PC2Parking.class), 98, new CoordImpl(-25000,0), 
+			final double x = -25000;
+			publicParkings.add(new PublicParking(Id.create("homePark", PC2Parking.class), 98, new Coord(x, (double) 0),
 					new ParkingCostCalculatorExample(0), "park"));
 			parkingInfrastructureManager.setPublicParkings(publicParkings);
 		}

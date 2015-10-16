@@ -56,7 +56,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceCostRate() != 0. ) {
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceRate() != 0. ) {
 			log.error( "monetary distance cost rate for "+mode+" different from zero but not used in accessibility computations");
 		}
 
@@ -67,8 +67,8 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		betaTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaTD = modeParams.getMarginalUtilityOfDistance();
 
-		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		constant = modeParams.getConstant();
 

@@ -42,15 +42,13 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -225,7 +223,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 				}
 				copy.addAll( idx, this.alternativeLinks ) ;
 				final ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
-				NetworkRoute newRoute = (NetworkRoute) modeRouteFactory.createRoute( TransportMode.car, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
+				NetworkRoute newRoute = modeRouteFactory.createRoute( NetworkRoute.class, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
 
 				//			RouteUtils.createNetworkRoute(routeLinkIds, network) ;
 

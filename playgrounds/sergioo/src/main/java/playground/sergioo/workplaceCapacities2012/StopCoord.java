@@ -3,12 +3,12 @@ package playground.sergioo.workplaceCapacities2012;
 import java.util.Collection;
 
 import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public class StopCoord extends CoordImpl implements Clusterable {
+public class StopCoord extends Coord implements Clusterable {
 
 	private static final long serialVersionUID = 1L;
 

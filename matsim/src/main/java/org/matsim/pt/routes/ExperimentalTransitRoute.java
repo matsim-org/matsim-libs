@@ -33,11 +33,14 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	private final static String SEPARATOR = "===";
 	private final static String IDENTIFIER_1 = "PT1" + SEPARATOR;
 
+	/*package*/ final static String ROUTE_TYPE = "experimentalPt1";
+
 	private Id<TransitStopFacility> accessStopId = null;
 	private Id<TransitStopFacility> egressStopId = null;
 	private Id<TransitLine> lineId = null;
 	private Id<TransitRoute> routeId = null;
 	private String description = null;
+	
 
 	/*package*/ ExperimentalTransitRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
@@ -80,8 +83,8 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	}
 
 	@Override
-	public void setRouteDescription(final Id<Link> startLinkId, final String routeDescription, final Id<Link> endLinkId) {
-		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
+	public void setRouteDescription(final String routeDescription) {
+		super.setRouteDescription(routeDescription);
 		if (routeDescription.startsWith(IDENTIFIER_1)) {
 			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
 			this.accessStopId = Id.create(parts[1], TransitStopFacility.class);
@@ -115,7 +118,7 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 
 	@Override
 	public String getRouteType() {
-		return "experimentalPt1";
+		return ROUTE_TYPE;
 	}
 	
 	@Override

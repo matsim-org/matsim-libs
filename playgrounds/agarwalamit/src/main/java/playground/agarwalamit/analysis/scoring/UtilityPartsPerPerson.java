@@ -35,8 +35,8 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class UtilityPartsPerPerson {
 
 	public static void main(String[] args) {
-		String runDir ="/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String runCase = "/baseCaseCtd/";
+		String runDir ="/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_5min_1000it_Dwell_TEST/";
+		String runCase = "/w8-18_hetero_1.0x/";
 		String config = runDir+runCase+"//output_config.xml.gz";
 		String plans = runDir+runCase+"//output_plans.xml.gz";
 		String network = runDir+runCase+"//output_network.xml.gz";

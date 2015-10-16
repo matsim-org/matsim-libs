@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.ivt.utils.ArgParser;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -51,9 +50,7 @@ public class DiluteSocialNetworkedPopulation {
 	private static void main(final ArgParser.Args args) {
 
 		final Coord center =
-			new CoordImpl(
-					args.getDoubleValue( "--xcenter" ),
-					args.getDoubleValue( "--ycenter" ) );
+				new Coord(args.getDoubleValue("--xcenter"), args.getDoubleValue("--ycenter"));
 
 		final double radius = args.getDoubleValue( "--radius" );
 

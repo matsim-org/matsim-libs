@@ -30,7 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -63,7 +63,7 @@ public class AnalyzeZHScenario {
 		NodeImpl centerNode = (NodeImpl) this.scenario.getNetwork().getNodes().get(Id.create("2531", Node.class));
 		double radius = 30000;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			if (((CoordImpl)centerNode.getCoord()).calcDistance(facility.getCoord()) < radius) {
+			if (CoordUtils.calcDistance(centerNode.getCoord(), facility.getCoord()) < radius) {
 				zhFacilityIds.add(facility.getId());
 			}
 		}

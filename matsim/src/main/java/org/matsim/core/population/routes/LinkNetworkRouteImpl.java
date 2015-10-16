@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -35,6 +36,8 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
+	/*package*/ final static String ROUTE_TYPE = "links";
+	
 	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>();
 	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
@@ -156,6 +159,43 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 		this.vehicleId = vehicleId;
 	}
 
+	@Override
+	public String getRouteDescription() {
+		StringBuilder desc = new StringBuilder(100);
+		desc.append(this.getStartLinkId().toString());
+		for (Id<Link> linkId : this.getLinkIds()) {
+			desc.append(" ");
+			desc.append(linkId.toString());
+		}
+		// If the start links equals the end link additionally check if its is a round trip. 
+		if (!this.getEndLinkId().equals(this.getStartLinkId()) || this.getLinkIds().size() > 0) {
+			desc.append(" ");
+			desc.append(this.getEndLinkId().toString());
+		}
+		return desc.toString();
+	}
+	
+	@Override
+	public void setRouteDescription(String routeDescription) {
+		List<Id<Link>> linkIds = NetworkUtils.getLinkIds(routeDescription);
+		Id<Link> startLinkId = getStartLinkId();
+		Id<Link> endLinkId = getEndLinkId();
+		if (linkIds.size() > 0) {
+			startLinkId = linkIds.remove(0);
+			setStartLinkId(startLinkId);
+		}
+		if (linkIds.size() > 0) {
+			endLinkId = linkIds.remove(linkIds.size() - 1);
+			setEndLinkId(endLinkId);
+		}
+		this.setLinkIds(startLinkId, linkIds, endLinkId);
+	}
+	
+	@Override
+	public String getRouteType() {
+		return ROUTE_TYPE;
+	}
+	
 	@Override
 	public String toString() {
 		String str = super.toString();

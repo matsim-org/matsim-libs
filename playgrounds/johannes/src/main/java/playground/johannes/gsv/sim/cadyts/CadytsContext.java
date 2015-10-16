@@ -20,13 +20,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.apache.log4j.Level;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,14 +38,18 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.Simulator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -65,7 +63,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	
 //	private final double countsScaleFactor;
-	private final Counts counts;
+	private final Counts<Link> counts;
 	private final boolean writeAnalysisFile;
 	private final CadytsConfigGroup cadytsConfig;
 	
@@ -93,7 +91,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		cadytsConfig.setWriteAnalysisFile(true);
 		
 		if ( counts==null ) {
-			this.counts = new Counts();
+			this.counts = new Counts<Link>();
 			String occupancyCountsFilename = config.counts().getCountsFileName();
 			if(occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
@@ -104,9 +102,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			this.counts = counts ;
 		}
 		
-		Set<Id<Link>> countedLinks = new TreeSet<>();
+		Set<String> countedLinks = new TreeSet<>();
 		for (Id<Link> id : this.counts.getCounts().keySet()) {
-			countedLinks.add(id);
+			countedLinks.add(id.toString());
 		}
 		
 		cadytsConfig.setCalibratedItems(countedLinks);
@@ -150,7 +148,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			try {
 				data = new String(Files.readAllBytes(Paths.get(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
 				ZoneCollection zones = new ZoneCollection();
-				zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 				
 				odCalibrator = new ODCalibrator(event.getControler().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
 				event.getControler().getEvents().addHandler(odCalibrator);

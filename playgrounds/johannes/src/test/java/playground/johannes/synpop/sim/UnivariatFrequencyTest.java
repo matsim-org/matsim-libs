@@ -19,9 +19,9 @@
 
 package playground.johannes.synpop.sim;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
-import playground.johannes.sna.math.LinearDiscretizer;
+import org.junit.Assert;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.sim.data.CachedPerson;
@@ -68,21 +68,20 @@ public class UnivariatFrequencyTest extends TestCase {
         cachedPersons.add(c2);
         cachedPersons.add(c3);
 
-        Object dataKey = new Object();
-        Converters.register("attribute", dataKey, DoubleConverter.getInstance());
+        Object dataKey = Converters.register("attribute", DoubleConverter.getInstance());
 
         UnivariatFrequency uf = new UnivariatFrequency(refPersons, cachedPersons, "attribute", new LinearDiscretizer
                 (1.0));
 
-        Assert.assertEquals(4/3.0, uf.evaluate(null));
+        Assert.assertEquals(3.0, uf.evaluate(null), 0.0);
 
         c1.setData(dataKey, 1.0);
         uf.onChange(dataKey, 2.0, 1.0, c1);
-        Assert.assertEquals(2 / 3.0, uf.evaluate(null));
+        Assert.assertEquals(1.5, uf.evaluate(null), 0.0);
 
         c3.setData(dataKey, 1.0);
         uf.onChange(dataKey, 3.0, 1.0, c3);
-        Assert.assertEquals(0.0, uf.evaluate(null));
+        Assert.assertEquals(0.0, uf.evaluate(null), 0.0);
 
     }
 }

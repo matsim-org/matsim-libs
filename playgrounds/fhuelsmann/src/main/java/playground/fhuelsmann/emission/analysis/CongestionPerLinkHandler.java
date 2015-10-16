@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeaveEventHandler {
@@ -61,12 +60,12 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 		}
 	
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkenter.put(event.getPersonId(), event.getTime());
+		this.linkenter.put(event.getDriverId(), event.getTime());
 	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
 		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Double enterTime;
 		double endOfTimeInterval;
 		if(personId.toString().contains("#")){
@@ -78,7 +77,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 //		double stopGoFraction;
 //		double distance = link.getLength(); 
 //	  
-//		if(this.linkenter.containsKey(event.getPersonId())){
+//		if(this.linkenter.containsKey(event.getDriverId())){
 //			enterTime = this.linkenter.get(personId);
 //			double travelTime = event.getTime() - enterTime;
 //			double freeflowTime = distance / freeTravelSpeed;
@@ -120,7 +119,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 //	}
 
 /**accumulated demand per link	**/
-		if(this.linkenter.containsKey(event.getPersonId())){
+		if(this.linkenter.containsKey(event.getDriverId())){
 			enterTime = this.linkenter.get(personId);
 
 			for(int i = 0; i < noOfTimeBins; i++){
@@ -162,7 +161,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler,LinkLeave
 			
 			
 			
-			 if(this.linkenter.containsKey(event.getPersonId())){
+			 if(this.linkenter.containsKey(event.getDriverId())){
 					enterTime = this.linkenter.get(personId);
 					double travelTime = event.getTime()-enterTime;
 					double averageSpeed=(distance/1000)/(travelTime/3600);

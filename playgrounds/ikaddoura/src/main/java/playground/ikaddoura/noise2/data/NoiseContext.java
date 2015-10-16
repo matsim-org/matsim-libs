@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.noise2.NoiseParameters;
@@ -341,7 +340,7 @@ public class NoiseContext {
 			for (int i = 1 ; i<parts ; i++) {
 				double x = fromX + (i*((1./(parts))*vectorX));
 				double y = fromY + (i*((1./(parts))*vectorY));
-				Coord  coordTmp = new CoordImpl(x,y);
+				Coord  coordTmp = new Coord(x, y);
 				coords.add(coordTmp);
 			}
 			

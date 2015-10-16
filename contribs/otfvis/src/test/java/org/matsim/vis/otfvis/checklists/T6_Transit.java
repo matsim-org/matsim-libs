@@ -25,6 +25,7 @@ package org.matsim.vis.otfvis.checklists;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +44,6 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -98,20 +98,24 @@ public class T6_Transit {
 		 */
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), this.scenario.createCoord(-2000, 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), this.scenario.createCoord(-2000, 1000));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), this.scenario.createCoord(-1000, 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), this.scenario.createCoord(-1000, 1000));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), this.scenario.createCoord(0, 0));
-		Node node6 = network.createAndAddNode(Id.create(6, Node.class), this.scenario.createCoord(0, 1000));
-		Node node7 = network.createAndAddNode(Id.create(7, Node.class), this.scenario.createCoord(500, 500));
-		Node node8 = network.createAndAddNode(Id.create(8, Node.class), this.scenario.createCoord(1500, 500));
-		Node node9 = network.createAndAddNode(Id.create(9, Node.class), this.scenario.createCoord(2500, 500));
-		Node node10 = network.createAndAddNode(Id.create(10, Node.class), this.scenario.createCoord(3500, 500));
-		Node node11 = network.createAndAddNode(Id.create(11, Node.class), this.scenario.createCoord(4000, 0));
-		Node node12 = network.createAndAddNode(Id.create(12, Node.class), this.scenario.createCoord(4000, 1000));
-		Node node13 = network.createAndAddNode(Id.create(13, Node.class), this.scenario.createCoord(5000, 0));
-		Node node14 = network.createAndAddNode(Id.create(14, Node.class), this.scenario.createCoord(5000, 1000));
+		double x3 = -2000;
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord(x3, (double) 0));
+		double x2 = -2000;
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord(x2, (double) 1000));
+		double x1 = -1000;
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord(x1, (double) 0));
+		double x = -1000;
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord(x, (double) 1000));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 0, (double) 0));
+		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 0, (double) 1000));
+		Node node7 = network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 500, (double) 500));
+		Node node8 = network.createAndAddNode(Id.create(8, Node.class), new Coord((double) 1500, (double) 500));
+		Node node9 = network.createAndAddNode(Id.create(9, Node.class), new Coord((double) 2500, (double) 500));
+		Node node10 = network.createAndAddNode(Id.create(10, Node.class), new Coord((double) 3500, (double) 500));
+		Node node11 = network.createAndAddNode(Id.create(11, Node.class), new Coord((double) 4000, (double) 0));
+		Node node12 = network.createAndAddNode(Id.create(12, Node.class), new Coord((double) 4000, (double) 1000));
+		Node node13 = network.createAndAddNode(Id.create(13, Node.class), new Coord((double) 5000, (double) 0));
+		Node node14 = network.createAndAddNode(Id.create(14, Node.class), new Coord((double) 5000, (double) 1000));
 
 		network.createAndAddLink(Id.create(1, Link.class), node1, node3, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(Id.create(2, Link.class), node2, node4, 1000.0, 10.0, 3600.0, 1);
@@ -131,12 +135,15 @@ public class T6_Transit {
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), this.scenario.createCoord(-100, -50), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), this.scenario.createCoord(-100, 850), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create(3, TransitStopFacility.class), this.scenario.createCoord(1400, 450), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create(4, TransitStopFacility.class), this.scenario.createCoord(3400, 450), false);
-		TransitStopFacility stop5 = builder.createTransitStopFacility(Id.create(5, TransitStopFacility.class), this.scenario.createCoord(3900, 50), false);
-		TransitStopFacility stop6 = builder.createTransitStopFacility(Id.create(6, TransitStopFacility.class), this.scenario.createCoord(3900, 850), false);
+		double x1 = -100;
+		double y = -50;
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(x1, y), false);
+		double x = -100;
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(x, (double) 850), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord((double) 1400, (double) 450), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create(4, TransitStopFacility.class), new Coord((double) 3400, (double) 450), false);
+		TransitStopFacility stop5 = builder.createTransitStopFacility(Id.create(5, TransitStopFacility.class), new Coord((double) 3900, (double) 50), false);
+		TransitStopFacility stop6 = builder.createTransitStopFacility(Id.create(6, TransitStopFacility.class), new Coord((double) 3900, (double) 850), false);
 
 		Link link1 = this.scenario.getNetwork().getLinks().get(Id.create(1, Link.class));
 		Link link2 = this.scenario.getNetwork().getLinks().get(Id.create(2, Link.class));
@@ -226,7 +233,7 @@ public class T6_Transit {
 		TransitStopFacility stop6 = schedule.getFacilities().get(Id.create(6, TransitStopFacility.class));
 
 		{ // person 1
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(1, Person.class));
+			Person person = pb.createPerson(Id.create(1, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:01:00"));
@@ -249,7 +256,7 @@ public class T6_Transit {
 		}
 
 		{ // person 2
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(2, Person.class));
+			Person person = pb.createPerson(Id.create(2, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:06:00"));
@@ -272,7 +279,7 @@ public class T6_Transit {
 		}
 
 		{ // person 3
-			PersonImpl person = (PersonImpl) pb.createPerson(Id.create(3, Person.class));
+			Person person = pb.createPerson(Id.create(3, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:11:00"));

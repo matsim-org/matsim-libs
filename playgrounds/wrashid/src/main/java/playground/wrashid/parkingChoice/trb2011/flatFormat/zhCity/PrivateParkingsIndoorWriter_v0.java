@@ -10,9 +10,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -52,7 +50,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 			int EGID = privateParkingIndoorFile.getInteger(i, 0);
 			int capacity= privateParkingIndoorFile.getInteger(i, 3);
 			totalDistributedCapacity+=capacity;
-			Coord coord=new CoordImpl(privateParkingIndoorFile.getDouble(i, 1),privateParkingIndoorFile.getDouble(i, 2));
+			Coord coord= new Coord(privateParkingIndoorFile.getDouble(i, 1), privateParkingIndoorFile.getDouble(i, 2));
 			
 			if (i==14955){
 				System.out.println();
@@ -255,7 +253,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	}
 	
 	public static void assignParkingCapacityToClosestFacility(Coord coord, int parkingCapacity, QuadTree<ActivityFacilityImpl> facilitiesQuadTree, LinkedList<PrivateParking> privateParkings){
-		ActivityFacilityImpl closestFacility=facilitiesQuadTree.get(coord.getX(), coord.getY());
+		ActivityFacilityImpl closestFacility=facilitiesQuadTree.getClosest(coord.getX(), coord.getY());
 		double activityCapacities[]=new double[closestFacility.getActivityOptions().size()];
 		double sumOfFacilityActivityCapacities=0;
 		
@@ -285,7 +283,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	private static ActivityFacilityImpl getClosestFacilityWithin300MeterForActivity(Coord coord,
 			 String activityType) {
 	
-		Collection<ActivityFacilityImpl> facilities = facilitiesQuadTree.get(coord.getX(), coord.getY(), 300);
+		Collection<ActivityFacilityImpl> facilities = facilitiesQuadTree.getDisk(coord.getX(), coord.getY(), 300);
 		
 		ActivityFacilityImpl bestActivityFacility=null;
 		double distanceBestActivityFacility=Double.MAX_VALUE;

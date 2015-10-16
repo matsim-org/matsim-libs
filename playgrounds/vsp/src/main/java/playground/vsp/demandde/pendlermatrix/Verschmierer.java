@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -89,7 +88,7 @@ public class Verschmierer {
 	private Coord doShoot(Geometry zone) {
 		Coord coord;
 		Point point = getRandomPointInFeature(this.random , zone);
-		coord = new CoordImpl(point.getX(), point.getY());
+		coord = new Coord(point.getX(), point.getY());
 		return coord;
 	}
 	

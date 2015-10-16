@@ -19,18 +19,8 @@
 
 package playground.johannes.gsv.fpd;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +38,6 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -59,18 +49,22 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
-import com.vividsolutions.jts.geom.Point;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author johannes
@@ -112,13 +106,13 @@ public class NetLoad {
 		/*
 		 * load counts
 		 */
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
 		cReader.parse(countsFile);
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonesFile, "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
 		/*
 		 * setup router
 		 */
@@ -141,8 +135,8 @@ public class NetLoad {
 						Point p1 = zones.get(i).getGeometry().getCentroid();
 						Point p2 = zones.get(j).getGeometry().getCentroid();
 
-						Node source = NetworkUtils.getNearestLink(network, new CoordImpl(p1.getX(), p1.getY())).getFromNode();
-						Node target = NetworkUtils.getNearestLink(network, new CoordImpl(p2.getX(), p2.getY())).getFromNode();
+						Node source = NetworkUtils.getNearestLink(network, new Coord(p1.getX(), p1.getY())).getFromNode();
+						Node target = NetworkUtils.getNearestLink(network, new Coord(p2.getX(), p2.getY())).getFromNode();
 
 						Path path = router.calcLeastCostPath(source, target, 0, null, null);
 
@@ -250,7 +244,7 @@ public class NetLoad {
 		}
 	}
 
-	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts obsCounts, String outDir) {
+	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts<Link> obsCounts, String outDir) {
 		MathTransform transform = null;
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));
@@ -262,7 +256,7 @@ public class NetLoad {
 		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
-		for (Count count : obsCounts.getCounts().values()) {
+		for (Count<Link> count : obsCounts.getCounts().values()) {
 			Id<Link> linkId = count.getLocId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);

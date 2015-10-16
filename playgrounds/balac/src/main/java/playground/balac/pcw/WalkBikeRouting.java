@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -26,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
@@ -35,9 +36,7 @@ import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -104,9 +103,9 @@ public class WalkBikeRouting {
 		RoutingModule routingModuleWalk = tripRouter.getRoutingModule("walk");
 		RoutingModule routingModuleBike = tripRouter.getRoutingModule("bike");
 
-		BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/geo_coded_fucker.txt");
+		BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/geo_coded_SC_wave1_referencevalues_sexyage_1008.txt");
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/walkbike_fucker.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/walkbike_wave1_sexyage_1008.txt");
 
 		NetworkImpl subNetworkWalk = NetworkImpl.createNetwork();
 		Set<String> restrictions = new HashSet<>();
@@ -134,14 +133,14 @@ public class WalkBikeRouting {
 			
 			if (arr[0].equals("45"))
 				System.out.println();
-				CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
+			Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 				
 				
 				
 				Link lStartWalk = lUtilsWalk.getClosestLink(coordStart);
 				Link lStartBike = lUtilsBike.getClosestLink(coordStart);
-				
-				CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
+
+			Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 				
 	
 				Link lEndWalk = lUtilsWalk.getClosestLink(coordEnd);
@@ -149,8 +148,8 @@ public class WalkBikeRouting {
 				
 				Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 				
-				((PersonImpl) person).setAge(Integer.parseInt(arr[12]));
-				((PersonImpl) person).setSex(arr[11]);
+				PersonUtils.setAge(person, Integer.parseInt(arr[12]));
+				PersonUtils.setSex(person, arr[11]);
 				
 				
 				double m = TimeConversion.convertTimeToDouble(arr[10]);

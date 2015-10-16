@@ -20,6 +20,7 @@ package playground.agarwalamit.mixedTraffic;
 
 import com.google.inject.Provider;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -54,7 +55,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -75,7 +75,6 @@ public class VehicleType2ScenarioTest {
 		
 		if(! useModifiedMobsimFactory){
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			((ScenarioImpl) scenario).createVehicleContainer();
 		}
 	}
 
@@ -120,10 +119,11 @@ public class VehicleType2ScenarioTest {
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-100.0,0.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord( 0.0,  0.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord( 0.0,1000.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( 0.0,1100.0));
+		double x = -100.0;
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x, 0.0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0.0, 0.0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(0.0, 1000.0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
 		link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per min.
 		link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 60, 1, null, "22");	

@@ -1,10 +1,19 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
-import org.matsim.api.core.v01.population.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -15,8 +24,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
-
-import java.util.*;
 
 public class BasePlanImpl implements BasePlan {
 
@@ -81,10 +88,10 @@ public class BasePlanImpl implements BasePlan {
 			emptyTime = null;
 		}
 		for(PlanElement planElement:plan.getPlanElements())
-			if(planElement instanceof Leg  && !(planElement instanceof EmptyTime) && /*TODO*/((Leg)planElement).getRoute() instanceof GenericRoute)
+			if(planElement instanceof Leg  && !(planElement instanceof EmptyTime))
 				((Leg)planElement).setRoute(null);
 		for(PlanElement planElement:newPlan.getPlanElements())
-			if(planElement instanceof Leg  && !(planElement instanceof EmptyTime) && /*TODO*/((Leg)planElement).getRoute() instanceof GenericRoute)
+			if(planElement instanceof Leg  && !(planElement instanceof EmptyTime))
 				((Leg)planElement).setRoute(null);
 		List<Trip> trips = TripStructureUtils.getTrips( newPlan , tripRouter.getStageActivityTypes() );
 		for (Trip trip : trips) {

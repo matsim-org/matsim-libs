@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -139,17 +139,17 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 				Coord coord = activity.getCoord();
 				Facility facility = null;
 				
-				if (activity.getType().equals(HOME)) facility = this.homeQuadTree.get(coord.getX(),coord.getY());
-				else if (activity.getType().equals(SHOP)) facility = this.shopQuadTree.get(coord.getX(),coord.getY());
-				else if (activity.getType().equals(WORK_SECTOR2)) facility = this.work2QuadTree.get(coord.getX(),coord.getY());
-				else if (activity.getType().equals(WORK_SECTOR3)) facility = this.work3QuadTree.get(coord.getX(),coord.getY());
-				else if (activity.getType().equals(LEISURE)) facility = this.leisureQuadTree.get(coord.getX(),coord.getY());
-				else if (activity.getType().equals(TTA)) facility = this.ttaQuadTree.get(coord.getX(),coord.getY());
+				if (activity.getType().equals(HOME)) facility = this.homeQuadTree.getClosest(coord.getX(), coord.getY());
+				else if (activity.getType().equals(SHOP)) facility = this.shopQuadTree.getClosest(coord.getX(), coord.getY());
+				else if (activity.getType().equals(WORK_SECTOR2)) facility = this.work2QuadTree.getClosest(coord.getX(), coord.getY());
+				else if (activity.getType().equals(WORK_SECTOR3)) facility = this.work3QuadTree.getClosest(coord.getX(), coord.getY());
+				else if (activity.getType().equals(LEISURE)) facility = this.leisureQuadTree.getClosest(coord.getX(), coord.getY());
+				else if (activity.getType().equals(TTA)) facility = this.ttaQuadTree.getClosest(coord.getX(), coord.getY());
 
 				if (facility != null) {
 					((ActivityImpl) activity).setFacilityId(facility.getId());
-					
-					if ( ((CoordImpl)facility.getCoord()).calcDistance(coord) > 500000 ) {
+
+					if ( CoordUtils.calcDistance(facility.getCoord(), coord) > 500000 ) {
 						log.warn("No Facility found within 500 km");
 					}
 				}

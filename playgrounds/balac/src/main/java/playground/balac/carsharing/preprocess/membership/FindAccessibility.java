@@ -11,11 +11,11 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
@@ -101,8 +101,8 @@ public class FindAccessibility
       Id<Person> id = Id.create(Integer.parseInt(parts[0]), Person.class);
       log.info("Id = " + id);
       pwcs.setId(id);
-      CoordImpl coordHome = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
-      CoordImpl coordWork = new CoordImpl(Double.parseDouble(parts[3]), Double.parseDouble(parts[4]));
+      Coord coordHome = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+      Coord coordWork = new Coord(Double.parseDouble(parts[3]), Double.parseDouble(parts[4]));
       pwcs.setCoordHome(this.coordTranformer.transform(coordHome));
       pwcs.setCoordWork(this.coordTranformer.transform(coordWork));
       this.personsWithClosestStations.put(pwcs.getId(), pwcs);
@@ -119,7 +119,7 @@ public class FindAccessibility
       String[] parts = StringUtils.explode(line, '\t');
 
       Id<Station> id = Id.create(Integer.parseInt(parts[0]), Station.class);
-      CoordImpl coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+      Coord coord = new Coord(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
       int cars = Integer.parseInt(parts[3]);
       station.setCoord(this.coordTranformer.transform(coord));
       station.setCars(cars);
@@ -162,8 +162,8 @@ public class FindAccessibility
       Vector orderedClosestStationsWork = new Vector();
       Vector orderedClosestStationsHome = new Vector();
 
-      Collection<Station> allClosestStationsWork = this.stations.get(pwcs.getCoordWork().getX(), pwcs.getCoordWork().getY(), 5000.0D);
-      Collection<Station> allClosestStationsHome = this.stations.get(pwcs.getCoordHome().getX(), pwcs.getCoordHome().getY(), 5000.0D);
+      Collection<Station> allClosestStationsWork = this.stations.getDisk(pwcs.getCoordWork().getX(), pwcs.getCoordWork().getY(), 5000.0D);
+      Collection<Station> allClosestStationsHome = this.stations.getDisk(pwcs.getCoordHome().getX(), pwcs.getCoordHome().getY(), 5000.0D);
 
       for (Station stationWork : allClosestStationsWork) {
         int i = 0;
@@ -193,7 +193,7 @@ public class FindAccessibility
         while (orderedClosestStationsWork.size() < 3) {
           Station nullStationWork = new Station();
           nullStationWork.setId(Id.create(0L, Station.class));
-          nullStationWork.setCoord(new CoordImpl(0.0D, 0.0D));
+          nullStationWork.setCoord(new Coord(0.0D, 0.0D));
           orderedClosestStationsWork.add(orderedClosestStationsWork.size(), nullStationWork);
         }
 
@@ -234,7 +234,7 @@ public class FindAccessibility
         while (orderedClosestStationsHome.size() < 3) {
           Station nullStationHome = new Station();
           nullStationHome.setId(Id.create(0L, Station.class));
-          nullStationHome.setCoord(new CoordImpl(0.0D, 0.0D));
+          nullStationHome.setCoord(new Coord(0.0D, 0.0D));
           orderedClosestStationsHome.add(orderedClosestStationsHome.size(), nullStationHome);
         }
         pwcs.setOrderedClosestStationsHome(orderedClosestStationsHome);

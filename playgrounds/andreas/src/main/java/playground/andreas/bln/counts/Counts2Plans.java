@@ -13,11 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -54,7 +50,7 @@ public class Counts2Plans {
 	private int numberOfPersonsLeftInBusAtEndOfLine = 0;
 	private int numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo = 0;
 
-	private LinkedList<PersonImpl> completedAgents = new LinkedList<PersonImpl>();
+	private LinkedList<Person> completedAgents = new LinkedList<Person>();
 
 
 	/**
@@ -88,7 +84,7 @@ public class Counts2Plans {
 
 		for (int i = 1; i <= number; i++) {
 
-			PersonImpl person = createPerson();
+			Person person = createPerson();
 			ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(from).getLinkId());
 			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
@@ -117,7 +113,7 @@ public class Counts2Plans {
 		for (int hour = 1; hour <= 24; hour++) {
 
 			log.info("Hour: " + hour);
-			LinkedList<PersonImpl> passengersInVehicle = new LinkedList<PersonImpl>();
+			LinkedList<Person> passengersInVehicle = new LinkedList<Person>();
 
 			for (Entry<String, LinkedList<Id<TransitStopFacility>>> entry : this.lines.entrySet()) {
 
@@ -128,7 +124,7 @@ public class Counts2Plans {
 
 							for (int i = 0; i < this.egress.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
 
-								PersonImpl person = passengersInVehicle.pollFirst();
+								Person person = passengersInVehicle.pollFirst();
 
 								if (person == null) {
 									log.warn("StopID: " + stopID + ", Passenger should leave the vehicle, but none is there");
@@ -148,7 +144,7 @@ public class Counts2Plans {
 						if (this.access.getCount(stopIdAsLink).getVolume(hour) != null) {
 
 							for (int i = 0; i < this.access.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
-								PersonImpl person = createPerson();
+								Person person = createPerson();
 								ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
 								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
@@ -178,9 +174,9 @@ public class Counts2Plans {
 
 	}
 
-	private PersonImpl createPerson(){
-		PersonImpl person = new PersonImpl(Id.create(this.runningID, Person.class));
-		person.createAndAddPlan(true);
+	private Person createPerson(){
+		Person person = PersonImpl.createPerson(Id.create(this.runningID, Person.class));
+		PersonUtils.createAndAddPlan(person, true);
 		this.runningID++;
 		return person;
 	}
@@ -190,7 +186,7 @@ public class Counts2Plans {
         ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 
-		for (PersonImpl person : this.completedAgents) {
+		for (Person person : this.completedAgents) {
 			pop.addPerson(person);
 		}
 

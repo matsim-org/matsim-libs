@@ -24,11 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -73,8 +69,8 @@ public class CreatePopulation {
 		ActivityFacility workFacility;
 		
 		for (int i = 0; i<nPersons; i++) {
-			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
-			p.setEmployed(true);
+			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			PersonUtils.setEmployed(p, true);
 			
 			if (i % 3 == 0) {
 				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(0, ActivityFacility.class));
@@ -94,7 +90,7 @@ public class CreatePopulation {
 		this.scenario.getPopulation().getPersons().clear();
 	}
 		
-	private void generateWorkPlan(PersonImpl p, ActivityFacility homeFacility, ActivityFacility workFacility, double timeOffset) {	
+	private void generateWorkPlan(Person p, ActivityFacility homeFacility, ActivityFacility workFacility, double timeOffset) {
 		
 		double time = 0.0 + timeOffset;
 		PlanImpl plan = new PlanImpl();
