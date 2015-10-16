@@ -69,13 +69,14 @@ public class CarEventsToTaxiPlans {
 				.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
 
 		
-		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork());
+		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork(), true);
+//		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork(), false);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ch);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-//		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
-		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
-		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/eventBasedPlans0.10.xml.gz");
+		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
+//		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
+		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/eventBasedPlansWithCars.xml.gz");
 	}
 	
 }
@@ -90,12 +91,18 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	Map<Id<Person>, Tuple<Id<Link>, Double>> departures = new HashMap<>();
 	int i = 0;
 	private Geometry shape;
+	private boolean leaveCarTrips;
 
 	public ConverterEventHandler(Scenario scenario, Geometry shape, Network oldNetwork) {
+		this(scenario, shape, oldNetwork, false);
+	}
+
+	public ConverterEventHandler(Scenario scenario, Geometry shape, Network oldNetwork, boolean leaveCarTrips) {
 		this.population = scenario.getPopulation();
 		this.network = (NetworkImpl) scenario.getNetwork();
 		this.shape = shape;
 		this.oldNetwork = oldNetwork;
+		this.leaveCarTrips = leaveCarTrips;
 	}
 
 	@Override
@@ -118,9 +125,14 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	private void createAndAddPerson(Id<Link> fromLinkId, double departureTime, Id<Link> toLinkId, double arrivalTime) {
 		fromLinkId = convertLink(fromLinkId);
 		toLinkId = convertLink(toLinkId);
-		
+		String mode = "taxi";
+		if (fromLinkId == null) return;
+		if (toLinkId == null) return;
 		if (!checkIfLinksinShape(fromLinkId, toLinkId))
-			return;
+			{if (leaveCarTrips)
+			mode = "car";
+			else return;
+			}
 		if (toLinkId == fromLinkId) return;
 		
 		Person p = population.getFactory().createPerson(Id.createPersonId(i++));
@@ -129,9 +141,9 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 		Activity home = population.getFactory().createActivityFromLinkId("home", fromLinkId);
 		home.setEndTime(departureTime);
 		plan.addActivity(home);
-		Leg taxiLeg = population.getFactory().createLeg("taxi");
-		taxiLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
-		plan.addLeg(taxiLeg);
+		Leg leg = population.getFactory().createLeg(mode);
+		leg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+		plan.addLeg(leg);
 		Activity work = population.getFactory().createActivityFromLinkId("work", toLinkId);
 		work.setStartTime(arrivalTime);
 		plan.addActivity(work);
@@ -149,8 +161,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	}
 
 	private boolean checkIfLinksinShape(Id<Link> fromLinkId, Id<Link> toLinkId) {
-		if (fromLinkId == null) return false;
-		if (toLinkId == null) return false;
+	
 		Coord startLinkCoord = this.network.getLinks().get(fromLinkId).getCoord();
 		Coord endLinkCoord = this.network.getLinks().get(toLinkId).getCoord();
 		return (shape.contains(MGC.coord2Point(startLinkCoord)) && shape.contains(MGC.coord2Point(endLinkCoord)));
