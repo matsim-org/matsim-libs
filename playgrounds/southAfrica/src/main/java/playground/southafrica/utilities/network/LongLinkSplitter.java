@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.southafrica.utilities.Header;
 
@@ -93,7 +92,7 @@ public class LongLinkSplitter {
 				Node fromNode = link.getFromNode();
 				for(int i = 1; i < units; i++){
 					/* Create the dummy node. */
-					Coord toCoord = new CoordImpl(
+					Coord toCoord = new Coord(
 							fromNode.getCoord().getX() + dX,
 							fromNode.getCoord().getY() + dY);
 					Node toNode = nf.createNode(
