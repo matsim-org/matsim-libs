@@ -180,7 +180,7 @@ public class SubPopMunichExposureControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-			addTravelTimeBinding("ride").to(carTravelTimeKey());
+			addTravelTimeBinding("ride").to(networkTravelTime());
 			addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
 			}
 		});

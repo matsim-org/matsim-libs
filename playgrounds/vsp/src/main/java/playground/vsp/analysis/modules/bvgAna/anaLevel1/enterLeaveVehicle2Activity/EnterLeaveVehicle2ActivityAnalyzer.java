@@ -124,7 +124,7 @@ public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalysisModule{
 
 //		for (PersonEntersVehicleEvent enterEvent : this.enterVehicleEvent2ActivityEndEvent.keySet()){
 //			ActivityEndEvent actend = this.enterVehicleEvent2ActivityEndEvent.get(enterEvent);
-//			log.info(enterEvent.getPersonId() + " enters vehicle " + enterEvent.getVehicleId() + " (Time:" + enterEvent.getTime() + ") after " + actend.getPersonId() + " ends activity " + actend.getActType() + " (Time: "+ actend.getTime()+")");
+//			log.info(enterEvent.getDriverId() + " enters vehicle " + enterEvent.getVehicleId() + " (Time:" + enterEvent.getTime() + ") after " + actend.getDriverId() + " ends activity " + actend.getActType() + " (Time: "+ actend.getTime()+")");
 //		}
 				
 	}

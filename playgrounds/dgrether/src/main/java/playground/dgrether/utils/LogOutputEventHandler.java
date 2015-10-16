@@ -110,7 +110,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	}
 
 	public void handleEvent(Event event) {
-//		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getPersonId());
+//		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getDriverId());
 	}
 
 	public void handleEvent(Wait2LinkEvent event) {

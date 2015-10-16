@@ -64,14 +64,14 @@ public class TravelTimeEventHandler implements PersonDepartureEventHandler, Pers
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().compareTo(Id.create(3, Link.class)) == 0) {
-			this.pendantLinkEnterEvent.put(event.getPersonId(), event);
+			this.pendantLinkEnterEvent.put(event.getDriverId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().compareTo(Id.create(3, Link.class)) == 0) {
-			double linkTT = event.getTime() - this.pendantLinkEnterEvent.get(event.getPersonId()).getTime();
+			double linkTT = event.getTime() - this.pendantLinkEnterEvent.get(event.getDriverId()).getTime();
 			this.linkTTs.add(linkTT);
 		}
 	}

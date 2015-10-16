@@ -112,7 +112,7 @@ public class TravelDemand {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			double time = event.getTime();
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 			Id linkId = event.getLinkId();
 			boolean isArrival = false;
 			updatePosition(time, personId, linkId, isArrival);
@@ -132,7 +132,7 @@ public class TravelDemand {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			double time = event.getTime();
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 			Id linkId = event.getLinkId();
 			boolean isArrival = false;
 			updatePosition(time, personId, linkId, isArrival);

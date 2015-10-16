@@ -234,32 +234,32 @@ public class EventsComparator {
 
 		@Override
 		public void handleEvent(PersonLeavesVehicleEvent event) {
-//			if(travelTime.containsKey(event.getPersonId())){
-//				Double travelTimeTemp = travelTime.get(event.getPersonId()) + event.getTime();
-//				travelTime.put(event.getPersonId(), travelTimeTemp);
+//			if(travelTime.containsKey(event.getDriverId())){
+//				Double travelTimeTemp = travelTime.get(event.getDriverId()) + event.getTime();
+//				travelTime.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeCar.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeBus.put(event.getDriverId(), travelTimeTemp);
 //			}else
-//				System.out.println(event.getPersonId() + ": first ActivityEndEvent is missing");			
+//				System.out.println(event.getDriverId() + ": first ActivityEndEvent is missing");
 		}
 
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
-//			if (travelTime.containsKey(event.getPersonId())){
-//				Double travelTimeTemp = travelTime.get(event.getPersonId()) - event.getTime();
-//				travelTime.put(event.getPersonId(), travelTimeTemp);
+//			if (travelTime.containsKey(event.getDriverId())){
+//				Double travelTimeTemp = travelTime.get(event.getDriverId()) - event.getTime();
+//				travelTime.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeCar.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeBus.put(event.getDriverId(), travelTimeTemp);
 //			}else{
-//				travelTime.put(event.getPersonId(), event.getTime()*(-1));
+//				travelTime.put(event.getDriverId(), event.getTime()*(-1));
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), event.getTime()*(-1));
+//					travelTimeCar.put(event.getDriverId(), event.getTime()*(-1));
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), event.getTime()*(-1));
+//					travelTimeBus.put(event.getDriverId(), event.getTime()*(-1));
 //			}			
 		}
 	}

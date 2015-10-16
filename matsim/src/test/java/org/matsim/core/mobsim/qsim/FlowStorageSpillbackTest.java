@@ -105,7 +105,7 @@ public class FlowStorageSpillbackTest {
 		for (LinkLeaveEvent event : linkLeaveEvents) {
 			System.out.println(event.toString());
 
-			if (event.getPersonId().toString().equals(this.testAgent4.toString()) && event.getLinkId().toString().equals(this.linkId2.toString())) {
+			if (event.getDriverId().toString().equals(this.testAgent4.toString()) && event.getLinkId().toString().equals(this.linkId2.toString())) {
 				Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
 			}
 		}

@@ -163,11 +163,11 @@ public abstract class AbstractModule implements Module {
         return travelTimeMultibinder.addBinding(mode);
     }
 
-    protected final LinkedBindingBuilder<TravelTime> bindCarTravelTime() {
-        return bind(carTravelTimeKey());
+    protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
+        return bind(networkTravelTime());
     }
 
-    protected final Key<TravelTime> carTravelTimeKey() {
+    protected final Key<TravelTime> networkTravelTime() {
         return Key.get(TravelTime.class, ForCar.class);
     }
 

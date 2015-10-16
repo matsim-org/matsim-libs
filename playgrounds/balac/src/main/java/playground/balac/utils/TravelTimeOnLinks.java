@@ -59,7 +59,7 @@ EventHandler eventHandler = new EventHandler(scenario);
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO Auto-generated method stub
-		map.put(event.getPersonId(), event);
+		map.put(event.getDriverId(), event);
 		
 	}
 
@@ -68,8 +68,8 @@ EventHandler eventHandler = new EventHandler(scenario);
 		// TODO Auto-generated method stub
 		double freespeed = scenario.getNetwork().getLinks().get(event.getLinkId()).getFreespeed();
 		double length = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-		if(map.get(event.getPersonId())!= null) {
-			double travelTime = event.getTime() - map.get(event.getPersonId()).getTime();
+		if(map.get(event.getDriverId())!= null) {
+			double travelTime = event.getTime() - map.get(event.getDriverId()).getTime();
 			double effectiveSpeed = length/travelTime;
 			if (freespeed < 13.88) {
 				speed1 += effectiveSpeed;

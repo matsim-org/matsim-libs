@@ -1,6 +1,5 @@
 package playground.michalm.taxi.run;
 
-import java.io.File;
 import java.util.Map;
 
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -10,17 +9,6 @@ import playground.michalm.util.ParameterFileReader;
 
 class TaxiLauncherParams
 {
-
-    static TaxiLauncherParams readParams(String paramFile)
-    {
-        Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
-        String dir = new File(paramFile).getParent() + '/';
-        params.put("inputDir", dir);
-        params.put("outputDir", dir);
-        return new TaxiLauncherParams(params);
-    }
-
-
     static TaxiLauncherParams readParams(String paramFile, String inputDir, String outputDir)
     {
         Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);

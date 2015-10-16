@@ -46,6 +46,14 @@ public class GrainUtils {
 	 * traces provided by Digicore in the longitudinal data set. The twelve 
 	 * months are hard-coded: March 2013 to February 2014.
 	 * 
+	 * <h4>NOTE:</h4>
+	 * I (JWJ, Oct 2015) changed the code below so that it can process both
+	 * the Grain data, and all the other non-grain months as well. So, the
+	 * portion that states that it ONLY looks at the 12 months is not correct,
+	 * but depends on which class is called, i.e. {@code GrainMonths} for the
+	 * stated 12 months, or {@code OtherMonths} for all other months in the 
+	 * longitudinal data set <i>except</i> the twelve grain months. 
+	 * 
 	 * @param inputFolder
 	 * @return
 	 */
@@ -53,7 +61,8 @@ public class GrainUtils {
 		LOG.info("Retrieveing the twelve monthly GPS trace files...");
 		List<File> files = new ArrayList<File>();
 		
-		String[] months = getMonths();
+//		String[] months = GrainMonths.getMonths();
+		String[] months = OtherMonths.getMonths();
 		
 		/* Check that each file exists, and once checked, add to list. */
 		for(String month : months){
@@ -80,7 +89,8 @@ public class GrainUtils {
 		LOG.info("Retrieveing the twelve monthly GPS trace files...");
 		List<File> files = new ArrayList<File>();
 		
-		String[] months = getMonths();
+//		String[] months = GrainMonths.getMonths();
+		String[] months = OtherMonths.getMonths();
 		for(String month : months){
 			File folder = new File(processedFolder + (processedFolder.endsWith("/") ? "" : "/") + month + "/Vehicles/");
 			if(!folder.exists()){
@@ -105,7 +115,8 @@ public class GrainUtils {
 		LOG.info("Retrieveing the twelve monthly output folders...");
 		List<File> files = new ArrayList<File>();
 		
-		String[] months = getMonths();
+//		String[] months = GrainMonths.getMonths();
+		String[] months = OtherMonths.getMonths();
 		for(String month : months){
 			File folder = new File(processedFolder + (processedFolder.endsWith("/") ? "" : "/") + month + "/");
 			if(!folder.exists()){
@@ -118,18 +129,5 @@ public class GrainUtils {
 		LOG.info("Done retrieving the output folders.");
 		return files;
 	}
-	
-	/**
-	 * Returns the twelve months of March 2013 to February 2014.
-	 * @return
-	 */
-	private static String[] getMonths(){
-		String[] months = {
-				"201303", "201304", "201305", "201306",
-				"201307", "201308", "201309", "201310",
-				"201311", "201312", "201401", "201402"
-		};
-		return months;
-	}
-	
+		
 }

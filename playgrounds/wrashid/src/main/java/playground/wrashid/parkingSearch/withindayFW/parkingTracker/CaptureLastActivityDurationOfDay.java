@@ -65,7 +65,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 	// this is invoked in the morning
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		//DebugLib.traceAgent(event.getPersonId());
+		//DebugLib.traceAgent(event.getDriverId());
 		
 		Id personId = event.getPersonId();
 		PersonDriverAgentImpl agent = this.agents.get(event.getPersonId());
@@ -92,7 +92,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 	// this is invoked in the evening
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		//DebugLib.traceAgent(event.getPersonId());
+		//DebugLib.traceAgent(event.getDriverId());
 		
 		Id personId = event.getPersonId();
 

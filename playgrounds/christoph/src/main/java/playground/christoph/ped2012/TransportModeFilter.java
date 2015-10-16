@@ -117,11 +117,11 @@ public class TransportModeFilter implements BasicEventHandler {
 		// skip link events from not observed agents
 		else if (event instanceof LinkEnterEvent) {
 			Event linkEvent = (Event) event;
-			if (!observedAgents.contains(((LinkEnterEvent) linkEvent).getPersonId())) return;
+			if (!observedAgents.contains(((LinkEnterEvent) linkEvent).getDriverId())) return;
 		} 
 		else if (event instanceof LinkLeaveEvent) {
 			Event linkEvent = (Event) event;
-			if (!observedAgents.contains(((LinkLeaveEvent) linkEvent).getPersonId())) return;
+			if (!observedAgents.contains(((LinkLeaveEvent) linkEvent).getDriverId())) return;
 		} 
 		
 		// skip agent wait 2 link events from not observed agents

@@ -65,15 +65,16 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class CreateBasecase {
 
 	public static void main(String[] args) {
-		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-		double scale = 0.01;
+//		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+		String basedir = "/net/ils4/jbischoff/input/";
+		double scale = 1.0;
 		
 		final Config config = ConfigUtils.createConfig();
 		ControlerConfigGroup ccg = config.controler();
-		ccg.setRunId("vw010cadytsr.1pct");
+		ccg.setRunId("vw012.100pct");
 		ccg.setOutputDirectory(basedir+"output/"+ccg.getRunId()+"/");
 		ccg.setFirstIteration(0);
-		int lastIteration = 300;
+		int lastIteration = 500;
 		ccg.setLastIteration(lastIteration);
 		int disableAfter = (int) (lastIteration * 0.9);
 		ccg.setMobsim("qsim");
@@ -86,23 +87,23 @@ public class CreateBasecase {
 		qsc.setUsingFastCapacityUpdate(true);
 		qsc.setTrafficDynamics(TrafficDynamics.withHoles);
 		qsc.setNumberOfThreads(16);
-		qsc.setStorageCapFactor(0.03);
-		qsc.setFlowCapFactor(scale);
+//		qsc.setStorageCapFactor(0.03);
+//		qsc.setFlowCapFactor(scale);
 //		qsc.setEndTime(28*3600);
 		config.network().setInputFile(basedir + "network.xml");
 		
-		config.plans().setInputFile(basedir+"initial_plans0.01.xml.gz");
+		config.plans().setInputFile(basedir+"initial_plans1.0.xml.gz");
 //		config.plans().setInputFile(basedir+"vw005.100pct.0.plans.xml.gz");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		
 		CountsConfigGroup counts = config.counts();
 		counts.setAnalyzedModes("car");
 		counts.setCountsFileName(basedir+"counts.xml");
-		counts.setCountsScaleFactor(1/scale);
+		counts.setCountsScaleFactor(1.0/scale);
 		final CadytsContext cContext = new CadytsContext(config);
 		CadytsConfigGroup cadyts = (CadytsConfigGroup) config.getModule("cadytsCar");
 		cadyts.setStartTime(6*3600);
-		cadyts.setEndTime(18*3600+1);
+		cadyts.setEndTime(20*3600+1);
 		cadyts.setTimeBinSize(3600);
 		cadyts.addParam("calibratedLinks","65601,48358,62489,71335" );
 		
@@ -140,6 +141,7 @@ public class CreateBasecase {
 		SubtourModeChoiceConfigGroup smc = config.subtourModeChoice();
 		smc.setConsiderCarAvailability(false);
 		smc.setModes(new String[]{"pt","bike","walk","car"});
+		
 						
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
 		vsp.setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
@@ -323,7 +325,7 @@ public class CreateBasecase {
 						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 						final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-						final double cadytsScoringWeight = 30. * config.planCalcScore().getBrainExpBeta() ;
+						final double cadytsScoringWeight = 20. * config.planCalcScore().getBrainExpBeta() ;
 						scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 						scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 

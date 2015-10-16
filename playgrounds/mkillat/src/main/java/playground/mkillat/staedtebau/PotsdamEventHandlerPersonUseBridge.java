@@ -44,8 +44,8 @@ public class PotsdamEventHandlerPersonUseBridge implements LinkLeaveEventHandler
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().equals(linkid1) || event.getLinkId().equals(linkid2) || event.getLinkId().equals(linkid3)|| event.getLinkId().equals(linkid4) || event.getLinkId().equals(linkid5) || event.getLinkId().equals(linkid6) || event.getLinkId().equals(linkid7) || event.getLinkId().equals(linkid8)){
-			if (personsBridge.containsKey(event.getPersonId())==false){
-				personsBridge.put(event.getPersonId(), event.getTime());
+			if (personsBridge.containsKey(event.getDriverId())==false){
+				personsBridge.put(event.getDriverId(), event.getTime());
 			}
 			;
 		}

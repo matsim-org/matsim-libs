@@ -82,22 +82,22 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 			Coord linkCoord=network.getLinks().get(event.getLinkId()).getCoord();
 			
 			// leaving area
-			if (vehicleInArea.contains(event.getPersonId()) && !isInArea(linkCoord)){
+			if (vehicleInArea.contains(event.getDriverId()) && !isInArea(linkCoord)){
 				outFlow[(int)Math.round(event.getTime()/binSizeInSeconds)]++;
 				//output.add(Math.round(event.getTime()) + "\t" + "-1");
 			}
 			
 			// entering area
-			if (!vehicleInArea.contains(event.getPersonId()) && isInArea(linkCoord)){
+			if (!vehicleInArea.contains(event.getDriverId()) && isInArea(linkCoord)){
 				inFlow[(int)Math.round(event.getTime()/binSizeInSeconds)]++;
 				//output.add(Math.round(event.getTime()) + "\t" + "+1");
 			}
 			
 			// update vehicleInArea
 			if (isInArea(linkCoord)){
-				vehicleInArea.add(event.getPersonId());
+				vehicleInArea.add(event.getDriverId());
 			} else {
-				vehicleInArea.remove(event.getPersonId());
+				vehicleInArea.remove(event.getDriverId());
 			}
 		}
 

@@ -62,28 +62,28 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	@Override
 		public void handleEvent(LinkEnterEvent event) {
 
-			if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
+			if (event.getDriverId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
 				// a car is entering a link
-				this.personId2enteringTime.put(event.getPersonId(), event.getTime());				
+				this.personId2enteringTime.put(event.getDriverId(), event.getTime());
 			}
 		}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
+		if (event.getDriverId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
 			// a car is leaving a link
-			if (this.personId2enteringTime.get(event.getPersonId()) == null){
+			if (this.personId2enteringTime.get(event.getDriverId()) == null){
 				// person just started from an activity, therefore not calculating travel times...
 				
 			} else {
-				double tActLink = event.getTime() - this.personId2enteringTime.get(event.getPersonId());
+				double tActLink = event.getTime() - this.personId2enteringTime.get(event.getDriverId());
 				Link link = this.network.getLinks().get(event.getLinkId());
 				double t0Link = link.getLength() / link.getFreespeed();
 				double diff = t0Link - tActLink;
 				
 				if (diff > 0) {
-					log.warn(event.getPersonId() + " is faster than freespeed! Doesn't make sense!");
+					log.warn(event.getDriverId() + " is faster than freespeed! Doesn't make sense!");
 				}
 				
 				if (Math.abs(diff) < 0.1){
@@ -91,14 +91,14 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 					diff = 0;
 				}
 							
-				if (this.personId2t0MinusTAkt.get(event.getPersonId()) == null){
-					this.personId2t0MinusTAkt.put(event.getPersonId(), diff);
+				if (this.personId2t0MinusTAkt.get(event.getDriverId()) == null){
+					this.personId2t0MinusTAkt.put(event.getDriverId(), diff);
 				} else {
-					double diffSumThisPerson = this.personId2t0MinusTAkt.get(event.getPersonId());
-					this.personId2t0MinusTAkt.put(event.getPersonId(), diffSumThisPerson + diff);
+					double diffSumThisPerson = this.personId2t0MinusTAkt.get(event.getDriverId());
+					this.personId2t0MinusTAkt.put(event.getDriverId(), diffSumThisPerson + diff);
 				}
 				
-				this.personId2enteringTime.put(event.getPersonId(), null);
+				this.personId2enteringTime.put(event.getDriverId(), null);
 			}
 		}
 	}

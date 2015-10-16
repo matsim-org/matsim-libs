@@ -51,7 +51,7 @@ public class EVehiclePlan {
 	}
 
 	public boolean expectedPerson(Id<Person> personId) {
-//		System.out.println(this.currentElement.getPersonId());
+//		System.out.println(this.currentElement.getDriverId());
 		return this.currentElement.getPersonId().equals(personId);
 	}
 

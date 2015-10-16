@@ -108,7 +108,7 @@ public class SearchTraffic {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-//			if (event.getPersonId().equals(filterEventsForAgentId)){
+//			if (event.getDriverId().equals(filterEventsForAgentId)){
 //				System.out.println(event.toString());
 //			}
 		}
@@ -116,7 +116,7 @@ public class SearchTraffic {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			linkEnterTime.put(event.getPersonId(), event.getTime());
+			linkEnterTime.put(event.getDriverId(), event.getTime());
 		}
 
 		@Override

@@ -117,10 +117,10 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 		if(!affectedLinks.contains(event.getLinkId())) return;
 		
 		if (event.getTime() < begin) {
-			beforeBeginOnLinkAgents.add(event.getPersonId());
+			beforeBeginOnLinkAgents.add(event.getDriverId());
 		} else if (event.getTime() > end) return;
 		else {
-			inbetweenOnLinkAgents.add(event.getPersonId());
+			inbetweenOnLinkAgents.add(event.getDriverId());
 		}
 	}
 
@@ -129,7 +129,7 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 		if(!affectedLinks.contains(event.getLinkId())) return;
 		
 		if (event.getTime() < begin) {
-			beforeBeginOnLinkAgents.remove(event.getPersonId());
+			beforeBeginOnLinkAgents.remove(event.getDriverId());
 		}
 	}
 

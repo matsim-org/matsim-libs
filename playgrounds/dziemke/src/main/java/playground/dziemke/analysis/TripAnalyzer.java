@@ -294,7 +294,7 @@ public class TripAnalyzer {
 	    		
 	    		// write person activity attributes
 //	    		if (trip.getActivityEndActType().equals("work")) {
-//	    			personActivityAttributes.putAttribute(trip.getPersonId(), "hasWorkActivity", true);		
+//	    			personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
 //	    		}
 	    		// TODO The plan was to claculated activity-chain frequencies here...
 	    		
