@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import floetteroed.utilities.math.Covariance;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
+import gunnar.ihop2.integration.MATSimDummy;
 import gunnar.ihop2.regent.RegentDictionary;
 
 /**
@@ -220,16 +222,20 @@ public class PopulationCreator {
 							.get(rnd.nextInt(zone.getSingleFamilyBuildings()
 									.size()));
 				} else {
-					System.err.println("no villas in zone " + zone.getId());
+					Logger.getLogger(MATSimDummy.class.getName()).warning(
+							"no villas in zone " + zone.getId());
 				}
 			} else if (APARTMENT.equals(housingType)) {
 				if (!zone.getMultiFamilyBuildings().isEmpty()) {
 					building = zone.getMultiFamilyBuildings().get(
 							MathHelpers.draw(apartmentProbas, rnd));
 				} else {
-					System.err.println("no apartments in zone " + zone.getId());
+					Logger.getLogger(MATSimDummy.class.getName()).warning(
+							"no apartments in zone " + zone.getId());
 				}
 			} else {
+				Logger.getLogger(MATSimDummy.class.getName()).severe(
+						"unknown housing type " + housingType);
 				throw new RuntimeException("unknown housing type "
 						+ housingType);
 			}
@@ -240,10 +246,13 @@ public class PopulationCreator {
 				building = zone.getWorkBuildings().get(
 						MathHelpers.draw(officeProbas, rnd));
 			} else {
-				System.err.println("no work buildings in zone " + zone.getId());
+				Logger.getLogger(MATSimDummy.class.getName()).warning(
+						"no work buildings in zone " + zone.getId());
 			}
 
 		} else {
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					"unkown activity: " + activityType);
 			throw new RuntimeException("unknown activity: " + activityType);
 		}
 
@@ -420,11 +429,12 @@ public class PopulationCreator {
 					RegentPopulationReader.CAR_ATTRIBUTEVALUE
 							.equals(workTourMode))) {
 				if (processedPersons % everyXthPerson == 0) {
-					System.out.print("Person " + personId + ": homeZone = "
-							+ homeZone + ", workZone = " + workZone
-							+ ", workTourMode = " + workTourMode);
-					System.out.println("; this is the " + processedPersons
-							+ "th agent.");
+					Logger.getLogger(MATSimDummy.class.getName()).info(
+							"Person " + personId + ": homeZone = " + homeZone
+									+ ", workZone = " + workZone
+									+ ", workTourMode = " + workTourMode
+									+ "; this is the " + processedPersons
+									+ "th agent.");
 					final Person person = this.newPerson(personId, xy2links,
 							coordinateTransform);
 					this.scenario.getPopulation().addPerson(person);

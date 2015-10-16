@@ -368,7 +368,9 @@ public class RandomSearch<U extends DecisionVariable> {
 			this.transitionEvaluations.add(transitionsPerIteration);
 			this.transitions += transitionsPerIteration;
 
-			this.statisticsWriter.writeToFile(this);
+			if (this.statisticsWriter != null) {
+				this.statisticsWriter.writeToFile(this);
+			}
 		}
 	}
 

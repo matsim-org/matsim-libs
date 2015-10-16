@@ -1,11 +1,9 @@
-package playground.gregor.ctsim.simulation.physics;
 /* *********************************************************************** *
  * project: org.matsim.*
- *
- *                                                                         *
+ * GrainMonths.java                                                                        *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,11 +16,30 @@ package playground.gregor.ctsim.simulation.physics;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+/**
+ * 
+ */
+package playground.nmviljoen.grain;
 
 /**
- * Created by laemmel on 07/10/15.
+ * Class to return the months that are useful for the Grain industry project.
+ * That is, March 2013 to February 2014.
+ * 
+ * @author jwjoubert
  */
-public interface CTNetworkEntity { //marker interface
+public class GrainMonths {
+	
+	/**
+	 * Returns the twelve months of March 2013 to February 2014.
+	 * @return
+	 */
+	public static String[] getMonths(){
+		String[] months = {
+				"201303", "201304", "201305", "201306",
+				"201307", "201308", "201309", "201310",
+				"201311", "201312", "201401", "201402"
+		};
+		return months;
+	}
 
-	void init();
 }

@@ -20,6 +20,7 @@ public class CTNode implements CTNetworkEntity {
 		return this.cell;
 	}
 
+	@Override
 	public void init() {
 		cell.init();
 	}
