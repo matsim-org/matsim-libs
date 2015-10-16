@@ -74,25 +74,25 @@ public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHa
 		int slot = (int)event.getTime()/timeInterval;
 		if(slot==numCars.length)
 			slot--;
-		if(event.getPersonId().toString().startsWith("pt")) {
+		if(event.getDriverId().toString().startsWith("pt")) {
 			Integer numBus = numBuses[slot];
 			if(numBus==null)
 				numBus = 0;
 			numBuses[slot].put(event.getLinkId(), numBus+1);
 		}
-		else if(event.getPersonId().toString().startsWith("stTG")) {
+		else if(event.getDriverId().toString().startsWith("stTG")) {
 			Integer numTruck = numTrucks[slot];
 			if(numTruck==null)
 				numTruck = 0;
 			numTrucks[slot].put(event.getLinkId(), numTruck+1);
 		}
-		else if(event.getPersonId().toString().startsWith("stTC")) {
+		else if(event.getDriverId().toString().startsWith("stTC")) {
 			Integer numCarCh = numCarsCh[slot];
 			if(numCarCh==null)
 				numCarCh = 0;
 			numCarsCh[slot].put(event.getLinkId(), numCarCh+1);
 		}
-		else if(event.getPersonId().toString().startsWith("stTT")) {
+		else if(event.getDriverId().toString().startsWith("stTT")) {
 			Integer numCarTo = numCarsTo[slot];
 			if(numCarTo==null)
 				numCarTo = 0;

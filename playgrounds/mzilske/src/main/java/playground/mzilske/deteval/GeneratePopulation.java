@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -672,7 +672,7 @@ public class GeneratePopulation {
 				String caseid = row[CASEID];
 				String pid = row[PID];
 				Id id = createPersonId(caseid, pid);
-				PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(id);
+				Person person = scenario.getPopulation().getFactory().createPerson(id);
 				String palter = row[PALTER];
 				if (palter.equals("997")) {
 					// Verweigert
@@ -681,13 +681,13 @@ public class GeneratePopulation {
 				} else if (palter.equals("999")) {
 					// Keine Angabe
 				} else {
-					person.setAge(Integer.parseInt(palter));
+					PersonUtils.setAge(person, Integer.parseInt(palter));
 				}
 				String psex = row[PSEX];
 				if (psex.equals("1")) {
-					person.setSex("m");
+					PersonUtils.setSex(person, "m");
 				} else if (psex.equals("2")) {
-					person.setSex("f");
+					PersonUtils.setSex(person, "f");
 				} else {
 					// unknown
 				}
@@ -745,10 +745,10 @@ public class GeneratePopulation {
 	}
 
 	private Person copyPersonWithNewLocationsInSameCell(Coord homeCoord, Person person, String cloneId) {
-		PersonImpl oldPerson = (PersonImpl) person;
-		PersonImpl newPerson = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(person.getId().toString() + "#" + cloneId, Person.class));
-		newPerson.setAge(oldPerson.getAge());
-		newPerson.setSex(oldPerson.getSex());
+		Person oldPerson = person;
+		Person newPerson = scenario.getPopulation().getFactory().createPerson(Id.create(person.getId().toString() + "#" + cloneId, Person.class));
+		PersonUtils.setAge(newPerson, PersonUtils.getAge(oldPerson));
+		PersonUtils.setSex(newPerson, PersonUtils.getSex(oldPerson));
 		for(Plan oldPlan : oldPerson.getPlans()) {
 			Plan newPlan = scenario.getPopulation().getFactory().createPlan();
 			for (PlanElement planElement : oldPlan.getPlanElements()) {
@@ -777,14 +777,14 @@ public class GeneratePopulation {
 
 	private Coord createRandomCoord(Integer integer) {
 		Point point = getRandomPointInFeature(rnd, verkehrszellen.get(integer));
-		return scenario.createCoord(point.getX(), point.getY());
+		return new Coord(point.getX(), point.getY());
 	}
 
 	private Coord createCentroidCoordIfAvailable(Integer integer) {
 		SimpleFeature verkehrszelle = verkehrszellen.get(integer);
 		if (verkehrszelle != null) {
 			Point point = ((Geometry) verkehrszelle.getDefaultGeometry()).getCentroid();
-			return scenario.createCoord(point.getX(), point.getY());
+			return new Coord(point.getX(), point.getY());
 		} else {
 			return null;
 		}

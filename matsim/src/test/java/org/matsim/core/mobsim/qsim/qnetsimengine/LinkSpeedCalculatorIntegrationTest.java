@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -69,12 +70,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// by default, the link takes 10 seconds to travel along, plus 1 second in the buffer, makes total of 11 seconds
@@ -95,12 +96,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// with 5 per second, the link takes 20 seconds to travel along, plus 1 second in the buffer, makes total of 21 seconds
@@ -120,12 +121,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
 		LinkEnterEvent lee = (LinkEnterEvent) events.get(5);
-		Assert.assertEquals("1", lee.getPersonId().toString());
+		Assert.assertEquals("1", lee.getVehicleId().toString());
 		Assert.assertEquals("2", lee.getLinkId().toString());
 
 		Assert.assertTrue(events.get(6) instanceof LinkLeaveEvent);
 		LinkLeaveEvent lle = (LinkLeaveEvent) events.get(6);
-		Assert.assertEquals("1", lle.getPersonId().toString());
+		Assert.assertEquals("1", lle.getVehicleId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
 		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds
@@ -193,10 +194,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 			Network network = this.scenario.getNetwork();
 			NetworkFactory nf = network.getFactory();
 
-			Node n1 = nf.createNode(nodeIds[1], this.scenario.createCoord(0, 0));
-			Node n2 = nf.createNode(nodeIds[2], this.scenario.createCoord(100, 0));
-			Node n3 = nf.createNode(nodeIds[3], this.scenario.createCoord(200, 0));
-			Node n4 = nf.createNode(nodeIds[4], this.scenario.createCoord(300, 0));
+			Node n1 = nf.createNode(nodeIds[1], new Coord((double) 0, (double) 0));
+			Node n2 = nf.createNode(nodeIds[2], new Coord((double) 100, (double) 0));
+			Node n3 = nf.createNode(nodeIds[3], new Coord((double) 200, (double) 0));
+			Node n4 = nf.createNode(nodeIds[4], new Coord((double) 300, (double) 0));
 
 			network.addNode(n1);
 			network.addNode(n2);

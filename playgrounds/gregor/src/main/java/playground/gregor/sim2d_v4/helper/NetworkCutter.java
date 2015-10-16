@@ -100,7 +100,7 @@ public class NetworkCutter {
 		
 		for (Link l : net.getLinks().values()) {
 			Point p = MGC.coord2Point(l.getCoord());
-			Section sec = qt.get(p.getX(), p.getY());
+			Section sec = qt.getClosest(p.getX(), p.getY());
 			if (!sec.getPolygon().contains(p)) {
 				log.info("could not find link section mapping in quadtree using linear search");
 				for (Section sec2 : env.getSections().values()) {
@@ -204,8 +204,8 @@ public class NetworkCutter {
 				l.getFromNode().getCoord().getX()+l.getLength(),l.getFromNode().getCoord().getY()+l.getLength());
 		Rect rec02 = new Rect(l.getToNode().getCoord().getX()-l.getLength(),l.getToNode().getCoord().getY()-l.getLength(),
 				l.getToNode().getCoord().getX()+l.getLength(),l.getToNode().getCoord().getY()+l.getLength());
-		qt.get(rec02, assoccSecs02);
-		qt.get(rec01, assoccSecs01);
+		qt.getRectangle(rec02, assoccSecs02);
+		qt.getRectangle(rec01, assoccSecs01);
 		assoccSecs01.addAll(assoccSecs02);
 		Coordinate c0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
 		Coordinate c1 = MGC.coord2Coordinate(l.getToNode().getCoord());

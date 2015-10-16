@@ -8,14 +8,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vbmh.util.ReadParkhistory;

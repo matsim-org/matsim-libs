@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -49,7 +48,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	}
 
 	private static final Logger log = Logger.getLogger(TransitAgentImpl.class);
-	
+
 	@Override
 	public final  boolean getExitAtStop(final TransitStopFacility stop) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) basicAgentDelegate.getCurrentLeg().getRoute();
@@ -68,7 +67,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 
 	@SuppressWarnings("static-method")
 	private final boolean containsId(List<TransitRouteStop> stopsToCome,
-                       Id<TransitStopFacility> egressStopId) {
+			Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
@@ -90,7 +89,7 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
 					+ " "
-					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
@@ -127,6 +126,11 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	@Override
 	public Id<Person> getId() {
 		return basicAgentDelegate.getId() ;
+	}
+
+	@Override
+	public String getMode() {
+		return basicAgentDelegate.getMode() ;
 	}
 
 }

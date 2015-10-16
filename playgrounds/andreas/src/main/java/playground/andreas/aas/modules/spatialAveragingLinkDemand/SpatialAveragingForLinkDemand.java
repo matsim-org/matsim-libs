@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
@@ -105,14 +104,14 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		
 		SimpleFeatureType featureType = createFeatures();
 		
-		Map<Double, Map<Id, Integer>> time2Counts1 = setNonCalculatedCountsAndFilter(this.demandHandler.getDemandPerLinkAndTimeInterval());
+		Map<Double, Map<Id<Link>, Integer>> time2Counts1 = setNonCalculatedCountsAndFilter(this.demandHandler.getDemandPerLinkAndTimeInterval());
 		this.demandHandler.reset(0); // really needed?!
 		
-		Map<Double, Map<Id, Double>> time2DemandMapToAnalyze = convertMapToDoubleValues(time2Counts1);
+		Map<Double, Map<Id<Link>, Double>> time2DemandMapToAnalyze = convertMapToDoubleValues(time2Counts1);
 		this.resultingFeatures = new ArrayList<SimpleFeature>();
 
 		for(double endOfTimeInterval : time2DemandMapToAnalyze.keySet()){
-			Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
+			Map<Id<Link>, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
 
 			int[][] noOfLinksInCell = new int[this.noOfXbins][this.noOfYbins];
 			double[][] sumOfweightsForCell = new double[this.noOfXbins][this.noOfYbins];
@@ -122,7 +121,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 				
 				if (demandMapToAnalyze.containsKey(link.getId())){
 					
-					Id linkId = link.getId();
+					Id<Link> linkId = link.getId();
 					Coord linkCoord = link.getCoord();
 					double xLink = linkCoord.getX();
 					double yLink = linkCoord.getY();
@@ -220,7 +219,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 	private Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);
 		double yCentroid = findBinCenterY(yIndex);
-		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
+		Coord cellCentroid = new Coord(xCentroid, yCentroid);
 		return cellCentroid;
 	}
 
@@ -238,15 +237,15 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 
 	/**
 	 * Is this really necessary?! AN
-	 * @param time2Demand
+	 * @param time2Counts1
 	 * @return
 	 */
-	private Map<Double, Map<Id, Double>> convertMapToDoubleValues(Map<Double, Map<Id, Integer>> time2Demand) {
-		Map<Double, Map<Id, Double>> mapOfDoubleValues = new HashMap<Double, Map<Id, Double>>();
-		for(Double endOfTimeInterval : time2Demand.keySet()){
-			Map<Id, Integer> linkId2Value = time2Demand.get(endOfTimeInterval);
-			Map<Id, Double> linkId2DoubleValue = new HashMap<Id, Double>();
-			for(Id linkId : linkId2Value.keySet()){
+	private Map<Double, Map<Id<Link>, Double>> convertMapToDoubleValues(Map<Double, Map<Id<Link>, Integer>> time2Counts1) {
+		Map<Double, Map<Id<Link>, Double>> mapOfDoubleValues = new HashMap<>();
+		for(Double endOfTimeInterval : time2Counts1.keySet()){
+			Map<Id<Link>, Integer> linkId2Value = time2Counts1.get(endOfTimeInterval);
+			Map<Id<Link>, Double> linkId2DoubleValue = new HashMap<>();
+			for(Id<Link> linkId : linkId2Value.keySet()){
 				int intValue = linkId2Value.get(linkId);
 				double doubleValue = intValue;
 				double linkLength_km = this.scenario.getNetwork().getLinks().get(linkId).getLength() / 1000.;
@@ -258,12 +257,12 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		return mapOfDoubleValues;
 	}
 
-	private Map<Double, Map<Id, Integer>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Integer>> time2Counts1) {
-		Map<Double, Map<Id, Integer>> time2CountsTotalFiltered = new HashMap<Double, Map<Id,Integer>>();
+	private Map<Double, Map<Id<Link>, Integer>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id<Link>, Integer>> time2Counts1) {
+		Map<Double, Map<Id<Link>, Integer>> time2CountsTotalFiltered = new HashMap<>();
 
 		for(Double endOfTimeInterval : time2Counts1.keySet()){
-			Map<Id, Integer> linkId2Count = time2Counts1.get(endOfTimeInterval);
-			Map<Id, Integer> linkId2CountFiltered = new HashMap<Id, Integer>();
+			Map<Id<Link>, Integer> linkId2Count = time2Counts1.get(endOfTimeInterval);
+			Map<Id<Link>, Integer> linkId2CountFiltered = new HashMap<>();
 			for(Link link : this.scenario.getNetwork().getLinks().values()){
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();
@@ -271,7 +270,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 
 				if(xLink > this.xMin && xLink < this.xMax){
 					if(yLink > this.yMin && yLink < this.yMax){
-						Id linkId = link.getId();
+						Id<Link> linkId = link.getId();
 						if(linkId2Count.get(linkId) == null){
 							linkId2CountFiltered.put(linkId, 0);
 						} else {

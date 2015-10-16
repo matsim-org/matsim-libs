@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -18,7 +19,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author thomas
  *
  */
-public final class UrbanSimZoneCSVWriterV2 implements AccessibilityCSVWriter {
+public final class UrbanSimZoneCSVWriterV2 implements ZoneDataExchangeInterface {
 	
 	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriterV2.class);
 	private BufferedWriter zoneWriter = null;
@@ -59,7 +60,7 @@ public final class UrbanSimZoneCSVWriterV2 implements AccessibilityCSVWriter {
 	 * @param startZone
 	 */
 	@Override
-	public  void writeRecord( ActivityFacility startZone, Node from, Map<Modes4Accessibility,Double> accessibilities ) {
+	public void setZoneAccessibilities( ActivityFacility startZone, Node from, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		try{

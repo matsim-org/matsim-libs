@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -83,12 +83,12 @@ public class PickupModel implements PersonDecisionModel {
 	
 	@Override
 	public void runModel(Person person) {
-		PersonImpl p = (PersonImpl) person;
+		Person p = person;
 		PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(person.getId());
 		
-		int age = p.getAge();
-		String sex = p.getSex();
-		boolean drivingLicense = p.hasLicense();
+		int age = PersonUtils.getAge(p);
+		String sex = PersonUtils.getSex(p);
+		boolean drivingLicense = PersonUtils.hasLicense(p);
 		boolean hasChildren = pdd.hasChildren();
 		
 		PickupDecision pickupDecision = runModel(age, drivingLicense, sex, hasChildren);

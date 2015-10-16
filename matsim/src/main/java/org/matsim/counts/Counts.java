@@ -23,28 +23,27 @@ package org.matsim.counts;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
-public class Counts {
+public class Counts<T> {
 
     public static final String ELEMENT_NAME = "counts";
 
 	private String name = null;
 	private String desc = null;
 	private int year = 0;
-	private final TreeMap<Id<Link>, Count> counts = new TreeMap<Id<Link>, Count>();
+	private final TreeMap<Id<T>, Count<T>> counts = new TreeMap<>();
 
 	/**
 	 * @param linkId the link to which the counting station is assigned, must be unique
 	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
 	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Count createAndAddCount(final Id<Link> linkId, final String stationName) {
+	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(linkId)) {
 			return null;
 		}
-		Count c = new Count(linkId, stationName);
+		Count<T> c = new Count<T>(linkId, stationName);
 		this.counts.put(linkId, c);
 		return c;
 	}
@@ -73,11 +72,11 @@ public class Counts {
 		return this.year;
 	}
 
-	public final TreeMap<Id<Link>, Count> getCounts() {
+	public final TreeMap<Id<T>, Count<T>> getCounts() {
 		return this.counts;
 	}
 
-	public final Count getCount(final Id<Link> locId) {
+	public final Count<T> getCount(final Id<T> locId) {
 		return this.counts.get(locId);
 	}
 

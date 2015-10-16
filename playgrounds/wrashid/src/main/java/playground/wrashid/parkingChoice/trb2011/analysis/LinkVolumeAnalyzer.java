@@ -148,7 +148,7 @@ public class LinkVolumeAnalyzer {
 		for (ActivityFacility actFacility : facilitiesQuadTree.values()) {
 			// TODO: this could be improved, as the same facility could have
 			// more than one act in it
-			int numberOfActFacilitiesInEnvironment = facilitiesQuadTree.get(actFacility.getCoord().getX(),
+			int numberOfActFacilitiesInEnvironment = facilitiesQuadTree.getDisk(actFacility.getCoord().getX(),
 					actFacility.getCoord().getY(), clusterRadiusInMeters).size();
 			facilitiesPriorityQueue.add(new SortableMapObject<ActivityFacility>(actFacility, -1.0
 					* numberOfActFacilitiesInEnvironment));
@@ -163,7 +163,7 @@ public class LinkVolumeAnalyzer {
 			ActivityFacility actFacility = facilitiesPriorityQueue.poll().getKey();
 
 			Coord clusterCenter = actFacility.getCoord();
-			Collection<ActivityFacilityImpl> facilitiesInArea = facilitiesQuadTree.get(actFacility.getCoord().getX(), actFacility
+			Collection<ActivityFacilityImpl> facilitiesInArea = facilitiesQuadTree.getDisk(actFacility.getCoord().getX(), actFacility
 					.getCoord().getY(), clusterRadiusInMeters);
 			double clusterScore = facilitiesInArea.size();
 			if (clusterScore > leastNumberOfActsInCluster) {
@@ -259,7 +259,7 @@ public class LinkVolumeAnalyzer {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (GeneralLib.isInZHCityRectangle(network.getLinks().get(event.getLinkId()).getCoord())) {
-				Id personId = event.getPersonId();
+				Id personId = event.getDriverId();
 				if (!stopFollowingAgent.containsKey(personId) && ParkingManager.considerForParking(personId)) {
 					if ((event.getTime() > 16 * 3600 && event.getTime() < 19 * 3600)) {
 						this.peakHourTravellingAgentLinkIds.put(event.getLinkId(), personId);

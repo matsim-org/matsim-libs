@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.toronto.demand.util.TableReader;
@@ -130,7 +130,7 @@ public class GTFSSystem {
 			this.stops.clear();
 			while (tr.next()){
 				Id<Stop> stopId = Id.create(tr.current().get("stop_id"), Stop.class);
-				CoordImpl coord = new CoordImpl(tr.current().get("stop_lon"), tr.current().get("stop_lat"));
+				Coord coord = new Coord(Double.parseDouble(tr.current().get("stop_lon")), Double.parseDouble(tr.current().get("stop_lat")));
 				
 				Stop s = new Stop(coord, tr.current().get("stop_name"), false);
 				this.stops.put(stopId, s);

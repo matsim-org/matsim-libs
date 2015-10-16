@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.utils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class QuadTreeRebuilder<T> {
 	}
 
 	public void put( final double x , final double y , final T element ) {
-		put( new CoordImpl( x , y ) , element );
+		put(new Coord(x, y), element );
 	}
 
 	public void put( final Coord coord , final T element ) {

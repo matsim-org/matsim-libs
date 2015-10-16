@@ -46,7 +46,6 @@ public class ProvincialPopulationExtractor2001 {
 	
 	public ProvincialPopulationExtractor2001() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
 	}
 	
 	public void extractProvince(String network, List<String> provincialCodes, String inputFolder, String outputFolder){

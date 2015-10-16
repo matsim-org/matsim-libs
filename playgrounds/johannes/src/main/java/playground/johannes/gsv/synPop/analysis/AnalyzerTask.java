@@ -22,11 +22,11 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.synpop.data.PlainPerson;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -71,7 +71,7 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
-	public abstract void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results);
+	public abstract void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results);
 		
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
@@ -84,7 +84,7 @@ public abstract class AnalyzerTask {
 			
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
 			Histogram.normalize(hist);
-			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
+			StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
 		} else {
 			logger.debug(String.format("Cannot create histogram: No samples for %s.", name));
 		}
@@ -92,8 +92,8 @@ public abstract class AnalyzerTask {
 	
 	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
-		TXTWriter.writeMap(hist, name, "n", String.format("%1$s/%2$s.txt", output, name)); 
+		StatsWriter.writeHistogram(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+		StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
 	}
 }

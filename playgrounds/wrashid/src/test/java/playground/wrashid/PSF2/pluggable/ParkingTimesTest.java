@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
@@ -34,8 +34,8 @@ import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 public class ParkingTimesTest extends MatsimTestCase {
 
 	public void testBasic(){
-		String eventsFile=getPackageInputDirectory() + "0.events.txt.gz";
-		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		String eventsFile=getPackageInputDirectory() + "0.events.xml";
+		ParkingTimesPlugin parkingTimesPlugin = getParkingTimes(eventsFile);
 		
 		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).size());
 		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getArrivalTime(),1.0);
@@ -45,29 +45,29 @@ public class ParkingTimesTest extends MatsimTestCase {
 	}
 	
 	public void testAgent2HasNoCarLegs(){
-		String eventsFile=getPackageInputDirectory() +"agent2HasNoCarLeg.events.txt";
-		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		String eventsFile=getPackageInputDirectory() +"agent2HasNoCarLeg.events.xml";
+		ParkingTimesPlugin parkingTimesPlugin = getParkingTimes(eventsFile);
 		
 		assertEquals(0, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).size());
 	}
 	
 	public void testAgent2UsesCarNotAsModeForFirstLeg(){
-		String eventsFile=getPackageInputDirectory() +"agent2UsesCarNotAsModeForFirstLeg.events.txt";
-		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
+		String eventsFile=getPackageInputDirectory() +"agent2UsesCarNotAsModeForFirstLeg.events.xml";
+		ParkingTimesPlugin parkingTimesPlugin = getParkingTimes(eventsFile);
 		
 		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).size());
 		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).get(0).getArrivalTime(),1.0);
 		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).get(0).getDepartureTime(),1.0);
 	}
 	
-	private ParkingTimesPlugin getParkintTimes(String eventsFile) {
+	private ParkingTimesPlugin getParkingTimes(String eventsFile) {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
 		events.addHandler(parkingTimesPlugin);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		
 		reader.readFile(eventsFile);
 		
@@ -76,7 +76,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	}
 	
 	public void testWithParkingLocationsFilterHome(){
-		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
+		String eventsFile=getPackageInputDirectory() +"0.events.xml";
 		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
@@ -87,7 +87,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 		
 		events.addHandler(parkingTimesPlugin);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		
 		reader.readFile(eventsFile);
 		
@@ -101,7 +101,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	
 	
 	public void testWithParkingLocationsFilterWork(){
-		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
+		String eventsFile=getPackageInputDirectory() +"0.events.xml";
 		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
@@ -112,7 +112,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 		
 		events.addHandler(parkingTimesPlugin);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		
 		reader.readFile(eventsFile);
 		

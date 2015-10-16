@@ -121,7 +121,7 @@ public class SeeCasino implements VisDebuggerAdditionalDrawer, LinkEnterEventHan
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().equals(this.leave)) {
-			Double a = this.agents.remove(event.getPersonId());
+			Double a = this.agents.remove(event.getDriverId());
 			double tm = event.getTime()-a;
 			this.avgQueueTime = this.count/(this.count+1.) * this.avgQueueTime + 1/(this.count+1.) * tm;
 			this.count++;
@@ -133,7 +133,7 @@ public class SeeCasino implements VisDebuggerAdditionalDrawer, LinkEnterEventHan
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().equals(this.enter0)||event.getLinkId().equals(this.enter1)) {
-			this.agents.put(event.getPersonId(), event.getTime());
+			this.agents.put(event.getDriverId(), event.getTime());
 			this.inside++;
 		}
 		

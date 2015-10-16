@@ -50,8 +50,9 @@ public class Array2DUtils
             throw new RuntimeException("Null or empty array");
         }
 
-        Object[][] transposed = (Object[][])Array.newInstance(array[0].getClass()
-                .getComponentType(), new int[] { array[0].length, array.length });
+        Object[][] transposed = (Object[][])Array.newInstance(
+                array[0].getClass().getComponentType(),
+                new int[] { array[0].length, array.length });
 
         for (int i = 0; i < transposed.length; i++) {
             for (int j = 0; j < array.length; j++) {

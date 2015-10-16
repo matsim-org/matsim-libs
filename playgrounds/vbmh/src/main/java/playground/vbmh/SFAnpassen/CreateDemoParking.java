@@ -15,7 +15,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
@@ -103,7 +102,7 @@ public class CreateDemoParking {
 				double location_capacity= activity.getCapacity();
 				String location_type = activity.getType();
 				Id<ActivityFacility> location_id= facility.getId();
-				CoordImpl location_coord = (CoordImpl) actfacility.getCoord();
+				Coord location_coord = actfacility.getCoord();
 				
 				//System.out.println(location_type);
 				

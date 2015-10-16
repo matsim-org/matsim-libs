@@ -1,9 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.8.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -15,62 +15,23 @@
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
+		<repository>
+			<id>extdeps</id>
+			<url>https://dl.bintray.com/gregor-laemmel/maven</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>com.jmatio</groupId>
-			<artifactId>jamtio</artifactId>
-			<version>0.2</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/jmatio/jamtio.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>evacuation</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>processing</groupId>
-			<artifactId>core</artifactId>
-			<scope>system</scope>
-			<version>2.2.1</version>
-			<systemPath>${basedir}/lib/processing-2.2.1/core.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>processing</groupId>
-			<artifactId>pdf</artifactId>
-			<scope>system</scope>
-			<version>2.2.1</version>
-			<systemPath>${basedir}/lib/processing-2.2.1/pdf.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>processing</groupId>
-			<artifactId>itext</artifactId>
-			<scope>system</scope>
-			<version>2.2.1</version>
-			<systemPath>${basedir}/lib/processing-2.2.1/itext.jar</systemPath>
+			<groupId>be.humphreys</groupId>
+			<artifactId>simplevoronoi</artifactId>
+			<version>0.1</version>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>gicentre</groupId>
 			<artifactId>gicentreutils</artifactId>
-			<scope>system</scope>
 			<version>3.3.0</version>
-			<systemPath>${basedir}/lib/gicentreutils/gicentreUtils.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>kabeja</groupId>
-			<artifactId>kabeja-0.4</artifactId>
-			<scope>system</scope>
-			<version>0.4</version>
-			<systemPath>${basedir}/lib/kabeja/kabeja-0.4.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>be.humphreys</groupId>
-			<artifactId>simplevoronoi</artifactId>
-			<scope>system</scope>
-			<version>0.2-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/simplevoronoi/simplevoronoi-0.2-SNAPSHOT.jar</systemPath>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
@@ -100,87 +61,13 @@
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
+			<artifactId>grpc-all</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
 			<artifactId>grpc-core</artifactId>
-			<scope>system</scope>
-			<version>0.1.0-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/grpc/grpc-core-0.1.0-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.grpc</groupId>
-			<artifactId>grpc-stub</artifactId>
-			<scope>system</scope>
-			<version>0.1.0-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/grpc/grpc-stub-0.1.0-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.grpc</groupId>
-			<artifactId>grpc-netty</artifactId>
-			<scope>system</scope>
-			<version>0.1.0-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/grpc/grpc-netty-0.1.0-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.grpc</groupId>
-			<artifactId>grpc-protobuf</artifactId>
-			<scope>system</scope>
-			<version>0.1.0-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/grpc/grpc-protobuf-0.1.0-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-buffer</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-buffer-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-codec-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty--codec-http</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-codec-http-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-http2</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-codec-http2-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-common</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-common-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-handler-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-resolver</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-resolver-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport</artifactId>
-			<scope>system</scope>
-			<version>4.1.0.Beta5-SNAPSHOT</version>
-			<systemPath>${basedir}/lib/netty/netty-transport-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+			<version>0.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.twitter</groupId>
@@ -197,21 +84,15 @@
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>vsp</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>signals</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.8.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>evacuation</artifactId>
+			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vividsolutions</groupId>
@@ -233,5 +114,16 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.5.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.processing</groupId>
+			<artifactId>pdf</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
 	</dependencies>
+
 </project>

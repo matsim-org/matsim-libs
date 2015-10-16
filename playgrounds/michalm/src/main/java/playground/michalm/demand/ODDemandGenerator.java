@@ -87,8 +87,7 @@ public class ODDemandGenerator
                 // leg
                 Leg leg = pf.createLeg(mode);
                 if (addEmptyRoute) {
-                    Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
-                    leg.setRoute(r);
+                    leg.setRoute(new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
                 }
                 leg.setDepartureTime(startAct.getEndTime());
 
@@ -117,7 +116,8 @@ public class ODDemandGenerator
 
 
     public void generateMultiplePeriods(Matrix[] matrices, String fromActivityType,
-            String toActivityType, String mode, double startTime, double duration, double flowCoeffs)
+            String toActivityType, String mode, double startTime, double duration,
+            double flowCoeffs)
     {
         for (int i = 0; i < matrices.length; i++) {
             generateSinglePeriod(matrices[i], fromActivityType, toActivityType, mode, startTime,

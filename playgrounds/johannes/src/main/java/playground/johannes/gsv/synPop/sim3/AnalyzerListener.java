@@ -22,12 +22,14 @@ package playground.johannes.gsv.synPop.sim3;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.gis.DataPool;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -62,7 +64,7 @@ public class AnalyzerListener implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		// new CopyFacilityUserData().afterStep(population, mutations,
 		// accepted);
 
@@ -73,7 +75,7 @@ public class AnalyzerListener implements SamplerListener {
 			file.mkdirs();
 			try {
 //				TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
-				ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
+				ProxyAnalyzer.analyze((Set<PlainPerson>)population, pTask, file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

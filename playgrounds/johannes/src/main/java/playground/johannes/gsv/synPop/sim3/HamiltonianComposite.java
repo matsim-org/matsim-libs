@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.sna.util.Composite;
-import playground.johannes.synpop.data.PlainPerson;
+import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.data.Person;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class HamiltonianComposite extends Composite<Hamiltonian> implements Hami
 	}
 	
 	@Override
-	public double evaluate(PlainPerson person) {
+	public double evaluate(Person person) {
 		double sum = 0;
 		
 		for(int i = 0; i < components.size(); i++) {

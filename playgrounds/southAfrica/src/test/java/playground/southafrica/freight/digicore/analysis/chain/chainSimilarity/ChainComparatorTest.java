@@ -6,8 +6,8 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -66,8 +66,8 @@ public class ChainComparatorTest {
 		
 		/* Check QuadTree. */
 		Assert.assertEquals("Wrong number of Ids in QuadTree.", 2, cc.getQuadTree().size());
-		Assert.assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(2, 0).equals(Id.create("a0", Facility.class)));
-		Assert.assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(8, 0).equals(Id.create("a1", Facility.class)));
+		Assert.assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().getClosest(2, 0).equals(Id.create("a0", Facility.class)));
+		Assert.assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().getClosest(8, 0).equals(Id.create("a1", Facility.class)));
 	}
 
 	
@@ -123,19 +123,19 @@ public class ChainComparatorTest {
 		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		/* Set up all the activities. */
-		DigicoreActivity a = new DigicoreActivity("a", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		a.setCoord(new CoordImpl(0.0, 0.0));
+		DigicoreActivity a = new DigicoreActivity("a", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a.setCoord(new Coord(0.0, 0.0));
 		a.setFacilityId(Id.create("f1", ActivityFacility.class));
-		DigicoreActivity b = new DigicoreActivity("b", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		b.setCoord(new CoordImpl(2.0, 0.0));
-		DigicoreActivity c = new DigicoreActivity("c", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		c.setCoord(new CoordImpl(4.0, 0.0));
+		DigicoreActivity b = new DigicoreActivity("b", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		b.setCoord(new Coord(2.0, 0.0));
+		DigicoreActivity c = new DigicoreActivity("c", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		c.setCoord(new Coord(4.0, 0.0));
 		c.setFacilityId(Id.create("f2", ActivityFacility.class));
-		DigicoreActivity d = new DigicoreActivity("d", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		d.setCoord(new CoordImpl(6.0, 0.0));
+		DigicoreActivity d = new DigicoreActivity("d", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		d.setCoord(new Coord(6.0, 0.0));
 		d.setFacilityId(Id.create("f3", ActivityFacility.class));
-		DigicoreActivity e = new DigicoreActivity("e", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		e.setCoord(new CoordImpl(8.0, 0.0));
+		DigicoreActivity e = new DigicoreActivity("e", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		e.setCoord(new Coord(8.0, 0.0));
 		
 		/* Set up chain 1. */
 		DigicoreChain chain1 = new DigicoreChain();

@@ -51,7 +51,6 @@ public class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
-	@SuppressWarnings("deprecation")
 	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
@@ -88,8 +87,8 @@ public class NetworkSimplifier {
 									// Try to merge both links by guessing the resulting links attributes
 									Link link = network.getFactory().createLink(
 											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
-											inLink.getFromNode().getId(),
-											outLink.getToNode().getId());
+											inLink.getFromNode(),
+											outLink.getToNode());
 
 									// length can be summed up
 									link.setLength(inLink.getLength() + outLink.getLength());

@@ -22,6 +22,7 @@ package playground.christoph.evacuation.population;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class RemoveUnselectedPlans extends AbstractPersonAlgorithm {
@@ -29,7 +30,7 @@ public class RemoveUnselectedPlans extends AbstractPersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		if (person instanceof PersonImpl) {
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 	}
 

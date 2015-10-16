@@ -29,7 +29,6 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -108,19 +107,19 @@ public class CarRoutingClaude {
 		
 		while(s != null) {
 			String[] arr = s.split("\\t");
+
+			Coord coordStartT = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[1]));
 			
-			Coord coordStartT = new CoordImpl(arr[2], arr[1]);
-			
-			CoordImpl coordStart = (CoordImpl) transformation.transform(coordStartT);
+			Coord coordStart = transformation.transform(coordStartT);
 			
 			System.out.println(coordStart.getX());
 			
 			Link lStart = lUtils.getClosestLink(coordStart);
+
+
+			Coord coordEndT = new Coord(Double.parseDouble(arr[4]), Double.parseDouble(arr[3]));
 			
-			
-			Coord coordEndT = new CoordImpl(arr[4], arr[3]);
-			
-			CoordImpl coordEnd = (CoordImpl) transformation.transform(coordEndT);
+			Coord coordEnd = transformation.transform(coordEndT);
 
 			Link lEnd = lUtils.getClosestLink(coordEnd);			
 			

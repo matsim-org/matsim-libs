@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -141,11 +141,11 @@ public class PlanWrapper {
 					 * the two activities. */
 					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
 					double chopFraction = (Time.MIDNIGHT*dayCount - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
-					double distance = ((CoordImpl) act.getCoord()).calcDistance(previousActivity.getCoord()) * chopFraction;
+					double distance = CoordUtils.calcDistance(act.getCoord(), previousActivity.getCoord()) * chopFraction;
 					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
 					double dx = act.getCoord().getX() - previousActivity.getCoord().getX();
 					double angle = Math.atan(dy / dx);
-					Coord coord = new CoordImpl(distance*Math.cos(angle), distance*Math.sin(angle));
+					Coord coord = new Coord(distance * Math.cos(angle), distance * Math.sin(angle));
 					
 					Activity chopEnd = new ActivityImpl("chopEnd", coord);
 					chopEnd.setEndTime(Time.MIDNIGHT);

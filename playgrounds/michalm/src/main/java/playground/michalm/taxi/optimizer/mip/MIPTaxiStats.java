@@ -23,7 +23,7 @@ import java.io.PrintWriter;
 
 import org.matsim.contrib.dvrp.data.VrpData;
 
-import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
@@ -98,6 +98,6 @@ public class MIPTaxiStats
 
     private TaxiStats calcTaxiStats()
     {
-        return new TaxiStatsCalculator(data.getVehicles()).getStats();
+        return new TaxiStatsCalculator(data.getVehicles().values()).getStats();
     }
 }

@@ -22,10 +22,10 @@ package playground.johannes.gsv.synPop.sim3;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.synpop.data.PlainPerson;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.synpop.data.Person;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -76,12 +76,12 @@ public class HamiltonianLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 		if(iter.get() % logInterval == 0) {
 			long iterNow = iter.get();
 			double[] values = new double[population.size()];
 			int i = 0;
-			for(PlainPerson person : population) {
+			for(Person person : population) {
 				values[i] = h.evaluate(person);
 				i++;
 			}
@@ -130,7 +130,7 @@ public class HamiltonianLogger implements SamplerListener {
 			File afile = new File(file);
 			afile.mkdirs();
 			try {
-				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
+				StatsWriter.writeHistogram(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

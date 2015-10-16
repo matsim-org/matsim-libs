@@ -42,7 +42,6 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -145,8 +144,7 @@ public class PTCountsNetworkSimplifier {
 			osmConfig.transit().setVehiclesFile(this.vehiclesInFile);
 		}
 		osmConfig.network().setInputFile(this.netInFile);
-		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
-		osmLoader.loadScenario();
+		ScenarioUtils.loadScenario(osmScenario);
 
 		if(this.usePT){
 			log.info("Running cleaner first...");
@@ -178,7 +176,7 @@ public class PTCountsNetworkSimplifier {
 			new CountsWriter(this.outCounts).write(this.countsOutFile);
 		}
 		log.info("Running network cleaner... Result may not be consistent with countsfile");
-		scenario = null; this.network = null; osmScenario = null; osmConfig = null; osmLoader = null;
+		scenario = null; this.network = null; osmScenario = null; osmConfig = null;
 		new NetworkCleaner().run(this.netOutFile + "_not_cleaned.xml.gz", this.netOutFile);
 
 	}
@@ -379,7 +377,7 @@ public class PTCountsNetworkSimplifier {
 				Id<Link> shortNameId = Id.create(this.shortNameMap.get(node.getId().toString()), Link.class);
 				if(this.outCounts.getCount(shortNameId) == null){
 					// Count station wasn't added to outCounts, yet
-					Count oldCount = this.inCounts.getCount(shortNameId);
+					Count<Link> oldCount = this.inCounts.getCount(shortNameId);
 					if(oldCount == null){
 						// count station was mapped, but data can not be provided, do nothing
 						// TODO [AN] Check, if linkToBlock can be removed
@@ -387,7 +385,7 @@ public class PTCountsNetworkSimplifier {
 						// create new count with correct locId and migrate data
 						if(linkToBlock != null){
 							this.outCounts.createAndAddCount(linkToBlock.getId(), oldCount.getCsId());
-							Count newCount = this.outCounts.getCount(linkToBlock.getId());
+							Count<Link> newCount = this.outCounts.getCount(linkToBlock.getId());
 							newCount.setCoord(oldCount.getCoord());
 							for (Volume volume : oldCount.getVolumes().values()) {
 								newCount.createVolume(volume.getHourOfDayStartingWithOne(), volume.getValue());

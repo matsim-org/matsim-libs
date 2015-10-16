@@ -25,7 +25,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -40,7 +39,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -147,7 +145,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 					/* Only consider the activity if it actually happens inside the grid. */
 					if(grid.isInGrid(p)){
 						/* Get the closest cell centroid. */
-						Point centroid = grid.getGrid().get(p.getX(), p.getY());
+						Point centroid = grid.getGrid().getClosest(p.getX(), p.getY());
 						
 						/* Get the hour of day. */
 						if(startTime > Double.NEGATIVE_INFINITY){
@@ -159,10 +157,10 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 						/* Check the conversion ratio. */
 						double radius = WIDTH/2.0;
 						double height = Math.sqrt(3)/2.0*radius;
-						Coord c1 = new CoordImpl(p.getX()-radius, p.getY());
-						Coord c2 = new CoordImpl(p.getX()+radius, p.getY());
-						Coord c3 = new CoordImpl(p.getX()-0.5*radius, p.getY()+height);
-						Coord c4 = new CoordImpl(p.getX()-0.5*radius, p.getY()-height);
+						Coord c1 = new Coord(p.getX() - radius, p.getY());
+						Coord c2 = new Coord(p.getX() + radius, p.getY());
+						Coord c3 = new Coord(p.getX() - 0.5 * radius, p.getY() + height);
+						Coord c4 = new Coord(p.getX() - 0.5 * radius, p.getY() - height);
 						
 						Coord c1c = ct.transform(c1);
 						Coord c2c = ct.transform(c2);
@@ -193,7 +191,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 			bw.newLine();
 			for(Point p : map.keySet()){
 				/* Transform the coordinate to WGS84. */
-				Coord c1 = new CoordImpl(p.getX(), p.getY());
+				Coord c1 = new Coord(p.getX(), p.getY());
 				Coord c2 = ct.transform(c1);
 				bw.write(String.format("%.4f,%.4f,%.8f,%.8f", p.getX(), p.getY(), c2.getX(), c2.getY()));
 				
@@ -338,12 +336,12 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 		double w = WIDTH/2.0;
 		double h = HEIGHT/2.0;
 		List<Coord> cl = new ArrayList<Coord>();
-		cl.add(new CoordImpl(x-w, y));
-		cl.add(new CoordImpl(x-0.5*w, y+h));
-		cl.add(new CoordImpl(x+0.5*w, y+h));
-		cl.add(new CoordImpl(x+w, y));
-		cl.add(new CoordImpl(x+0.5*w, y-h));
-		cl.add(new CoordImpl(x-0.5*w, y-h));
+		cl.add(new Coord(x - w, y));
+		cl.add(new Coord(x - 0.5 * w, y + h));
+		cl.add(new Coord(x + 0.5 * w, y + h));
+		cl.add(new Coord(x + w, y));
+		cl.add(new Coord(x + 0.5 * w, y - h));
+		cl.add(new Coord(x - 0.5 * w, y - h));
 		List<Coordinate> clc = new ArrayList<Coordinate>();
 		for(Coord c : cl){
 			Coord cc = ct.transform(c);

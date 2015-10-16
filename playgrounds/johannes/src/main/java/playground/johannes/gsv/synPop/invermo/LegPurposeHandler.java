@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 
 /**
  * @author johannes
@@ -62,7 +62,7 @@ public class LegPurposeHandler implements LegAttributeHandler {
 		if(code.equalsIgnoreCase("51")) {
 			return "gastro";
 		} else if(code.equalsIgnoreCase("52")) {
-			return ActivityType.LEISURE;
+			return ActivityTypes.LEISURE;
 		} else if(code.equalsIgnoreCase("54")) {
 			return "culture";
 		} else if(code.equalsIgnoreCase("55")) {

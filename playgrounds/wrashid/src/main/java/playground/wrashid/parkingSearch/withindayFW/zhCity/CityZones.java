@@ -24,9 +24,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.facilities.ActivityFacility;
 
 
 public class CityZones {
@@ -86,7 +84,7 @@ public class CityZones {
 	}
 
 	public CityZone getClosestZone(Coord coord){
-		return zones.get(coord.getX(), coord.getY());
+		return zones.getClosest(coord.getX(), coord.getY());
 	}
 	
 }

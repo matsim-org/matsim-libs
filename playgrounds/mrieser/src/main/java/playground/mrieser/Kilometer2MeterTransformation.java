@@ -21,13 +21,12 @@
 package playground.mrieser;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class Kilometer2MeterTransformation implements CoordinateTransformation {
 
 	public Coord transform(Coord coord) {
-		return new CoordImpl(coord.getX() * 1000.0, coord.getY() * 1000.0);
+		return new Coord(coord.getX() * 1000.0, coord.getY() * 1000.0);
 	}
 
 }

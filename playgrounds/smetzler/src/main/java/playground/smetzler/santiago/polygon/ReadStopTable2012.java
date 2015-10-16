@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -74,7 +73,7 @@ public class ReadStopTable2012 implements TabularFileHandler {
 				ptZoneId2TransitStopCoordinates.put(zoneId, new ArrayList<Coord>());
 			}
 
-			ptZoneId2TransitStopCoordinates.get(zoneId).add(new CoordImpl(row[1], row[2]));
+			ptZoneId2TransitStopCoordinates.get(zoneId).add(new Coord(Double.parseDouble(row[1]), Double.parseDouble(row[2])));
 		} else {
 			StringBuffer tempBuffer = new StringBuffer();
 			for (String string : row) {

@@ -46,7 +46,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -177,7 +176,7 @@ public class SelectedPlans2ESRIShape {
 		double rx = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
-		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
+		Coord c = new Coord(cc.getX() + rx, cc.getY() + ry);
 		
 		try {
 			return this.actBuilder.buildFeature(null, new Object [] {MGC.coord2Point(c), id, type, linkId, startTime, endTime});

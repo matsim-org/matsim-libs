@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkDoubleLinks {
 
@@ -58,7 +57,7 @@ public class NetworkDoubleLinks {
 	private final void handleDoubleLink(LinkImpl l, NetworkImpl network) {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
-		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
+		Coord nc = new Coord(0.5 * (fn.getCoord().getX() + tn.getCoord().getX()), 0.5 * (fn.getCoord().getY() + tn.getCoord().getY()));
 		Node n = network.createAndAddNode(Id.create(l.getId()+this.suffix, Node.class),nc,((NodeImpl) fn).getType());
 		network.removeLink(l.getId());
 		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());

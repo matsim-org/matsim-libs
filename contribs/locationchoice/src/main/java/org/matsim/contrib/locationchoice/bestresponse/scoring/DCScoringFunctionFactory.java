@@ -24,19 +24,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
+public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 	private DestinationChoiceBestResponseContext lcContext;
 	private Scenario scenario;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
     public DCScoringFunctionFactory(Scenario scenario, DestinationChoiceBestResponseContext lcContext) {
-		super(scenario.getConfig().planCalcScore(), scenario.getNetwork());
 		this.scenario = scenario;
 		this.lcContext = lcContext;
 		log.info("creating DCScoringFunctionFactory");
@@ -60,8 +60,16 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create(), scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new CharyparNagelLegScoring(
+						CharyparNagelScoringParameters.getBuilder(
+								scenario,
+								person.getId() ).create(), scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new CharyparNagelAgentStuckScoring(
+						CharyparNagelScoringParameters.getBuilder(
+								scenario,
+								person.getId() ).create()));
 		return scoringFunctionAccumulator;
 	}
 }

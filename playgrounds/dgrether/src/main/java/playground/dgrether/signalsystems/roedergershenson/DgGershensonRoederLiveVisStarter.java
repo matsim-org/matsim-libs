@@ -19,24 +19,27 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9Runner;
 import playground.dgrether.signalsystems.DgSensorManager;
 
@@ -52,8 +55,12 @@ public class DgGershensonRoederLiveVisStarter {
 	public void runCottbus(){
 		EventsManager events = EventsUtils.createEventsManager();
 		String conf = DgFigure9Runner.signalsConfigFileGershenson;
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
-		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
+		
+		Config config = ConfigUtils.loadConfig(conf);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
+		
 		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
@@ -69,7 +76,7 @@ public class DgGershensonRoederLiveVisStarter {
 		}
 
 		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);

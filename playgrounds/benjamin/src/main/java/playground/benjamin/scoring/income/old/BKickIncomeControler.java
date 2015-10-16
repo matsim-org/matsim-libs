@@ -63,7 +63,7 @@ public final class BKickIncomeControler extends BkControler {
 //		this.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
+//				bindCarTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
 //			}
 //		});
 //		//		if (this.travelTimeCalculator == null) {

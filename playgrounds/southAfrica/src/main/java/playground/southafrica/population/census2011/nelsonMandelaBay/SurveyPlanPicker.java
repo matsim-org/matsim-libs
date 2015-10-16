@@ -35,10 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -156,8 +153,8 @@ public class SurveyPlanPicker {
 			Coord home = getQtPlanHomeCoordinate(plan);
 			
 			/* Get the person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertNmbm2004Employment( ((PersonImpl)person).isEmployed() ).toString();
-			String b = SaDemographicsAge.getAgeClass(((PersonImpl)person).getAge()).toString();
+			String a = SaDemographicsEmployment.convertNmbm2004Employment( PersonUtils.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass(PersonUtils.getAge(person)).toString();
 			Id<Household> hhid = Id.create((String) surveyPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId"), Household.class);
 			Household household = surveyPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
@@ -204,8 +201,8 @@ public class SurveyPlanPicker {
 			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
 			
 			/* Get person's demographic 'signature' */
-			String a = SaDemographicsEmployment.convertCensus2011Employment( ((PersonImpl)person).isEmployed() ).toString();
-			String b = SaDemographicsAge.getAgeClass( ((PersonImpl)person).getAge() ).toString();
+			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonUtils.isEmployed(person) ).toString();
+			String b = SaDemographicsAge.getAgeClass( PersonUtils.getAge(person) ).toString();
 			Household household = censusPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
 			String d = SaDemographicsIncome.convertCensus2011Income( Income2011.getIncomeEnum(household.getIncome()) ).toString();
@@ -279,18 +276,18 @@ public class SurveyPlanPicker {
 		Collection<Plan> plansToRank = null;
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
-			Plan closestPlan = qt.get(c.getX(), c.getY());
+			Plan closestPlan = qt.getClosest(c.getX(), c.getY());
 			/* The closest plan's home coordinate. */
 			Coord closestHome = getQtPlanHomeCoordinate(closestPlan);
 			
 			double radius = CoordUtils.calcDistance(c, closestHome );
-			Collection<Plan> plans = qt.get(c.getX(), c.getY(), radius);
+			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
 				 * then you stand the chance of running into an infinite loop.
 				 * Hence, add a minimum of 1m to move on. */
 				radius += Math.max(radius, 1.0);
-				plans = qt.get(c.getX(), c.getY(), radius);
+				plans = qt.getDisk(c.getX(), c.getY(), radius);
 			}
 			plansToRank = plans;
 		} else{

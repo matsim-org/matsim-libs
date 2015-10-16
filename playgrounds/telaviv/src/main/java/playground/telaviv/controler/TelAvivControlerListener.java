@@ -39,6 +39,7 @@ import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
 import org.matsim.contrib.analysis.christoph.DistanceDistribution;
 import org.matsim.contrib.analysis.christoph.DistanceDistribution.DistributionClass;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -320,8 +321,9 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		/*
 		 * further analysis stuff for location choice
 		 */
-		double analysisBinSize = Double.parseDouble(config.findParam("locationchoice", "analysisBinSize"));
-		double analysisBoundary = Double.parseDouble(config.findParam("locationchoice", "analysisBoundary"));
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		double analysisBinSize = dccg.getAnalysisBinSize();
+		double analysisBoundary = dccg.getAnalysisBoundary();
 		String idExclusion = config.findParam("locationchoice", "idExclusion");
 		ActTypeConverter converter = new ActTypeConverter(false);
 		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.findParam("locationchoice", "flexible_types"));

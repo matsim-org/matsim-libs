@@ -23,7 +23,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -31,9 +30,9 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TestCenteredPenalty {
 	private final double radius = 6000;
-	private final Coord center = new CoordImpl( 0 , 0 );
-	private final Coord somewhereOutside = new CoordImpl( 0 , 2 * radius );
-	private final Coord middleZone = new CoordImpl( 0 , radius / 2 );
+	private final Coord center = new Coord((double) 0, (double) 0);
+	private final Coord somewhereOutside = new Coord((double) 0, 2 * radius);
+	private final Coord middleZone = new Coord((double) 0, radius / 2);
 	private final double maxPenalty = 1000;
 
 	private CenteredTimeProportionalPenalty penalty;

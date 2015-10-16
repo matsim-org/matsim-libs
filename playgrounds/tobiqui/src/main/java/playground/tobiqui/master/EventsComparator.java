@@ -111,11 +111,22 @@ public class EventsComparator {
 		}
 //		
 		//average travel-time difference
-		avgTravelTimeDif = Math.round(avgTravelTimeDif/travelTimeDif.size());
-		avgTravelTimeDifCar = Math.round(avgTravelTimeDifCar/travelTimeDifCar.size());
-		avgTravelTimeDifBus = Math.round(avgTravelTimeDifBus/travelTimeDifBus.size());
-		avgTravelTimeDifWalk = Math.round(avgTravelTimeDifWalk/travelTimeDifWalk.size());
-		//average leg distance
+		if (travelTimeDif.size() != 0)
+			avgTravelTimeDif = Math.round(avgTravelTimeDif/travelTimeDif.size());
+		else
+			avgTravelTimeDif = 0;
+		if (travelTimeDifCar.size() != 0)
+			avgTravelTimeDifCar = Math.round(avgTravelTimeDifCar/travelTimeDifCar.size());
+		else
+			avgTravelTimeDifCar = 0;
+		if (travelTimeDifBus.size() != 0)
+			avgTravelTimeDifBus = Math.round(avgTravelTimeDifBus/travelTimeDifBus.size());
+		else
+			avgTravelTimeDifBus = 0;
+		if (travelTimeDifWalk.size() != 0)
+			avgTravelTimeDifWalk = Math.round(avgTravelTimeDifWalk/travelTimeDifWalk.size());
+		else
+			avgTravelTimeDifWalk = 0;
 
 //		//gets the 10% of agents with the biggest difference of travel-time on average 
 //		ValueSortedMap <Id, Integer> travelTimeDifSorted = new ValueSortedMap<Id, Integer>();	
@@ -223,32 +234,32 @@ public class EventsComparator {
 
 		@Override
 		public void handleEvent(PersonLeavesVehicleEvent event) {
-//			if(travelTime.containsKey(event.getPersonId())){
-//				Double travelTimeTemp = travelTime.get(event.getPersonId()) + event.getTime();
-//				travelTime.put(event.getPersonId(), travelTimeTemp);
+//			if(travelTime.containsKey(event.getDriverId())){
+//				Double travelTimeTemp = travelTime.get(event.getDriverId()) + event.getTime();
+//				travelTime.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeCar.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeBus.put(event.getDriverId(), travelTimeTemp);
 //			}else
-//				System.out.println(event.getPersonId() + ": first ActivityEndEvent is missing");			
+//				System.out.println(event.getDriverId() + ": first ActivityEndEvent is missing");
 		}
 
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
-//			if (travelTime.containsKey(event.getPersonId())){
-//				Double travelTimeTemp = travelTime.get(event.getPersonId()) - event.getTime();
-//				travelTime.put(event.getPersonId(), travelTimeTemp);
+//			if (travelTime.containsKey(event.getDriverId())){
+//				Double travelTimeTemp = travelTime.get(event.getDriverId()) - event.getTime();
+//				travelTime.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeCar.put(event.getDriverId(), travelTimeTemp);
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), travelTimeTemp);
+//					travelTimeBus.put(event.getDriverId(), travelTimeTemp);
 //			}else{
-//				travelTime.put(event.getPersonId(), event.getTime()*(-1));
+//				travelTime.put(event.getDriverId(), event.getTime()*(-1));
 //				if (event.getVehicleId().toString().contains("car"))
-//					travelTimeCar.put(event.getPersonId(), event.getTime()*(-1));
+//					travelTimeCar.put(event.getDriverId(), event.getTime()*(-1));
 //				if (event.getVehicleId().toString().contains("bus"))
-//					travelTimeBus.put(event.getPersonId(), event.getTime()*(-1));
+//					travelTimeBus.put(event.getDriverId(), event.getTime()*(-1));
 //			}			
 		}
 	}

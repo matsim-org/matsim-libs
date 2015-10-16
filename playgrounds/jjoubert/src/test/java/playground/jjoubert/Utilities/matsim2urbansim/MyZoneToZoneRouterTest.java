@@ -33,11 +33,11 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 
 public class MyZoneToZoneRouterTest extends MatsimTestCase{
@@ -51,7 +51,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
 		assertNull("Router should be null.", mzzr.getRouter());
 		
-		mzzr.prepareTravelTimeData(inputFolder + "/50.events.txt.gz");
+		mzzr.prepareTravelTimeData(inputFolder + "/50.events.xml");
 		assertNotNull("Router should exist.", mzzr.getRouter());
 		assertEquals("Router should be of type Dijkstra.", Dijkstra.class, mzzr.getRouter().getClass());
 	}
@@ -59,7 +59,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 	public void testProcessZones(){
 		setupNetwork();
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
-		pr.readFile(inputFolder + "/output_plans.xml.gz");
+		pr.readFile(inputFolder + "/plans100.xml"); /* Standard equil plans100.xml file. */
 		
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
@@ -67,7 +67,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		DenseDoubleMatrix2D matrix = mpp.getOdMatrix();
 		
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
-		mzzr.prepareTravelTimeData(inputFolder + "/50.events.txt.gz");
+		mzzr.prepareTravelTimeData(inputFolder + "/50.events.xml");
 		MyLinkStatsReader mlsr = new MyLinkStatsReader(inputFolder + "/50.linkstats.txt");
 		boolean empties = mzzr.processZones(matrix, mlsr.readSingleHour("6-7"));
 		DenseDoubleMatrix2D od = mzzr.getOdMatrix(); 
@@ -137,6 +137,6 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		// Read plans and network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(inputFolder + "/output_network.xml.gz");
+		nr.readFile(inputFolder + "/network.xml");
 	}
 }

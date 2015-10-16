@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.List;
 import java.util.Random;
@@ -44,18 +44,18 @@ public class MutatorComposite implements Mutator {
 	}
 	
 	@Override
-	public List<PlainPerson> select(List<PlainPerson> persons) {
+	public List<Person> select(List<Person> persons) {
 		active = mutators.randomChoice();
 		return active.select(persons);
 	}
 
 	@Override
-	public boolean modify(List<PlainPerson> persons) {
+	public boolean modify(List<Person> persons) {
 		return active.modify(persons);
 	}
 
 	@Override
-	public void revert(List<PlainPerson> persons) {
+	public void revert(List<Person> persons) {
 		active.revert(persons);
 
 	}

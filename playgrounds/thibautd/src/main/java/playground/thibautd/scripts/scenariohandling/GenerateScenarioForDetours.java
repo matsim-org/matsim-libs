@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,10 +32,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.*;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
@@ -198,7 +198,7 @@ public class GenerateScenarioForDetours {
 						final Person driver =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) driver).setCarAvail( "always" );
+						PersonUtils.setCarAvail(driver, "always");
 						driver.addPlan(
 								createPlan(
 									random,
@@ -213,7 +213,7 @@ public class GenerateScenarioForDetours {
 						final Person passenger =
 							population.getFactory().createPerson(
 									personIdFactory.createNextId(Person.class) );
-						((PersonImpl) passenger).setCarAvail( "never" );
+						PersonUtils.setCarAvail(passenger, "never");
 						passenger.addPlan(
 								createPlan(
 									random,
@@ -272,22 +272,22 @@ public class GenerateScenarioForDetours {
 		final Node homeOriginNode =
 			network.getFactory().createNode(
 				nodeIdFactory.createNextId(Node.class),
-				new CoordImpl( X_HOME , 0 ) );
+					new Coord(X_HOME, (double) 0));
 		network.addNode( homeOriginNode );
 		final Node homeDestinationNode =
 			network.getFactory().createNode(
 				nodeIdFactory.createNextId(Node.class),
-				new CoordImpl( X_HOME , 0 ) );
+					new Coord(X_HOME, (double) 0));
 		network.addNode( homeDestinationNode );
 		final Node workOriginNode =
 			network.getFactory().createNode(
 				nodeIdFactory.createNextId(Node.class),
-				new CoordImpl( X_WORK , 0 ) );
+					new Coord(X_WORK, (double) 0));
 		network.addNode( workOriginNode );
 		final Node workDestinationNode =
 			network.getFactory().createNode(
 				nodeIdFactory.createNextId(Node.class),
-				new CoordImpl( X_WORK , 0 ) );
+					new Coord(X_WORK, (double) 0));
 		network.addNode( workDestinationNode );
 
 		network.addLink(
@@ -317,9 +317,7 @@ public class GenerateScenarioForDetours {
 			final Node node =
 				network.getFactory().createNode(
 						nodeIdFactory.createNextId(Node.class),
-						new CoordImpl(
-							X_WORK,
-							i * LENGTH_DETOUR ) );
+						new Coord(X_WORK, (double) (i * LENGTH_DETOUR)));
 			network.addNode( node );
 
 			network.addLink(

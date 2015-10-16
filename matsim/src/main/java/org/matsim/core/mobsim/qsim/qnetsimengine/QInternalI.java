@@ -35,12 +35,22 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  */
 abstract class QInternalI {
 	
+	/**
+	 * Seems ok as public interface function. kai, aug'15
+	 */
 	abstract boolean doSimStep(final double now) ;
 	
+	/**
+	 * Seems ok as public interface function. kai, aug'15 
+	 */
 	abstract void clearVehicles() ;
 	
 	abstract Collection<MobsimVehicle> getAllVehicles() ;
 	
+	/**
+	 * <br>
+	 * seems ok as public interface function. kai, aug'15
+	 */
 	abstract void addFromUpstream(final QVehicle veh);
 	
 	abstract boolean isNotOfferingVehicle();

@@ -87,8 +87,8 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 		
 		} else {
 			// car!
-			this.personId2justDeparted.put(event.getPersonId(), false);
-			this.personId2enteringTime.put(event.getPersonId(), event.getTime());				
+			this.personId2justDeparted.put(event.getDriverId(), false);
+			this.personId2enteringTime.put(event.getDriverId(), event.getTime());
 		}
 	}
 	
@@ -102,7 +102,7 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 			// car!
 			double t0Link;
 			
-			if (this.personId2justDeparted.get(event.getPersonId())){
+			if (this.personId2justDeparted.get(event.getDriverId())){
 				// person just started from an activity
 				t0Link = 1.;
 				
@@ -111,11 +111,11 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 				t0Link = link.getLength() / link.getFreespeed();
 			}
 			
-			double tActLink = event.getTime() - this.personId2enteringTime.get(event.getPersonId());
+			double tActLink = event.getTime() - this.personId2enteringTime.get(event.getDriverId());
 			double diff = tActLink - t0Link;
 			
 			if (diff < 0) {
-				log.warn(event.getPersonId() + " is faster than freespeed! Doesn't make sense!");
+				log.warn(event.getDriverId() + " is faster than freespeed! Doesn't make sense!");
 			}
 			
 			if (Math.abs(diff) <= 0.1){
@@ -124,7 +124,7 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 			
 			this.delay = this.delay + diff;
 						
-			this.personId2enteringTime.put(event.getPersonId(), null);
+			this.personId2enteringTime.put(event.getDriverId(), null);
 		}
 	}
 

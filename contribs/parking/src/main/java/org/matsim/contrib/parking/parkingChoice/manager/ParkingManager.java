@@ -66,12 +66,12 @@ public class ParkingManager {
         Coord actCoordinate = controller.getScenario().getActivityFacilities().getFacilities().get(actFacilityId).getCoord();
 		
 		double radius=initialParkingSearchRadiusInMeter;
-		Collection<Parking> collection = parkings.get(actCoordinate.getX(), actCoordinate.getY(), radius);
+		Collection<Parking> collection = parkings.getDisk(actCoordinate.getX(), actCoordinate.getY(), radius);
 		removeAllUnusableParking(collection,agentId, actFacilityId, actType);
 		
 		while (collection.size()==0){
 			radius*=2;
-			collection = parkings.get(actCoordinate.getX(), actCoordinate.getY(), radius);
+			collection = parkings.getDisk(actCoordinate.getX(), actCoordinate.getY(), radius);
 			removeAllUnusableParking(collection,agentId, actFacilityId, actType);
 		}
 		

@@ -36,11 +36,11 @@ import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -257,12 +257,12 @@ public class KMLActsWriter {
 //		new MatsimNetworkReader(network).readFile(netFilename);
 
 		List<Activity> actList = new LinkedList<Activity>();
-		Activity act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
+		Activity act = new ActivityImpl("whatever", new Coord((double) 4579260, (double) 5841710));
 		actList.add(act);
-		act = new ActivityImpl("whatever", new CoordImpl(4579260, 5841710));
+		act = new ActivityImpl("whatever", new Coord((double) 4579260, (double) 5841710));
 		actList.add(act);
 
-		Activity act2 = new ActivityImpl("whatever2", new CoordImpl(4579260, 5841710));
+		Activity act2 = new ActivityImpl("whatever2", new Coord((double) 4579260, (double) 5841710));
 		actList.add(act2);
 
 		KMLActsWriter test = new KMLActsWriter(null, actList);

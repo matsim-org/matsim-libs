@@ -21,9 +21,9 @@ package playground.johannes.gsv.synPop.invermo;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
@@ -33,7 +33,7 @@ import java.util.Locale;
  * @author johannes
  *
  */
-public class Date2TimeTask implements ProxyPlanTask {
+public class Date2TimeTask implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {
@@ -50,7 +50,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 				Seconds secs = Seconds.secondsBetween(reference, startDate);
 				
 				leg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(secs.getSeconds()));
-				if(!leg.keys().contains(MIDKeys.PERSON_MONTH)) {
+				if(!leg.keys().contains(MiDKeys.PERSON_MONTH)) {
 					setPlanDate(startDate, plan);
 				}
 			}
@@ -66,7 +66,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 				
 				leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(secs.getSeconds()));
 				
-				if(!leg.keys().contains(MIDKeys.PERSON_MONTH)) {
+				if(!leg.keys().contains(MiDKeys.PERSON_MONTH)) {
 					setPlanDate(endDate, plan);
 				}
 			}
@@ -80,7 +80,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 	}
 	
 	private void setPlanDate(LocalDateTime dateTime, Episode plan) {
-		plan.setAttribute(MIDKeys.PERSON_MONTH, dateTime.monthOfYear().getAsShortText(Locale.US));
+		plan.setAttribute(MiDKeys.PERSON_MONTH, dateTime.monthOfYear().getAsShortText(Locale.US));
 		plan.setAttribute(CommonKeys.DAY, dateTime.dayOfWeek().getAsShortText(Locale.US));
 	}
 

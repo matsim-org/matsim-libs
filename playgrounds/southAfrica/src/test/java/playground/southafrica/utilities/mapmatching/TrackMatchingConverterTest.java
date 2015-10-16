@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -19,7 +20,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -49,9 +49,9 @@ public class TrackMatchingConverterTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = sc.getNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n1 = nf.createNode(Id.createNodeId("1"), new CoordImpl(0.0, 0.0));
-		Node n2 = nf.createNode(Id.createNodeId("2"), new CoordImpl(10.0, 0.0));
-		Node n3 = nf.createNode(Id.createNodeId("3"), new CoordImpl(20.0, 0.0));
+		Node n1 = nf.createNode(Id.createNodeId("1"), new Coord(0.0, 0.0));
+		Node n2 = nf.createNode(Id.createNodeId("2"), new Coord(10.0, 0.0));
+		Node n3 = nf.createNode(Id.createNodeId("3"), new Coord(20.0, 0.0));
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);

@@ -34,10 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.utils.spatialAvg.Cell;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * 
@@ -57,15 +56,15 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 	private double timeBinSize;
 
 	
-	public IntervalHandlerGroups(int numberOfTimeBins, SpatialAveragingInputData inputData, Map<Link,Cell> links2cells, SpatialAveragingParameters parameter){
+	public IntervalHandlerGroups(int numberOfTimeBins, SpatialAveragingInputData inputData, Map<Link,Cell> links2cells){
 		this.numberOfTimeBins = numberOfTimeBins;
 		mapLinksById(links2cells);
 		this.inputData = inputData;
 		this.personFilter = new PersonFilter();
 		recognisedPersons = new HashSet<Id<Person>>();
 		this.timeBinSize = inputData.getEndTime()/numberOfTimeBins;
-		this.noOfXbins = parameter.getNoOfXbins();
-		this.noOfYbins = parameter.getNoOfYbins();
+		this.noOfXbins = inputData.getNoOfXbins();
+		this.noOfYbins = inputData.getNoOfYbins();
 		this.reset(0);
 	}
 
@@ -118,7 +117,7 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 				currentTimeBin++;
 			}
 		}else{ // person not yet recognised --- actiity start event missing
-//			recognisedPersons.add(event.getPersonId());
+//			recognisedPersons.add(event.getDriverId());
 			int tb = 0;
 			// time bins prior to events time bin
 			while(tb < currentTimeBin){

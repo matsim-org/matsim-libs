@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -54,8 +53,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -65,7 +63,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -95,7 +92,6 @@ public class RunAnalyses {
 
 	public void readNetwork() {
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
-		((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
 	public void readPopulation() {
@@ -148,10 +144,10 @@ public class RunAnalyses {
 		@Override
 		public void run(Person person) {
 			try {
-				PersonImpl p = (PersonImpl) person;
-				this.writer.write(person.getId() + "\t" + p.getAge() + "\t");
-				this.writer.write(p.getSex() + "\t" + p.getLicense() + "\t");
-				this.writer.write(p.getCarAvail() + "\t" + p.isEmployed() + "\n");
+				Person p = person;
+				this.writer.write(person.getId() + "\t" + PersonUtils.getAge(p) + "\t");
+				this.writer.write(PersonUtils.getSex(p) + "\t" + PersonUtils.getLicense(p) + "\t");
+				this.writer.write(PersonUtils.getCarAvail(p) + "\t" + PersonUtils.isEmployed(p) + "\n");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -422,7 +418,7 @@ public class RunAnalyses {
 //		Set<Id> agentIds = new HashSet<Id>(1000);
 //		for (List<PersonEntersVehicleEvent> events : enterLeave.getStopId2PersonEnterEventMap().values()) {
 //			for (PersonEntersVehicleEvent event : events) {
-//				agentIds.add(event.getPersonId());
+//				agentIds.add(event.getDriverId());
 //			}
 //		}
 

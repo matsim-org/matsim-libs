@@ -32,8 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.vsp.parkAndRide.PRFacility;
 
@@ -75,7 +75,7 @@ public class PRInputDataReader {
 	            	
 	            	prInputData.setId(id);
 		            prInputData.setStopName(name);
-	            	prInputData.setCoord(new CoordImpl(xCoord, yCoord));
+					prInputData.setCoord(new Coord(xCoord, yCoord));
 	            	prInputData.setCapacity(capacity);
 	            	this.id2PRInputData.put(prInputData.getId(), prInputData);
 	            	}  	

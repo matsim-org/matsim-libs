@@ -126,7 +126,7 @@ class MultiRunTaxiLauncher
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             simulateIteration();
-            TaxiStats evaluation = new TaxiStatsCalculator(context.getVrpData().getVehicles())
+            TaxiStats evaluation = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
                     .getStats();
             long t1 = System.currentTimeMillis();
             cacheStats.updateStats(routerWithCache);
@@ -155,6 +155,7 @@ class MultiRunTaxiLauncher
     {
         for (AlgorithmConfig cfg : configs) {
             params.algorithmConfig = cfg;
+            params.validate();
             run(runs);
         }
     }
@@ -199,7 +200,8 @@ class MultiRunTaxiLauncher
             params = TaxiLauncherParams.readParams(paramFile, inputDir, outputDir);
         }
         else if (args.length == 2) {
-            params = TaxiLauncherParams.readParams(paramFile);
+            String dir = new File(paramFile).getParent() + '/';
+            params = TaxiLauncherParams.readParams(paramFile, dir, dir);
         }
         else {
             throw new IllegalArgumentException();

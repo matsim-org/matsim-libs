@@ -22,7 +22,6 @@ package playground.vsp.analysis.modules.ptTripAnalysis.utils;
 import org.apache.commons.math.geometry.Vector3D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author droeder
@@ -63,9 +62,9 @@ public class GeoCalculator {
 	
 	public static double angleStraight2e1(Tuple<Coord, Coord> one){
 		if(one.getSecond().getY() < one.getFirst().getY()){
-			return ((2* Math.PI) - angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0))));
+			return ((2* Math.PI) - angleBeetween2Straights(one, new Tuple<Coord, Coord>(new Coord((double) 0, (double) 0), new Coord((double) 1, (double) 0))));
 		}else{
-			return angleBeetween2Straights(one, new Tuple<Coord, Coord>(new CoordImpl(0, 0), new CoordImpl(1,0)));
+			return angleBeetween2Straights(one, new Tuple<Coord, Coord>(new Coord((double) 0, (double) 0), new Coord((double) 1, (double) 0)));
 		}
 	}
 	

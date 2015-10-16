@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
@@ -12,7 +12,7 @@
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>ivtExt</artifactId>
-  		<version>0.7.0-SNAPSHOT</version>
+  		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>org.json</groupId>
@@ -22,7 +22,7 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>multimodal</artifactId>
-  		<version>0.7.0-SNAPSHOT</version>
+  		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.trove4j</groupId>
@@ -37,7 +37,7 @@
 	  <dependency>
 		  <groupId>org.matsim.contrib</groupId>
 		  <artifactId>socnetsim</artifactId>
-		  <version>0.7.0-SNAPSHOT</version>
+		  <version>0.8.0-SNAPSHOT</version>
 	  </dependency>
   </dependencies>
   	<build>

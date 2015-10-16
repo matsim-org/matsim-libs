@@ -30,7 +30,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -94,7 +93,8 @@ public class FacilitiesProductionKTI {
 
 	private final ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
-	private final Coord center = new CoordImpl(682756, 248732); // Letten
+	private final Coord center = new Coord((double) 682756, (double) 248732); // Letten
+
 	private final double radius = 5000.0;
 
 	/**
@@ -162,7 +162,7 @@ public class FacilitiesProductionKTI {
 		int priceCnt = 0;
 
 		for (ActivityFacility f : this.facilities.getFacilitiesForActivityType("s").values()) {
-			ShopLocation shop = (ShopLocation) zhShopsQuadTree.get(
+			ShopLocation shop = (ShopLocation) zhShopsQuadTree.getClosest(
 					trafo.transform(f.getCoord()).getX(), trafo.transform(f.getCoord()).getY());
 			if (CoordUtils.calcDistance(f.getCoord(), trafoback.transform(shop.getCoord())) < 150.0 &&
 					this.isFood(f)) {

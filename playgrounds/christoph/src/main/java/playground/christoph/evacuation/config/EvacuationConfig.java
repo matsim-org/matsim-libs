@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.christoph.evacuation.router.util.DistanceFuzzyFactorProviderFactory;
 
@@ -56,8 +55,9 @@ public class EvacuationConfig {
 	public static String transitRouterFile = "";
 	
 //	public static Coord centerCoord = new CoordImpl("683518.0","246836.0");	// Bellevue Coord
-	public static Coord centerCoord = new CoordImpl("640050.0", "246256.0");	// Coordinates of KKW Goesgen
-	
+	public static Coord centerCoord = new Coord(Double.parseDouble("640050.0"), Double.parseDouble("246256.0"));	// Coordinates of KKW Goesgen
+
+
 	public static String dhm25File = "";
 	public static String srtmFile = "";
 	
@@ -170,7 +170,7 @@ public class EvacuationConfig {
 	
 	
 	public static Coord getRescueCoord() {
-		return new CoordImpl(centerCoord.getX() + 50000.0, centerCoord.getY() + 50000.0);
+		return new Coord(centerCoord.getX() + 50000.0, centerCoord.getY() + 50000.0);
 	}
 	
 	public static void printConfig() {

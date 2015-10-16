@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -99,7 +99,6 @@ public class AssignmentProblem
                     maxArrivalTimeForRMinRequests.increment(path.getArrivalTime());
                 }
             }
-
         }
 
         for (int r = rMin; r < rData.dimension; r++) {

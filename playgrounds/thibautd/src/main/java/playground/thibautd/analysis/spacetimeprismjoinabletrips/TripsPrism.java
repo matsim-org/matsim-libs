@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -416,9 +415,7 @@ public class TripsPrism {
 	private static Coord getCenter(
 			final Coord coord1,
 			final Coord coord2) {
-		return new CoordImpl(
-				(coord1.getX() + coord2.getX()) / 2,
-				(coord1.getY() + coord2.getY()) / 2);
+		return new Coord((coord1.getX() + coord2.getX()) / 2, (coord1.getY() + coord2.getY()) / 2);
 	}
 
 	private Collection<Record> getSpaceTimeBall(
@@ -432,7 +429,7 @@ public class TripsPrism {
 			log.trace( "the quad tree contains "+records.size()+" records" );
 		}
 
-		Collection<Record> spaceRestricted = records.get( center.getX() , center.getY(), radius );
+		Collection<Record> spaceRestricted = records.getDisk(center.getX(), center.getY(), radius);
 
 		if (log.isTraceEnabled()) {
 			log.trace( "the space ball contains "+spaceRestricted.size()+" records" );

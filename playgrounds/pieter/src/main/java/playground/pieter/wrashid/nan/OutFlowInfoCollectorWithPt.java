@@ -118,7 +118,7 @@ class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEven
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
 	}
 
 }

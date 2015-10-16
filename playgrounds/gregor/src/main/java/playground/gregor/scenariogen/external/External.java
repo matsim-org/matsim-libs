@@ -20,22 +20,14 @@
 
 package playground.gregor.scenariogen.external;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -44,18 +36,19 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class External {
-	private static String inputDirWrite = "/Users/laemmel/devel/external/input";
-	
+	private static final int nrAgents = 10;
+	private static String inputDirWrite = "/Users/laemmel/devel/jps/input";
 //	private static String inputDir = "./input";
 //	private static String outputDir = "./output";
-	
-	private static String inputDir = "/Users/laemmel/devel/external/input";
-	private static String outputDir = "/Users/laemmel/devel/external/output";
-	private static final int nrAgents = 100;
+//
+private static String inputDir = "/Users/laemmel/devel/jps/input";
+	private static String outputDir = "/Users/laemmel/devel/jps/output";
 
 	public static void main(String[] args) {
 		Config c = ConfigUtils.createConfig();
@@ -113,7 +106,7 @@ public class External {
 		c.controler().setMobsim("extsim");
 		c.global().setCoordinateSystem("EPSG:3395");
 
-		c.qsim().setEndTime(2 * 3600);
+		c.qsim().setEndTime(2 * 60);
 
 		new ConfigWriter(c).write(inputDirWrite + "/config.xml");
 
@@ -152,21 +145,23 @@ public class External {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(4.6,4.6));
-		Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(4.4,0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(9.2,4.6));
-		Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(4.4,9.2));
-		Node n4 = fac.createNode(Id.create("4", Node.class), new CoordImpl(0,4.6));
-		Node n5 = fac.createNode(Id.create("5", Node.class), new CoordImpl(-5,4.6));
-		Node n6 = fac.createNode(Id.create("6", Node.class), new CoordImpl(-20,4.6));
-		Node n7 = fac.createNode(Id.create("7", Node.class), new CoordImpl(14.2,4.6));
-		Node n8 = fac.createNode(Id.create("8", Node.class), new CoordImpl(29.2,4.6));
-		Node n9 = fac.createNode(Id.create("9", Node.class), new CoordImpl(4.4,-5));
-		Node n10 = fac.createNode(Id.create("10", Node.class), new CoordImpl(4.4,-20));
-		Node n11 = fac.createNode(Id.create("11", Node.class), new CoordImpl(4.4,14.2));
-		Node n12 = fac.createNode(Id.create("12", Node.class), new CoordImpl(4.4,29.2));
+		Node n4 = fac.createNode(Id.create("4", Node.class), new Coord(-2, 4.6));
+		Node n3 = fac.createNode(Id.create("3", Node.class), new Coord(4.4, 11.2));
+		Node n2 = fac.createNode(Id.create("2", Node.class), new Coord(11.2, 4.6));
+		Node n1 = fac.createNode(Id.create("1", Node.class), new Coord(4.4, -2));
+		Node n11 = fac.createNode(Id.create("11", Node.class), new Coord(4.4, 4.6));
 
-		net.addNode(n0);
+		Node n5 = fac.createNode(Id.create("5", Node.class), new Coord(-20, 4.6));
+		Node n6 = fac.createNode(Id.create("6", Node.class), new Coord(-4, 4.6));
+
+		Node n7 = fac.createNode(Id.create("7", Node.class), new Coord(4.4, -4));
+
+		Node n8 = fac.createNode(Id.create("8", Node.class), new Coord(4.4, 13.2));
+
+		Node n9 = fac.createNode(Id.create("9", Node.class), new Coord(13.2, 4.6));
+
+		Node n10 = fac.createNode(Id.create("10", Node.class), new Coord(20, 13.2));
+
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
@@ -178,33 +173,45 @@ public class External {
 		net.addNode(n9);
 		net.addNode(n10);
 		net.addNode(n11);
-		net.addNode(n12);
+
 
 		Link l0 = fac.createLink(Id.create("0", Link.class), n5, n6);
 		Link l0Rev = fac.createLink(Id.create("0_rev", Link.class), n6, n5);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n5, n4);
-		Link l1Rev = fac.createLink(Id.create("1_rev", Link.class), n5, n4);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n4, n0);
-		Link l2Rev = fac.createLink(Id.create("2_rev", Link.class), n0, n4);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n0, n2);
-		Link l3Rev = fac.createLink(Id.create("3_rev", Link.class), n2, n0);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n7);
-		Link l4Rev = fac.createLink(Id.create("4_rev", Link.class), n7, n2);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n7, n8);
-		Link l5Rev = fac.createLink(Id.create("5_rev", Link.class), n8, n7);
 
-		Link l6 = fac.createLink(Id.create("6", Link.class), n12, n11);
-		Link l6Rev = fac.createLink(Id.create("6_rev", Link.class), n11, n12);
-		Link l7 = fac.createLink(Id.create("7", Link.class), n11, n3);
-		Link l7Rev = fac.createLink(Id.create("7_rev", Link.class), n3, n11);
-		Link l8 = fac.createLink(Id.create("8", Link.class), n3, n0);
-		Link l8Rev = fac.createLink(Id.create("8_rev", Link.class), n0, n3);
-		Link l9 = fac.createLink(Id.create("9", Link.class), n0, n1);
-		Link l9Rev = fac.createLink(Id.create("9_rev", Link.class), n1, n0);
-		Link l10 = fac.createLink(Id.create("10", Link.class), n1, n9);
-		Link l10Rev = fac.createLink(Id.create("10_rev", Link.class), n9, n1);
-		Link l11 = fac.createLink(Id.create("11", Link.class), n9, n10);
-		Link l11Rev = fac.createLink(Id.create("11_rev", Link.class), n9, n10);
+
+		Link l1 = fac.createLink(Id.create("1", Link.class), n6, n4);
+		Link l1Rev = fac.createLink(Id.create("1_rev", Link.class), n4, n6);
+
+		Link l2 = fac.createLink(Id.create("2", Link.class), n4, n11);
+		Link l2Rev = fac.createLink(Id.create("2_rev", Link.class), n11, n4);
+
+
+		Link l3 = fac.createLink(Id.create("3", Link.class), n11, n2);
+		Link l3Rev = fac.createLink(Id.create("3_rev", Link.class), n2, n11);
+
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n9);
+		Link l4Rev = fac.createLink(Id.create("4_rev", Link.class), n9, n2);
+
+		Link l5 = fac.createLink(Id.create("5", Link.class), n9, n10);
+		Link l5Rev = fac.createLink(Id.create("5_rev", Link.class), n10, n9);
+
+		Link l6 = fac.createLink(Id.create("6", Link.class), n11, n3);
+		Link l6Rev = fac.createLink(Id.create("6_rev", Link.class), n3, n11);
+
+		Link l7 = fac.createLink(Id.create("7", Link.class), n3, n8);
+		Link l7Rev = fac.createLink(Id.create("7_rev", Link.class), n8, n3);
+
+		Link l8 = fac.createLink(Id.create("8", Link.class), n8, n9);
+		Link l8Rev = fac.createLink(Id.create("8_rev", Link.class), n9, n8);
+
+		Link l9 = fac.createLink(Id.create("9", Link.class), n11, n1);
+		Link l9Rev = fac.createLink(Id.create("9_rev", Link.class), n1, n11);
+
+		Link l10 = fac.createLink(Id.create("10", Link.class), n1, n7);
+		Link l10Rev = fac.createLink(Id.create("10_rev", Link.class), n7, n1);
+
+		Link l11 = fac.createLink(Id.create("11", Link.class), n7, n9);
+		Link l11Rev = fac.createLink(Id.create("11_rev", Link.class), n9, n7);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -234,16 +241,16 @@ public class External {
 
 		// extern --> Q
 		Set<String> externQ = new HashSet<String>();
-		externQ.add("7_rev");
 		externQ.add("1_rev");
 		externQ.add("10");
 		externQ.add("4");
-		// Q --> extern
+		externQ.add("7");
+		// Q --> Jupedsim
 		Set<String> qExtern = new HashSet<String>();
 		qExtern.add("2");
-		qExtern.add("7");
-		qExtern.add("10_rev");
-		qExtern.add("4_rev");
+		qExtern.add("6_rev");
+		qExtern.add("9_rev");
+		qExtern.add("3_rev");
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
@@ -254,7 +261,7 @@ public class External {
 		modesQExt.add("car");
 		modesQExt.add("2ext");
 
-		double flow = 2 * .71 * 1.33;
+		double flow = 1.6 * 1.2;
 		for (Link l : net.getLinks().values()) {
 			double length = CoordUtils.calcDistance(l.getFromNode().getCoord(),
 					l.getToNode().getCoord());
@@ -270,6 +277,10 @@ public class External {
 				l.setAllowedModes(modesExtQ);
 			}
 		}
+		l10.setCapacity(flow / 3.);
+		l4.setCapacity(flow / 3.);
+		l7.setCapacity(flow / 3.);
+
 
 		((NetworkImpl) net).setCapacityPeriod(1);
 		((NetworkImpl) net).setEffectiveCellSize(.26);

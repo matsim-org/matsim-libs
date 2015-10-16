@@ -264,10 +264,10 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
     }
 
 	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
-		if(!personIdsForLinks.contains(event.getPersonId()))
+		if(!personIdsForLinks.contains(event.getDriverId()))
 			return;
 		Object[] linkArgs = { event.getLinkId().toString(),
-				event.getPersonId().toString(),
+				event.getDriverId().toString(),
 				"car",
 				"",
                 (int) chain.getLinkEnterTime(),
@@ -551,7 +551,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				ptVehicle.in = true;
 				ptVehicle.setLinkEnterTime(event.getTime());
 			} else {
-				chains.get(event.getPersonId()).setLinkEnterTime(
+				chains.get(event.getDriverId()).setLinkEnterTime(
 						event.getTime());
 			}
 
@@ -576,7 +576,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				if (isWriteIdsForLinks())
 					writeTransitIdsForLink(vehicle, event);
 			} else {
-				TravellerChain chain = chains.get(event.getPersonId());
+				TravellerChain chain = chains.get(event.getDriverId());
 				if (chain.inCar) {
 					Journey journey = chain.getJourneys().getLast();
 					journey.incrementCarDistance(network.getLinks()

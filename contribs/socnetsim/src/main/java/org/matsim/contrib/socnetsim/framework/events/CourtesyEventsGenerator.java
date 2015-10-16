@@ -47,7 +47,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 
 	private final EventsManager events;
 	private final SocialNetwork socialNetwork;
-	private final Map< Id<ActivityFacility> , Set< Id<Person> > > personsAtFacility = new HashMap< >();
+	private final Map< Id<ActivityFacility> , Map<String, Set< Id<Person> > > > personsAtFacility = new HashMap< >();
 
 	@Inject
 	public CourtesyEventsGenerator(
@@ -73,15 +73,17 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	public void handleEvent(final ActivityStartEvent event) {
 		handleEvent(
 				CourtesyEvent.Type.sayHelloEvent,
+				event.getActType(),
 				event.getPersonId(),
 				event.getFacilityId(),
-				event.getTime() );
+				event.getTime());
 	}
 
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		handleEvent(
 				CourtesyEvent.Type.sayGoodbyeEvent,
+				event.getActType(),
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -89,38 +91,53 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 
 	private void handleEvent(
 			final CourtesyEvent.Type type,
+			final String actType,
 			final Id<Person> ego,
 			final Id<ActivityFacility> facility,
 			final double time) {
 		// TODO: handle wraparound (done improperly because we track people from their second act...)
 		final Set< Id<Person> > alters = socialNetwork.getAlters( ego );
-		for ( Id<Person> present : MapUtils.getSet( facility , personsAtFacility ) ) {
+
+		switch ( type ) {
+			case sayGoodbyeEvent:
+				// avoid problems with wrap-around: do not say goodbye before being tracked.
+				// this caused problems with agents having leisure at home.
+				// solution would be to track the agents from the start of the simulation
+				if ( !getPersonsAtFacilityForType( facility , actType ).remove( ego ) ) return;
+				break;
+			case sayHelloEvent:
+				getPersonsAtFacilityForType( facility , actType ).add( ego );
+				break;
+			default:
+				throw new RuntimeException( type+"?" );
+		}
+
+		for ( Id<Person> present : getPersonsAtFacilityForType( facility , actType ) ) {
 			if ( alters.contains( present ) ) {
 				events.processEvent(
 						new CourtesyEvent(
 							time,
+							actType,
 							ego,
 							present,
 							type ) );
 				events.processEvent(
 						new CourtesyEvent(
 							time,
+							actType,
 							present,
 							ego,
 							type ) );
 			}
 		}
+	}
 
-		switch ( type ) {
-			case sayGoodbyeEvent:
-				MapUtils.getSet( facility , personsAtFacility ).remove( ego );
-				break;
-			case sayHelloEvent:
-				MapUtils.getSet( facility , personsAtFacility ).add( ego );
-				break;
-			default:
-				throw new RuntimeException( type+"?" );
-		}
+	private Set<Id<Person>> getPersonsAtFacilityForType( Id<ActivityFacility> facility, String actType ) {
+		return MapUtils.getSet(
+				actType,
+				MapUtils.getMap(
+						facility,
+						personsAtFacility ) );
 	}
 }
 

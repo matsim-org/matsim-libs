@@ -106,7 +106,7 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		Person person = population.getPersons().get(personId);
 		Plan plan = person.getSelectedPlan();
 		int idx = counter.get(personId);

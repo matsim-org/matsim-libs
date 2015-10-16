@@ -25,10 +25,11 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -103,8 +104,8 @@ public class GenerateHeadsToChildrenSocialNetwork {
 
 			for ( Id id : hh.getMemberIds() ) {
 				socialNetwork.addEgo( id );
-				final PersonImpl p = (PersonImpl) population.getPersons().get( id );
-				if ( p.getAge() > AGE_OF_REASON ) adults.add( id );
+				final Person p = population.getPersons().get( id );
+				if ( PersonUtils.getAge(p) > AGE_OF_REASON ) adults.add( id );
 				else children.add( id );
 			}
 

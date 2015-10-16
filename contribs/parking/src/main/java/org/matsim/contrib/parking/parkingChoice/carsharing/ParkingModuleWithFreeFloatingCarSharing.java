@@ -2,6 +2,7 @@ package org.matsim.contrib.parking.parkingChoice.carsharing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 
 public interface ParkingModuleWithFreeFloatingCarSharing {
 
@@ -25,5 +26,7 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
 	
 	
 	public void resetForNewIterationStart();
+
+	void makeFFVehicleAvailable(Id vehicleId, PC2Parking parking);
 	
 }

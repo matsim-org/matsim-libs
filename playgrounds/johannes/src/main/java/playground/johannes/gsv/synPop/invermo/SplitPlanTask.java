@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.*;
 
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ import java.util.List;
  * @author johannes
  * 
  */
-public class SplitPlanTask implements ProxyPersonTask {
+public class SplitPlanTask implements PersonTask {
 	
 	private static final Logger logger = Logger.getLogger(SplitPlanTask.class);
 
 	public static DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
 	@Override
-	public void apply(PlainPerson person) {
+	public void apply(Person person) {
 		List<Episode> newPlans = new ArrayList<Episode>();
 		
 		for (Episode plan : person.getEpisodes()) {
@@ -80,7 +80,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 			
 //			if (current.dayOfYear().get() != prev.dayOfYear().get()) {
 			if (nights > 0) {
-				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+				subPlan.setAttribute(MiDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 
 				subPlan.addActivity(((PlainSegment)act).clone());
 				newPlans.add(subPlan);
@@ -89,7 +89,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 				subPlan.addActivity(((PlainSegment)act).clone());
 				subPlan.addLeg(((PlainSegment)leg).clone());
 			} else {
-				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+				subPlan.setAttribute(MiDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 				
 				subPlan.addActivity(((PlainSegment)act).clone());
 				subPlan.addLeg(((PlainSegment)leg).clone());

@@ -30,27 +30,36 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.Vehicle;
 
-public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,PersonDepartureEventHandler {
+public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler {
+	
 	private static final Logger logger = Logger.getLogger(DemandPerLinkHandler.class);
 
-	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
+	Map<Id<Vehicle>, Id<Person>> vehicleId2DriverId = new HashMap<>();
 	
-	Map<Double, Map<Id, Integer>> time2LinkIdAndDemand = new HashMap<Double, Map<Id, Integer>>();
-	Map<Double, Map<Id, Double>> time2LinkIdAndCongestionTime = new HashMap<Double, Map<Id,Double>>();
+	Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkEnterPerVehId = new HashMap<>();
+	Map<Id<Person>, Tuple<Id<Link>, Double>> arrivalPerPersonId = new HashMap<>();
+	Map<Id<Person>, Tuple<Id<Link>, Double>> departurePerPersonId = new HashMap<>();
+	
+	Map<Double, Map<Id<Link>, Integer>> time2LinkIdAndDemand = new HashMap<>();
+	Map<Double, Map<Id<Link>, Double>> time2LinkIdAndCongestionTime = new HashMap<>();
 	private final Network network;
 	private final int noOfTimeBins;
 	private final double timeBinSize;
@@ -72,29 +81,34 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		this.time2LinkIdAndCongestionTime.clear();
 		logger.info("Resetting congestion time aggregation to " + this.time2LinkIdAndCongestionTime);
 		
-		linkenter.clear();
-		agentarrival.clear();
-		agentdeparture.clear();
+		linkEnterPerVehId.clear();
+		arrivalPerPersonId.clear();
+		departurePerPersonId.clear();
 		
 		linkLeaveCnt = 0;
 		linkLeaveWarnCnt = 0;
 	}
 
 	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		vehicleId2DriverId.put(event.getVehicleId(), event.getPersonId());
+	}
+
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.linkenter.put(event.getPersonId(), linkId2Time);
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
+		this.linkEnterPerVehId.put(event.getVehicleId(), linkId2Time);
 	}
 	
 	public void handleEvent(final LinkLeaveEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		double linkLeaveTime = event.getTime();
 		double endOfTimeInterval;
 		
 		for(int i = 0; i < noOfTimeBins; i++){
 			if(linkLeaveTime > i * timeBinSize && linkLeaveTime <= (i + 1) * timeBinSize){
 				endOfTimeInterval = (i + 1) * timeBinSize;
-				Map<Id, Integer> linkId2Counts = new HashMap<Id, Integer>();
+				Map<Id<Link>, Integer> linkId2Counts = new HashMap<>();
 
 				if(time2LinkIdAndDemand.get(endOfTimeInterval) == null){
 					linkId2Counts.put(linkId, 1);
@@ -113,28 +127,29 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		}
 		
 		
-		Id personId = event.getPersonId();
-		if(!this.linkenter.containsKey(event.getPersonId())){
+		Id<Vehicle> vehId = event.getVehicleId();
+		Id<Person> driverId = vehicleId2DriverId.get(vehId);
+		if(!this.linkEnterPerVehId.containsKey(vehId)){
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
-				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
+				logger.warn("Vehicle " + vehId + " is leaving link " + linkId + " without having entered. " +
 				"Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveWarnCnt++;
 			return;
 		}
-		double enterTime = this.linkenter.get(personId).getSecond();
+		double enterTime = this.linkEnterPerVehId.get(vehId).getSecond();
 		double travelTime;
-		if(!this.agentarrival.containsKey(personId) || !this.agentdeparture.containsKey(personId)){
+		if(!this.arrivalPerPersonId.containsKey(driverId) || !this.departurePerPersonId.containsKey(driverId)){
 			travelTime = linkLeaveTime - enterTime;
 		}
-		else if(!this.agentarrival.get(personId).getFirst().equals(event.getLinkId())
-				|| !this.agentdeparture.get(personId).getFirst().equals(event.getLinkId())){
+		else if(!this.arrivalPerPersonId.get(driverId).getFirst().equals(event.getLinkId())
+				|| !this.departurePerPersonId.get(driverId).getFirst().equals(event.getLinkId())){
 
 			travelTime = linkLeaveTime - enterTime;
 		} else {
-		double arrivalTime = this.agentarrival.get(personId).getSecond();		
-		double departureTime = this.agentdeparture.get(personId).getSecond();	
+		double arrivalTime = this.arrivalPerPersonId.get(driverId).getSecond();		
+		double departureTime = this.departurePerPersonId.get(driverId).getSecond();	
 		travelTime = linkLeaveTime - enterTime - departureTime + arrivalTime;	
 		}
 		
@@ -152,7 +167,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		for(int i = 0; i < noOfTimeBins; i++){
 			if(linkLeaveTime > i * timeBinSize && linkLeaveTime <= (i + 1) * timeBinSize){
 				endOfTimeInterval = (i + 1) * timeBinSize;
-				Map<Id, Double> linkId2CongestionTime = new HashMap<Id, Double>();
+				Map<Id<Link>, Double> linkId2CongestionTime = new HashMap<>();
 
 				if(time2LinkIdAndCongestionTime.get(endOfTimeInterval) == null){
 					linkId2CongestionTime.put(linkId, timeSpentInCongestion);
@@ -174,27 +189,27 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
+		if(!event.getLegMode().equals(TransportMode.car)){ // link travel time calculation not neccessary for other modes
 			return;
 		}
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.agentarrival.put(event.getPersonId(), linkId2Time);
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
+		this.arrivalPerPersonId.put(event.getPersonId(), linkId2Time);
 	}
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
+		if(!event.getLegMode().equals(TransportMode.car)){ // link travel time calculation not neccessary for other modes
 			return;
 		}
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.agentdeparture.put(event.getPersonId(), linkId2Time);
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
+		this.departurePerPersonId.put(event.getPersonId(), linkId2Time);
 	}
 	
-	public Map<Double, Map<Id, Integer>> getDemandPerLinkAndTimeInterval() {
+	public Map<Double, Map<Id<Link>, Integer>> getDemandPerLinkAndTimeInterval() {
 		return this.time2LinkIdAndDemand;
 	}
 
-	public Map<Double, Map<Id, Double>> getCongestionTimePerLinkAndTimeInterval() {
+	public Map<Double, Map<Id<Link>, Double>> getCongestionTimePerLinkAndTimeInterval() {
 		return this.time2LinkIdAndCongestionTime;
 	}
 

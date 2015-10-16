@@ -37,7 +37,7 @@ import playground.thibautd.utils.SoftCache;
  * @author thibautd
  */
 public class TripSoftCache {
-	public static enum LocationType {coord, link, facility;}
+	public enum LocationType {coord, link, facility;}
 	private final boolean considerPerson;
 	private final LocationType locationType;
 

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -64,7 +65,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	public InsertParkingActivities(Scenario scenario, TripRouter tripRouter, ParkingInfrastructure parkingInfrastructure) {
 		this.scenario = scenario;
 		this.tripRouter = tripRouter;
-		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), (ScenarioImpl) scenario);
+		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
 		
 		this.modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
@@ -103,9 +104,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 			
 			// create walk legs and parking activities
 			Leg walkLegToParking = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), previousActivity.getLinkId());
-			Activity firstParkingActivity = createParkingActivity(((Activity) previousActivity).getFacilityId(), vehicleId, firstParking);
+			Activity firstParkingActivity = createParkingActivity(previousActivity.getFacilityId(), vehicleId, firstParking);
 			firstParking = false;
-			Activity secondParkingActivity = createParkingActivity(((Activity) nextActivity).getFacilityId(), vehicleId, firstParking);
+			Activity secondParkingActivity = createParkingActivity(nextActivity.getFacilityId(), vehicleId, firstParking);
 			Leg walkLegFromParking = createWalkLeg(carLeg.getDepartureTime() + carLeg.getTravelTime(), nextActivity.getLinkId(), nextActivity.getLinkId());
 			
 			// add legs and activities to plan
@@ -402,7 +403,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private Leg createWalkLeg(double departureTime, Id startLinkId, Id endLinkId) {
 		Leg walkLeg = this.scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
 		walkLeg.setDepartureTime(departureTime);
-		walkLeg.setRoute(modeRouteFactory.createRoute(TransportMode.walk, startLinkId, endLinkId));
+		walkLeg.setRoute(modeRouteFactory.createRoute(Route.class, startLinkId, endLinkId));
 		return walkLeg;
 	}
 

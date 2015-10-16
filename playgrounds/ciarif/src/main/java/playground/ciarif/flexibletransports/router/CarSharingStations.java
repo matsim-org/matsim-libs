@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -46,7 +45,7 @@ public class CarSharingStations implements FacilitiesPortfolio
     while ((line = reader.readLine()) != null) {
       String[] parts = StringUtils.explode(line, '\t');
       if (parts.length == 7) {
-        CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+        Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
         int cars = Integer.parseInt(parts[4]);
         LinkImpl stationLink = MyLinkUtils.getClosestLink(this.network, coord);
         CarSharingStation csStation = new CarSharingStation(Id.create(parts[0], CarSharingStation.class), coord, stationLink, cars);
@@ -60,14 +59,14 @@ public class CarSharingStations implements FacilitiesPortfolio
 
   public CarSharingStation getClosestLocation(Coord coord)
   {
-    return (this.stations.get(coord.getX(), coord.getY()));
+    return (this.stations.getClosest(coord.getX(), coord.getY()));
   }
   
   public Vector<CarSharingStation> getClosestStations (Coord coord, int number, double distance) {
 	  
 	  Vector<CarSharingStation> orderedClosestStations = new Vector<CarSharingStation> ();
 	  //orderedClosestStations.add(0, this.stations.get(coord.getX(),coord.getY()));
-	  Collection<CarSharingStation> allClosestStations = this.stations.get(coord.getX(), coord.getY(), distance);
+	  Collection<CarSharingStation> allClosestStations = this.stations.getDisk(coord.getX(), coord.getY(), distance);
 	  //log.info("number of all cs stations = " + allClosestStations.size());
 	  for (CarSharingStation station:allClosestStations){
 		  int i = 0;

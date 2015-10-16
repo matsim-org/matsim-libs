@@ -22,8 +22,9 @@ package playground.johannes.gsv.popsim;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.PlainFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -45,12 +46,12 @@ public class Analyzer {
 
 		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml";
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		
 		parser.parse(personFile);
 
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<? extends Person> persons = parser.getPersons();
 		
 		
 //		logger.info("Cloning persons...");

@@ -20,10 +20,18 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import playground.johannes.gsv.popsim.DetourFactor;
 import playground.johannes.gsv.synPop.mid.analysis.MonthTask;
 import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -46,12 +54,12 @@ public class Analyzer {
 		String personFile = args[0];
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.car.trips.xml";
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		
 		parser.parse(personFile);
 
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		
 		Set<PlainPerson> remove = new HashSet<>();
 		for(PlainPerson person : persons) {
@@ -77,11 +85,11 @@ public class Analyzer {
 //			geometries.add((Geometry) feature.getDefaultGeometry());
 //		}
 //		
-//		Config config = ConfigUtils.createConfig();
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-//		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-//		facReader.readFile(args[1]);
-//		ActivityFacilities facilities = scenario.getActivityFacilities();
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
+		facReader.readFile(args[1]);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
@@ -101,7 +109,8 @@ public class Analyzer {
 		task.addTask(new PkmTaskSeason("car"));
 		task.addTask(new MonthTask());
 //		task.addTask(new PopulationDensityTask(geometries, facilities, output));
-		
+		task.addTask(new DetourFactor(facilities));
+
 		task.setOutputDirectory(output);
 		ProxyAnalyzer.analyze(persons, task, output);
 		

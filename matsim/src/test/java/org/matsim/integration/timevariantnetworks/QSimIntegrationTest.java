@@ -21,6 +21,7 @@
 package org.matsim.integration.timevariantnetworks;
 
 import junit.framework.Assert;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -41,15 +42,11 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsLogger;
@@ -82,8 +79,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		// create a population
 		Population plans = scenario.getPopulation();
-		PersonImpl person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
-		PersonImpl person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
+		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
+		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
 		plans.addPerson(person2);
 
@@ -136,17 +133,17 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population plans = scenario.getPopulation();
-		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, personsPerWave);
-		for(PersonImpl p : persons1) {
+		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
+		for(Person p : persons1) {
 			plans.addPerson(p);
 		}
-		PersonImpl person1 = persons1.get(personsPerWave - 1);
+		Person person1 = persons1.get(personsPerWave - 1);
 
-		List<PersonImpl> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
-		for(PersonImpl p : persons2) {
+		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
+		for(Person p : persons2) {
 			plans.addPerson(p);
 		}
-		PersonImpl person2 = persons2.get(personsPerWave - 1);
+		Person person2 = persons2.get(personsPerWave - 1);
 		/*
 		 * Run the simulation with the time-variant network and the two waves of
 		 * persons. Observe the last person of each wave.
@@ -201,9 +198,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population plans = scenario.getPopulation();
-		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, 1);
+		List<Person> persons1 = createPersons(0, link1, link3, network, 1);
 		final Id<Person> personId = persons1.get(0).getId();
-		for(PersonImpl p : persons1) {
+		for(Person p : persons1) {
 			plans.addPerson(p);
 		}
 
@@ -262,10 +259,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
@@ -284,13 +281,13 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<PersonImpl> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkImpl network,
+	private List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkImpl network,
 			final int count) {
 		double departureTime = depTime;
-		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);
+		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
-			PersonImpl person = new PersonImpl(Id.create(i + (int)departureTime, Person.class));
-			PlanImpl plan1 = person.createAndAddPlan(true);
+			Person person = PersonImpl.createPerson(Id.create(i + (int) departureTime, Person.class));
+			PlanImpl plan1 = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
 			a1.setEndTime(departureTime);
 			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
@@ -314,15 +311,15 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 */
 	private static class TestTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final PersonImpl person1;
-		private final PersonImpl person2;
+		private final Person person1;
+		private final Person person2;
 		private final Id<Link> linkId;
 		protected double person1enterTime = Time.UNDEFINED_TIME;
 		protected double person1leaveTime = Time.UNDEFINED_TIME;
 		protected double person2enterTime = Time.UNDEFINED_TIME;
 		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		protected TestTravelTimeCalculator(final PersonImpl person1, final PersonImpl person2, final Id<Link> linkId) {
+		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Id<Link> linkId) {
 			this.person1 = person1;
 			this.person2 = person2;
 			this.linkId = linkId;
@@ -333,9 +330,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2enterTime = event.getTime();
 			}
 		}
@@ -345,9 +342,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2leaveTime = event.getTime();
 			}
 		}

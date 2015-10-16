@@ -21,20 +21,18 @@ package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Leg;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -110,7 +108,7 @@ public abstract class TransitionLoadTask extends TrajectoryAnalyzerTask {
 			if (!samples.isEmpty()) {
 				Discretizer disc = FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 100);
 				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), disc, true);
-				TXTWriter.writeMap(load, "time", "n", String.format("%s/%s.%s.txt", getOutputDirectory(), key, filter));
+				StatsWriter.writeHistogram(load, "time", "n", String.format("%s/%s.%s.txt", getOutputDirectory(), key, filter));
 			}
 
 		} catch (IOException e) {

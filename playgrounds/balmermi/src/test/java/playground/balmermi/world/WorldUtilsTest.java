@@ -22,7 +22,6 @@ package playground.balmermi.world;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -34,10 +33,10 @@ public class WorldUtilsTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testDistancePointLinesegment() {
-		CoordImpl p1 = new CoordImpl(10, 20);
-		CoordImpl p2 = new CoordImpl(10, 30);
-		CoordImpl p3 = new CoordImpl(10, 40);
-		CoordImpl p4 = new CoordImpl(20, 30);
+		Coord p1 = new Coord((double) 10, (double) 20);
+		Coord p2 = new Coord((double) 10, (double) 30);
+		Coord p3 = new Coord((double) 10, (double) 40);
+		Coord p4 = new Coord((double) 20, (double) 30);
 
 		assertEquals(10.0, CoordUtils.distancePointLinesegment(p1, p3, p4), 1e-10);
 

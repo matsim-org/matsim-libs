@@ -51,7 +51,6 @@ import org.matsim.contrib.evacuation.analysis.data.EventData;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
 
@@ -164,7 +163,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		for (double x = minX; x <= maxX; x += cellSize) {
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell cell = new Cell(new LinkedList<Event>());
-				cell.setCoord(new CoordImpl(x, y));
+				cell.setCoord(new Coord(x, y));
 				this.cellTree.put(x, y, cell);
 				cellCount++;
 			}
@@ -206,7 +205,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// get the cell data, store event to it
 		List<Event> cellEvents = cell.getData();
@@ -224,7 +223,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// get the cell data, store event to it
 		List<Event> cellEvents = cell.getData();
@@ -262,17 +261,17 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getPersonId().toString().contains("veh"))
+		if (event.getDriverId().toString().contains("veh"))
 			return;
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// do not consider the exit link
 		if ((ignoreExitLink) && (cell.getId().toString().equals("" + Cell.getCurrentId())))
@@ -302,12 +301,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
-		Cell cell = this.cellTree.get(c.getX(), c.getY());
+		Cell cell = this.cellTree.getClosest(c.getX(), c.getY());
 
 		// do not consider the exit link
 		if ((ignoreExitLink) && (cell.getId().toString().equals("" + Cell.getCurrentId())))
@@ -394,7 +393,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				double latestTime = currentLinkLeaveTimes.get(confidentElementNo).getSecond();
 				maxClearingTime = Math.max(latestTime, maxClearingTime);
 
-				cellTree.get(boundary, cells);
+				cellTree.getRectangle(boundary, cells);
 
 				for (Cell cell : cells)
 					cell.updateClearanceTime(latestTime);

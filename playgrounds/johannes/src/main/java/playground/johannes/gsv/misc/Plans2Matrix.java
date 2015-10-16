@@ -19,11 +19,7 @@
 
 package playground.johannes.gsv.misc;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -33,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -42,15 +39,17 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -62,11 +61,11 @@ public class Plans2Matrix {
 
 	public KeyMatrix run(Collection<Plan> plans, ZoneCollection zones, ActivityFacilities facilities, String zoneIdKey) {
 		KeyMatrix m = new KeyMatrix();
-//		Set<Zone> zoneSet = zones.zoneSet();
-//		for(Zone zone1 : zoneSet) {
+//		Set<Zone> getZones = zones.getZones();
+//		for(Zone zone1 : getZones) {
 //			String isocode1 = zone1.getAttribute("ISO_CODE");
 //			if ("DE".equalsIgnoreCase(isocode1)) {
-//				for (Zone zone2 : zoneSet) {
+//				for (Zone zone2 : getZones) {
 //					String isocode2 = zone2.getAttribute("ISO_CODE");
 //					if ("DE".equalsIgnoreCase(isocode2)) {
 //						String id1 = zone1.getAttribute("NO");
@@ -145,7 +144,7 @@ public class Plans2Matrix {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(args[1]);
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[2], args[3]);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], args[3]);
 
 		Set<Plan> plans = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {

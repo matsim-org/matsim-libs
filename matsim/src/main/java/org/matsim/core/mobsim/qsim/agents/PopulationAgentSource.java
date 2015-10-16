@@ -30,6 +30,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Inject;
 import java.util.*;
 
 public final class PopulationAgentSource implements AgentSource {
@@ -40,6 +41,7 @@ public final class PopulationAgentSource implements AgentSource {
 	private Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
 
+	@Inject
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
 		this.population = population;
 		this.agentFactory = agentFactory;

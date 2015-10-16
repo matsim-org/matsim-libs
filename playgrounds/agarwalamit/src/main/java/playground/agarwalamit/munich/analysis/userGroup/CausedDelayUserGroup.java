@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,7 +34,6 @@ import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
@@ -131,7 +131,7 @@ public class CausedDelayUserGroup {
 
 		this.marginal_Utl_money = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.marginal_Utl_performing_sec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
-		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getTraveling_utils_hr()/3600;
+		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600;
 		this.marginalUtlOfTravelTime = this.marginal_Utl_traveling_car_sec + this.marginal_Utl_performing_sec;
 		this.vtts_car = this.marginalUtlOfTravelTime / this.marginal_Utl_money;
 	}

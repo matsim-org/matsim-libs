@@ -25,10 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -71,7 +68,7 @@ public class PlanRemoveUnselected {
 		Counter counter = new Counter(" person # ");
 		for (Person person : this.plans.getPersons().values()) {
 			counter.incCounter();
-			((PersonImpl) person).removeUnselectedPlans();
+			PersonUtils.removeUnselectedPlans(((PersonImpl) person));
 		}
 		log.info("runModifications done.");
 

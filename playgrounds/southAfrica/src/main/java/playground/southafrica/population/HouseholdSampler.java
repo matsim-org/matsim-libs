@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -33,7 +34,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.HouseholdsAlgorithmRunner;
 import org.matsim.households.HouseholdsReaderV10;
@@ -123,8 +123,7 @@ public class HouseholdSampler {
 		LOG.info("Sampling " + String.format("%.1f%%", fraction*100) + " of households.");
 		
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).createHouseholdsContainer();
-		
+
 		/* Read just the households. */
 		String householdsFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "households.xml.gz";
 		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdsFile);		
@@ -161,7 +160,7 @@ public class HouseholdSampler {
 		/* Read and clean the household attributes. */
 		String householdAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz";
 		ObjectAttributesXmlReader hhar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
-		hhar.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		hhar.putAttributeConverter(Coord.class, new CoordConverter());
 		hhar.parse(householdAttributeFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledIds().size() + " household's attributes...");
@@ -207,7 +206,7 @@ public class HouseholdSampler {
 
 		/* Household attributes, if they exist. */
 		ObjectAttributesXmlWriter hhaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
-		hhaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		hhaw.putAttributeConverter(Coord.class, new CoordConverter());
 		hhaw.writeFile(hhaf.getAbsolutePath());
 
 		/* Population. */

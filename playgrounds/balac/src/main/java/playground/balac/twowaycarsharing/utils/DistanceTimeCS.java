@@ -127,12 +127,12 @@ public class DistanceTimeCS {
 		public void handleEvent(LinkEnterEvent event) {
 			// TODO Auto-generated method stub
 			
-			if (startTimes.containsKey(event.getPersonId())) {
+			if (startTimes.containsKey(event.getDriverId())) {
 				
-				double d = distance.get(event.getPersonId());
+				double d = distance.get(event.getDriverId());
 				
 				d += scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-				distance.put(event.getPersonId(), d);
+				distance.put(event.getDriverId(), d);
 			}
 			
 		}

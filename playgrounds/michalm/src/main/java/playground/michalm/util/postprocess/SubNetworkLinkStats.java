@@ -29,10 +29,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.michalm.util.gis.PolygonBasedFilter;
-
 import com.google.common.base.Predicate;
 import com.vividsolutions.jts.geom.Geometry;
+
+import playground.michalm.util.gis.PolygonBasedFilter;
 
 
 public class SubNetworkLinkStats

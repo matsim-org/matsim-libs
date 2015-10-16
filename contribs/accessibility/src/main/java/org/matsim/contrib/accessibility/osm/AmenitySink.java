@@ -20,18 +20,13 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -40,7 +35,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
@@ -49,13 +43,7 @@ import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
-import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
-import org.openstreetmap.osmosis.core.domain.v0_6.Node;
-import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
-import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
-import org.openstreetmap.osmosis.core.domain.v0_6.Way;
-import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
@@ -134,10 +122,11 @@ public class AmenitySink implements Sink {
 //	}
 
 	private void processFacilities(ActivityFacilitiesFactory aff,
-			Map<Long,? extends EntityContainer> nodeMap) {
-		for(long n : nodeMap.keySet()){
-			Entity entity = nodeMap.get(n).getEntity();
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long n : entityMap.keySet()){
+			Entity entity = entityMap.get(n).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			
 			/* Check amenities */
 			String amenity = tags.get("amenity");
 			String matsimType = null;
@@ -145,11 +134,11 @@ public class AmenitySink implements Sink {
 				matsimType = getActivityType(amenity);
 			}
 			if(matsimType != null){
-				String activityType = getActivityType(amenity);
+				//String activityType = getActivityType(amenity);
 				String name = tags.get("name");
 				if(name != null){
 					/* Check education level. */
-					if(activityType.equalsIgnoreCase("e")){
+					if(matsimType.equalsIgnoreCase("e")){
 						getEducationLevel(name);
 					}					
 				} else{
@@ -158,7 +147,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				//Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -168,11 +157,12 @@ public class AmenitySink implements Sink {
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
-				ActivityOption ao = aff.createActivityOption(activityType);
+				ActivityOption ao = aff.createActivityOption(matsimType);
 				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
 			}
+			
 			/* Check shops */
 			String shops = tags.get("shop");
 			if(shops != null){
@@ -183,7 +173,7 @@ public class AmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 //				Coord coord = getCoord(entity);
-				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
+				Coord coord = CoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){

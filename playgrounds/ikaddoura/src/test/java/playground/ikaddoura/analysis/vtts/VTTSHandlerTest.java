@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,7 +53,8 @@ public class VTTSHandlerTest {
 		
 		Config config = ConfigUtils.createConfig();	
 		config.planCalcScore().setPerforming_utils_hr(6.0);
-		config.planCalcScore().setTraveling_utils_hr(-4.0);
+		final double traveling = -4.0;
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
 		config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 		config.planCalcScore().setEarlyDeparture_utils_hr(0.);
 		config.planCalcScore().setLateArrival_utils_hr(-18.);

@@ -40,13 +40,11 @@ import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLev
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
-import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.facilities.ActivityFacilities;
 
 /**
  * This class should work both with jdeqsim and mobsim.
@@ -115,7 +113,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-	    Id<Vehicle> vehicleId = Id.create(event.getPersonId(),Vehicle.class);
+	    Id<Vehicle> vehicleId = Id.create(event.getDriverId(),Vehicle.class);
 		if (ignoreAgent(vehicleId, event.getLinkId())) {
 			return;
 		}
@@ -170,11 +168,11 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (ignoreAgent(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId())) {
+		if (ignoreAgent(Id.create(event.getDriverId(), Vehicle.class), event.getLinkId())) {
 			return;
 		}
 
-		linkEnterTime.put(Id.create(event.getPersonId(), Vehicle.class), event.getTime());
+		linkEnterTime.put(Id.create(event.getDriverId(), Vehicle.class), event.getTime());
 	}
 
 	public ChargingOutputLog getLog() {

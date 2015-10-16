@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -70,7 +69,7 @@ public class SimpleAnmParser extends MatsimXmlParser {
 			Id<Node> id = Id.create(Long.parseLong(atts.getValue("NO")), Node.class);
 			double xcoord = Double.parseDouble(atts.getValue("XCOORD"));
 			double ycoord = Double.parseDouble(atts.getValue("YCOORD"));
-			this.currentNode = new AnmNode(id, new CoordImpl(xcoord, ycoord));
+			this.currentNode = new AnmNode(id, new Coord(xcoord, ycoord));
 		} else if ("LINK".equals(name) & this.linkHandler != null) {
 			Id<Link> id = Id.create(atts.getValue("ID"), Link.class);
 			Id<Node> fromNode = Id.create(Long.parseLong(atts.getValue("FROMNODENO")), Node.class);

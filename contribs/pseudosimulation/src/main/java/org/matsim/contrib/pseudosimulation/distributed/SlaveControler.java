@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -237,7 +236,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
-                            bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                            bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                         }
                     });
                     disutilityFactory.setSigma(0.1);
@@ -277,7 +276,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                    bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                 }
             });
             disutilityFactory.setSigma(0.1);
@@ -387,7 +386,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         Set<Id<Person>> personIdsToRemove = new HashSet<>();
         for (Id<Person> personId : matsimControler.getScenario().getPopulation().getPersons().keySet()) {
             if (i++ >= diff) break;
-            personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getScenario().getPopulation().getPersons().get(personId)));
+            personsToSend.add(new PersonSerializable(matsimControler.getScenario().getPopulation().getPersons().get(personId)));
             personIdsToRemove.add(personId);
         }
         for (Id<Person> personId : personIdsToRemove)
@@ -552,7 +551,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private void dumpPlans() throws IOException {
         List<PersonSerializable> temp = new ArrayList<>();
         for (Person p : scenario.getPopulation().getPersons().values())
-            temp.add(new PersonSerializable((PersonImpl) p));
+            temp.add(new PersonSerializable(p));
         writer.writeObject(temp);
     }
 

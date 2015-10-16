@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -36,25 +37,27 @@ import org.matsim.api.core.v01.population.Person;
  * @author boescpa
  */
 public class Trip {
+    private static Logger log = Logger.getLogger(Trip.class);
 
 	// TODO-boescpa Write tests...
 
 	private static Long tripIdCounter = (long)0;
+    private static boolean alreadyWarned = false;
 
-	protected final long tripId;
-	protected final Id agentId;
-	protected final double startTime;
-	protected final Id startLinkId;
-	protected final double startXCoord;
-	protected final double startYCoord;
-	protected final double endTime;
-	protected final Id endLinkId;
-	protected final double endXCoord;
-	protected final double endYCoord;
-	protected final String mode;
-	protected final String purpose;
-	protected final double duration;
-	protected final long distance;
+	public final long tripId;
+	public final Id agentId;
+	public final double startTime;
+	public final Id startLinkId;
+	public final double startXCoord;
+	public final double startYCoord;
+	public final double endTime;
+	public final Id endLinkId;
+	public final double endXCoord;
+	public final double endYCoord;
+	public final String mode;
+	public final String purpose;
+	public final double duration;
+	public final long distance;
 
 	public Trip(Id agentId,
 				double startTime, Id startLinkId, double startXCoord, double startYCoord,
@@ -107,22 +110,29 @@ public class Trip {
 			String newLine = readsLines.readLine(); // Header is read...
 			newLine = readsLines.readLine();
 			while (newLine != null) {
-				String[] tripLine = newLine.split("\t");
-				Trip trip = new Trip(
-						Id.create(tripLine[0], Person.class), //agentId
-						Double.parseDouble(tripLine[1]), // startTime
-						Id.create(tripLine[2], Link.class), // startLinkId
-						Double.parseDouble(tripLine[3]), // startXCoord
-						Double.parseDouble(tripLine[4]), // startYCoord
-						Double.parseDouble(tripLine[5]), // endTime
-						Id.create(tripLine[6], Link.class), // endLinkId
-						Double.parseDouble(tripLine[7]), // endXCoord
-						Double.parseDouble(tripLine[8]), // endYCoord
-						tripLine[9], // mode
-						tripLine[10], // purpose
-						Double.parseDouble(tripLine[11]), // duration
-						Long.parseLong(tripLine[12])); // distance
-				tripCollection.put(trip.tripId, trip);
+                try {
+                    String[] tripLine = newLine.split("\t");
+                    Trip trip = new Trip(
+                            Id.create(tripLine[0], Person.class), //agentId
+                            Double.parseDouble(tripLine[1]), // startTime
+                            Id.create(tripLine[2], Link.class), // startLinkId
+                            Double.parseDouble(tripLine[3]), // startXCoord
+                            Double.parseDouble(tripLine[4]), // startYCoord
+                            Double.parseDouble(tripLine[5]), // endTime
+                            Id.create(tripLine[6], Link.class), // endLinkId
+                            Double.parseDouble(tripLine[7]), // endXCoord
+                            Double.parseDouble(tripLine[8]), // endYCoord
+                            tripLine[9], // mode
+                            tripLine[10], // purpose
+                            Double.parseDouble(tripLine[11]), // duration
+                            Long.parseLong(tripLine[12])); // distance
+                    tripCollection.put(trip.tripId, trip);
+                } catch (Exception e) {
+                    if (!alreadyWarned) {
+                        log.error("Trip file contains entries that can not be read.");
+                        alreadyWarned = true;
+                    }
+                }
 				newLine = readsLines.readLine();
 			}
 			readsLines.close();

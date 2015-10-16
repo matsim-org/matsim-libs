@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -207,8 +206,8 @@ public class HWHDemandGenerator {
 			y = geometry.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (geometry.getEnvelopeInternal().getMaxY() - geometry.getEnvelopeInternal().getMinY());
 			point = MGC.xy2Point(x, y);
 		} while (!geometry.contains(point));
-		
-		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
-		return coordImpl;
+
+		Coord coord = new Coord(point.getX(), point.getY());
+		return coord;
 	}	
 }

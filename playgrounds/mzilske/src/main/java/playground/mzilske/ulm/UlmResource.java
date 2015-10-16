@@ -11,6 +11,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -82,7 +83,6 @@ class UlmResource {
 		config.network().setInputFile(wd + "/network.xml");
 		config.plans().setInputFile(wd + "/population.xml");
 		config.global().setCoordinateSystem(CRS);
-		config.scenario().setUseVehicles(true);
 		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setSnapshotPeriod(1);
@@ -91,6 +91,7 @@ class UlmResource {
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(wd + "/output");
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(16*60*60);

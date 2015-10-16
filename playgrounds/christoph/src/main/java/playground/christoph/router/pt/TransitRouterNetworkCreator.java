@@ -156,7 +156,7 @@ public class TransitRouterNetworkCreator {
 		// connect all transfer nodes with walking links if they're located less than beelineWalkConnectionDistance from each other
 		for (TransitRouterNetworkNode fromNode : transferNodes) {
 			Coord fromCoord = fromNode.getCoord();
-			Collection<TransitRouterNetworkNode> nearestTransferNodes = transferNodesQuadTree.get(fromCoord.getX(), fromCoord.getY(), maxBeelineWalkConnectionDistance);
+			Collection<TransitRouterNetworkNode> nearestTransferNodes = transferNodesQuadTree.getDisk(fromCoord.getX(), fromCoord.getY(), maxBeelineWalkConnectionDistance);
 			for (TransitRouterNetworkNode toNode : nearestTransferNodes) {
 				if (fromNode != toNode) {
 					// do not yet add them to the network, as this would change in/out-links

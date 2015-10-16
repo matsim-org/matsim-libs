@@ -29,7 +29,7 @@ import org.matsim.core.router.util.TravelTime;
 import javax.inject.Provider;
 import java.util.Map;
 
-class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
+public class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %

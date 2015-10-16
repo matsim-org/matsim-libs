@@ -19,23 +19,22 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -54,7 +53,7 @@ public class DistDistribution {
 //		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.modena.xml");
 		KeyMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 
@@ -79,8 +78,8 @@ public class DistDistribution {
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(25000), true);
 		Histogram.normalize(hist);
-//		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
+//		TXTWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
 	}
 
 }

@@ -49,7 +49,6 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -74,7 +73,7 @@ public class ExtractTripModeSharesAroundBellevue {
 	private static final Logger log =
 		Logger.getLogger(ExtractTripModeSharesAroundBellevue.class);
 
-	private static final Coord BELLEVUE_COORD = new CoordImpl( 683518 , 246836 );
+	private static final Coord BELLEVUE_COORD = new Coord((double) 683518, (double) 246836);
 	private static final StageActivityTypes STAGES =
 		new StageActivityTypesImpl(
 				Arrays.asList(
@@ -105,7 +104,7 @@ public class ExtractTripModeSharesAroundBellevue {
 	private static final double CROW_FLY_FACTOR = 1;
 	private static final boolean USE_NET_DIST = false;
 
-	private static enum Filtering {od, homeCoord;}
+	private enum Filtering {od, homeCoord;}
 
 	public static void main(final String[] args) throws IOException {
 		final ArgParser parser = new ArgParser();
@@ -226,7 +225,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		return dist;
 	}
 
-	private static interface Filter {
+	private interface Filter {
 		public boolean acceptPlan(final Plan plan);
 		public boolean acceptTrip(final Trip trip);
 	}

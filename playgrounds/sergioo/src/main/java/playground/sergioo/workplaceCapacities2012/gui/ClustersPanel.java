@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 
 import playground.sergioo.facilitiesGenerator2012.gui.WeigthsNetworkWindow.Option;
 import playground.sergioo.visualizer2D2012.AxisPainter;
@@ -72,7 +72,7 @@ public class ClustersPanel extends LayersPanel implements MouseListener, MouseMo
 			//Color color = new Color(5f*(float)(cluster.getPoints().size())/numTotalPoints, 5f*(float)(cluster.getPoints().size())/numTotalPoints, 5f*(float)(cluster.getPoints().size())/numTotalPoints);
 			PointsPainter pointsPainter = new PointsPainter(color);
 			for(PointND<Double> point:cluster.getPoints())
-				pointsPainter.addPoint(new CoordImpl(point.getElement(0), point.getElement(1)));
+				pointsPainter.addPoint(new Coord(point.getElement(0), point.getElement(1)));
 			addLayer(new Layer(pointsPainter));
 		}
 		this.setBackground(Color.CYAN);
@@ -99,7 +99,7 @@ public class ClustersPanel extends LayersPanel implements MouseListener, MouseMo
 			ppPainter.setWeightedPoints(cluster.getPoints());
 			addLayer(new Layer(ppPainter));
 			PointPerson center = cluster.getPoints().get(0).centroidOf(cluster.getPoints());
-			pointsPainter.addPoint(new CoordImpl(center.getElement(0), center.getElement(1)));
+			pointsPainter.addPoint(new Coord(center.getElement(0), center.getElement(1)));
 			i++;
 		}
 		addLayer(new Layer(pointsPainter));

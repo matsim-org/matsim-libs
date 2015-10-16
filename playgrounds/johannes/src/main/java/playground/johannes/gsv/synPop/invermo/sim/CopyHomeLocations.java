@@ -20,13 +20,9 @@
 package playground.johannes.gsv.synPop.invermo.sim;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,13 +42,14 @@ public class CopyHomeLocations implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> person, boolean accpeted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> person, boolean accpeted) {
 		if(iter.get() % interval == 0) {
-			for(PlainPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
+			for(Person thePerson : population) {
+				ActivityFacility home = (ActivityFacility) ((PlainPerson)thePerson).getUserData(SwitchHomeLocation
+						.USER_FACILITY_KEY);
 				Episode plan = thePerson.getEpisodes().get(0);
 				for(Attributable act : plan.getActivities()) {
-					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					if(ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
 					}
 				}

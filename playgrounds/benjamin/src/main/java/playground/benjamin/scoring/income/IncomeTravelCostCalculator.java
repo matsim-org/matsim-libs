@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scoring.income;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -63,10 +64,10 @@ public class IncomeTravelCostCalculator implements TravelDisutility {
 		 * Distance dependent routing is only impelemted for car since pt is only pseudo transit*/
 
 //		this.distanceCostFactor = - charyparNagelScoring.getMarginalUtlOfDistanceCar();
-		this.distanceCostFactor = - charyparNagelScoring.getMonetaryDistanceCostRateCar() * charyparNagelScoring.getMarginalUtilityOfMoney() ;
+		this.distanceCostFactor = -charyparNagelScoring.getModes().get(TransportMode.car).getMonetaryDistanceRate() * charyparNagelScoring.getMarginalUtilityOfMoney() ;
 
 		//also opportunity costs of time have to be considered at this point (second summand)!
-		this.betaTravelTime = (- charyparNagelScoring.getTraveling_utils_hr() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);
+		this.betaTravelTime = (-charyparNagelScoring.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (charyparNagelScoring.getPerforming_utils_hr() / 3600.0);
 	}
 
 	//calculate generalized travel costs

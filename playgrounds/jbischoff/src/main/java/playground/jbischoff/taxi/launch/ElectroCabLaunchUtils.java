@@ -73,11 +73,11 @@ public class ElectroCabLaunchUtils
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
+        travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork(), Double.MAX_VALUE);
         ecabhandler = new ElectricTaxiChargingHandler(events);
         rankhandler = new TaxiRankHandler();
         HashMap<Id<org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id<org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
-        for (Vehicle v : context.getVrpData().getVehicles()) {
+        for (Vehicle v : context.getVrpData().getVehicles().values()) {
             Id aid = v.getId();
             rankhandler.addVehicle(v);
             if (aid.toString().startsWith("et")) {
@@ -94,13 +94,13 @@ public class ElectroCabLaunchUtils
         System.out.println(context.getVrpData().getVehicles().size() + " taxis in total, of which "
                 + ecabhandler.getVehicles().size() + " are electric.");
 
-        for (Vehicle v : context.getVrpData().getVehicles()) {
+        for (Vehicle v : context.getVrpData().getVehicles().values()) {
             travelDistanceEvaluator.addAgent(v.getId());
         }
 
         energyConsumptionTracker = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
 
-        taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
+        taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario, Double.MAX_VALUE);
 
         handlerGroup.addHandler(travelDistanceEvaluator);
         handlerGroup.addHandler(energyConsumptionTracker);
@@ -108,7 +108,7 @@ public class ElectroCabLaunchUtils
         handlerGroup.addHandler(rankhandler);
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
-        for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
+        for (TaxiRank r : ((ETaxiData)context.getVrpData()).getTaxiRanks().values()) {
             rankhandler.addRank(r);
             //            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
             if (r.getId().toString().equals("249"))

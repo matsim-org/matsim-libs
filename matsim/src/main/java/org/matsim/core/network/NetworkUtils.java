@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.*;
 
@@ -517,6 +516,6 @@ public class NetworkUtils {
 	private static Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
-		return new CoordImpl(x, y);
+		return new Coord(x, y);
 	}
 }

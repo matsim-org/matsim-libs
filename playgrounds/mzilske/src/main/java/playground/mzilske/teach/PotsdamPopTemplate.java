@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -101,8 +100,8 @@ public class PotsdamPopTemplate implements Runnable {
 	private Coord shoot(Geometry zone) {
 		Random r = new Random();
 		Point point = getRandomPointInFeature(r, zone);
-		CoordImpl coordImpl = new CoordImpl(point.getX(), point.getY());
-		return coordImpl;
+		Coord coord = new Coord(point.getX(), point.getY());
+		return coord;
 	}
 
 	private Activity createWork(Coord workLocation) {

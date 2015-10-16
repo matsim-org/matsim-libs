@@ -10,12 +10,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
@@ -27,7 +26,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
-import playground.michalm.taxi.data.TaxiData;
 import playground.michalm.taxi.data.TaxiRank;
 
 public class PrtRouterWrapper implements RoutingModule {
@@ -81,7 +79,7 @@ public class PrtRouterWrapper implements RoutingModule {
         
         //prtLeg
 		leg = new LegImpl(PrtRequestCreator.MODE);
-		GenericRoute route = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
+		Route route = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		leg.setRoute(route);
 		leg.setDepartureTime(time);
         trip.add(leg);

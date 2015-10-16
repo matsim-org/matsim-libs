@@ -124,9 +124,9 @@ public class ShapeConverterPopRandom {
 				Double starty = (Double) sf.getAttribute("start_y_ny");
 				Double endx = (Double) sf.getAttribute("ende_x_ny");
 				Double endy = (Double) sf.getAttribute("ende_y_ny");
-				
-				Coord startCoordinates = scenario.createCoord(startx, starty);
-				Coord endCoordinates = scenario.createCoord(endx, endy);
+
+				Coord startCoordinates = new Coord(startx, starty);
+				Coord endCoordinates = new Coord(endx, endy);
 				
 				String actType = (String) sf.getAttribute("Formal_enk"); // activity type
 				actType = actType.toLowerCase();
@@ -231,7 +231,7 @@ public class ShapeConverterPopRandom {
 				Activity originalActivity = (Activity) pe;
 				Double xCoord = originalActivity.getCoord().getX() + Math.random()*shift - .5*shift;
 				Double yCoord = originalActivity.getCoord().getY() + Math.random()*shift - .5*shift;
-				Activity act = popfac.createActivityFromCoord(originalActivity.getType(), scenario.createCoord(xCoord, yCoord));
+				Activity act = popfac.createActivityFromCoord(originalActivity.getType(), new Coord(xCoord, yCoord));
 				Double endtime = originalActivity.getEndTime() + Math.random()*timeShift  - .5*timeShift;
 				act.setEndTime(endtime);
 				newPlan.addActivity(act);

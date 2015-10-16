@@ -52,8 +52,8 @@ public class Net2GIS
             outFileN = dir + args[4];
         }
         else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+            throw new IllegalArgumentException(
+                    "Incorrect program arguments: " + Arrays.toString(args));
         }
 
         String coordSystem = TransformationFactory.WGS84_UTM33N;

@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
@@ -42,8 +41,7 @@ public class ReaderTripHandler {
 	public void constructTrip(String [] entries, NetworkImpl network, ZHFacilities facilities,
 			MZTrip mzTrip, int tripNr) {
 
-		Coord beforeShoppingCoord = new CoordImpl(
-				Double.parseDouble(entries[38].trim()), Double.parseDouble(entries[39].trim()));
+		Coord beforeShoppingCoord = new Coord(Double.parseDouble(entries[38].trim()), Double.parseDouble(entries[39].trim()));
 		ActivityImpl beforeShoppingAct = new org.matsim.core.population.ActivityImpl("start", beforeShoppingCoord);
 		// in seconds after midnight
 		double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
@@ -70,7 +68,7 @@ public class ReaderTripHandler {
 		afterShoppingAct.setLinkId(NetworkUtils.getNearestLink(network, afterShoppingCoord).getId());
 
 		if (!(mzTrip.getEndTime() > 0.0)) {
-			log.error("No end time found for person : " /*+ mzTrip.getPersonId()*/);
+			log.error("No end time found for person : " /*+ mzTrip.getDriverId()*/);
 		}
 		double startTimeAfterShoppingAct = mzTrip.getEndTime();
 		afterShoppingAct.setStartTime(startTimeAfterShoppingAct);

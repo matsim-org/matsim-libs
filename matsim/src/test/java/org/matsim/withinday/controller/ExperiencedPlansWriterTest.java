@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +45,6 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
@@ -266,13 +266,13 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		
 		Network network = scenario.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
-		
-		Node node0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
-		Node node1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1.0, 0.0));
-		Node node2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2.0, 0.0));
-		Node node3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3.0, 0.0));
-		Node node4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(1.0, 1.0));
-		Node node5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(2.0, 1.0));
+
+		Node node0 = networkFactory.createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
+		Node node1 = networkFactory.createNode(Id.create("n1", Node.class), new Coord(1.0, 0.0));
+		Node node2 = networkFactory.createNode(Id.create("n2", Node.class), new Coord(2.0, 0.0));
+		Node node3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord(3.0, 0.0));
+		Node node4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord(1.0, 1.0));
+		Node node5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord(2.0, 1.0));
 		
 		Link link0 = networkFactory.createLink(Id.create("l0", Link.class), node0, node1);
 		Link link1 = networkFactory.createLink(Id.create("l1", Link.class), node1, node2);
@@ -307,7 +307,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private Person createPerson(Scenario scenario, String id) {
 		
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);

@@ -29,7 +29,9 @@ import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -39,7 +41,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * This class tests the pt simulation of MATSim for a simple network created with CreateTestNetwork.java.
@@ -66,15 +67,16 @@ import org.matsim.testcases.MatsimTestCase;
  * @author thomas
  * @author tthunig
  */
-public class PtMatrixTest extends MatsimTestCase{
+public class PtMatrixTest {
 	
 	private static final Logger log = Logger.getLogger(PtMatrixTest.class);
-	 
-	@Override
+
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
+
 	@Before
 	public void setUp() throws Exception {
-		super.setUp() ;
-		OutputDirectoryLogging.catchLogEntries();		
+		OutputDirectoryLogging.catchLogEntries();
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 	}
 
@@ -100,7 +102,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed ) ;
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String location = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
+		String location = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
 		
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
@@ -204,16 +206,15 @@ public class PtMatrixTest extends MatsimTestCase{
 
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
-		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel times fitting into the dummy network
-		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel distances fitting into the dummy network
-		
+		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
+		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(folder.newFile("ptTravelInfo.csv"));	// creates a dummy csv file with pt travel times fitting into the dummy network
+
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setUsingPtStops(true);
 		module.setUsingTravelTimesAndDistances(true);
 		module.setPtStopsInputFile(stopsLocation);								
 		module.setPtTravelTimesInputFile(timesLocation);						
-		module.setPtTravelDistancesInputFile(distancesLocation);				
+		module.setPtTravelDistancesInputFile(timesLocation);
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);

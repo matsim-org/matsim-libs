@@ -33,11 +33,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
@@ -66,9 +66,8 @@ public class DgAnalysisPopulationReader {
 			sc.setNetwork(net);
 		}
 		else {
-			ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 			sc.getConfig().network().setInputFile(networkPath);
-			sl.loadNetwork();
+			new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
 			net = sc.getNetwork();
 			this.loadedNetworks.put(networkPath, net);
 		}

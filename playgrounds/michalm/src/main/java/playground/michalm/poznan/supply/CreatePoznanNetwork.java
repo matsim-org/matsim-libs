@@ -1,10 +1,8 @@
 package playground.michalm.poznan.supply;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.core.config.*;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -16,8 +14,8 @@ public class CreatePoznanNetwork
 {
     public static void main(String[] args)
     {
-//        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_all.osm";
-//        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_all.xml";
+        //        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_all.osm";
+        //        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_all.xml";
 
         String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_down2tertiary.osm";
         String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_down2tertiary.xml";
@@ -50,4 +48,5 @@ public class CreatePoznanNetwork
 
         new NetworkCleaner().run(network);
         new NetworkWriter(network).write(networkFile);
-    }}
+    }
+}

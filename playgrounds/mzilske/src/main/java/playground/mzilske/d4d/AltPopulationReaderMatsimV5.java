@@ -45,11 +45,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -137,21 +137,21 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 
 	private Person parsePerson(XMLStreamReader xmlr) throws XMLStreamException {
 		String id = xmlr.getAttributeValue(""	, "id");
-		PersonImpl person = new PersonImpl(Id.create(id, Person.class));
+		Person person = PersonImpl.createPerson(Id.create(id, Person.class));
 		String sex = xmlr.getAttributeValue(""	, "sex");
-		if (sex!=null) person.setSex(sex);
+		if (sex!=null) PersonUtils.setSex(person, sex);
 		String age = xmlr.getAttributeValue(""	, "age");
-		if (age!=null) person.setAge(Integer.parseInt(age)); 
+		if (age!=null) PersonUtils.setAge(person, Integer.parseInt(age));
 		String license = xmlr.getAttributeValue(""	, "license");
-		if (license!=null) person.setLicence(license);
+		if (license!=null) PersonUtils.setLicence(person, license);
 		String car = xmlr.getAttributeValue(""	, "car_avail");
-		if (car!=null) person.setCarAvail(car);
+		if (car!=null) PersonUtils.setCarAvail(person, car);
 		String employed = xmlr.getAttributeValue(""	, "employed");
 		if (employed!=null) {
 			if (employed.equals("yes")) {
-				person.setEmployed(true);
+				PersonUtils.setEmployed(person, true);
 			} else if (employed.equals("no")) {
-				person.setEmployed(false);
+				PersonUtils.setEmployed(person, false);
 			}
 		}
 		while (xmlr.hasNext()) {
@@ -161,7 +161,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 				if ("travelcard".compareTo(name ) == 0) {
 					String tc = xmlr.getAttributeValue("", "type");
 					if (tc!=null) {
-						person.addTravelcard(tc);
+						PersonUtils.addTravelcard(person, tc);
 					}
 				} else if ("plan".compareTo(name ) == 0) {
 					Plan plan = parsePlan(xmlr);
@@ -216,11 +216,11 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			Id<Link> linkId = Id.create(xmlr.getAttributeValue("", "link"), Link.class);
 			curract = (ActivityImpl) population.getFactory().createActivityFromLinkId(xmlr.getAttributeValue("", "type"), linkId);
 			if ((xmlr.getAttributeValue("", "x") != null) && (xmlr.getAttributeValue("", "y") != null)) {
-				coord = new CoordImpl(xmlr.getAttributeValue("", "x"), xmlr.getAttributeValue("", "y"));
+				coord = new Coord(Double.parseDouble(xmlr.getAttributeValue("", "x")), Double.parseDouble(xmlr.getAttributeValue("", "y")));
 				curract.setCoord(coord);
 			}
 		} else if ((xmlr.getAttributeValue("", "x") != null) && (xmlr.getAttributeValue("", "y") != null)) {
-			coord = new CoordImpl(xmlr.getAttributeValue(""	, "x"), xmlr.getAttributeValue("", "y"));
+			coord = new Coord(Double.parseDouble(xmlr.getAttributeValue("", "x")), Double.parseDouble(xmlr.getAttributeValue("", "y")));
 			curract = (ActivityImpl) population.getFactory().createActivityFromCoord(xmlr.getAttributeValue("", "type"), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
@@ -285,7 +285,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			currRoute = linkNetworkRoute;
 		} else if ("generic".equals(routeType)) {
 			GenericRouteImpl genericRoute = new GenericRouteImpl(Id.create(startLink, Link.class), Id.create(endLink, Link.class));
-			genericRoute.setRouteDescription(null, routeDescription.trim(), null);
+			genericRoute.setRouteDescription(routeDescription.trim());
 			currRoute = genericRoute;
 		} else if ("experimentalPt1".equals(routeType)) {
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();

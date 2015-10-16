@@ -1,24 +1,14 @@
 package playground.michalm.taxi.run;
 
-import java.io.File;
 import java.util.Map;
+
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.util.ParameterFileReader;
 
 
 class TaxiLauncherParams
 {
-
-    static TaxiLauncherParams readParams(String paramFile)
-    {
-        Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
-        String dir = new File(paramFile).getParent() + '/';
-        params.put("inputDir", dir);
-        params.put("outputDir", dir);
-        return new TaxiLauncherParams(params);
-    }
-
-
     static TaxiLauncherParams readParams(String paramFile, String inputDir, String outputDir)
     {
         Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
@@ -38,7 +28,7 @@ class TaxiLauncherParams
     String taxiCustomersFile;
     String taxisFile;
     String ranksFile;
-    
+
     String zonesXmlFile;
     String zonesShpFile;
 
@@ -57,6 +47,8 @@ class TaxiLauncherParams
     Double pickupDuration;
     Double dropoffDuration;
 
+    Boolean batteryChargingDischarging;
+
     Boolean otfVis;
 
     String outputDir;
@@ -71,6 +63,10 @@ class TaxiLauncherParams
     public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
 
 
+    TaxiLauncherParams()
+    {}
+
+
     TaxiLauncherParams(Map<String, String> params)
     {
         this.params = params;
@@ -82,7 +78,7 @@ class TaxiLauncherParams
         taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
         ranksFile = getInputPath("ranksFile");
         taxisFile = getInputPath("taxisFile");
-        
+
         zonesXmlFile = getInputPath("zonesXmlFile");
         zonesShpFile = getInputPath("zonesShpFile");
 
@@ -99,12 +95,10 @@ class TaxiLauncherParams
         destinationKnown = getBoolean("destinationKnown");
         vehicleDiversion = getBoolean("vehicleDiversion");
 
-        if (vehicleDiversion && !onlineVehicleTracker) {
-            throw new IllegalArgumentException("Diversion requires online tracking");
-        }
-
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
+
+        batteryChargingDischarging = getBoolean("batteryChargingDischarging");
 
         otfVis = getBoolean("otfVis");
 
@@ -112,6 +106,29 @@ class TaxiLauncherParams
         vrpOutDir = getOutputPath("vrpOutDir");
         histogramOutDir = getOutputPath("histogramOutDir");
         eventsOutFile = getOutputPath("eventsOutFile");
+
+        validate();
+    }
+
+
+    public void validate()
+    {
+        if (algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            if (eventsFile != null) {
+                throw new IllegalStateException(
+                        "eventsFile ignored when TravelTimeSource.FREE_FLOW_SPEED");
+            }
+        }
+        else {//TravelTimeSource.EVENTS
+            if (changeEventsFile != null) {
+                throw new IllegalStateException(
+                        "changeEventsFile ignored when TravelTimeSource.EVENTS");
+            }
+        }
+
+        if (vehicleDiversion && !onlineVehicleTracker) {
+            throw new IllegalStateException("Diversion requires online tracking");
+        }
     }
 
 

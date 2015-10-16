@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
@@ -37,8 +37,8 @@ public class PuT_trip_finder_handler implements TabularFileHandler {
 	private final BufferedWriter writer;
 
 	// some variables to maintain state
-	private CoordImpl startCoord = null;
-	private CoordImpl endCoord = null;
+	private Coord startCoord = null;
+	private Coord endCoord = null;
 	private String personId = null;
 	private String tripId = null;
 	private List<String> segmentIds = new ArrayList<String>();
@@ -109,8 +109,7 @@ public class PuT_trip_finder_handler implements TabularFileHandler {
 			this.tripId = row[1];
 			this.startDate = row[6];
 			this.startTime = row[7];
-			this.startCoord = new CoordImpl(Double.parseDouble(row[3]) / 1000.0,
-					Double.parseDouble(row[4]) / 1000.0);
+			this.startCoord = new Coord(Double.parseDouble(row[3]) / 1000.0, Double.parseDouble(row[4]) / 1000.0);
 			this.cntSegments = 0;
 			this.cntPuTSegments = 0;
 			this.cntRailSegments = 0;
@@ -118,7 +117,7 @@ public class PuT_trip_finder_handler implements TabularFileHandler {
 		this.segmentIds.add(row[2]);
 		this.endDate = row[11];
 		this.endTime = row[12];
-		this.endCoord = new CoordImpl(Double.parseDouble(row[8]) / 1000.0, Double
+		this.endCoord = new Coord(Double.parseDouble(row[8]) / 1000.0, Double
 				.parseDouble(row[9]) / 1000.0);
 		this.cntSegments++;
 		this.Probability_Walks.add(Double.valueOf(row[15]));

@@ -67,11 +67,11 @@ public class EventWriterXMLTest {
 		LinkLeaveEvent event1 = (LinkLeaveEvent) collector.getEvents().get(0);
 		LinkLeaveEvent event2 = (LinkLeaveEvent) collector.getEvents().get(1);
 
-		Assert.assertEquals("agent 1", event1.getPersonId().toString());
+		Assert.assertEquals("agent 1", event1.getDriverId().toString());
 		Assert.assertEquals("link<2", event1.getLinkId().toString());
 		Assert.assertEquals("vehicle>3", event1.getVehicleId().toString());
 
-		Assert.assertEquals("agent 2", event2.getPersonId().toString());
+		Assert.assertEquals("agent 2", event2.getDriverId().toString());
 		Assert.assertEquals("link'3", event2.getLinkId().toString());
 		Assert.assertEquals("vehicle\"4", event2.getVehicleId().toString());
 	}

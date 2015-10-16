@@ -138,7 +138,7 @@ public class FacilityChanger {
 			final ParkAndRideFacility fac,
 			final double currentRadius) {
 		Collection<ParkAndRideFacility> neighbors =
-				facilitiesQT.get(
+				facilitiesQT.getDisk(
 						fac.getCoord().getX(),
 						fac.getCoord().getY(),
 						currentRadius);

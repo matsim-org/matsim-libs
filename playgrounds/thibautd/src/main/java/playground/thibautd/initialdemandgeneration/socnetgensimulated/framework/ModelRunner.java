@@ -25,6 +25,6 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
  * @author thibautd
  */
 public interface ModelRunner {
-	public SocialNetwork runModel( Thresholds thresholds );
+	SocialNetwork runModel( Thresholds thresholds );
 }
 

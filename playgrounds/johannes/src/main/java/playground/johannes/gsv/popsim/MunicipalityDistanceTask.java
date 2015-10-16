@@ -22,14 +22,14 @@ package playground.johannes.gsv.popsim;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -40,12 +40,12 @@ import java.util.Map;
  */
 public class MunicipalityDistanceTask extends AnalyzerTask {
     @Override
-    public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList xVals = new TDoubleArrayList();
         TDoubleArrayList yVals = new TDoubleArrayList();
 
-        for(PlainPerson person : persons) {
-            String xStr = person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
+        for(Person person : persons) {
+            String xStr = person.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
             for(Episode plan : person.getEpisodes()) {
                 for(Attributable leg : plan.getLegs()) {
 
@@ -66,10 +66,10 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
                 double[] y = yVals.toNativeArray();
 //                Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                 TDoubleDoubleHashMap corr = Correlations.mean(x, y);
-                TXTWriter.writeMap(corr, "munic", "distance", filename);
+                StatsWriter.writeHistogram(corr, "munic", "distance", filename);
 
                 filename = String.format("%s/munic.dist.scatter.txt", getOutputDirectory());
-                TXTWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
+                StatsWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
             } catch (IOException e) {
                 e.printStackTrace();
             }

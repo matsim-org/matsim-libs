@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Count;
@@ -62,7 +61,7 @@ public class CountsFileGenerator {
 		while(line!=null) {
 			String[] parts = line.split(SEPARATOR);
 			String code = parts[1];
-			Coord location = new CoordImpl(Double.parseDouble(parts[5]), Double.parseDouble(parts[6]));
+			Coord location = new Coord(Double.parseDouble(parts[5]), Double.parseDouble(parts[6]));
 			location = cT.transform(location);
 			countLocations.put(code, location);
 			line = readerLocations.readLine();
@@ -72,7 +71,7 @@ public class CountsFileGenerator {
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile("./data/networks/singapore1.xml");
 		Network network = scenario.getNetwork();
-		Map<String,Counts> allCounts = new HashMap<String, Counts>();
+		Map<String,Counts<Link>> allCounts = new HashMap<>();
 		for(String mode:MODES)
 			allCounts.put(mode, new Counts());
 		BufferedReader readerLinks = new BufferedReader(new FileReader(new File("./data/counts/CountLinks.txt")));
@@ -81,7 +80,7 @@ public class CountsFileGenerator {
 			String[] parts = line.split(SEPARATOR);
 			for(String mode:MODES) {
 				Count count = allCounts.get(mode).createAndAddCount(Id.createLinkId(parts[2]), parts[0]+SEPARATOR+parts[1]);
-				count.setCoord(new CoordImpl(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
+				count.setCoord(new Coord(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
 			}
 			line = readerLinks.readLine();
 		}
@@ -108,7 +107,7 @@ public class CountsFileGenerator {
 				for(Entry<String, Coord> countLocationE:countLocations.entrySet())
 					if(countLocationE.getKey().equals(code))
 						entryLocation = countLocationE;
-					Coord location = entryLocation == null?new CoordImpl(0,0):entryLocation.getValue();
+				Coord location = entryLocation == null? new Coord((double) 0, (double) 0) :entryLocation.getValue();
 					CountsWindow window = new CountsWindow(name+"     "+(entryLocation == null?"":entryLocation.getKey())+"     "+code+"     "+movement, network);
 					for(Coord point:countLocations.values())
 						window.addPoint(point);

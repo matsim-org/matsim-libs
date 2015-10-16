@@ -37,7 +37,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -107,9 +106,7 @@ public class ConvertXYToBikeSharingStations {
 				final String[] fields = line.split( "," );
 
 				final Coord coord =
-					new CoordImpl(
-							Double.parseDouble( fields[ 0 ] ),
-							Double.parseDouble( fields[ 1 ] ) );
+						new Coord(Double.parseDouble(fields[0]), Double.parseDouble(fields[1]));
 				final Id<Link> link =
 					NetworkUtils.getNearestLink(network, coord).getId();
 

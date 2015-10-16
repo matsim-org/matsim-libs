@@ -24,10 +24,14 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
@@ -62,8 +66,10 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final boolean scoreActs;
 	
 	public final boolean usingOldScoringBelowZeroUtilityDuration ;
+	
+	public final int simulationPeriodInDays;
 
-	public CharyparNagelScoringParameters(
+	private CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
 			final Map<String, Mode> modeParams,
 			final double marginalUtilityOfWaiting_s,
@@ -75,7 +81,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			final double marginalUtilityOfMoney,
 			final double abortedPlanScore,
 			final boolean scoreActs,
-			final boolean usingOldScoringBelowZeroUtilityDuration) {
+			final boolean usingOldScoringBelowZeroUtilityDuration,
+			final int simulationPeriodInDays) {
 		this.utilParams = utilParams;
 		this.modeParams = modeParams;
 		this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
@@ -88,10 +95,27 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		this.abortedPlanScore = abortedPlanScore;
 		this.scoreActs = scoreActs;
 		this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+		this.simulationPeriodInDays = simulationPeriodInDays;
 	}
 
-	public static CharyparNagelScoringParametersBuilder getBuilder( final PlanCalcScoreConfigGroup config ) {
-		return new CharyparNagelScoringParametersBuilder( config );
+	public static CharyparNagelScoringParametersBuilder getBuilder(
+			final Scenario scenario,
+			final Id<Person> person ) {
+		return new CharyparNagelScoringParametersBuilder(
+				scenario.getConfig().planCalcScore(),
+				scenario.getConfig().planCalcScore().getScoringParameters(
+						(String)
+						scenario.getPopulation().getPersonAttributes().getAttribute(
+								person.toString(),
+								scenario.getConfig().plans().getSubpopulationAttributeName() ) ),
+				scenario.getConfig().scenario() );
+	}
+
+	public static CharyparNagelScoringParametersBuilder getBuilder(
+			final PlanCalcScoreConfigGroup config,
+			final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
+			final ScenarioConfigGroup scenarioConfig) {
+		return new CharyparNagelScoringParametersBuilder( config, scoringParameterSet, scenarioConfig );
 	}
 
 	public static final class CharyparNagelScoringParametersBuilder {
@@ -108,22 +132,28 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		private double abortedPlanScore;
 		private boolean scoreActs;
 		private boolean usingOldScoringBelowZeroUtilityDuration;
+		private int simulationPeriodInDays = 1;
 
-		private CharyparNagelScoringParametersBuilder( final PlanCalcScoreConfigGroup config ) {
-			this.usingOldScoringBelowZeroUtilityDuration = config.isUsingOldScoringBelowZeroUtilityDuration() ;
+		private CharyparNagelScoringParametersBuilder(
+				final PlanCalcScoreConfigGroup configGroup,
+				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
+				final ScenarioConfigGroup scenarioConfig) {
+			this.simulationPeriodInDays = scenarioConfig.getSimulationPeriodInDays();
+			
+			this.usingOldScoringBelowZeroUtilityDuration = configGroup.isUsingOldScoringBelowZeroUtilityDuration() ;
 
-			marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
-			marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
-			marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
-			marginalUtilityOfWaitingPt_s = config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
-			marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
-			utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
-			marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
+			marginalUtilityOfWaiting_s = scoringParameterSet.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
+			marginalUtilityOfLateArrival_s = scoringParameterSet.getLateArrival_utils_hr() / 3600.0;
+			marginalUtilityOfEarlyDeparture_s = scoringParameterSet.getEarlyDeparture_utils_hr() / 3600.0;
+			marginalUtilityOfWaitingPt_s = scoringParameterSet.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
+			marginalUtilityOfPerforming_s = scoringParameterSet.getPerforming_utils_hr() / 3600.0;
+			utilityOfLineSwitch = scoringParameterSet.getUtilityOfLineSwitch() ;
+			marginalUtilityOfMoney = scoringParameterSet.getMarginalUtilityOfMoney() ;
 			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
 			utilParams = new TreeMap<String, ActivityUtilityParameters>() ;
-			for (ActivityParams params : config.getActivityParams()) {
+			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
 				// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
 				if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
@@ -133,7 +163,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			}
 
 			modeParams = new TreeMap<String, Mode>() ;
-			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = config.getModes();
+			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
 			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
@@ -141,12 +171,12 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				double marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
 				double marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
-				double monetaryDistanceCostRate = params.getMonetaryDistanceCostRate();
+				double monetaryDistanceRate = params.getMonetaryDistanceRate();
 				double constant = params.getConstant();
 				Mode newModeParams = new Mode(
 						marginalUtilityOfTraveling_s,
 						marginalUtilityOfDistance_m,
-						monetaryDistanceCostRate,
+						monetaryDistanceRate,
 						constant);
 				modeParams.put(modeName, newModeParams);
 			}
@@ -234,7 +264,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 					marginalUtilityOfMoney,
 					abortedPlanScore,
 					scoreActs,
-					usingOldScoringBelowZeroUtilityDuration);
+					usingOldScoringBelowZeroUtilityDuration,
+					this.simulationPeriodInDays);
 		}
 	}
 }

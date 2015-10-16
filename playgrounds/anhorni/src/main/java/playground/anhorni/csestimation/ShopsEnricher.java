@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 
@@ -84,7 +83,7 @@ public class ShopsEnricher {
 			if (sum > 0) {
 				Id<Location> id = Id.create(Integer.parseInt(entries[0].trim()), Location.class);
 				BZShop bzShop = new BZShop(id);
-				Coord coord = new CoordImpl(x, y);
+				Coord coord = new Coord((double) x, (double) y);
 				bzShop.setCoord(coord);			
 				bzShop.setSize(size);
 				bzShops.put(id, bzShop);
@@ -96,7 +95,7 @@ public class ShopsEnricher {
 	public void assignSize() {
 		QuadTree<Location> bzQuadTree = Utils.buildLocationQuadTree(this.bzShops); 
 		for (ShopLocation shop:this.shops.values()) {			
-			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
+			BZShop closestBZShop = (BZShop) bzQuadTree.getRectangle(shop.getCoord().getX(), shop.getCoord().getY());
 						
 			if (CoordUtils.calcDistance(closestBZShop.getCoord(), shop.getCoord()) < 200) {
 				if (closestBZShop.sizeMultiplyDefined()) {					

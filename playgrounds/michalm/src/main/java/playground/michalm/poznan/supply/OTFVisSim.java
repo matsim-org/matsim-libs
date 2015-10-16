@@ -24,8 +24,8 @@ public class OTFVisSim
             mviFile = args[1];
         }
         else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+            throw new IllegalArgumentException(
+                    "Incorrect program arguments: " + Arrays.toString(args));
         }
 
         OTFVis.playMVI(dir + mviFile);

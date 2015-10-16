@@ -29,13 +29,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,21 +67,21 @@ public class Facilities2Zones {
         logger.info("Loading zones...");
         ZoneCollection zones = new ZoneCollection();
         String data = new String(Files.readAllBytes(Paths.get(zonesIn)));
-        zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+        zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
         zones.setPrimaryKey(zoneIdKey);
 
         logger.info("Loading persons...");
-        XMLParser parser = new XMLParser();
+        XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
         parser.parse(popIn);
         logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-        Set<PlainPerson> persons = parser.getPersons();
+        Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
         MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
         SetZones task = new SetZones(zones, scenario.getActivityFacilities(), zoneIdKey, transform);
 
-        ProxyTaskRunner.run(task, persons, true);
+        TaskRunner.run(task, persons, true);
 
         logger.info(String.format("%s activities could not be located in a zone.", task.getNotFound()));
 

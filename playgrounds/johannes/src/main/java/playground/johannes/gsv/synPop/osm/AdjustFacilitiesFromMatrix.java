@@ -19,43 +19,30 @@
 
 package playground.johannes.gsv.synPop.osm;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.*;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.MatsimFacilitiesReader;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
-
-import com.vividsolutions.jts.geom.Point;
+import java.util.*;
 
 /**
  * @author johannes
@@ -83,7 +70,7 @@ public class AdjustFacilitiesFromMatrix {
 		 */
 		logger.info("Loading zones...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
-		Set<Zone> tmp = Zone2GeoJSON.parseFeatureCollection(data);
+		Set<Zone> tmp = ZoneGeoJsonIO.parseFeatureCollection(data);
 		ZoneCollection zones = new ZoneCollection();
 		zones.addAll(tmp);
 		/*
@@ -108,7 +95,7 @@ public class AdjustFacilitiesFromMatrix {
 		double c = MatrixOperations.sum(m) / scenario.getActivityFacilities().getFacilities().size();
 		TObjectDoubleHashMap<String> marginals = MatrixOperations.marginalsCol(m);
 
-		for (Zone zone : zones.zoneSet()) {
+		for (Zone zone : zones.getZones()) {
 			String name = zone.getAttribute("nuts3_name");
 			Set<ActivityFacility> facilities = f2Zone.get(zone);
 			if (facilities != null) {
@@ -185,7 +172,7 @@ public class AdjustFacilitiesFromMatrix {
 				double x = f.getCoord().getX() + (random.nextDouble() * 100);
 				double y = f.getCoord().getY() + (random.nextDouble() * 100);
 				Id<ActivityFacility> id = Id.create(f.getId().toString() + "clone" + i, ActivityFacility.class);
-				ActivityFacility newfac = facilities.getFactory().createActivityFacility(id, new CoordImpl(x, y));
+				ActivityFacility newfac = facilities.getFactory().createActivityFacility(id, new Coord(x, y));
 
 				for (ActivityOption opt : f.getActivityOptions().values()) {
 					newfac.addActivityOption(facilities.getFactory().createActivityOption(opt.getType()));

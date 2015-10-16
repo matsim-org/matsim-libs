@@ -20,6 +20,11 @@
 
 package playground.dziemke.cemdapMatsimCadyts.controller;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -37,12 +42,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 public class CemdapMatsimCadytsController {
 	//private final static Logger log = Logger.getLogger(CemdapMatsimCadytsController.class);
@@ -159,11 +161,13 @@ public class CemdapMatsimCadytsController {
 //		});
 		
 		// scoring function
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				// outcommenting following lines until return statement -> set scoring to zero
 				// outcommenting following three lines -> cadyts-only scoring

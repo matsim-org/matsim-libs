@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkSummary implements NetworkRunnable {
@@ -98,10 +97,10 @@ public class NetworkSummary implements NetworkRunnable {
 	}
 
 	public final Coord getMinCoord() {
-		return new CoordImpl(this.minX, this.minY);
+		return new Coord(this.minX, this.minY);
 	}
 
 	public final Coord getMaxCoord() {
-		return new CoordImpl(this.maxX, this.maxY);
+		return new Coord(this.maxX, this.maxY);
 	}
 }

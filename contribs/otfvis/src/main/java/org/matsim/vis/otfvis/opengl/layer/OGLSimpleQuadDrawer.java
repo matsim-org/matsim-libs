@@ -6,10 +6,9 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
@@ -57,7 +56,7 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 		if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
 			idstr = new String(id);
 		}
-		linkIds.put(new CoordImpl(middleX , middleY ), idstr);
+		linkIds.put(new Coord(middleX, middleY), idstr);
 	}
 
 	public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){

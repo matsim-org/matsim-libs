@@ -19,12 +19,13 @@
 
 package playground.johannes.gsv.matrices.misc;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
 import java.io.IOException;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 
 /**
  * @author johannes
@@ -33,7 +34,7 @@ import playground.johannes.gsv.zones.ZoneCollection;
 public class ExtractDE {
 
 	public static KeyMatrix extract(KeyMatrix m, String zonefile, String key) throws IOException {
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonefile, key);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonefile, key);
 
 		KeyMatrix newM = new KeyMatrix();
 		Set<String> keys = m.keys();

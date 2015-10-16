@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /*package*/ class LandmarkerPieSlices {
@@ -285,7 +284,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 		double centerX = (maxX - minX) / 2 + minX;
 		double centerY = (maxY - minY) / 2 + minY;
 
-		return new CoordImpl(centerX, centerY);
+		return new Coord(centerX, centerY);
 	}
 
 	public Node[] getLandmarks() {

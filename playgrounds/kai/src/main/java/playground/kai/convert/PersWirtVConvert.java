@@ -161,7 +161,7 @@ public class PersWirtVConvert {
 
 	private static Coord createCoordFromPOINT(Scenario sc, String fromPoint) {
 		String[] point = fromPoint.split("[() ]") ;
-		Coord coord = sc.createCoord(Double.parseDouble(point[1]), Double.parseDouble(point[2]) ) ;
+		Coord coord = new Coord(Double.parseDouble(point[1]), Double.parseDouble(point[2]));
 		
 		
 		return transformer.transform(coord) ;

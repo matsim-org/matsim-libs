@@ -60,5 +60,9 @@ public class IvtAnalysisModule extends AbstractModule {
 									actTypesForAnalysis);
 					}
 				});
+
+		bind(ActivityHistogram.class);
+		addEventHandlerBinding().to(ActivityHistogram.class);
+		addControlerListenerBinding().to( ActivityHistogramListener.class );
 	}
 }

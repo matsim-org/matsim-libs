@@ -9,26 +9,31 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionF
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 /**
  * @author balacm
  */
-public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory{
+public class AvignonScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final Controler controler;
 	private DestinationChoiceBestResponseContext lcContext;
 	private Config config;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
+	private final CharyparNagelScoringParametersForPerson parametersForPerson;
+
 	public AvignonScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
-        super(config.planCalcScore(), controler.getScenario().getNetwork());
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;
+		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 		log.info("creating DCScoringFunctionFactory");
 	}
 		
@@ -70,9 +75,11 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
 					person.getSelectedPlan(),
                     lcContext);
 		}
+
+		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), controler.getScenario().getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring( params ));
 		return scoringFunctionAccumulator;
 	}
 

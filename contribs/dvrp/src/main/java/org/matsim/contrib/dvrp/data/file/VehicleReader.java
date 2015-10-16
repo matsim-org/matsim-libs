@@ -31,7 +31,11 @@ import org.xml.sax.Attributes;
 public class VehicleReader
     extends MatsimXmlParser
 {
-    private final static String VEHICLE = "vehicle";
+    private static final String VEHICLE = "vehicle";
+
+    private static final double DEFAULT_CAPACITY = 1;
+    private static final double DEFAULT_T_0 = 0;
+    private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
     private VrpData data;
     private Map<Id<Link>, ? extends Link> links;
@@ -40,7 +44,6 @@ public class VehicleReader
     public VehicleReader(Scenario scenario, VrpData data)
     {
         this.data = data;
-
         links = scenario.getNetwork().getLinks();
     }
 
@@ -49,7 +52,7 @@ public class VehicleReader
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
         if (VEHICLE.equals(name)) {
-            startVehicle(atts);
+            data.addVehicle(createVehicle(atts));
         }
     }
 
@@ -59,18 +62,13 @@ public class VehicleReader
     {}
 
 
-    private void startVehicle(Attributes atts)
+    protected Vehicle createVehicle(Attributes atts)
     {
         Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
-
-        Id<Link> startLinkId = Id.create(atts.getValue("start_link"), Link.class);
-        Link startLink = links.get(startLinkId);
-
-        double capacity = ReaderUtils.getDouble(atts, "capacity", 1);
-
-        double t0 = ReaderUtils.getDouble(atts, "t_0", 0);
-        double t1 = ReaderUtils.getDouble(atts, "t_1", 24 * 60 * 60);
-
-        data.addVehicle(new VehicleImpl(id, startLink, capacity, t0, t1));
+        Link startLink = links.get(Id.createLinkId(atts.getValue("start_link")));
+        double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+        double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
+        double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
+        return new VehicleImpl(id, startLink, capacity, t0, t1);
     }
 }

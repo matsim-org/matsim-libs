@@ -21,10 +21,10 @@ package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -44,10 +44,10 @@ public class MonthTask extends AnalyzerTask {
 	 * .Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> values = new TObjectDoubleHashMap<>();
-		for (PlainPerson person : persons) {
-			String month = person.getAttribute(MIDKeys.PERSON_MONTH);
+		for (Person person : persons) {
+			String month = person.getAttribute(MiDKeys.PERSON_MONTH);
 			if (month != null) {
 				values.adjustOrPutValue(month, 1.0, 1.0);
 			}
@@ -55,7 +55,7 @@ public class MonthTask extends AnalyzerTask {
 
 		if (outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(values, "month", "count", String.format("%s/months.txt", getOutputDirectory()));
+				StatsWriter.writeLabeledHistogram(values, "month", "count", String.format("%s/months.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

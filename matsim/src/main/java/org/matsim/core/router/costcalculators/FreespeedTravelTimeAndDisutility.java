@@ -21,6 +21,7 @@
 package org.matsim.core.router.costcalculators;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -79,9 +80,9 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 	}
 
 	public FreespeedTravelTimeAndDisutility(PlanCalcScoreConfigGroup cnScoringGroup){
-		this(cnScoringGroup.getTraveling_utils_hr() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
+		this(cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0, cnScoringGroup.getPerforming_utils_hr() / 3600.0,
 //				cnScoringGroup.getMarginalUtlOfDistanceCar());
-				cnScoringGroup.getMonetaryDistanceCostRateCar()*cnScoringGroup.getMarginalUtilityOfMoney());
+				cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() *cnScoringGroup.getMarginalUtilityOfMoney());
 	}
 
 	@Override

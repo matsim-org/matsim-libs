@@ -22,19 +22,20 @@ package playground.johannes.gsv.synPop.mid.run;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
-import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
 import playground.johannes.gsv.synPop.mid.sim.PersonNuts1Name;
 import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 
 import java.io.IOException;
 import java.util.Random;
@@ -58,12 +59,12 @@ public class SetHomeLocations {
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, args[0]);
 		
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Cloning persons...");
@@ -78,8 +79,8 @@ public class SetHomeLocations {
 		logger.info("Done.");
 		
 		logger.info("Validation data...");
-		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);
-		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 1);
+		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
+		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");

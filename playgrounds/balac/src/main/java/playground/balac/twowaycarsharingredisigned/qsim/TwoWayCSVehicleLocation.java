@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,13 +12,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TwoWayCSVehicleLocation {
 
 	
 	private QuadTree<TwoWayCSStation> vehicleLocationQuadTree;	
+	
+	private static final Logger log = Logger.getLogger(TwoWayCSVehicleLocation.class);
+
 	
 	public TwoWayCSVehicleLocation(String inputFilePath, Scenario scenario) throws IOException {
 	    double minx = (1.0D / 0.0D);
@@ -42,8 +45,8 @@ public class TwoWayCSVehicleLocation {
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
-	    
-	    	CoordImpl coordStart = new CoordImpl(arr[2], arr[3]);
+
+			Coord coordStart = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 			Link l = linkUtils.getClosestLink(coordStart);
 	    	
 	    	//Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
@@ -53,7 +56,7 @@ public class TwoWayCSVehicleLocation {
 	    		vehIDs.add(Integer.toString(i));
 	    		i++;
 	    	}
-			TwoWayCSStation f = new TwoWayCSStation(l, Integer.parseInt(arr[6]), vehIDs);
+			TwoWayCSStation f = new TwoWayCSStation(l, l.getCoord(), Integer.parseInt(arr[6]), vehIDs);
 	    	
 	    	vehicleLocationQuadTree.put(l.getCoord().getX(), l.getCoord().getY(), f);
 	    	s = reader.readLine();
@@ -80,8 +83,15 @@ public class TwoWayCSVehicleLocation {
 	    
 	    
 	    for(TwoWayCSStation f: stations) {  
-	    	
+	    	if (vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()) != null
+	    			&& vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getLink().getId().toString().equals(f.getLink().getId().toString())) {
+	    		log.warn("Two carsharing stations were mapped to the same link" + f.getLink().getId().toString() +", consider merging these two stations before the simulation.");
+	    		log.warn("These stations are on the coordinates: " + vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getCoord().toString() + " and " + f.getCoord().toString());
+	    	}
+
 	    	vehicleLocationQuadTree.put(f.getLink().getCoord().getX(), f.getLink().getCoord().getY(), f);
+	    		
+	    		
 	    }
 	   
 	  }
@@ -92,7 +102,7 @@ public class TwoWayCSVehicleLocation {
 	
 	public void addVehicle(Link link, String id) {
 		
-		TwoWayCSStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		TwoWayCSStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			
@@ -101,7 +111,7 @@ public class TwoWayCSVehicleLocation {
 			
 			vehIDs.add(id);
 			
-			TwoWayCSStation fNew = new TwoWayCSStation(link, 1, vehIDs);		
+			TwoWayCSStation fNew = new TwoWayCSStation(link, link.getCoord(), 1, vehIDs);		
 			
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
 			
@@ -114,7 +124,7 @@ public class TwoWayCSVehicleLocation {
 				newvehIDs.add(s);
 			}
 			newvehIDs.add(0, id);
-			TwoWayCSStation fNew = new TwoWayCSStation(link, f.getNumberOfVehicles() + 1, newvehIDs);		
+			TwoWayCSStation fNew = new TwoWayCSStation(link, link.getCoord(), f.getNumberOfVehicles() + 1, newvehIDs);		
 			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
 			
@@ -135,7 +145,7 @@ public class TwoWayCSVehicleLocation {
 			if (!newvehIDs.remove(id))
 				throw new NullPointerException("Removing the vehicle did not wok");
 
-			TwoWayCSStation fNew = new TwoWayCSStation(station.getLink(), station.getNumberOfVehicles() - 1, newvehIDs);	
+			TwoWayCSStation fNew = new TwoWayCSStation(station.getLink(), station.getCoord(), station.getNumberOfVehicles() - 1, newvehIDs);	
 			
 						
 			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 

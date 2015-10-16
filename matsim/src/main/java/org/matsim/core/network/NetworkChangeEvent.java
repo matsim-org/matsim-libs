@@ -114,7 +114,7 @@ public class NetworkChangeEvent {
 	 * 
 	 * @param links a collection of links affected by this event.
 	 */
-	public void addLinks(Collection<Link> links) {
+	public void addLinks(Collection<? extends Link> links) {
 		this.links.addAll(links);
 	}
 	
@@ -146,7 +146,8 @@ public class NetworkChangeEvent {
 	/**
 	 * 
 	 * @param flowCapacityChange
-	 *            the flow capacity changes.
+	 *            the flow capacity changes in veh/s (!!), i.e. the unit which LinkImpl wants,
+	 *            not the unit in network.xml
 	 */
 	public void setFlowCapacityChange(ChangeValue flowCapacityChange) {
 		this.flowCapacityChange = flowCapacityChange;

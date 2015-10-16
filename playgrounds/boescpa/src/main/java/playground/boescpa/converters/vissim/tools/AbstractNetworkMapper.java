@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.boescpa.converters.vissim.ConvEvents;
@@ -70,8 +69,8 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 		// follow all links and check which "zones" of mutual base grid are passed
 		for (Link link : network.getLinks().values()) {
 			List<Id<Node>> passedZones = new LinkedList<>();
-			Coord start = new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-			Coord end = new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			Coord start = new Coord(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Coord end = new Coord(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			double[] deltas = calculateDeltas(start, end);
 			for (int i = 0; i <= (int)deltas[2]; i++) {
 				Id<Node> presentSmallest = findZone(mutualBaseGrid, start, deltas, i);
@@ -96,7 +95,7 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 		double presentSmallestDist = Double.MAX_VALUE;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
 			Double dist = CoordUtils.calcDistance(zone.getCoord(),
-					new CoordImpl(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
+					new Coord(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
 			if (dist < presentSmallestDist) {
 				presentSmallestDist = dist;
 				presentSmallest = zone.getId();

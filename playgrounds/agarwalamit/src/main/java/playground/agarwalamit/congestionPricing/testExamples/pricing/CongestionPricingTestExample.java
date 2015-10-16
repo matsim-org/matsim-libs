@@ -20,6 +20,7 @@ package playground.agarwalamit.congestionPricing.testExamples.pricing;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,7 +50,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -110,7 +110,7 @@ class CongestionPricingTestExample {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(fact);
+					bindCarTravelDisutilityFactory().toInstance(fact);
 				}
 			});
 
@@ -122,7 +122,7 @@ class CongestionPricingTestExample {
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(),  sc)));
 				break;
 			case "implV6":
-				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(),  sc)));
+//				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(),  sc)));
 				break;
 			default:
 				break;
@@ -140,7 +140,7 @@ class CongestionPricingTestExample {
 		config.controler().setLastIteration(20);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setMobsim("qsim");
-		config.controler().setOverwriteFileSetting(true ? OverwriteFileSetting.deleteDirectoryIfExists:OverwriteFileSetting.failIfDirectoryExists);
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		config.qsim().setEndTime(9*3600.);
 
@@ -224,12 +224,13 @@ class CongestionPricingTestExample {
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
 
 		// nodes between o-d1 (all horizonal links)
-		Node no = network.createAndAddNode(Id.createNodeId("o"), sc.createCoord(-100, 0));
-		Node n1 = network.createAndAddNode(Id.createNodeId(1), sc.createCoord(0, 0));
-		Node n2 = network.createAndAddNode(Id.createNodeId(2), sc.createCoord(1000, 0));
-		Node n3 = network.createAndAddNode(Id.createNodeId(3), sc.createCoord(2000, 0));
-		Node n4 = network.createAndAddNode(Id.createNodeId(4), sc.createCoord(3000, 0));
-		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), sc.createCoord(3100, 0));
+		double x = -100;
+		Node no = network.createAndAddNode(Id.createNodeId("o"), new Coord(x, (double) 0));
+		Node n1 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 0, (double) 0));
+		Node n2 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 1000, (double) 0));
+		Node n3 = network.createAndAddNode(Id.createNodeId(3), new Coord((double) 2000, (double) 0));
+		Node n4 = network.createAndAddNode(Id.createNodeId(4), new Coord((double) 3000, (double) 0));
+		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), new Coord((double) 3100, (double) 0));
 
 		lo = network.createAndAddLink(Id.createLinkId("o"), no, n1, 100, 15, 3600, 1);
 		network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 15, 3600, 1);
@@ -237,15 +238,17 @@ class CongestionPricingTestExample {
 		network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 15, 3600, 1);
 		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 15, 3600, 1);
 
-		Node n6 = network.createAndAddNode(Id.createNodeId(6), sc.createCoord(2000,-1000));
-		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), sc.createCoord(2000, -1100));
+		double y1 = -1000;
+		Node n6 = network.createAndAddNode(Id.createNodeId(6), new Coord((double) 2000, y1));
+		double y = -1100;
+		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), new Coord((double) 2000, y));
 
 		//bottleneck link
 		network.createAndAddLink(Id.createLinkId(4), n3, n6, 600, 15, 600, 1);
 		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 15, 1500, 1);
 
 		// an alternative link with higher disutility
-		network.createAndAddLink(Id.createLinkId(5), n1, n6, 17000, 20, 2700, 1);
+		network.createAndAddLink(Id.createLinkId(5), n1, n6, 12750, 15, 2700, 1);
 
 		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}

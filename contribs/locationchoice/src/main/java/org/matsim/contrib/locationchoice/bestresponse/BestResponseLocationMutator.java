@@ -19,6 +19,11 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,17 +45,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private final ActivityFacilities facilities;
@@ -102,8 +101,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
 		
-		String idExclusion = super.scenario.getConfig().findParam("locationchoice", "idExclusion");
-		if (idExclusion != null && Long.parseLong(person.getId().toString()) > Long.parseLong(idExclusion)) return;
+		Long idExclusion = this.dccg.getIdExclusion();
+		if (idExclusion != null && Long.parseLong(person.getId().toString()) > idExclusion) return;
 
 		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 		// (this may be done by now. kai, jan'13)
@@ -126,13 +125,13 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 
 	private void handleActivities(Plan plan, final Plan bestPlan, int personIndex) {
-		int tmp = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "tt_approximationLevel"));
-		ApproximationLevel travelTimeApproximationLevel ;
-		if ( tmp==0 ) {
+		int tmp = this.dccg.getTravelTimeApproximationLevel();
+		ApproximationLevel travelTimeApproximationLevel;
+		if (tmp == 0) {
 			travelTimeApproximationLevel = ApproximationLevel.COMPLETE_ROUTING ;
-		} else if ( tmp==1 ) {
+		} else if (tmp == 1) {
 			travelTimeApproximationLevel = ApproximationLevel.LOCAL_ROUTING ;
-		} else if ( tmp==2 ) {
+		} else if (tmp == 2) {
 			travelTimeApproximationLevel = ApproximationLevel.NO_ROUTING ;
 		} else {
 			throw new RuntimeException("unknwon travel time approximation level") ;
@@ -161,7 +160,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
-					Coord center = new CoordImpl(x,y);
+					Coord center = new Coord(x, y);
 
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					
@@ -198,7 +197,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
-		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
+		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).getDisk(center.getX(), center.getY(), maxRadius);
 		
 		for (ActivityFacilityWithIndex facility : list) {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
@@ -291,8 +290,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
-		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
-		double betaTime = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr();
+		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
+		double betaTime = this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
 			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
@@ -311,8 +310,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
 		// define a maximum distance choice set manually
-		if (Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "maxDistanceDCScore")) > 0.0) {
-			maxDistance = Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "maxDistanceDCScore"));
+		if (this.dccg.getMaxDistanceDCScore() > 0.0) {
+			maxDistance = this.dccg.getMaxDistanceDCScore();
 		}
 		return maxDistance;
 	}

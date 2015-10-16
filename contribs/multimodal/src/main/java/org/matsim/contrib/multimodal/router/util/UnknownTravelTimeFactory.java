@@ -25,7 +25,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Provider;
 
-class UnknownTravelTimeFactory implements Provider<TravelTime> {
+public class UnknownTravelTimeFactory implements Provider<TravelTime> {
 
 	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;

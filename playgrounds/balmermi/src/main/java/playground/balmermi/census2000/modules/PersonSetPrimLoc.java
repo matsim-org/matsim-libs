@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -274,13 +274,13 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no work fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.workFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
+				to_fac = this.workFacQuadTree.getClosest(to_zone.getCoord().getX(), to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {
 				to_fac = this.getPrimActFacility(to_facs,WORK);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCoord();
+			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<work_list.size(); i++) {
 				ActivityImpl a = work_list.get(i);
 				a.setCoord(coord);
@@ -296,13 +296,13 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no educ fac in to_zone id=" +
 				                   to_zone.getId() + ". Getting a close one...");
-				to_fac = this.educFacQuadTree.get(to_zone.getCoord().getX(),to_zone.getCoord().getY());
+				to_fac = this.educFacQuadTree.getClosest(to_zone.getCoord().getX(), to_zone.getCoord().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
 			else {
 				to_fac = this.getPrimActFacility(to_facs,EDUCATION);
 			}
-			CoordImpl coord = (CoordImpl)to_fac.getCoord();
+			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<educ_list.size(); i++) {
 				ActivityImpl a = educ_list.get(i);
 				a.setCoord(coord);

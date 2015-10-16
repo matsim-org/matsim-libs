@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -99,13 +99,13 @@ public class CreateDemand {
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
-				((PersonImpl)person).createDesires("desired activity durations");
+				//((PersonImpl)person).createDesires("desired activity durations");
 				/*
 				 * Create a day plan and add it to the person
 				 */
 				Plan plan = populationFactory.createPlan();
 				person.addPlan(plan);
-				((PersonImpl)person).setSelectedPlan(plan);
+				person.setSelectedPlan(plan);
 			}
 			bufferedReader.close();
 		} // end try
@@ -155,8 +155,7 @@ public class CreateDemand {
 				 * Otherwise add a leg and an activity (destination activity)
 				 */
 				if (!personId.equals(previousPerson)) {
-					Coord coordOrigin = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordOrigin]), 
-							Double.parseDouble(parts[index_yCoordOrigin]));
+					Coord coordOrigin = new Coord(Double.parseDouble(parts[index_xCoordOrigin]), Double.parseDouble(parts[index_yCoordOrigin]));
 					
 					Activity activity = 
 						populationFactory.createActivityFromCoord("home", coordOrigin);
@@ -184,8 +183,7 @@ public class CreateDemand {
 					/*
 					 * Add activity given its type.
 					 */
-					Coord coordDestination = this.scenarioPUS.createCoord(Double.parseDouble(parts[index_xCoordDestination]), 
-							Double.parseDouble(parts[index_yCoordDestination]));
+					Coord coordDestination = new Coord(Double.parseDouble(parts[index_xCoordDestination]), Double.parseDouble(parts[index_yCoordDestination]));
 										
 					String activityType = parts[index_activityType].trim();
 					if (activityType.startsWith("w")) worker = true;
@@ -195,7 +193,7 @@ public class CreateDemand {
 					
 					Double duration = Double.parseDouble(parts[index_activityDuration]);		
 					// store the desired duration in the persons knowledge
-					((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
+					//((PersonImpl)person).getDesires().putActivityDuration(activityType, duration);
 					plan.addActivity(activity);
 				}
 				previousPerson = personId;
@@ -219,7 +217,7 @@ public class CreateDemand {
 		 * Adapt the activity locations and the activity end times. 
 		 */
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {			
-			if (((PersonImpl)person).isEmployed()) {
+			if (PersonUtils.isEmployed(person)) {
 				Collections.shuffle(this.pusWorkers, this.random);
 				Person pusPerson = this.scenarioPUS.getPopulation().getPersons().get(this.pusWorkers.get(0));
 				Plan plan = this.adaptAndCopyPlan(person, pusPerson.getSelectedPlan(), true);	
@@ -271,7 +269,9 @@ public class CreateDemand {
 				}
 				else {
 					Person pusPerson = plan.getPerson();
-					double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					if ( true ) throw new RuntimeException( "desires do not exist anymore. please use a Map" );
+					//double activityDuration = ((PersonImpl)pusPerson).getDesires().getActivityDuration(activity.getType());
+					double activityDuration = 0;
 					
 					time += activityDuration + this.randomizeTimes();
 					String dur = String.valueOf((int)(activityDuration / 3600.0));
@@ -303,21 +303,21 @@ public class CreateDemand {
 		if (activity.getType().startsWith("s")) {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.shopFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}
 		else if (activity.getType().startsWith("l")) {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.leisureFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}
 		else {
 			double radius = 8000.0;
 			while (facilities.size() == 0) {
-				facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.get(xCoordCenter, yCoordCenter, radius);
+				facilities = (ArrayList<ActivityFacility>) this.educationFacilitiesTree.getDisk(xCoordCenter, yCoordCenter, radius);
 				radius *= 2.0;
 			}
 		}

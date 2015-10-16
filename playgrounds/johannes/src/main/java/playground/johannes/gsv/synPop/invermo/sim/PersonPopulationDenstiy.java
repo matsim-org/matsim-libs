@@ -21,14 +21,15 @@ package playground.johannes.gsv.synPop.invermo.sim;
 
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.gis.DataPool;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,8 +52,9 @@ public class PersonPopulationDenstiy implements Hamiltonian {
 	}
 	
 	@Override
-	public double evaluate(PlainPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
+	public double evaluate(Person person) {
+		ActivityFacility home = (ActivityFacility) ((PlainPerson)person).getUserData(SwitchHomeLocation
+				.USER_FACILITY_KEY);
 		Double density = densities.get(home);
 		if(density == null) {
 			attachDensity(home);
@@ -63,7 +65,7 @@ public class PersonPopulationDenstiy implements Hamiltonian {
 			return Double.POSITIVE_INFINITY;
 		}
 		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
+		Double target = (Double) ((PlainPerson)person).getUserData(TARGET_DENSITY);
 		
 		return Math.abs(density - target)/density;
 	}

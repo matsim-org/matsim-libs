@@ -20,6 +20,7 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -180,14 +181,15 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		
 		Network network = sc.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
-		
-		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), sc.createCoord(0, 0));
-		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), sc.createCoord(10000, 0));
-		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), sc.createCoord(20000, 0));
-		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), sc.createCoord(30000, 0));
-		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), sc.createCoord(30000, 10000));
-		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), sc.createCoord(40000, 0));
-		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), sc.createCoord(30000, -10000));
+
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), new Coord((double) 10000, (double) 0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), new Coord((double) 20000, (double) 0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), new Coord((double) 30000, (double) 0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), new Coord((double) 30000, (double) 10000));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), new Coord((double) 40000, (double) 0));
+		double y = -10000;
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), new Coord((double) 30000, y));
 		
 		network.addNode(n1);
 		network.addNode(n2);

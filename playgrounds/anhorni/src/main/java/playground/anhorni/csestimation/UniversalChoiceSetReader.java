@@ -24,8 +24,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class UniversalChoiceSetReader {
@@ -45,7 +45,7 @@ public class UniversalChoiceSetReader {
 				Id<Location> id = Id.create(Integer.parseInt(entrs[0].trim()), Location.class);
 				ShopLocation shop = new ShopLocation(id);
 				// lat -> 1 | lon -> 0
-				CoordImpl coord = new CoordImpl(Double.parseDouble(entrs[5]), Double.parseDouble(entrs[4]));
+				Coord coord = new Coord(Double.parseDouble(entrs[5]), Double.parseDouble(entrs[4]));
 				shop.setCoord(this.trafo.transform(coord));
 				shops.put(id, shop);				
 			}

@@ -175,7 +175,7 @@ public class Assignment {
 		
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
+			Person person = pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 					
 			System.out.println("Agent: "+i+" from "+populationSize);
@@ -316,13 +316,13 @@ public class Assignment {
 			
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				person.setCarAvail("never");
+				PersonUtils.setCarAvail(person, "never");
 			}
 			else{
-				person.setCarAvail("always");
+				PersonUtils.setCarAvail(person, "always");
 			}
 			
-			person.setEmployed(true);
+			PersonUtils.setEmployed(person, true);
 		//	person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan

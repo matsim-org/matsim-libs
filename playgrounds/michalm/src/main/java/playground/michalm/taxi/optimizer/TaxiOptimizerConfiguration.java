@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.path.VrpPathCalculator;
 
 import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
@@ -35,7 +35,8 @@ public class TaxiOptimizerConfiguration
 
     public TaxiOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
             TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder,
-            FilterFactory filterFactory, Goal goal, String workingDirectory, Map<Id<Zone>, Zone> zones)
+            FilterFactory filterFactory, Goal goal, String workingDirectory,
+            Map<Id<Zone>, Zone> zones)
     {
         this.context = context;
 

@@ -190,7 +190,9 @@ public class Stitcher {
 
 	private void addLink(Link link) {
 		if (!networkForThisRoute.getLinks().containsKey(link.getId())) {
-			networkForThisRoute.addLink(networkForThisRoute.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId()));
+			networkForThisRoute.addLink(networkForThisRoute.getFactory().createLink(link.getId(), 
+					networkForThisRoute.getNodes().get(link.getFromNode().getId()), 
+					networkForThisRoute.getNodes().get(link.getToNode().getId())));
 		}
 	}
 

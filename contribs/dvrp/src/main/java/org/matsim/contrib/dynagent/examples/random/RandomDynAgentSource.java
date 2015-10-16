@@ -53,13 +53,14 @@ public class RandomDynAgentSource
             RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
 
             Id<Person> id = Id.createPersonId(i);
-            Id<Link> startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks()
-                    .keySet());
+            Id<Link> startLinkId = RandomDynAgentLogic
+                    .chooseRandomElement(network.getLinks().keySet());
             DynAgent agent = new DynAgent(id, startLinkId, qSim, agentLogic);
 
             qSim.createAndParkVehicleOnLink(
                     qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
-                            VehicleUtils.getDefaultVehicleType()), startLinkId);
+                            VehicleUtils.getDefaultVehicleType()),
+                    startLinkId);
             qSim.insertAgentIntoMobsim(agent);
         }
     }

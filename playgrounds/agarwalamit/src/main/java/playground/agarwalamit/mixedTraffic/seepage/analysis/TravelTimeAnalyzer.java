@@ -132,16 +132,16 @@ public class TravelTimeAnalyzer extends AbstractAnalysisModule {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			if(event.getLinkId().equals(travelTimeOnLink)){
-				double travelTimeSoFar = person2LinkTravelTime.get(event.getPersonId()); 
-				person2LinkTravelTime.put(event.getPersonId(), travelTimeSoFar+event.getTime());
+				double travelTimeSoFar = person2LinkTravelTime.get(event.getDriverId());
+				person2LinkTravelTime.put(event.getDriverId(), travelTimeSoFar+event.getTime());
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if(event.getLinkId().equals(travelTimeOnLink)){
-				if(!person2LinkTravelTime.containsKey(event.getPersonId())){
-					person2LinkTravelTime.put(event.getPersonId(), - event.getTime());
+				if(!person2LinkTravelTime.containsKey(event.getDriverId())){
+					person2LinkTravelTime.put(event.getDriverId(), - event.getTime());
 				} else throw new RuntimeException("Person is traveling on this link only once. Aborting...");
 			}
 		}

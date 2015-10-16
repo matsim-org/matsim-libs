@@ -21,8 +21,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String DROPOFF_DURATION = "dropoffDuration";
 	private static final String DESTINATION_KNOWN = "destinationKnown";
 	private static final String VEHICLE_DIVERSION = "vehicleDiversion";
-	private static final String NEAREST_REQUEST_LIM = "vehicleDiversion";
-	private static final String NEAREST_VEH_LIM= "vehicleDiversion";
+	private static final String NEAREST_REQUEST_LIM = "nearestRequestLimit";
+	private static final String NEAREST_VEH_LIM= "nearestVehicleLimit";
 	private static final String GOAL= "optimizerGoal";
 	
 	

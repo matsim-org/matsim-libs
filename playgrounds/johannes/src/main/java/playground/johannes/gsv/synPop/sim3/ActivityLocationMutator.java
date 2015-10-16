@@ -20,13 +20,10 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.synpop.data.PlainPerson;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 
 import java.util.List;
 import java.util.Random;
@@ -61,8 +58,8 @@ public class ActivityLocationMutator implements SingleMutator {
 	}
 
 	@Override
-	public boolean mutate(PlainPerson person) {
-		List<Segment> activities = person.getPlan().getActivities();
+	public boolean mutate(Person person) {
+		List<Segment> activities = ((PlainPerson)person).getPlan().getActivities();
 	
 		int idx = random.nextInt(activities.size());
 		// if(idx == 0 || idx == activities.size() - 1)
@@ -112,7 +109,7 @@ public class ActivityLocationMutator implements SingleMutator {
 //	
 //				if (prevFac.equals(nextFac)) {
 //					PlainElement leg = person.getPlan().getLegs().get(idx - 1);
-//					String value = leg.getAttribute(MIDKeys.LEG_ROUTE_DISTANCE);
+//					String value = leg.getAttribute(MiDKeys.LEG_ROUTE_DISTANCE);
 //					if (value != null) {
 //						double dist = Double.parseDouble(value);
 //						// QuadTree<ActivityFacility> quadTree =
@@ -144,7 +141,7 @@ public class ActivityLocationMutator implements SingleMutator {
 	}
 
 	@Override
-	public void revert(PlainPerson person) {
+	public void revert(Person person) {
 //		currentAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, currentFacility.getId().toString());
 		currentAct.setUserData(USER_DATA_KEY, currentFacility);
 

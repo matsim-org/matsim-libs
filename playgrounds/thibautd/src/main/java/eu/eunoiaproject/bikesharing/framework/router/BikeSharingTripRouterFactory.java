@@ -39,10 +39,10 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.Facility;
 
-import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
 /**
  * Builds a standard trip router factory for bike sharing simulations.
@@ -116,7 +116,10 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 		if ( routePtUsingSchedule || scenario.getConfig().transit().isUseTransit() ) {
 			// XXX should be person-dependent
 			final CharyparNagelScoringParameters scoringParams =
-					CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();
+					CharyparNagelScoringParameters.getBuilder(
+							scenario.getConfig().planCalcScore(),
+							scenario.getConfig().planCalcScore().getScoringParameters( null ),
+							scenario.getConfig().scenario()).create();
 			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
 			initialNodeRouters.add( 
 					new InitialNodeRouter(

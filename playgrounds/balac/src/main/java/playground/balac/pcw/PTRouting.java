@@ -2,6 +2,7 @@ package playground.balac.pcw;
 
 import com.google.inject.Provider;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,15 +12,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -32,7 +31,6 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;
 import playground.balac.utils.TransitRouterImplFactory;
-import playground.balac.utils.TransitRouterNetworkReaderMatsimV1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -142,36 +140,44 @@ public class PTRouting {
 		config.global().setNumberOfThreads(16);	// for parallel population reading
 	
 		
-		config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/network_multimodal.xml.gz");
+	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/network_multimodal.xml.gz");
 
-	    config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/facilities.xml.gz");
-	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/schedule.20120117.ch-edited.xml.gz");
-	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/transitVehicles.ch.xml.gz");
+	  //  config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/facilities.xml.gz");
+	    config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");
+
+	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/mmSchedule.xml.gz");
+	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/mmVehicles.xml.gz");
 		
-		config.transit().setUseTransit(true);
+		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/transitRouterNetwork_thinned.xml.gz");
+		TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 100.0D);
+	    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setUtilityOfLineSwitch(-2.0D);
+		final double travelingWalk = -12.0D;
+		((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
-	    ((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getModeRoutingParams().get("walk").setTeleportedModeSpeed(1.34);
+		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+	    routeConfigGroup.getModeRoutingParams().get("walk").setBeelineDistanceFactor(1.2);
+	    routeConfigGroup.getModeRoutingParams().get("walk").setTeleportedModeSpeed(4.8 / 3.6);
+	   // new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");
+
+	  //  ((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getModeRoutingParams().get("walk").setTeleportedModeSpeed(1.34);
 	    
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/coord_"+args[0] +".txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/geo_coded_SC_wave1_referencevalues_sexyage_1008.txt");
 
 //		    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
-			final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPT_"+args[0]+".txt");
-			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPTFr_"+args[0]+".txt");
+			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/travelTimesPTFr_sexyage_1008_"+args[0]+".txt");
 
-			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/frequency_"+args[0]+".txt");
+			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/frequency_sexyage_1008_"+args[0]+".txt");
 			
 		((TransitRouterConfigGroup) config.getModule("transitRouter")).setSearchRadius(2000.0);
 			
@@ -179,7 +185,7 @@ public class PTRouting {
 		
 		NetworkLinkUtils lUtils = new NetworkLinkUtils(scenario.getNetwork());
 		
-		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+	//	PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
 		TransitRouterWrapper routingModule = new TransitRouterWrapper(
         		transitRouterFactory.get(),
@@ -202,15 +208,15 @@ public class PTRouting {
 			String[] arr = s.split(";");
 			
 			if (!(arr[1].startsWith("-") || arr[2].startsWith("-") || arr[3].startsWith("-") || arr[4].startsWith("-"))) {
-			
-			CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
+
+				Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 			
 			
 			
 			Link lStart = lUtils.getClosestLink(coordStart);
-			
-			
-			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
+
+
+				Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 			
 
 			Link lEnd = lUtils.getClosestLink(coordEnd);
@@ -417,16 +423,11 @@ public class PTRouting {
 		
 		outFrequency.flush();
 		outFrequency.close();
-		outLink.flush();
-		outLink.close();
+		
 		outLinkF.flush();
 		outLinkF.close();
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
-//				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
-		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-        ).writeFileV4("./plans_pt_trips_"+args[0]+".xml.gz");
-
+		
 
 }
 

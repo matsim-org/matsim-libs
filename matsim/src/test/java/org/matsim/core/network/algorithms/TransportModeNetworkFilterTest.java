@@ -26,6 +26,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -281,7 +282,7 @@ public class TransportModeNetworkFilterTest {
 		final Network network = scenario.getNetwork();
 		final NetworkFactory factory = network.getFactory();
 
-		Node node1 = factory.createNode(Id.create(1, Node.class), scenario.createCoord(0, 0));
+		Node node1 = factory.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		network.addNode(node1);
 		Link link1 = factory.createLink(Id.create(1, Link.class), node1, node1);
 		link1.setAllowedModes(createHashSet(TransportMode.car));
@@ -345,19 +346,19 @@ public class TransportModeNetworkFilterTest {
 			final Network network = this.scenario.getNetwork();
 			final NetworkFactory factory = network.getFactory();
 
-			network.addNode(factory.createNode(this.nodeIds[ 1], this.scenario.createCoord(  0, 100)));
-			network.addNode(factory.createNode(this.nodeIds[ 2], this.scenario.createCoord(  0,   0)));
-			network.addNode(factory.createNode(this.nodeIds[ 3], this.scenario.createCoord(100,   0)));
-			network.addNode(factory.createNode(this.nodeIds[ 4], this.scenario.createCoord(100, 100)));
-			network.addNode(factory.createNode(this.nodeIds[ 5], this.scenario.createCoord(100, 200)));
-			network.addNode(factory.createNode(this.nodeIds[ 6], this.scenario.createCoord(200, 200)));
-			network.addNode(factory.createNode(this.nodeIds[ 7], this.scenario.createCoord(200, 100)));
-			network.addNode(factory.createNode(this.nodeIds[ 8], this.scenario.createCoord(200,   0)));
-			network.addNode(factory.createNode(this.nodeIds[ 9], this.scenario.createCoord(300,   0)));
-			network.addNode(factory.createNode(this.nodeIds[10], this.scenario.createCoord(300, 100)));
-			network.addNode(factory.createNode(this.nodeIds[11], this.scenario.createCoord(300, 200)));
-			network.addNode(factory.createNode(this.nodeIds[12], this.scenario.createCoord(400, 200)));
-			network.addNode(factory.createNode(this.nodeIds[13], this.scenario.createCoord(400, 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 1], new Coord((double) 0, (double) 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 2], new Coord((double) 0, (double) 0)));
+			network.addNode(factory.createNode(this.nodeIds[ 3], new Coord((double) 100, (double) 0)));
+			network.addNode(factory.createNode(this.nodeIds[ 4], new Coord((double) 100, (double) 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 5], new Coord((double) 100, (double) 200)));
+			network.addNode(factory.createNode(this.nodeIds[ 6], new Coord((double) 200, (double) 200)));
+			network.addNode(factory.createNode(this.nodeIds[ 7], new Coord((double) 200, (double) 100)));
+			network.addNode(factory.createNode(this.nodeIds[ 8], new Coord((double) 200, (double) 0)));
+			network.addNode(factory.createNode(this.nodeIds[ 9], new Coord((double) 300, (double) 0)));
+			network.addNode(factory.createNode(this.nodeIds[10], new Coord((double) 300, (double) 100)));
+			network.addNode(factory.createNode(this.nodeIds[11], new Coord((double) 300, (double) 200)));
+			network.addNode(factory.createNode(this.nodeIds[12], new Coord((double) 400, (double) 200)));
+			network.addNode(factory.createNode(this.nodeIds[13], new Coord((double) 400, (double) 100)));
 
 			network.addLink(createLink(network, this.linkIds[ 1], this.nodeIds[ 1], this.nodeIds[ 2], this.modesC));
 			network.addLink(createLink(network, this.linkIds[ 2], this.nodeIds[ 2], this.nodeIds[ 3], this.modesC));

@@ -18,6 +18,14 @@
  * *********************************************************************** */
 
 package playground.jbischoff.taxibus.utils;
+
+import java.util.ArrayList;
+
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+
+import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
+
 /**
  * @author  jbischoff
  *
@@ -25,4 +33,29 @@ package playground.jbischoff.taxibus.utils;
 public class TaxibusUtils {
     public static final String TAXIBUS_MODE = "taxibus";
 
+
+
+public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
+	double cost = 0.0;
+	
+	for (VrpPathWithTravelData path : newPath){
+		cost += path.getTravelCost();
+	}
+	
+	return cost;
+}
+
+
+
+public static void printRequestPath(TaxibusVehicleRequestPath best) {
+	System.out.println("RequestPath for vehicle : "+best.vehicle.getId());
+	for (TaxibusRequest r : best.requests){
+	System.out.println(r.toString() + "\tfrom\t"+ r.getFromLink().getId().toString() + "\tto:\t"+ r.getToLink().getId().toString());
+	}
+	for (VrpPathWithTravelData p : best.path){
+		System.out.println("Path from\t" + p.getFromLink().getId().toString()+ "\tto\t"+ p.getToLink().getId().toString());
+		
+	}
+	
+}
 }

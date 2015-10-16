@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -143,7 +142,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		this.blendFactor = blendFactor;
 
 		this.marginalUtilityOfMoney = controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
+		this.opportunityCostOfCarTravel = -controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
 
 		init();
 	}
@@ -206,19 +205,19 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		/*
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
-		if (!activeAgents.contains(event.getPersonId())) return;
+		if (!activeAgents.contains(event.getDriverId())) return;
 
 		LinkTrip linkTrip = new LinkTrip();
-		linkTrip.person_id = event.getPersonId();
+		linkTrip.person_id = event.getDriverId();
 		linkTrip.link_id = event.getLinkId();
 		linkTrip.enterTime = event.getTime();
 
-		activeTrips.put(event.getPersonId(), linkTrip);
+		activeTrips.put(event.getDriverId(), linkTrip);
 
 		/*
 		 * Analysis
 		 */
-		LegTrip legTrip = activeLegs.get(event.getPersonId());
+		LegTrip legTrip = activeLegs.get(event.getDriverId());
 		if (legTrip == null) {
 			log.error("LegTrip was not found!");
 			return;
@@ -231,9 +230,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		/*
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
-		if (!activeAgents.contains(event.getPersonId())) return;
+		if (!activeAgents.contains(event.getDriverId())) return;
 
-		LinkTrip linkTrip = activeTrips.get(event.getPersonId());
+		LinkTrip linkTrip = activeTrips.get(event.getDriverId());
 
 		if (linkTrip == null) {
 			log.error("LinkTrip was not found!");

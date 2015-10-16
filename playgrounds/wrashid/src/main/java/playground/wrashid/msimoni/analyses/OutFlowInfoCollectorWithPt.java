@@ -133,7 +133,7 @@ public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implemen
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
 	}
 	
 	@Override

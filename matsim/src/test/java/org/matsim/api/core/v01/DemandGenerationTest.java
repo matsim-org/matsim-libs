@@ -154,7 +154,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 	}
 
 	private void createFakeNetwork(Scenario scenario, Network network){
-		Coord coord = scenario.createCoord(0,0 ) ;
+		Coord coord = new Coord((double) 0, (double) 0);
 
 		Node n1 = network.getFactory().createNode(Id.create(0, Node.class), coord);
 		network.addNode( n1 ) ;

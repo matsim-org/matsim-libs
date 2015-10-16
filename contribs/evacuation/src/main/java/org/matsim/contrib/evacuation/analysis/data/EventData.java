@@ -196,7 +196,7 @@ public class EventData<C> {
 
 	public LinkedList<Cell> getCells() {
 		LinkedList<Cell> cells = new LinkedList<Cell>();
-		getCellTree().get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+		getCellTree().getRectangle(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
 		return cells;
 	}
 

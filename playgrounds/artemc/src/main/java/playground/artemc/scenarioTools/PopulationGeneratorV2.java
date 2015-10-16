@@ -60,9 +60,9 @@ public class PopulationGeneratorV2 {
 		HashMap<Integer, ArrayList<Id>> zoneWorkFacilities = new HashMap<Integer, ArrayList<Id>>();	
 		HashMap<Integer, Double> occupancy = new HashMap<Integer, Double>();
 		
-		Random generator = new Random();	
+		Random generator = new Random();
 		
-		ArrayList<String[]> facilityIncome = CSVReader.readCSV(incomeFilePath);	
+		ArrayList<String[]> facilityIncome = CSVReader.readCSV(incomeFilePath, ",");
 		HashMap<Id, Integer> facilityIncomeMap = new HashMap<Id, Integer>(); 
 
 		for(String[] entry:facilityIncome){
@@ -177,7 +177,7 @@ public class PopulationGeneratorV2 {
 		
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
+			Person person = pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 					
 			System.out.println("Agent: "+i+" from "+populationSize);
@@ -319,13 +319,13 @@ public class PopulationGeneratorV2 {
 			
 			double carAvailToss = generator.nextDouble();
 			if(carAvailToss<noCarPercentage){
-				person.setCarAvail("never");
+				PersonUtils.setCarAvail(person, "never");
 			}
 			else{
-				person.setCarAvail("always");
+				PersonUtils.setCarAvail(person, "always");
 			}
 			
-			person.setEmployed(true);
+			PersonUtils.setEmployed(person, true);
 			person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan

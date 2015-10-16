@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,7 +46,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -111,75 +111,75 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		Person p = sc.getPopulation().getPersons().get(Id.create("1", Person.class));
 		
 		// calc the first best route without any congestion
-		List<Leg> legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 0, p);
+		List<Leg> legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
 		Assert.equals(210., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 110, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 111, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 410, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 411, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 710, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 711, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
 		Assert.equals(85899., legs.get(1).getTravelTime());
 		
 		// only the first departure is overcrowded
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v1", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 0, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
 		Assert.equals(510., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 110, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
 		Assert.equals(400., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 111, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 410, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 411, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 710, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 711, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
 		Assert.equals(86199., legs.get(1).getTravelTime());
 		
 		// first and second departure is overcrowded
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v2", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 0, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
 		Assert.equals(810., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 110, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
 		Assert.equals(700., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 111, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
 		Assert.equals(699., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 410, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
 		Assert.equals(400., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 411, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 710, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 711, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
 		Assert.equals(86499., legs.get(1).getTravelTime());
 		
 		// all departures are overcrowded (disutility for all connections). Therefore,
 		// we get the same results as they are returned without any congestion.
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v3", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 0, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
 		Assert.equals(210., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 110, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 111, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 410, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 411, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 710, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
 		Assert.equals(100., legs.get(1).getTravelTime());
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 711, p);
+		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
 		Assert.equals(85899., legs.get(1).getTravelTime());
 	}
 	
@@ -213,13 +213,13 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	private void createPerson(Scenario sc) {
 		PopulationFactory factory =  sc.getPopulation().getFactory();
 		Plan plan = factory.createPlan();
-		Activity home = factory.createActivityFromCoord("h", sc.createCoord(0, 0));
+		Activity home = factory.createActivityFromCoord("h", new Coord((double) 0, (double) 0));
 		home.setEndTime(0);
 		plan.addActivity(home);
 		Leg l = factory.createLeg(TransportMode.pt);
 		Person p = factory.createPerson(Id.create(1, Person.class));
 		plan.addLeg(l);
-		plan.addActivity(factory.createActivityFromCoord("w", sc.createCoord(100, 100)));
+		plan.addActivity(factory.createActivityFromCoord("w", new Coord((double) 100, (double) 100)));
 		p.addPlan(plan);
 		sc.getPopulation().addPerson(p);
 	}
@@ -238,9 +238,11 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	private void createNetwork(Scenario sc) {
 		NetworkFactory factory =  sc.getNetwork().getFactory();
 		Node one, two, three;
-		one = factory.createNode(Id.create("n1", Node.class), sc.createCoord(-100, -100));
-		two = factory.createNode(Id.create("n2", Node.class), sc.createCoord(0, 0));
-		three = factory.createNode(Id.create("n3", Node.class), sc.createCoord(100, 100));
+		double x = -100;
+		double y = -100;
+		one = factory.createNode(Id.create("n1", Node.class), new Coord(x, y));
+		two = factory.createNode(Id.create("n2", Node.class), new Coord((double) 0, (double) 0));
+		three = factory.createNode(Id.create("n3", Node.class), new Coord((double) 100, (double) 100));
 		sc.getNetwork().addNode(one);
 		sc.getNetwork().addNode(two);
 		sc.getNetwork().addNode(three);
@@ -256,10 +258,10 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		TransitSchedule sched = sc.getTransitSchedule();
 		TransitScheduleFactory schedFactory = sched.getFactory();
 		TransitLine line = schedFactory.createTransitLine(Id.create("wagonLine", TransitLine.class));
-		
-		TransitStopFacility f1 = schedFactory.createTransitStopFacility(Id.create("f1", TransitStopFacility.class), sc.createCoord(0, 0), false);
+
+		TransitStopFacility f1 = schedFactory.createTransitStopFacility(Id.create("f1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		f1.setLinkId(Id.create("l1", Link.class));
-		TransitStopFacility f2 = schedFactory.createTransitStopFacility(Id.create("f2", TransitStopFacility.class), sc.createCoord(100, 100), false);
+		TransitStopFacility f2 = schedFactory.createTransitStopFacility(Id.create("f2", TransitStopFacility.class), new Coord((double) 100, (double) 100), false);
 		f2.setLinkId(Id.create("l2", Link.class));
 		sched.addStopFacility(f1);
 		sched.addStopFacility(f2);

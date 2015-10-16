@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -54,17 +55,14 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // The Controler will wire it into the EventsManager later.
         // (Again, there is a second method to add an instance directly.)
         addEventHandlerBinding().to(TravelTimeCalculator.class);
-        // I export interfaces TravelTime and LinkToLinkTravelTime, and I say
-        // what is behind them, see below. The Providers
-        // are just getters which access the TravelTimeCalculator.
-        // I don't say "asSingleton" here, because I don't need to care -
-        // The TravelTimeCalculator is the singleton, and the TravelTime reference can be
-        // fetched from it as often as the framework wants.
-        bind(TravelTime.class).toProvider(TravelTimeProvider.class);
+        bindNetworkTravelTime().toProvider(FromTravelTimeCalculator.class);
+        for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+            addTravelTimeBinding(mode).to(networkTravelTime());
+        }
         bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
     }
 
-    static class TravelTimeProvider implements Provider<TravelTime> {
+    private static class FromTravelTimeCalculator implements Provider<TravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;
@@ -76,7 +74,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     }
 
-    static class LinkToLinkTravelTimeProvider implements Provider<LinkToLinkTravelTime> {
+    private static class LinkToLinkTravelTimeProvider implements Provider<LinkToLinkTravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;
@@ -88,7 +86,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     }
 
-    static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
+    private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
         @Inject
         Scenario scenario;

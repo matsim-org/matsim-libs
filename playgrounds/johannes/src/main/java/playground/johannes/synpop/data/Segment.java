@@ -25,4 +25,8 @@ package playground.johannes.synpop.data;
 public interface Segment extends Attributable {
 
     public Episode getEpisode();
+
+    Segment next();
+
+    Segment previous();
 }

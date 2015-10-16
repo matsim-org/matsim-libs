@@ -93,7 +93,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		
-		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(costFactory.createTravelDisutility(super.getTravelTimeCollector(), this.getConfig().planCalcScore()), super.getTravelTimeCollector());
 		
 		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
 				this.getWithinDayTripRouterFactory(), routingContext);

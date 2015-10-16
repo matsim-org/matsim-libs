@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -24,8 +24,8 @@ public class BikeWalkTravelTimes {
 		outLink.newLine();
 		while(s != null) {
 			String[] arr = s.split("\t");
-			CoordImpl coordStart = new CoordImpl(arr[1], arr[2]);
-			CoordImpl coordEnd = new CoordImpl(arr[3], arr[4]);
+			Coord coordStart = new Coord(Double.parseDouble(arr[1]), Double.parseDouble(arr[2]));
+			Coord coordEnd = new Coord(Double.parseDouble(arr[3]), Double.parseDouble(arr[4]));
 		
 			outLink.write(arr[0] + " ");
 			double travelTimeWalk = CoordUtils.calcDistance(coordStart, coordEnd) * 1.3 / 1.1667;

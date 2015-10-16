@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -40,11 +40,11 @@ public class ActivityTypePredicate implements Predicate {
 	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
 		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
 		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
+		if (ActivityTypes.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
 			return true;
-		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
+		} else if (ActivityTypes.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
 			return true;
-		} else if (!ActivityType.HOME.equalsIgnoreCase(nextType) && !ActivityType.HOME.equalsIgnoreCase(prevType)) {
+		} else if (!ActivityTypes.HOME.equalsIgnoreCase(nextType) && !ActivityTypes.HOME.equalsIgnoreCase(prevType)) {
 			/*
 			 * count only to activity
 			 */

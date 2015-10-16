@@ -87,7 +87,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) { 
-		Id<Person> personId= event.getPersonId();
+		Id<Person> personId= event.getDriverId();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 		if(this.linkId2PersonId2LinkInfo.get(event.getLinkId()).containsKey(personId)){
 			throw new RuntimeException("Person is already on the link. Cannot happen.");
@@ -110,7 +110,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		if(event.getLinkId().equals(Id.create("-1",Link.class))) {
 		} else {
 			Id<Link> linkId = event.getLinkId();
-			Id<Person> personId = event.getPersonId();
+			Id<Person> personId = event.getDriverId();
 			Map<Id<Person>, PersonOnLinkInformation> personId2LinkInfo = this.linkId2PersonId2LinkInfo.get(linkId);
 
 			if (personId2LinkInfo == null) {
@@ -156,7 +156,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		PersonOnLinkInformation personOnLinkInfo = new PersonOnLinkInformation();
 		personOnLinkInfo.setLink(link);
 		personOnLinkInfo.setLinkEnterTime(event.getTime());
-		personOnLinkInfo.setLegMode(this.personId2LegMode.get(event.getPersonId()));
+		personOnLinkInfo.setLegMode(this.personId2LegMode.get(event.getDriverId()));
 		return personOnLinkInfo;
 	}
 

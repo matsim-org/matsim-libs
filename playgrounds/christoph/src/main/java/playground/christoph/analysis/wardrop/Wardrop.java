@@ -41,7 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class Wardrop {
@@ -315,10 +315,10 @@ public class Wardrop {
 		//Coord endCentre = getZoneCentre(endZone);
 		
 		// distance between the centres of the traffic cells
-		double referenceLength = ((CoordImpl)startCentre).calcDistance(endCentre);
+		double referenceLength = CoordUtils.calcDistance(startCentre, endCentre);
 	
 		// shortest distance between start and endpoint of a trip
-		double length = ((CoordImpl)start).calcDistance(end); 
+		double length = CoordUtils.calcDistance(start, end);
 		
 		//return (tripDuration * length / referenceLength);
 		return (tripDuration * referenceLength / length);
@@ -382,7 +382,7 @@ public class Wardrop {
 					 *  If not - skip it!
 					 */
 					//double cellDistance = ((CoordImpl)getZoneCentre(i)).calcDistance(getZoneCentre(j));
-					double cellDistance = ((CoordImpl)wardropZones.getZoneCentre(i)).calcDistance(wardropZones.getZoneCentre(j));
+					double cellDistance = CoordUtils.calcDistance(((Coord) wardropZones.getZoneCentre(i)), wardropZones.getZoneCentre(j));
 					if (calcTripResults &&  cellDistance < minCellDistance) {
 						calcTripResults = false;
 					}

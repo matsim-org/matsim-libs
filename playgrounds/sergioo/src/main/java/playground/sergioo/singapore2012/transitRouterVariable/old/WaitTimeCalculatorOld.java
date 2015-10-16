@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -79,8 +78,8 @@ public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, Perso
 				Arrays.sort(sortedDepartures);
 				for(TransitRouteStop stop:route.getStops()) {
 					String key = line.getId()+")["+route.getId()+"]"+stop.getStopFacility().getId();
-					waitTimes.put(key, new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
-					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
+					waitTimes.put(key, new WaitTimeDataArray(totalTime/timeSlot+1));
+					double[] cacheWaitTimes = new double[totalTime/timeSlot+1];
 					for(int i=0; i<cacheWaitTimes.length; i++) {
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
@@ -152,7 +151,7 @@ public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, Perso
 			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						String[] leg = ((Leg)planElement).getRoute().getRouteDescription().split(SEPARATOR);
 						WaitTimeData data = waitTimes.get(leg[2]+")["+leg[3]+"]"+leg[1]);
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
@@ -195,7 +194,7 @@ public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, Perso
 			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						String[] leg = (((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						WaitTimeData data = waitTimes.get(leg[2]+")["+leg[3]+"]"+leg[1]);
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);

@@ -41,7 +41,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author johannes
@@ -75,7 +74,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 			double maxy = node.getCoord().getY() + radius;
 			
 			Set<Node> intersectionNodes = new HashSet<Node>(20);
-			quadTree.get(minx, miny, maxx, maxy, intersectionNodes);
+			quadTree.getRectangle(minx, miny, maxx, maxy, intersectionNodes);
 			
 			if(intersectionNodes.size() > 1) {
 			Set<Node> sourceNodes = new HashSet<Node>();
@@ -161,7 +160,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 		}
 		
 		double n = nodes.size();
-		return new CoordImpl(xsum/n, ysum/n);
+		return new Coord(xsum / n, ysum / n);
 	}
 	
 	private void assignProps(Collection<Link> links, Link link) {

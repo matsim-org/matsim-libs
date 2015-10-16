@@ -24,20 +24,27 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -45,16 +52,16 @@ import org.matsim.api.core.v01.population.Person;
  * @author tthunig
  *
  */
-public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, PersonDepartureEventHandler{
+public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, 
+		VehicleAbortsEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonLeavesVehicleEventHandler{
 
-	private static final Logger log = Logger.getLogger(DgAverageTravelTimeSpeed.class);
-	
 	private Network network;
-	private Map<Id<Person>, Double> networkEnterTimeByPersonId;
+	private Map<Id<Vehicle>, Double> networkEnterTimesByVehicleId;
 	private Set<Id<Person>> seenPersonIds;
 	private double sumTravelTime;
 	private double sumDistance;
 	private double numberOfTrips;
+	private Map<Id<Vehicle>, Set<Id<Person>>> vehId2SetOfPersonIdsMap;
 
 	public DgAverageTravelTimeSpeed(Network network) {
 		this.network = network;
@@ -63,41 +70,63 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void reset(int iteration) {
-		this.networkEnterTimeByPersonId = new HashMap<>();
+		this.networkEnterTimesByVehicleId = new HashMap<>();
 		this.seenPersonIds = new HashSet<>();
 		this.sumTravelTime = 0.0;
 		this.sumDistance = 0.0;
 		this.numberOfTrips = 0.0;
+		this.vehId2SetOfPersonIdsMap = new HashMap<>();
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!vehId2SetOfPersonIdsMap.containsKey(event.getPersonId())){
+			vehId2SetOfPersonIdsMap.put(event.getVehicleId(), new HashSet<Id<Person>>());
+		}
+		vehId2SetOfPersonIdsMap.get(event.getVehicleId()).add(event.getPersonId());		
 	}
 
-	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		vehId2SetOfPersonIdsMap.get(event.getVehicleId()).remove(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		if (network.getLinks().containsKey(event.getLinkId())) {
+			handleVehicleSeen(event.getVehicleId(), event.getTime());
+		}
+	}
+
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (network.getLinks().containsKey(event.getLinkId())) {
-			this.networkEnterTimeByPersonId.put(event.getPersonId(), event.getTime());
-			this.seenPersonIds.add(event.getPersonId());
+			handleVehicleSeen(event.getVehicleId(), event.getTime());
 		}
 	}
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (network.getLinks().containsKey(event.getLinkId())) {
-			this.networkEnterTimeByPersonId.put(event.getPersonId(), event.getTime());
-			this.seenPersonIds.add(event.getPersonId());
-		}
+	private void handleVehicleSeen(Id<Vehicle> vehId, double time) {
+		this.networkEnterTimesByVehicleId.put(vehId, time);
+		this.seenPersonIds.addAll(vehId2SetOfPersonIdsMap.get(vehId));
 	}
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (network.getLinks().containsKey(event.getLinkId())) {
-			Double linkEnterEvent = this.networkEnterTimeByPersonId.remove(event.getPersonId());
-			if (linkEnterEvent != null) {
-				this.sumTravelTime += event.getTime() - linkEnterEvent;
-				this.sumDistance += network.getLinks().get(event.getLinkId()).getLength();
+		handleVehicleLeft(event.getVehicleId(), event.getLinkId(), event.getTime());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		handleVehicleLeft(event.getVehicleId(), event.getLinkId(), event.getTime());		
+	}
+
+	private void handleVehicleLeft(Id<Vehicle> vehId, Id<Link> linkId, double time) {
+		if (network.getLinks().containsKey(linkId)) {
+			Double vehEnterTime = this.networkEnterTimesByVehicleId.remove(vehId);
+			if (vehEnterTime != null) {
+				this.sumTravelTime += time - vehEnterTime;
+				this.sumDistance += network.getLinks().get(linkId).getLength();
 			}
-		}
-		else{
-			log.error("Link wasn't found.");
 		}
 	}
 
@@ -106,21 +135,11 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 		if (this.seenPersonIds.contains(event.getPersonId())){
 			this.numberOfTrips++;
 		}
-		if (network.getLinks().containsKey(event.getLinkId())) {
-			Double personDepartureEvent = this.networkEnterTimeByPersonId.remove(event.getPersonId());
-			if (personDepartureEvent != null) {
-				this.sumTravelTime += event.getTime() - personDepartureEvent;
-				this.sumDistance += network.getLinks().get(event.getLinkId()).getLength();
-			}
-		}
-		else{
-			log.error("Link wasn't found.");
-		}		
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.networkEnterTimeByPersonId.remove(event.getPersonId());
+	public void handleEvent(VehicleAbortsEvent event) {
+		this.networkEnterTimesByVehicleId.remove(event.getVehicleId());
 	}
 
 	
@@ -128,7 +147,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 		return sumTravelTime;
 	}
 	
-	public double getNumberOfPersons(){
+	public double getNumberOfVehicles(){
 		return this.seenPersonIds.size();
 	}
 	

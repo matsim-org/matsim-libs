@@ -81,7 +81,7 @@ public class LandUseBuildingSink implements Sink {
 	private int featureErrorCounter = 0;
 	private int buildingErrorCounter = 0;
 	
-	private static PolygonFeatureFactory polygonFeatureFactory;
+	private PolygonFeatureFactory polygonFeatureFactory;
 
 	
 	public LandUseBuildingSink(CoordinateTransformation ct, Map<String, String> osmLandUseToMatsimType, 
@@ -112,8 +112,8 @@ public class LandUseBuildingSink implements Sink {
 		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		
-		String attributeLabel = "type";
-		initFeatureType(attributeLabel);
+		String landUseType = "type";
+		initLandUseFeatureType(landUseType);
 
 		/* First check all the ways for land use. */
 		processLandUseAreas(aff, wayMap);
@@ -128,20 +128,20 @@ public class LandUseBuildingSink implements Sink {
 
 	private void processLandUseAreas(ActivityFacilitiesFactory aff,	Map<Long,? extends EntityContainer> entityMap) {
 		
-		// TODO process historic=menorial and leisure=park and amenitiy=xy and tourism=zoo the same way
+		// TODO process historic=memorial and leisure=park and amenity=xy and tourism=zoo the same way
 		
 		for(long entityKey : entityMap.keySet()){
 			Entity entity = entityMap.get(entityKey).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
 			
 			String landuseType = tags.get("landuse");
-			String activityType = null;
+			String matsimActivityType = null;
 			if(landuseType != null) {
-				activityType = getActivityType(landuseType, this.landUseTypeMap);
+				matsimActivityType = getActivityType(landuseType, this.landUseTypeMap);
 			}
-			if(activityType != null){
-				Coord[] coords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
-				SimpleFeature feature = createFeature(coords, activityType);
+			if(matsimActivityType != null){
+				Coord[] coords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				SimpleFeature feature = createLandUseFeature(coords, matsimActivityType);
 				if (feature == null) {
 					continue;
 				}
@@ -151,27 +151,31 @@ public class LandUseBuildingSink implements Sink {
 	}
 	
 	
-	private void initFeatureType(String attributeLabel) {
-		polygonFeatureFactory = new PolygonFeatureFactory.Builder().
+	private void initLandUseFeatureType(String landUseType) {
+		
+		// TODO make CRS adjustable
+		
+		this.polygonFeatureFactory = new PolygonFeatureFactory.Builder().
 		setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
-		setName("buildings").
-		addAttribute(attributeLabel, String.class).
+		//setName("buildings").
+		setName("land_use").
+		addAttribute(landUseType, String.class).
 		create();
 	}	
 	
 	
-	private SimpleFeature createFeature(Coord[] coords, String activityType) {
-		Object[] attributes = new Object[]{activityType};
+	private SimpleFeature createLandUseFeature(Coord[] coords, String matsimActivityType) {
+		Object[] attributes = new Object[]{matsimActivityType};
 
-		Coordinate[] coordinates = new Coordinate[coords.length];
+		Coordinate[] vividCoordinates = new Coordinate[coords.length];
 		for (int i = 0; i < coords.length; i++) {
-			coordinates[i] = new Coordinate(coords[i].getX(), coords[i].getY());
+			vividCoordinates[i] = new Coordinate(coords[i].getX(), coords[i].getY());
 		}
 		
 		SimpleFeature feature = null;
 		
 		try {
-			feature = polygonFeatureFactory.createPolygon(coordinates, attributes, null);
+			feature = this.polygonFeatureFactory.createPolygon(vividCoordinates, attributes, null);
 		} catch (IllegalArgumentException e) {
 			log.error("IllegalArgumentException: " + e.getMessage());
 			this.featureErrorCounter++;
@@ -220,9 +224,9 @@ public class LandUseBuildingSink implements Sink {
 					}
 				}
 								
-				Coord coord = CoordUtils.getCoord(entity, ct, nodeMap, wayMap, relationMap);
-				Coord[] buildingCoords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
-				SimpleFeature buildingAsFeature = createFeature(buildingCoords, null);
+				Coord coord = CoordUtils.getCentroidCoord(entity, ct, nodeMap, wayMap, relationMap);
+				Coord[] buildingCoords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				SimpleFeature buildingAsFeature = createLandUseFeature(buildingCoords, null);
 				if (buildingAsFeature == null) {
 					log.error("The feature of building " + entityKey + " is null!");
 					this.buildingErrorCounter++;

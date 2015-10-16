@@ -96,7 +96,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 
 		Leg leg = new LegImpl( HitchHikingConstants.PASSENGER_MODE );
 		Route route = routeFactory.createRoute(
-					HitchHikingConstants.PASSENGER_MODE,
+					Route.class, // HitchHikingConstants.PASSENGER_MODE,
 					puSpot.getId(),
 					doSpot.getId());
 		route.setDistance( distance );

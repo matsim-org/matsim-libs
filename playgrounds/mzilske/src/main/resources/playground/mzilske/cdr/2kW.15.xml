@@ -58,9 +58,6 @@
 		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim -->
 		<param name="mobsim" value="qsim" />
 
-		<!-- Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible. -->
-		<param name="snapshotFormat" value="null" />
-
 		<param name="writeEventsInterval" value="&WRITEINTERVAL;" />
 		<param name="writePlansInterval" value="&WRITEINTERVAL;" />
 	</module>
@@ -207,7 +204,6 @@
 	<module name="strategy" >
 		<param name="Module_1" value="ChangeExpBeta" />
 		<param name="ModuleProbability_1" value="0.7" />
-		<param name="ModuleDisableAfterIteration_1" value="null" />
 
 		<param name="Module_2" value="ReRoute" />
 		<param name="ModuleProbability_2" value="0.2" />
@@ -219,13 +215,5 @@
 		<param name="maxAgentPlanMemorySize" value="5" />
 		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
 	</module>
-
-<!-- ====================================================================== -->
-<!-- 
-	<module name="vspExperimental" >
-		<param name="vspDefaultsCheckingLevel" value="warn" />
-	</module>
- -->
-<!-- ====================================================================== -->
 
 </config>

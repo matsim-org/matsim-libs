@@ -1,7 +1,6 @@
 package playground.wrashid.parkingChoice.infrastructure;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.facilities.ActivityFacility;
 
 public class PrivateParking extends ParkingImpl {
 

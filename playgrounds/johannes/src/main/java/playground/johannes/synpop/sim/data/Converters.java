@@ -31,34 +31,55 @@ public class Converters {
 
     private static Map<Object, Container> objKeys = new HashMap<>();
 
-    public static void register(String plainKey, Object objKey, Converter converter) {
+    public static Object register(String plainKey, Converter converter) {
+        Container c = plainKeys.get(plainKey);
+        if(c == null) {
+            c = new Container();
+            c.plainKey = plainKey;
+            c.converter = converter;
+            c.objectKey = new Object();
+
+            plainKeys.put(plainKey, c);
+            objKeys.put(c.objectKey, c);
+        }
+
+        return c.objectKey;
+    }
+
+    /**
+     * @deprecated
+     */
+    public static void registerWithObjectKey(String plainKey, Object objKey, Converter converter) {
         Container c = new Container();
         c.plainKey = plainKey;
         c.objectKey = objKey;
         c.converter = converter;
 
-        plainKeys.put(plainKey, c);
-        objKeys.put(objKey, c);
+        if (plainKeys.put(plainKey, c) != null) throw new RuntimeException("You are overwriting a plain-object " +
+                "key-pair!");
+        if (objKeys.put(objKey, c) != null) throw new RuntimeException("You are overwriting a plain-object " +
+                "key-pair!");
+
     }
 
-    static String getPlainKey(Object key) {
+    public static String getPlainKey(Object key) {
         Container c = objKeys.get(key);
-        if(c != null) return c.plainKey;
+        if (c != null) return c.plainKey;
         else return null;
     }
 
-    static Object getObjectKey(String key) {
+    public static Object getObjectKey(String key) {
         Container c = plainKeys.get(key);
-        if(c != null) return c.objectKey;
+        if (c != null) return c.objectKey;
         else return null;
     }
 
-    static String toString(Object key, Object value) {
+    public static String toString(Object key, Object value) {
         Container c = objKeys.get(key);
         return c.converter.toString(value);
     }
 
-    static Object toObject(String key, String value) {
+    public static Object toObject(String key, String value) {
         Container c = plainKeys.get(key);
         return c.converter.toObject(value);
     }

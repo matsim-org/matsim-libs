@@ -139,9 +139,9 @@ public class ShapeConverterPop {
 				Double starty = new Double((Integer) sf.getAttribute("START_Y"));
 				Double endx = new Double((Integer) sf.getAttribute("ENDE_X"));
 				Double endy = new Double((Integer) sf.getAttribute("ENDE_Y"));
-				
-				Coord startCoordinates = scenario.createCoord(startx, starty);
-				Coord endCoordinates = scenario.createCoord(endx, endy);
+
+				Coord startCoordinates = new Coord(startx, starty);
+				Coord endCoordinates = new Coord(endx, endy);
 				
 				String actType = (String) sf.getAttribute("SKOM1"); // activity type
 				actType = actType.toLowerCase();

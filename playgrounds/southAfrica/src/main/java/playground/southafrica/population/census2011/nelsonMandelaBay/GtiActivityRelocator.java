@@ -17,7 +17,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -75,7 +74,7 @@ public class GtiActivityRelocator {
 		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "population_Gti.xml.gz");
 		
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(gar.cpr.getScenario().getHouseholds().getHouseholdAttributes());
-		oaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
+		oaw.putAttributeConverter(Coord.class, new CoordConverter());
 		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "householdAttributes_Gti.xml.gz");
 		
 		Header.printFooter();
@@ -159,7 +158,7 @@ public class GtiActivityRelocator {
 					os instanceof String){
 				/* Get the point and its associated coordinates. */
 				Point ps = (Point)geo;
-				Coord c = new CoordImpl(ps.getX(), ps.getY());
+				Coord c = new Coord(ps.getX(), ps.getY());
 				Coord cc = ct.transform(c);
 				
 				/* Establish a facility for the point. */
@@ -541,16 +540,16 @@ public class GtiActivityRelocator {
 		Collection<ActivityFacility> facilitiesToRank = null;
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest facility. */
-			ActivityFacility closestFacility = qt.get(c.getX(), c.getY());
+			ActivityFacility closestFacility = qt.getClosest(c.getX(), c.getY());
 			
 			double radius = CoordUtils.calcDistance(c, closestFacility.getCoord() );
-			Collection<ActivityFacility> facilities = qt.get(c.getX(), c.getY(), radius);
+			Collection<ActivityFacility> facilities = qt.getDisk(c.getX(), c.getY(), radius);
 			while(facilities.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
 				 * then you stand the chance of running into an infinite loop.
 				 * Hence, add a minimum of 1m to move on. */
 				radius += Math.max(radius, 1.0);
-				facilities = qt.get(c.getX(), c.getY(), radius);
+				facilities = qt.getDisk(c.getX(), c.getY(), radius);
 			}
 			facilitiesToRank = facilities;
 		} else{

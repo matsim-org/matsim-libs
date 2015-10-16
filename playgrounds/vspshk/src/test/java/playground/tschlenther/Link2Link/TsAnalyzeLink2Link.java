@@ -10,14 +10,19 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
 
 	private Map<Integer,int[]> routeUsersPerIter;
-	
+	private Map<RunSettings, Map<Integer,int[]>> resultsOfRun;
 	private int iteration;
+	private RunSettings currentRunSettings;
 	
-	public TsAnalyzeLink2Link() {
+	
+	public TsAnalyzeLink2Link(RunSettings settings) {
 		super();
+		this.currentRunSettings = settings;
 		this.routeUsersPerIter = new HashMap<Integer,int[]>();
+		this.resultsOfRun = new HashMap<RunSettings, Map<Integer,int[]>>();
 		this.reset(0);
 	}
+	
 	
 	@Override
 	public void reset(int iteration) {
@@ -35,15 +40,81 @@ public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
 		}
 	}
 	
+	public void saveRunResults(){
+		if(!this.resultsOfRun.containsKey(currentRunSettings)){
+			this.resultsOfRun.put(currentRunSettings, routeUsersPerIter);
+		}
+		else{
+			throw new RuntimeException("won't save same run settings twice");
+		}
+	}
+	
+	public void setToNextRun(RunSettings settings){
+		this.currentRunSettings = new RunSettings(settings.isUseLanes(),settings.isUseSignals(),settings.isUseLink2Link());
+		this.reset(0);
+	}
+	
 	public void writeResults(){
-		for(int i : this.routeUsersPerIter.keySet()){
-			System.out.println("\n ITERATION "+ i + ":\n");
+		for(RunSettings settings : resultsOfRun.keySet()){
+			System.out.println("\n RUNSETTINGS : \t Signals: " + settings.isUseSignals() + "\t Lanes: " + settings.isUseLanes() + "\t Link2Link: " + settings.isUseLink2Link() );
 
-			System.out.println("Fahrer auf oberer Route: " + this.routeUsersPerIter.get(i)[0]);
-			System.out.println("Fahrer auf unterer Route: " + this.routeUsersPerIter.get(i)[1]);
+			for(int i : resultsOfRun.get(settings).keySet()){
+				
+				
+				System.out.println("\n ITERATION "+ i + ":");
+				System.out.println("Fahrer auf oberer Route: " + this.routeUsersPerIter.get(i)[0]);
+				System.out.println("Fahrer auf unterer Route: " + this.routeUsersPerIter.get(i)[1]);
+			}
+	
 		}
 	}
 
 	
 	
 }
+
+class RunSettings {
+	
+	private boolean useLanes;
+	private boolean useSignals;
+	private boolean useLink2Link;
+
+	public RunSettings(){
+		this.useLanes = false;
+		this.useSignals = false;
+		this.useLink2Link = false;
+	}
+	
+	public RunSettings(boolean useLanes, boolean useSignals, boolean useLink2Link){
+		this.useLanes = useLanes;
+		this.useSignals = useSignals;
+		this.useLink2Link = useLink2Link;
+	}
+	
+	public boolean isUseLanes() {
+		return useLanes;
+	}
+
+	public void setUseLanes(boolean useLanes) {
+		this.useLanes = useLanes;
+	}
+
+	public boolean isUseSignals() {
+		return useSignals;
+	}
+
+	public void setUseSignals(boolean useSignals) {
+		this.useSignals = useSignals;
+	}
+
+	public boolean isUseLink2Link() {
+		return useLink2Link;
+	}
+
+	public void setUseLink2Link(boolean useLink2Link) {
+		this.useLink2Link = useLink2Link;
+	}
+
+	
+}
+

@@ -224,7 +224,7 @@ public class RunPSim {
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                    bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                 }
             });
             disutilityFactory.setSigma(0.1);

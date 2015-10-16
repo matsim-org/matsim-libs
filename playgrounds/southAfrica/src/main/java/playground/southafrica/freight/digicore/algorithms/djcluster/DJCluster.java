@@ -160,7 +160,7 @@ public class DJCluster {
 				
 				if(p.getCluster() == null){
 					// Compute the density-based neighbourhood, N(p), of the point p
-					Collection<ClusterActivity> neighbourhood = quadTree.get(p.getCoord().getX(), p.getCoord().getY(), radius);
+					Collection<ClusterActivity> neighbourhood = quadTree.getDisk(p.getCoord().getX(), p.getCoord().getY(), radius);
 					List<ClusterActivity> uN = new ArrayList<ClusterActivity>(neighbourhood.size());
 					List<ClusterActivity> cN = new ArrayList<ClusterActivity>(neighbourhood.size());
 					for (ClusterActivity cp : neighbourhood) {

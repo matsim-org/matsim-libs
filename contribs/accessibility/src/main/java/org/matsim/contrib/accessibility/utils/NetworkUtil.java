@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public final class NetworkUtil {
 	private NetworkUtil(){} // do not instantiate
@@ -155,9 +154,9 @@ public final class NetworkUtil {
 		 */
 		
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 1000));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000, 2000));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
 //		Node node4 = network.createAndAddNode(Id.create("4", Node.cla)s, new CoordImpl(2000, 2000));
 //		Node node5 = network.createAndAddNode(Id.create("5", Node.cla)s, new CoordImpl(1000, 0));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
@@ -165,16 +164,18 @@ public final class NetworkUtil {
 //		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
 //		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 
-		Distances distance1 = NetworkUtil.getDistances2Node(new CoordImpl(100, 0), link1, node1);
+		Distances distance1 = NetworkUtil.getDistances2Node(new Coord((double) 100, (double) 0), link1, node1);
 		log.info(distance1.getDistancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
-		
-		Distances distance2 = NetworkUtil.getDistances2Node(new CoordImpl(100, -10), link1, node1);
+
+		final double y = -10;
+		Distances distance2 = NetworkUtil.getDistances2Node(new Coord((double) 100, y), link1, node1);
 		log.info(distance2.getDistancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
-		
-		Distances distance3 = NetworkUtil.getDistances2Node(new CoordImpl(100, 1000), link2, node2);
+
+		Distances distance3 = NetworkUtil.getDistances2Node(new Coord((double) 100, (double) 1000), link2, node2);
 		log.info(distance3.getDistancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
-		
-		Distances distance4 = NetworkUtil.getDistances2Node(new CoordImpl(-100, 1000), link2, node2);
+
+		final double x = -100;
+		Distances distance4 = NetworkUtil.getDistances2Node(new Coord(x, (double) 1000), link2, node2);
 		log.info(distance4.getDistancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
 	}
 }

@@ -22,7 +22,6 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
@@ -58,8 +57,8 @@ public class WGS84toCH1903LV03Plus implements CoordinateTransformation {
 			44.54 * Math.pow(lonNorm, 3);
 		
 		/* Important Note: in the Swiss Grid, y describes easting and x describes 
-		 * northing, contrary to the usual naming conventions!		 */ 
-		return new CoordImpl(Math.round(CH1903Y), Math.round(CH1903X));
+		 * northing, contrary to the usual naming conventions!		 */
+		return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X));
 	}
 
 }

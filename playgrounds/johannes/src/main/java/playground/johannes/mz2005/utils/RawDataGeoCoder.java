@@ -29,7 +29,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
@@ -184,7 +183,7 @@ public class RawDataGeoCoder {
 		else {
 			LatLng coord = googleLookup.requestCoordinate(builder.toString());
 			if(coord != null)
-				c = new CoordImpl(coord.getLng().doubleValue(), coord.getLat().doubleValue());
+				c = new Coord(coord.getLng().doubleValue(), coord.getLat().doubleValue());
 		}
 		
 		if(c == null) {

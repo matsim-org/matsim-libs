@@ -25,10 +25,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -72,7 +72,7 @@ public class ReadFromUrbansimParcelModel {
 				long parcelIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("parcel_id")] ) ;
 				Id<ActivityFacility> parcelId = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
-				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
+				Coord coord = new Coord(Double.parseDouble(parts[idxFromKey.get("x_coord_sp")]), Double.parseDouble(parts[idxFromKey.get("y_coord_sp")]));
 
 				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcelId,coord) ;
 				facility.setDesc("urbansim location") ;
@@ -127,7 +127,7 @@ public class ReadFromUrbansimParcelModel {
 		for ( Entry<Id<Zone>,PseudoZone> entry : pseudoZones.entrySet() ) {
 			Id<Zone> zoneId = entry.getKey();
 			PseudoZone pz = entry.getValue() ;
-			Coord coord = new CoordImpl( pz.sumx/pz.cnt , pz.sumy/pz.cnt ) ;
+			Coord coord = new Coord(pz.sumx / pz.cnt, pz.sumy / pz.cnt);
 			zones.createAndAddFacility(Id.create(zoneId, ActivityFacility.class), coord) ;
 		}
 
@@ -159,7 +159,7 @@ public class ReadFromUrbansimParcelModel {
 				String[] parts = line.split("[\t\n]+");
 
 				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
-				PersonImpl newPerson = new PersonImpl( personId ) ;
+				Person newPerson = PersonImpl.createPerson(personId);
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;
@@ -178,14 +178,14 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 				}
 
-				PlanImpl plan = newPerson.createAndAddPlan(true);
+				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				Utils.makeHomePlan(plan, homeCoord) ;
 
 				int idx = idxFromKey.get("parcel_id_work") ;
 				if ( parts[idx].equals("-1") ) {
-					newPerson.setEmployed(Boolean.FALSE);
+					PersonUtils.setEmployed(newPerson, Boolean.FALSE);
 				} else {
-					newPerson.setEmployed(Boolean.TRUE);
+					PersonUtils.setEmployed(newPerson, Boolean.TRUE);
 					Id<ActivityFacility> workParcelId = Id.create( parts[idx], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
@@ -212,7 +212,7 @@ public class ReadFromUrbansimParcelModel {
 						backupPop.addPerson( newPerson) ;
 						notFoundCnt++ ;
 						break ;
-					} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
+					} else if ( PersonUtils.isEmployed(oldPerson) != PersonUtils.isEmployed(newPerson) ) { // employment status changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
@@ -224,7 +224,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if new person works
-					if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
+					if ( !PersonUtils.isEmployed(newPerson) ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
 						newPop.addPerson(newPerson) ;
 						break ;
 					}

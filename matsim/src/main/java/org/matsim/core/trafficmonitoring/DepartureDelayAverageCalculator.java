@@ -139,7 +139,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		DepartureEvent removeMe = new DepartureEvent(event.getPersonId());
+		DepartureEvent removeMe = new DepartureEvent(event.getDriverId());
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {
 			double departureDelay = event.getTime() - departureTime.intValue();

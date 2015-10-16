@@ -19,10 +19,10 @@
 
 package playground.michalm.taxi.data;
 
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
 public class TaxiRequests

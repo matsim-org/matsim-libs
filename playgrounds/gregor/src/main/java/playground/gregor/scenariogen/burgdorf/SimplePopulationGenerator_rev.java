@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SimplePopulationGenerator_rev {
@@ -91,9 +90,9 @@ public class SimplePopulationGenerator_rev {
 			
 			
 			if (MatsimRandom.getRandom().nextBoolean()) {
-				((PersonImpl)pers).setSelectedPlan(plan);
+				pers.setSelectedPlan(plan);
 			} else {
-				((PersonImpl)pers).setSelectedPlan(plan2);
+				pers.setSelectedPlan(plan2);
 			}
 			
 			pop.addPerson(pers);

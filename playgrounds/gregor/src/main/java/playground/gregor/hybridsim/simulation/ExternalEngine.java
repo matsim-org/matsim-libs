@@ -21,14 +21,6 @@ package playground.gregor.hybridsim.simulation;
 
 
 import io.grpc.stub.StreamObserver;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -44,36 +36,21 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalIAdapter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.hybrid.MATSimInterface;
-import org.matsim.hybrid.MATSimInterface.AgentsStuck;
-import org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed;
-import org.matsim.hybrid.MATSimInterface.Extern2MATSim;
-import org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories;
+import org.matsim.hybrid.MATSimInterface.*;
 import org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent;
-import org.matsim.hybrid.MATSimInterface.ExternAfterSim;
-import org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.ExternDoSimStep;
-import org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived;
-import org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim;
-import org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.ExternSimStepFinished;
-import org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived;
-import org.matsim.hybrid.MATSimInterface.ExternalConnect;
-import org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent.Builder;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived;
-import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents;
-import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
-
 import playground.gregor.hybridsim.events.ExternalAgentConstructEvent;
 import playground.gregor.hybridsim.grpc.GRPCExternalClient;
 import playground.gregor.hybridsim.grpc.GRPCInternalServer;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
@@ -84,17 +61,12 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 	private final Map<Id<Link>, QLinkInternalIAdapter> adapters = new HashMap<>();
 	private final EventsManager em;
 	private final Netsim sim;
-	private GRPCExternalClient client;
-
 	private final GRPCInternalServer server;
-
 	private final Thread t1;
-
 	private final CyclicBarrier clientBarrier = new CyclicBarrier(2);
-
-	
 	//testing only
 	private final Set<Id<Person>> handled = new HashSet<>();
+	private GRPCExternalClient client;
 	private double onsetX = 1113711.9263903373;
 	private double onsetY = 7041180.26922217;
 	
@@ -117,11 +89,6 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 	}
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		// TODO Auto-generated method stub
-
-	}
 	public void registerAdapter(QLinkInternalIAdapter external2qAdapterLink) {
 		this.adapters.put(external2qAdapterLink.getLink().getId(),
 				external2qAdapterLink);
@@ -135,19 +102,14 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		return this.sim;
 	}
 
-
-
-
-	//rpc extern --> MATSim
-
 	@Override
 	public void reqExtern2MATSim(Extern2MATSim request,
 			StreamObserver<Extern2MATSimConfirmed> responseObserver) {
 		Extern2MATSim.Agent a = request
 				.getAgent();
-		
+
 //		log.info("Extern2MATSim " + request);
-		
+
 		Id<Person> persId = Id.createPersonId(a.getId());
 		QVehicle veh = this.vehicles.get(persId);
 		Id<Link> nextLId = veh.getDriver().chooseNextLinkId();
@@ -166,13 +128,14 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} else {
 			b.setAccepted(false);
 		}
-		
+
 		Extern2MATSimConfirmed resp = b.build();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
 	}
 
 
+	//rpc extern --> MATSim
 
 	@Override
 	public void reqAgentStuck(AgentsStuck request,
@@ -191,8 +154,6 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
 	}
-
-
 
 	@Override
 	public void reqExternalConnect(ExternalConnect request,
@@ -213,8 +174,6 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		}
 	}
 
-
-
 	@Override
 	public void reqExternSimStepFinished(ExternSimStepFinished request,
 			StreamObserver<ExternSimStepFinishedReceived> responseObserver) {
@@ -228,7 +187,6 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		responseObserver.onCompleted();
 	}
 
-
 	@Override
 	public void reqMaximumNumberOfAgents(MaximumNumberOfAgents request,
 			StreamObserver<MaximumNumberOfAgentsConfirmed> responseObserver) {
@@ -237,12 +195,11 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		responseObserver.onCompleted();
 
 	}
-	
-	
+
 	@Override
 	public void reqSendTrajectories(Extern2MATSimTrajectories request,
 			StreamObserver<MATSim2ExternTrajectoriesReceived> responseObserver) {
-		
+
 		double time = this.sim.getSimTimer().getTimeOfDay();
 		for (Agent a : request.getAgentList()) {
 			double x = a.getX();
@@ -252,23 +209,21 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 				ExternalAgentConstructEvent ee = new ExternalAgentConstructEvent(time, id);
 				this.em.processEvent(ee);
 				this.handled.add(id);
-				
+
 			}
-			
+
 			double angle = a.getAngle();
 			double dx = Math.cos(Math.PI*angle/180);
 			double dy = Math.sin(Math.PI*angle/180);
 			XYVxVyEventImpl e = new XYVxVyEventImpl(id, x+onsetX, y+onsetY, dx, dy, time);
 			this.em.processEvent(e);
 		}
-		
+
 //		MATSim2ExternTrajectoriesReceived resp = MATSim2ExternTrajectoriesReceived.newBuilder().build();
 		MATSim2ExternTrajectoriesReceived resp = MATSim2ExternTrajectoriesReceived.getDefaultInstance();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
 	}
-
-	//rpc MATSim --> extern
 
 	@Override
 	public void doSimStep(double time) {
@@ -287,11 +242,13 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 	}
 
+	//rpc MATSim --> extern
+
 	@Override
 	public void onPrepareSim() {
 
 		try {
-			this.clientBarrier.await(); //to make sure matsim --> extern connection is working 
+			this.clientBarrier.await(); //to make sure matsim --> extern connection is working
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
@@ -314,6 +271,12 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 			e.printStackTrace();
 		}
 		this.server.shutdown();
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public boolean hasSpace(Id<Node> id) {

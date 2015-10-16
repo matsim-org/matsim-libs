@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author johannes
  * 
  */
-public class ReplaceActTypes implements ProxyPlanTask {
+public class ReplaceActTypes implements EpisodeTask {
 
 	public static final String ORIGINAL_TYPE = "origType";
 
@@ -41,16 +41,16 @@ public class ReplaceActTypes implements ProxyPlanTask {
 	public Map<String, String> getTypeMapping() {
 		if (typeMapping == null) {
 			typeMapping = new HashMap<String, String>();
-			typeMapping.put("vacations_short", ActivityType.LEISURE);
-			typeMapping.put("vacations_long", ActivityType.LEISURE);
-			typeMapping.put("visit", ActivityType.LEISURE);
-			typeMapping.put("culture", ActivityType.LEISURE);
-			typeMapping.put("gastro", ActivityType.LEISURE);
-			typeMapping.put(ActivityType.BUISINESS, ActivityType.WORK);
-			typeMapping.put("private", ActivityType.MISC);
-			typeMapping.put("pickdrop", ActivityType.MISC);
-			typeMapping.put("sport", ActivityType.LEISURE);
-			typeMapping.put("wecommuter", ActivityType.WORK);
+			typeMapping.put("vacations_short", ActivityTypes.LEISURE);
+			typeMapping.put("vacations_long", ActivityTypes.LEISURE);
+			typeMapping.put("visit", ActivityTypes.LEISURE);
+			typeMapping.put("culture", ActivityTypes.LEISURE);
+			typeMapping.put("gastro", ActivityTypes.LEISURE);
+			typeMapping.put(ActivityTypes.BUSINESS, ActivityTypes.WORK);
+			typeMapping.put("private", ActivityTypes.MISC);
+			typeMapping.put("pickdrop", ActivityTypes.MISC);
+			typeMapping.put("sport", ActivityTypes.LEISURE);
+			typeMapping.put("wecommuter", ActivityTypes.WORK);
 		}
 
 		return typeMapping;

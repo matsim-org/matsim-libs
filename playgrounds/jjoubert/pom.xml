@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
@@ -18,7 +18,7 @@
     <dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
-  		<version>0.7.0-SNAPSHOT</version>
+  		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
     <dependency>
     	<groupId>colt</groupId>
@@ -38,13 +38,8 @@
     </dependency>
     <dependency>
     	<groupId>playground</groupId>
-    	<artifactId>fabrice</artifactId>
-    	<version>0.7.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>playground</groupId>
     	<artifactId>southAfrica</artifactId>
-    	<version>0.7.0-SNAPSHOT</version>
+    	<version>0.8.0-SNAPSHOT</version>
     </dependency>
     <!--<dependency>-->
     	<!--<groupId>javailp</groupId>-->
@@ -68,9 +63,15 @@
     <dependency>
     	<groupId>playground</groupId>
     	<artifactId>nmviljoen</artifactId>
-    	<version>0.7.0-SNAPSHOT</version>
+    	<version>0.8.0-SNAPSHOT</version>
     </dependency>
-  </dependencies>
+	<dependency>
+		<groupId>Jama</groupId>
+		<artifactId>Jama</artifactId>
+		<version>1.0.2</version>
+	</dependency>
+
+</dependencies>
   <build>
 	<plugins>
 		<plugin>

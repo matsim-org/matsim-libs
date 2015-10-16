@@ -26,7 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * Objective Function based on a SuperEllipse. The superellipse is defined as

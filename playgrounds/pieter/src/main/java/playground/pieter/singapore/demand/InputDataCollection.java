@@ -17,10 +17,10 @@ import javax.management.timer.Timer;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -459,8 +459,7 @@ class InputDataCollection implements Serializable {
 					secondaryFacilitiesTable));
 			int counter = 1;
 			while (rs.next()) {
-				CoordImpl coord = new CoordImpl(rs.getDouble("longitude"),
-						rs.getDouble("latitude"));
+				Coord coord = new Coord(rs.getDouble("longitude"), rs.getDouble("latitude"));
 				ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) scenario
 						.getActivityFacilities())
 						.createAndAddFacility(
@@ -484,8 +483,8 @@ class InputDataCollection implements Serializable {
 						.getActivityFacilities()).createAndAddFacility(
 								Id.create("home_"
                                         + rs.getInt("id_res_facility"), ActivityFacility.class),
-								new CoordImpl(rs.getDouble("x_utm48n"), rs
-										.getDouble("y_utm48n")));
+						new Coord(rs.getDouble("x_utm48n"), rs
+								.getDouble("y_utm48n")));
 				facility.setDesc(rs.getString("property_type"));
 				ActivityOptionImpl actOption = facility
 						.createActivityOption("home");

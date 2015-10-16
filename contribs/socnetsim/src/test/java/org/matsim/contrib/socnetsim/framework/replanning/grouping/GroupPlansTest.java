@@ -56,7 +56,7 @@ public class GroupPlansTest {
 		final List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i < 5; i++) {
-			plans.add( new PlanImpl( new PersonImpl( Id.create( i , Person.class ) ) ) );
+			plans.add( new PlanImpl(PersonImpl.createPerson(Id.create(i, Person.class))) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -73,8 +73,8 @@ public class GroupPlansTest {
 				planMap.put(
 						id,
 						new PlanImpl(
-							new PersonImpl(
-								id ) ) );
+								PersonImpl.createPerson(
+										id)) );
 			}
 			plans.add( factory.createJointPlan( planMap ) );
 		}

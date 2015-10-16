@@ -4,10 +4,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -28,7 +30,6 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -111,7 +112,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 			//initialize opportunities for accessibility computation
 			ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new CoordImpl(200, 100));
+			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
 			//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 			GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
@@ -190,7 +191,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		//initialize opportunities for accessibility computation
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new CoordImpl(200, 100));
+		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
 		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
 
@@ -255,13 +256,13 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void setZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
+	public void setZoneAccessibilities(ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities1) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
-		if(measurePoint.getCoord().equals(new CoordImpl(100,0))){
+		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){
 			accessibilitiesHomeZone = accessibilities1 ;
 		}
-		if(measurePoint.getCoord().equals(new CoordImpl(200,100))){
+		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
 

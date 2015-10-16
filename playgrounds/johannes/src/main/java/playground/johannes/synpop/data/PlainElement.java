@@ -62,6 +62,7 @@ public abstract class PlainElement implements Attributable {
 
 	@Override
 	public Collection<String> keys() {
+		initAttriutes();
 		return attributes.keySet();
 	}
 

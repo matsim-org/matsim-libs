@@ -6,15 +6,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 
 // urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
 // yy move to matsim4urbansim
-final class UrbansimCellBasedAccessibilityCSVWriterV2 implements AccessibilityCSVWriter {
+final class UrbansimCellBasedAccessibilityCSVWriterV2 implements ZoneDataExchangeInterface {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
-	private static final String FILE_NAME= "accessibility_indicators.csv";
+	private static final String ACCESSIBILITY_INDICATORS= "accessibility_indicators.csv";
 
 	private BufferedWriter accessibilityDataWriter ;
 
@@ -24,7 +25,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements AccessibilityCS
 	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
 		log.info("Initializing  ...");
 		try {
-		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + FILE_NAME );
+		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			throw new RuntimeException("writer could not be instantiated") ;
@@ -61,7 +62,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements AccessibilityCS
 	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory, String modeName){
 		try{
 			log.info("Initializing ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + "accessibility_indicators" + "_" + modeName + ".csv" );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS + "_" + modeName + ".csv" );
 			// yyyyyy in some calling sequences, this is called too early, and the directory is not yet there. kai, feb'14
 
 			// create header
@@ -86,8 +87,10 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements AccessibilityCS
 	 * 
 	 */
 	@Override
-	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) {
+	public void setZoneAccessibilities(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
+		
+		log.info( "here2");
 
 		try{
 			assert(accessibilityDataWriter != null);

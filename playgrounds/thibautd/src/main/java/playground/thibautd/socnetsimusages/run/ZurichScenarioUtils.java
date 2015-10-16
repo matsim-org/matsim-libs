@@ -23,11 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.thibautd.utils.DesiresConverter;
-
-import java.util.Map;
 
 /**
  * @author thibautd
@@ -45,24 +42,23 @@ public final class ZurichScenarioUtils {
 			final ObjectAttributesXmlReader reader =
 				new ObjectAttributesXmlReader(
 						scenario.getPopulation().getPersonAttributes());
-			reader.putAttributeConverter( Desires.class , new DesiresConverter() );
 			reader.parse(
 				config.plans().getInputPersonAttributeFile() );
 
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {
 				// put desires (if any) in persons for backward compatibility
-				final Desires desires = (Desires)
-					scenario.getPopulation().getPersonAttributes().getAttribute(
-							person.getId().toString(),
-							"desires" );
-				if ( desires != null ) {
-					((PersonImpl) person).createDesires( desires.getDesc() );
-					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
-						((PersonImpl) person).getDesires().putActivityDuration(
-							entry.getKey(),
-							entry.getValue() );
-					}
-				}
+				//final Desires desires = (Desires)
+				//	scenario.getPopulation().getPersonAttributes().getAttribute(
+				//			person.getId().toString(),
+				//			"desires" );
+				//if ( desires != null ) {
+				//	((PersonImpl) person).createDesires( desires.getDesc() );
+				//	for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+				//		((PersonImpl) person).getDesires().putActivityDuration(
+				//			entry.getKey(),
+				//			entry.getValue() );
+				//	}
+				//}
 
 				// travel card
 				final Boolean hasCard = (Boolean)
@@ -70,7 +66,7 @@ public final class ZurichScenarioUtils {
 							person.getId().toString(),
 							"hasTravelcard" );
 				if ( hasCard != null && hasCard ) {
-					((PersonImpl) person).addTravelcard( UNKOWN_TRAVEL_CARD );
+					PersonUtils.addTravelcard(person, UNKOWN_TRAVEL_CARD);
 				}
 			}
 		}

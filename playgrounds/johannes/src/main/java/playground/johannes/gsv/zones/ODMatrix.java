@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.zones;
 
+import playground.johannes.synpop.gis.Zone;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

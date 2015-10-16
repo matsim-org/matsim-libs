@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicles;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;

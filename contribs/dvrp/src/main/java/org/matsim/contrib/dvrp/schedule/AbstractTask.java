@@ -123,7 +123,7 @@ public abstract class AbstractTask
         if (this.taskTracker != null) {
             throw new IllegalStateException("Tracking already initialized");
         }
-        
+
         if (status != TaskStatus.STARTED) {
             throw new IllegalStateException("Allowed only for STARTED tasks");
         }

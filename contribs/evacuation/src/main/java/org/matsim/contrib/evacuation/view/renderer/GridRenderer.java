@@ -20,21 +20,6 @@
 
 package org.matsim.contrib.evacuation.view.renderer;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Transparency;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,8 +35,14 @@ import org.matsim.contrib.evacuation.model.config.ToolConfig;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GridRenderer extends AbstractRenderLayer {
 
@@ -59,10 +50,6 @@ public class GridRenderer extends AbstractRenderLayer {
 	private float transparency;
 	private QuadTree<Cell> cellTree;
 
-	private double minX = Double.NaN;
-	private double minY = Double.NaN;
-	private double maxX = Double.NaN;
-	private double maxY = Double.NaN;
 	private Cell selectedCell;
 	private CoordinateTransformation ctInverse;
 	private EventData data;
@@ -74,12 +61,12 @@ public class GridRenderer extends AbstractRenderLayer {
 		this.ctInverse = this.controller.getCtTarget2Osm();
 	}
 
-	public void setTransparency(float transparency) {
-		this.transparency = transparency;
-	}
-
 	public float getTransparency() {
 		return transparency;
+	}
+
+	public void setTransparency(float transparency) {
+		this.transparency = transparency;
 	}
 
 	@Override
@@ -127,14 +114,13 @@ public class GridRenderer extends AbstractRenderLayer {
 					&& (leaveTimes != null)) {
 
 				Coord fromCoord = this.controller.getCtTarget2Osm().transform(
-						new CoordImpl(link.getFromNode().getCoord().getX(),
-								link.getFromNode().getCoord().getY()));
+						new Coord(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
 				Point2D fromP2D = this.controller
 						.geoToPixel(new Point2D.Double(fromCoord.getY(),
 								fromCoord.getX()));
 
 				Coord toCoord = this.controller.getCtTarget2Osm().transform(
-						new CoordImpl(link.getToNode().getCoord().getX(), link
+						new Coord(link.getToNode().getCoord().getX(), link
 								.getToNode().getCoord().getY()));
 				Point2D toP2D = this.controller.geoToPixel(new Point2D.Double(
 						toCoord.getY(), toCoord.getX()));
@@ -182,7 +168,7 @@ public class GridRenderer extends AbstractRenderLayer {
 
 			// get all cells from celltree
 			LinkedList<Cell> cells = new LinkedList<Cell>();
-			cellTree.get(new Rect(Double.NEGATIVE_INFINITY,
+			cellTree.getRectangle(new Rect(Double.NEGATIVE_INFINITY,
 					Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY), cells);
 
@@ -192,15 +178,15 @@ public class GridRenderer extends AbstractRenderLayer {
 
 				// get cell coordinate (+ gridsize) and transform into pixel
 				// coordinates
-				CoordImpl cellCoord = cell.getCoord();
+				Coord cellCoord = cell.getCoord();
 				Coord transformedCoord = this.ctInverse
-						.transform(new CoordImpl(cellCoord.getX() - gridSize
+						.transform(new Coord(cellCoord.getX() - gridSize
 								/ 2, cellCoord.getY() - gridSize / 2));
 				Point2D cellCoordP2D = this.controller
 						.geoToPixel(new Point2D.Double(transformedCoord.getY(),
 								transformedCoord.getX()));
 				Coord cellPlusGridCoord = this.ctInverse
-						.transform(new CoordImpl(cellCoord.getX() + gridSize
+						.transform(new Coord(cellCoord.getX() + gridSize
 								/ 2, cellCoord.getY() + gridSize / 2));
 				Point2D cellPlusGridCoordP2D = this.controller
 						.geoToPixel(new Point2D.Double(
@@ -333,51 +319,6 @@ public class GridRenderer extends AbstractRenderLayer {
 			}
 			this.imageContainer.setColor(Color.black);
 		}
-	}
-
-	public BufferedImage getGridAsImage(Mode mode, int width, int height) {
-
-		this.controller.getVisualizer().getActiveMapRenderLayer()
-				.setPosition(this.controller.getCenterPosition());
-
-		double gridSize = this.data.getCellSize();
-
-		Coord gridFromCoord = this.controller.getCtTarget2Osm().transform(
-				new CoordImpl(minX - gridSize / 2, minY - gridSize / 2));
-		Point2D fromGridPoint = this.controller.geoToPixel(new Point2D.Double(
-				gridFromCoord.getY(), gridFromCoord.getX()));
-
-		Coord gridToCoord = this.controller.getCtTarget2Osm().transform(
-				new CoordImpl(maxX + gridSize / 2, maxY + gridSize / 2));
-		Point2D toGridPoint = this.controller.geoToPixel(new Point2D.Double(
-				gridToCoord.getY(), gridToCoord.getX()));
-
-		GraphicsEnvironment ge = GraphicsEnvironment
-				.getLocalGraphicsEnvironment();
-		GraphicsDevice gs = ge.getDefaultScreenDevice();
-		GraphicsConfiguration gc = gs.getDefaultConfiguration();
-
-		int minX = (int) Math.min(fromGridPoint.getX(), toGridPoint.getX());
-		int maxX = (int) Math.max(fromGridPoint.getX(), toGridPoint.getX());
-		int minY = (int) Math.min(fromGridPoint.getY(), toGridPoint.getY());
-		int maxY = (int) Math.max(fromGridPoint.getY(), toGridPoint.getY());
-
-		BufferedImage bImage = gc.createCompatibleImage(maxX - minX,
-				maxY - minY, Transparency.TRANSLUCENT);
-
-		Graphics IG = bImage.getGraphics();
-		Graphics2D IG2D = (Graphics2D) IG;
-
-		IG2D.setColor(new Color(255, 255, 0, 0));
-		IG2D.fillRect(0, 0, width, height);
-
-		// draw utilization
-		if (mode.equals(Mode.UTILIZATION))
-			drawUtilization();
-		else
-			drawGrid(mode, false);
-
-		return bImage;
 	}
 
 	public void setMode(Mode mode) {

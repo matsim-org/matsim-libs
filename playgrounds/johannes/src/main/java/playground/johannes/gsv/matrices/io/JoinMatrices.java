@@ -22,6 +22,7 @@ package playground.johannes.gsv.matrices.io;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.VisumOMatrixReader;
 
 import java.io.IOException;
 
@@ -33,7 +34,8 @@ public class JoinMatrices {
     public static void main(String[] args) throws IOException {
         KeyMatrix sum = new KeyMatrix();
         for(int i = 0; i < args.length - 1; i++) {
-            KeyMatrix m = VisumOMatrixReader.read(args[i]);
+            KeyMatrix m = new KeyMatrix();
+            VisumOMatrixReader.read(m, args[i]);
             MatrixOperations.add(sum, m);
         }
 

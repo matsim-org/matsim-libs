@@ -22,11 +22,12 @@ package playground.johannes.gsv.synPop.sim3;
 import org.apache.log4j.Logger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -37,7 +38,7 @@ public class Sampler {
 //	private final static Object H_KEY = new Object();
 	private static final Logger logger = Logger.getLogger(Sampler.class);
 	
-	private final Collection<PlainPerson> population;
+	private final Collection<? extends Person> population;
 	
 	private final Hamiltonian hamiltonian;
 	
@@ -49,7 +50,8 @@ public class Sampler {
 	
 	private PopulationSegmenter segmenter = new DefaultSegmenter();
 	
-	public Sampler(Collection<PlainPerson> population, Hamiltonian hamiltonian, MutatorFactory factory, Random random) {
+	public Sampler(Collection<? extends Person> population, Hamiltonian hamiltonian, MutatorFactory factory, Random
+			random) {
 		this.population = population;
 		this.hamiltonian = hamiltonian;
 		this.mutatorFactory = factory;
@@ -71,7 +73,7 @@ public class Sampler {
 		/*
 		 * split collection in approx even segments
 		 */
-		List<PlainPerson>[] segments = segmenter.split(population, numThreads);
+		List<Person>[] segments = segmenter.split((Set<Person>)population, numThreads);
 		/*
 		 * create threads
 		 */
@@ -98,7 +100,7 @@ public class Sampler {
 	
 	private class SampleThread implements Runnable {
 
-		private final List<PlainPerson> population;
+		private final List<Person> population;
 		
 		private final Mutator mutator;
 		
@@ -106,7 +108,7 @@ public class Sampler {
 		
 		private final long iterations;
 		
-		public SampleThread(List<PlainPerson> population, Mutator mutator, long iterations, Random random) {
+		public SampleThread(List<Person> population, Mutator mutator, long iterations, Random random) {
 			this.population = population;
 			this.mutator = mutator;
 			this.iterations = iterations;
@@ -124,7 +126,7 @@ public class Sampler {
 			/*
 			 * select person
 			 */
-			List<PlainPerson> mutations = mutator.select(population);
+			List<Person> mutations = mutator.select(population);
 			/*
 			 * evaluate
 			 */
@@ -162,7 +164,7 @@ public class Sampler {
 	private static class DefaultListener implements SamplerListener {
 
 				@Override
-		public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+		public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 			
 		}
 		
@@ -171,7 +173,7 @@ public class Sampler {
 	private static class DefaultSegmenter implements PopulationSegmenter {
 
 		@Override
-		public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments) {
+		public List<Person>[] split(Collection<Person> persons, int segments) {
 			int n = Math.min(persons.size(), segments);
 			return CollectionUtils.split(persons, n);
 		}

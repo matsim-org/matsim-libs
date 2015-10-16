@@ -41,7 +41,7 @@ public class TwoWayCarsharingVehicleLocation {
 	
 	public void addVehicle(Link link, String id) {
 		
-		TwoWayCarsharingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		TwoWayCarsharingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			

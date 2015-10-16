@@ -21,7 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Provider;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -29,12 +29,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -43,10 +42,10 @@ import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
+
+import com.google.inject.Provider;
 
 /**
  * @author amit
@@ -82,6 +81,9 @@ public class EvacPatnaControler {
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode", "bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
+			
+			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString()); // for seepage, link dynamics must be passingQ.
+			
 			String outputDir = config.controler().getOutputDirectory()+"/evac_seepage/";
 			config.controler().setOutputDirectory(outputDir);
 		} else {
@@ -92,7 +94,6 @@ public class EvacPatnaControler {
 		Scenario sc = ScenarioUtils.loadScenario(config); 
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
@@ -134,17 +135,7 @@ public class EvacPatnaControler {
 		controler.setDumpDataAtEnd(true);
 
 		if(isUsingSeepage){
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindMobsim().toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new SeepageMobsimfactory(QueueWithBufferType.amit).createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
-			});
+			Logger.getLogger(EvacPatnaControler.class).error("Removed seepage network factory. Should work without it if not, check is passing is allowed.");
 		}
 		
 		if(congestionPricing) {
@@ -153,10 +144,10 @@ public class EvacPatnaControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
+//			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));

@@ -2,7 +2,6 @@ package playground.wrashid.jin;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -15,7 +14,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NumberOfVehiclesEnteringAndExitingArea {
 
@@ -84,22 +82,22 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 			Coord linkCoord=network.getLinks().get(event.getLinkId()).getCoord();
 			
 			// leaving area
-			if (vehicleInArea.contains(event.getPersonId()) && !isInArea(linkCoord)){
+			if (vehicleInArea.contains(event.getDriverId()) && !isInArea(linkCoord)){
 				outFlow[(int)Math.round(event.getTime()/binSizeInSeconds)]++;
 				//output.add(Math.round(event.getTime()) + "\t" + "-1");
 			}
 			
 			// entering area
-			if (!vehicleInArea.contains(event.getPersonId()) && isInArea(linkCoord)){
+			if (!vehicleInArea.contains(event.getDriverId()) && isInArea(linkCoord)){
 				inFlow[(int)Math.round(event.getTime()/binSizeInSeconds)]++;
 				//output.add(Math.round(event.getTime()) + "\t" + "+1");
 			}
 			
 			// update vehicleInArea
 			if (isInArea(linkCoord)){
-				vehicleInArea.add(event.getPersonId());
+				vehicleInArea.add(event.getDriverId());
 			} else {
-				vehicleInArea.remove(event.getPersonId());
+				vehicleInArea.remove(event.getDriverId());
 			}
 		}
 
@@ -116,7 +114,7 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 	
 	
 	public static boolean isInArea(Coord coord){
-		Coord circleCenter=new CoordImpl(683243.7,247459.2);
+		Coord circleCenter= new Coord(683243.7, 247459.2);
 		double radius=700;
 		
 //		Coord circleCenter=new CoordImpl(682922.588,247474.957);

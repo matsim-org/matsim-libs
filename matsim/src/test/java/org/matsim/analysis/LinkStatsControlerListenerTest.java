@@ -23,7 +23,7 @@ import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.LinkStatsControlerListener;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -40,6 +40,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -315,8 +316,8 @@ public class LinkStatsControlerListenerTest {
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(2);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
@@ -382,7 +383,7 @@ public class LinkStatsControlerListenerTest {
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, Id.create(i, Vehicle.class)));
 			}
 		}
 	}

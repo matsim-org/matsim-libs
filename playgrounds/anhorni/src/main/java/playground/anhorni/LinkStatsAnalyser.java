@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -169,8 +169,7 @@ public class LinkStatsAnalyser {
 
 			for (int i=0; i<24; i++) {
 				count.createVolume(i+1, linkVolumes[i] );
-				count.setCoord(new CoordImpl(this.network.getLinks().get(linkId).getCoord().getX(),
-						this.network.getLinks().get(linkId).getCoord().getY()));
+				count.setCoord(new Coord(this.network.getLinks().get(linkId).getCoord().getX(), this.network.getLinks().get(linkId).getCoord().getY()));
 			}
 		}
 

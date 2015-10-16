@@ -111,8 +111,8 @@ public class TtCreateBraessPopulation {
 			// create a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-			// 8:00 am. plus i seconds
-			startAct.setEndTime(8 * 3600 + i);
+			// distribute agents uniformly between 8 and 9 am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 		
 			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(

@@ -22,12 +22,17 @@ package org.matsim.core.controler.listener;
 
 import java.util.EventListener;
 
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+
 /**
  * This is an empty marker interface which must be implemented by all Interfaces
  * providing methods to listen for ControlerEvents.
+ * <br>
+ * An example of how this can be used can be found at {@link 
+ * tutorial.programming.example07ControlerListener.RunControlerListenerExample}.
  *
  * @author dgrether
  */
-public interface ControlerListener extends EventListener {
+public interface ControlerListener extends EventListener, MatsimExtensionPoint {
 
 }

@@ -127,7 +127,7 @@ public class BiDirCAKernelSmootherAnalyzer {
 				double v2 = 0;
 
 				double lambda = 0.2;
-				Collection<Measurement> nb = qt.get(rho1, rho2,lambda);
+				Collection<Measurement> nb = qt.getDisk(rho1, rho2, lambda);
 				double total = 0;
 				for (Measurement el : nb) {
 					double weight = compContribution(el,rho1,rho2,lambda);

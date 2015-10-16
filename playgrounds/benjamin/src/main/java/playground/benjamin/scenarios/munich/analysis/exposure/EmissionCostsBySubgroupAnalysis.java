@@ -34,14 +34,13 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.CellWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkLineWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.utils.spatialAvg.Cell;
+import playground.benjamin.utils.spatialAvg.CellWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkLineWeightUtil;
+import playground.benjamin.utils.spatialAvg.LinkWeightUtil;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.utils.spatialAvg.SpatialAveragingWriter;
+import playground.benjamin.utils.spatialAvg.SpatialGrid;
 
 /**
  * 
@@ -56,7 +55,6 @@ public class EmissionCostsBySubgroupAnalysis {
 	private String analysisCase = "zone30"; // base, zone30, pricing, exposurePricing, 983
 	final static int numberOfTimeBins = 1;
 	
-	private SpatialAveragingParameters sap;
 	private double timeBinSize;
 	private LinkWeightUtil linkweightUtil;
 	private SpatialAveragingInputData inputData;
@@ -77,19 +75,17 @@ public class EmissionCostsBySubgroupAnalysis {
 	}
 	
 	private void initialize(){
-		sap = new SpatialAveragingParameters();
-		
-		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
+//		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
 		timeBinSize = inputData.getEndTime()/numberOfTimeBins;
 		
-		logger.info(inputData.getScenarioInformation());
+//		logger.info(inputData.getScenarioInformation());
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputData.getNetworkFile());
 		config.plans().setInputFile(inputData.getPlansFileCompareCase());
 		scenario = ScenarioUtils.loadScenario(config);
 		
-		sGrid = new SpatialGrid(inputData, sap.getNoOfXbins(), sap.getNoOfYbins());
+		sGrid = new SpatialGrid(inputData, inputData.getNoOfXbins(), inputData.getNoOfYbins());
 		// map links to cells
 		links2cells = sGrid.getLinks2GridCells(scenario.getNetwork().getLinks().values());
 		logger.info("Mapped " + links2cells.size() + " links to cells. ");
@@ -100,22 +96,22 @@ public class EmissionCostsBySubgroupAnalysis {
 		logger.info("Starting to calculate durations...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells, sap);
+		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells);
 		eventsManager.addHandler(intervalHandlerGroups);
 		eventsReader.parse(inputData.getEventsFileCompareCase());
 		
 		totalDurations = intervalHandlerGroups.getTotalDurations();
 		groupDurations = intervalHandlerGroups.getGroupDurations();
 		
-		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData, sap, false);
+		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData);
 		
 		for(int timeBin =0; timeBin<numberOfTimeBins; timeBin++){
-			logger.info(inputData.getScenarioInformation());
+//			logger.info(inputData.getScenarioInformation());
 			logger.info("Writing duration output for time interval " + timeBin + " of " + numberOfTimeBins + " time intervals.");
 			String timeIntervalEnd = Double.toString(((timeBin+1.0)*timeBinSize));
-			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathCompareCase()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			for(UserGroup ug: UserGroup.values()){
-				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathCompareCase()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			}
 		}
 		logger.info("Done calculating and writing durations.");
@@ -139,7 +135,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		// calculate scaled (relative duration density, scenario scaling factor)
 		// emission costs -> timebin x subgroup x subgroup matrix
 		
-		linkweightUtil = new LinkLineWeightUtil(sap.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/sap.getNoOfBins());
+		linkweightUtil = new LinkLineWeightUtil(inputData.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/inputData.getNoOfBins());
 		linkweightUtil = new CellWeightUtil(links2cells, sGrid);
 		HashMap<Integer, GroupXGroupExposureCosts> timeBin2GroupEmissionCostMatrix = new HashMap<Integer, GroupXGroupExposureCosts>();
 		for(int i=0; i<numberOfTimeBins; i++){
@@ -149,7 +145,7 @@ public class EmissionCostsBySubgroupAnalysis {
 			timeBin2GroupEmissionCostMatrix.get(i).calculateGroupCosts(timeBin2causingUserGroup2links2flatEmissionCosts.get(i),
 					groupDurations.get(i), linkweightUtil, averageDurationPerCell,
 					scenario.getNetwork().getLinks());
-			logger.info(inputData.getScenarioInformation());
+//			logger.info(inputData.getScenarioInformation());
 			Double intervalEndTime = (1.0+i)*timeBinSize;
 			timeBin2GroupEmissionCostMatrix.get(i).writeOutputFile(inputData.getExposureOutPathForCompareCase()+"."+intervalEndTime+".");
 		}

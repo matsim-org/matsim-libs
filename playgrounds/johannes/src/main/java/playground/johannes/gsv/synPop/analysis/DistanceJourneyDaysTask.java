@@ -22,13 +22,13 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -47,14 +47,14 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
 		if (outputDirectoryNotNull()) {
 			TDoubleArrayList days = new TDoubleArrayList();
 			TDoubleArrayList distances = new TDoubleArrayList();
 
-			for (PlainPerson person : persons) {
+			for (Person person : persons) {
 				for (Episode plan : person.getEpisodes()) {
-					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
+					String dayVal = plan.getAttribute(MiDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
 						for (Attributable leg : plan.getLegs()) {
 							if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
@@ -74,7 +74,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 
 			TDoubleDoubleHashMap map = Correlations.mean(days.toNativeArray(), distances.toNativeArray());
 			try {
-				TXTWriter.writeMap(map, "days", "distance", String.format("%s/d.days.txt", getOutputDirectory()));
+				StatsWriter.writeHistogram(map, "days", "distance", String.format("%s/d.days.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

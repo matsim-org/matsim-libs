@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,17 +64,15 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV5;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
  */
-public class TestNetworkExperiment {
+class TestNetworkExperiment {
 	final Logger log = Logger.getLogger(TestNetworkExperiment.class);
 
 
@@ -83,7 +82,7 @@ public class TestNetworkExperiment {
 //		testEx.printData();
 	}
 
-	public void test4MarginalCongestionCosts(){
+	void test4MarginalCongestionCosts(){
 		String outputDir = "./output/pop10/";
 		new File(outputDir).mkdirs();
 
@@ -106,16 +105,16 @@ public class TestNetworkExperiment {
 	}
 
 
-	public void printData(){
-		Map<Id<Person>, Double> personId2AffectedDelays_v3 = getPersonId2Delays("v3", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v4 = getPersonId2Delays("v4", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v5 = getPersonId2Delays("v5", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v6 = getPersonId2Delays("v6", "affected");
+	void printData(){
+		Map<Id<Person>, Double> personId2AffectedDelays_v3 = generatePersonId2Delays("v3", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v4 = generatePersonId2Delays("v4", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v5 = generatePersonId2Delays("v5", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v6 = generatePersonId2Delays("v6", "affected");
 
-		Map<Id<Person>, Double> personId2CausingDelays_v3 = getPersonId2Delays("v3", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v4 = getPersonId2Delays("v4", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v5 = getPersonId2Delays("v5", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v6 = getPersonId2Delays("v6", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v3 = generatePersonId2Delays("v3", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v4 = generatePersonId2Delays("v4", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v5 = generatePersonId2Delays("v5", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v6 = generatePersonId2Delays("v6", "causing");
 
 		BufferedWriter  writer = IOUtils.getBufferedWriter("./output/comparisonOfPricingImpls.txt");
 		try {
@@ -133,6 +132,7 @@ public class TestNetworkExperiment {
 		personIds.addAll(personId2CausingDelays_v5.keySet());
 		personIds.addAll(personId2AffectedDelays_v3.keySet());
 		personIds.addAll(personId2CausingDelays_v3.keySet());
+		// yy why is v6 not added? kai, aug'15
 
 
 		try {
@@ -147,7 +147,7 @@ public class TestNetworkExperiment {
 		}
 	}
 
-	public Map<Id<Person>, Double> getPersonId2Delays(String congestionPricingImpl, String affectedOrCausing){
+	Map<Id<Person>, Double> generatePersonId2Delays(String congestionPricingImpl, String affectedOrCausing){
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
@@ -173,8 +173,7 @@ public class TestNetworkExperiment {
 		});
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v5")) events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events, false);
 		sim.run();
@@ -192,7 +191,7 @@ public class TestNetworkExperiment {
 		return personId2Delay;
 	}
 
-	private QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
+	private static QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
@@ -261,13 +260,13 @@ public class TestNetworkExperiment {
 		}
 
 		private void createNetwork(){
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0));
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 100));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, 90));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 200));
-			Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(700, 150));
-			Node node6 = network.createAndAddNode(Id.createNodeId("6"), this.scenario.createCoord(500, 20));
-			Node node7 = network.createAndAddNode(Id.createNodeId("7"), this.scenario.createCoord(700, 100));
+			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 100));
+			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, (double) 90));
+			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 500, (double) 200));
+			Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 700, (double) 150));
+			Node node6 = network.createAndAddNode(Id.createNodeId("6"), new Coord((double) 500, (double) 20));
+			Node node7 = network.createAndAddNode(Id.createNodeId("7"), new Coord((double) 700, (double) 100));
 
 			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600,1,null,"7");
 			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,1000.0,20.0,3600,1,null,"7");

@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
+import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -38,8 +40,10 @@ import java.util.Set;
 /**
  * @author thibautd
  */
+@Singleton
 public class TravelTimesRecord implements PersonDepartureEventHandler,
 		ActivityStartEventHandler {
+	private static final Logger log = Logger.getLogger(TravelTimesRecord.class);
 	private final Map<Id<Person>, TravelTimesForPerson> times = new HashMap<>();
 	private final Set<Id<Person>> ignoreDeparture = new HashSet<>();
 
@@ -59,6 +63,10 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling activity start "+event );
+		}
+
 		if ( stageActivityTypes.isStageActivity( event.getActType() ) ) {
 			ignoreDeparture.add( event.getPersonId() );
 		}
@@ -66,17 +74,21 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory ).arrivals.add(event.getTime());
+					factory ).addArrival(event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling person departure "+event );
+		}
+
 		if ( !ignoreDeparture.remove( event.getPersonId() ) ) {
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory).departures.add(event.getTime());
+					factory).addDeparture(event.getTime());
 		}
 	}
 
@@ -85,6 +97,13 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 				person,
 				times,
 				factory).getTravelTimeBefore( time );
+	}
+
+	public boolean alreadyKnowsTravelTimeAfter( final Id<Person> person , final double time ) {
+		return MapUtils.getArbitraryObject(
+				person,
+				times,
+				factory).alreadyKnowsTravelTimeAfter(time);
 	}
 
 	public double getTravelTimeAfter( final Id<Person> person , final double time ) {
@@ -115,7 +134,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 		public double getTravelTimeBefore( final double time ) {
 			final int bs = arrivals.binarySearch( time );
-			final int index = bs < 0 ? -bs - 1 : bs;
+			final int index = bs < 0 ? -bs - 2 : bs;
 
 			final double tt = arrivals.get( index ) - departures.get( index );
 			assert tt >= 0;
@@ -123,9 +142,18 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			return tt;
 		}
 
+		public boolean alreadyKnowsTravelTimeAfter( final double time ) {
+			assert arrivals.size() == departures.size() || arrivals.size() == departures.size() - 1;
+			return !departures.isEmpty() &&
+					arrivals.size() == departures.size() &&
+					departures.get( departures.size() - 1 ) >= time;
+
+		}
+
 		public double getTravelTimeAfter( final double time ) {
+			assert arrivals.size() == departures.size();
 			final int bs = departures.binarySearch( time );
-			final int index = bs < 0 ? -bs : bs;
+			final int index = bs < 0 ? -bs -1 : bs;
 
 			final double tt = arrivals.get( index ) - departures.get( index );
 			assert tt >= 0;

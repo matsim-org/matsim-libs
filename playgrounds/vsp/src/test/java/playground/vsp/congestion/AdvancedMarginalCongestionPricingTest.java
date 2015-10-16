@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +37,7 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -76,7 +78,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -136,7 +141,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -187,7 +195,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
+		
+		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -255,7 +265,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 
@@ -274,7 +284,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		// with delay --> 70.570685898554200
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
@@ -324,7 +334,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 
@@ -343,7 +353,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		
 		// home duration morning: 28800.
 		// home duration evening with delay: (24 * 3600.) - 57705.
@@ -399,7 +409,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 
@@ -456,7 +466,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
 

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -413,8 +412,8 @@ public class M2KS2010NetworkConverter {
 				linkEnd, linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
-		Coord start = new CoordImpl(scaledLinkStart.x, scaledLinkStart.y);
-		Coord end = new CoordImpl(scaledLinkEnd.x, scaledLinkEnd.y);
+		Coord start = new Coord(scaledLinkStart.x, scaledLinkStart.y);
+		Coord end = new Coord(scaledLinkEnd.x, scaledLinkEnd.y);
 		return new Tuple<Coord, Coord>(start, end);
 	}
 

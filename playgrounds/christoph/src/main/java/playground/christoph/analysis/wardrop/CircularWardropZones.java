@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class CircularWardropZones extends WardropZonesImpl{
 
@@ -112,7 +112,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 		for (int i = 0; i < zoneCentres.size(); i++)
 		{
 			Coord centre = zoneCentres.get(i);
-			double distance = ((CoordImpl)centre).calcDistance(coord);
+			double distance = CoordUtils.calcDistance(centre, coord);
 			if (distance <= radius) zones.add(i);
 		}
 		return zones;
@@ -138,8 +138,8 @@ public class CircularWardropZones extends WardropZonesImpl{
 		
 		double xCoord = xMin + (xIndex * dx + dx/2);
 		double yCoord = yMax - (yIndex * dy + dy/2);
-		
-		Coord coord = new CoordImpl(xCoord, yCoord);
+
+		Coord coord = new Coord(xCoord, yCoord);
 		
 		return coord;
 	}

@@ -37,6 +37,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.*;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -1322,7 +1323,7 @@ public class CepasToEvents {
                 Event personEntersVehicle = new PersonEntersVehicleEvent(
                         (double) cluster.orderedDwellEvents.firstKey() - 0.002, driverId, busRegNum);
                 Event wait2Link = new Wait2LinkEvent((double) cluster.orderedDwellEvents.firstKey() - 0.001, driverId,
-                        departureLinkId, busRegNum);
+                        departureLinkId, busRegNum, PtConstants.NETWORK_MODE, 1.0);
                 this.eventQueue.addLast(driverStarts);
                 this.eventQueue.addLast(transitDriverDeparture);
                 this.eventQueue.addLast(personEntersVehicle);

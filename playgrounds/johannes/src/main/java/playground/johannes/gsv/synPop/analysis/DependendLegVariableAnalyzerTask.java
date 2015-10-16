@@ -22,13 +22,13 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -49,11 +49,11 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
     }
 
     @Override
-    public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList xVals = new TDoubleArrayList();
         TDoubleArrayList yVals = new TDoubleArrayList();
 
-        for(PlainPerson person : persons) {
+        for(Person person : persons) {
             for(Episode plan : person.getEpisodes()) {
                 for(Attributable leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(xKey);
@@ -75,10 +75,10 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
                     double[] y = yVals.toNativeArray();
                     Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                     TDoubleDoubleHashMap corr = Correlations.mean(x, y, disc);
-                    TXTWriter.writeMap(corr, xKey, yKey, filename);
+                    StatsWriter.writeHistogram(corr, xKey, yKey, filename);
 
                     filename = String.format("%s/%s.%s.scatter.txt", getOutputDirectory(), xKey, yKey);
-                    TXTWriter.writeScatterPlot(xVals, yVals, xKey, yKey, filename);
+                    StatsWriter.writeScatterPlot(xVals, yVals, xKey, yKey, filename);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

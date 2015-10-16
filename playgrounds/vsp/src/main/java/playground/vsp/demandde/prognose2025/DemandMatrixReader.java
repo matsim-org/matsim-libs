@@ -34,7 +34,6 @@ import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -147,7 +146,7 @@ public class DemandMatrixReader {
 					double x = Double.parseDouble(row[2]);
 					double y = Double.parseDouble(row[3]);
 					Node node = DemandMatrixReader.this.sc.getNetwork().getFactory().createNode(Id.create(row[5], Node.class),
-							coordinateTransformation.transform(DemandMatrixReader.this.sc.createCoord(x, y) ));
+							coordinateTransformation.transform(new Coord(x, y)));
 					DemandMatrixReader.this.sc.getNetwork().addNode(node);
 				}
 
@@ -167,7 +166,7 @@ public class DemandMatrixReader {
 			Coordinate coordinate = point.getCoordinate();
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
-			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
+			Coord coord = new Coord(Double.parseDouble(xcoordinate.toString()), Double.parseDouble(ycoordinate.toString()));
 			ActivityFacility facility = factory.createActivityFacility(Id.create(gemeindeschluessel, ActivityFacility.class), coord);
 			{
 				ActivityOption option = factory.createActivityOption("work");

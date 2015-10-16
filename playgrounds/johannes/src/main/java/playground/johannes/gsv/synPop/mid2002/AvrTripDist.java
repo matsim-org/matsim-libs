@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.mid2002;
 
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
+
 import java.io.IOException;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.mid.RowHandler;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 
 /**
  * @author johannes

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -38,10 +39,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -372,12 +371,12 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		TripRouter tripRouter = tripRouterFactory.get();
 		
 		Network network = scenario.getNetwork();
-		
-		CoordImpl coordStart = new CoordImpl(l.getCoord());
+
+		Coord coordStart = new Coord(l.getCoord().getX(), l.getCoord().getY());
 		
 		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, l.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
+
+		Coord coordEnd = new Coord(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getX(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getY());
 
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, leg.getRoute().getEndLinkId());
 		
@@ -392,7 +391,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		LegImpl carLeg = new LegImpl("twowaycarsharing");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, l.getId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
 		carLeg.setRoute(route);
@@ -442,7 +441,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		LegImpl carLeg = new LegImpl("twowaycarsharing");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( leg.getRoute().getStartLinkId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
 		carLeg.setRoute(route);
@@ -492,7 +491,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		LegImpl carLeg = new LegImpl("twowaycarsharing");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", leg.getRoute().getStartLinkId(), link.getId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, leg.getRoute().getStartLinkId(), link.getId());
 		route.setLinkIds( leg.getRoute().getStartLinkId(), ids, link.getId());
 		route.setTravelTime( travelTime);
 		carLeg.setRoute(route);
@@ -544,7 +543,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		//if no cars within certain radius return null
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		
-		Collection<TwoWayCSStation> location = twvehiclesLocation.getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing")));
+		Collection<TwoWayCSStation> location = twvehiclesLocation.getQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing")));
 		if (location.isEmpty()) return null;
 		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
 		TwoWayCSStation closest = null;

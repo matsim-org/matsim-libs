@@ -34,7 +34,7 @@ public class ReadableQuadTree<T> {
 	}
 
 	public T get(double x, double y) {
-		return quadTree.get(x, y);
+		return quadTree.getClosest(x, y);
 	}
 
 	public int size() {

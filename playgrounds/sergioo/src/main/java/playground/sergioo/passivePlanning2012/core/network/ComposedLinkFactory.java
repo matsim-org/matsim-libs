@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.router.FastDijkstra;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -53,7 +52,7 @@ public class ComposedLinkFactory implements LinkFactory {
 
 	//Attributes
 	private final Map<Id<Node>, Id<Node>> composedNodes;
-	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
+	private final FastDijkstra leastCostPathCalculator;
 
 	//Constructors
 	public ComposedLinkFactory(Network baseNetwork, Network simplerNetwork, String mode) {

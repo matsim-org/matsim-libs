@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -23,7 +24,6 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFree
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -38,13 +38,10 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -100,6 +97,8 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	
 	double walkSpeed = 0.0;
 	
+	ParkingLinkInfo parkingSpot;
+	
 	// ============================================================================================================================
 	// c'tor
 
@@ -113,7 +112,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		this.scenario = scenario;
 		this.parkingModule = parkingModule;
 		
-		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
+		beelineFactor = ((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
 		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		
 		
@@ -349,14 +348,13 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
-		
-		
-		
-		CoordImpl coordStart = new CoordImpl(l.getCoord());
+
+
+		Coord coordStart = new Coord(l.getCoord().getX(), l.getCoord().getY());
 		
 		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, l.getId());
-		
-		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
+
+		Coord coordEnd = new Coord(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getX(), scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord().getY());
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, leg.getRoute().getEndLinkId());
 		
 		
@@ -371,7 +369,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl("freefloating");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, l.getId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
 		route.setVehicleId(Id.create("FF_" + (vehID), Vehicle.class));
@@ -399,7 +397,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		Route route = leg.getRoute();
 
 		//create route for the car part of the freefloating trip
-		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(Id.create(vehID, Vehicle.class),
+		parkingSpot = parkingModule.parkFreeFloatingVehicle(Id.create(vehID, Vehicle.class),
 				this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord(),
 				this.person.getId(), now);
 		
@@ -409,14 +407,13 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
-		
-		
-		
-		CoordImpl coordStart = new CoordImpl(scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+
+
+		Coord coordStart = new Coord(scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getX(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getY());
 		
 		TwoWayCSFacility startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, route.getEndLinkId());
-		
-		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord());
+
+		Coord coordEnd = new Coord(scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord().getX(), scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord().getY());
 		TwoWayCSFacility endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, parkingSpot.getLinkId());
 		
 		
@@ -431,7 +428,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl("freefloatingparking");
 		
 		carLeg.setTravelTime( travelTime );
-		LinkNetworkRouteImpl route1 = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", route.getEndLinkId(), parkingSpot.getLinkId());
+		NetworkRoute route1 = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, route.getEndLinkId(), parkingSpot.getLinkId());
 		route1.setLinkIds( route.getEndLinkId(), ids,  parkingSpot.getLinkId());
 		route1.setTravelTime( travelTime);
 		//route1.setVehicleId(new IdImpl("FF_" + (vehID)));
@@ -453,6 +450,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	private void initializeFreeFloatingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
+		this.parkingModule.makeFFVehicleAvailable(Id.create((vehID), Vehicle.class), parkingSpot.getParking());
 		Route route = leg.getRoute();
 		
 		double distance = 0.0; // this will be acquired from the parking module

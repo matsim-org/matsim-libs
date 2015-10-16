@@ -27,12 +27,11 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -133,8 +132,7 @@ public class RunEmissionToolOffline {
 	private void loadScenario() {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
-		scenarioLoader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
 	}
 
 	public static void main (String[] args) throws Exception{

@@ -71,9 +71,9 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 
 		Id linkId = event.getLinkId();
 		if(map.containsKey(linkId)){
-			int thisPersonNumber = Integer.parseInt(event.getPersonId().toString());
+			int thisPersonNumber = Integer.parseInt(event.getDriverId().toString());
 			if( thisPersonNumber >= lowerAgentId && thisPersonNumber <= upperAgentId ){
-				Id personId = event.getPersonId();
+				Id personId = event.getDriverId();
 				eventMap.put(personId, event.getTime());				
 			}
 		}
@@ -120,31 +120,31 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 
 	
 	private void addSpeedToZone(LinkLeaveEvent event){
-		if(eventMap.containsKey(event.getPersonId())){
+		if(eventMap.containsKey(event.getDriverId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
-					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
+					(event.getTime() - eventMap.get(event.getDriverId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
 			SAZone theZone = map.get(event.getLinkId());
 			theZone.addToSpeedDetail(hour, speed);
 			theZone.incrementSpeedCount(hour);
 			
-			eventMap.remove(event.getPersonId());
+			eventMap.remove(event.getDriverId());
 		}		
 	}
 
 	
 	public void addSpeedToLink(LinkLeaveEvent event) {
-		if(eventMap.containsKey(event.getPersonId())){
+		if(eventMap.containsKey(event.getDriverId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
-					(event.getTime() - eventMap.get(event.getPersonId()))) *			// in seconds
+					(event.getTime() - eventMap.get(event.getDriverId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
 			linkSpeeds.get(event.getLinkId()).get(hour).add(speed);
 			
-			eventMap.remove(event.getPersonId());
+			eventMap.remove(event.getDriverId());
 		}
 		
 	}

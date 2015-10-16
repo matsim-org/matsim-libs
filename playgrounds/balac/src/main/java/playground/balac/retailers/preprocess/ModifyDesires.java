@@ -19,34 +19,35 @@ public class ModifyDesires {
 	}
 	
 	public void run() {
-		if (!(this.person.getDesires().getActivityDuration(act.getType()) > 0)) {
-			Double duration = this.person.getDesires().getActivityDuration("shop");
-			if (duration > 0) {
-				this.person.createDesires(act.getType());
-				
-				this.person.getDesires().putActivityDuration(act.getType(),duration);
-				this.person.getDesires().removeActivityDuration("shop");
-			}
-			else {
-				if (act.getType().contains("nongrocery")) {
-					this.person.createDesires(act.getType());
-					this.person.getDesires().putActivityDuration(act.getType(),this.person.getDesires().getActivityDuration("shopgrocery"));
-				}
-				else {
-					this.person.createDesires(act.getType());
-					this.person.getDesires().putActivityDuration(act.getType(),this.person.getDesires().getActivityDuration("nongrocery"));
-				}
-			}
-		}
-		
-		Double duration = this.person.getDesires().getActivityDuration("shop");
-		if (duration > 0) {
-			this.person.createDesires(act.getType());
-			this.person.getDesires().putActivityDuration(act.getType(),duration);
-			this.person.getDesires().removeActivityDuration("shop");
-		}
-		else {
-			
-		}
+		throw new UnsupportedOperationException( "Desires do not exist anymore. Please use object attributes" );
+		//if (!(this.person.getDesires().getActivityDuration(act.getType()) > 0)) {
+		//	Double duration = this.person.getDesires().getActivityDuration("shop");
+		//	if (duration > 0) {
+		//		this.person.createDesires(act.getType());
+		//
+		//		this.person.getDesires().putActivityDuration(act.getType(),duration);
+		//		this.person.getDesires().removeActivityDuration("shop");
+		//	}
+		//	else {
+		//		if (act.getType().contains("nongrocery")) {
+		//			this.person.createDesires(act.getType());
+		//			this.person.getDesires().putActivityDuration(act.getType(),this.person.getDesires().getActivityDuration("shopgrocery"));
+		//		}
+		//		else {
+		//			this.person.createDesires(act.getType());
+		//			this.person.getDesires().putActivityDuration(act.getType(),this.person.getDesires().getActivityDuration("nongrocery"));
+		//		}
+		//	}
+		//}
+		//
+		//Double duration = this.person.getDesires().getActivityDuration("shop");
+		//if (duration > 0) {
+		//	this.person.createDesires(act.getType());
+		//	this.person.getDesires().putActivityDuration(act.getType(),duration);
+		//	this.person.getDesires().removeActivityDuration("shop");
+		//}
+		//else {
+		//
+		//}
 	}
 }

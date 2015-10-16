@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -77,7 +77,7 @@ public class SimpleMasterAreas {
 		while(mPAreasR.next()) {
 			ResultSet mPAreasR2 = dataBaseAux.executeQuery("SELECT ZoneID,`Pu/Pr` FROM DCM_mplan_zones_modeshares WHERE objectID="+mPAreasR.getInt(1));
 			mPAreasR2.next();
-			dataMPAreas.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), new MPAreaData(Id.create(mPAreasR.getString(1), ActivityFacility.class), coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), Id.create(mPAreasR2.getInt(1), ActivityFacility.class), mPAreasR2.getDouble(2)));
+			dataMPAreas.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), new MPAreaData(Id.create(mPAreasR.getString(1), ActivityFacility.class), coordinateTransformation.transform(new Coord(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), Id.create(mPAreasR2.getInt(1), ActivityFacility.class), mPAreasR2.getDouble(2)));
 			mPAreasPlotRatio.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), mPAreasR.getDouble(3));
 		}
 		mPAreasR.close();
@@ -101,7 +101,7 @@ public class SimpleMasterAreas {
 			Id<ActivityFacility> id = Id.create((int)(buildingsR.getFloat(5)), ActivityFacility.class);
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
-			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new Coord(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double capacity = buildingsR.getDouble(7)*mPAreasPlotRatio.get(areaId)/workerAreas.get(mPArea.getType());
 			if(capacity>0) {

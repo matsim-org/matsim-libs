@@ -50,8 +50,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -71,21 +69,17 @@ public class GenerateFundamentalDiagramData {
 
 	static final Logger log = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
-	//CONFIGURATION: static variables used for aggregating configuration options
-
 	static boolean PASSING_ALLOWED = false;
 	static boolean SEEPAGE_ALLOWED = false;
-	private boolean SEEP_NETWORK_FACTORY = false;
 	private final boolean LIVE_OTFVis = false;
 	static boolean WITH_HOLES = false;
-	boolean WRITE_FD_DATA = true;
 	static String RUN_DIR ;
 	public boolean isPlottingDistribution = false;
 
 	static boolean writeInputFiles = true; // includes config,network and plans
 
-	static String[] TRAVELMODES;	//identification of the different modes
-	static Double[] MODAL_SPLIT; //modal split in PCU 
+	static String[] TRAVELMODES;	
+	static Double[] MODAL_SPLIT; 
 
 	private int reduceDataPointsByFactor = 1;
 
@@ -111,31 +105,41 @@ public class GenerateFundamentalDiagramData {
 	public static String HOLE_SPEED = "15";
 
 	public static void main(String[] args) {
-
-		String RUN_DIR = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312";
-
-		String OUTPUT_FOLDER ="/carBikePassing/";
-		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
-
-		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1.,1.}; // in pcu
-
+		
+		boolean isRunningOnCluster = false;
+		
+		if (args.length  > 0) isRunningOnCluster = true;
+		
+		if( ! isRunningOnCluster ) {
+			
+			args = new String [8];
+			
+			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
+			String outFolder ="/carBikePassing/";
+			
+			args[0] = my_dir + outFolder ;
+			args[1] = "car,bike"; // travel (main) modes
+			args[2] = "1.0,1.0"; // modal split in pcu
+			args[3] = "true"; // isPassingAllowed
+			args[4] = "false"; // isSeepageAllowed
+			args[5] = "false"; // isUsingHoles
+			args[6] = "10"; // reduce number of data points by this factor
+			args[7] = "false"; // is plotting modal split distribution
+		}
+		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
-
-		generateFDData.setTravelModes(travelModes);
-		generateFDData.setModalSplit(modalSplit);
-		generateFDData.setPassingAllowed(true);
-		generateFDData.setSeepageAllowed(false);
-		generateFDData.setIsWritingFinalFdData(true);
-		generateFDData.setWriteInputFiles(true);
-		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
-		generateFDData.setUseHoles(false);
-		generateFDData.setReduceDataPointsByFactor(10);
-		generateFDData.setUsingSeepNetworkFactory(false);
-		//		HOLE_SPEED = args[4];
-		generateFDData.setIsPlottingDistribution(false);
+		
+		generateFDData.setRunDirectory(args[0]);
+		generateFDData.setTravelModes(args[1].split(","));
+		generateFDData.setModalSplit(args[2].split(",")); //in pcu
+		generateFDData.setPassingAllowed(Boolean.valueOf(args[3]));
+		generateFDData.setSeepageAllowed(Boolean.valueOf(args[4]));
+		generateFDData.setUseHoles(Boolean.valueOf(args[5]));
+		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
+		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
+		
+		generateFDData.setWriteInputFiles(true); 
 		generateFDData.run();
-
 	}
 
 	private void consistencyCheckAndInitialize(){
@@ -152,15 +156,12 @@ public class GenerateFundamentalDiagramData {
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
 
 		if(writeInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
-		if(WRITE_FD_DATA && RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
 
 		flowUnstableWarnCount = new int [TRAVELMODES.length];
 		speedUnstableWarnCount = new int [TRAVELMODES.length];
 	}
 
-	/**
-	 * @param outputFile final data will be written to this file
-	 */
 	public void run(){
 
 		consistencyCheckAndInitialize();
@@ -171,13 +172,13 @@ public class GenerateFundamentalDiagramData {
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
-		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
+		openFileAndWriteHeader(RUN_DIR+"/data.txt");
 
 		if(isPlottingDistribution){
 			parametricRunAccordingToDistribution();	
 		} else parametricRunAccordingToGivenModalSplit();
 
-		if(WRITE_FD_DATA) closeFile();
+		closeFile();
 	}
 
 	public void setRunDirectory(String runDir) {
@@ -200,8 +201,11 @@ public class GenerateFundamentalDiagramData {
 		TRAVELMODES = travelModes;
 	}
 
-	public void setModalSplit(Double[] modalSplit) {
-		MODAL_SPLIT = modalSplit;
+	public void setModalSplit(String [] modalSplit) {
+		MODAL_SPLIT = new Double [modalSplit.length];
+		for (int ii = 0; ii <modalSplit.length; ii ++){
+			MODAL_SPLIT [ii] = Double.valueOf(modalSplit[ii]);
+		}
 	}
 
 	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
@@ -212,20 +216,12 @@ public class GenerateFundamentalDiagramData {
 		WITH_HOLES = isUsingHole;
 	}
 
-	private void setUsingSeepNetworkFactory(boolean isUsingMySeepNetworkFactory){
-		SEEP_NETWORK_FACTORY = isUsingMySeepNetworkFactory;
-	}
-
 	public void setIsPlottingDistribution(boolean isPlottingDistribution) {
 		this.isPlottingDistribution = isPlottingDistribution;
 	}
 
 	public Map<Double, Map<String, Tuple<Double, Double>>> getOutData() {
 		return outData;
-	}
-
-	public void setIsWritingFinalFdData(boolean isWritingFinalData) {
-		WRITE_FD_DATA = isWritingFinalData;
 	}
 
 	private void parametricRunAccordingToGivenModalSplit(){
@@ -432,7 +428,7 @@ public class GenerateFundamentalDiagramData {
 			if(globalLinkDensity > networkDensity/3+10) stableState =false; //+10; since we still need some points at max density to show zero speed.
 		}
 
-		if(WRITE_FD_DATA && stableState) {
+		if( stableState ) {
 			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
@@ -478,22 +474,13 @@ public class GenerateFundamentalDiagramData {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		QNetsimEngine netsimEngine ;
-
-		if(SEEP_NETWORK_FACTORY){
-			log.warn("Using modified \"QueueWithBuffer\". Keep eyes open.");
-			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(QueueWithBufferType.amit);
-			netsimEngine = new QNetsimEngine(qSim,seepNetFactory);
-		} else {
-			netsimEngine = new QNetsimEngine(qSim);
-		}
+		QNetsimEngine netsimEngine  = new QNetsimEngine(qSim);
 
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
 		log.info("=======================");
-		log.info("Modifying AgentSource by modifying mobsim agents' next link so that, "
-				+ "agents keep moving on the track.");
+		log.info("Mobsim agents' are directly added to AgentSource.");
 		log.info("=======================");
 
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
@@ -630,20 +617,29 @@ public class GenerateFundamentalDiagramData {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
+		private static final Id<Link> FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR);
+		private static final Id<Link> LAST_LINK_ID_OF_BASE = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
+		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
+		private static final Id<Link> FIRST_LINK_LINK_ID_OF_BASE = Id.createLinkId(0);
+		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
 			this.actEndTime = actEndTime;
+			this.plannedVehicleId = Id.create(agentId, Vehicle.class);
 		}
 
 		private final Id<Person> personId;
+		private final Id<Vehicle> plannedVehicleId;
 		private final String mode;
 		private final double actEndTime;
 
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
 
-		private Id<Link> currentLinkId = Id.createLinkId("home");
+		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
 		private State agentState= MobsimAgent.State.ACTIVITY;;
 
 		@Override
@@ -653,7 +649,7 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return Id.createLinkId("work");
+			return DESTINATION_LINK_ID;
 		}
 
 		@Override
@@ -663,24 +659,21 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			if (globalFlowDynamicsUpdator.isPermanent()){ 
-				isArriving = true; 
-			}
 
 			if (GenerateFundamentalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
 				isArriving = true; 
 			}
 
-			if( this.getCurrentLinkId().equals(Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1)) || this.currentLinkId.equals(Id.createLinkId("home"))){
+			if( LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId) || ORIGIN_LINK_ID.equals(this.currentLinkId)){
 				//person departing from home OR last link of the track
-				return Id.createLinkId(0);
-			} else if(this.getCurrentLinkId().equals(Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1))){ //last link of base
+				return FIRST_LINK_LINK_ID_OF_BASE;
+			} else if(LAST_LINK_ID_OF_BASE.equals(this.currentLinkId)){
 				if ( isArriving) {
-					return Id.createLinkId("work") ;
+					return DESTINATION_LINK_ID ;
 				} else {
-					return Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR) ;
+					return FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK ;
 				}
-			}  else if (this.getCurrentLinkId().equals(Id.createLinkId("work"))){
+			}  else if (DESTINATION_LINK_ID.equals(this.currentLinkId)){
 				return null;// this will send agent for arrival
 			} else {
 				Id<Link> existingLInkId = this.currentLinkId;
@@ -714,7 +707,7 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
-			return Id.create(this.getId(), Vehicle.class);
+			return this.plannedVehicleId;
 		}
 
 		@Override
@@ -724,6 +717,9 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public double getActivityEndTime() {
+			if(isArriving && this.agentState.equals(MobsimAgent.State.ACTIVITY)) {
+				return Double.POSITIVE_INFINITY; // let agent go to sleep.
+			}
 			return this.actEndTime;
 		}
 

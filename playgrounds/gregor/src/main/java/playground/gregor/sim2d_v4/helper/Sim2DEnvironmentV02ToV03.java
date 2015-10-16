@@ -67,7 +67,7 @@ public class Sim2DEnvironmentV02ToV03 {
 					LineSegment l = s.getOpeningSegments().get(i);
 					double x = (l.x0+l.x1)/2;
 					double y = (l.y0+l.y1)/2;
-					Opening o = qt.get(x, y);
+					Opening o = qt.getClosest(x, y);
 					if (o != null) {
 						double dx = o.x-x;
 						double dy = o.y-y;

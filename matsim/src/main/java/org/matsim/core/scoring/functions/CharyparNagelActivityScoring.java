@@ -313,7 +313,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 				// score first activity
 				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
 				// score last activity
-				this.score += calcActScore(this.currentActivityStartTime, 24*3600, lastActivity); // SCENARIO_DURATION
+				this.score += calcActScore(this.currentActivityStartTime, this.params.simulationPeriodInDays * 24*3600, lastActivity);
 			}
 		}
 	}

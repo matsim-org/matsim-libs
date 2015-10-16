@@ -22,6 +22,7 @@ package playground.johannes.gsv.popsim;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.File;
@@ -52,14 +53,14 @@ public class AnalyzerListener implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
 
 		if (iters.get() % interval == 0) {
 			String output = String.format("%s/%s", rootDir, String.valueOf(iters));
 			File file = new File(output);
 			file.mkdirs();
 			try {
-				ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
+				ProxyAnalyzer.analyze((Collection<PlainPerson>)population, pTask, file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

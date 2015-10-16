@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author johannes
@@ -27,6 +27,6 @@ import playground.johannes.synpop.data.PlainPerson;
  */
 public interface Hamiltonian {
 
-	public double evaluate(PlainPerson person);
+	public double evaluate(Person person);
 	
 }

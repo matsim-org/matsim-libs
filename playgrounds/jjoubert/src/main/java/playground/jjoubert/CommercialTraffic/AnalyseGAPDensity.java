@@ -105,7 +105,7 @@ public class AnalyseGAPDensity {
 
 						Point thisActivity = gf.createPoint(new Coordinate(x, y) );
 
-						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, gapSearchRadius );
+						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.getDisk(x, y, gapSearchRadius);
 						SAZone minorZone = findZoneInArrayList(thisActivity, shortlist );
 						if ( minorZone != null ){
 							minorZone.incrementMinorActivityCountDetail( timeOfDay );
@@ -149,7 +149,7 @@ public class AnalyseGAPDensity {
 
 						Point thisActivity = gf.createPoint(new Coordinate(x, y) );
 						
-						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.get(x, y, gapSearchRadius );
+						ArrayList<SAZone> shortlist = (ArrayList<SAZone>) tree.getDisk(x, y, gapSearchRadius);
 						SAZone majorZone = findZoneInArrayList(thisActivity, shortlist );
 						if ( majorZone != null ){
 							majorZone.incrementMajorActivityCountDetail( timeOfDay );

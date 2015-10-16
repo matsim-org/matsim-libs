@@ -94,7 +94,7 @@ public class createPatnaNetwork {
 				else {
 					double xcord = ((Double.parseDouble(fromNodeXCoord))/(1000000));				
 					double ycord = ((Double.parseDouble(fromNodeYCoord))/(1000000));
-					Coord createCoord = scenario.createCoord(xcord, ycord);
+					Coord createCoord = new Coord(xcord, ycord);
 					fromNode = network.getFactory().createNode(fromNodeId,ct.transform( createCoord));
 					network.addNode(fromNode);
 				}
@@ -107,7 +107,7 @@ public class createPatnaNetwork {
 				else {
 					double xcord = ((Double.parseDouble(toNodeXCoord))/(1000000));
 					double ycord = ((Double.parseDouble(toNodeYCoord))/(1000000));
-					Coord createCoord = scenario.createCoord(xcord, ycord);
+					Coord createCoord = new Coord(xcord, ycord);
 					toNode = network.getFactory().createNode(toNodeId, ct.transform(createCoord) );
 					network.addNode(toNode);
 				}

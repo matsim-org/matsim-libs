@@ -15,10 +15,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -55,10 +54,10 @@ public class MembershipAssigner {
 
 
 	
-	private double computeAccessCSWork(PersonImpl pi) {
+	private double computeAccessCSWork(Person pi) {
 		
 		Collection<CarSharingStation> closestStations = new TreeSet<CarSharingStation>();
-		Coord c = new CoordImpl (1.0D / 0.0D, 1.0D / 0.0D );
+		Coord c = new Coord(1.0D / 0.0D, 1.0D / 0.0D);
 		double access = 0.0D;
 		for (PlanElement pe : pi.getSelectedPlan().getPlanElements()) {
 			
@@ -85,9 +84,9 @@ public class MembershipAssigner {
 
 
 
-	private double computeAccessCSHome(PersonImpl pi) {
+	private double computeAccessCSHome(Person pi) {
 		Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
-		Coord c = new CoordImpl (1.0D / 0.0D, 1.0D / 0.0D );
+		Coord c = new Coord(1.0D / 0.0D, 1.0D / 0.0D);
 		double access = 0.0D;
 		for (PlanElement pe : pi.getSelectedPlan().getPlanElements()) {
 			
@@ -141,17 +140,18 @@ public class MembershipAssigner {
 
 	private void modifyPlans() {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			PersonImpl pi = (PersonImpl)person;
+			Person pi = person;
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + pi.getId());
 			}
-			if (pi.getLicense().equalsIgnoreCase("yes")) {this.assignCarSharingMembership(pi);}
-			else {pi.addTravelcard("unknown");}
+			if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {this.assignCarSharingMembership(pi);}
+			else {
+				PersonUtils.addTravelcard(pi, "unknown");}
 			PlanImpl selectedPlan = (PlanImpl)pi.getSelectedPlan();
 			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
 				final LegImpl leg = (LegImpl)actslegs.get(j);
-				if (leg.getMode().startsWith("ride")& pi.getTravelcards().equals("ch-HT-mobility")) {
+				if (leg.getMode().startsWith("ride")& PersonUtils.getTravelcards(pi).equals("ch-HT-mobility")) {
 					leg.setMode("carsharing");
 				}
 			}
@@ -160,18 +160,18 @@ public class MembershipAssigner {
 	}
 	
 
-	private void assignCarSharingMembership(PersonImpl pi) {
+	private void assignCarSharingMembership(Person pi) {
 		log.info("Processing person " + pi.getId());
 		FlexTransPersonImpl ftPerson = new  FlexTransPersonImpl(pi);
 		this.addFTAttributes(ftPerson);
 		int choice = new MembershipModel(this.scenario).calcMembership(ftPerson);
 		if (choice == 0) {
-			pi.addTravelcard("ch-HT-mobility");
+			PersonUtils.addTravelcard(pi, "ch-HT-mobility");
 		}
 		else {
-			pi.addTravelcard("unknown");
+			PersonUtils.addTravelcard(pi, "unknown");
 		}
-		log.info("travelcards = " + pi.getTravelcards());
+		log.info("travelcards = " + PersonUtils.getTravelcards(pi));
 	}
 
 
@@ -192,8 +192,8 @@ public class MembershipAssigner {
 
 
 	private double computeDensityHome(FlexTransPersonImpl pi) {
-		
-		Coord c = new CoordImpl (1.0D / 0.0D, 1.0D / 0.0D );
+
+		Coord c = new Coord(1.0D / 0.0D, 1.0D / 0.0D);
 		//QuadTree<Person> personsQuadTree = MembershipUtils.createPersonQuadTree (this.scenario);
 		for (PlanElement pe : pi.getSelectedPlan().getPlanElements()) {
 			
@@ -208,7 +208,7 @@ public class MembershipAssigner {
 			
 			}
 		}
-		int density =  (this.personsQuadTree.get(c.getX(),c.getY(), 0.05)).size();
+		int density =  (this.personsQuadTree.getDisk(c.getX(), c.getY(), 0.05)).size();
 		log.info("density " + density);
 		return density;
 	}	

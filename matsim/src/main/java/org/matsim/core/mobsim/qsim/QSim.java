@@ -61,6 +61,8 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
+import javax.inject.Inject;
+
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
  * approach consists of the following elements (and presumably more, developed by mzilske):<ul>
@@ -183,6 +185,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * If you wish to use QSim as a product and run a simulation based on a Config file, rather use QSimFactory as your entry point.
 	 *
 	 */
+	@Inject
 	public QSim(final Scenario sc, EventsManager events) {
 		this.scenario = sc;
 		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {

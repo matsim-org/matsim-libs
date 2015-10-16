@@ -1,6 +1,6 @@
 package playground.dhosse.prt.data;
 
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -8,16 +8,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.TaxiRank;
 
-public class PrtData extends TaxiData {
+public class PrtData extends ETaxiData {
 	
-	private List<TaxiRank> vehicleRanks;
+	private Collection<TaxiRank> vehicleRanks;
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
-	public PrtData(Network network, TaxiData data){
-		this.vehicleRanks = data.getTaxiRanks();
+	public PrtData(Network network, ETaxiData data){
+		this.vehicleRanks = data.getTaxiRanks().values();
 		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
 		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);
 	}
@@ -42,11 +42,11 @@ public class PrtData extends TaxiData {
     }
     
     public TaxiRank getNearestRank(Coord coord){
-    	return quadTreeRanks.get(coord.getX(), coord.getY());
+    	return quadTreeRanks.getClosest(coord.getX(), coord.getY());
     }
     
     public TaxiRank getNearestRank(Link link){
-    	return quadTreeRanks.get(link.getCoord().getX(), link.getCoord().getY());
+    	return quadTreeRanks.getClosest(link.getCoord().getX(), link.getCoord().getY());
     }
     
     @SuppressWarnings("unchecked")

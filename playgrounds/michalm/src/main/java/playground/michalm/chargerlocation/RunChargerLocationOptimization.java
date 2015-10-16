@@ -128,23 +128,23 @@ public class RunChargerLocationOptimization
         //                .crateFreespeedDistanceCalculator(scenario.getNetwork());
         DistanceCalculator calculator = DistanceCalculators.BEELINE_DISTANCE_CALCULATOR;
 
-        Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
         readPotentials(zones, potentialFile, HORIZON);
 
         double totalEnergyConsumed = //
         Math.max(eScenario.energyPerVehicle - (includeDeltaSoc ? DELTA_SOC : 0), 0)
                 * HORIZON.vehicleCount;
-        ZoneData zoneData = new ZoneData(zones, zonePotentials, totalEnergyConsumed
-                / totalPotential);
+        ZoneData zoneData = new ZoneData(zones, zonePotentials,
+                totalEnergyConsumed / totalPotential);
 
         //read/create stations at either zone centroids or ranks 
-        List<ChargingStation> stations = new ArrayList<>();
+        List<ChargerLocation> locations = new ArrayList<>();
         for (Zone z : zones.values()) {
-            Id<ChargingStation> id = Id.create(z.getId(), ChargingStation.class);
-            ChargingStation station = new ChargingStation(id, z.getCoord(), eScenario.chargePower);
-            stations.add(station);
+            Id<ChargerLocation> id = Id.create(z.getId(), ChargerLocation.class);
+            ChargerLocation location = new ChargerLocation(id, z.getCoord(), eScenario.chargePower);
+            locations.add(location);
         }
-        ChargerData chargerData = new ChargerData(stations, HORIZON.hours);
+        ChargerData chargerData = new ChargerData(locations, HORIZON.hours);
 
         int maxChargers = (int)Math.ceil(eScenario.oversupply * totalEnergyConsumed
                 / (eScenario.chargePower * HORIZON.hours));
@@ -155,7 +155,8 @@ public class RunChargerLocationOptimization
     }
 
 
-    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile, TimeHorizon horizon)
+    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile,
+            TimeHorizon horizon)
     {
         if (horizon == TimeHorizon._24H) {
             //TODO does not work for 24h: should be Mon 4am till Fri 4am
@@ -208,21 +209,21 @@ public class RunChargerLocationOptimization
     {
         String dir = "d:/PP-rad/berlin/chargerLocation/";
         String name = eScenario.name() + (includeDeltaSoc ? "_DeltaSOC" : "_noDeltaSOC");
-        writeChargers(solution.x, dir + "chargers_out_of_" + problem.maxChargers + "_" + name
-                + ".csv");
+        writeChargers(solution.x,
+                dir + "chargers_out_of_" + problem.maxChargers + "_" + name + ".csv");
         writeFlows(solution.f, dir + "flows_" + name + ".csv");
     }
 
 
     private void writeChargers(int[] x, String file)
     {
-        List<ChargingStation> stations = problem.chargerData.stations;
+        List<ChargerLocation> locations = problem.chargerData.locations;
 
         try (PrintWriter writer = new PrintWriter(file)) {
             for (int j = 0; j < problem.J; j++) {
                 if (x[j] > 0) {
-                    Id<ChargingStation> stationId = stations.get(j).getId();
-                    writer.printf("%s,%d\n", stationId, x[j]);
+                    Id<ChargerLocation> locationId = locations.get(j).getId();
+                    writer.printf("%s,%d\n", locationId, x[j]);
                 }
             }
         }
@@ -235,15 +236,15 @@ public class RunChargerLocationOptimization
     private void writeFlows(double[][] f, String file)
     {
         List<ZoneData.Entry> zoneEntries = problem.zoneData.entries;
-        List<ChargingStation> stations = problem.chargerData.stations;
+        List<ChargerLocation> locations = problem.chargerData.locations;
 
         try (PrintWriter writer = new PrintWriter(file)) {
             for (int i = 0; i < problem.I; i++) {
                 for (int j = 0; j < problem.J; j++) {
                     if (f[i][j] > 1e-2) {
                         Id<Zone> zoneId = zoneEntries.get(i).zone.getId();
-                        Id<ChargingStation> stationId = stations.get(j).getId();
-                        writer.printf("%s,%s,%.2f\n", zoneId, stationId, f[i][j]);
+                        Id<ChargerLocation> locationId = locations.get(j).getId();
+                        writer.printf("%s,%s,%.2f\n", zoneId, locationId, f[i][j]);
                     }
                 }
             }
@@ -258,7 +259,7 @@ public class RunChargerLocationOptimization
     {
         for (EScenario es : EScenario.values()) {
             System.err.println("==========================" + es.name());
-//            new RunChargerLocationOptimization(es, true).solveProblem();
+            //            new RunChargerLocationOptimization(es, true).solveProblem();
             new RunChargerLocationOptimization(es, false).solveProblem();
         }
     }

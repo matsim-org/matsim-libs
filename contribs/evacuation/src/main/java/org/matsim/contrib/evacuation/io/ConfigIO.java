@@ -24,20 +24,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.control.Controller;
-import org.matsim.contrib.evacuation.evacuationptlineseditor.BusStop;
-import org.matsim.contrib.evacuation.evacuationptlineseditor.PTLinesGenerator;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.network.NetworkChangeEventFactory;
+import org.matsim.core.network.NetworkChangeEventFactoryImpl;
+import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleWriterV1;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 /**
@@ -108,60 +106,5 @@ public class ConfigIO
 		return false;
 
 	}
-	
-	public static synchronized boolean savePTLines(Controller controller, Map<Id<Link>, BusStop> busStops)
-	{
-		Config config = controller.getScenario().getConfig();
-		
-		String scenarioPath = controller.getScenarioPath();
-		
-		//settings to activate pt simulation
-		config.strategy().addParam("maxAgentPlanMemorySize", "3");
-		config.strategy().addParam("Module_1", DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
-		config.strategy().addParam("ModuleProbability_1", "0.1");
-		config.strategy().addParam("Module_2", DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-		config.strategy().addParam("ModuleProbability_2", "0.8");
-		config.strategy().addParam("Module_3", DefaultPlanStrategiesModule.DefaultStrategy.ChangeLegMode.toString());
-		config.strategy().addParam("ModuleProbability_3", "0.4");
-		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
-		
-		
-		
-		config.strategy().addParam("fractionOfIterationsToDisableInnovation", "0.8");
-		
-		
-//		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
-//		config.strategy().addParam("ModuleProbability_4", "0.3");
-
-		config.setParam("qsim", "startTime", "00:00:00");
-		config.setParam("qsim", "endTime", "30:00:00");
-		config.setParam("changeLegMode", "modes", "car,pt");
-		config.setParam("changeLegMode", "ignoreCarAvailability", "false");
-		
-		config.setParam("transit", "transitScheduleFile", scenarioPath+"/transitSchedule.xml");
-		config.setParam("transit", "vehiclesFile",scenarioPath+"/transitVehicles.xml");
-		config.setParam("transit", "transitModes", "pt");
-
-		config.transit().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		
-		String configFile = controller.getConfigFilePath();
-		
-		new ConfigWriter(config).write(configFile);
-		
-		PTLinesGenerator gen = new PTLinesGenerator(controller.getScenario(),busStops);
-		TransitSchedule schedule = gen.getTransitSchedule();
-		
-		new NetworkWriter(controller.getScenario().getNetwork()).write(config.network().getInputFile());
-		new TransitScheduleWriterV1(schedule).write(scenarioPath+"/transitSchedule.xml");
-		new VehicleWriterV1(((ScenarioImpl)controller.getScenario()).getTransitVehicles()).writeFile(scenarioPath+"/transitVehicles.xml");
-		
-		
-		
-		return true;
-	}
-	
-	
-	
 
 }

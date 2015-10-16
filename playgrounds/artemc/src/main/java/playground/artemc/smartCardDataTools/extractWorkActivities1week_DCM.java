@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.artemc.utils.DataBaseAdmin;
@@ -156,7 +155,7 @@ public class extractWorkActivities1week_DCM {
 					if(count==0){
 						firstLat = agentTrips.getDouble(4);
 						firstLon = agentTrips.getDouble(5);
-						Coord coordStart =new CoordImpl(firstLon, firstLat);
+						Coord coordStart = new Coord(firstLon, firstLat);
 						Coord UTMStart = ct.transform(coordStart);
 						firstLon=UTMStart.getX();
 						firstLat=UTMStart.getY();
@@ -165,8 +164,8 @@ public class extractWorkActivities1week_DCM {
 						jEndTime = c.calculateEndTime(agentTrips.getString(2),agentTrips.getDouble(3));
 	//					System.out.println(agentTrips.getString(2)+","+agentTrips.getLong(3)+", "+jEndTime+"\n");
 						endLat = agentTrips.getDouble(6);
-						endLon = agentTrips.getDouble(7);			  
-						Coord coordEnd =new CoordImpl(endLon, endLat);
+						endLon = agentTrips.getDouble(7);
+						Coord coordEnd = new Coord(endLon, endLat);
 						Coord UTMEnd = ct.transform(coordEnd);
 						endLon=UTMEnd.getX();
 						endLat=UTMEnd.getY();
@@ -177,7 +176,7 @@ public class extractWorkActivities1week_DCM {
 					
 					startLat = agentTrips.getDouble(4);
 					startLon = agentTrips.getDouble(5);
-					Coord coordStart =new CoordImpl(startLon, startLat);
+					Coord coordStart = new Coord(startLon, startLat);
 					Coord UTMStart = ct.transform(coordStart);
 					startLon=UTMStart.getX();
 					startLat=UTMStart.getY();
@@ -492,8 +491,8 @@ public class extractWorkActivities1week_DCM {
 			  	  
 					jEndTime = c.calculateEndTime(agentTrips.getString(2),agentTrips.getDouble(3));		  
 					endLat = agentTrips.getDouble(6);
-					endLon = agentTrips.getDouble(7);			  
-					Coord coordEnd =new CoordImpl(endLon, endLat);
+					endLon = agentTrips.getDouble(7);
+					Coord coordEnd = new Coord(endLon, endLat);
 					Coord UTMEnd = ct.transform(coordEnd);
 					endLon=UTMEnd.getX();
 					endLat=UTMEnd.getY();

@@ -19,27 +19,22 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
@@ -47,8 +42,10 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -72,7 +69,7 @@ public class FracDimOpportunities {
 			targetPoints.add(v.getPoint());
 		}
 
-		SimpleFeature feature = FeatureSHP.readFeatures(chborderFile).iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures(chborderFile).iterator().next();
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		
@@ -108,7 +105,7 @@ public class FracDimOpportunities {
 		System.out.println("Creating histograms...");
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 100, 500), true);
 		Histogram.normalize(hist);
-		TXTWriter.writeMap(hist, "d", "p", outFile);
+		StatsWriter.writeHistogram(hist, "d", "p", outFile);
 	}
 
 }

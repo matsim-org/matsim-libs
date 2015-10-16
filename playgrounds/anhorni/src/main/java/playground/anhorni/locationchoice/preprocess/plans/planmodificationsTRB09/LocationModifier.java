@@ -37,7 +37,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -82,7 +81,7 @@ public class LocationModifier extends Modifier {
 		/* assign a random location around Bellevue with a radius of 30km
 		 * -> tailored for WU project
 		 */
-		this.assignRandomLocation(new CoordImpl(683508.50, 246832.91), 30000);
+		this.assignRandomLocation(new Coord(683508.50, 246832.91), 30000);
 	}
 
 	private void assignRandomLocation(Coord coords, double radius) {
@@ -91,8 +90,8 @@ public class LocationModifier extends Modifier {
 		Iterator<? extends Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
-		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.getDisk(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.getDisk(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
 

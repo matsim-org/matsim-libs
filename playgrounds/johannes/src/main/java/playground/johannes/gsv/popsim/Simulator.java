@@ -19,15 +19,32 @@
 
 package playground.johannes.gsv.popsim;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import gnu.trove.TDoubleArrayList;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
-import playground.johannes.gsv.synPop.analysis.DependendLegVariableAnalyzerTask;
+import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.sim3.*;
-import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
+import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
+import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.CalculateGeoDistance;
+import playground.johannes.synpop.processing.GuessMissingActTypes;
+import playground.johannes.synpop.processing.LegAttributeRemover;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.sim.*;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.io.IOException;
 import java.util.*;
@@ -38,90 +55,150 @@ import java.util.*;
  */
 public class Simulator {
 
+	private static final Logger logger = Logger.getLogger(Simulator.class);
+
+	private static final String MODULE_NAME = "synPopSim";
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		XMLParser parser = new XMLParser();
-		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
+		Config config = new Config();
+		ConfigUtils.loadConfig(config, args[0]);
 
-		Set<PlainPerson> persons = parser.getPersons();
+		logger.info("Loading persons...");
+		Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
+				"popInputFile"), new PlainFactory());
+		logger.info(String.format("Loaded %s persons.", refPersons.size()));
 
-		for(PlainPerson person : persons) {
-			String age = person.getAttribute(CommonKeys.PERSON_AGE);
-			if(age != null) person.setUserData(DistanceVector.AGE_KEY, Double.parseDouble(age));
-			String income = person.getAttribute(CommonKeys.HH_INCOME);
-			if(income != null) person.setUserData(DistanceVector.INCOME_KEY, Double.parseDouble(income));
+		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
 
+		TaskRunner.run(new ReplaceActTypes(), refPersons);
+		new GuessMissingActTypes(random).apply(refPersons);
+		TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
+
+		logger.info("Cloning persons...");
+		Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), 100000, random);
+		logger.info(String.format("Generated %s persons.", simPersons.size()));
+
+		logger.info("Loading data...");
+		DataPool dataPool = new DataPool();
+		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+//		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+		dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
+		logger.info("Done.");
+
+//		logger.info("Validation data...");
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
+//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
+//		logger.info("Done.");
+
+		logger.info("Setting up sampler...");
+		/*
+		 * Distribute population according to zone values.
+		 */
+		new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
+		/*
+		 * Assign random activity facilities.
+		 */
+		TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+		TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
+		TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+
+		final String output = config.getParam(MODULE_NAME, "output");
+
+		final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
+
+		ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
+
+		final HamiltonianComposite hamiltonians = new HamiltonianComposite();
+
+		MutatorComposite<? extends Attributable> mutators = new MutatorComposite<>(random);
+
+        UnivariatFrequency distance = buildDistanceHamiltonian(refPersons, simPersons);
+        hamiltonians.addComponent(distance, 1e6);
+
+
+        FacilityMutatorBuilder fBuilder = new FacilityMutatorBuilder(dataPool, random);
+        fBuilder.addToBlacklist(ActivityTypes.HOME);
+
+        AttributeChangeListenerComposite listeners = new AttributeChangeListenerComposite();
+        listeners.addComponent(new GeoDistanceUpdater(distance));
+//        listeners.addComponent(distance);
+        fBuilder.setListener(listeners);
+        mutators.addMutator(fBuilder.build());
+
+		MarkovEngine sampler = new MarkovEngine(simPersons, hamiltonians, mutators, random);
+
+		MarkovEngineListenerComposite listener = new MarkovEngineListenerComposite();
+
+		listener.addComponent(new MarkovEngineListener() {
+
+			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 10000000);
+
+			@Override
+			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+				l.afterStep(population, null, accepted);
+			}
+		});
+		listener.addComponent(new MarkovEngineListener() {
+			HamiltonianLogger l = new HamiltonianLogger(hamiltonians, 100000);
+			@Override
+			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+				l.afterStep(population, null, accepted);
+			}
+		});
+
+		sampler.setListener(listener);
+
+		sampler.run(100000001);
+	}
+
+	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
+		TDoubleArrayList values = new TDoubleArrayList(persons.size());
+		for(Person person : persons) {
+			String strVal = person.getAttribute(attrKey);
+			if(strVal != null) {
+				values.add(Double.parseDouble(strVal));
+			}
 		}
 
-		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new AgeIncomeCorrelation());
-		task.addTask(new DependendLegVariableAnalyzerTask(CommonKeys.LEG_START_TIME, CommonKeys.LEG_ROUTE_DISTANCE));
-		task.addTask(new MunicipalityDistanceTask());
+		return values.toNativeArray();
+	}
 
-		ProxyAnalyzer.analyze(persons, task, "/home/johannes/gsv/germany-scenario/sim/output/ref/");
+	private static UnivariatFrequency buildDistanceHamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson>
+			simPersons) {
+		Set<Attributable> refLegs = getLegs(refPersons);
+		Set<Attributable> simLegs = getLegs(simPersons);
 
-		Random random = new XORShiftRandom();
+		List<Double> values = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE).collect(refPersons);
+		double[] nativeValues = CollectionUtils.toNativeArray(values);
+		Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
-//		persons = PersonCloner.weightedClones(persons, 100000, random);
+		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
 
-		HamiltonianComposite h = new HamiltonianComposite();
-//		h.addComponent(new DistanceVector(persons, random), 100);
-//		Hamiltonian h = new DistanceVector(persons);
+		return f;
+	}
 
-		Set<PlainPerson> simPersons = new HashSet<>(100000);
-		for(int i = 0; i < 10000; i++) {
-			PlainPerson p = new PlainPerson(String.valueOf(i));
-
-			p.setAttribute(CommonKeys.HH_INCOME, String.valueOf(random.nextInt(8000)));
-			p.setUserData(DistanceVector.INCOME_KEY, new Double(p.getAttribute(CommonKeys.HH_INCOME)));
-
-			p.setAttribute(CommonKeys.PERSON_AGE, String.valueOf(random.nextInt(100)));
-			p.setUserData(DistanceVector.AGE_KEY, new Double(p.getAttribute(CommonKeys.PERSON_AGE)));
-
-			simPersons.add(p);
+	private static Set<Attributable> getLegs(Set<? extends Person> persons) {
+		Set<Attributable> legs = new HashSet<>();
+		for(Person p : persons) {
+			Episode e = p.getEpisodes().get(0);
+			legs.addAll(e.getLegs());
 		}
 
-		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
-//		factory.addFactory(new IncomeMutatorFactory(random));
-		HistogramSync1D histSyncAge = new HistogramSync1D(persons, simPersons, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, null);
-		HistogramSync1D histSyncIncome = new HistogramSync1D(persons, simPersons, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, null);
+		return legs;
+	}
 
-		HistogramSync2D histSyncAgeIncomeMean = new HistogramSync2D(persons, simPersons, DistanceVector.AGE_KEY, DistanceVector.INCOME_KEY, new LinearDiscretizer(1.0));
+	private static class Route2GeoDistFunction implements UnivariateRealFunction {
 
-		HistoSyncComposite comp = new HistoSyncComposite();
-		comp.addComponent(histSyncAge);
-		comp.addComponent(histSyncIncome);
-		comp.addComponent(histSyncAgeIncomeMean);
-
-		factory.addFactory(new AgeMutatorFactory(random, comp));
-		factory.addFactory(new IncomeMutatorFactory(random, comp));
-
-		h.addComponent(histSyncAge, 50000);
-		h.addComponent(histSyncIncome, 70000);
-		h.addComponent(histSyncAgeIncomeMean, 0.05);
-
-		Sampler sampler = new Sampler(simPersons, h, factory, random);
-
-		SamplerListenerComposite listener = new SamplerListenerComposite();
-
-		Map<Object, String> map = new HashMap<>();
-		map.put(DistanceVector.AGE_KEY, CommonKeys.PERSON_AGE);
-		map.put(DistanceVector.INCOME_KEY, CommonKeys.HH_INCOME);
-
-
-
-
-		listener.addComponent(new SynchronizeUserData(map, 100000));
-		listener.addComponent(new AnalyzerListener(task, "/home/johannes/gsv/germany-scenario/sim/output/", 100000));
-		listener.addComponent(new HamiltonianLogger(h, 100000));
-
-		sampler.setSamplerListener(listener);
-
-		sampler.run(1000001, 1);
+		@Override
+		public double value(double x) throws FunctionEvaluationException {
+			double routDist = x/1000.0;
+			double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+			return routDist * factor * 1000;
+		}
 	}
 
 }

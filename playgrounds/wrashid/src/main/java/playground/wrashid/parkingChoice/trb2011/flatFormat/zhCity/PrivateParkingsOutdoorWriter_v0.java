@@ -8,9 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -31,7 +29,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 		
 		for (int i=1;i<privateParkingOutdoorFile.getNumberOfRows();i++){
 			int parkingCapacity= privateParkingOutdoorFile.getInteger(i, 3);
-			Coord coord=new CoordImpl(privateParkingOutdoorFile.getDouble(i, 1),privateParkingOutdoorFile.getDouble(i, 2));
+			Coord coord= new Coord(privateParkingOutdoorFile.getDouble(i, 1), privateParkingOutdoorFile.getDouble(i, 2));
 		
 			if (parkingCapacity>0){
 				PrivateParkingsIndoorWriter_v0.assignParkingCapacityToClosestFacility(coord, parkingCapacity, facilitiesQuadTree, privateParkings);

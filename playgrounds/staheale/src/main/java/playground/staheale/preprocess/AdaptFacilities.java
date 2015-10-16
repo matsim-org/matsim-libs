@@ -23,10 +23,10 @@ package playground.staheale.preprocess;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -39,7 +39,7 @@ public class AdaptFacilities {
 
 	private static Logger log = Logger.getLogger(AdaptFacilities.class);
 	private ScenarioImpl scenario;
-	private final CoordImpl ZurichCenter = new CoordImpl(683508.5,246832.9063);
+	private final Coord ZurichCenter = new Coord(683508.5, 246832.9063);
 
 	public AdaptFacilities() {
 		super();

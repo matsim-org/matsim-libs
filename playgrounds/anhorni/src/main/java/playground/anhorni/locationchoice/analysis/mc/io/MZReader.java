@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
@@ -56,12 +56,10 @@ public class MZReader {
 				// filter inplausible persons
 				// 6177302: unbezahlte Arbeit
 				//if (personId.compareTo(Id.create("6177302")) == 0) continue; 
-				
-				CoordImpl coordEnd = new CoordImpl(
-						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
-				
-				CoordImpl coordStart = new CoordImpl(
-						Double.parseDouble(entries[18].trim()), Double.parseDouble(entries[19].trim()));
+
+				Coord coordEnd = new Coord(Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
+
+				Coord coordStart = new Coord(Double.parseDouble(entries[18].trim()), Double.parseDouble(entries[19].trim()));
 				
 				double startTime = 60* Double.parseDouble(entries[5].trim());
 				
@@ -70,9 +68,8 @@ public class MZReader {
 					endTime = 60* Double.parseDouble(entries[41].trim());
 				}	
 				MZTrip mzTrip = new MZTrip(personId, coordStart, coordEnd, startTime, endTime);
-				
-				CoordImpl coordHome = new CoordImpl(
-						Double.parseDouble(entries[6].trim()), Double.parseDouble(entries[7].trim()));
+
+				Coord coordHome = new Coord(Double.parseDouble(entries[6].trim()), Double.parseDouble(entries[7].trim()));
 				
 				mzTrip.setHome(coordHome);
 

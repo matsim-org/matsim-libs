@@ -19,22 +19,20 @@
 
 package playground.johannes.gsv.gis;
 
+import com.vividsolutions.jts.geom.Point;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneEsriShapeIO;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
-import playground.johannes.sna.gis.CRSUtils;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -49,13 +47,13 @@ public class MergeZoneAttributes {
 	 */
 	public static void main(String[] args) throws IOException, FactoryException {
 		MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467));
-		ZoneCollection gsvZones = ZoneCollectionSHPReader.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+		ZoneCollection gsvZones = ZoneEsriShapeIO.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 
-		ZoneCollection deZones = ZoneCollectionSHPReader.read("/home/johannes/gsv/gis/vg250-ew_3112.gk3.shape.ebenen/vg250-ew_ebenen/vg250_krs.shp");
+		ZoneCollection deZones = ZoneEsriShapeIO.read("/home/johannes/gsv/gis/vg250-ew_3112.gk3.shape.ebenen/vg250-ew_ebenen/vg250_krs.shp");
 
 		ZoneCollection newCollection = new ZoneCollection();
 
-		for (Zone gsvZone : gsvZones.zoneSet()) {
+		for (Zone gsvZone : gsvZones.getZones()) {
 			if (gsvZone.getAttribute("NUTS0_CODE").equalsIgnoreCase("DE")) {
 				Point p = gsvZone.getGeometry().getCentroid();
 				p = CRSUtils.transformPoint(p, transform);
@@ -86,7 +84,7 @@ public class MergeZoneAttributes {
 			}
 		}
 
-		String data = Zone2GeoJSON.toJson(newCollection.zoneSet());
+		String data = ZoneGeoJsonIO.toJson(newCollection.getZones());
 		Files.write(Paths.get("/home/johannes/gsv/gis/de.nuts3.json"), data.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
 
 	}

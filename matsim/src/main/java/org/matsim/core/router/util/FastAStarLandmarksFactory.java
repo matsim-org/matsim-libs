@@ -20,6 +20,7 @@
 
 package org.matsim.core.router.util;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
@@ -44,8 +45,9 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	private final Map<Network, RoutingNetwork> routingNetworks;
 
 	@Inject
-	FastAStarLandmarksFactory(Network network, Config config, TravelTime travelTime, TravelDisutilityFactory fsttc) {
-		this(network, fsttc.createTravelDisutility(travelTime, config.planCalcScore()), FastRouterType.ARRAY);
+	FastAStarLandmarksFactory(Network network, Config config, Map<String,TravelTime> travelTime, Map<String,TravelDisutilityFactory> fsttc) {
+		//TODO: No guarantee that these are the same travel times for which the router is later requested.
+		this(network, fsttc.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), config.planCalcScore()), FastRouterType.ARRAY);
 	}
 
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {

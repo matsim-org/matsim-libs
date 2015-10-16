@@ -20,7 +20,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -144,7 +143,7 @@ public class SetSecondaryLocation  {
 							if (E.equals(act.getType())){
 								Double x = home_coord.getX();
 								Double y = home_coord.getY();
-								ActivityFacility closestEducationFacility = educationQuadTree.get(x,y);
+								ActivityFacility closestEducationFacility = educationQuadTree.getClosest(x, y);
 								act.setFacilityId(closestEducationFacility.getId());
 								act.setCoord(closestEducationFacility.getCoord()); 
 							}
@@ -192,8 +191,8 @@ public class SetSecondaryLocation  {
 								radius = Math.max(Math.sqrt(dx*dx+dy*dy)/3.0,1);
 								dx = dx/6.0;
 								dy = dy/6.0;
-								CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
-								CoordImpl coord2 = new CoordImpl(work_coord.getX()-dx,work_coord.getY()+dy);
+								Coord coord1 = new Coord(home_coord.getX() + dx, home_coord.getY() + dy);
+								Coord coord2 = new Coord(work_coord.getX() - dx, work_coord.getY() + dy);
 								ActivityFacilityImpl f = null;
 								if (SHOPACT.equals(act.getType())) {
 									f = getFacility(coord1,coord2,radius,S);
@@ -353,7 +352,7 @@ public class SetSecondaryLocation  {
 	}
 
 	private final ActivityFacilityImpl getFacility(Coord coord, double radius, String act_type) {
-		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
+		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).getDisk(coord.getX(), coord.getY(), radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return getFacility(coord,2.0*radius,act_type);
@@ -361,9 +360,9 @@ public class SetSecondaryLocation  {
 		return getFacility(fs,act_type);
 	}
 
-	private final ActivityFacilityImpl getFacility(CoordImpl coord1, CoordImpl coord2, double radius, String act_type) {
-		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
-		fs.addAll(getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
+	private final ActivityFacilityImpl getFacility(Coord coord1, Coord coord2, double radius, String act_type) {
+		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).getDisk(coord1.getX(), coord1.getY(), radius);
+		fs.addAll(getFacilities(act_type).getDisk(coord2.getX(), coord2.getY(), radius));
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return getFacility(coord1,coord2,2.0*radius,act_type);

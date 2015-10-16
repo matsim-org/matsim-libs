@@ -44,7 +44,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -103,7 +102,7 @@ public class NetworksShpXmlMatcherMain {
 				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
 				Node[] nodes = new Node[coords.length];
 				for(int n=0; n<nodes.length; n++) {
-					Coord coord = new CoordImpl(coords[n].x, coords[n].y);
+					Coord coord = new Coord(coords[n].x, coords[n].y);
 					for(Node node:network.getNodes().values())
 						if(node.getCoord().equals(coord))
 							nodes[n] = node;
@@ -142,13 +141,13 @@ public class NetworksShpXmlMatcherMain {
 				Id<Node> idFromNode = Id.createNodeId((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {
-					fromNode = networkFactory.createNode(idFromNode, new CoordImpl(coords[0].x, coords[0].y));
+					fromNode = networkFactory.createNode(idFromNode, new Coord(coords[0].x, coords[0].y));
 					network.addNode(fromNode);
 				}
 				Id<Node> idToNode = Id.createNodeId((Long)feature.getAttribute("JNODE"));
 				Node toNode = network.getNodes().get(idToNode);
 				if(toNode==null) {
-					toNode = networkFactory.createNode(idToNode, new CoordImpl(coords[coords.length-1].x, coords[coords.length-1].y));
+					toNode = networkFactory.createNode(idToNode, new Coord(coords[coords.length - 1].x, coords[coords.length - 1].y));
 					network.addNode(toNode);
 				}
 				Link link = network.getFactory().createLink(Id.createLinkId(idFromNode+"-->"+idToNode), fromNode, toNode);

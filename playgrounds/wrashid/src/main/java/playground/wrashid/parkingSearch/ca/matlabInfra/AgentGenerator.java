@@ -137,7 +137,7 @@ class MyEventHandler implements LinkEnterEventHandler, PersonDepartureEventHandl
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		if (Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {
 				agentsInStudyArea.put(personId, new Agent(personId, event.getTime()));

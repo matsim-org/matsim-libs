@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -17,14 +16,11 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 	HashMap<Id,Id> usingPt=new HashMap<Id, Id>();
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		FindOutAgentsUsingPt findOutPt=new FindOutAgentsUsingPt();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
+		EventsManager events = EventsUtils.createEventsManager();  //create new object of events-manager class
 		
 		events.addHandler(findOutPt);
 		
@@ -54,8 +50,8 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (usingPt.containsKey(event.getPersonId())){
-			System.out.println(event.getPersonId());
+		if (usingPt.containsKey(event.getDriverId())){
+			System.out.println(event.getDriverId());
 		}
 		
 	}

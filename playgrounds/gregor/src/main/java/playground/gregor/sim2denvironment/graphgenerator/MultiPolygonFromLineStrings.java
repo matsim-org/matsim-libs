@@ -46,7 +46,7 @@ public class MultiPolygonFromLineStrings {
 		//		List<LinearRing> lrs = new ArrayList<LinearRing>();
 		List<Polygon> ps = new ArrayList<Polygon>();
 		for (Point p : points) {
-			Collection<LineString> neighbors = lsTree.get(p.getX(),p.getY(), FETCH_RADIUS);
+			Collection<LineString> neighbors = lsTree.getDisk(p.getX(), p.getY(), FETCH_RADIUS);
 
 			if (neighbors.size() == 2) {
 				Iterator<LineString> it = neighbors.iterator();

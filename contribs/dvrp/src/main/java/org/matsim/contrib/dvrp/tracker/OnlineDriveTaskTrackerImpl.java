@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -130,6 +131,7 @@ class OnlineDriveTaskTrackerImpl
 
     private double predictLinkExitTime()
     {
-        return Math.max(timer.getTimeOfDay(), linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
+        return Math.max(timer.getTimeOfDay(),
+                linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
     }
 }

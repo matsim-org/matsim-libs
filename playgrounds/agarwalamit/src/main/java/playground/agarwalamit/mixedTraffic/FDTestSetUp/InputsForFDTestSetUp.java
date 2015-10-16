@@ -107,7 +107,7 @@ public class InputsForFDTestSetUp {
 		for (int i = 0; i<SUBDIVISION_FACTOR+1; i++){
 			double x=0, y=0;
 			x = (LINK_LENGTH/SUBDIVISION_FACTOR)*i;
-			Coord coord = scenario.createCoord(x, y);
+			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(i);
 
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
@@ -117,7 +117,7 @@ public class InputsForFDTestSetUp {
 		for (int i = 0; i<SUBDIVISION_FACTOR; i++){
 			double x = LINK_LENGTH - ((LINK_LENGTH/SUBDIVISION_FACTOR))*Math.cos(Math.PI/3)*(i+1);
 			double y = (LINK_LENGTH/SUBDIVISION_FACTOR)*Math.sin(Math.PI/3)*(i+1);
-			Coord coord = scenario.createCoord(x, y);
+			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(SUBDIVISION_FACTOR+i+1);
 
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
@@ -127,18 +127,19 @@ public class InputsForFDTestSetUp {
 		for (int i = 0; i<SUBDIVISION_FACTOR-1; i++){
 			double x = LINK_LENGTH/2 - (LINK_LENGTH / SUBDIVISION_FACTOR)*Math.cos(Math.PI/3)*(i+1);
 			double y = Math.tan(Math.PI/3)*x;
-			Coord coord = scenario.createCoord(x, y);
+			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(2*SUBDIVISION_FACTOR+i+1);
 
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
 		}
 		//additional startNode and endNode for home and work activities
-		Coord coord = scenario.createCoord(-50.0, 0.0);
+		double x = -50.0;
+		Coord coord = new Coord(x, 0.0);
 		Node startNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId("home"), coord);
 		network.addNode(startNode);
-		
-		coord = scenario.createCoord(LINK_LENGTH+50.0, 0.0);
+
+		coord = new Coord(LINK_LENGTH + 50.0, 0.0);
 		Id<Node> endNodeId = Id.createNodeId("work");
 		Node endNode = scenario.getNetwork().getFactory().createNode(endNodeId, coord);
 		network.addNode(endNode);

@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 
 /**
@@ -41,7 +43,22 @@ public class DirectionPredicate implements LegPredicate {
     @Override
     public boolean test(Segment leg) {
         if(mode.equals(OUTWARD)) {
+            String prev = leg.previous().getAttribute(CommonKeys.ACTIVITY_TYPE);
+            if(ActivityTypes.HOME.equalsIgnoreCase(prev)) return true;
+            else return false;
+        } else if(mode.equals(RETURN)) {
+            String next = leg.next().getAttribute(CommonKeys.ACTIVITY_TYPE);
+            if(ActivityTypes.HOME.equalsIgnoreCase(next)) return true;
+            else return false;
+        } else if(mode.equals(INTERMEDIATE)) {
+            String prev = leg.previous().getAttribute(CommonKeys.ACTIVITY_TYPE);
+            String next = leg.next().getAttribute(CommonKeys.ACTIVITY_TYPE);
 
+            if(!prev.equalsIgnoreCase(ActivityTypes.HOME) && !next.equalsIgnoreCase(ActivityTypes.HOME)) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         return false;

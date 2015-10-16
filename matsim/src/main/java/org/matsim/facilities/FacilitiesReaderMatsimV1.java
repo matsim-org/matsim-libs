@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -89,8 +90,8 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startFacility(final Attributes atts) {
-		this.currfacility = this.factory.createActivityFacility(Id.create(atts.getValue("id"), ActivityFacility.class), 
-				this.scenario.createCoord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
+		this.currfacility = this.factory.createActivityFacility(Id.create(atts.getValue("id"), ActivityFacility.class),
+				new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
 		this.facilities.addActivityFacility(this.currfacility);
 		((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
 	}

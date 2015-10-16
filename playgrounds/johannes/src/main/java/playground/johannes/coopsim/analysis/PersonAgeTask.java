@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.core.population.PersonUtils;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.population.PersonImpl;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.DummyDiscretizer;
 
 /**
  * @author illenberger
@@ -39,7 +38,7 @@ public class PersonAgeTask extends TrajectoryAnalyzerTask {
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		for(Trajectory t : trajectories) {
-			stats.addValue(((PersonImpl) t.getPerson()).getAge());
+			stats.addValue(PersonUtils.getAge(t.getPerson()));
 		}
 		
 		results.put("person_age", stats);

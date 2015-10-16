@@ -26,7 +26,11 @@ import java.util.List;
  */
 public interface Person extends Attributable {
 
-    public List<Episode> getEpisodes();
+    String getId();
 
-    public void addEpisode(Episode episode);
+    List<? extends Episode> getEpisodes();
+
+    void addEpisode(Episode episode);
+
+    void removeEpisode(Episode episode);
 }

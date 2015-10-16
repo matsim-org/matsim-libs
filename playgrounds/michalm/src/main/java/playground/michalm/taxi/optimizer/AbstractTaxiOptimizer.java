@@ -63,16 +63,16 @@ public abstract class AbstractTaxiOptimizer
                 unscheduleAwaitingRequests();
             }
 
-            for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+            for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
                 optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
             }
 
             scheduleUnplannedRequests();
-            
+
             if (doUnscheduleAwaitingRequests && vehicleDiversion) {
                 handleAimlessDriveTasks();
             }
-            
+
             requiresReoptimization = false;
         }
     }
@@ -88,12 +88,12 @@ public abstract class AbstractTaxiOptimizer
 
     protected abstract void scheduleUnplannedRequests();
 
-    
+
     protected void handleAimlessDriveTasks()
     {
         optimConfig.scheduler.stopAllAimlessDriveTasks();
     }
-    
+
 
     @Override
     public void requestSubmitted(Request request)

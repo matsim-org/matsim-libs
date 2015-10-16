@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.Header;
@@ -61,7 +60,7 @@ public class GautengGantryParser {
 				Double lon = Double.parseDouble(sa[0]);
 				Double lat = Double.parseDouble(sa[1]);
 				String name = sa[2];
-				coordMap.put(Id.create(name, Coord.class), new CoordImpl(lon, lat));
+				coordMap.put(Id.create(name, Coord.class), new Coord(lon, lat));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

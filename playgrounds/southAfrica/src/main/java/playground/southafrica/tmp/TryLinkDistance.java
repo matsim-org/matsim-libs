@@ -19,6 +19,7 @@
 
 package playground.southafrica.tmp;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -26,14 +27,13 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class TryLinkDistance {
 	public static void trySomething(){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n1 = nf.createNode(Id.createNodeId("n1"), new CoordImpl(0.0, 0.0));
-		Node n2 = nf.createNode(Id.createNodeId("n2"), new CoordImpl(0.0, 0.0));
+		Node n1 = nf.createNode(Id.createNodeId("n1"), new Coord(0.0, 0.0));
+		Node n2 = nf.createNode(Id.createNodeId("n2"), new Coord(0.0, 0.0));
 		Link link = nf.createLink(Id.createLinkId("1"), n1, n2);
 	}
 

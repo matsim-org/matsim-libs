@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.anhorni.utils.Utils;
@@ -57,15 +57,15 @@ public class TripMeasureDistribution {
 			MZTrip trip = trips_it.next();
 			
 			double radius = 0.0;
-			CoordImpl center = null;
+			Coord center = null;
 			
 			if (region.equals("zh")) {
 				radius = 30000.0;
-				center = new CoordImpl(683518.0,246836.0);	
+				center = new Coord(683518.0, 246836.0);
 			}
 			else if (region.equals("cityzh")) {
 				radius = 10000.0;
-				center = new CoordImpl(683518.0,246836.0);	
+				center = new Coord(683518.0, 246836.0);
 			}
 			if (this.intersect(trip, radius, center)) {
 				filteredTrips.add(trip);
@@ -79,7 +79,7 @@ public class TripMeasureDistribution {
 	}	
 	
 	// in our simulation there are only shopping facilities inside zh circle
-	private boolean intersect(MZTrip mzTrip, double radius, CoordImpl center) {		
+	private boolean intersect(MZTrip mzTrip, double radius, Coord center) {
 		double distance = CoordUtils.distancePointLinesegment(
 				mzTrip.getCoordStart(), mzTrip.getCoordEnd(), center);
 		
@@ -116,9 +116,9 @@ public class TripMeasureDistribution {
 			
 			if (Integer.parseInt(trip.getPurposeCode()) < 0 && filter99) continue;
 			
-			CoordImpl coordStart = trip.getCoordStart();
-			CoordImpl coordEnd = trip.getCoordEnd();
-			double dist = coordStart.calcDistance(coordEnd)/1000.0;
+			Coord coordStart = trip.getCoordStart();
+			Coord coordEnd = trip.getCoordEnd();
+			double dist = CoordUtils.calcDistance(coordStart, coordEnd) /1000.0;
 	
 			if (dist < min) {
 				min = dist;
@@ -149,9 +149,9 @@ public class TripMeasureDistribution {
 			
 			if (Integer.parseInt(trip.getPurposeCode()) < 0 && filter99) continue;
 			
-			CoordImpl coordStart = trip.getCoordStart();
-			CoordImpl coordEnd = trip.getCoordEnd();
-			double dist = coordStart.calcDistance(coordEnd)/1000.0;
+			Coord coordStart = trip.getCoordStart();
+			Coord coordEnd = trip.getCoordEnd();
+			double dist = CoordUtils.calcDistance(coordStart, coordEnd) /1000.0;
 			if (dist > max) {
 				max = dist;
 			}
@@ -182,9 +182,9 @@ public class TripMeasureDistribution {
 			
 			if (Integer.parseInt(trip.getPurposeCode()) < 0 && filter99) continue;
 			
-			CoordImpl coordStart = trip.getCoordStart();
-			CoordImpl coordEnd = trip.getCoordEnd();
-			double dist = coordStart.calcDistance(coordEnd)/1000.0;
+			Coord coordStart = trip.getCoordStart();
+			Coord coordEnd = trip.getCoordEnd();
+			double dist = CoordUtils.calcDistance(coordStart, coordEnd) /1000.0;
 			avg += dist / this.getNumberOfTrips(region);
 		}
 		return avg;
@@ -213,9 +213,9 @@ public class TripMeasureDistribution {
 			
 			if (Integer.parseInt(trip.getPurposeCode()) < 0 && filter99) continue;
 			
-			CoordImpl coordStart = trip.getCoordStart();
-			CoordImpl coordEnd = trip.getCoordEnd();
-			double dist = coordStart.calcDistance(coordEnd)/1000.0;
+			Coord coordStart = trip.getCoordStart();
+			Coord coordEnd = trip.getCoordEnd();
+			double dist = CoordUtils.calcDistance(coordStart, coordEnd) /1000.0;
 			values.add(dist);
 		}
 		return Utils.median(values);

@@ -24,9 +24,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -100,7 +100,7 @@ public class DigicoreNetworkParser {
 					Id<ActivityFacility> id = Id.create(sa[0], ActivityFacility.class);
 					if(!dn.containsVertex(id)){
 						dn.addVertex(id);
-						dn.getCoordinates().put(id, new CoordImpl(sa[1], sa[2]));
+						dn.getCoordinates().put(id, new Coord(Double.parseDouble(sa[1]), Double.parseDouble(sa[2])));
 					}
 					nodeCounter.incCounter();
 				} else if(type.equals("arc")){

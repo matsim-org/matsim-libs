@@ -20,15 +20,17 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,14 +46,14 @@ public class PersonFilter {
 	public static void main(String args[]) {
 		String outDir = "/home/johannes/gsv/mid2008/pop/";
 //		String outDir = "/Users/jillenberger/Dropbox/work/raw/";
-		XMLParser parser = new XMLParser();
+		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
 		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
 //		parser.parse("/Users/jillenberger/Dropbox/work/raw/pop.xml");
-		Set<PlainPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 //		logger.info("Cloning persons...");
@@ -60,39 +62,39 @@ public class PersonFilter {
 //		logger.info("Population size = " + persons.size());
 		
 		logger.info("Converting ride legs to car legs...");
-		ProxyTaskRunner.run(new ConvertRide2Car(), persons);
+		TaskRunner.run(new ConvertRide2Car(), persons);
 		
 		logger.info("Converting activities to misc type...");
-		ProxyTaskRunner.run(new Convert2MiscType(), persons);
+		TaskRunner.run(new Convert2MiscType(), persons);
 		
 		logger.info("Removing non mobile persons...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.mob.xml", persons);
 		
 		logger.info("Removing non car persons...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
+		TaskRunner.validatePersons(new DeleteModes("car"), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.car.xml", persons);
 		
 		logger.info("Removing legs with less than 3 KM...");
-		ProxyTaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		
 //		writer.write(outDir + "pop.car.wo3km.xml", persons);
 //		writer.write(outDir + "hesen.car.wo3km.midjourneys.xml", persons);
 		
 		logger.info("Removing legs with more than 1000 KM...");
-		ProxyTaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		TaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
+		TaskRunner.validatePersons(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.car.3-1000km.xml", persons);
 		
 		logger.info("Extracting MID trips...");
 		Set<PlainPerson> newPersons = new HashSet<>();
 		for(PlainPerson person : persons) {
-			if(MIDKeys.MID_TRIPS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+			if(MiDValues.MID_TRIPS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}
 		}
@@ -102,7 +104,7 @@ public class PersonFilter {
 		logger.info("Extracting MID journeys...");
 		newPersons = new HashSet<>();
 		for(PlainPerson person : persons) {
-			if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+			if(MiDValues.MID_JOUNREYS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}
 		}

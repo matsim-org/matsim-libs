@@ -19,40 +19,23 @@
 
 package playground.johannes.gsv.sim;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import playground.johannes.synpop.data.CommonKeys;
 
-import playground.johannes.gsv.misc.QuadTree;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.sna.util.ProgressLogger;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author johannes
@@ -246,7 +229,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 				Coord coord = current.getCoord();
 				double min = Math.max(0, d * (1 - mutationError));
 				double max = d * (1 + mutationError);
-				List<ActivityFacility> candidates = (List<ActivityFacility>) quadtree.get(coord.getX(), coord.getY(), min, max);
+				List<ActivityFacility> candidates = (List<ActivityFacility>) quadtree.getRing(coord.getX(), coord.getY(), min, max);
 
 				if (!candidates.isEmpty()) {
 					/*

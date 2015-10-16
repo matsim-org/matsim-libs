@@ -22,12 +22,12 @@ package playground.southafrica.projects.complexNetworks.utils;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.Iterator;
@@ -88,10 +88,10 @@ public class GraphMLConverterTest extends MatsimTestCase{
 		NetworkFactory nf = network.getFactory();
 		
 		/* Nodes */
-		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(0, 5));
-		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(5, 10));
-		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(5, 0));
-		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(10, 5));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 5));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new Coord((double) 5, (double) 10));
+		Node n3 = nf.createNode(Id.create(3, Node.class), new Coord((double) 5, (double) 0));
+		Node n4 = nf.createNode(Id.create(4, Node.class), new Coord((double) 10, (double) 5));
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);

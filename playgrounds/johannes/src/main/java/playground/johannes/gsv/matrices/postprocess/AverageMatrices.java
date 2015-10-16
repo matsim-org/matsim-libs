@@ -20,11 +20,16 @@
 package playground.johannes.gsv.matrices.postprocess;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.fpd.Average;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 
@@ -34,10 +39,9 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
  */
 public class AverageMatrices {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	private static final Logger logger = Logger.getLogger(AverageMatrices.class);
+
+	public static void main(String[] args) throws IOException {
 		String[] dirs = new String[args.length - 1];
 		for (int i = 0; i < args.length - 1; i++) {
 			dirs[i] = args[i];
@@ -47,33 +51,51 @@ public class AverageMatrices {
 		String outDir = args[args.length - 1];
 
 		for (String fileName : fileNames) {
-			Set<KeyMatrix> matrices = new HashSet<>();
-			for (String dir : dirs) {
-				String file = String.format("%s/%s", dir, fileName);
+			if(fileName.startsWith("car")) {
+				Set<KeyMatrix> matrices = new HashSet<>();
+				for (String dir : dirs) {
+					String file = String.format("%s/%s", dir, fileName);
+					logger.info(String.format("Loading matrix %s...", file));
+					if(new File(file).exists()) {
+						KeyMatrix m = loadMatrix(file);
+						matrices.add(m);
+					} else {
+						logger.info("File not found.");
+					}
+				}
 
-				KeyMatrix m = loadMatrix(file);
-				matrices.add(m);
-
+				logger.info(String.format("Averaging matrix %s...", fileName));
+				KeyMatrix avr = MatrixOperations.average(matrices);
+				logger.info(String.format("Writing matrix %s...", fileName));
+				writeMatrix(avr, String.format("%s/%s", outDir, fileName));
 			}
-
-			KeyMatrix avr = MatrixOperations.average(matrices);
-
-			// MatrixOperations.randomize(avr, 0.1);
-
-			writeMatrix(avr, String.format("%s/%s", outDir, fileName));
 		}
 	}
 
-	private static KeyMatrix loadMatrix(String file) {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse(file);
-		return reader.getMatrix();
+	private static KeyMatrix loadMatrix(String file) throws IOException {
+		if(file.endsWith(".txt") || file.endsWith("txt.gz")) {
+			KeyMatrix m = new KeyMatrix();
+			KeyMatrixTxtIO.read(m, file);
+			return m;
+		} else if(file.endsWith("xml") || file.endsWith("xml.gz")) {
+			KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+			reader.setValidating(false);
+			reader.parse(file);
+			return reader.getMatrix();
+		} else {
+			return null;
+		}
 	}
 
-	private static void writeMatrix(KeyMatrix m, String file) {
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, file);
+	private static void writeMatrix(KeyMatrix m, String file) throws IOException {
+		if(file.endsWith(".xml") || file.endsWith(".xml.gz")) {
+			KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+			writer.write(m, file);
+		} else if(file.endsWith(".txt") || file.endsWith(".txt.gz")) {
+			KeyMatrixTxtIO.write(m, file);
+		} else {
+			throw new RuntimeException("Unknown file format.");
+		}
 	}
 
 }

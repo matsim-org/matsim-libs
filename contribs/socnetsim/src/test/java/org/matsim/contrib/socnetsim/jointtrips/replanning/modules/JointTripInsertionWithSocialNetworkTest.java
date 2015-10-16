@@ -41,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -112,7 +111,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 		final Population population = sc.getPopulation();
 		final PopulationFactory factory = population.getFactory();
 
-		final Coord coordHome = new CoordImpl( 0 , 0 );
+		final Coord coordHome = new Coord((double) 0, (double) 0);
 		final Id linkHome = Id.create( "link" , Link.class );
 		final int nAgents = 100;
 		for ( int i = 0; i < nAgents; i++ ) {

@@ -3,13 +3,12 @@ package playground.dhosse.prt;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.AbstractModule;
@@ -26,8 +25,8 @@ import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.file.ElectricVehicleReader;
+import playground.michalm.taxi.data.ETaxiData;
+import playground.michalm.taxi.data.file.ETaxiReader;
 import playground.michalm.taxi.data.file.TaxiRankReader;
 
 public class PrtModule {
@@ -69,17 +68,17 @@ public class PrtModule {
 		controler.getConfig().plansCalcRoute().getModeRoutingParams().put(PrtRequestCreator.MODE, pars);
 		
 		LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tdis, ttime);
-		LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(router, new TimeDiscretizer(30*4, 15, false));
+		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, new TimeDiscretizer(30*4, 15, false));
 		
-		calculator = new VrpPathCalculatorImpl(routerWithCache, ttime, tdis);
+		calculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(ttime, tdis));
 		
 		context = new MatsimVrpContextImpl();
 		context.setScenario(scenario);
 		
-		TaxiData data = new TaxiData();
+		ETaxiData data = new ETaxiData();
 		context.setVrpData(data);
-		new TaxiRankReader(context.getScenario(), (TaxiData) context.getVrpData()).parse(prtConfig.getRanksFile());
-		new ElectricVehicleReader(scenario, data).parse(prtConfig.getVehiclesFile());
+		new TaxiRankReader(context.getScenario(), (ETaxiData) context.getVrpData()).parse(prtConfig.getRanksFile());
+		new ETaxiReader(scenario, data).parse(prtConfig.getVehiclesFile());
 		
 		PrtData prtData = new PrtData(scenario.getNetwork(), data);
 		

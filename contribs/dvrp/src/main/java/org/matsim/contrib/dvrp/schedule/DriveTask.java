@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
+import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.router.*;
 
 

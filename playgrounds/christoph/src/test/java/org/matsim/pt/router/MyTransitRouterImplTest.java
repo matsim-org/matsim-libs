@@ -460,17 +460,18 @@ public class MyTransitRouterImplTest {
 			this.routerConfig.setBeelineWalkSpeed(10.0); // so the agents can walk the distance in 10 seconds
 
 			double x = 0;
-			this.coord1 = this.scenario.createCoord(x, 0);
+			this.coord1 = new Coord(x, (double) 0);
 			x += 1000;
-			this.coord2 = this.scenario.createCoord(x, 0);
+			this.coord2 = new Coord(x, (double) 0);
 			x += (this.routerConfig.getBeelineWalkConnectionDistance() * 0.75);
-			this.coord3 = this.scenario.createCoord(x, -1000);
-			this.coord4 = this.scenario.createCoord(x, 0);
-			this.coord5 = this.scenario.createCoord(x, 1000);
+			double y = -1000;
+			this.coord3 = new Coord(x, y);
+			this.coord4 = new Coord(x, (double) 0);
+			this.coord5 = new Coord(x, (double) 1000);
 			x += (this.routerConfig.getBeelineWalkConnectionDistance() * 0.75);
-			this.coord6 = this.scenario.createCoord(x, 0);
+			this.coord6 = new Coord(x, (double) 0);
 			x += 1000;
-			this.coord7 = this.scenario.createCoord(x, 0);
+			this.coord7 = new Coord(x, (double) 0);
 
 			// network
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();

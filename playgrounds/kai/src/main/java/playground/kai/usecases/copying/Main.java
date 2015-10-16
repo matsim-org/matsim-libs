@@ -67,7 +67,7 @@ public class Main {
 		
 		Id<Link> startLinkId = Id.createLinkId("startLink") ;
 		Id<Link> endLinkId = Id.createLinkId("endLink") ;
-		NetworkRoute route = (NetworkRoute) pf.createRoute( TransportMode.car, startLinkId, endLinkId) ;
+		NetworkRoute route = pf.createRoute( NetworkRoute.class, startLinkId, endLinkId) ;
 		leg.setRoute(route);
 		
 		List<Id<Link>> linkIds = new ArrayList<>() ;

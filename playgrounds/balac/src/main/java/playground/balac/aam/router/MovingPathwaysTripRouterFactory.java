@@ -45,10 +45,7 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 			new AAMRoutingModule(this.scenario));
 
 
-		final CharyparNagelScoringParameters scoringParams =
-				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();
-		
-	/*	
+	/*
 		router.setRoutingModule(TransportMode.pt,
 				new TransitMultiModalAccessRoutingModule(
 						scenario,

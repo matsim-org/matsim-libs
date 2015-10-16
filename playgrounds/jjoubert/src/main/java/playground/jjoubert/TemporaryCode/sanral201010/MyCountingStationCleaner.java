@@ -41,7 +41,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.southafrica.utilities.filesampler.MyFileFilter;
 
 /**
  * Class to remove {@link Count} stations from {@link Counts} files.

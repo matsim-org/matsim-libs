@@ -58,7 +58,7 @@ public class PopulationGenerator {
 		 */
 		
 		long key =1;
-		for(long i=1; i<700;i++){
+		for(long i=1; i<3000;i++){
 			key=i;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
@@ -73,9 +73,9 @@ public class PopulationGenerator {
 			 * we keep the home coordinates for later use (see below).
 			 * Note that we use the CoordinateTransformation created above.
 			 */
-			Coord homeCoordinates = sc.createCoord(686661.13571, 4827510.51845);
+			Coord homeCoordinates = new Coord(686661.13571, 4827510.51845);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600 + i*5.143); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
+			activity1.setEndTime(21600 + i*2); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			
@@ -87,7 +87,7 @@ public class PopulationGenerator {
 			/*
 			 * Create a "work" Activity, at a different location.
 			 */
-			Activity activity2 = populationFactory.createActivityFromCoord("work", sc.createCoord(689426.65361, 4826700.65288));
+			Activity activity2 = populationFactory.createActivityFromCoord("work", new Coord(689426.65361, 4826700.65288));
 			activity2.setEndTime(57600); // leave at 4 p.m.
 			plan.addActivity(activity2);
 			System.out.println("Last Departure Time: " + claculateTime(activity1.getEndTime()));
@@ -99,18 +99,18 @@ public class PopulationGenerator {
 
 		}
 		
-		 for(long i=1; i<600;i++){
-			key=i+700;
+		 for(long i=1; i<1500;i++){
+			key=i+3000;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
 			Plan plan = populationFactory.createPlan();
-			Coord homeCoordinates = sc.createCoord(686661.13571, 4826063.88649);
+			Coord homeCoordinates = new Coord(686661.13571, 4826063.88649);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600+ i*6); // leave at 6 o'clock
+			activity1.setEndTime(21600+ i*2); // leave at 6 o'clock
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			plan.addLeg(populationFactory.createLeg("car"));
-			Activity activity2 = populationFactory.createActivityFromCoord("work", sc.createCoord(689426.65361, 4826700.65288));
+			 Activity activity2 = populationFactory.createActivityFromCoord("work", new Coord(689426.65361, 4826700.65288));
 			activity2.setEndTime(57600); // leave at 4 p.m.
 			plan.addActivity(activity2);
 			System.out.println("Last Departure Time: " + claculateTime(activity1.getEndTime()));

@@ -26,13 +26,13 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -82,23 +82,23 @@ public class VktEstimatorTest {
 		/* Create the plans. */
 		PopulationFactory pf = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 		Plan plan1 = new PlanImpl();
-		plan1.addActivity(pf.createActivityFromCoord("D", new CoordImpl(5.0, 5.0)));
+		plan1.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
 		plan1.addLeg(new LegImpl("walk"));
-		plan1.addActivity(pf.createActivityFromCoord("E", new CoordImpl(9.0, 5.0)));
+		plan1.addActivity(pf.createActivityFromCoord("E", new Coord(9.0, 5.0)));
 		plans.add(plan1);
 		
 		Plan plan2 = new PlanImpl();
-		plan2.addActivity(pf.createActivityFromCoord("D", new CoordImpl(5.0, 5.0)));
+		plan2.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
 		plan2.addLeg(new LegImpl("walk"));
-		plan2.addActivity(pf.createActivityFromCoord("F", new CoordImpl(5.0, 0.0)));
+		plan2.addActivity(pf.createActivityFromCoord("F", new Coord(5.0, 0.0)));
 		plans.add(plan2);
 		
 		Plan plan3 = new PlanImpl();
-		plan3.addActivity(pf.createActivityFromCoord("F", new CoordImpl(5.0, 0.0)));
+		plan3.addActivity(pf.createActivityFromCoord("F", new Coord(5.0, 0.0)));
 		plan3.addLeg(new LegImpl("walk"));
-		plan3.addActivity(pf.createActivityFromCoord("D", new CoordImpl(5.0, 5.0)));
+		plan3.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
 		plan3.addLeg(new LegImpl("walk"));
-		plan3.addActivity(pf.createActivityFromCoord("E", new CoordImpl(9.0, 5.0)));
+		plan3.addActivity(pf.createActivityFromCoord("E", new Coord(9.0, 5.0)));
 		plans.add(plan3);
 	}
 

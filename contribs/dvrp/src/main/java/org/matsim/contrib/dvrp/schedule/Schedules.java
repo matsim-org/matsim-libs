@@ -119,15 +119,6 @@ public class Schedules
     }
 
 
-    public static <T extends Task> Link getFirstLinkInSchedule(Schedule<T> schedule)
-    {
-        List<T> tasks = schedule.getTasks();
-        return tasks.isEmpty() ? //
-                schedule.getVehicle().getStartLink() : //
-                Tasks.getBeginLink(tasks.get(0));
-    }
-
-
     public static <T extends Task> Link getLastLinkInSchedule(Schedule<T> schedule)
     {
         List<T> tasks = schedule.getTasks();

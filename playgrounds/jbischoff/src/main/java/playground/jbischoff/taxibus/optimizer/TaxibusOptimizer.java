@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,38 +19,13 @@
 
 package playground.jbischoff.taxibus.optimizer;
 
-import java.util.Collection;
-import java.util.Set;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
 
 /**
- * @author  jbischoff
- *
+ * @author michalm, jbischoff
  */
-public class TaxibusOptimizer extends AbstractTaxiOptimizer {
-	
-    private Set<Vehicle> possibleVehicles;
-
-	
-
-	public TaxibusOptimizer(TaxibusOptimizerConfiguration optimConfig, Collection<TaxiRequest> unplannedRequests,
-			boolean doUnscheduleAwaitingRequests) {
-		super(optimConfig, unplannedRequests, doUnscheduleAwaitingRequests);
-	}
-
-	@Override
-	protected void scheduleUnplannedRequests() {
-		initPossibleVehicles();
-		
-	}
-	
-	private void initPossibleVehicles(){
-		//check if vehicle is either freely available or can take more passengers
-	}
-	
-
-}
+public interface TaxibusOptimizer
+    extends VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
+{}

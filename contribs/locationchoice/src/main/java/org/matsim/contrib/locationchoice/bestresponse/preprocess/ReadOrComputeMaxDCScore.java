@@ -52,8 +52,9 @@ public class ReadOrComputeMaxDCScore {
 	}
 
     public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {
-  		String maxEpsValuesFileName = config.findParam("locationchoice", "maxDCScoreFile");
-		if (!maxEpsValuesFileName.equals("null") && arekValsRead) {			
+    	DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+  		String maxEpsValuesFileName = dccg.getMaxEpsFile();
+		if (maxEpsValuesFileName != null && arekValsRead) {
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
 				maxEpsReader.parse(maxEpsValuesFileName);

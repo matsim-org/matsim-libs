@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -48,16 +49,16 @@ public class KtiToNormalConfigTrivial {
 		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
 		outputConfig.addModule( planCalcScore );
 		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
-		planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
-		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
-		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
+		planCalcScore.getModes().get(TransportMode.car).setConstant(ktiConfigGroup.getConstCar());
+		planCalcScore.getModes().get(TransportMode.bike).setConstant(ktiConfigGroup.getConstBike());
+		planCalcScore.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(ktiConfigGroup.getTravelingBike());
 		// TODO: check units (per km or per m)
-		planCalcScore.setMonetaryDistanceCostRatePt(
-				-( ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
-				planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceCostRateCar(
-				-( ktiConfigGroup.getDistanceCostCar() / 1000d ) /
-				planCalcScore.getMarginalUtilityOfMoney() );
+		double monetaryDistanceRatePt = -( ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) /
+        planCalcScore.getMarginalUtilityOfMoney();
+		planCalcScore.getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
+		double monetaryDistanceRateCar = -( ktiConfigGroup.getDistanceCostCar() / 1000d ) /
+        planCalcScore.getMarginalUtilityOfMoney();
+		planCalcScore.getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
 		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
 		outputConfig.addModule( ktiLikeConfigGroup );

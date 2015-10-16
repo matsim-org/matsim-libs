@@ -23,7 +23,6 @@ package playground.singapore.typesPopulation.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -33,15 +32,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriterHandler;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * @author mrieser
+ * @author mrieser NOOOO, we did NOT write this class!!! I don't even know that population_pops.dtd is for!
  * @author balmermi
  */
 /*package*/ class PopulationWriterHandlerImplPops implements PopulationWriterHandler {
@@ -107,29 +105,29 @@ import org.matsim.core.utils.misc.Time;
 				out.write(person.getPopulationId().toString());
 				out.write("\"");
 			}
-			if (person.getSex() != null) {
+			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");
-				out.write(person.getSex());
+				out.write(PersonUtils.getSex(person));
 				out.write("\"");
 			}
-			if (person.getAge() != Integer.MIN_VALUE) {
+			if (PersonUtils.getAge(person) != Integer.MIN_VALUE) {
 				out.write(" age=\"");
-				out.write(Integer.toString(person.getAge()));
+				out.write(Integer.toString(PersonUtils.getAge(person)));
 				out.write("\"");
 			}
-			if (person.getLicense() != null) {
+			if (PersonUtils.getLicense(person) != null) {
 				out.write(" license=\"");
-				out.write(person.getLicense());
+				out.write(PersonUtils.getLicense(person));
 				out.write("\"");
 			}
-			if (person.getCarAvail() != null) {
+			if (PersonUtils.getCarAvail(person) != null) {
 				out.write(" car_avail=\"");
-				out.write(person.getCarAvail());
+				out.write(PersonUtils.getCarAvail(person));
 				out.write("\"");
 			}
-			if (person.isEmployed() != null) {
+			if (PersonUtils.isEmployed(person) != null) {
 				out.write(" employed=\"");
-				out.write((person.isEmployed() ? "yes" : "no"));
+				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
 				out.write("\"");
 			}
 		}
@@ -240,34 +238,13 @@ import org.matsim.core.utils.misc.Time;
 	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 
-		if (route instanceof GenericRoute) {
 			out.write("type=\"");
-			out.write(((GenericRoute) route).getRouteType());
+			out.write((route).getRouteType());
 			out.write("\">");
-			String rd = ((GenericRoute) route).getRouteDescription();
+			String rd = (route).getRouteDescription();
 			if (rd != null) {
 				out.write(rd);
 			}
-		}
-		else if (route instanceof NetworkRoute) {
-			NetworkRoute nr = (NetworkRoute) route;
-			
-			if ( nr.getVehicleId()!=null ) {
-				out.write("vehicleRefId=\""+ nr.getVehicleId() +"\" ") ;
-			}
-			
-			out.write("type=\"links\">");
-			out.write(nr.getStartLinkId().toString());
-			for (Id linkId : nr.getLinkIds()) {
-				out.write(" ");
-				out.write(linkId.toString());
-			}
-			// If the start links equals the end link additionally check if its is a round trip. 
-			if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
-				out.write(" ");
-				out.write(nr.getEndLinkId().toString());
-			}
-		}
 	}
 
 	private void endRoute(final BufferedWriter out) throws IOException {
