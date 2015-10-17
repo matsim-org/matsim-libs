@@ -228,12 +228,19 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
-		final String plansFileName = "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
-		final String linkAttributesFileName = "./data_ZZZ/run/link-attributes.xml";
+//		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+//		final String plansFileName = "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
+//		final String linkAttributesFileName = "./data_ZZZ/run/link-attributes.xml";
+//
+//		final String pathFileName = "./data_ZZZ/run/paths.csv";
+//		final String tripFileName = "./data_ZZZ/run/trips.csv";
 
-		final String pathFileName = "./data_ZZZ/run/paths.csv";
-		final String tripFileName = "./data_ZZZ/run/trips.csv";
+		final String networkFileName = "./test/regentmatsim/input/network-expanded.xml";
+		final String plansFileName = "./test/regentmatsim/matsim-output/ITERS/it.0/0.plans.xml.gz";
+		final String linkAttributesFileName = "./test/regentmatsim/input/link-attributes.xml";
+
+		final String pathFileName = "./test/regentmatsim/exchange/paths.csv";
+		final String tripFileName = "./test/regentmatsim/exchange/trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);

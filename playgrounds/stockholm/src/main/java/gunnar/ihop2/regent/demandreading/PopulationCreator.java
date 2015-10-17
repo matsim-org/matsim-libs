@@ -55,13 +55,13 @@ public class PopulationCreator {
 
 	// -------------------- CONSTANTS --------------------
 
-	static final String HOME = "home";
+	public static final String HOME = "home";
 
-	static final String WORK = "work";
+	public static final String WORK = "work";
 
-	static final String VILLA = "villa";
+	public static final String VILLA = "villa";
 
-	static final String APARTMENT = "apartment";
+	public static final String APARTMENT = "apartment";
 
 	// -------------------- MEMBERS --------------------
 
