@@ -7,18 +7,20 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -27,6 +29,7 @@ import cadyts.utilities.misc.StreamFlushHandler;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
+import gunnar.ihop2.regent.costwriting.TourTravelTimes;
 import gunnar.ihop2.regent.costwriting.TravelTimeMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
@@ -51,8 +54,6 @@ public class MATSimDummy {
 
 	public static final String TRAVELTIME_MATRIX_FILENAME_ELEMENT = "traveltimes";
 
-	// TODO CONTINUE HERE
-
 	public static final String REGENT_FOLDER_ELEMENT = "regentfolder";
 
 	public static final String REGENT_COMMAND_ELEMENT = "regentcommand";
@@ -60,6 +61,8 @@ public class MATSimDummy {
 	public static final String ITERATIONS_ELEMENT = "iterations";
 
 	public static final String ZONE_ELEMENT = "zone";
+
+	public static final String RANDOMSEED_ELEMENT = "randomseed";
 
 	private static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
@@ -218,32 +221,30 @@ public class MATSimDummy {
 		}
 		Collections.sort(zoneIDs, new StringAsIntegerComparator());
 
+		final String randomSeedStr = config.get(IHOP2_ELEMENT,
+				RANDOMSEED_ELEMENT);
+		Random rnd;
+		if (randomSeedStr != null) {
+			try {
+				final Long randomSeed = Long.parseLong(randomSeedStr);
+				rnd = new Random(randomSeed);
+			} catch (NumberFormatException e) {
+				rnd = null;
+				fatal("could not read the " + ITERATIONS_ELEMENT
+						+ " XML element.");
+			}
+		} else {
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"no random seed specified");
+			rnd = new Random();
+		}
+
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"... program parameters appear OK so far.");
 
 		/*
 		 * -------------------- PERMANENT CONFIGURATIONS --------------------
 		 */
-
-		// TODO CONTINUE HERE
-
-		// Logger.getLogger(MATSimDummy.class.getName()).info(
-		// "Creating zonal system ...");
-		//
-		// final ZonalSystem zonalSystem;
-		// {
-		// final org.matsim.core.config.Config matsimConfig = ConfigUtils
-		// .loadConfig(matsimConfigFileName);
-		// final Scenario scenario = ScenarioUtils.loadScenario(matsimConfig);
-		// zonalSystem = new ZonalSystem(zoneShapeFileName,
-		// StockholmTransformationFactory.WGS84_EPSG3857);
-		// zonalSystem.addNetwork(scenario.getNetwork(),
-		// StockholmTransformationFactory.WGS84_SWEREF99);
-		// zonalSystem.addBuildings(buildingShapeFileName);
-		// }
-		//
-		// Logger.getLogger(MATSimDummy.class.getName()).info(
-		// "... succeeded to create zonal system.");
 
 		/*
 		 * ==================== OUTER ITERATIONS ====================
@@ -252,8 +253,8 @@ public class MATSimDummy {
 		for (int iteration = 1; iteration <= maxIterations; iteration++) {
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"---------- STARTING ITERATION " + iteration
-							+ " ----------");
+					"---------- STARTING ITERATION " + iteration + " OF "
+							+ maxIterations + " ----------");
 
 			/*
 			 * -------------------- LOAD CONFIGURATION --------------------
@@ -333,15 +334,6 @@ public class MATSimDummy {
 
 			// TODO take this out of the controler!?
 			final Scenario scenario = ScenarioUtils.loadScenario(matsimConfig);
-			final int timeBinSize = 15 * 60;
-			final int endTime = 12 * 3600;
-			final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
-					scenario.getNetwork(), timeBinSize, endTime, scenario
-							.getConfig().travelTimeCalculator());
-			final Set<String> relevantLinkIDs = new LinkedHashSet<String>(
-					ObjectAttributeUtils2.allObjectKeys(linkAttributes));
-			// final String zonesShapeFileName =
-			// "./data/shapes/sverige_TZ_EPSG3857.shp";
 			// TODO this was already created in the population generation
 			final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName,
 					StockholmTransformationFactory.WGS84_EPSG3857);
@@ -355,19 +347,37 @@ public class MATSimDummy {
 					+ lastIteration
 					+ "/" + lastIteration + ".events.xml.gz";
 
+			final int ttCalcTimeBinSize = 15 * 60;
+			final int ttCalcEndTime = 24 * 3600 - 1; // one sec before midnight
+			final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
+					scenario.getNetwork(), ttCalcTimeBinSize, ttCalcEndTime,
+					scenario.getConfig().travelTimeCalculator());
+			Logger.getLogger(TourTravelTimes.class.getName()).info(
+					"number of time bins in matsim tt calc: "
+							+ ttcalc.getNumSlots());
+			Logger.getLogger(TourTravelTimes.class.getName()).info(
+					"time bin size in matsim tt calc: " + ttcalc.getTimeSlice()
+							+ " seconds");
+			final EventsManager events = EventsUtils.createEventsManager();
+			events.addHandler(ttcalc);
+			final MatsimEventsReader eventsReader = new MatsimEventsReader(
+					events);
+			eventsReader.readFile(eventsFileName);
+			final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
+
+			// TODO CONFIGURE THIS
 			final int startTime_s = 6 * 3600 + 1800;
 			final int binSize_s = 3600;
 			final int binCnt = 1;
 			final int sampleCnt = 1;
 
-			new TravelTimeMatrices(scenario.getNetwork(), ttcalc,
-					eventsFileName,
-					// traveltimesFileName,
-					relevantLinkIDs, zoneIDs, zonalSystem, new Random(),
+			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+					scenario.getNetwork(), linkTTs,
+					new LinkedHashSet<>(zoneIDs), zonalSystem, rnd,
 					startTime_s, binSize_s, binCnt, sampleCnt);
-			Logger.getLogger(MATSimDummy.class.getName()).warning(
-					"TRAVEL TIME WRITING IS TURNED OFF. TALK TO GUNNAR");
-			// TODO configure seed
+			final TourTravelTimes tourTravelTimes = new TourTravelTimes(
+					scenario, travelTimeMatrices);
+			tourTravelTimes.writeToFile(traveltimesFileName);
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"... succeeded to write traveltime matrices to file: "
@@ -395,7 +405,6 @@ public class MATSimDummy {
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"... succeeded to run Regent");
-
 		}
 
 		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
