@@ -18,13 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ivt.analysis;
+package playground.ivt.analysis.activityhistogram;
 
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
@@ -46,7 +53,7 @@ import java.util.TreeMap;
  *
  */
 @Singleton
-public class ActivityHistogram implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ActivityHistogram implements ActivityHandler, ActivityStartEventHandler {
 
 	private Population population;
 	private int iteration = 0;
@@ -58,6 +65,24 @@ public class ActivityHistogram implements ActivityStartEventHandler, ActivityEnd
 	ActivityHistogram(Population population, EventsManager eventsManager) {
 		this(300);
 		this.population = population;
+	}
+
+
+	@Override
+	public void handleActivity(Id<Person> agentId, Activity activity) {
+		// cannot handle all starts from this method, because it would require calling "finish"
+		// on the EventsToActivity instance, which is complicated...
+		if ( activity.getStartTime() == Time.UNDEFINED_TIME  ) {
+			handleStart( 0,
+					activity.getType(),
+					agentId);
+		}
+		if ( activity.getEndTime() != Time.UNDEFINED_TIME ) {
+			handleEnd(
+					activity.getEndTime(),
+					activity.getType(),
+					agentId );
+		}
 	}
 
 	/**
@@ -82,29 +107,37 @@ public class ActivityHistogram implements ActivityStartEventHandler, ActivityEnd
 		this(binSize, 30*3600/binSize + 1);
 	}
 
-	/* Implementation of EventHandler-Interfaces */
 
-	@Override
-	public void handleEvent(final ActivityStartEvent event) {
-		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getActType() != null)) {
-			DataFrame dataFrame = getDataForType(event.getActType());
+	public void handleStart(
+			final double time,
+			final String actType,
+			final Id<Person> personId) {
+		int index = getBinIndex(time);
+		if ((population == null || population.getPersons().keySet().contains( personId ) && actType != null)) {
+			DataFrame dataFrame = getDataForType(actType);
 			dataFrame.countsStart[index]++;
 		}
 	}
 
+
 	@Override
-	public void handleEvent(final ActivityEndEvent event) {
-		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getActType() != null)) {
-			DataFrame dataFrame = getDataForType(event.getActType());
+	public void handleEvent(ActivityStartEvent event) {
+		handleStart(event.getTime(), event.getActType(), event.getPersonId());
+	}
+
+	public void handleEnd(
+			final double time,
+			final String actType,
+			final Id<Person> personId) {
+		int index = getBinIndex(time);
+		if ((population == null || population.getPersons().keySet().contains( personId ) && actType != null)) {
+			DataFrame dataFrame = getDataForType(actType);
 			dataFrame.countsEnd[index]++;
 		}
 	}
 
 	@Override
 	public void reset(final int iter) {
-		// TODO: initialise the data to take into account initial location?
 		this.iteration = iter;
 		this.data.clear();
 	}

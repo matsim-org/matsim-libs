@@ -61,7 +61,7 @@ public class TaxiVehicleCreator
 	
 	public static void main(String[] args) {
 		TaxiVehicleCreator tvc = new TaxiVehicleCreator();
-		for (int i = 100000; i<251000 ; i=i+10000 ){
+		for (int i = 10000; i<25100 ; i=i+1000 ){
 			System.out.println(i);
 			tvc.run(i);
 		}
@@ -78,7 +78,7 @@ public class TaxiVehicleCreator
 		for (int i = 0 ; i< amount; i++){
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry);
 		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(MGC.point2Coord(p));
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(36*3600));
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(48*3600));
         vehicles.add(v);
 
 		}

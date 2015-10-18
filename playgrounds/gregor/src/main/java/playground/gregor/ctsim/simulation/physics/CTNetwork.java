@@ -120,7 +120,9 @@ public class CTNetwork {
 
 		while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
 			CTEvent e = events.poll();
-
+			if (e.getExecTime() < time) {
+				throw new RuntimeException("event time (" + e.getExecTime() + ") smaller sim time (" + time + ")!");
+			}
 			if (e.isInvalid()) {
 				continue;
 			}

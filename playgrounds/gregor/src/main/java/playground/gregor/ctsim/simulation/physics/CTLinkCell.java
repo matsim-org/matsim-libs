@@ -112,7 +112,7 @@ public class CTLinkCell extends CTCell {
 			}
 		}
 		this.n--;
-		this.rho = this.n / alpha;
+		this.setRho(this.n / getAlpha());
 	}
 
 	public boolean jumpOnPed(CTPed ctPed, double time) {
@@ -128,7 +128,7 @@ public class CTLinkCell extends CTCell {
 			}
 		}
 		this.n++;
-		this.rho = this.n / alpha;
+		this.setRho(this.n / getAlpha());
 
 
 		return true;

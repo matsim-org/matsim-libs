@@ -19,8 +19,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.dgrether.DgPaths;
-
 /**
  * Class to create a population for the braess scenario.
  * 
@@ -79,13 +77,16 @@ public class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * All agents start after each other in one second gaps, the first one at 8
-	 * am.
+	 * All agents start uniformly distributed between 8 and 9 am.
 	 * 
-	 * If numberOfInitRoutes is zero, all agents are initialized with no initial
-	 * routes. If it is three they are initialized with all three routes in this
+	 * If initRouteSpecification is NONE, all agents are initialized with no initial
+	 * routes. 
+	 * If it is ONLY_MIDDLE, all agents are initialized with the middle route.
+	 * If it is ALL they are initialized with all three routes in this
 	 * scenario, whereby every second agent gets the upper and every other agent
-	 * the lower route as initial selected route.
+	 * the lower route as initial selected route. 
+	 * If it is ONLY_OUTER, all agents are initialized with both outer routes, 
+	 * whereby they are again alternately selected.
 	 * 
 	 * @param initRouteSpecification
 	 *            specification which routes should be used as initial routes

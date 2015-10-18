@@ -32,7 +32,6 @@ public interface Network extends MatsimToplevelContainer {
 
 	/**
 	 * Returns the builder for network elements
-	 * @return
 	 */
 	@Override
 	public NetworkFactory getFactory();

@@ -43,7 +43,11 @@ public class ZoneEsriShapeIO {
 				Zone zone = new Zone((Geometry) feature.getDefaultGeometry());
 		
 				for(Property prop : feature.getProperties()) {
-					zone.setAttribute(prop.getName().getLocalPart(), prop.getValue().toString());
+					String name = prop.getName().getLocalPart();
+					Object valueObj = prop.getValue();
+					String value = null;
+					if(valueObj != null) value = valueObj.toString();
+					zone.setAttribute(name, value);
 					
 				}
 				

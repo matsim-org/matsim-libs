@@ -41,7 +41,7 @@ public class PlansConverter {
 	public static void main(String[] args) {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:32633", TransformationFactory.DHDN_GK4);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("plans.xml");
+		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Desktop/test.xml");
 		
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()){
@@ -56,7 +56,7 @@ public class PlansConverter {
 				}
 			}
 		}
-	new PopulationWriter(scenario.getPopulation()).write("newplans.xml");	
+	new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/Desktop/testO.xml");	
 		
 	}
 

@@ -1,6 +1,10 @@
 package floetteroed.opdyts.ntimestworoutes;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +29,10 @@ import floetteroed.utilities.math.Vector;
 class Talk_2015_09_03 {
 
 	private static Vector minMaxExternalities(final double maxExternality,
-			final int linkCnt) {
+			final int linkCnt, final int nth) {
 		final Vector externalities = new Vector(linkCnt);
 		for (int i = 0; i < linkCnt; i++) {
-			final double externality = (i % 2 == 0) ? maxExternality : 0.0;
+			final double externality = (i % nth == 0) ? maxExternality : 0.0;
 			externalities.set(i, externality);
 			System.out.println("externality on link " + i + " is "
 					+ externality);
@@ -72,6 +76,7 @@ class Talk_2015_09_03 {
 		final double demand = 500;
 		final double capacity = 1000;
 		final int linkCnt = 800;
+		final int tollCnt = 400;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
@@ -83,9 +88,13 @@ class Talk_2015_09_03 {
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.1;
 
-		for (Integer populationSize : new Integer[] { 2 }) { // 2, 4, 8, 16,
-																// 32, 64, 128,
-																// 256}) {
+		final double maxExternality = 3.0;
+		final Vector externalities = randomExternalities(maxExternality,
+				linkCnt, new Random(4711));
+		
+		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32 }) {
+			// , 4, 8, 16, 32, 64, 128,
+			// 256 }) {
 
 			final List<List<Double>> naiveTransitionList = new ArrayList<List<Double>>();
 			final List<List<Double>> naiveObjectiveFunctionValueList = new ArrayList<List<Double>>();
@@ -95,11 +104,8 @@ class Talk_2015_09_03 {
 			final List<List<Double>> equilibriumWeightList = new ArrayList<List<Double>>();
 			final List<List<Double>> uniformityWeightList = new ArrayList<List<Double>>();
 
-			final double maxExternality = 3.0;
-			final Vector externalities = minMaxExternalities(maxExternality,
-					linkCnt);
-			// final Vector externalities = randomExternalities(
-			// maxExternality, linkCnt, rnd);
+			// final Vector externalities = minMaxExternalities(maxExternality,
+			// linkCnt, nth);
 
 			for (Boolean interpolate : new Boolean[] { false, true }) {
 
@@ -150,7 +156,7 @@ class Talk_2015_09_03 {
 					// ContinuousTollRandomizer(
 					// system, linkCnt, 0.1, 1.0, rnd);
 					final DecisionVariableRandomizer randomization = new ContinuousDiscreteTollRandomizer(
-							system, linkCnt, linkCnt / 2, 0.1, 1.0, rnd);
+							system, linkCnt, tollCnt, 0.1, 1.0, rnd);
 
 					// final TrajectorySamplingSelfTuner selfTuner = new
 					// TrajectorySamplingSelfTuner();
@@ -242,15 +248,36 @@ class Talk_2015_09_03 {
 
 			// >>>>> DIAGRAM >>>>>
 
+			// identify dimensions
+
+			double min = Double.POSITIVE_INFINITY;
+			double max = Double.NEGATIVE_INFINITY;
+			for (int r = 0; r < replications; r++) {
+				for (int i = 0; i < transitionList.get(r).size(); i++) {
+					min = min(min,
+							objectiveFunctionValueList.get(r).get(i) / 1000);
+					max = max(max,
+							objectiveFunctionValueList.get(r).get(i) / 1000);
+				}
+				for (int i = 0; i < naiveTransitionList.get(r).size(); i++) {
+					min = min(min, naiveObjectiveFunctionValueList.get(r)
+							.get(i) / 1000);
+					max = max(max, naiveObjectiveFunctionValueList.get(r)
+							.get(i) / 1000);
+				}
+			}
+
+			// write out file
+
 			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8, 5);
 			writer.setLabelX("transitions [$10^3$]");
 			writer.setLabelY("Q [$10^3$]");
-			writer.setYMin(20.0 * ((double) linkCnt) / 40.0);
-			writer.setYMax(50.0 * ((double) linkCnt) / 40.0);
-			writer.setYDelta(5.0 * ((double) linkCnt) / 40.0);
-			writer.setXMin(0.0);
-			writer.setXMax(25.0);
-			writer.setXDelta(5.0);
+			// writer.setYMin(0.0);
+			// writer.setYMax(150.0);
+			// writer.setYDelta(20.0);
+			// writer.setXMin(0.0);
+			// writer.setXMax(25.0);
+			// writer.setXDelta(5.0);
 
 			for (int r = 0; r < replications; r++) {
 				final String selectId = "select"
@@ -273,7 +300,11 @@ class Talk_2015_09_03 {
 			}
 			writer.addCommand("\\rput[rt](8,5){\\textcolor{blue}{naive}, \\textcolor{red}{select}}");
 
-			writer.printAll(System.out);
+			// FileOutputStream toFileStream = new FileOutputStream("file");
+			// PrintStream toFilePrintStream = new PrintStream("./test.txt");
+
+			writer.printAll(new PrintStream("./output/opdyts/pop-"
+					+ populationSize + ".txt"));
 
 			// <<<<< DIAGRAM <<<<<
 
