@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import floetteroed.utilities.math.MathHelpers;
+
 /**
  *
  * @author Gunnar Flötteröd
@@ -74,6 +76,14 @@ public class MatrixUtils {
 				final String columnId = changedEntry.getToLocation();
 				changedEntry.setValue(changedEntry.getValue()
 						/ get(factorMatrix, rowId, columnId));
+			}
+		}
+	}
+
+	public static void round(final Matrix matrix, final int digits) {
+		for (ArrayList<Entry> row : matrix.getFromLocations().values()) {
+			for (Entry entry : row) {
+				entry.setValue(MathHelpers.round(entry.getValue(), digits));
 			}
 		}
 	}

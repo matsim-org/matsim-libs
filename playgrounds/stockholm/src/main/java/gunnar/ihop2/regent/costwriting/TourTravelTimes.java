@@ -3,7 +3,10 @@ package gunnar.ihop2.regent.costwriting;
 import static gunnar.ihop2.regent.demandreading.PopulationCreator.HOME;
 import static org.matsim.matrices.MatrixUtils.add;
 import static org.matsim.matrices.MatrixUtils.mult;
+import static org.matsim.matrices.MatrixUtils.round;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -127,14 +130,37 @@ public class TourTravelTimes {
 								+ "during the analyzed time window");
 			}
 			mult(tourTT_min, 1.0 / freqSum);
+			round(tourTT_min, 2);
 		}
 	}
 
-	public void writeToFile(final String regentMatrixFileName) {
+	public void writeTourTravelTimesToFile(final String regentMatrixFileName) {
 		final MatricesWriter writer = new MatricesWriter(this.tourTTMatrices);
 		writer.setIndentationString("  ");
 		writer.setPrettyPrint(true);
 		writer.write(regentMatrixFileName);
+	}
+
+	public void writeHistogramsToFile(final String histogramFileName) {
+		try {
+			final PrintWriter writer = new PrintWriter(histogramFileName);
+			writer.println("Departure time histograms per activity type.");
+			writer.println();
+			for (Map.Entry<String, Histogram> act2histEntry : this.actType2dptTimeHist
+					.entrySet()) {
+				writer.println(act2histEntry.getKey());
+				writer.println();
+				writer.println(act2histEntry.getValue());
+				writer.println();
+				writer.println();
+			}
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			Logger.getLogger(this.getClass().getName()).warning(
+					"could not write departure " + "time histograms to file "
+							+ histogramFileName);
+		}
 	}
 
 	// ------------------ MAIN-FUNCTION, ONLY FOR TESTING ------------------
@@ -183,13 +209,12 @@ public class TourTravelTimes {
 		final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
 
 		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-				scenario.getNetwork(),
-				linkTTs, null, zonalSystem, new Random(), startTime_s,
-				binSize_s, binCnt, sampleCnt);
+				scenario.getNetwork(), linkTTs, null, zonalSystem,
+				new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
 
 		final TourTravelTimes tsa = new TourTravelTimes(scenario,
 				travelTimeMatrices);
-		tsa.writeToFile(regentMatrixFileName);
+		tsa.writeTourTravelTimesToFile(regentMatrixFileName);
 
 		System.out.println("... DONE");
 	}

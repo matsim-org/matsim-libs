@@ -73,9 +73,8 @@ public class TravelTimeMatrices {
 			Logger.getLogger(MATSimDummy.class.getName()).warning(
 					"no relevant zone ids given, using all zones in "
 							+ "zonal system that contain at least one node");
-			for (Zone zone : zonalSystem.id2zone.values()) {
-				if ((zonalSystem.zone2nodes.get(zone) != null)
-						&& (zonalSystem.zone2nodes.get(zone).size() > 0)) {
+			for (Zone zone : zonalSystem) {
+				if (zonalSystem.getNodes(zone).size() > 0) {
 					relevantAndFeasibleZoneIDs.add(zone.getId());
 				}
 			}
@@ -87,8 +86,7 @@ public class TravelTimeMatrices {
 					Logger.getLogger(MATSimDummy.class.getName()).warning(
 							"zonal system does not contain zone id " + zoneId);
 				} else {
-					if ((zonalSystem.zone2nodes.get(zone) != null)
-							&& (zonalSystem.zone2nodes.get(zone).size() > 0)) {
+					if (zonalSystem.getNodes(zone).size() > 0) {
 						relevantAndFeasibleZoneIDs.add(zoneId);
 					} else {
 						Logger.getLogger(MATSimDummy.class.getName()).warning(
@@ -123,8 +121,7 @@ public class TravelTimeMatrices {
 			for (String fromZoneID : relevantAndFeasibleZoneIDs) {
 				// go through a sample of nodes in the origin zone
 				for (Node fromNode : drawWithoutReplacement(sampleCnt,
-						zonalSystem.zone2nodes.get(zonalSystem.id2zone
-								.get(fromZoneID)), rnd)) {
+						zonalSystem.getNodes(fromZoneID), rnd)) {
 					final LeastCostPathTree lcpt = new LeastCostPathTree(
 							linkTTs, new OnlyTimeDependentTravelDisutility(
 									linkTTs));
@@ -133,8 +130,7 @@ public class TravelTimeMatrices {
 					for (String toZoneID : relevantAndFeasibleZoneIDs) {
 						// go through a sample of nodes in the destination zone
 						for (Node toNode : drawWithoutReplacement(sampleCnt,
-								zonalSystem.zone2nodes.get(zonalSystem.id2zone
-										.get(toZoneID)), rnd)) {
+								zonalSystem.getNodes(toZoneID), rnd)) {
 							add(ttMatrix_min, fromZoneID, toZoneID, lcpt
 									.getTree().get(toNode.getId()).getCost()
 									* MIN_PER_S);
