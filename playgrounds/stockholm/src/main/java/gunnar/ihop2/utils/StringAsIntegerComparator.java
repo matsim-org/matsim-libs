@@ -1,4 +1,4 @@
-package gunnar.ihop2.integration;
+package gunnar.ihop2.utils;
 
 import java.util.Comparator;
 
