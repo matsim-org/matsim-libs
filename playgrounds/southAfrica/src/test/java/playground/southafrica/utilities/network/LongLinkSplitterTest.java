@@ -20,8 +20,6 @@
 
 package playground.southafrica.utilities.network;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
