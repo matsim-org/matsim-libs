@@ -96,11 +96,11 @@ public class CTCellTest extends MatsimTestCase {
 		// supply = 1.2501
 
 		double j = c.getJ(nb);
-		//j = width * Math.min(demand, supply);
-		//  = 1. * min(1.66675,1.2501)
-		//	= 1.2501
+		//j = 1.5*width * Math.min(demand, supply);
+		//  = 1.5 * min(1.66675,1.2501)
+		//	= 1.87515
 
-		assertEquals("correct flow", 1.2501, j);
+		assertEquals("correct flow", 1.87515, j);
 	}
 
 
