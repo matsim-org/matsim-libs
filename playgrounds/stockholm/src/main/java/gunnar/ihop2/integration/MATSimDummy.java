@@ -28,6 +28,7 @@ import gunnar.ihop2.regent.costwriting.TourTravelTimes;
 import gunnar.ihop2.regent.costwriting.TravelTimeMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.utils.StringAsIntegerComparator;
 
 /**
  * 
