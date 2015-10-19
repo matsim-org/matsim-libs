@@ -22,19 +22,60 @@
 
 package org.matsim.contrib.signals.router;
 
-import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.LeastCostPathCalculatorModule;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.pt.router.TransitRouterModule;
 
-public class InvertedNetworkTripRouterFactoryModule extends AbstractModule {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
+
+
+public class InvertedNetworkRoutingModuleModule extends AbstractModule {
+
+    private static Logger log = Logger.getLogger(InvertedNetworkRoutingModuleModule.class);
+
     @Override
     public void install() {
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule()); // yy why?  kai, jul'15
         if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
-            bind(TripRouter.class).toProvider(LinkToLinkTripRouterFactory.class).in(Singleton.class);
+            addRoutingModuleBinding(TransportMode.car).toProvider(new InvertedNetworkRoutingModuleProvider(TransportMode.car));
+            log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
         }
     }
+
+    private static class InvertedNetworkRoutingModuleProvider implements Provider<RoutingModule> {
+
+        String mode;
+
+        @Inject
+        Scenario scenario;
+
+        @Inject
+        LeastCostPathCalculatorFactory leastCostPathCalcFactory;
+
+        @Inject
+        Map<String, TravelDisutilityFactory> travelDisutilities;
+
+        @Inject
+        LinkToLinkTravelTime travelTimes;
+
+        public InvertedNetworkRoutingModuleProvider(String mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public RoutingModule get() {
+            return new InvertedNetworkRoutingModule( mode, scenario.getPopulation().getFactory(), scenario, leastCostPathCalcFactory, travelDisutilities.get(TransportMode.car), travelTimes) ;
+        }
+    }
+
 }

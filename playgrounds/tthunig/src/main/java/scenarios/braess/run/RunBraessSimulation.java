@@ -15,7 +15,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -134,7 +134,7 @@ public class RunBraessSimulation {
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE)){
