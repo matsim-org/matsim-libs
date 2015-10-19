@@ -50,7 +50,6 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
 import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
-import utils.TtPaths;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
