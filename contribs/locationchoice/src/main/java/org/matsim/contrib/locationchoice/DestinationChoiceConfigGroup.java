@@ -429,8 +429,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 				this.setAnalysisBoundary(defaultAnalysisBoundary);
 			}
 			else {
-				int intValue = Integer.parseInt(value);
-				this.setAnalysisBoundary(intValue);
+				double doubleValue = Double.parseDouble(value);
+				this.setAnalysisBoundary(doubleValue);
 			}
 		} else if (ANALYSIS_BINSIZE.equals(key)) {
 			if (value.length() == 0) {
@@ -438,8 +438,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 				this.setAnalysisBinSize(defaultAnalysisBinSize);
 			}
 			else {
-				int intValue = Integer.parseInt(value);
-				setAnalysisBinSize(intValue);
+				double doubleValue = Double.parseDouble(value);
+				setAnalysisBinSize(doubleValue);
 			}
 		} else if (IDEXCLUSION.equals(key)) {
 			if (value.length() == 0) {
