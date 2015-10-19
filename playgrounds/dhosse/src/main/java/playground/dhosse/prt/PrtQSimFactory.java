@@ -1,60 +1,55 @@
 package playground.dhosse.prt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.path.VrpPathCalculator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.router.util.*;
 
 import playground.dhosse.prt.launch.NPersonsActionCreator;
 import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
+import playground.dhosse.prt.optimizer.PrtOptimizerConfiguration;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
-import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.dhosse.prt.scheduler.PrtScheduler;
 import playground.michalm.taxi.TaxiActionCreator;
-import playground.michalm.taxi.optimizer.TaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
-import playground.michalm.taxi.optimizer.filter.FilterFactory;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.scheduler.*;
 
 public class PrtQSimFactory implements MobsimFactory{
 	
 	private final PrtConfigGroup prtConfig;
 	private final MatsimVrpContextImpl context;
-	private VrpPathCalculator calculator;
+    public final TravelTime travelTime;
+    public final TravelDisutility travelDisutility;
 	private AlgorithmConfig algorithmConfig;
 	
-	public PrtQSimFactory(PrtConfigGroup prtConfig, MatsimVrpContextImpl context, VrpPathCalculator calculator,
-			AlgorithmConfig config){
+
+    public PrtQSimFactory(PrtConfigGroup prtConfig, MatsimVrpContextImpl context,
+            TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig config)
+    {
 		
 		this.prtConfig = prtConfig;
 		this.context = context;
-		this.calculator = calculator;
 		this.algorithmConfig = config;
 		
+        this.travelTime = travelTime;
+        this.travelDisutility = travelDisutility;
 	}
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, calculator, algorithmConfig);
+		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);
 
 		QSimConfigGroup conf = sc.getConfig().qsim();
@@ -116,26 +111,24 @@ public class PrtQSimFactory implements MobsimFactory{
 	}
 	
 	private TaxiOptimizerConfiguration initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
-			VrpPathCalculator calculator, AlgorithmConfig algorithmConfig){
+			TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig algorithmConfig){
 		
 		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration());
 		
 		if(prtConfig.getVehicleCapacity() > 1){
 			
-			PrtScheduler scheduler = new PrtScheduler(context, calculator, taxiParams);
-			NPersonsVehicleRequestPathFinder vrpFinder = new NPersonsVehicleRequestPathFinder(calculator, scheduler, prtConfig.getVehicleCapacity());
+			PrtScheduler scheduler = new PrtScheduler(context, taxiParams, travelTime, travelDisutility);
 			FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 			
-			return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
-					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
+			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
+					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), prtConfig);
 			
 		}
 		
-		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, taxiParams);
-		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
+		TaxiScheduler scheduler = new TaxiScheduler(context, taxiParams, travelTime, travelDisutility);
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
-		return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
+		return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
 				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
 		
 	}

@@ -175,15 +175,6 @@ import playground.michalm.util.MovingAgentsRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);
 
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
-                travelTime);
-
-        LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-                router, new TimeDiscretizer(31 * 4, 15 * 60, false));
-
-        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime,
-                travelDisutility));
-
         ETaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(vrpData);
 
@@ -192,7 +183,7 @@ import playground.michalm.util.MovingAgentsRegister;
         TaxiSchedulerParams params = new TaxiSchedulerParams(false, false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
-                calculator, params, tdisSource, dirName);
+                params,travelTime , travelDisutility, dirName);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());

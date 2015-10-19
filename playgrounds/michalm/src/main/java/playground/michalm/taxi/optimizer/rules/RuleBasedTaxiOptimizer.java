@@ -34,8 +34,10 @@ import playground.michalm.taxi.vehreqpath.*;
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
+    protected final VehicleRequestPathFinder vrpFinder;
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
+
     private Set<Vehicle> idleVehicles;
 
 
@@ -47,8 +49,10 @@ public class RuleBasedTaxiOptimizer
             throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
-        this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
-        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
+        vrpFinder = new VehicleRequestPathFinder(optimConfig);
+
+        vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
+        requestFilter = optimConfig.filterFactory.createRequestFilter();
     }
 
 
@@ -107,8 +111,7 @@ public class RuleBasedTaxiOptimizer
 
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
                     req);
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs, VehicleRequestPaths.TW_COST);
+            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
                 optimConfig.scheduler.scheduleRequest(best);
@@ -128,8 +131,7 @@ public class RuleBasedTaxiOptimizer
 
             Iterable<TaxiRequest> filteredReqs = requestFilter
                     .filterRequestsForVehicle(unplannedRequests, veh);
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
-                    filteredReqs, VehicleRequestPaths.TP_COST);
+            VehicleRequestPath best = vrpFinder.findBestRequestForVehicle(veh, filteredReqs);
 
             if (best != null) {
                 optimConfig.scheduler.scheduleRequest(best);

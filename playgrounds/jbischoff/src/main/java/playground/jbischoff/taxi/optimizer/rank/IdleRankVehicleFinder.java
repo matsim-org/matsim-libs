@@ -51,7 +51,7 @@ public class IdleRankVehicleFinder
     private boolean useChargeOverTime;
     private boolean includeDriversWill = false;
     Random rnd;
-    private static double MINIMUMSOCFORDISPATCH = 0.25;
+    private static double MINIMUM_SOC_FOR_DISPATCH = 0.25;
 
 
     public IdleRankVehicleFinder(MatsimVrpContext context, TaxiScheduler scheduler)
@@ -80,7 +80,7 @@ public class IdleRankVehicleFinder
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
     {
-        return (getVehicleSoc(veh) > MINIMUMSOCFORDISPATCH);
+        return (getVehicleSoc(veh) > MINIMUM_SOC_FOR_DISPATCH);
     }
 
 

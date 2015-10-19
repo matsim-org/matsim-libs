@@ -23,7 +23,9 @@ import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -35,15 +37,17 @@ public class AssignmentProblem
     private final double NULL_PATH_COST = 48 * 60 * 60; //2 days
 
     private final TaxiOptimizerConfiguration optimConfig;
+    private final LeastCostPathCalculator router;
 
     private SortedSet<TaxiRequest> unplannedRequests;
     private VehicleData vData;
     private AssignmentRequestData rData;
 
-
     public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
+        router = new DijkstraWithThinPath(optimConfig.context.getScenario().getNetwork(),
+                optimConfig.travelDisutility, optimConfig.travelTime);
     }
 
 
@@ -120,8 +124,8 @@ public class AssignmentProblem
 
         for (int v = 0; v < vData.dimension; v++) {
             VehicleData.Entry departure = getVehicleDataEntry(v);
-            reqPaths[v] = optimConfig.calculator.calcPath(departure.link, req.getFromLink(),
-                    departure.time);
+            reqPaths[v] = VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(),
+                    departure.time, router, optimConfig.travelTime, optimConfig.travelDisutility);
         }
 
         return reqPaths;

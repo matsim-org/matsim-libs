@@ -19,50 +19,37 @@
 
 package playground.jbischoff.taxibus.scheduler;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.tracker.TaskTrackers;
+import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.scheduler.TaxibusTask.TaxibusTaskType;
 import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
-
-public class TaxibusScheduler 
+public class TaxibusScheduler
 {
-   
-	private TaxibusSchedulerParams params;
-    protected final MatsimVrpContext context;
-    protected final VrpPathCalculator calculator;
 
-    public TaxibusScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
-            TaxibusSchedulerParams params)
+    private TaxibusSchedulerParams params;
+    protected final MatsimVrpContext context;
+
+
+    public TaxibusScheduler(MatsimVrpContext context, TaxibusSchedulerParams params)
     {
         this.context = context;
-        this.calculator = calculator;
         this.params = params;
 
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
-            Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
+            Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
             schedule.addTask(new TaxibusStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
     }
@@ -76,16 +63,17 @@ public class TaxibusScheduler
 
     public boolean isIdle(Vehicle vehicle)
     {
-        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) vehicle.getSchedule();
-        if (context.getTime() >= vehicle.getT1() || schedule.getStatus() != ScheduleStatus.STARTED) {
+        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)vehicle.getSchedule();
+        if (context.getTime() >= vehicle.getT1()
+                || schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
         TaxibusTask currentTask = schedule.getCurrentTask();
         return Schedules.isLastTask(currentTask)
                 && currentTask.getTaxibusTaskType() == TaxibusTaskType.STAY;
-    }    
-    
+    }
+
 
     public LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh)
     {
@@ -100,47 +88,52 @@ public class TaxibusScheduler
     }
 
 
-    public TreeSet<LinkTimePair> getFreeSlotsInUpcomingRidesAndEarliestIdle(Vehicle veh){
-    	TreeSet<LinkTimePair> linkTimeSet = new TreeSet<>(new Comparator<LinkTimePair>() {
+    public TreeSet<LinkTimePair> getFreeSlotsInUpcomingRidesAndEarliestIdle(Vehicle veh)
+    {
+        TreeSet<LinkTimePair> linkTimeSet = new TreeSet<>(new Comparator<LinkTimePair>() {
 
-			@Override
-			public int compare(LinkTimePair o1, LinkTimePair o2) {
-				Double o1t = o1.time; 
-				return o1t.compareTo(o2.time);
-			}
-		});
-    	
-    	double capacity = veh.getCapacity();
-    	
-        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
-        for (int i = schedule.getCurrentTask().getTaskIdx()+1; i<Schedules.getLastTask(schedule).getTaskIdx();i++){
-        	
-        	if (i>=schedule.getTasks().size()) break;
-        	
-        	TaxibusTask task = schedule.getTasks().get(i);
-        	
-        	if (task instanceof TaxibusDriveWithPassengerTask){
-        		 if (((TaxibusDriveWithPassengerTask) task).getRequests().size()<capacity){
-        			 double time = Math.max(task.getBeginTime(), context.getTime());
-        			 LinkTimePair ltp = new LinkTimePair(((TaxibusDriveWithPassengerTask) task).getPath().getFromLink(),time);
-        			 linkTimeSet.add(ltp);
-        		 }
-        	}
+            @Override
+            public int compare(LinkTimePair o1, LinkTimePair o2)
+            {
+                Double o1t = o1.time;
+                return o1t.compareTo(o2.time);
+            }
+        });
+
+        double capacity = veh.getCapacity();
+
+        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
+        for (int i = schedule.getCurrentTask().getTaskIdx() + 1; i < Schedules.getLastTask(schedule)
+                .getTaskIdx(); i++) {
+
+            if (i >= schedule.getTasks().size())
+                break;
+
+            TaxibusTask task = schedule.getTasks().get(i);
+
+            if (task instanceof TaxibusDriveWithPassengerTask) {
+                if ( ((TaxibusDriveWithPassengerTask)task).getRequests().size() < capacity) {
+                    double time = Math.max(task.getBeginTime(), context.getTime());
+                    LinkTimePair ltp = new LinkTimePair(
+                            ((TaxibusDriveWithPassengerTask)task).getPath().getFromLink(), time);
+                    linkTimeSet.add(ltp);
+                }
+            }
         }
-    	LinkTimePair earliestIdle = getEarliestIdleness(veh);
-    	linkTimeSet.add(earliestIdle);
-    	
-    	return linkTimeSet;
+        LinkTimePair earliestIdle = getEarliestIdleness(veh);
+        linkTimeSet.add(earliestIdle);
+
+        return linkTimeSet;
     }
-    
-    
+
+
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
         if (context.getTime() >= veh.getT1()) {// time window T1 exceeded
             return null;
         }
 
-        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
+        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
         Link link;
         double time;
 
@@ -181,7 +174,7 @@ public class TaxibusScheduler
             throw new RuntimeException("Diversion must be on");
         }
 
-        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
+        Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
 
         if (/*context.getTime() >= veh.getT1() ||*/schedule.getStatus() != ScheduleStatus.STARTED) {
             return null;
@@ -215,137 +208,139 @@ public class TaxibusScheduler
     public void scheduleRequest(TaxibusVehicleRequestPath best)
     {
         best.failIfAnyRequestNotUnplanned();
-        
-        Schedule<TaxibusTask> bestSched =  (Schedule<TaxibusTask>) best.vehicle.getSchedule();
-        TaxibusTask lastTask  = Schedules.getLastTask(bestSched);
+
+        Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>)best.vehicle.getSchedule();
+        TaxibusTask lastTask = Schedules.getLastTask(bestSched);
         System.out.println("scheduled to bus: " + best.requests);
         if (lastTask.getTaxibusTaskType() == TaxibusTaskType.STAY) {
-        	Iterator<VrpPathWithTravelData> iterator = best.path.iterator(); 
-        	VrpPathWithTravelData path = iterator.next();
+            Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
+            VrpPathWithTravelData path = iterator.next();
             scheduleDriveToFirstRequest((TaxibusStayTask)lastTask, bestSched, path);
             Set<TaxibusRequest> onBoard = new LinkedHashSet<>();
             Set<TaxibusRequest> droppedOff = new LinkedHashSet<>();
             Set<TaxibusRequest> pickedUp = new LinkedHashSet<>();
             TreeSet<TaxibusRequest> pickUpsForLink = best.getPickUpsForLink(path.getToLink());
             double lastEndTime = path.getArrivalTime();
-			if (pickUpsForLink!=null){
-				lastEndTime = schedulePickups(bestSched, lastEndTime, onBoard,pickedUp, pickUpsForLink);
-            	
+            if (pickUpsForLink != null) {
+                lastEndTime = schedulePickups(bestSched, lastEndTime, onBoard, pickedUp,
+                        pickUpsForLink);
+
             }
-			 else {
-	            	//it shouldnt be null for the first pickup
-	            	throw new IllegalStateException();
-	            }
-			TreeSet<TaxibusRequest> dropOffsForLink = best.getDropOffsForLink(path.getToLink());
-        	if (dropOffsForLink!=null){
-        		// this is the very first pickup, anyone who would be dropped off here would hence not really ride on the bus...
-        		lastEndTime = scheduleDropOffs(bestSched,onBoard,dropOffsForLink,droppedOff,lastEndTime);
-        	}
-           
-			
-		while (iterator.hasNext()){
-        	 path = iterator.next();
-        
-        	if (path.getFromLink() != path.getToLink()){
-        	
-        	lastEndTime = scheduleDriveAlongPath(bestSched, path, onBoard, lastEndTime);
-        	       	
-        	}
-        	else{
-        		continue;
-        	}
-        	dropOffsForLink = best.getDropOffsForLink(path.getToLink());
-        	if (dropOffsForLink!=null){
-        		
-        		lastEndTime = scheduleDropOffs(bestSched,onBoard,dropOffsForLink,droppedOff,lastEndTime);
-        	}
-        	 pickUpsForLink = best.getPickUpsForLink(path.getToLink());
-  			if (pickUpsForLink!=null){
-              	lastEndTime = schedulePickups(bestSched, lastEndTime,pickedUp, onBoard, pickUpsForLink);
-              	
-              }
-        	
-        	
-		}
-		if (!onBoard.isEmpty()){
-			throw new IllegalStateException();
-			//we forgot a customer?
-		}
-			
-            
+            else {
+                //it shouldnt be null for the first pickup
+                throw new IllegalStateException();
+            }
+            TreeSet<TaxibusRequest> dropOffsForLink = best.getDropOffsForLink(path.getToLink());
+            if (dropOffsForLink != null) {
+                // this is the very first pickup, anyone who would be dropped off here would hence not really ride on the bus...
+                lastEndTime = scheduleDropOffs(bestSched, onBoard, dropOffsForLink, droppedOff,
+                        lastEndTime);
+            }
+
+            while (iterator.hasNext()) {
+                path = iterator.next();
+
+                if (path.getFromLink() != path.getToLink()) {
+
+                    lastEndTime = scheduleDriveAlongPath(bestSched, path, onBoard, lastEndTime);
+
+                }
+                else {
+                    continue;
+                }
+                dropOffsForLink = best.getDropOffsForLink(path.getToLink());
+                if (dropOffsForLink != null) {
+
+                    lastEndTime = scheduleDropOffs(bestSched, onBoard, dropOffsForLink, droppedOff,
+                            lastEndTime);
+                }
+                pickUpsForLink = best.getPickUpsForLink(path.getToLink());
+                if (pickUpsForLink != null) {
+                    lastEndTime = schedulePickups(bestSched, lastEndTime, pickedUp, onBoard,
+                            pickUpsForLink);
+
+                }
+
+            }
+            if (!onBoard.isEmpty()) {
+                throw new IllegalStateException();
+                //we forgot a customer?
+            }
+
         }
-                
+
         else {
             throw new IllegalStateException();
         }
 
-         appendTasksAfterDropoff(bestSched);
-        
+        appendTasksAfterDropoff(bestSched);
+
     }
 
 
-	private double scheduleDropOffs(Schedule<TaxibusTask> bestSched, 
-			Set<TaxibusRequest> onBoard, TreeSet<TaxibusRequest> dropOffsForLink, Set<TaxibusRequest> droppedOff, double beginTime) {
-		for (TaxibusRequest req : dropOffsForLink){
-			if (droppedOff.contains(req)) continue;
-			double endTime =  beginTime+params.dropoffDuration;
-		    bestSched.addTask(new TaxibusDropoffTask(beginTime,endTime, req));
-		    System.out.println("schedule dropoff" + req);
-		    beginTime = endTime;   
-			if (!onBoard.remove(req)){
-				throw new IllegalStateException("Dropoff without pickup.");
-			}
-			droppedOff.add(req);
-			
-		}	
-		return beginTime;
-	}
+    private double scheduleDropOffs(Schedule<TaxibusTask> bestSched, Set<TaxibusRequest> onBoard,
+            TreeSet<TaxibusRequest> dropOffsForLink, Set<TaxibusRequest> droppedOff,
+            double beginTime)
+    {
+        for (TaxibusRequest req : dropOffsForLink) {
+            if (droppedOff.contains(req))
+                continue;
+            double endTime = beginTime + params.dropoffDuration;
+            bestSched.addTask(new TaxibusDropoffTask(beginTime, endTime, req));
+            System.out.println("schedule dropoff" + req);
+            beginTime = endTime;
+            if (!onBoard.remove(req)) {
+                throw new IllegalStateException("Dropoff without pickup.");
+            }
+            droppedOff.add(req);
+
+        }
+        return beginTime;
+    }
 
 
-	private double schedulePickups(Schedule<TaxibusTask> bestSched, double beginTime,
-			Set<TaxibusRequest> onBoard,Set<TaxibusRequest> pickedUp, TreeSet<TaxibusRequest> pickUpsForLink) {
-		
-		for (TaxibusRequest req : pickUpsForLink)
-		{
-			if (pickedUp.contains(req)) continue;
-			double t3 = Math.max(beginTime, req.getT0())
-		    		+ params.pickupDuration;
-		    bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
-		    System.out.println("schedule pickup" + req);
-			onBoard.add(req);
-			beginTime = t3;
-			pickedUp.add(req);
-		}
-		return beginTime;
-	}
+    private double schedulePickups(Schedule<TaxibusTask> bestSched, double beginTime,
+            Set<TaxibusRequest> onBoard, Set<TaxibusRequest> pickedUp,
+            TreeSet<TaxibusRequest> pickUpsForLink)
+    {
+
+        for (TaxibusRequest req : pickUpsForLink) {
+            if (pickedUp.contains(req))
+                continue;
+            double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
+            bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
+            System.out.println("schedule pickup" + req);
+            onBoard.add(req);
+            beginTime = t3;
+            pickedUp.add(req);
+        }
+        return beginTime;
+    }
 
 
-    
+    private double scheduleDriveAlongPath(Schedule<TaxibusTask> bestSched,
+            VrpPathWithTravelData path, Set<TaxibusRequest> onBoard, double lastEndtime)
+    {
+
+        VrpPathWithTravelData updatedPath = new VrpPathWithTravelDataImpl(lastEndtime,
+                path.getTravelTime(), path.getTravelCost(), path.getLinks(), path.getLinkTTs());
+        bestSched.addTask(new TaxibusDriveWithPassengerTask(onBoard, updatedPath));
+
+        return updatedPath.getArrivalTime();
+    }
 
 
-	
-
-
-    private double scheduleDriveAlongPath(Schedule<TaxibusTask> bestSched, VrpPathWithTravelData path, Set<TaxibusRequest> onBoard, double lastEndtime) {
-    	
-    	VrpPathWithTravelData updatedPath = new VrpPathWithTravelDataImpl(lastEndtime, path.getTravelTime(), path.getTravelCost(), path.getLinks(), path.getLinkTTs());
-    	bestSched.addTask(new TaxibusDriveWithPassengerTask(onBoard, updatedPath));
-    	
-    	
-    	return updatedPath.getArrivalTime();
-	}
-
-
-	private void scheduleDriveToFirstRequest(TaxibusStayTask lastTask, Schedule<TaxibusTask> bestSched, VrpPathWithTravelData path)
+    private void scheduleDriveToFirstRequest(TaxibusStayTask lastTask,
+            Schedule<TaxibusTask> bestSched, VrpPathWithTravelData path)
     {
         switch (lastTask.getStatus()) {
-        	case STARTED:
-        		// bus is already idle
-        		lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT task
-        		break;
-            
-        	case PLANNED:
-        		        		
+            case STARTED:
+                // bus is already idle
+                lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT task
+                break;
+
+            case PLANNED:
+
                 if (lastTask.getBeginTime() == path.getDepartureTime()) { // waiting for 0 seconds!!!
                     bestSched.removeLastTask();// remove WaitTask
                 }
@@ -354,7 +349,6 @@ public class TaxibusScheduler
                     lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT task
                 }
                 break;
-
 
             case PERFORMED:
             default:
@@ -365,9 +359,6 @@ public class TaxibusScheduler
             bestSched.addTask(new TaxibusDriveTask(path));
         }
     }
-
-
-
 
 
     /**
@@ -386,16 +377,14 @@ public class TaxibusScheduler
 
         updateTimelineImpl(schedule, endTime);
 
-       
     }
-
-
 
 
     protected void appendTasksAfterDropoff(Schedule<TaxibusTask> schedule)
     {
         appendStayTask(schedule);
     }
+
 
     protected void appendStayTask(Schedule<TaxibusTask> schedule)
     {
@@ -506,7 +495,7 @@ public class TaxibusScheduler
     {
         removedRequests = new ArrayList<>();
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
-            removeAwaitingRequestsImpl((Schedule<TaxibusTask>) veh.getSchedule());
+            removeAwaitingRequestsImpl((Schedule<TaxibusTask>)veh.getSchedule());
         }
 
         return removedRequests;
@@ -588,7 +577,7 @@ public class TaxibusScheduler
                 if (params.vehicleDiversion) {
                     return 0;
                 }
-                TaxibusTask nextTask =  schedule.getTasks().get(currentTask.getTaskIdx()+1);
+                TaxibusTask nextTask = schedule.getTasks().get(currentTask.getTaskIdx() + 1);
                 if (nextTask.getTaxibusTaskType() == TaxibusTaskType.PICKUP) {
                     //if no diversion and driving to pick up sb then serve that request
                     return params.destinationKnown ? 3 : null;
@@ -627,8 +616,9 @@ public class TaxibusScheduler
     }
 
 
-	public void stopAllAimlessDriveTasks() {
-		// TODO Auto-generated method stub
-		
-	}
+    public void stopAllAimlessDriveTasks()
+    {
+        // TODO Auto-generated method stub
+
+    }
 }

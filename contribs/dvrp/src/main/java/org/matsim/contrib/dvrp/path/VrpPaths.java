@@ -19,36 +19,71 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import java.util.Comparator;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
 public class VrpPaths
 {
-    public static final Comparator<VrpPathWithTravelData> TRAVEL_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getTravelTime(), p2.getTravelTime());
+    /**
+     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+     */
+    public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink,
+            double departureTime, LeastCostPathCalculator router, TravelTime travelTime,
+            TravelDisutility travelDisutility)
+    {
+        Path path = null;
+        if (fromLink != toLink) {
+            //calc path for departureTime+1 (we need 1 second to move over the node)
+            path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
+                    departureTime + 1, null, null);
         }
-    };
 
-    public static final Comparator<VrpPathWithTravelData> ARRIVAL_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getArrivalTime(), p2.getArrivalTime());
-        }
-    };
+        return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime,
+                travelDisutility);
+    }
 
-    public static final Comparator<VrpPathWithTravelData> DEPARTURE_TIME_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getDepartureTime(), p2.getDepartureTime());
-        }
-    };
 
-    public static final Comparator<VrpPathWithTravelData> TRAVEL_COST_COMPARATOR = new Comparator<VrpPathWithTravelData>() {
-        public int compare(VrpPathWithTravelData p1, VrpPathWithTravelData p2)
-        {
-            return Double.compare(p1.getTravelCost(), p2.getTravelCost());
+    public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime,
+            Path path, TravelTime travelTime, TravelDisutility travelDisutility)
+    {
+        if (fromLink == toLink) {
+            return new VrpPathWithTravelDataImpl(departureTime, 0, 0, new Link[] { fromLink },
+                    new double[] { 0 });
         }
-    };
+
+        int count = path.links.size();
+        Link[] links = new Link[count + 2];
+        double[] linkTTs = new double[count + 2];
+
+        //we start at the end of fromLink
+        //actually, in QSim, it usually takes 1 second to move over the first node
+        //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
+        //otherwise it can take much longer)
+        double currentTime = departureTime;
+        links[0] = fromLink;
+        double linkTT = 1.;
+        linkTTs[0] = linkTT;
+        currentTime += linkTT;
+
+        for (int i = 1; i <= count; i++) {
+            Link link = path.links.get(i - 1);
+            links[i] = link;
+            linkTT = travelTime.getLinkTravelTime(link, currentTime, null, null);
+            linkTTs[i] = linkTT;
+            currentTime += linkTT;
+        }
+
+        //there is no extra time spent on queuing at the end of the last link
+        links[count + 1] = toLink;
+        linkTT = toLink.getLength() / toLink.getFreespeed(currentTime);//as long as we cannot divert from the last link this is okay
+        linkTTs[count + 1] = linkTT;
+
+        double totalTT = 1 + path.travelTime + linkTT;
+        double totalCost = path.travelCost
+                + travelDisutility.getLinkMinimumTravelDisutility(toLink);
+
+        return new VrpPathWithTravelDataImpl(departureTime, totalTT, totalCost, links, linkTTs);
+    }
 }

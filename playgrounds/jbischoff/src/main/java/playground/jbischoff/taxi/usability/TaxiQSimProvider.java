@@ -108,28 +108,17 @@ public class TaxiQSimProvider implements Provider<QSim> {
 		//this initiation takes place upon creating qsim for each iteration
 		TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 		
-		
 		TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(), tcg.isVehicleDiversion(),
 				tcg.getPickupDuration(), tcg.getDropoffDuration());
 		
 		resetSchedules(context.getVrpData().getVehicles().values());
 		
-		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
-				.getNetwork(), travelDisutility, travelTime);
-
-		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-				router, new TimeDiscretizer(30 * 4, 15 * 60, false));
-
-		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
-				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
-		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
-		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(
-				calculator, scheduler);
+		TaxiScheduler scheduler = new TaxiScheduler(context, params, travelTime, travelDisutility);
 
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, tcg.getNearestRequestsLimit(), tcg.getNearestVehiclesLimit());
 
 		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
-				context, calculator, scheduler, vrpFinder, filterFactory,
+				context, travelTime, travelDisutility, scheduler, filterFactory,
 				Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
 		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 

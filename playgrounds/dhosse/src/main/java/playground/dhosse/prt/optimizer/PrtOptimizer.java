@@ -19,13 +19,14 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
+import playground.dhosse.prt.VehicleRequestPaths;
+import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPaths;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 
@@ -38,25 +39,28 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	private final MatsimVrpContext context;
 	private final TaxiScheduler scheduler;
-	private VrpPathCalculator calculator;
 	private TaxiOptimizerConfiguration optimizerConfig;
+	
+	private final NPersonsVehicleRequestPathFinder vrpFinder;
 	
 	public PrtOptimizer(TaxiOptimizerConfiguration optimizerConfig){
 		
-		this(optimizerConfig.context, optimizerConfig, optimizerConfig.calculator, optimizerConfig.scheduler, new IdleRankVehicleFinder(optimizerConfig.context,
+		this(optimizerConfig.context, optimizerConfig, optimizerConfig.scheduler, new IdleRankVehicleFinder(optimizerConfig.context,
 						optimizerConfig.scheduler));
 		
 	}
 	
-	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerConfiguration optimizerConfig, VrpPathCalculator calculator, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
+	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerConfiguration optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
 		
 		this.optimizerConfig = optimizerConfig;
 		this.context = context;
 		this.scheduler = scheduler;
-		this.calculator = calculator; 
 		this.idleVehicleFinder = vehicleFinder;
 		this.unplannedRequests = new ArrayList<TaxiRequest>() {
 		};
+		
+		int vehicleCapacity = ((PrtOptimizerConfiguration)optimizerConfig).prtConfigGroup.getVehicleCapacity();
+		vrpFinder =  new NPersonsVehicleRequestPathFinder(optimizerConfig, vehicleCapacity);
 		
 	}
 	
@@ -125,8 +129,8 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
             Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
                     req);
-            VehicleRequestPath best = this.optimizerConfig.vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs, VehicleRequestPaths.TW_COST);
+            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req,
+                    filteredVehs);
 
             if (best != null) {
                 this.scheduler.scheduleRequest(best);
@@ -136,25 +140,24 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         }
     }
 	
-	protected void scheduleRankReturn(Vehicle veh, double time, boolean charge, boolean home)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
-        if (last.getStatus() != TaskStatus.STARTED)
-            throw new IllegalStateException();
-
-        last.setEndTime(time);
-        Link currentLink = last.getLink();
-        Link nearestRank = veh.getStartLink();
-
-        VrpPathWithTravelData path = this.calculator
-                .calcPath(currentLink, nearestRank, time);
-        if (path.getArrivalTime() > veh.getT1())
-            return; // no rank return if vehicle is going out of service anyway
-        sched.addTask(new TaxiDriveTask(path));
-        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
-
-    }
-
+//	protected void scheduleRankReturn(Vehicle veh, double time, boolean charge, boolean home)
+//    {
+//        @SuppressWarnings("unchecked")
+//        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
+//        TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
+//        if (last.getStatus() != TaskStatus.STARTED)
+//            throw new IllegalStateException();
+//
+//        last.setEndTime(time);
+//        Link currentLink = last.getLink();
+//        Link nearestRank = veh.getStartLink();
+//
+//        VrpPathWithTravelData path = VrpPathCalculator.calcPath(currentLink, nearestRank, time);
+//        if (path.getArrivalTime() > veh.getT1())
+//            return; // no rank return if vehicle is going out of service anyway
+//        sched.addTask(new TaxiDriveTask(path));
+//        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+//
+//    }
+//
 }
