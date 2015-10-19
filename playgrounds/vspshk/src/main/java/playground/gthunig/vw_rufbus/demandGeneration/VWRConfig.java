@@ -14,12 +14,17 @@ public class VWRConfig {
 	private String schools;
 	private String universities;
 	
+	
 	private String plansOutputComlpete;
 	
 	private double scalefactor = 1.0;
+
+	private String transitSchedule;
+
+	private String objectAttributes;
 	
 	public VWRConfig(String basedir, String network, String counties, String commercial, String industrial, String residential, 
-						String retail, String schools, String universities, String plansOutputComlpete ,double scalefactor) {
+						String retail, String schools, String universities, String plansOutputComlpete ,double scalefactor, String transitSchedule, String objectAttributes) {
 		this.basedir = basedir;
 		
 		this.network = network;
@@ -31,16 +36,23 @@ public class VWRConfig {
 		this.retail = retail;
 		this.schools = schools;
 		this.universities = universities;
-		
+		this.objectAttributes = objectAttributes;
 		this.plansOutputComlpete = plansOutputComlpete;
 		
 		this.scalefactor = scalefactor;
+		this.transitSchedule = transitSchedule;
 	}
 
 	public String getNetworkFileString() {
 		return this.basedir + this.network;
 	}
+	public String getObjectAttributes() {
+		return objectAttributes;
+	}
 
+	public String getTransitSchedule() {
+		return transitSchedule;
+	}
 	public String getCountiesFileString() {
 		return this.basedir + this.counties;
 	}

@@ -263,7 +263,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		if (event.getLegMode().equals(TransportMode.car)) {
 			this.enrouteDrivers.add(personId);
 		}
-//		this.enrouteDrivers.remove(event.getPersonId());
+//		this.enrouteDrivers.remove(event.getDriverId());
 		
 		List<Leg> legs = agentLegs.get(personId);
 		
@@ -304,7 +304,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Id vehicleId = event.getVehicleId();
 		Id linkId = event.getLinkId();
 		

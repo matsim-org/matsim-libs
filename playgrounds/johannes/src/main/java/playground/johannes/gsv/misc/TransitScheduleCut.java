@@ -1,36 +1,28 @@
 package playground.johannes.gsv.misc;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.*;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import playground.johannes.sna.gis.CRSUtils;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TransitScheduleCut {
 
@@ -39,7 +31,7 @@ public class TransitScheduleCut {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/matsim/studies/netz2030/data/raw/Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp");
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures("/home/johannes/gsv/matsim/studies/netz2030/data/raw/Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp");
 		Set<Geometry> geometries = new HashSet<Geometry>();
 		for(SimpleFeature feature : features) {
 			String code = (String)feature.getAttribute("NUTS0_CODE");

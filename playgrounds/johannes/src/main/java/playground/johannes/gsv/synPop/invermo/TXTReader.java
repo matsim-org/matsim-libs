@@ -21,10 +21,10 @@ package playground.johannes.gsv.synPop.invermo;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.processing.TaskRunner;
@@ -286,7 +286,7 @@ public class TXTReader {
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
 		
 		logger.info("Deleting plans with out of bounds trips.");
-		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
+		Geometry bounds = (Geometry) EsriShapeIO.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
 		TaskRunner.validateEpisodes(new DeleteOutOfBounds(bounds), persons);
 		TaskRunner.validatePersons(new ValidateNoPlans(), persons);
 		logger.info("Population size = " + persons.size());

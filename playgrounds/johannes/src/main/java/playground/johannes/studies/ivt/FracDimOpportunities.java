@@ -23,18 +23,18 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
@@ -69,7 +69,7 @@ public class FracDimOpportunities {
 			targetPoints.add(v.getPoint());
 		}
 
-		SimpleFeature feature = FeatureSHP.readFeatures(chborderFile).iterator().next();
+		SimpleFeature feature = EsriShapeIO.readFeatures(chborderFile).iterator().next();
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		

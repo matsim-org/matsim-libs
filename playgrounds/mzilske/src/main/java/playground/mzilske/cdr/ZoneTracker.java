@@ -52,22 +52,22 @@ public class ZoneTracker implements LinkEnterEventHandler {
 
     @Override
     public void handleEvent(LinkEnterEvent event) {
-        Id<Zone> oldZoneId = personInZone.get(event.getPersonId());
+        Id<Zone> oldZoneId = personInZone.get(event.getDriverId());
         Id<Zone> newZoneId = linkToZoneResolver.resolveLinkToZone(event.getLinkId());
         if (oldZoneId != null) {
             if (!oldZoneId.equals(newZoneId)) {
-                // this.eventsManager.processEvent(new ZoneLeaveEvent(event.getTime(), event.getPersonId(), oldZoneId));
+                // this.eventsManager.processEvent(new ZoneLeaveEvent(event.getTime(), event.getDriverId(), oldZoneId));
             }
             if (newZoneId != null) {
-                // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getPersonId(), newZoneId));
-                personInZone.put(event.getPersonId(), newZoneId);
+                // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getDriverId(), newZoneId));
+                personInZone.put(event.getDriverId(), newZoneId);
             } else {
-                personInZone.remove(event.getPersonId());
+                personInZone.remove(event.getDriverId());
             }
         } else {
             if (newZoneId != null) {
-                // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getPersonId(), newZoneId));
-                personInZone.put(event.getPersonId(), newZoneId);
+                // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getDriverId(), newZoneId));
+                personInZone.put(event.getDriverId(), newZoneId);
             }
         }
 

@@ -21,6 +21,7 @@ package playground.gregor.ctsim.run;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -33,33 +34,59 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.gregor.casim.simulation.CAMobsimFactory;
-import playground.gregor.casim.simulation.physics.AbstractCANetwork;
-import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
+import playground.gregor.ctsim.simulation.CTMobsimFactory;
 import playground.gregor.ctsim.simulation.CTTripRouterFactory;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class CTRunner implements IterationStartsListener {
+
+	public static boolean DEBUG = false;
 
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
 
 	public static void main(String[] args) {
-		if (args.length != 3) {
+		if (args.length != 2) {
 			printUsage();
 			System.exit(-1);
 		}
 		String qsimConf = args[0];
-		Config c = ConfigUtils.loadConfig(qsimConf);
 
-		c.controler().setOutputDirectory("/Users/laemmel/devel/cttest/output/");
+		boolean vis = Boolean.parseBoolean(args[1]);
+		DEBUG = vis;
+
+		Config c = ConfigUtils.loadConfig(qsimConf);
 
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("ctsim");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 
-
 		final Controler controller = new Controler(sc);
+		if (vis) {
+			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+
+
+			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+			InfoBox iBox = new InfoBox(dbg, sc);
+			dbg.addAdditionalDrawer(iBox);
+			//		dbg.addAdditionalDrawer(new Branding());
+//			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+//			dbg.addAdditionalDrawer(qDbg);
+
+			EventsManager em = controller.getEvents();
+//			em.addHandler(qDbg);
+			em.addHandler(dbg);
+		}
+
+
 
 
 		controller.getConfig().controler().setOverwriteFileSetting(
@@ -72,14 +99,12 @@ public class CTRunner implements IterationStartsListener {
 		controller.setTripRouterFactory(tripRouter);
 
 
-		final CAMobsimFactory factory = new CAMobsimFactory();
-		if (args[1].equals("false")) {
-			factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
-		}
+		final CTMobsimFactory factory = new CTMobsimFactory();
+
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("casim")) {
+				if (getConfig().controler().getMobsim().equals("ctsim")) {
 					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
 						@Override
 						public Mobsim get() {
@@ -90,14 +115,14 @@ public class CTRunner implements IterationStartsListener {
 			}
 		});
 
-		controller.addControlerListener(new IterationStartsListener() {
-
-			@Override
-			public void notifyIterationStarts(IterationStartsEvent event) {
-				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
-
-			}
-		});
+//		controller.addControlerListener(new IterationStartsListener() {
+//
+//			@Override
+//			public void notifyIterationStarts(IterationStartsEvent event) {
+//				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
+//
+//			}
+//		});
 
 		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
 		// DefaultTripRouterFactoryImpl fac = new
@@ -149,17 +174,16 @@ public class CTRunner implements IterationStartsListener {
 
 	protected static void printUsage() {
 		System.out.println();
-		System.out.println("CARunner");
-		System.out.println("Controller for ca (pedestrian) simulations.");
+		System.out.println("CTRunner");
+		System.out.println("Controller for ct (pedestrian) simulations.");
 		System.out.println();
-		System.out.println("usage : CARunner config multilane_mode visualize");
+		System.out.println("usage : CARunner config");
 		System.out.println();
 		System.out.println("config:   A MATSim config file.");
-		System.out.println("multilane_mode:   one of {true,false}.");
 		System.out.println("visualize:   one of {true,false}.");
 		System.out.println();
 		System.out.println("---------------------");
-		System.out.println("2014, matsim.org");
+		System.out.println("2015, matsim.org");
 		System.out.println();
 	}
 

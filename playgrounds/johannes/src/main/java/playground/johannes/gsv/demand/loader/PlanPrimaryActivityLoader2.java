@@ -22,18 +22,16 @@
  */
 package playground.johannes.gsv.demand.loader;
 
+import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.opengis.feature.simple.SimpleFeature;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
+
 import java.io.IOException;
 import java.util.Random;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity2;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -42,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class PlanPrimaryActivityLoader2 extends AbstractTaskWrapper {
 
 	public PlanPrimaryActivityLoader2(Scenario scenario, String zoneFile, Random random) throws IOException {
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zoneFile);
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures(zoneFile);
 		SimpleFeature feature = features.iterator().next();
 		Geometry geometry = ((Geometry) feature.getDefaultGeometry()).getGeometryN(0);
 				

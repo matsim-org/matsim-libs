@@ -42,7 +42,6 @@ import java.util.Random;
 
 import floetteroed.utilities.Tuple;
 
-
 /**
  * An attempt to deal with the (at least to me incomprehensible) coordinate
  * system specification for data plotting in PSTricks.
@@ -60,7 +59,7 @@ public class PSTricksDiagramWriter {
 
 	// -------------------- MEMBERS --------------------
 
-	private String endLine = "\n";
+	private String endLine = "";//"\n";
 
 	private Double xMin = null;
 
@@ -101,7 +100,7 @@ public class PSTricksDiagramWriter {
 	public void setEndLine(final String endLine) {
 		this.endLine = endLine;
 	}
-	
+
 	public void setLabelX(final String xLabel) {
 		this.xLabel = (xLabel != null ? xLabel : "");
 	}
@@ -332,14 +331,27 @@ public class PSTricksDiagramWriter {
 					out.println(endLine);
 					out.print("    ");
 				}
-				out.print("D ");
+
+				out.print("{");
 				out.print(round(xy.getA(), digits));
-				out.print(" D ");
+				out.print(", ");
 				out.print(round(xy.getB(), digits));
-				out.print(" ");
+				out.print("}");
+
+				if (i < entry.getValue().size()) {
+					out.print(", ");
+				}
+
+				// out.print("D ");
+				// out.print(round(xy.getA(), digits));
+				// out.print(" D ");
+				// out.print(round(xy.getB(), digits));
+				// out.print(" ");
+
 			}
 			out.println(endLine);
-			out.println("  }]\n");
+			// out.println("  }]\n");
+			out.println("}]\n");
 			out.print("  \\dataplot[");
 			{
 				// TODO NEW

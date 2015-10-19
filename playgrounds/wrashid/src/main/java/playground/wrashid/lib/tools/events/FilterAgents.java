@@ -216,7 +216,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-			Id<Person> personId = event.getPersonId();
+			Id<Person> personId = event.getDriverId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -230,7 +230,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(LinkLeaveEvent event) {
-			Id<Person> personId = event.getPersonId();
+			Id<Person> personId = event.getDriverId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {

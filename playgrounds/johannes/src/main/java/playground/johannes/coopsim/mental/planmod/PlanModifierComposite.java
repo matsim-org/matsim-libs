@@ -20,8 +20,7 @@
 package playground.johannes.coopsim.mental.planmod;
 
 import org.matsim.api.core.v01.population.Plan;
-
-import playground.johannes.sna.util.Composite;
+import org.matsim.contrib.common.collections.Composite;
 
 /**
  * @author illenberger

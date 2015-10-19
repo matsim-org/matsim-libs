@@ -279,6 +279,7 @@ public class Controler extends AbstractController {
 		 * are added to the list.
 		 */
 
+		this.injectorCreated = true;
         this.injector = Injector.createInjector(
                 config,
                 new AbstractModule() {
@@ -304,7 +305,6 @@ public class Controler extends AbstractController {
                         });
                     }
                 });
-        this.injectorCreated = true;
 
 		if (this.dumpDataAtEnd) {
 			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );

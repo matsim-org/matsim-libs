@@ -265,7 +265,7 @@ public class RunCapeTownFreight {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addTravelTimeBinding("commercial").to(carTravelTimeKey());
+				addTravelTimeBinding("commercial").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});

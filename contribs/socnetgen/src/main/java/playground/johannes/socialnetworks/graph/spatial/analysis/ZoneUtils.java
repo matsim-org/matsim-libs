@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.*;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.graph.analysis.Degree;
@@ -32,17 +29,12 @@ import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 import playground.johannes.studies.gis.Accessibility;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -107,7 +99,7 @@ public class ZoneUtils {
 //		ZoneLayer<Set<SpatialVertex>> layer =  ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
 //		layer.overwriteCRS(CRSUtils.getCRS(21781));
 		
-		Geometry boundary = (Geometry) FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
 		boundary.setSRID(21781);
 		
 		ZoneLayer<Set<SpatialVertex>> layer = Accessibility.createGridLayer(10000, boundary);

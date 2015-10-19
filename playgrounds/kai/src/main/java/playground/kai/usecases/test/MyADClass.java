@@ -20,7 +20,13 @@ package playground.kai.usecases.test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -32,10 +38,20 @@ public class MyADClass {
        
       	 Scenario scenario = ScenarioUtils.loadScenario( config ) ;
        
-      	 NetworkCleaner cleaner = new NetworkCleaner() ;
-      	 cleaner.run( scenario.getNetwork() ) ;
-      	 
       	 Controler controler = new Controler( scenario ) ;
+      	 
+      	 controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.addMobsimListenerBinding().toInstance(new MobsimBeforeSimStepListener(){
+					@Override public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+						for (  MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents() ) {
+						}
+					}
+				});
+			}
+      	 });
+      	 
       	 controler.run() ;
       	 
        }

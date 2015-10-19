@@ -77,7 +77,7 @@ public class RailCountsCollector implements TransitBoardEventHandler,
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		TransitLine line = currentLines.get(event.getPersonId());
+		TransitLine line = currentLines.get(event.getDriverId());
 		if(line != null) {
 			railCounts.addCounts(event.getLinkId(), line.getId(), 1);
 		}

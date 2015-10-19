@@ -28,7 +28,7 @@ public class MyEventHandler1 implements LinkEnterEventHandler,
 		System.out.println("LinkEnterEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
-		System.out.println("PersonId: " + event.getPersonId());
+		System.out.println("PersonId: " + event.getDriverId());
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class MyEventHandler1 implements LinkEnterEventHandler,
 		System.out.println("LinkLeaveEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
-		System.out.println("PersonId: " + event.getPersonId());
+		System.out.println("PersonId: " + event.getDriverId());
 	}
 
 	@Override

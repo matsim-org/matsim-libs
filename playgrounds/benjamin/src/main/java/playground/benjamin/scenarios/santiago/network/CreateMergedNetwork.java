@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class CreateMergedNetwork {
 	
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../../shared-svn/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
 
@@ -168,7 +168,6 @@ public class CreateMergedNetwork {
 		calcMinMaxCoord(network);
 		
 		System.out.println("### Finished network creation. ###");
-		
 	}
 	
 	private static void convertNet2Shape(Network network, String crs, String outputDir){
@@ -225,5 +224,4 @@ public class CreateMergedNetwork {
 	private static void createDir(File file) {
 		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
-
 }

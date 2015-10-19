@@ -56,17 +56,23 @@ public class CTPed {
 		}
 	}
 
+	public DriverAgent getDriver() {
+		return this.driver;
+	}
 
 	public double getDesiredDir() {
 		return this.dir;
 	}
 
 
-	public CTCell getNextCellAndJump() {
-		this.currentCell.jumpOffPed(this);
-		this.currentCell = tentativeNextCell;
-		this.currentCell.jumpOnPed(this);
-		this.tentativeNextCell = null;
+	public CTCell getNextCellAndJump(double time) {
+		if (this.tentativeNextCell.jumpOnPed(this, time)) {
+			this.currentCell.jumpOffPed(this, time);
+			this.currentCell = tentativeNextCell;
+
+			this.tentativeNextCell = null;
+
+		}
 		return this.currentCell;
 	}
 
@@ -84,7 +90,7 @@ public class CTPed {
 			CTLink ctLink = (CTLink) p;
 			Link us = ctLink.getUsLink();
 			Link ds = ctLink.getDsLink();
-			if (us.getId() == driver.chooseNextLinkId()) {
+			if (us != null && us.getId() == driver.chooseNextLinkId()) {
 				this.dir = -Math.PI / 2.;
 				driver.notifyMoveOverNode(driver.chooseNextLinkId());
 				return;
@@ -105,5 +111,6 @@ public class CTPed {
 
 	public Id<Link> getNextLinkId() {
 		return this.driver.chooseNextLinkId();
+
 	}
 }

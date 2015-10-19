@@ -50,11 +50,11 @@ public class PersonEventFilter implements EventFilter {
 	public boolean doProcessEvent(Event event) {
 		if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent e = (LinkEnterEvent) event;
-			Id<Person> personId = e.getPersonId();
+			Id<Person> personId = e.getDriverId();
 			this.personIds.contains(personId);
 		} else if (event instanceof LinkLeaveEvent) {
 			LinkLeaveEvent e = (LinkLeaveEvent) event;
-			Id<Person> personId = e.getPersonId();
+			Id<Person> personId = e.getDriverId();
 			this.personIds.contains(personId);
 		} else if (event instanceof Wait2LinkEvent) {
 			Wait2LinkEvent e = (Wait2LinkEvent) event;

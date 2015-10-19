@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.matrices.io;
 
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;

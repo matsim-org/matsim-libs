@@ -20,9 +20,9 @@
 package playground.johannes.synpop.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -39,11 +39,15 @@ public class ZoneEsriShapeIO {
 		Set<Zone> zoneSet = new HashSet<>();
 		
 		try {
-			for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
+			for(SimpleFeature feature : EsriShapeIO.readFeatures(filename)) {
 				Zone zone = new Zone((Geometry) feature.getDefaultGeometry());
 		
 				for(Property prop : feature.getProperties()) {
-					zone.setAttribute(prop.getName().getLocalPart(), prop.getValue().toString());
+					String name = prop.getName().getLocalPart();
+					Object valueObj = prop.getValue();
+					String value = null;
+					if(valueObj != null) value = valueObj.toString();
+					zone.setAttribute(name, value);
 					
 				}
 				

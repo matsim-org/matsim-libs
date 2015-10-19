@@ -9,9 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -20,7 +18,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 public class OverrideCarTraveltimeTest {
 
@@ -33,7 +30,7 @@ public class OverrideCarTraveltimeTest {
             @Override
             public void install() {
                 bindCarTravelDisutilityFactory().to(InterestingTravelDisutilityFactory.class);
-                bindCarTravelTime().to(InterestingTravelTime.class);
+                bindNetworkTravelTime().to(InterestingTravelTime.class);
                 addControlerListenerBinding().to(InterestingControlerListener.class);
             }
         });

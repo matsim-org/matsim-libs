@@ -28,11 +28,10 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.ctsim.simulation.physics.CTNetsimEngine;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 public class CTWalkerDepatureHandler implements DepartureHandler {
 
-	private static final String transportMode = TransportMode.walkca;
+	private static final String transportMode = "walkct";
 	private final CTNetsimEngine engine;
 
 	public CTWalkerDepatureHandler(CTNetsimEngine caEngine, Scenario sc) {

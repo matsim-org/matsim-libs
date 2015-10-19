@@ -20,14 +20,16 @@
 package playground.gregor.ctsim.simulation.physics;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import playground.gregor.casim.simulation.physics.CAVehicle;
+import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.CTNetworkFactory;
 import playground.gregor.ctsim.simulation.CTWalkerDepatureHandler;
 
@@ -60,7 +62,7 @@ public class CTNetsimEngine implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 		log.info("prepare");
-		this.ctNet = fac.createCANetwork(sim.getScenario().getNetwork(),
+		this.ctNet = fac.createCTNetwork(sim.getScenario().getNetwork(),
 				sim.getEventsManager(), this);
 	}
 
@@ -77,17 +79,21 @@ public class CTNetsimEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	public void letVehicleArrive(CAVehicle veh) {
+	public void letPedArrive(CTPed veh) {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-		MobsimDriverAgent driver = veh.getDriver();
+		PersonDriverAgentImpl driver = (PersonDriverAgentImpl) veh.getDriver();
 		internalInterface
 				.getMobsim()
 				.getEventsManager()
 				.processEvent(
-						new PersonLeavesVehicleEvent(now, driver.getId(), veh
-								.getId()));
+						new VehicleLeavesTrafficEvent(now, driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class), "walkct", 0));
+		internalInterface
+				.getMobsim()
+				.getEventsManager()
+				.processEvent(
+						new PersonLeavesVehicleEvent(now, driver.getId(), Id.create(driver.getId(), org.matsim.vehicles.Vehicle.class)));
 		// reset vehicles driver
-		veh.setDriver(null);
+//		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
 		this.internalInterface.arrangeNextAgentState(driver);
 	}

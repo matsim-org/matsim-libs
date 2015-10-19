@@ -50,7 +50,6 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
 import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
-import utils.TtPaths;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -73,12 +72,12 @@ public class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V8;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9
 	}
@@ -89,8 +88,7 @@ public class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static String OUTPUT_BASE_DIR = TtPaths.RUNSSVN + "braess/withoutLanes_signalsVsTolls/";
-//	private static String OUTPUT_BASE_DIR = "/Users/nagel/kairuns/braess/output";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -276,7 +274,7 @@ public class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 3 );
+		config.strategy().setMaxAgentPlanMemorySize( 0 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
