@@ -75,7 +75,8 @@ class Talk_2015_09_03 {
 		final Random rnd = new Random();
 		final double demand = 500;
 		final double capacity = 1000;
-		final int linkCnt = 400;
+		final int linkCnt = 800;
+		final int tollCnt = 400;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
@@ -87,10 +88,13 @@ class Talk_2015_09_03 {
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.1;
 
-		final int nth = 10;
 		final double maxExternality = 3.0;
-
-		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32,64, 128,256}) {
+		final Vector externalities = randomExternalities(maxExternality,
+				linkCnt, new Random(4711));
+		
+		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32 }) {
+			// , 4, 8, 16, 32, 64, 128,
+			// 256 }) {
 
 			final List<List<Double>> naiveTransitionList = new ArrayList<List<Double>>();
 			final List<List<Double>> naiveObjectiveFunctionValueList = new ArrayList<List<Double>>();
@@ -100,10 +104,8 @@ class Talk_2015_09_03 {
 			final List<List<Double>> equilibriumWeightList = new ArrayList<List<Double>>();
 			final List<List<Double>> uniformityWeightList = new ArrayList<List<Double>>();
 
-			final Vector externalities = minMaxExternalities(maxExternality,
-					linkCnt, nth);
-			// final Vector externalities = randomExternalities(
-			// maxExternality, linkCnt, rnd);
+			// final Vector externalities = minMaxExternalities(maxExternality,
+			// linkCnt, nth);
 
 			for (Boolean interpolate : new Boolean[] { false, true }) {
 
@@ -154,7 +156,7 @@ class Talk_2015_09_03 {
 					// ContinuousTollRandomizer(
 					// system, linkCnt, 0.1, 1.0, rnd);
 					final DecisionVariableRandomizer randomization = new ContinuousDiscreteTollRandomizer(
-							system, linkCnt, linkCnt / nth, 0.1, 1.0, rnd);
+							system, linkCnt, tollCnt, 0.1, 1.0, rnd);
 
 					// final TrajectorySamplingSelfTuner selfTuner = new
 					// TrajectorySamplingSelfTuner();
@@ -270,12 +272,12 @@ class Talk_2015_09_03 {
 			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8, 5);
 			writer.setLabelX("transitions [$10^3$]");
 			writer.setLabelY("Q [$10^3$]");
-			writer.setYMin(0.0);
-			writer.setYMax(150.0);
-			writer.setYDelta(20.0);
-			writer.setXMin(0.0);
-			writer.setXMax(25.0);
-			writer.setXDelta(5.0);
+			// writer.setYMin(0.0);
+			// writer.setYMax(150.0);
+			// writer.setYDelta(20.0);
+			// writer.setXMin(0.0);
+			// writer.setXMax(25.0);
+			// writer.setXDelta(5.0);
 
 			for (int r = 0; r < replications; r++) {
 				final String selectId = "select"
@@ -301,9 +303,8 @@ class Talk_2015_09_03 {
 			// FileOutputStream toFileStream = new FileOutputStream("file");
 			// PrintStream toFilePrintStream = new PrintStream("./test.txt");
 
-			writer.printAll(new PrintStream(
-					"./output/opdyts/links-400_every-10th/pop-"
-							+ populationSize + ".txt"));
+			writer.printAll(new PrintStream("./output/opdyts/pop-"
+					+ populationSize + ".txt"));
 
 			// <<<<< DIAGRAM <<<<<
 

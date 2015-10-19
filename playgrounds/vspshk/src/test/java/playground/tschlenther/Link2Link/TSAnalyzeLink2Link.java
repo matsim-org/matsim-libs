@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 
-public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
+public class TSAnalyzeLink2Link implements LinkEnterEventHandler{
 
 	private Map<Integer,int[]> routeUsersPerIter;
 	private Map<RunSettings, Map<Integer,int[]>> resultsOfRun;
@@ -15,10 +15,10 @@ public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
 	private RunSettings currentRunSettings;
 	
 	
-	public TsAnalyzeLink2Link(RunSettings settings) {
+	public TSAnalyzeLink2Link(RunSettings settings) {
 		super();
-		this.currentRunSettings = settings;
-		this.routeUsersPerIter = new HashMap<Integer,int[]>();
+		this.currentRunSettings = new RunSettings(settings.isUseLanes(),settings.isUseSignals(),settings.isUseLink2Link());
+		this.routeUsersPerIter = new HashMap<Integer,int[]>();					//top route at [0] , lower route at [1]
 		this.resultsOfRun = new HashMap<RunSettings, Map<Integer,int[]>>();
 		this.reset(0);
 	}
@@ -32,21 +32,23 @@ public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getLinkId().equals(Id.createLinkId("Link3"))){
+		if(event.getLinkId().equals(Id.createLinkId("Link3"))){				//top route
 			this.routeUsersPerIter.get(this.iteration)[0] += 1;
 		}
-		else if(event.getLinkId().equals(Id.createLinkId("Link5"))){
+		else if(event.getLinkId().equals(Id.createLinkId("Link5"))){		//lower route
 			this.routeUsersPerIter.get(this.iteration)[1] += 1;
 		}
 	}
 	
-	public void saveRunResults(){
+	public Map<Integer, int[]> saveAndGetRunResults(){
 		if(!this.resultsOfRun.containsKey(currentRunSettings)){
 			this.resultsOfRun.put(currentRunSettings, routeUsersPerIter);
 		}
 		else{
 			throw new RuntimeException("won't save same run settings twice");
 		}
+		return routeUsersPerIter;
+				
 	}
 	
 	public void setToNextRun(RunSettings settings){
@@ -55,22 +57,20 @@ public class TsAnalyzeLink2Link implements LinkEnterEventHandler{
 	}
 	
 	public void writeResults(){
+		System.out.println("number of entries: " + resultsOfRun.keySet().size());
+
 		for(RunSettings settings : resultsOfRun.keySet()){
 			System.out.println("\n RUNSETTINGS : \t Signals: " + settings.isUseSignals() + "\t Lanes: " + settings.isUseLanes() + "\t Link2Link: " + settings.isUseLink2Link() );
-
-			for(int i : resultsOfRun.get(settings).keySet()){
-				
-				
+			
+			 Map<Integer, int[]> currentResults = resultsOfRun.get(settings);
+			for(int i : currentResults.keySet()){
 				System.out.println("\n ITERATION "+ i + ":");
-				System.out.println("Fahrer auf oberer Route: " + this.routeUsersPerIter.get(i)[0]);
-				System.out.println("Fahrer auf unterer Route: " + this.routeUsersPerIter.get(i)[1]);
+				System.out.println("Fahrer auf oberer Route: " + currentResults.get(i)[0]);
+				System.out.println("Fahrer auf unterer Route: " + currentResults.get(i)[1]);
 			}
 	
 		}
 	}
-
-	
-	
 }
 
 class RunSettings {
@@ -113,6 +113,11 @@ class RunSettings {
 
 	public void setUseLink2Link(boolean useLink2Link) {
 		this.useLink2Link = useLink2Link;
+	}
+	
+	@Override
+	public String toString(){
+		return "lanes used: " + this.useLanes + "\n signals used: " + this.useSignals + "\n Link2Link routing: " + this.useLink2Link;
 	}
 
 	

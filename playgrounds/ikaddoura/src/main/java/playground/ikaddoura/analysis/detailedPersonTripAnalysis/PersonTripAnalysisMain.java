@@ -80,27 +80,29 @@ public class PersonTripAnalysisMain {
 		
 	public static void main(String[] args) {
 		
+		String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+//		String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/c/output/";
+		
+		log.info("Searching for run-directory in args at index 0...");
 		if (args.length > 0) {
-			throw new RuntimeException("Aborting...");
-			
-		} else {			
-			
-			String id = "c13";
-			
-			String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
-//			String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/c/output/";
-			
-			networkFile = runDirectory + id + "/output_network.xml.gz";
-			configFile = runDirectory + id + "/output_config.xml.gz";
-			
-			eventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			outputPath = runDirectory + id + "/ITERS/it.100/detailedAnalysis/";
-			populationFile = runDirectory + id + "/output_plans.xml.gz";
-			
-			noiseEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			
+			runDirectory = args[0];
+			log.info("Run-directory found at index 0.");
+		} else {
+			log.info("Could not find run-directory in args. Default directory from ikaddoura has been taken.");
 		}
+		
+		String id = "c13";
+		
+		networkFile = runDirectory + id + "/output_network.xml.gz";
+		configFile = runDirectory + id + "/output_config.xml.gz";
+		
+		eventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+		outputPath = runDirectory + id + "/ITERS/it.100/detailedAnalysis/";
+		populationFile = runDirectory + id + "/output_plans.xml.gz";
+		
+		noiseEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+		congestionEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
+			
 		
 		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
 		analysis.run();
