@@ -97,7 +97,7 @@ public class InputsForFDTestSetUp {
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario = ScenarioUtils.createScenario(config);
 		
-		if(GenerateFundamentalDiagramData.DUMP_INPUT_FILES) new ConfigWriter(config).write(outputFolder+"/config.xml");
+		if(GenerateFundamentalDiagramData.isDumpingInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
 	
 	/**
@@ -190,7 +190,7 @@ public class InputsForFDTestSetUp {
 		endLink.setAllowedModes(allowedModes);
 		network.addLink(endLink);
 
-		if(GenerateFundamentalDiagramData.DUMP_INPUT_FILES) new NetworkWriter(network).write(outputFolder+"/network.xml");
+		if(GenerateFundamentalDiagramData.isDumpingInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
 	}
 
 	private void fillTravelModeData(){

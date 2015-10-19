@@ -20,6 +20,7 @@
 
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Random;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -70,7 +72,8 @@ public class GenerateFundamentalDiagramData {
 	static final Logger LOG = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
 	static String RUN_DIR ;
-	static boolean DUMP_INPUT_FILES = true; // includes config, network
+	static boolean isDumpingInputFiles = false; // includes config, network
+	private boolean isWritingEventsFileForEachIteration = false;
 	
 	static String[] TRAVELMODES;	
 	
@@ -80,7 +83,7 @@ public class GenerateFundamentalDiagramData {
 	static String HOLE_SPEED = "15";
 
 	private Double[] modalSplitInPCU;
-	private final boolean liveOTFVis = false;
+	private boolean isUsingLiveOTFVis = false;
 	private boolean isPlottingDistribution = false;
 
 	private int reduceDataPointsByFactor = 1;
@@ -128,18 +131,21 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setRunDirectory(args[0]);
 		generateFDData.setTravelModes(args[1].split(","));
 		generateFDData.setModalSplit(args[2].split(",")); //in pcu
-		generateFDData.setPassingAllowed(Boolean.valueOf(args[3]));
-		generateFDData.setSeepageAllowed(Boolean.valueOf(args[4]));
-		generateFDData.setUseHoles(Boolean.valueOf(args[5]));
+		generateFDData.setIsPassingAllowed(Boolean.valueOf(args[3]));
+		generateFDData.setIsSeepageAllowed(Boolean.valueOf(args[4]));
+		generateFDData.setIsUsingHoles(Boolean.valueOf(args[5]));
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
-		generateFDData.setWriteInputFiles(true);
+		
+		generateFDData.setIsDumpingInputFiles(true);
+		generateFDData.setIsUsingLiveOTFVis(false);
+		generateFDData.setIsWritingEventsFileForEachIteration(false);
 		
 		generateFDData.run();
 	}
 
 	private void consistencyCheckAndInitialize(){
-		if(DUMP_INPUT_FILES) {
+		if(isDumpingInputFiles) {
 			createLogFile();
 		}
 
@@ -151,8 +157,17 @@ public class GenerateFundamentalDiagramData {
 		if(SEEPAGE_ALLOWED) LOG.info("=======Seepage is allowed.========");
 		if(WITH_HOLES) LOG.info("======= Using double ended queue.=======");
 
-		if(DUMP_INPUT_FILES && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
+		if(isDumpingInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
 		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+		
+		if(reduceDataPointsByFactor != 1) {
+			LOG.info("===============");
+			LOG.warn("Number of modes for each mode type in FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
+					"Make sure this is what you want because it will be more likely to have less or no points in congested regime in absence of queue model with holes.");
+			LOG.info("===============");
+		}
+		
+		if(isWritingEventsFileForEachIteration) Log.warn("This will write one event file corresponding to each iteration and thus ");
 
 		flowUnstableWarnCount = new int [TRAVELMODES.length];
 		speedUnstableWarnCount = new int [TRAVELMODES.length];
@@ -181,16 +196,16 @@ public class GenerateFundamentalDiagramData {
 		RUN_DIR = runDir;
 	}
 
-	public void setPassingAllowed(boolean isPassingAllowed) {
+	public void setIsPassingAllowed(boolean isPassingAllowed) {
 		PASSING_ALLOWED = isPassingAllowed;
 	}
 
-	public void setSeepageAllowed(boolean isSeepageAllowed) {
+	public void setIsSeepageAllowed(boolean isSeepageAllowed) {
 		SEEPAGE_ALLOWED = isSeepageAllowed;
 	}
 
-	public void setWriteInputFiles(boolean writeInputFiles) {
-		GenerateFundamentalDiagramData.DUMP_INPUT_FILES = writeInputFiles;
+	public void setIsDumpingInputFiles(boolean writeInputFiles) {
+		isDumpingInputFiles = writeInputFiles;
 	}
 
 	public void setTravelModes(String[] travelModes) {
@@ -208,7 +223,7 @@ public class GenerateFundamentalDiagramData {
 		this.reduceDataPointsByFactor = reduceDataPointsByFactor;
 	}
 
-	public void setUseHoles(boolean isUsingHole) {
+	public void setIsUsingHoles(boolean isUsingHole) {
 		WITH_HOLES = isUsingHole;
 	}
 
@@ -216,9 +231,18 @@ public class GenerateFundamentalDiagramData {
 		this.isPlottingDistribution = isPlottingDistribution;
 	}
 
+	public void setIsUsingLiveOTFVis(boolean liveOTFVis) {
+		this.isUsingLiveOTFVis = liveOTFVis;
+	}
+
+	public void setIsWritingEventsFileForEachIteration(
+			boolean isWritingEventsFileForEachIteration) {
+		this.isWritingEventsFileForEachIteration = isWritingEventsFileForEachIteration;
+	}
+
 	private void parametricRunAccordingToGivenModalSplit(){
 
-		//		Creating minimal configuration respecting modal split in PCU and integer agent numbers
+		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
 		List<Double> pcus = new ArrayList<Double>();
 		for(int index =0 ;index<TRAVELMODES.length;index++){
 			double tempPCU = MixedTrafficVehiclesUtils.getPCU(TRAVELMODES[index]);
@@ -251,20 +275,17 @@ public class GenerateFundamentalDiagramData {
 			minSteps.set(0, 1);
 		}
 
-		// for a faster simulation or to have less points on FD, minSteps is increased
 		if(reduceDataPointsByFactor!=1) {
-			LOG.info("===============");
-			LOG.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
-					"Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
-			LOG.info("===============");
 			for(int index=0;index<minSteps.size();index++){
 				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);
 			}
 		}
+		
 		//set up number of Points to run.
 		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
+	
 		for(int index=0;index<TRAVELMODES.length;index++){
 			sumOfPCUInEachStep +=  minSteps.get(index) * MixedTrafficVehiclesUtils.getPCU(TRAVELMODES[index]);
 		}
@@ -280,10 +301,12 @@ public class GenerateFundamentalDiagramData {
 			pointsToRun.add(pointToRun);
 		}
 
-		//Effective iteration over all points 
 		for ( int i=0; i<pointsToRun.size(); i++){
 			List<Integer> pointToRun = pointsToRun.get(i);
+			LOG.info("===============");
 			LOG.info("Going into run where number of Agents are - \t"+pointToRun);
+			Log.info("Further, " + (pointsToRun.size() - i) +" combinations will be simulated.");
+			LOG.info("===============");
 			this.singleRun(pointToRun);
 		}
 	}
@@ -352,7 +375,6 @@ public class GenerateFundamentalDiagramData {
 				iterationModule.add1();
 			}
 		}
-		//System.out.println(pointsToRun.size());
 		return pointsToRun;
 	}
 
@@ -377,8 +399,14 @@ public class GenerateFundamentalDiagramData {
 		events.addHandler(globalFlowDynamicsUpdator);
 		events.addHandler(passingEventsUpdator);
 
-		EventWriterXML eventWriter = new EventWriterXML(RUN_DIR+"/events.xml");
-		if(DUMP_INPUT_FILES){
+		EventWriterXML eventWriter = null;
+		
+		if(isWritingEventsFileForEachIteration){
+			String eventsDir = RUN_DIR+"/events/";
+			
+			if (! new File(eventsDir).exists() ) new File(eventsDir).mkdir();
+			
+			eventWriter = new EventWriterXML(eventsDir+"/events"+pointToRun.toString()+".xml");
 			events.addHandler(eventWriter);
 		}
 
@@ -444,19 +472,10 @@ public class GenerateFundamentalDiagramData {
 			writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			writer.print("\n");
 		}
-		//storing data in map
-		Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<String, Tuple<Double,Double>>();
-		for(int i=0; i < TRAVELMODES.length; i++){
 
-			Tuple<Double, Double> flowSpeed = 
-					new Tuple<Double, Double>(this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow(),
-							this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
-			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
-		}
-
-		if(DUMP_INPUT_FILES) eventWriter.closeFile();
+		if(isWritingEventsFileForEachIteration) eventWriter.closeFile();
 	}
-
+	
 	static final Map<Id<Person>, String> person2Mode = new HashMap<Id<Person>, String>();
 
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
@@ -506,7 +525,7 @@ public class GenerateFundamentalDiagramData {
 
 		qSim.addAgentSource(agentSource);
 
-		if ( liveOTFVis ) {
+		if ( isUsingLiveOTFVis ) {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
