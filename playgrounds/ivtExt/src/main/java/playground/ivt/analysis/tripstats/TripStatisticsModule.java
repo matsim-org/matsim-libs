@@ -16,21 +16,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.analysis;
+package playground.ivt.analysis.tripstats;
 
+import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
-import playground.ivt.analysis.activityhistogram.ActivityHistogramModule;
-import playground.ivt.analysis.tripstats.TripStatisticsModule;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scoring.EventsToActivities;
+import org.matsim.core.scoring.EventsToLegs;
+
+import javax.inject.Inject;
 
 /**
  * @author thibautd
  */
-public class IvtAnalysisModule extends AbstractModule {
+public class TripStatisticsModule extends AbstractModule {
 	@Override
 	public void install() {
-		install( new TripModeSharesModule() );
-		install( new ActivityHistogramModule() );
-		install( new TripStatisticsModule() );
-	}
+		bind(TripStatisticsCollectingEventHandler.class);
+		addControlerListenerBinding().to(TripStatisticsCollectingEventHandler.class);
 
+		addEventHandlerBinding()
+				.toProvider(
+					new Provider<EventHandler>() {
+						@Inject Scenario scenario;
+						@Inject TripStatisticsCollectingEventHandler legHandler;
+
+						@Override
+						public EventHandler get() {
+							final EventsToLegs eventsToLegs = new EventsToLegs( scenario );
+							eventsToLegs.setLegHandler(legHandler);
+							return eventsToLegs;
+						}
+					} );
+
+		addEventHandlerBinding()
+				.toProvider(
+					new Provider<EventHandler>() {
+						@Inject TripStatisticsCollectingEventHandler activityHandler;
+
+						@Override
+						public EventHandler get() {
+							final EventsToActivities eventsToActivities = new EventsToActivities( );
+							// Awful, just waiting for better design fo eventsToActivities
+							eventsToActivities.setActivityHandler(activityHandler);
+							activityHandler.setEventsToActivities( eventsToActivities );
+							return eventsToActivities;
+						}
+					} );
+	}
 }

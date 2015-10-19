@@ -16,13 +16,15 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.math;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * 
@@ -99,6 +101,16 @@ public class MathHelpers {
 			result++;
 			pSum += probs.get(result);
 		} while (pSum < x && result < probs.size() - 1);
+		return result;
+	}
+
+	// TODO NEW
+	public static <T> Set<T> drawWithoutReplacement(int n,
+			final Collection<T> collection, final Random rnd) {
+		final Set<T> result = new LinkedHashSet<T>();
+		while ((result.size() < n) && (result.size() < collection.size())) {
+			result.add(draw(collection, rnd));
+		}
 		return result;
 	}
 
