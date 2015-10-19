@@ -73,7 +73,7 @@ public class PopulationCreator {
 
 	private double populationSampleFactor = 1.0;
 
-	private String zonesBoundaryShapeFileName = null;
+	// private String zonesBoundaryShapeFileName = null;
 
 	private String agentHomeXYFileName = null;
 
@@ -139,10 +139,10 @@ public class PopulationCreator {
 		writer.close();
 	}
 
-	public void setZonesBoundaryShapeFileName(
-			final String zonesBoundaryShapeFileName) {
-		this.zonesBoundaryShapeFileName = zonesBoundaryShapeFileName;
-	}
+	// public void setZonesBoundaryShapeFileName(
+	// final String zonesBoundaryShapeFileName) {
+	// this.zonesBoundaryShapeFileName = zonesBoundaryShapeFileName;
+	// }
 
 	public void setPopulationSampleFactor(final double populationSampleFactor) {
 		this.populationSampleFactor = populationSampleFactor;
@@ -392,15 +392,13 @@ public class PopulationCreator {
 						StockholmTransformationFactory.WGS84_EPSG3857,
 						StockholmTransformationFactory.WGS84_SWEREF99);
 
-		// TODO >>>>> NEW >>>>>
-		final Map<String, Zone> id2clippedZone;
-		if (this.zonesBoundaryShapeFileName != null) {
-			id2clippedZone = this.zonalSystem
-					.getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
-		} else {
-			id2clippedZone = this.zonalSystem.id2zone;
-		}
-		// TODO <<<<< NEW <<<<<
+		// final Map<String, Zone> id2clippedZone;
+		// if (this.zonesBoundaryShapeFileName != null) {
+		// id2clippedZone = this.zonalSystem
+		// .getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
+		// } else {
+		// id2clippedZone = this.zonalSystem.getId2zoneView();
+		// }
 
 		final ObjectAttributes personAttributes = this.scenario.getPopulation()
 				.getPersonAttributes();
@@ -422,8 +420,9 @@ public class PopulationCreator {
 			final String workTourMode = (String) personAttributes.getAttribute(
 					personId, WORKTOURMODE_ATTRIBUTE);
 
-			if (id2clippedZone.keySet().contains(homeZone)
-					&& id2clippedZone.keySet().contains(workZone) && (
+			if (this.zonalSystem.getId2zoneView().keySet().contains(homeZone)
+					&& this.zonalSystem.getId2zoneView().keySet()
+							.contains(workZone) && (
 					// RegentPopulationReader.PT_ATTRIBUTEVALUE
 					// .equals(workTourMode) ||
 					RegentPopulationReader.CAR_ATTRIBUTEVALUE
@@ -490,7 +489,7 @@ public class PopulationCreator {
 		pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
 		pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
-		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
+		// pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
 		pc.setPopulationSampleFactor(0.05);
 		pc.setLinkAttributes(linkAttributes);
 		pc.run(initialPlansFile);
