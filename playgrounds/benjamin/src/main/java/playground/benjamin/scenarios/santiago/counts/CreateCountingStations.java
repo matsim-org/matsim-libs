@@ -20,7 +20,7 @@ public class CreateCountingStations {
 
 	private static final Logger log = Logger.getLogger(CreateCountingStations.class) ;
 
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
 	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/counts/" ; //outputDir of this class -> input for Matsim (KT)
 

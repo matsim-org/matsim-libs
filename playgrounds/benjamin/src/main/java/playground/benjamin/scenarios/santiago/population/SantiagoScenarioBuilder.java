@@ -70,6 +70,7 @@ import playground.benjamin.scenarios.santiago.Constants;
 import playground.benjamin.scenarios.santiago.Constants.SubpopulationName;
 
 public class SantiagoScenarioBuilder {
+	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 
 	static String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
@@ -84,14 +85,10 @@ public class SantiagoScenarioBuilder {
 	static final String popA0eAX = "A0equalAX";			//Population with first Activity = last Activity
 	static final String popA0neAX = "A0NoNequalAX";		//Population with first Activity != last Activity
 	
+	private double n = 0.;
 	
-	
-	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
-	
-	private static double n = 0.;
-	
-	private static final String pathForMatsim = "../../runs-svn/santiago/run11c/";		//TODO: path within config file to in-/output files 
-	private static final String outPlans = "plans_final";								//name of plan file
+	private final static String pathForMatsim = "../../../runs-svn/santiago/run20/";		//TODO: path within config file to in-/output files 
+	private final String outPlans = "plans_final";								//name of plan file
 	
 	
 	/**
@@ -104,26 +101,29 @@ public class SantiagoScenarioBuilder {
 	 * </ol>
 	 * 
 	 * Along with the generation of plans, an input config file is created and written.
-	 * Todo-marks show positions for essential config settings e.g. pathes and names of in-/output.  
+	 * Todo-marks show positions for essential config settings, e.g. paths and names of in-/output.  
 	 * 
 	 * @param args
 	 */
 	public static void main(String args[]){
-		
+		SantiagoScenarioBuilder scb = new SantiagoScenarioBuilder();
+		scb.build();
+	}
+	
+	private void build() {
 		createDir(new File(outputDir));
 		
 		Config config = ConfigUtils.createConfig();
 		setUpConfigParameters(config);
 		
-		CSVToPlans converter = new CSVToPlans(	config,
-												outputDir + "plans/",
-												boundariesInputDir + "Boundaries_20150428_085038.shp");
-		converter.run(	databaseFilesDir + "Hogar.csv",
-						databaseFilesDir + "Persona.csv",
-						databaseFilesDir + "Export_Viaje.csv",
-						databaseFilesDir + "Etapa.csv",
-						databaseFilesDir + "comunas.csv");
-		
+		CSVToPlans converter = new CSVToPlans(config,
+											  outputDir + "plans/",
+											  boundariesInputDir + "Boundaries_20150428_085038.shp");
+		converter.run(databaseFilesDir + "Hogar.csv",
+					  databaseFilesDir + "Persona.csv",
+					  databaseFilesDir + "Export_Viaje.csv",
+					  databaseFilesDir + "Etapa.csv",
+					  databaseFilesDir + "comunas.csv");
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).readFile(outputDir + "plans/plans.xml.gz");
@@ -131,19 +131,12 @@ public class SantiagoScenarioBuilder {
 		removePersons(scenario.getPopulation());
 		
 		Map<String, Population> populationMap = getPlansBeforeMidnight(scenario.getPopulation());
-		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
 		
+		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plansA0eAx_coords_beforeMidnight.xml.gz");
 		log.info("persons with a0 equal to aX: " + populationMap.get(popA0eAX).getPersons().size());
 		
 		new PopulationWriter(populationMap.get(popA0neAX)).write(outputDir + "plans/plansA0neAx_coords_beforeMidnight.xml.gz");
-		
 		log.info("persons with a0 non equal to aX: " + populationMap.get(popA0neAX).getPersons().size());
-		
-		n = populationMap.get(popA0eAX).getPersons().size() + populationMap.get(popA0neAX).getPersons().size(); 
-		
-		setCountsParameters(config.counts());
-		setQSimParameters(config.qsim());
-//		new ConfigWriter(config).write(outputDir + "config_initial.xml");
 		
 		Scenario scenarioOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population populationOut = scenarioOut.getPopulation();
@@ -178,7 +171,6 @@ public class SantiagoScenarioBuilder {
 				  }
 				}
 			}
-			
 		}
 		new PopulationWriter(population).write(outputDir + "plans/plans_final.xml.gz");
 		
@@ -191,39 +183,37 @@ public class SantiagoScenarioBuilder {
 			ActivityParams params = new ActivityParams();
 			params.setActivityType(act);
 			params.setTypicalDuration(acts.get(act).getFirst());
-			params.setMinimalDuration(acts.get(act).getSecond());
+//			params.setMinimalDuration(acts.get(act).getSecond());
 			params.setClosingTime(Time.UNDEFINED_TIME);
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform); //TODO: Set to "uniform" or "relative"
+			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 			if (act.equals("pt iNaNH")){			//do not score pt transit activity
 				params.setScoringThisActivityAtAll(false);
 			}
 			config.planCalcScore().addActivityParams(params);
 		}
 		
+		n = populationMap.get(popA0eAX).getPersons().size() + populationMap.get(popA0neAX).getPersons().size(); 
+		setCountsParameters(config.counts());
+		setQSimParameters(config.qsim());
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 		
-		Scenario scenarioFinal = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
+		Scenario scenarioFinal = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//What happens here? looks for me like just read & write population to the same file... (KT, 24.08.2015)
 		new MatsimPopulationReader(scenarioFinal).readFile(outputDir + "plans/plans_final.xml.gz");
 		Population populationFinal = scenarioFinal.getPopulation();
-		
 		new PopulationWriter(populationFinal).write(outputDir + "plans/" + outPlans + ".xml.gz");
-		
-		log.info("final: " + populationOut.getPersons().size());
-		
-		
-		
+		log.info("Final populaton size: " + populationOut.getPersons().size());	
 	}
-	
+
 	/**
 	 * remove persons from the population that get extremely negative scored
 	 * @param population
 	 */
-	private static void removePersons(Population population) {
+	private void removePersons(Population population) {
 		
 		population.getPersons().remove(Id.createPersonId("23187103"));
 		population.getPersons().remove(Id.createPersonId("13768103"));
@@ -235,8 +225,7 @@ public class SantiagoScenarioBuilder {
 		population.getPersons().remove(Id.createPersonId("14380104"));
 		population.getPersons().remove(Id.createPersonId("25611002"));
 		population.getPersons().remove(Id.createPersonId("13491103"));
-		population.getPersons().remove(Id.createPersonId("22343101"));
-		
+		population.getPersons().remove(Id.createPersonId("22343101"));	
 	}
 
 	/**
@@ -257,8 +246,7 @@ public class SantiagoScenarioBuilder {
 	 * @param population
 	 * @return
 	 */
-	private static Map<String, Population> getPlansBeforeMidnight(Population population){
-		
+	private Map<String, Population> getPlansBeforeMidnight(Population population){
 //		top=-33.0144 left=-71.3607 bottom=-33.8875 right=-70.4169
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", Constants.toCRS);
 		final double x1 = -71.3607;
@@ -280,11 +268,9 @@ public class SantiagoScenarioBuilder {
 		Population pop2 = sc2.getPopulation();
 		
 		for(Person person : population.getPersons().values()){
-			
 			if(person.getSelectedPlan().getPlanElements().size() < 3){
 				continue;
 			}
-			
 			boolean addPerson = true;
 			double lastStartTime = Double.NEGATIVE_INFINITY;
 			double lastEndTime = Double.NEGATIVE_INFINITY;
@@ -292,27 +278,21 @@ public class SantiagoScenarioBuilder {
 			Plan selectedPlan = person.getSelectedPlan();
 			
 			for(PlanElement pe : selectedPlan.getPlanElements()){
-				
 				if(pe instanceof Activity){
-					
 					Activity act = (Activity)pe;
-					
 					if(act.getCoord() == null){
 						addPerson = false;
 						break;
 					}
-					
 					if(act.getCoord().getX() == 0 || act.getCoord().getY() == 0){
 						addPerson = false;
 						break;
 					}
-					
 					if(act.getCoord().getX() < minX || act.getCoord().getX() > maxX ||
 							act.getCoord().getY() < minY || act.getCoord().getY() > maxY){
 						addPerson = false;
 						break;
 					}
-					
 					if(act.getStartTime() != Time.UNDEFINED_TIME){
 						if(act.getStartTime() > lastStartTime && act.getStartTime() <= 24*3600){
 							lastStartTime = act.getStartTime();
@@ -321,7 +301,6 @@ public class SantiagoScenarioBuilder {
 							break;
 						}
 					}
-					
 					if(act.getEndTime() != Time.UNDEFINED_TIME){
 						if(act.getEndTime() > lastEndTime && act.getEndTime() <= 24*3600){
 							lastEndTime = act.getEndTime();
@@ -330,20 +309,13 @@ public class SantiagoScenarioBuilder {
 							break;
 						}
 					}
-					
 					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-
 						if(act.getStartTime() > act.getEndTime()){
-							
 							addPerson = false;
 							break;
-							
 						}
-						
 					}
-					
 				}
-				
 			}
 			
 			if(!addPerson) continue;
@@ -352,15 +324,10 @@ public class SantiagoScenarioBuilder {
 			Activity lastAct = (Activity) selectedPlan.getPlanElements().get(selectedPlan.getPlanElements().size()-1);
 			
 			if(firstAct.getType().equals(lastAct.getType())){
-				
 				pop.addPerson(person);
-				
 			} else{
-			
 				pop2.addPerson(person);
-				
 			}
-				
 		}
 		
 		Map<String, Population> populationMap = new HashMap<String, Population>();
@@ -368,12 +335,9 @@ public class SantiagoScenarioBuilder {
 		populationMap.put(popA0neAX, pop2);
 		
 		return populationMap;
-		
 	}
 	
-	@SuppressWarnings(value = { "unused" })
 	private static Population getRest(Population allPersons, Population population1, Population population2){
-		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
 		final double x1 = -71.3607;
 		final double y1 = -33.8875;
@@ -389,50 +353,35 @@ public class SantiagoScenarioBuilder {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		
 		for(Person person : allPersons.getPersons().values()){
-
 			if(!population1.getPersons().values().contains(person) && !population2.getPersons().values().contains(person)){
-				
 				boolean add = true;
 				
 				if(person.getSelectedPlan().getPlanElements().size() < 3) continue;
-				
 				for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-					
 					if(pe instanceof Activity){
-						
 						Activity act = (Activity) pe;
-						
 						if(act.getCoord() == null){
 							add = false;
 							break;
 						}
-						
 						if(act.getCoord().getX() == 0 || act.getCoord().getY() == 0){
 							add = false;
 							break;
 						}
-						
 						if(act.getCoord().getX() < minX || act.getCoord().getX() > maxX ||
 								act.getCoord().getY() < minY || act.getCoord().getY() > maxY){
 							add = false;
 							break;
 						}
-						
 					}
-					
 				}
 				if(add) population.addPerson(person);
-				
 			}
 		}
-		
 		return population;
-		
 	}
 	
-	@SuppressWarnings(value = { "unused" })
-	private static Population cutPlansTo24H(Population population){
-		
+	private Population cutPlansTo24H(Population population){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population populationOut = scenario.getPopulation();
 		PopulationFactoryImpl popFactory = (PopulationFactoryImpl)populationOut.getFactory();
@@ -447,53 +396,30 @@ public class SantiagoScenarioBuilder {
 			double lastEndTime = Double.NEGATIVE_INFINITY;
 			
 			for(PlanElement pe : planElements){
-				
 				if(pe instanceof Activity){
-					
 					Activity act = (Activity)pe;
-					
 					if(act.getStartTime() != Time.UNDEFINED_TIME){
-						
 						if(act.getStartTime() >= lastStartTime && act.getStartTime() <= 24*3600){
-							
 							lastStartTime = act.getStartTime();
-							
 						} else {
-							
 							break;
-							
 						}
-						
 					}
-					
 					if(act.getEndTime() != Time.UNDEFINED_TIME){
-						
 						if(act.getEndTime() >= lastEndTime && act.getEndTime() <= 24*3600){
-							
 							lastEndTime = act.getEndTime();
-							
 						} else{
-							
 							break;
-							
 						}
-						
 					}
 					
 					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						
 						if(act.getStartTime() > act.getEndTime()){
-							
 							break;
-							
 						}
-						
 					}
-					
 				}
-				
 				validUntilIndex++;
-				
 			}
 			
 			Person personOut = popFactory.createPerson(person.getId());
@@ -502,17 +428,11 @@ public class SantiagoScenarioBuilder {
 			for(int i = 0; i < validUntilIndex; i++){
 				
 				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-				
 				if(pe instanceof Activity){
-					
 					planOut.addActivity((Activity)pe);
-					
 				} else{
-					
 					planOut.addLeg((Leg)pe);
-					
 				}
-				
 			}
 			
 			personOut.addPlan(planOut);
@@ -523,27 +443,16 @@ public class SantiagoScenarioBuilder {
 			while(!valid && planOut.getPlanElements().size() > 0){
 				
 				PlanElement pe = planOut.getPlanElements().get(planOut.getPlanElements().size()-1);
-				
 				if(pe instanceof Leg){
-					
 					planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
-					
 				} else if(pe instanceof Activity){
-					
 					Activity act = (Activity)pe;
-					
 					if(!act.getType().equals("pt interaction")){
-						
 						valid = true;
-						
 					} else{
-						
-						
 						planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
 					}
-					
 				}
-				
 			}
 			
 			if(planOut.getPlanElements().size() > 2){
@@ -552,57 +461,36 @@ public class SantiagoScenarioBuilder {
 				Activity lastAct = (Activity)personOut.getSelectedPlan().getPlanElements().get(personOut.getSelectedPlan().getPlanElements().size()-1);
 				
 				if(!firstAct.getType().equals(lastAct.getType())){
-					
 					firstAct.setStartTime(0.);
 					lastAct.setEndTime(24 * 3600);
-					
 				}
-				
 				populationOut.addPerson(personOut);
-				
 			}
-			
 		}
-		
 		return populationOut;
-		
 	}
 	
-	private static void randomizeEndTime(Population population){
-		
+	private void randomizeEndTime(Population population){
 		log.info("Randomizing activity end times...");
-		
 		Random random = MatsimRandom.getRandom();
-		
 		for(Person person : population.getPersons().values()){
-			
 			double timeShift = 0.;
-			
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-				
 				if(pe instanceof Activity){
-					
 					Activity act = (Activity) pe;
-					
 					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						
 						if(act.getEndTime() - act.getStartTime() == 0){
 							timeShift += 1800.;
 						}
-						
 					}
-					
 				}
-				
 			}
 			
 			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
 			
 			double delta = 0;
-			
 			while(delta == 0){
-				
 				delta = createRandomEndTime(random);
 				if(firstAct.getEndTime() + delta < 0){
 					delta = 0;
@@ -617,42 +505,27 @@ public class SantiagoScenarioBuilder {
 						delta = 0;
 					}
 				}
-				
 			}
 			
 			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
-				
 				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 				if(pe instanceof Activity){
-					
 					Activity act = (Activity)pe;
-					
 					if(!act.getType().equals("pt interaction")){
-						
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
-							
 							act.setStartTime(act.getStartTime() + delta);
 						}
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
-							
 							act.setEndTime(act.getEndTime() + delta);
-							
 						}
-						
 					}
-					
 				}
-				
 			}
-			
 		}
-		
 		log.info("...Done.");
-		
 	}
 	
-	private static double createRandomEndTime(Random random){
-		
+	private double createRandomEndTime(Random random){
 		//draw two random numbers [0;1] from uniform distribution
 		double r1 = random.nextDouble();
 		double r2 = random.nextDouble();
@@ -662,7 +535,6 @@ public class SantiagoScenarioBuilder {
 		double endTime = 20*60 * normal;
 		
 		return endTime;
-		
 	}
 	
 	/**
@@ -674,8 +546,7 @@ public class SantiagoScenarioBuilder {
 	 * 
 	 * @param config
 	 */
-	private static void setUpConfigParameters(Config config){
-
+	private void setUpConfigParameters(Config config){
 		setControlerParameters(config.controler());
 //		setCountsParameters(config.counts());
 		setGlobalParameters(config.global());
@@ -693,40 +564,31 @@ public class SantiagoScenarioBuilder {
 //		setSubtourModeChoiceParameters(config.subtourModeChoice());	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
 		config.removeModule("subtourModeChoice");
 		
-		setTimeAllocationMutatorParameters(config.timeAllocationMutator());
+//		setTimeAllocationMutatorParameters(config.timeAllocationMutator());
 		setTravelTimeCalculatorParameters(config.travelTimeCalculator());
 		setVspExperimentalParameters(config.vspExperimental());
-		
 	}
 	
-	private static void setControlerParameters(ControlerConfigGroup cc){
-		
+	private void setControlerParameters(ControlerConfigGroup cc){
 		cc.setLinkToLinkRoutingEnabled(false);
-		
 		HashSet<EventsFileFormat> eventsFileFormats = new HashSet<EventsFileFormat>();
 		eventsFileFormats.add(EventsFileFormat.xml);
 		cc.setEventsFileFormats(eventsFileFormats);
-		
 		cc.setFirstIteration(0);
 		cc.setLastIteration(100);
-		
 		cc.setMobsim(MobsimType.qsim.name());
 		cc.setOutputDirectory(pathForMatsim + "output/"); //TODO
 		cc.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any text. (KT, 2015-08-17) 
-		
+		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any number. (KT, 2015-08-17) 
 		Set<String> snapshotFormat = new HashSet<String>();
 		snapshotFormat.add("otfvis");
 		cc.setSnapshotFormat(snapshotFormat);
-		
 		cc.setWriteEventsInterval(10);
 		cc.setWritePlansInterval(10);
 		cc.setWriteSnapshotsInterval(10);
-		
 	}
 	
-	private static void setCountsParameters(CountsConfigGroup counts){
-		
+	private void setCountsParameters(CountsConfigGroup counts){
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(5);
 		counts.setCountsScaleFactor(Constants.N / n);
@@ -736,42 +598,32 @@ public class SantiagoScenarioBuilder {
 		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml"); //TODO
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(10);
-		
 	}
 	
-	private static void setGlobalParameters(GlobalConfigGroup global){
-		
+	private void setGlobalParameters(GlobalConfigGroup global){
 		global.setCoordinateSystem(Constants.toCRS);
 		global.setNumberOfThreads(2);
 		global.setRandomSeed(4711L);
-		
 	}
 	
-	private static void setLinkStatsParameters(LinkStatsConfigGroup ls){
-		
+	private void setLinkStatsParameters(LinkStatsConfigGroup ls){
 		ls.setAverageLinkStatsOverIterations(5);
 		ls.setWriteLinkStatsInterval(10);
-		
 	}
 	
-	private static void setNetworkParameters(NetworkConfigGroup net){
-		
+	private void setNetworkParameters(NetworkConfigGroup net){
 		net.setChangeEventInputFile(null);
 		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz"); //TODO
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);
-		
 	}
 	
-	private static void setParallelEventHandlingParameters(ParallelEventHandlingConfigGroup peh){
-		
+	private void setParallelEventHandlingParameters(ParallelEventHandlingConfigGroup peh){
 		peh.setEstimatedNumberOfEvents(null);
 		peh.setNumberOfThreads(2);
-		
 	}
 	
-	private static void setPlanCalcScoreParameters(PlanCalcScoreConfigGroup pcs){
-		
+	private void setPlanCalcScoreParameters(PlanCalcScoreConfigGroup pcs){
 		pcs.setBrainExpBeta(1);
 		pcs.setEarlyDeparture_utils_hr(-0.0);
 		pcs.setFractionOfIterationsToStartScoreMSA(0.8);
@@ -867,26 +719,38 @@ public class SantiagoScenarioBuilder {
 		otherModeParams.setMarginalUtilityOfTraveling(-1.056);
 		otherModeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(otherModeParams);
-		
 	}
 	
-	private static void setPlanParameters(PlansConfigGroup plans){
-		
+	private void setPlanParameters(PlansConfigGroup plans){
 		plans.setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 		plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml"); //TODO
 		plans.setInputFile(pathForMatsim + "input/" + outPlans + ".xml.gz"); //TODO
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
 		plans.setSubpopulationAttributeName(SubpopulationName.carUsers); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
-		
 	}
 	
-	private static void setPlansCalcRouteParameters(PlansCalcRouteConfigGroup pcr){
-		
+	private void setPlansCalcRouteParameters(PlansCalcRouteConfigGroup pcr){
 		Set<String> networkModes = new HashSet<String>();
 		networkModes.add(TransportMode.car);
+		networkModes.add(TransportMode.ride);
+		networkModes.add(Constants.Modes.taxi.toString());
 		pcr.setNetworkModes(networkModes);
 		
+		/*
+		 * using ride and taxi as a network modes; is this using time-dependent travel times?
+		 * */
+//		ModeRoutingParams rideParams = new ModeRoutingParams(TransportMode.ride);
+//		rideParams.setBeelineDistanceFactor(1.3);
+//		rideParams.setTeleportedModeSpeed(34 / 3.6);
+//		pcr.addModeRoutingParams(rideParams);
+//		
+//		ModeRoutingParams taxiParams = new ModeRoutingParams(Constants.Modes.taxi.toString());
+//		taxiParams.setBeelineDistanceFactor(1.3);
+//		taxiParams.setTeleportedModeSpeed(34 / 3.6);
+//		pcr.addModeRoutingParams(taxiParams);
+		
+		//begin pt parameter settings
 		ModeRoutingParams busParams = new ModeRoutingParams(Constants.Modes.bus.toString());
 		busParams.setBeelineDistanceFactor(1.3);
 		busParams.setTeleportedModeSpeed(25 / 3.6);
@@ -897,20 +761,11 @@ public class SantiagoScenarioBuilder {
 		metroParams.setTeleportedModeSpeed(32 / 3.6);
 		pcr.addModeRoutingParams(metroParams);
 		
-		ModeRoutingParams colectivoParams = new ModeRoutingParams(Constants.Modes.colectivo.toString());
-		colectivoParams.setBeelineDistanceFactor(1.3);
-		colectivoParams.setTeleportedModeSpeed(30 / 3.6);
-		pcr.addModeRoutingParams(colectivoParams);
-		
-		ModeRoutingParams schoolBusParams = new ModeRoutingParams(Constants.Modes.school_bus.toString());
-		schoolBusParams.setBeelineDistanceFactor(1.3);
-		schoolBusParams.setTeleportedModeSpeed(25 / 3.6);
-		pcr.addModeRoutingParams(schoolBusParams);
-		
-		ModeRoutingParams taxiParams = new ModeRoutingParams(Constants.Modes.taxi.toString());
-		taxiParams.setBeelineDistanceFactor(1.3);
-		taxiParams.setTeleportedModeSpeed(34 / 3.6);
-		pcr.addModeRoutingParams(taxiParams);
+		ModeRoutingParams trainParams = new ModeRoutingParams(Constants.Modes.train.toString());
+		trainParams.setBeelineDistanceFactor(1.3);
+		trainParams.setTeleportedModeSpeed(50 / 3.6);
+		pcr.addModeRoutingParams(trainParams);
+		//end pt parameter settings
 		
 		ModeRoutingParams walkParams = new ModeRoutingParams(TransportMode.walk);
 		walkParams.setBeelineDistanceFactor(1.3);
@@ -922,33 +777,33 @@ public class SantiagoScenarioBuilder {
 		bikeParams.setTeleportedModeSpeed(15 / 3.6);
 		pcr.addModeRoutingParams(bikeParams);
 		
+		ModeRoutingParams colectivoParams = new ModeRoutingParams(Constants.Modes.colectivo.toString());
+		colectivoParams.setBeelineDistanceFactor(1.3);
+		colectivoParams.setTeleportedModeSpeed(30 / 3.6);
+		pcr.addModeRoutingParams(colectivoParams);
+		
 		ModeRoutingParams motorcycleParams = new ModeRoutingParams(Constants.Modes.motorcycle.toString());
 		motorcycleParams.setBeelineDistanceFactor(1.3);
 		motorcycleParams.setTeleportedModeSpeed(34 / 3.6);
 		pcr.addModeRoutingParams(motorcycleParams);
-		
-		ModeRoutingParams trainParams = new ModeRoutingParams(Constants.Modes.train.toString());
-		trainParams.setBeelineDistanceFactor(1.3);
-		trainParams.setTeleportedModeSpeed(50 / 3.6);
-		pcr.addModeRoutingParams(trainParams);
+
+		ModeRoutingParams schoolBusParams = new ModeRoutingParams(Constants.Modes.school_bus.toString());
+		schoolBusParams.setBeelineDistanceFactor(1.3);
+		schoolBusParams.setTeleportedModeSpeed(25 / 3.6);
+		pcr.addModeRoutingParams(schoolBusParams);
 		
 		ModeRoutingParams otherModeParams = new ModeRoutingParams(TransportMode.other);
 		otherModeParams.setBeelineDistanceFactor(1.3);
 		otherModeParams.setTeleportedModeSpeed(50 / 3.6);
 		pcr.addModeRoutingParams(otherModeParams);
-		
-		ModeRoutingParams rideParams = new ModeRoutingParams(TransportMode.ride);
-		rideParams.setBeelineDistanceFactor(1.3);
-		rideParams.setTeleportedModeSpeed(34 / 3.6);
-		pcr.addModeRoutingParams(rideParams);
-		
 	}
 	
-	private static void setQSimParameters(QSimConfigGroup qsim){
-		
+	private void setQSimParameters(QSimConfigGroup qsim){
 		qsim.setEndTime(Time.UNDEFINED_TIME);
-		qsim.setFlowCapFactor(n/Constants.N);
-		qsim.setStorageCapFactor(0.015);
+		double flowCapFactor = (n / Constants.N);
+		qsim.setFlowCapFactor(flowCapFactor);
+//		qsim.setStorageCapFactor(0.015);
+		qsim.setStorageCapFactor(flowCapFactor * 3.);
 		qsim.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
 		qsim.setLinkDynamics(LinkDynamics.FIFO.name());
 		qsim.setLinkWidth(30);
@@ -968,27 +823,24 @@ public class SantiagoScenarioBuilder {
 		qsim.setUsingFastCapacityUpdate(false);
 		qsim.setUsingThreadpool(false);
 		qsim.setVehicleBehavior(VehicleBehavior.teleport);
-		
 	}
 	
-	private static void setScenarioParameters(ScenarioConfigGroup scenario){
-		
+	private void setScenarioParameters(ScenarioConfigGroup scenario){
 	}
 	
-	private static void setStrategyParameters(StrategyConfigGroup strategy){
-		
+	private void setStrategyParameters(StrategyConfigGroup strategy){
 		strategy.setFractionOfIterationsToDisableInnovation(0.8);
 		strategy.setMaxAgentPlanMemorySize(5);
 		strategy.setPlanSelectorForRemoval("WorstPlanSelector");
 		
 		StrategySettings changeExpBeta = new StrategySettings();
 		changeExpBeta.setStrategyName("ChangeExpBeta");
-		changeExpBeta.setWeight(0.6);
+		changeExpBeta.setWeight(0.7);
 		strategy.addStrategySettings(changeExpBeta);
 		
 		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
-		reRoute.setWeight(0.3);
+		reRoute.setWeight(0.15);
 		strategy.addStrategySettings(reRoute);
 		
 		//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
@@ -996,30 +848,24 @@ public class SantiagoScenarioBuilder {
 //		StrategySettings subTourModeChoice = new StrategySettings();
 //		subTourModeChoice.setStrategyName("SubtourModeChoice");
 //		subTourModeChoice.setSubpopulation(SubpopulationValues.carAvail);
-//		subTourModeChoice.setWeight(0.1);
+//		subTourModeChoice.setWeight(0.15);
 //		strategy.addStrategySettings(subTourModeChoice);
 //	
-		
 	}
 	
 	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
-	private static void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
-		
-		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
-		smc.setConsiderCarAvailability(true); //TODO true or false ? (KT 2015-09-18)
-		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
-		
-	}
+//	private void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
+//		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
+//		smc.setConsiderCarAvailability(true); //TODO true or false ? (KT 2015-09-18); is not considered anyways (BK 2015-10-19)
+//		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
+//	}
 	
-	private static void setTimeAllocationMutatorParameters(TimeAllocationMutatorConfigGroup tam){
-		
-		tam.setAffectingDuration(false);
-		tam.setMutationRange(7600.);
-		
-	}
+//	private void setTimeAllocationMutatorParameters(TimeAllocationMutatorConfigGroup tam){
+//		tam.setAffectingDuration(false);
+//		tam.setMutationRange(7600.);
+//	}
 	
-	private static void setTravelTimeCalculatorParameters(TravelTimeCalculatorConfigGroup ttc){
-		
+	private void setTravelTimeCalculatorParameters(TravelTimeCalculatorConfigGroup ttc){
 		ttc.setAnalyzedModes(TransportMode.car);
 		ttc.setCalculateLinkToLinkTravelTimes(false);
 		ttc.setCalculateLinkTravelTimes(true);
@@ -1028,19 +874,15 @@ public class SantiagoScenarioBuilder {
 		ttc.setTraveltimeBinSize(900);
 		ttc.setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorArray.name());
 		ttc.setTravelTimeGetterType("average");
-		
 	}
 	
-	private static void setVspExperimentalParameters(VspExperimentalConfigGroup vsp){
-		
+	private void setVspExperimentalParameters(VspExperimentalConfigGroup vsp){
 		vsp.setLogitScaleParamForPlansRemoval(1.0);
 		vsp.setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 		vsp.setWritingOutputEvents(true);
-		
 	}
 	
-	private static void createDir(File file) {
+	private void createDir(File file) {
 		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
-
 }

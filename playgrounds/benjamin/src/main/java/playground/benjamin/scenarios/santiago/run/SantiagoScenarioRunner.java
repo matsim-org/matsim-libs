@@ -19,7 +19,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class SantiagoScenarioRunner {
 
-	private static String inputPath = "../../../runs-svn/santiago/run11c/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static String inputPath = "../../../runs-svn/santiago/run9/input/";
 	private static boolean doModeChoice = false;
 	
