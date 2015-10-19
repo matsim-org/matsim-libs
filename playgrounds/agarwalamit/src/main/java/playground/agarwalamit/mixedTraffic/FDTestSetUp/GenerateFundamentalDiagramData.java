@@ -53,7 +53,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -113,12 +112,12 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312/";
-			String outFolder ="/singleModes/holes/2lanes/car/";
+			String my_dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
+			String outFolder ="/singleModes/holes/2lanes/carBike/";
 			
 			args[0] = my_dir + outFolder ;
-			args[1] = "car"; // travel (main) modes
-			args[2] = "1.0"; // modal split in pcu
+			args[1] = "car,bike"; // travel (main) modes
+			args[2] = "1.0,1.0"; // modal split in pcu
 			args[3] = "false"; // isPassingAllowed
 			args[4] = "false"; // isSeepageAllowed
 			args[5] = "true"; // isUsingHoles
@@ -133,13 +132,13 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setModalSplit(args[2].split(",")); //in pcu
 		generateFDData.setIsPassingAllowed(Boolean.valueOf(args[3]));
 		generateFDData.setIsSeepageAllowed(Boolean.valueOf(args[4]));
-		generateFDData.setIsUsingHoles(Boolean.valueOf(args[5]));
+		generateFDData.setIsUsingHoles(Boolean.valueOf(args[5])); 
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
 		
 		generateFDData.setIsDumpingInputFiles(true);
 		generateFDData.setIsUsingLiveOTFVis(false);
-		generateFDData.setIsWritingEventsFileForEachIteration(false);
+		generateFDData.setIsWritingEventsFileForEachIteration(true);
 		
 		generateFDData.run();
 	}
@@ -397,7 +396,8 @@ public class GenerateFundamentalDiagramData {
 		passingEventsUpdator  = new PassingEventsUpdator();
 
 		events.addHandler(globalFlowDynamicsUpdator);
-		events.addHandler(passingEventsUpdator);
+		
+		if(TRAVELMODES.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
 		
@@ -465,11 +465,17 @@ public class GenerateFundamentalDiagramData {
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
 			}
-			writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
+			
+			if( TRAVELMODES.length > 1 ) {
 
-			writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
+				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
 
-			writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
+				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
+
+				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
+
+			}
+			
 			writer.print("\n");
 		}
 
@@ -568,11 +574,14 @@ public class GenerateFundamentalDiagramData {
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
-		writer.print("noOfCarsPerkm \t");
+		
+		if( TRAVELMODES.length > 1 ) {
+			writer.print("noOfCarsPerkm \t");
 
-		writer.print("totalBikesPassedByAllCarsPerKm \t");
+			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
-		writer.print("avgBikePassingRatePerkm \t");
+			writer.print("avgBikePassingRatePerkm \t");
+		}
 
 		writer.print("\n");
 	}
