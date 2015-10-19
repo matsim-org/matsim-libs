@@ -21,6 +21,7 @@
 package playground.southafrica.utilities.network;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -90,6 +91,7 @@ public class LongLinkSplitterTest {
 	}
 	
 	@Test
+	@Ignore
 	public void writeNetworks(){
 		Network nw1 = buildNetwork();
 		new NetworkWriter(nw1).write("/Users/jwjoubert/Downloads/nw1.xml");
