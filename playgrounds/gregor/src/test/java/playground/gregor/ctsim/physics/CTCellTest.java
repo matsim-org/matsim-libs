@@ -43,7 +43,7 @@ public class CTCellTest extends MatsimTestCase {
 	}
 
 	private CTLinkCell getCTLinkCell() {
-		CTLinkCell cell = new CTLinkCell(42.0, 24.0, null, null, 1);
+		CTLinkCell cell = new CTLinkCell(42.0, 24.0, null, null, 1, 1);
 
 		return cell;
 	}

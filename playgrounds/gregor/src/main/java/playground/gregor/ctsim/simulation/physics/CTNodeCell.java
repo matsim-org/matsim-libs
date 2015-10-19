@@ -44,7 +44,7 @@ public class CTNodeCell extends CTCell {
 
 
 	public CTNodeCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width) {
-		super(x, y, net, parent, width);
+		super(x, y, net, parent, width, 0);
 		Node node = ((CTNode) parent).getNode();
 		for (Link l : node.getOutLinks().values()) {
 			peds.put(l.getId(), new LinkedList<CTPed>());
@@ -60,18 +60,17 @@ public class CTNodeCell extends CTCell {
 			this.nextCellJumpTime = Double.NaN;
 			return;
 		}
-		double minJumpTime = Double.POSITIVE_INFINITY;
+		double maxFJ = 0;
 		CTPed nextJumper = null;
 		for (LinkedList<CTPed> l : this.peds.values()) {
 			if (l.size() == 0) {
 				continue;
 			}
-			double rate = chooseNextCellAndReturnJumpRate(l.peek());
+			double fj = chooseNextCellAndReturnMaxFJ(l.peek());
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
+
+			if (fj > maxFJ) {
+				maxFJ = fj;
 				nextJumper = l.peek();
 			}
 
@@ -80,8 +79,10 @@ public class CTNodeCell extends CTCell {
 			return;
 		}
 		this.next = nextJumper;
-
-		this.nextCellJumpTime = minJumpTime;
+		double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
+		double j = getJ(nextJumper.getTentativeNextCell());
+		double jumpTime = now + rnd / j;
+		this.nextCellJumpTime = jumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
 		this.currentEvent = e;
 		this.net.addEvent(e);

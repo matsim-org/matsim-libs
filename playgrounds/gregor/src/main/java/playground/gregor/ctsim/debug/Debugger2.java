@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -69,7 +70,7 @@ public class Debugger2 {
 			links.add(Id.createLinkId(3));
 			for (CTCell cell : link.getCells()) {
 				int n = cell.getN();
-				int rnd = n / 2;//(int) (MatsimRandom.getRandom().nextInt(n) * 1);
+				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * .3);
 				for (int i = 0; i < rnd; i++) {
 					nrPeds++;
 					DriverAgent walker = new SimpleCTNetworkWalker(links);
@@ -81,27 +82,27 @@ public class Debugger2 {
 			}
 
 		}
-//		{
-//			CTLink link = net.getLinks().get(Id.createLinkId("7"));
-//			List<Id<Link>> links = new ArrayList<>();
-//			links.add(Id.createLinkId(7));
-//			links.add(Id.createLinkId(6));
-//			links.add(Id.createLinkId(5));
-//			links.add(Id.createLinkId(4));
-//			for (CTCell cell : link.getCells()) {
-//				int n = cell.getN();
-//				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
-//				for (int i = 0; i < rnd; i++) {
-//					nrPeds++;
-//					DriverAgent walker = new SimpleCTNetworkWalker(links);
-//
-//					CTPed ped = new CTPed(cell, walker);
-//					cell.jumpOnPed(ped, 0);
-//				}
-//				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
-//			}
-//
-//		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("7"));
+			List<Id<Link>> links = new ArrayList<>();
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.3);
+				for (int i = 0; i < rnd; i++) {
+					nrPeds++;
+					DriverAgent walker = new SimpleCTNetworkWalker(links);
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
 		System.out.println(nrPeds);
 		long start = System.nanoTime();
 		net.run();

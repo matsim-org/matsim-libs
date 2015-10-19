@@ -22,10 +22,7 @@ package playground.gregor.ctsim.simulation.physics;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.gregor.ctsim.simulation.CTEvent;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by laemmel on 12/10/15.
@@ -38,8 +35,8 @@ public class CTLinkCell extends CTCell {
 
 	private final Map<Double, Double> cosLookup = new TreeMap<>();
 
-	public CTLinkCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width) {
-		super(x, y, net, parent, width);
+	public CTLinkCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width, double area) {
+		super(x, y, net, parent, width, area);
 	}
 
 	@Override
@@ -51,25 +48,22 @@ public class CTLinkCell extends CTCell {
 			this.nextCellJumpTime = Double.NaN;
 			return;
 		}
-		double minJumpTime = Double.POSITIVE_INFINITY;
+		double maxFJ = 0;
 		CTPed nextJumper = null;
 		if (dsList.size() > 0) {
-			double rate = chooseNextCellAndReturnJumpRate(dsList.peek());
+			double fJ = chooseNextCellAndReturnMaxFJ(dsList.peek());
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
+
+			if (fJ > maxFJ) {
+				maxFJ = fJ;
 				nextJumper = dsList.peek();
 			}
 		}
 		if (usList.size() > 0) {
-			double rate = chooseNextCellAndReturnJumpRate(usList.peek());
+			double fJ = chooseNextCellAndReturnMaxFJ(usList.peek());
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
+			if (fJ > maxFJ) {
+//				maxFJ = fJ;
 				nextJumper = usList.peek();
 			}
 		}
@@ -79,7 +73,13 @@ public class CTLinkCell extends CTCell {
 		}
 		this.next = nextJumper;
 
-		this.nextCellJumpTime = minJumpTime;
+		double j = getJ(nextJumper.getTentativeNextCell());///(Math.sqrt(3)/2);
+		double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
+		double meanJumpTime = 1. / j;
+//		log.info(meanJumpTime);
+		double nextJumpTime = now + rnd * meanJumpTime;
+
+		this.nextCellJumpTime = nextJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
 		this.currentEvent = e;
 		this.net.addEvent(e);
@@ -113,6 +113,8 @@ public class CTLinkCell extends CTCell {
 		}
 		this.n--;
 		this.setRho(this.n / getAlpha());
+		List<CTCellFace> f = this.getFaces();
+		Collections.shuffle(f);
 	}
 
 	public boolean jumpOnPed(CTPed ctPed, double time) {
