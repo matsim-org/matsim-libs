@@ -61,7 +61,6 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -537,11 +536,11 @@ public class Controler extends AbstractController {
      * implement your own complex travel mode.
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
-	public final void setTripRouterFactory(final TripRouterFactory factory) {
+	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-				bind(TripRouterFactory.class).toInstance(factory);
+				bind(TripRouter.class).toProvider(factory);
 			}
         });
 	}

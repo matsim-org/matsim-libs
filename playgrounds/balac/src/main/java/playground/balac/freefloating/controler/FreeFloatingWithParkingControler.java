@@ -5,33 +5,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
-import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
+
+import javax.inject.Provider;
 
 
 public class FreeFloatingWithParkingControler {
@@ -94,16 +87,16 @@ public class FreeFloatingWithParkingControler {
 		}
 		
 		controler.setTripRouterFactory(
-				new TripRouterFactory() {
+				new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
 					@Override
-					public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+					public TripRouter get() {
 						// this factory initializes a TripRouter with default modules,
 						// taking into account what is asked for in the config
 					
 						// This allows us to just add our module and go.
-						final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+						final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
-						final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+						final TripRouter router = delegate.get();
 						
 						// add our module to the instance
 						router.setRoutingModule(

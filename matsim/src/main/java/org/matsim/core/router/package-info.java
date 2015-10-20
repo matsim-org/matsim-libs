@@ -38,7 +38,7 @@
  * route all trips in a plan.
  * </ul>
  *
- * The behaviour can be modified by implementing custom {@link org.matsim.core.router.TripRouterFactory}s.
+ * The behaviour can be modified by implementing custom {@link org.matsim.core.router.RoutingModule}s.
  * <br>
  * The previous behavior was based on legs rather than trips: the corresponding
  * classes are <b>temporarily</b> kept in the {@link org.matsim.core.router.old}

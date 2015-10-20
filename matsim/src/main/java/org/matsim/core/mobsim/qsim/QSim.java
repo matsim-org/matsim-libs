@@ -204,29 +204,36 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	@Override
 	public void run() {
-		// Teleportation must be last (default) departure handler, so add it
-		// only before running.
-		addDepartureHandler(this.teleportationEngine);
-		prepareSim();
-		this.listenerManager.fireQueueSimulationInitializedEvent();
+		try {
+			// Teleportation must be last (default) departure handler, so add it
+			// only before running.
+			addDepartureHandler(this.teleportationEngine);
+			prepareSim();
+			this.listenerManager.fireQueueSimulationInitializedEvent();
 
-		// Put agents into the handler for their first ("overnight") action,
-		// probably the ActivityEngine. This is done before the first
-		// beforeSimStepEvent, because the expectation seems to be
-		// (e.g. in OTFVis), that agents are doing something
-		// (can be located somewhere) before you execute a sim step.
-		// Agents can abort in this loop already, so we iterate over
-		// a defensive copy of the agent collection.
-		for (MobsimAgent agent : new ArrayList<>(this.agents.values())) {
-			arrangeNextAgentAction(agent);
-		}
+			// Put agents into the handler for their first ("overnight") action,
+			// probably the ActivityEngine. This is done before the first
+			// beforeSimStepEvent, because the expectation seems to be
+			// (e.g. in OTFVis), that agents are doing something
+			// (can be located somewhere) before you execute a sim step.
+			// Agents can abort in this loop already, so we iterate over
+			// a defensive copy of the agent collection.
+			for (MobsimAgent agent : new ArrayList<>(this.agents.values())) {
+				arrangeNextAgentAction(agent);
+			}
 
-		// do iterations
-		boolean doContinue = true;
-		while ( doContinue ) {
-			doContinue = doSimStep();
+			// do iterations
+			boolean doContinue = true;
+			while (doContinue) {
+				doContinue = doSimStep();
+			}
 		}
-		cleanupSim();
+		finally {
+			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
+			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
+			// at least on the eth euler cluster (but not on our local machines at ivt!?) td oct 15
+			cleanupSim();
+		}
 	}
 
 	// ============================================================================================================================
@@ -291,9 +298,19 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	void cleanupSim() {
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
+
+		boolean gotException = false;
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
-			mobsimEngine.afterSim();
+			try {
+				// make sure all engines are cleaned up
+				mobsimEngine.afterSim();
+			}
+			catch ( Exception e ) {
+				log.error("got exception while cleaning up", e);
+			}
 		}
+
+		if ( gotException ) throw new RuntimeException( "got exception while cleaning up the QSim. Please check the error messages above for details.");
 	}
 
 	/**

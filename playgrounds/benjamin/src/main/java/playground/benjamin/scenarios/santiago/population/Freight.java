@@ -34,9 +34,9 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class Freight {
 
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/freight/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/plans/" ; //outputDir of this class -> input for Matsim (KT)
 
 	private static Map<String, Coord> zonaId2Coord = new HashMap<String, Coord>();
 	private static Map<String, FreightTrip> tripId2FreightTrip = new HashMap<String, FreightTrip>(); 

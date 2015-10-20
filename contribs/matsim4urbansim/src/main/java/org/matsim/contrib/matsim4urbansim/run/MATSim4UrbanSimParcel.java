@@ -41,6 +41,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -301,7 +302,7 @@ class MATSim4UrbanSimParcel{
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			BoundingBox nbb = BoundingBox.createBoundingBox(controler.getScenario().getNetwork());
 			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
-			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
+			controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix)); // the car and pt router
 
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {

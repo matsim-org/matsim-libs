@@ -21,6 +21,7 @@ package playground.thibautd.socnetsimusages.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
 import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
@@ -41,6 +42,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.analysis.IvtAnalysisModule;
@@ -51,6 +54,7 @@ import playground.thibautd.initialdemandgeneration.transformation.SocialNetworke
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
 import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquityModule;
+import playground.thibautd.utils.PrintThreadInfoAtEndModule;
 
 /**
  * @author thibautd
@@ -93,6 +97,7 @@ public class RunSocialScenarioWithEquity {
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
 						install(new IvtAnalysisModule() );
+						install( new PrintThreadInfoAtEndModule() );
 					}
 				});
 		controller.addOverridingModule(
@@ -107,6 +112,7 @@ public class RunSocialScenarioWithEquity {
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 				scenario.getActivityFacilities(),
 				(NetworkImpl) scenario.getNetwork() );
+
 		controller.run();
 	}
 

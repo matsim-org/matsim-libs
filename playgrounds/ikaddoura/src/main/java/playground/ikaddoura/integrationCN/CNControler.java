@@ -35,12 +35,17 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
+import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.noise2.NoiseCalculationOnline;
 import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
+import playground.ikaddoura.noise2.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -86,9 +91,10 @@ public class CNControler {
 	}
 
 	public void run(String configFile, boolean congestionPricing, boolean noisePricing) {
-		
+				
 		Controler controler = new Controler(configFile);
-	
+		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
+
 		// noise
 		
 		NoiseContext noiseContext = null;
@@ -169,7 +175,7 @@ public class CNControler {
 
 		// congestion
 		
-		TollHandler congestionTollHandler;
+		final TollHandler congestionTollHandler;
 		if (congestionPricing) {
 			congestionTollHandler = new TollHandler(controler.getScenario());
 		} else {
@@ -181,14 +187,20 @@ public class CNControler {
 		if (noisePricing && congestionPricing) {
 			// simultaneous noise and congestion pricing
 			
-			// router considers external congestion and noise cost
-			final CNTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CNTollDisutilityCalculatorFactory(noiseContext, congestionTollHandler);
-			controler.addOverridingModule(new AbstractModule() {
+			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
+			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
+					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					noiseContext,
+					congestionTollHandler
+				);
+			factory.setSigma(0.); // for now no randomness
+			
+			controler.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			});
+			}); 
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -199,14 +211,28 @@ public class CNControler {
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
 			
-			// router considers external noise cost
-			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-			controler.addOverridingModule(new AbstractModule() {
+			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
+			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
+					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					noiseContext
+				);
+			factory.setSigma(0.); // for now no randomness
+			
+			controler.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			});
+			}); 
+			
+			// a router which accounts for noise toll payments
+//			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
+//			controler.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+//				}
+//			});
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -217,14 +243,28 @@ public class CNControler {
 		} else if (noisePricing == false && congestionPricing) {
 			// only congestion pricing
 			
-			// router considers external congestion cost
-			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
-			controler.addOverridingModule(new AbstractModule() {
+			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
+			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
+					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					congestionTollHandler
+				);
+			factory.setSigma(0.); // for now no randomness
+			
+			controler.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			});
+			}); 
+			
+			// a router which accounts for congestion toll payments
+//			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
+//			controler.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+//				}
+//			});
 			
 			// computation of noise events + NO consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -236,6 +276,7 @@ public class CNControler {
 			// base case
 			
 			// default router
+			// TODO: Use the VTTS router?
 			
 			// computation of noise events + NO consideration in scoring	
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -250,6 +291,10 @@ public class CNControler {
 		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
+		
+		// analysis
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		analysis.run();
 	}
 	
 }

@@ -21,17 +21,22 @@ package playground.gregor.casim.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
 
-public class CATripRouterFactory implements TripRouterFactory {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
+
+public class CATripRouterFactory implements Provider<TripRouter> {
 
 	private static final Logger log = Logger
 			.getLogger(CATripRouterFactory.class);
@@ -41,6 +46,13 @@ public class CATripRouterFactory implements TripRouterFactory {
 	private Scenario scenario;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
+	@Inject
+	Map<String, TravelTime> travelTimes;
+
+	@Inject
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
+	@Inject
 	public CATripRouterFactory(Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathClaculatorFactory) {
 		this.scenario = sc;
@@ -48,13 +60,16 @@ public class CATripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(
-			RoutingContext routingContext) {
+	public TripRouter get() {
+
+		TravelTime travelTime = travelTimes.get("car");
+		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
+
 
 		LeastCostPathCalculator routeAlgo = leastCostPathCalculatorFactory
 				.createPathCalculator(scenario.getNetwork(),
-						routingContext.getTravelDisutility(),
-						routingContext.getTravelTime());
+						travelDisutility,
+						travelTime);
 
 		TripRouter tr = new TripRouter();
 

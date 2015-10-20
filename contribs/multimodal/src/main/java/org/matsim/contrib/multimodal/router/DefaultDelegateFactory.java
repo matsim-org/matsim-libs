@@ -35,16 +35,18 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Due to several reasons, the DefaultTripRouterFactoryImpl should not be used
@@ -73,7 +75,7 @@ import org.matsim.core.router.util.TravelTime;
  * 
  * @author cdobler
  */
-public class DefaultDelegateFactory implements TripRouterFactory {
+public class DefaultDelegateFactory implements Provider<TripRouter> {
 
 	private static final Logger log = Logger.getLogger(DefaultDelegateFactory.class);
 	
@@ -81,19 +83,25 @@ public class DefaultDelegateFactory implements TripRouterFactory {
     private final Scenario scenario;
     
     private final Map<String, Network> multimodalSubNetworks = new HashMap<>();
-	
+
+	@Inject
+	Map<String, TravelTime> travelTimes;
+
+	@Inject
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
     public DefaultDelegateFactory(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
     	this.scenario = scenario;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
     }
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+	public TripRouter get() {
         
 		TripRouter tripRouter = new TripRouter();
 
-		TravelTime travelTime = routingContext.getTravelTime();
-		TravelDisutility travelDisutility = routingContext.getTravelDisutility();
+		TravelTime travelTime = travelTimes.get("car");
+		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
 
 		Network network = this.scenario.getNetwork();
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();

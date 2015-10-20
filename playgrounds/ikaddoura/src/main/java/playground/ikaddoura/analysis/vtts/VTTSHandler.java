@@ -68,6 +68,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private final static Logger log = Logger.getLogger(VTTSHandler.class);
 	private static int incompletedPlanWarning = 0;
 	private static int noCarVTTSWarning = 0;
+	private static int noTripVTTSWarning = 0;
+	private static int noTripNrWarning = 0;
 	
 	private final Scenario scenario;
 	private int currentIteration;
@@ -451,8 +453,14 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			
 			if (tripNrOfGivenTime == Integer.MIN_VALUE) {
 			
-				log.warn("Could not identify the trip number of person " + id + " at time " + time + "."
-						+ " Trying to use the average car VTTS...");
+				if (noTripNrWarning <= 3) {
+					log.warn("Could not identify the trip number of person " + id + " at time " + time + "."
+							+ " Trying to use the average car VTTS...");
+				}
+				if (noTripNrWarning == 3) {
+					log.warn("Additional warnings of this type are suppressed.");
+				}
+				noTripNrWarning++;
 				return this.getAvgVTTSh(id, TransportMode.car);
 			
 			} else {
@@ -466,10 +474,10 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 					} else {
 
 						
-						if (noCarVTTSWarning <= 10) {
+						if (noCarVTTSWarning <= 3) {
 							log.warn("In the previous iteration at the given time " + time + " the agent " + id + " was performing a trip with a different mode (" + this.personId2TripNr2Mode.get(id).get(tripNrOfGivenTime) + ")."
 									+ "Trying to use the average car VTTS.");
-							if (noCarVTTSWarning == 10) {
+							if (noCarVTTSWarning == 3) {
 								log.warn("Additional warnings of this type are suppressed.");
 							}
 							noCarVTTSWarning++;
@@ -478,8 +486,14 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 					}
 					
 				} else {
-					log.warn("Could not find the VTTS of person " + id + " and trip number " + tripNrOfGivenTime + " (time: " + time + ")."
-							+ " Trying to use the average car VTTS...");
+					if (noTripVTTSWarning <= 3) {
+						log.warn("Could not find the VTTS of person " + id + " and trip number " + tripNrOfGivenTime + " (time: " + time + ")."
+								+ " Trying to use the average car VTTS...");
+					}
+					if (noTripVTTSWarning == 3) {
+						log.warn("Additional warnings of this type are suppressed.");
+					}
+					noTripVTTSWarning++;
 					return this.getAvgVTTSh(id, TransportMode.car);
 				}
 			} 

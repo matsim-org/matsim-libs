@@ -26,18 +26,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
@@ -134,15 +130,8 @@ public class InitRoutes {
 			
 			final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 			
-			Provider<TripRouter> tripRouterFact = new TripRouterProviderImpl(
-					scenario, new TravelDisutilityFactory() {
-						@Override
-						public TravelDisutility createTravelDisutility(
-								TravelTime timeCalculator,
-								PlanCalcScoreConfigGroup cnScoringGroup) {
-							return timeCostCalc;
-						}
-					}, timeCostCalc, new AStarLandmarksFactory(network,
+			Provider<TripRouter> tripRouterFact = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(
+					scenario, new AStarLandmarksFactory(network,
 							timeCostCalc, 1), null);
 			
 			PlanRouter router = new PlanRouter( tripRouterFact.get() , null ) ;

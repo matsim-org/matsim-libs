@@ -67,6 +67,7 @@ import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import org.matsim.core.utils.collections.MapUtils;
 import playground.ivt.utils.TripModeShares;
 
+import javax.inject.Provider;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -406,7 +407,7 @@ public class Matsim2030Utils {
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 	}
 
-	public static TripRouterFactory createTripRouterFactory( final Scenario scenario ) {
+	public static Provider<TripRouter> createTripRouterFactory(final Scenario scenario) {
 		final TransitRouterConfig conf = new TransitRouterConfig( scenario.getConfig() );
 
 		final ScenarioMergingConfigGroup matsim2030conf =

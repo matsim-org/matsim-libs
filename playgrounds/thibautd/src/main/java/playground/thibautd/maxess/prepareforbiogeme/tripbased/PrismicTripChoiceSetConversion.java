@@ -31,10 +31,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
@@ -49,8 +46,6 @@ import playground.thibautd.utils.SoftCache;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author thibautd
@@ -87,8 +82,8 @@ public class PrismicTripChoiceSetConversion {
 									final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 									final TripRouter tripRouter =
-											new TripRouterFactoryBuilderWithDefaults().build(sc).instantiateAndConfigureTripRouter(
-													new RoutingContextImpl(tt, tt));
+											new TripRouterFactoryBuilderWithDefaults().build(sc).get(
+											);
 
 									tripRouter.setRoutingModule(
 											TransportMode.car,

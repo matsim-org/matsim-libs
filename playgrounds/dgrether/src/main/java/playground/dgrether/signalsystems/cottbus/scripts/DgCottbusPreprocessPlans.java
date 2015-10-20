@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,10 +58,8 @@ public class DgCottbusPreprocessPlans {
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												timeCostCalc,
-												timeCostCalc ) ) ) );
+								scenario ).get(
+						) ) );
 		((PopulationImpl) scenario.getPopulation()).runAlgorithms();
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.write(popOutFile);

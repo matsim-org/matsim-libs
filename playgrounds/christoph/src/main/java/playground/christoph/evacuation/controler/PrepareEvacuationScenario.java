@@ -36,10 +36,7 @@ import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -89,7 +86,7 @@ public class PrepareEvacuationScenario {
 	
 	public void prepareScenario(Scenario scenario) {
 
-		TripRouterFactory tripRouterFactory = createTripRouterFactory(scenario);
+		Provider<TripRouter> tripRouterFactory = createTripRouterFactory(scenario);
 		
 		/*
 		 * Adapt network capacities and speeds.
@@ -229,7 +226,7 @@ public class PrepareEvacuationScenario {
 		assignVehiclesToPlans.printStatistics();
 	}
 	
-	private TripRouterFactory createTripRouterFactory(Scenario scenario) {
+	private Provider<TripRouter> createTripRouterFactory(Scenario scenario) {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);		
 		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
@@ -240,19 +237,19 @@ public class PrepareEvacuationScenario {
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
 		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().transit().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
-		
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+
+		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
+		Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory,
 				transitRouterFactory);
 		
 		return transitTripRouterFactory;
 	}
 	
-	private TripRouter createTripRouterInstance(Scenario scenario, TripRouterFactory tripRouterFactory) {
+	private TripRouter createTripRouterInstance(Scenario scenario, Provider<TripRouter> tripRouterFactory) {
 		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
-		return tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		return tripRouterFactory.get();
 	}
 }
