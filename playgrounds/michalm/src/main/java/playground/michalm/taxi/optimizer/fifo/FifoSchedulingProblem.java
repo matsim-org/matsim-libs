@@ -32,10 +32,11 @@ public class FifoSchedulingProblem
     private final VehicleRequestPathFinder vrpFinder;
 
 
-    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig)
+    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig,
+            VehicleRequestPathFinder vrpFinder)
     {
         this.optimConfig = optimConfig;
-        vrpFinder = new VehicleRequestPathFinder(optimConfig);
+        this.vrpFinder = vrpFinder;
     }
 
 

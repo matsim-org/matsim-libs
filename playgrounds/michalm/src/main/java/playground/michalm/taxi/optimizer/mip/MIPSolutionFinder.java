@@ -31,6 +31,7 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.fifo.FifoSchedulingProblem;
 import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
 import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
 class MIPSolutionFinder
@@ -60,7 +61,8 @@ class MIPSolutionFinder
         Queue<TaxiRequest> queue = new PriorityQueue<>(n, Requests.T0_COMPARATOR);
         Collections.addAll(queue, rData.requests);
 
-        new FifoSchedulingProblem(optimConfig).scheduleUnplannedRequests(queue);
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(optimConfig);
+        new FifoSchedulingProblem(optimConfig, vrpFinder).scheduleUnplannedRequests(queue);
 
         double t_P = optimConfig.scheduler.getParams().pickupDuration;
 
