@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
+import com.google.inject.name.Names;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
@@ -31,10 +32,18 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.jointtrips.router.JointTripRouterModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
@@ -43,11 +52,11 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouter;
-import org.matsim.contrib.socnetsim.jointtrips.router.JointTripRouterFactory;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -70,6 +79,8 @@ public class JointPseudoSimTest {
 		utils.getOutputDirectory(); // intended side effect: delete content
 		final Scenario scenario = createTestScenario();
 
+		com.google.inject.Provider<TripRouter> tripRouterFactory = createTripRouterFactory(scenario);
+
 		final TravelTimeCalculator travelTime =
 				new TravelTimeCalculator(
 						scenario.getNetwork(),
@@ -81,16 +92,7 @@ public class JointPseudoSimTest {
 		CompareEventsUtils.testEventsSimilarToQsim(
 				createTestScenario(),
 				new JointPlanRouter(
-					new JointTripRouterFactory(
-						new Provider<TripRouter>() {
-							@Override
-							public TripRouter get() {
-								return defFact.get(
-								);
-							}
-						},
-						scenario.getPopulation().getFactory()
-						).get(),
+						tripRouterFactory.get(),
 					null ),
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
@@ -99,6 +101,24 @@ public class JointPseudoSimTest {
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
 				travelTime,
 				false );
+	}
+
+	private com.google.inject.Provider<TripRouter> createTripRouterFactory(final Scenario scenario) {
+		Injector injector = Injector.createInjector(
+				scenario.getConfig(),
+				AbstractModule.override(Collections.singleton(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(scenario.getConfig()));
+						install(new TripRouterModule());
+						install(new TravelTimeCalculatorModule());
+						install(new TravelDisutilityModule());
+						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
+					}
+				}), new JointTripRouterModule()));
+
+		return injector.getProvider(TripRouter.class);
 	}
 
 	@Test @Ignore( "test is too restrictive on what is a correct output..." )
@@ -118,16 +138,7 @@ public class JointPseudoSimTest {
 		CompareEventsUtils.testEventsSimilarToQsim(
 				createTestScenario(),
 				new JointPlanRouter(
-					new JointTripRouterFactory(
-						new Provider<TripRouter>() {
-							@Override
-							public TripRouter get() {
-								return defFact.get(
-								);
-							}
-						},
-						scenario.getPopulation().getFactory()
-						).get(),
+					createTripRouterFactory(scenario).get(),
 					null ),
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
