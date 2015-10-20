@@ -62,7 +62,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.RandomizedCongestionTollTimeDistanceTravelDisutilityFactory;
 import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
@@ -166,8 +166,8 @@ public class RunBraessSimulation {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
-						final RandomizedTollTimeDistanceTravelDisutilityFactory factory = 
-								new RandomizedTollTimeDistanceTravelDisutilityFactory(
+						final RandomizedCongestionTollTimeDistanceTravelDisutilityFactory factory = 
+								new RandomizedCongestionTollTimeDistanceTravelDisutilityFactory(
 								new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 								tollHandler
 							) ;

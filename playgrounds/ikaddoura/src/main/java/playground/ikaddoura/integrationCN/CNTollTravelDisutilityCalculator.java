@@ -58,6 +58,7 @@ public class CNTollTravelDisutilityCalculator implements TravelDisutility{
 	private NoiseContext noiseContext;
 	private TollHandler tollHandler;
 	
+	@Deprecated
 	public CNTollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseContext noiseContext, TollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
