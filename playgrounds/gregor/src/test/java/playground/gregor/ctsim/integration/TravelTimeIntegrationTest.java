@@ -374,12 +374,13 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double tt2 = ttObserver2.ttVariance.getMean();
 		double var2 = ttObserver2.ttVariance.getVar();
 
+
 		double cellHeight = 3. * CTLink.WIDTH / 4.;
 		double nrCells = (int) (80. / cellHeight);
 		double realLength = cellHeight * nrCells;
 		double expctdTT = realLength / 1.5;
 
-		assertEquals("correct avg travel time", expctdTT, tt2, 0.5);
+		assertEquals("correct avg travel time", expctdTT, tt2, 1.0);
 
 	}
 
