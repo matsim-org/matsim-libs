@@ -32,6 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.matrices.Matrices;
+import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
@@ -50,11 +51,25 @@ public class TravelTimeMatrices {
 
 	private final int binSize_s;
 
+	private final Matrices matrices;
+
 	// TODO encapsulate
 	public final List<Matrix> ttMatrixList_min;
 
 	// -------------------- CONSTRUCTION --------------------
 
+	public TravelTimeMatrices(final Matrices matrices, final int startTime_s, final int binSize_s) {
+		this.matrices = matrices;
+		this.startTime_s = startTime_s;
+		this.binSize_s = binSize_s;
+		this.ttMatrixList_min = new ArrayList<Matrix>(this.matrices.getMatrices().size());
+		for (Matrix matrix : this.matrices.getMatrices().values()) {
+			this.ttMatrixList_min.add(matrix);
+			System.out.println(matrix.getId());
+		}
+		// TODO CONTINUE HERE
+	}
+	
 	public TravelTimeMatrices(final Network network, final TravelTime linkTTs,
 			final Set<String> relevantZoneIDs, final ZonalSystem zonalSystem,
 			final Random rnd, final int startTime_s, final int binSize_s,
@@ -101,6 +116,7 @@ public class TravelTimeMatrices {
 		 * Create one travel time matrix per time bin.
 		 */
 
+		this.matrices = new Matrices();
 		this.ttMatrixList_min = new ArrayList<Matrix>(binCnt);
 
 		for (int bin = 0; bin < binCnt; bin++) {
@@ -112,8 +128,8 @@ public class TravelTimeMatrices {
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"Using " + sampleCnt + " random node(s) per zone.");
 
-			final Matrix ttMatrix_min = (new Matrices()).createMatrix("TT_"
-					+ Time.strFromSec(time_s), "");
+			final Matrix ttMatrix_min = this.matrices.createMatrix(
+					"TT_" + Time.strFromSec(time_s), "travel time in minutes");
 			this.ttMatrixList_min.add(ttMatrix_min);
 			final Matrix cntMatrix = newAnonymousMatrix();
 
@@ -155,6 +171,13 @@ public class TravelTimeMatrices {
 		return this.ttMatrixList_min.size();
 	}
 
+	public void writeToFile(final String fileName) {
+		final MatricesWriter writer = new MatricesWriter(this.matrices);
+		writer.setIndentationString("  ");
+		writer.setPrettyPrint(true);
+		writer.write(fileName);
+	}
+
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -175,12 +198,14 @@ public class TravelTimeMatrices {
 		zonalSystem.addNetwork(scenario.getNetwork(),
 				StockholmTransformationFactory.WGS84_SWEREF99);
 
-		final String eventsFileName = "./data_ZZZ/run/output/ITERS/it.0/0.events.xml.gz";
+		// final String eventsFileName =
+		// "./data_ZZZ/run/output/ITERS/it.0/0.events.xml.gz";
+		final String eventsFileName = "./test/10percentCarNetworkPlain/1000.events.xml.gz";
 
-		final int startTime_s = 6 * 3600 + 1800;
+		final int startTime_s = 5 * 3600;
 		final int binSize_s = 3600;
-		final int binCnt = 2;
-		final int sampleCnt = 2;
+		final int binCnt = 15;
+		final int sampleCnt = 1;
 
 		final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
 				scenario.getNetwork(), timeBinSize, endTime, scenario
@@ -191,9 +216,11 @@ public class TravelTimeMatrices {
 		reader.readFile(eventsFileName);
 		final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
 
-		new TravelTimeMatrices(scenario.getNetwork(), linkTTs, null,
-				zonalSystem, new Random(), startTime_s, binSize_s, binCnt,
-				sampleCnt);
+		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+				scenario.getNetwork(), linkTTs, null, zonalSystem,
+				new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
+//		travelTimeMatrices
+//				.writeToFile("./test/10percentCarNetworkPlain/travelTimeMatrices.xml");
 
 		System.out.println("... DONE");
 	}
