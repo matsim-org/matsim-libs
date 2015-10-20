@@ -22,7 +22,7 @@ import java.util.*;
 public class CTLink implements CTNetworkEntity {
 
 
-	public static final double WIDTH = 2;
+	public static final double WIDTH = 4;
 	private static final Logger log = Logger.getLogger(CTLink.class);
 	private static final double EPSILON = 0.00001;
 	private final CTNetwork network;
