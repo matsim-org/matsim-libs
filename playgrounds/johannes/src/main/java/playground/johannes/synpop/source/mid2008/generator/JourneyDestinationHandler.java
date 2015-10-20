@@ -17,39 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
+
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Map;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
 /**
  * @author johannes
  *
  */
-public class JourneyModeHandler implements LegAttributeHandler {
+public class JourneyDestinationHandler implements LegAttributeHandler {
 
 	@Override
 	public void handle(Segment leg, Map<String, String> attributes) {
-		String mode = attributes.get("hvm_r");
-		
-		if(mode.equalsIgnoreCase("Auto")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
-		} else if(mode.equalsIgnoreCase("Bahn")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
-		} else if(mode.equalsIgnoreCase("Reisebus")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
-		} else if(mode.equalsIgnoreCase("Flugzeug")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
-		} else if(mode.equalsIgnoreCase("Schiff")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
-		} else if(mode.equalsIgnoreCase("Schiff")) {
-			leg.setAttribute(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_PT);
-		} else {
-			leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
+		String value = attributes.get(VariableNames.JOURNEY_DESTINATION);
+
+		if("1".equals(value)) {
+			leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.DOMESTIC);
+		} else if("2".equals(value)) {
+			leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.ABROAD);
+		} else if("3".equals(value)) {
+			leg.setAttribute(MiDKeys.LEG_DESTINATION, MiDValues.ABROAD);
 		}
 	}
 

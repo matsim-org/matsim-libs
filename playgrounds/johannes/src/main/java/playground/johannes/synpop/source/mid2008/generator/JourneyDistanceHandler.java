@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008;
+package playground.johannes.synpop.source.mid2008.generator;
+
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
+
+import java.util.Map;
 
 /**
  * @author johannes
+ * 
  */
-public interface MiDValues {
+public class JourneyDistanceHandler implements LegAttributeHandler {
 
-    String IN_TOWN = "inTown";
-    String OUT_OF_TOWN = "outOfTown";
-    String ROUND_TRIP = "roundTrip";
-    String JANUARY = "jan";
-    String FEBRUARY = "feb";
-    String MARCH = "mar";
-    String APRIL = "apr";
-    String MAY = "may";
-    String JUNE = "jun";
-    String JULY = "jul";
-    String AUGUST = "aug";
-    String SEPTEMBER = "sep";
-    String OCTOBER = "oct";
-    String NOVEMBER = "nov";
-    String DECEMBER = "dec";
-    String MID_JOUNREYS = "midjourneys";
-    String MID_TRIPS = "midtrips";
-    String ABROAD = "abroad";
-    String DOMESTIC = "domestic";
+	@Override
+	public void handle(Segment leg, Map<String, String> attributes) {
+		String val = attributes.get(VariableNames.JOURNEY_DISTANCE);
+
+		if(val != null) {
+			int dist = Integer.parseInt(val);
+
+			if (dist <= 20000) { //range according to mid documentation
+				dist *= 1000;
+				leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(dist));
+			}
+		}
+	}
+
 }

@@ -224,7 +224,7 @@ public class Simulator {
 			}
 		}
 	}
-	private static class Route2GeoDistFunction implements UnivariateRealFunction {
+	public static class Route2GeoDistFunction implements UnivariateRealFunction {
 
 		@Override
 		public double value(double x) throws FunctionEvaluationException {

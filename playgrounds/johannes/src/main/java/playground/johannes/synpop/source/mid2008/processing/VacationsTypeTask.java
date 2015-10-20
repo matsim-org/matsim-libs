@@ -17,31 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.processing;
 
-import java.util.Map;
-
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class JourneyDestinationHandler implements LegAttributeHandler {
+public class VacationsTypeTask implements EpisodeTask {
 
-	public static final String DESTINATION = "destination";
-	
-	public static final String GERMANY = "de";
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
-	 */
 	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String dest = attributes.get("p1012");
-			
-		if("innerhalb Deutschlands".equals(dest)) {
-			leg.setAttribute(DESTINATION, GERMANY);
+	public void apply(Episode plan) {
+		for (Attributable act : plan.getActivities()) {
+			if (act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityTypes.LEISURE)) {
+				String val = plan.getAttribute(MiDKeys.JOURNEY_DAYS);
+				int days = 0;
+
+				if (val != null)
+					days = Integer.parseInt(val);
+				
+				if (days > 4) {
+					act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.VACATIONS_LONG);
+				} else  if(days > 1 && days <= 4) {
+					act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityTypes.VACATIONS_SHORT);
+				}
+
+			}
 		}
 
 	}

@@ -17,44 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.EpisodeTask;
-import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+
+import java.util.Map;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class InfereVacationsType implements EpisodeTask {
+public class JourneyDaysHandler implements EpisodeAttributeHandler {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes
-	 * .gsv.synPop.PlainEpisode)
-	 */
 	@Override
-	public void apply(Episode plan) {
-		for (Attributable act : plan.getActivities()) {
-			if (act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("vacations")) {
-				String val = plan.getAttribute("journeydays");
-				int days = 0;
-				if (val != null)
-					days = Integer.parseInt(val);
-				
-				if (days > 4) {
-					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
-				} else {
-					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
-				}
+	public void handle(Episode plan, Map<String, String> attributes) {
+		String value = attributes.get(VariableNames.JOURNEY_NIGHTS);
+		if(value != null) {
+			int nights = Integer.parseInt(value);
 
-			}
+			if (nights < 95)
+				plan.setAttribute(MiDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 		}
-
 	}
 
 }

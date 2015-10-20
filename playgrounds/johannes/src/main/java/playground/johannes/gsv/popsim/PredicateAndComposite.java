@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.popsim;
 
-import java.util.Map;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
+import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
- * 
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.PlainElement, java.util.Map)
-	 */
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(dist));
-		} else {
-			System.err.println();
-		}
-	}
+    @Override
+    public boolean test(T attributable) {
+        for(Predicate<T> p : components) {
+            if(!p.test(attributable)) {
+                return false;
+            }
+        }
 
+        return true;
+    }
 }

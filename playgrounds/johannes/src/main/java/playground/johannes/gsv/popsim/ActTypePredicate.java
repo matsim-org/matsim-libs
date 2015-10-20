@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.popsim;
 
-import playground.johannes.synpop.data.Episode;
-
-import java.util.Map;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
- *
  */
-public interface JourneyAttributeHandler {
+public class ActTypePredicate implements Predicate<Segment> {
 
-	public void handle(Episode plan, Map<String, String> attributes);
-	
+    private final String type;
+
+    public ActTypePredicate(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public boolean test(Segment segment) {
+        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
+    }
 }

@@ -17,30 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008;
+package playground.johannes.gsv.popsim;
+
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public interface MiDValues {
+public class LegPurposePredicate implements Predicate<Segment> {
 
-    String IN_TOWN = "inTown";
-    String OUT_OF_TOWN = "outOfTown";
-    String ROUND_TRIP = "roundTrip";
-    String JANUARY = "jan";
-    String FEBRUARY = "feb";
-    String MARCH = "mar";
-    String APRIL = "apr";
-    String MAY = "may";
-    String JUNE = "jun";
-    String JULY = "jul";
-    String AUGUST = "aug";
-    String SEPTEMBER = "sep";
-    String OCTOBER = "oct";
-    String NOVEMBER = "nov";
-    String DECEMBER = "dec";
-    String MID_JOUNREYS = "midjourneys";
-    String MID_TRIPS = "midtrips";
-    String ABROAD = "abroad";
-    String DOMESTIC = "domestic";
+    private final ActTypePredicate actTypePredicate;
+
+    public LegPurposePredicate(ActTypePredicate actTypePredicate) {
+        this.actTypePredicate = actTypePredicate;
+    }
+
+    @Override
+    public boolean test(Segment segment) {
+        return actTypePredicate.test(segment.next());
+    }
 }

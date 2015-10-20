@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.popsim;
 
-import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.source.mid2008.generator.LegAttributeHandler;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author johannes
- *
  */
-public class JourneyPurposeHandler implements LegAttributeHandler {
+public class Predicates {
 
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String purpose = attributes.get("p101");
-		
-		if(purpose.equalsIgnoreCase("Ausflug, Urlaub, Kurzreise zu touristischen Zielen")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
-		} else if(purpose.equalsIgnoreCase("Besuche von Freunden oder Bekannten")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
-		} else if(purpose.equalsIgnoreCase("andere Privatreise")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
-		} else if(purpose.equalsIgnoreCase("Dienst- oder Geschäftsreise")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS);
-		} else if(purpose.equalsIgnoreCase("Fahrt als Berufspendler | Wochenendpendler")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, "wecommuter");
-		} else {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.MISC);
-		}
-	}
+    public static Map<String, ActTypePredicate> actTypePredicates(Collection<? extends Person> persons) {
+        Set<String> acttypes = new HashSet<>();
 
+        for(Person person : persons) {
+            for(Episode episode : person.getEpisodes()) {
+                for(Segment act : episode.getActivities()) {
+                    String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+                    if(type != null)
+                        acttypes.add(type);
+                }
+            }
+        }
+
+        Map<String, ActTypePredicate> predicates = new HashMap<>();
+        for(String type : acttypes) {
+            predicates.put(type, new ActTypePredicate(type));
+        }
+
+        return predicates;
+    }
 }

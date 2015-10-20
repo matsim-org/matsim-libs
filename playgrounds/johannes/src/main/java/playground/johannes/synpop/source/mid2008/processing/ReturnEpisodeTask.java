@@ -17,14 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.synpop.source.mid2008.processing;
 
+import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonTask;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,31 +31,44 @@ import java.util.Set;
  * @author johannes
  * 
  */
-public class AddReturnPlan implements PersonTask {
+public class ReturnEpisodeTask implements PersonTask {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.synpop.processing.PersonTask#apply(playground.johannes
-	 * .gsv.synPop.PlainPerson)
-	 */
+	private static final Logger logger = Logger.getLogger(ReturnEpisodeTask.class);
+
 	@Override
 	public void apply(Person person) {
+		int count = 0;
+
 		Set<Episode> journeys = new HashSet<>();
 		for (Episode p : person.getEpisodes()) {
-			if ("midjourneys".equalsIgnoreCase(p.getAttribute("datasource"))) {
+			if(p.getLegs().size() == 1)
 				journeys.add(p);
+			 else {
+				count++;
 			}
 		}
 
-		for(Episode plan : journeys) {
-			Episode returnPlan = ((PlainEpisode)plan).clone();
-			Collections.reverse(returnPlan.getActivities());
-			Collections.reverse(returnPlan.getLegs());
+		if(count > 0) {
+			logger.warn(String.format("There are %s episodes with more than one leg. Are you sure this is a journeys " +
+					"file?", count));
+		}
 
-			person.addEpisode(returnPlan);
+		PlainFactory factory = new PlainFactory();
+		for(Episode episode : journeys) {
+			Episode returnEpisode = PersonUtils.shallowCopy(episode, factory);
+
+			for(int i = episode.getActivities().size() - 1; i >= 0; i--) {
+				Segment clone = PersonUtils.shallowCopy(episode.getActivities().get(i), factory);
+				returnEpisode.addActivity(clone);
+			}
+
+			for(int i = episode.getLegs().size() - 1; i >= 0; i--) {
+				Segment clone = PersonUtils.shallowCopy(episode.getLegs().get(i), factory);
+				clone.removeAttribute(MiDKeys.LEG_ORIGIN);
+				returnEpisode.addLeg(clone);
+			}
+
+			person.addEpisode(returnEpisode);
 		}
 	}
-
 }

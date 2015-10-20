@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.popsim;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.source.mid2008.generator.EpisodeAttributeHandler;
-
-import java.util.Map;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
- *
  */
-public class JourneyDaysHandler implements EpisodeAttributeHandler {
+public class ModePredicate implements Predicate<Segment> {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.source.mid2008.generator.EpisodeAttributeHandler#handle(playground.johannes.synpop.data.PlainEpisode, java.util.Map)
-	 */
-	@Override
-	public void handle(Episode plan, Map<String, String> attributes) {
-		int nights = Integer.parseInt(attributes.get("p1014"));
-		
-		if(nights < 995)
-			plan.setAttribute(MiDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
-	}
+    private final String mode;
 
+    public ModePredicate(String mode) {
+        this.mode = mode;
+    }
+
+    @Override
+    public boolean test(Segment segment) {
+        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
+    }
 }
