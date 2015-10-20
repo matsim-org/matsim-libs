@@ -20,11 +20,35 @@
 
 package org.matsim.core.events;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -34,10 +58,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
@@ -85,9 +105,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		String eventType = atts.getValue("type");
 
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.events.processEvent(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.events.processEvent(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActivityEndEvent(
 					time, 

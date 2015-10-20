@@ -32,15 +32,12 @@ public class LinkEnterEvent extends Event {
 	public static final String EVENT_TYPE = "entered link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_PERSON = "person";
 	
-	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	public LinkEnterEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
+	public LinkEnterEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
-		this.driverId = driverId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 	}
@@ -54,8 +51,9 @@ public class LinkEnterEvent extends Event {
 	 * Please use getVehicleId() instead. 
 	 * Vehicle-driver relations can be made by Wait2Link and VehicleLeavesTraffic Events.
 	 */
+	@Deprecated
 	Id<Person> getDriverId() {
-		return this.driverId;
+		return null;
 	}	
 
 	public Id<Link> getLinkId() {
@@ -69,11 +67,8 @@ public class LinkEnterEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.driverId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
 		return attr;
 	}
 }
