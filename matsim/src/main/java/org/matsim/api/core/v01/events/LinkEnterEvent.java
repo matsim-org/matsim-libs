@@ -50,7 +50,11 @@ public class LinkEnterEvent extends Event {
 		return EVENT_TYPE;
 	}
 	
-	public Id<Person> getDriverId() {
+	/**
+	 * Please use getVehicleId() instead. 
+	 * Vehicle-driver relations can be made by Wait2Link and VehicleLeavesTraffic Events.
+	 */
+	Id<Person> getDriverId() {
 		return this.driverId;
 	}	
 
