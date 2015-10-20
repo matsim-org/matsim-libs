@@ -71,7 +71,7 @@ public class TripRouterFactoryModule extends AbstractModule {
             for (String mode : getConfig().transit().getTransitModes()) {
                 addRoutingModuleBinding(mode).toProvider(TransitRoutingModuleProvider.class);
             }
-//            addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
+            addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
     }
 
