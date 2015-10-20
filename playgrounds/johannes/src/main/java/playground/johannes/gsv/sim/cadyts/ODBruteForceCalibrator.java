@@ -37,9 +37,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,6 +57,7 @@ import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -443,11 +442,13 @@ public class ODBruteForceCalibrator {
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 		}
 
-		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		TripRouterFactory factory = builder.build(scenario);
 		FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(1, 0, 0);
-		RoutingContextImpl context = new RoutingContextImpl(tt, tt);
-		TripRouter router = factory.instantiateAndConfigureTripRouter(context);
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		builder.setTravelDisutility(tt);
+		builder.setTravelTime(tt);
+
+		Provider<TripRouter> factory = builder.build(scenario);
+		TripRouter router = factory.get();
 
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);

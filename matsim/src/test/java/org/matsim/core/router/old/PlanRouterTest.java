@@ -31,8 +31,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,21 +43,26 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PlanRouterTest {
 
     @Test
     public void passesVehicleFromOldPlan() {
-        Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+        final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
         config.plans().setInputFile("test/scenarios/equil/plans1.xml");
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        TripRouter tripRouter = new TripRouterProviderImpl(
-                scenario,
-                new OnlyTimeDependentTravelDisutilityFactory(),
-                new FreeSpeedTravelTime(),
-                new DijkstraFactory(),
-                null).get();
+        final Scenario scenario = ScenarioUtils.loadScenario(config);
+        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+            @Override
+            public void install() {
+                install(new TripRouterModule());
+                bind(Scenario.class).toInstance(scenario);
+                addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+                addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+            }
+        });
+        TripRouter tripRouter = injector.getInstance(TripRouter.class);
         PlanRouter testee = new PlanRouter(tripRouter);
         Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
@@ -78,12 +86,20 @@ public class PlanRouterTest {
 
         // A trip router which provides vehicle ids by itself.
         final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        TripRouter tripRouter = new TripRouterProviderImpl(
-                scenario,
-                disutilityFactory,
-                travelTime,
-                leastCostAlgoFactory,
-                null).get();
+        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+            @Override
+            public void install() {
+                install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+                    @Override
+                    public void install() {
+                        bind(Scenario.class).toInstance(scenario);
+                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+                        addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+                    }
+                }));
+            }
+        });
+        TripRouter tripRouter = injector.getInstance(TripRouter.class);
         RoutingModule routingModule = new RoutingModule() {
             @Override
             public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {

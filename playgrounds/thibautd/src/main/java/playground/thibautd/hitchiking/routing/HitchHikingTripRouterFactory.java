@@ -23,8 +23,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -34,7 +32,7 @@ import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 /**
  * @author thibautd
  */
-public class HitchHikingTripRouterFactory extends DefaultTripRouterFactoryImpl {
+public class HitchHikingTripRouterFactory /* extends DefaultTripRouterFactoryImpl */ {
 	private final HitchHikingSpots spots;
 	private final Controler controler;
 	private final SpotWeighter spotWeighter;
@@ -45,19 +43,19 @@ public class HitchHikingTripRouterFactory extends DefaultTripRouterFactoryImpl {
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		super(controler.getScenario(), null, null);
+		//super(controler.getScenario(), null, null);
 		this.controler = controler;
 		this.spotWeighter = spotWeighter;
 		this.spots = spots;
 		this.config = config;
 	}
 
-	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	// @Override
+	public TripRouter instantiateAndConfigureTripRouter() {
 		if (true) 
 			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
-		TripRouter instance = super.instantiateAndConfigureTripRouter(iterationContext);
-
+		//TripRouter instance = super.get(iterationContext);
+		TripRouter instance = null;
         instance.setRoutingModule(
 				HitchHikingConstants.PASSENGER_MODE,
 				new HitchHikingPassengerRoutingModule(

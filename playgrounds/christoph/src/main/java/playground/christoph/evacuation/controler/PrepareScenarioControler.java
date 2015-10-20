@@ -38,9 +38,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -119,9 +117,9 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
-		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.getScenario());
+		javax.inject.Provider<TripRouter> tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.getScenario());
 
-        legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), getScenario().getNetwork());
+        legModeChecker = new LegModeChecker(tripRouterFactory.get(), getScenario().getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.getScenario().getPopulation());

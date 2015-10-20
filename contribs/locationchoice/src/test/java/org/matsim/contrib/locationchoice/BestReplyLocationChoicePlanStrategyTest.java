@@ -33,6 +33,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Provider;
+
 public class BestReplyLocationChoicePlanStrategyTest {
 	
 	@Rule
@@ -72,7 +74,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		private final TravelTime travelTime;
 		private final TravelDisutility travelDisutility;
 		private final ScoringFunctionFactory scoringFunctionFactory;
-		private final TripRouterFactory tripRouterFactory;
+		private final Provider<TripRouter> tripRouterFactory;
 		
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
@@ -103,7 +105,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 
 		@Override
 		public TripRouter getTripRouter() {
-			return this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(travelDisutility, travelTime));
+			return this.tripRouterFactory.get();
 		}
 	}
 }

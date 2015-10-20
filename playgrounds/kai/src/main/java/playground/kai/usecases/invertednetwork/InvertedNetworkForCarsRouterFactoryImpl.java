@@ -24,20 +24,19 @@ package playground.kai.usecases.invertednetwork;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+
+import javax.inject.Provider;
 
 /**
  * @author thomas
  *
  */
-public class InvertedNetworkForCarsRouterFactoryImpl implements TripRouterFactory {
+public class InvertedNetworkForCarsRouterFactoryImpl implements Provider<TripRouter> {
 
 
-	private TripRouterFactory delegate;
+	private Provider<TripRouter> delegate;
 
 	private Scenario scenario;
 
@@ -48,15 +47,15 @@ public class InvertedNetworkForCarsRouterFactoryImpl implements TripRouterFactor
 //	private boolean firstCall = true;
 	
 	public InvertedNetworkForCarsRouterFactoryImpl(final Scenario scenario, TravelDisutilityFactory tdf ) {
-		this.delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+		this.delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario);
 		this.scenario = scenario;
 		this.tdf = tdf ;
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	public TripRouter get() {
 	
-		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter(iterationContext);
+		TripRouter tripRouter = this.delegate.get();
 
 		// add alternative module for car routing
 		tripRouter.setRoutingModule(TransportMode.car, new InvertedRoutingModule(this.scenario,this.tdf) );

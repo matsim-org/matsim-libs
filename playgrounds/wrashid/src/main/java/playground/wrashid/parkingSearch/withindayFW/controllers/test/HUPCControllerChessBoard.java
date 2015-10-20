@@ -32,8 +32,6 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -75,11 +73,9 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 
-		RoutingContext routingContext = new RoutingContextImpl(costFactory.createTravelDisutility(super.getTravelTimeCollector(), this.getConfig().planCalcScore()), super.getTravelTimeCollector());
-		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
-				this.getWithinDayTripRouterFactory(), routingContext);
+				this.getWithinDayTripRouterFactory());
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.getScenario() );
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);

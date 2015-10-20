@@ -27,8 +27,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -121,19 +119,13 @@ final class RunWithinDayExample implements StartupListener {
 	}
 	
 	private void initReplanners() {
-		// plug the "routing context" together (needed later):
-		final TravelTime travelTimeCollector = this.withinDayControlerListener.getTravelTimeCollector();
-		final TravelDisutilityFactory travelDisutilityFactory = this.withinDayControlerListener.getTravelDisutilityFactory();
-		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTimeCollector, this.scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTimeCollector);
-		
 		// this defines which agents are replanned:
 		ActivityEndIdentifierFactory activityEndIdentifierFactory = new ActivityEndIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
 
 		// this defines the agent replanning:
 		NextActivityAppendingReplannerFactory duringActivityReplannerFactory =
 				new NextActivityAppendingReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		duringActivityReplannerFactory.addIdentifier(activityEndIdentifierFactory.createIdentifier());
 		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
 	}
