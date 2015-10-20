@@ -54,10 +54,6 @@ public class RunSignalSystemsExample {
 		
 		config.plans().setInputFile("./../../matsim/examples/equil-extended/plans100.xml");
 		
-		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
-		// (this switch will eventually go away)
-		config.scenario().setUseSignalSystems(true);
-		
 		// these are the paths to the signal systems definition files:
 		config.signalSystems().setSignalSystemFile("./../../matsim/examples/equil-extended/signalSystems_v2.0.xml");
 		config.signalSystems().setSignalGroupsFile("./../../matsim/examples/equil-extended/signalGroups_v2.0.xml");
@@ -76,9 +72,7 @@ public class RunSignalSystemsExample {
 		
 		//do it, do it, do it, now
 		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+						OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		c.run();
 	}
 
