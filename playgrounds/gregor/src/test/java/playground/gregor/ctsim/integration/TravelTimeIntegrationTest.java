@@ -54,6 +54,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
 import playground.gregor.ctsim.simulation.CTTripRouterFactory;
+import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.utils.Variance;
 
 import java.util.HashMap;
@@ -373,8 +374,12 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double tt2 = ttObserver2.ttVariance.getMean();
 		double var2 = ttObserver2.ttVariance.getVar();
 
+		double cellHeight = 3. * CTLink.WIDTH / 4.;
+		double nrCells = (int) (80. / cellHeight);
+		double realLength = cellHeight * nrCells;
+		double expctdTT = realLength / 1.5;
 
-		assertEquals("correct avg travel time", 53.333, tt2, 0.5);
+		assertEquals("correct avg travel time", expctdTT, tt2, 0.5);
 
 	}
 
