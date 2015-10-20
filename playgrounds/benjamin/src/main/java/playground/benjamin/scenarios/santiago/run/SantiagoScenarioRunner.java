@@ -1,6 +1,7 @@
 package playground.benjamin.scenarios.santiago.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -9,12 +10,15 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 
 
 public class SantiagoScenarioRunner {
@@ -42,42 +46,92 @@ public class SantiagoScenarioRunner {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		Controler controler = new Controler(scenario);
 		
+		// adding ride and taxi as network modes requires some router; here, the same values as for car are used
+		setNetworkModeRouting(controler);
+		
 		// adding pt fare in a simplified way
 		controler.getEvents().addHandler(new PTFlatFareHandler(controler));
 		
-		// adding subtour mode choice strategy parameters for car and non-car users
+		// adding basic strategies for car and non-car users
+		setBasicStrategiesForSubpopulations(controler);
+		
+		// adding subtour mode choice strategies for car and non-car users
 		if(doModeChoice){
 			setModeChoiceForSubpopulations(controler);
 		}
 		controler.run();
 	}
 
-	private static void setModeChoiceForSubpopulations(final Controler controler) {
-		StrategySettings carAvail = new StrategySettings();
-		carAvail.setStrategyName("SubtourModeChoice_".concat("carAvail"));
-		carAvail.setSubpopulation("carAvail");
-		carAvail.setWeight(0.1);
-		controler.getConfig().strategy().addStrategySettings(carAvail);
+	private static void setNetworkModeRouting(Controler controler) {
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(carTravelDisutilityFactoryKey());
+			}
+		});
+	}
+
+	private static void setBasicStrategiesForSubpopulations(Controler controler) {
+		setReroute("carAvail", controler);
+		setChangeExp("carAvail", controler);
+		setReroute(null, controler);
+		setChangeExp(null, controler);
+	}
+
+	private static void setChangeExp(String subpopName, Controler controler) {
+		StrategySettings changeExpSettings = new StrategySettings();
+		// TODO: why can the name be identical?
+		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		changeExpSettings.setSubpopulation(subpopName);
+		changeExpSettings.setWeight(0.7);
+		controler.getConfig().strategy().addStrategySettings(changeExpSettings);
+	}
+
+	private static void setReroute(String subpopName, Controler controler) {
+		StrategySettings reRouteSettings = new StrategySettings();
+		// TODO: why can the name be identical?
+		reRouteSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
+		reRouteSettings.setSubpopulation(subpopName);
+		reRouteSettings.setWeight(0.15);
+		controler.getConfig().strategy().addStrategySettings(reRouteSettings);
 		
-		StrategySettings nonCarAvail = new StrategySettings();
-		nonCarAvail.setStrategyName("SubtourModeChoice_".concat("nonCarAvail"));
-		// TODO: check if this really refers to the people without car
-		nonCarAvail.setSubpopulation(null);
-		nonCarAvail.setWeight(0.1);
-		controler.getConfig().strategy().addStrategySettings(nonCarAvail);
+	}
+
+	private static void setModeChoiceForSubpopulations(final Controler controler) {
+		final String nameMcCarAvail = "SubtourModeChoice_".concat("carAvail");
+		StrategySettings modeChoiceCarAvail = new StrategySettings();
+		modeChoiceCarAvail.setStrategyName(nameMcCarAvail);
+		modeChoiceCarAvail.setSubpopulation("carAvail");
+		modeChoiceCarAvail.setWeight(0.15);
+		controler.getConfig().strategy().addStrategySettings(modeChoiceCarAvail);
+		
+		final String nameMcNonCarAvail = "SubtourModeChoice_".concat("nonCarAvail");
+		StrategySettings modeChoiceNonCarAvail = new StrategySettings();
+		modeChoiceNonCarAvail.setStrategyName(nameMcNonCarAvail);
+		modeChoiceNonCarAvail.setSubpopulation(null);
+		modeChoiceNonCarAvail.setWeight(0.15);
+		controler.getConfig().strategy().addStrategySettings(modeChoiceNonCarAvail);
 		
 		// adding subtour mode choice strategy module for car and non-car users
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat("carAvail")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					String[] availableModes = {"car", "bike", "bus", "metro", "walk"};
 					String[] chainBasedModes = {"car", "bike"};
 
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						// TODO: check what considerCarAvailable does
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));
 						return builder.build();
@@ -88,13 +142,12 @@ public class SantiagoScenarioRunner {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat("nonCarAvail")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					String[] availableModes = {"bike", "bus", "metro", "walk"};
 					String[] chainBasedModes = {"bike"};
 
 					@Override
 					public PlanStrategy get() {
-						// TODO: check what considerCarAvailable does
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));
@@ -103,6 +156,5 @@ public class SantiagoScenarioRunner {
 				});
 			}
 		});
-		
 	}
 }

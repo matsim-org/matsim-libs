@@ -1,8 +1,8 @@
 package playground.benjamin.scenarios.santiago;
 
-public final class Constants {
+public final class SantiagoScenarioConstants {
 
-	//enum to standardize the way the modes are written in files
+	// additional modes
 	public enum Modes{
 							bus,
 							metro,
