@@ -187,14 +187,20 @@ public class CNControler {
 		if (noisePricing && congestionPricing) {
 			// simultaneous noise and congestion pricing
 			
-			// router considers external congestion and noise cost
-			final CNTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CNTollDisutilityCalculatorFactory(noiseContext, congestionTollHandler);
-			controler.addOverridingModule(new AbstractModule() {
+			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
+			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
+					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					noiseContext,
+					congestionTollHandler
+				);
+			factory.setSigma(0.); // for now no randomness
+			
+			controler.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			});
+			}); 
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
