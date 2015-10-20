@@ -31,7 +31,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 * @author ikaddoura
 */
 
-public class RandomizedCongestionTollTimeDistanceTravelDisutility implements TravelDisutility {
+public class CongestionTollTimeDistanceTravelDisutility implements TravelDisutility {
 	
 	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final TollHandler tollHandler;
@@ -45,7 +45,7 @@ public class RandomizedCongestionTollTimeDistanceTravelDisutility implements Tra
 	 */
 	private final double blendFactor = 1.0;
 	
-	public RandomizedCongestionTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
+	public CongestionTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
 			TollHandler tollHandler,
 			double marginalUtilityOfMoney,
 			double sigma) {

@@ -46,7 +46,7 @@ import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedCongestionTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 
 /**
  * @author ikaddoura
@@ -126,7 +126,7 @@ public class CNTest {
 		Controler controler = new Controler(configFile1);
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 
-		final RandomizedCongestionTollTimeDistanceTravelDisutilityFactory factory = new RandomizedCongestionTollTimeDistanceTravelDisutilityFactory(
+		final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 				tollHandler
 			) ;

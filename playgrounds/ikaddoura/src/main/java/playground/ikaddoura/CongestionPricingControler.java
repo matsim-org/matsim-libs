@@ -46,7 +46,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedCongestionTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
@@ -145,7 +145,7 @@ public class CongestionPricingControler {
 				
 			} else if (router.equals("randomized")) {
 				
-				final RandomizedCongestionTollTimeDistanceTravelDisutilityFactory factory = new RandomizedCongestionTollTimeDistanceTravelDisutilityFactory(
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 						new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 						tollHandler
 					) ;

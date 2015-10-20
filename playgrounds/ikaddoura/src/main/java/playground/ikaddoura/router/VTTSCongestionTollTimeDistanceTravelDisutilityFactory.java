@@ -25,7 +25,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedCongestionTollTimeDistanceTravelDisutility;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutility;
 
 
 /**
@@ -48,7 +48,7 @@ public final class VTTSCongestionTollTimeDistanceTravelDisutilityFactory impleme
 		
 		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
-		return new RandomizedCongestionTollTimeDistanceTravelDisutility(
+		return new CongestionTollTimeDistanceTravelDisutility(
 				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
