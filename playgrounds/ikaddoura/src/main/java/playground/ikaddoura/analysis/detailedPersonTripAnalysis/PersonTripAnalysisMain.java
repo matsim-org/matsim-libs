@@ -142,7 +142,7 @@ public class PersonTripAnalysisMain {
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
 		events.addHandler(congestionHandler);
-//		events.addHandler(noiseHandler);
+		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -180,17 +180,17 @@ public class PersonTripAnalysisMain {
 		
 		// noise events analysis
 	
-//		if (noiseHandler.isCaughtNoiseEvent()) {
-//			log.info("Noise events have already been analyzed based on the standard events file.");
-//		} else {
-//			EventsManager eventsNoise = EventsUtils.createEventsManager();
-//			eventsNoise.addHandler(noiseHandler);
-//					
-//			log.info("Reading noise events file...");
-//			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-//			noiseEventReader.parse(noiseEventsFile);
-//			log.info("Reading noise events file... Done.");	
-//		}	
+		if (noiseHandler.isCaughtNoiseEvent()) {
+			log.info("Noise events have already been analyzed based on the standard events file.");
+		} else {
+			EventsManager eventsNoise = EventsUtils.createEventsManager();
+			eventsNoise.addHandler(noiseHandler);
+					
+			log.info("Reading noise events file...");
+			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
+			noiseEventReader.parse(noiseEventsFile);
+			log.info("Reading noise events file... Done.");	
+		}	
 		
 		// print the results
 		
