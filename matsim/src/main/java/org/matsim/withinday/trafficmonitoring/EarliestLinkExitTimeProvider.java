@@ -20,8 +20,11 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,17 +36,20 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Returns the time when an agent could leave a link if he can travel
@@ -53,7 +59,7 @@ import org.matsim.core.utils.misc.Time;
  * @author cdobler
  */
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
-		PersonDepartureEventHandler, PersonStuckEventHandler {
+		PersonDepartureEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
 
@@ -72,6 +78,8 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<Id<Person>, Double> earliestLinkExitTimes = new ConcurrentHashMap<>();
 	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
+	private Map<Id<Vehicle>, List<Id<Person>>> personsInsideVehicle = new HashMap<>();
+	
 	public EarliestLinkExitTimeProvider(Scenario scenario) {
 		this(scenario, null);
 		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
@@ -125,34 +133,37 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		// handle event for all persons inside the vehicle
+		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())) {
+			String transportMode = this.transportModeProvider.getTransportMode(personInsideVehicle);
+			double now = event.getTime();
+			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+			Person person = this.scenario.getPopulation().getPersons().get(personInsideVehicle);
+			double earliestExitTime = Time.UNDEFINED_TIME;
+			if (this.multiModalTravelTimes != null) {
+				if (transportMode == null) {
+					throw new RuntimeException("Agent " + personInsideVehicle.toString() + " is currently not performing a leg. Aborting!");
+				} else {
+					TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
+					if (travelTime == null) {
+						throw new RuntimeException("No TravelTime object was found for mode " + transportMode + ". Aborting!");
+					}
 
-		String transportMode = this.transportModeProvider.getTransportMode(event.getDriverId());
-		double now = event.getTime();
-		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
-
-		double earliestExitTime = Time.UNDEFINED_TIME;
-		if (this.multiModalTravelTimes != null) {
-			if (transportMode == null) {
-				throw new RuntimeException("Agent " + event.getDriverId().toString() + " is currently not performing a leg. Aborting!");
-			} else {
-				TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
-				if (travelTime == null) {
-					throw new RuntimeException("No TravelTime object was found for mode " + transportMode + ". Aborting!");
+					earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
 				}
-
-				earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
+			} else {
+				earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
 			}
-		} else {
-			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
+			this.handleAddEarliestLinkExitTime(personInsideVehicle, earliestExitTime);
 		}
-
-		this.handleAddEarliestLinkExitTime(event.getDriverId(), earliestExitTime);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		this.removeEarliestLinkExitTimesAtTime(event.getDriverId());
+		// handle event for all persons inside the vehicle
+		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())) {
+			this.removeEarliestLinkExitTimesAtTime(personInsideVehicle);
+		}
 	}
 	
 	@Override
@@ -192,5 +203,13 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 				}
 			}
 		}
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
+			personsInsideVehicle.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+		}
+		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
 	}
 }

@@ -20,28 +20,36 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler {
+public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler {
 
 	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
 	private final HashMap<Id<Link>, DepartureDelayData> linkData;
+	private Map<Id<Vehicle>, List<Id<Person>>> vehicleToPersonsInside = new HashMap<>();
 	
 	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
 
@@ -138,21 +146,32 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 	}
 
 	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!vehicleToPersonsInside.containsKey(event.getVehicleId())){
+			vehicleToPersonsInside.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+		}
+		vehicleToPersonsInside.get(event.getVehicleId()).add(event.getPersonId());
+	}
+
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		DepartureEvent removeMe = new DepartureEvent(event.getDriverId());
-		Double departureTime = departureEventsTimes.remove(removeMe);
-		if (departureTime != null) {
-			double departureDelay = event.getTime() - departureTime.intValue();
-			if (departureDelay < 0) {
-				throw new RuntimeException("departureDelay cannot be < 0.");
+		// calculate delay for all persons inside the vehicle
+		for (Id<Person> personInsideVehicle : vehicleToPersonsInside .get(event.getVehicleId())){
+			DepartureEvent removeMe = new DepartureEvent(personInsideVehicle);
+			Double departureTime = departureEventsTimes.remove(removeMe);
+			if (departureTime != null) {
+				double departureDelay = event.getTime() - departureTime.intValue();
+				if (departureDelay < 0) {
+					throw new RuntimeException("departureDelay cannot be < 0.");
+				}
+				Id<Link> linkId = event.getLinkId();
+				DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
+				if (ddd == null) {
+					ddd = new DepartureDelayData();
+					this.linkData.put(linkId, ddd);
+				}
+				ddd.addDepartureDelay(departureTime, departureDelay);
 			}
-			Id<Link> linkId = event.getLinkId();
-			DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
-			if (ddd == null) {
-				ddd = new DepartureDelayData();
-				this.linkData.put(linkId, ddd);
-			}
-			ddd.addDepartureDelay(departureTime, departureDelay);
 		}
 	}
 

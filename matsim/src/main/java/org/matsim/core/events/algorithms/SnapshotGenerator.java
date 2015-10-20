@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -68,7 +69,8 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final SnapshotStyle snapshotStyle;
 	private double skipUntil = 0.0;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	private HashMap<Id<Vehicle>, Id<Person>> vehicleToDriverMap;
 
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final MobsimConfigGroupI config) {
 		this.network = network;
@@ -110,19 +112,21 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getDriverId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(vehicleToDriverMap.get(event.getVehicleId()), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getDriverId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(vehicleToDriverMap.get(event.getVehicleId()), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final Wait2LinkEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event.getPersonId(), event.getTime()));
+		
+		vehicleToDriverMap.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override

@@ -62,7 +62,7 @@ import java.util.concurrent.CyclicBarrier;
  */
 public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
-		PersonArrivalEventHandler, PersonDepartureEventHandler,
+		VehicleLeavesTrafficEventHandler, Wait2LinkEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 
@@ -71,7 +71,7 @@ public class TravelTimeCollector implements TravelTime,
 	private Network network;
 
 	// Trips with no Activity on the current Link
-	private Map<Id<Person>, TripBin> regularActiveTrips; // PersonId
+	private Map<Id<Vehicle>, TripBin> regularActiveTrips; // VehicleId
 	private Map<Id<Link>, TravelTimeInfo> travelTimeInfos; // LinkId
 	
 	private TravelTimeInfoProvider travelTimeInfoProvider;
@@ -91,7 +91,7 @@ public class TravelTimeCollector implements TravelTime,
 	private final int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
 	
-	private Set<Id<Person>> agentsToFilter;
+	private Set<Id<Vehicle>> vehiclesToFilter;
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 	
@@ -121,7 +121,7 @@ public class TravelTimeCollector implements TravelTime,
 		this.regularActiveTrips = new HashMap<>();
 		this.travelTimeInfos = new ConcurrentHashMap<>();
 		this.changedLinks = new HashMap<Double, Collection<Link>>();
-		this.agentsToFilter = new HashSet<>();
+		this.vehiclesToFilter = new HashSet<>();
 				
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
@@ -186,27 +186,27 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		/* 
-		 * If only some modes are analyzed, we check whether the agent
+		 * If only some modes are analyzed, we check whether the vehicle
 		 * performs a trip with one of those modes. if not, we skip the event.
 		 */
-		if (filterModes && agentsToFilter.contains(event.getDriverId())) return;
+		if (filterModes && vehiclesToFilter.contains(event.getVehicleId())) return;
 		
-		Id<Person> personId = event.getDriverId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
 		tripBin.enterTime = time;
 
-		this.regularActiveTrips.put(personId, tripBin);
+		this.regularActiveTrips.put(vehicleId, tripBin);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getDriverId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 		double time = event.getTime();
 
-		TripBin tripBin = this.regularActiveTrips.remove(personId);
+		TripBin tripBin = this.regularActiveTrips.remove(vehicleId);
 		if (tripBin != null) {
 			tripBin.leaveTime = time;
 
@@ -232,28 +232,28 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	/*
-	 * If an Agent performs an Activity on a Link we have to remove his current
-	 * Trip. Otherwise we would have a Trip with the Duration of the Trip itself
-	 * and the Activity.
+	 * If a vehicle leaves the traffic we have to remove its current
+	 * trip. Otherwise we would have a trip with the duration of the trip itself
+	 * and the activity.
 	 */
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		Id<Person> personId = event.getPersonId();
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		Id<Vehicle> vehicleId = event.getVehicleId();
 
-		this.regularActiveTrips.remove(personId);
+		this.regularActiveTrips.remove(vehicleId);
 		
-		// try to remove agent from set with filtered agents
-		if (filterModes) this.agentsToFilter.remove(event.getPersonId());
+		// try to remove vehicle from set with filtered vehicles
+		if (filterModes) this.vehiclesToFilter.remove(event.getVehicleId());
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		/* 
-		 * If filtering transport modes is enabled and the agents
-		 * starts a leg on a non analyzed transport mode, add the agent
-		 * to the filtered agents set.
+		 * If filtering transport modes is enabled and the vehicle
+		 * starts a leg on a non analyzed transport mode, add the vehicle
+		 * to the filtered vehicles set.
 		 */
-		if (filterModes && !analyzedModes.contains(event.getLegMode())) this.agentsToFilter.add(event.getPersonId());
+		if (filterModes && !analyzedModes.contains(event.getNetworkMode())) this.vehiclesToFilter.add(event.getVehicleId());
 	}
 	
 	/*
