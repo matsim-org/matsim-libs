@@ -37,9 +37,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -171,7 +169,7 @@ public class EvacuationControlerListener implements StartupListener {
 	 */
 	private Map<String, TravelTime> withinDayTravelTimes;
 	private EvacuationTransitRouterFactory evacuationTransitRouterFactory;
-	private TripRouterFactory withinDayTripRouterFactory;
+	private Provider<TripRouter> withinDayTripRouterFactory;
 	private LeastCostPathCalculatorFactory withinDayLeastCostPathCalculatorFactory;
 	private TravelDisutilityFactory withinDayTravelDisutilityFactory;
 	
@@ -539,7 +537,7 @@ public class EvacuationControlerListener implements StartupListener {
 		Scenario scenario = controler.getScenario();
 		WithinDayEngine withinDayEngine = this.withinDayControlerListener.getWithinDayEngine();
 		DecisionDataProvider decisionDataProvider = this.decisionModelRunner.getDecisionDataProvider();
-		TripRouterFactory tripRouterFactory = this.withinDayTripRouterFactory;	
+		Provider<TripRouter> tripRouterFactory = this.withinDayTripRouterFactory;
 		
 		TravelDisutility travelDisutility = this.withinDayTravelDisutilityFactory.createTravelDisutility(
 				this.withinDayTravelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()); 
@@ -580,7 +578,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

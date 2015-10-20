@@ -21,7 +21,7 @@ package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 
 import javax.inject.Provider;
 import java.lang.reflect.Constructor;
@@ -37,19 +37,19 @@ class PTripRouterFactoryFactory {
 
 	private final static Logger log = Logger.getLogger(PTripRouterFactoryFactory.class);
 
-	public static TripRouterFactory getTripRouterFactoryInstance(Controler controler, Class<? extends TripRouterFactory> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
+	public static Provider<TripRouter> getTripRouterFactoryInstance(Controler controler, Class<? extends Provider<TripRouter>> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
 
 		if(tripRouterFactory == null){
 			// standard case
 			return new PTripRouterFactoryImpl(controler, pTransitRouterFactory);
 		} else {
 
-			TripRouterFactory factory;
+			Provider<TripRouter> factory;
 			try {
 				try{
 					Class<?>[] args = new Class[1];
 					args[0] = Controler.class;
-					Constructor<? extends TripRouterFactory> c = null;
+					Constructor<? extends Provider<TripRouter>> c = null;
 					c = tripRouterFactory.getConstructor(args);
 					factory = c.newInstance(controler);
 				}catch(NoSuchMethodException e){
@@ -57,7 +57,7 @@ class PTripRouterFactoryFactory {
 						Class<?>[] args = new Class[2];
 						args[0] = Controler.class;
 						args[1] = Provider.class;
-						Constructor<? extends TripRouterFactory> c = null;
+						Constructor<? extends Provider<TripRouter>> c = null;
 						c = tripRouterFactory.getConstructor(args);
 						factory = c.newInstance(controler, pTransitRouterFactory);
 					} catch (NoSuchMethodException ee) {

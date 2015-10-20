@@ -6,20 +6,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.router.*;
+
+import javax.inject.Provider;
 
 
-public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
+public class MovingPathwaysTripRouterFactory implements Provider<TripRouter>{
 
-	private final TripRouterFactory delegate;
+	private final Provider<TripRouter> delegate;
 	private Scenario scenario;
 	
-	public MovingPathwaysTripRouterFactory ( TripRouterFactory delegate, Scenario scenario) {
+	public MovingPathwaysTripRouterFactory (Provider<TripRouter> delegate, Scenario scenario) {
 		
 		this.scenario = scenario;
 		this.delegate = delegate;
@@ -28,16 +25,15 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 	
 	public MovingPathwaysTripRouterFactory(
 			final Scenario scenario ) {
-		this( DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,
+		this(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
 				scenario );
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(
-			RoutingContext routingContext) {
+	public TripRouter get() {
 		// TODO Auto-generated method stub		
 
-		final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+		final TripRouter router = delegate.get();
 		
 		// add our module to the instance
 		router.setRoutingModule(

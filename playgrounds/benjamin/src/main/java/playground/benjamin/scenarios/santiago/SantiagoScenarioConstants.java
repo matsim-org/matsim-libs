@@ -1,9 +1,9 @@
 package playground.benjamin.scenarios.santiago;
 
-public final class Constants {
+public final class SantiagoScenarioConstants {
 
-	//enum to standardize the way the modes are written in files
-	public static enum Modes{
+	// additional modes
+	public enum Modes{
 							bus,
 							metro,
 							colectivo,
@@ -13,7 +13,8 @@ public final class Constants {
 							train,
 							truck
 						};
-						
+					
+	//Santiago greater area population according to "Informe de Difusión", page 9, tabla 1			
 	public final static int N = 6651700;
 	
 	public final static String toCRS = "EPSG:32719";

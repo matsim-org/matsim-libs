@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouterFactory;
 
 import playground.jbischoff.taxibus.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.sim.TaxibusTripRouterFactory;
@@ -54,7 +53,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 		context.setVrpData(vrpData);	 
     
        
-        TripRouterFactory factory = new TaxibusTripRouterFactory(controler); 
+        TaxibusTripRouterFactory factory = new TaxibusTripRouterFactory(controler);
 		controler.setTripRouterFactory(factory);
 		controler.addOverridingModule(new AbstractModule() {
 			

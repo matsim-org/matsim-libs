@@ -22,20 +22,21 @@ package playground.christoph.oldenburg;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
+import javax.inject.Provider;
+
 public class CreateEvacuationPlanReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public CreateEvacuationPlanReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+												Provider<TripRouter> tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
@@ -46,7 +47,7 @@ public class CreateEvacuationPlanReplannerFactory extends WithinDayInitialReplan
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new CreateEvacuationPlanReplanner(super.getId(), this.scenario,
 				this.getWithinDayEngine().getActivityRescheduler(),
-				new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext)));
+				new PlanRouter(this.tripRouterFactory.get()));
 		return replanner;
 	}
 

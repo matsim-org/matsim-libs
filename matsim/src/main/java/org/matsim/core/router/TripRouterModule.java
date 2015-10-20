@@ -22,15 +22,10 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.HashMap;
 import java.util.Map;
 
 public class TripRouterModule extends AbstractModule {
@@ -38,31 +33,29 @@ public class TripRouterModule extends AbstractModule {
     @Override
     public void install() {
         install(new TripRouterFactoryModule());
+        bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
         bind(TripRouter.class).toProvider(RealTripRouterProvider.class);
     }
 
     private static class RealTripRouterProvider implements Provider<TripRouter> {
 
-        final Config config;
-        final TripRouterFactory tripRouterFactory;
-        final Map<String, TravelDisutilityFactory> travelDisutilityFactory;
-        final Map<String, TravelTime> travelTime;
+        final Map<String, Provider<RoutingModule>> routingModules;
+        private MainModeIdentifier mainModeIdentifier;
 
         @Inject
-        RealTripRouterProvider(Config config, TripRouterFactory tripRouterFactory, Map<String,TravelDisutilityFactory> travelDisutilityFactory, Map<String,TravelTime> travelTime) {
-            this.config = config;
-            this.travelDisutilityFactory = travelDisutilityFactory;
-            this.tripRouterFactory = tripRouterFactory;
-            this.travelTime = travelTime;
+        RealTripRouterProvider(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+            this.routingModules = routingModules;
+            this.mainModeIdentifier = mainModeIdentifier;
         }
 
         @Override
         public TripRouter get() {
-            Map<String, TravelDisutility> travelDisutilities = new HashMap<>();
-            for (Map.Entry<String, TravelDisutilityFactory> entry : travelDisutilityFactory.entrySet()) {
-                travelDisutilities.put(entry.getKey(), entry.getValue().createTravelDisutility(travelTime.get(entry.getKey()), config.planCalcScore()));
+            TripRouter tripRouter = new TripRouter();
+            for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+                tripRouter.setRoutingModule(entry.getKey(), entry.getValue().get());
             }
-            return tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(travelDisutilities, travelTime));
+            tripRouter.setMainModeIdentifier(mainModeIdentifier);
+            return tripRouter;
         }
 
     }

@@ -24,8 +24,12 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +44,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -49,6 +54,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
 import playground.gregor.ctsim.simulation.CTTripRouterFactory;
+import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.utils.Variance;
 
 import java.util.HashMap;
@@ -61,6 +67,7 @@ import java.util.Set;
  */
 public class TravelTimeIntegrationTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(TravelTimeIntegrationTest.class);
+
 
 	@Test
 	public void testTravelTimeOverMultipleLinks() {
@@ -96,18 +103,42 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double tt2 = ttObserver2.ttVariance.getMean();
 		double var2 = ttObserver2.ttVariance.getVar();
 
-		//
+//		//est additional dist
+		int nrNodes = 7;
+		final double nodeLength = Math.sqrt(3) * Math.sqrt(64 / (1.5 * Math.sqrt(3))) / 2;
+		double additionalLength = nrNodes * nodeLength;
+		double totalLength = 80. + additionalLength;
+		double coeff = totalLength / 80.;
+		double expTT = tt2 * coeff;
+		double mxDev = Math.abs(expTT - tt2);
 
-
-		assertEquals("similar travel times", tt1, tt2, 1 * 7);//one sec per node deviance seems to be reasonable
+		assertEquals("similar travel times", tt1, tt2, mxDev);
 
 		boolean tt1Bigger = tt1 > tt2;
 		assertTrue("longer avg travel time in scenario 1", tt1Bigger);
 
 	}
 
-	private void runScenario(Scenario sc, AverageTravelTime ttObserver) {
+	private void runScenario(Scenario sc, TTObserver ttObserver) {
 		final Controler controller = new Controler(sc);
+
+//		//DEBUG
+//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//
+//
+//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+//		EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+//		InfoBox iBox = new InfoBox(dbg, sc);
+//		dbg.addAdditionalDrawer(iBox);
+//		//		dbg.addAdditionalDrawer(new Branding());
+////			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+////			dbg.addAdditionalDrawer(qDbg);
+//
+//		EventsManager em = controller.getEvents();
+////			em.addHandler(qDbg);
+//		em.addHandler(dbg);
+//		//END_DEBUG
 
 
 		controller.getEvents().addHandler(ttObserver);
@@ -223,9 +254,34 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 			l.setAllowedModes(modes);
 			l.setFreespeed(20);
 			l.setLength(10.);
-			l.setCapacity(4. / 1.33);
+			l.setCapacity(8. * 1.33);
 		}
 
+
+	}
+
+	private void createSc2(Scenario sc1) {
+		Network net1 = sc1.getNetwork();
+		NetworkFactory fac1 = net1.getFactory();
+		Node n1_0 = fac1.createNode(Id.createNodeId("n1_0"), CoordUtils.createCoord(0, 0));
+		Node n1_1 = fac1.createNode(Id.createNodeId("n1_1"), CoordUtils.createCoord(10, 0));
+		Node n1_9 = fac1.createNode(Id.createNodeId("n1_9"), CoordUtils.createCoord(90, 0));
+		net1.addNode(n1_0);
+		net1.addNode(n1_1);
+		net1.addNode(n1_9);
+		Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
+		Link l1_8 = fac1.createLink(Id.createLinkId("l1_8"), n1_1, n1_9);
+		net1.addLink(l1_0);
+		net1.addLink(l1_8);
+		Set<String> modes = new HashSet<>();
+		modes.add("walkct");
+		for (Link l : net1.getLinks().values()) {
+			l.setAllowedModes(modes);
+			l.setFreespeed(20);
+			l.setLength(10.);
+			l.setCapacity(8. * 1.33);
+		}
+		l1_8.setLength(80.);
 
 	}
 
@@ -253,31 +309,6 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 
 	}
 
-	private void createSc2(Scenario sc1) {
-		Network net1 = sc1.getNetwork();
-		NetworkFactory fac1 = net1.getFactory();
-		Node n1_0 = fac1.createNode(Id.createNodeId("n1_0"), CoordUtils.createCoord(0, 0));
-		Node n1_1 = fac1.createNode(Id.createNodeId("n1_1"), CoordUtils.createCoord(10, 0));
-		Node n1_9 = fac1.createNode(Id.createNodeId("n1_9"), CoordUtils.createCoord(90, 0));
-		net1.addNode(n1_0);
-		net1.addNode(n1_1);
-		net1.addNode(n1_9);
-		Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
-		Link l1_8 = fac1.createLink(Id.createLinkId("l1_8"), n1_1, n1_9);
-		net1.addLink(l1_0);
-		net1.addLink(l1_8);
-		Set<String> modes = new HashSet<>();
-		modes.add("walkct");
-		for (Link l : net1.getLinks().values()) {
-			l.setAllowedModes(modes);
-			l.setFreespeed(20);
-			l.setLength(10.);
-			l.setCapacity(4. / 1.33);
-		}
-		l1_8.setLength(80.);
-
-	}
-
 	public void setupConfig(Scenario sc) {
 		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
@@ -289,7 +320,7 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 
 		c.controler().setMobsim("ctsim");
 
-		c.controler().setLastIteration(10);
+		c.controler().setLastIteration(0);
 
 		PlanCalcScoreConfigGroup.ActivityParams pre = new PlanCalcScoreConfigGroup.ActivityParams("origin");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
@@ -337,15 +368,19 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		createBigPopWithSpreadedDeparutreTimes(sc2);
 		setupConfig(sc2);
 		c2.controler().setOutputDirectory(getOutputDirectory() + "/sc2/");
-		AverageTravelTime ttObserver2 = new AverageTravelTime();
+//		AverageTravelTime ttObserver2 = new AverageTravelTime();
+		AverageLinkTravelTime ttObserver2 = new AverageLinkTravelTime(Id.createLinkId("l1_8"));
 		runScenario(sc2, ttObserver2);
 		double tt2 = ttObserver2.ttVariance.getMean();
 		double var2 = ttObserver2.ttVariance.getVar();
 
 
-		log.warn("Travel time is to long, achieved free speed is only " + 80. / tt2 + " m/s. This needs to be fixed!!");
-		log.warn("For the time being the test passes if travel time is 133 +/- 1 sec.");
-		assertEquals("correct avg travel time", 133.0, tt2, 1);
+		double cellHeight = 3. * CTLink.WIDTH / 4.;
+		double nrCells = (int) (80. / cellHeight);
+		double realLength = cellHeight * nrCells;
+		double expctdTT = realLength / 1.5;
+
+		assertEquals("correct avg travel time", expctdTT, tt2, 1.0);
 
 	}
 
@@ -373,7 +408,44 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 
 	}
 
-	private class AverageTravelTime implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+	private interface TTObserver extends EventHandler {
+
+	}
+
+	private class AverageLinkTravelTime implements LinkEnterEventHandler, LinkLeaveEventHandler, TTObserver {
+		private final Id<Link> linkId;
+		private Map<Id<Person>, LinkEnterEvent> departures = new HashMap<>();
+
+		private Variance ttVariance = new Variance();
+
+		public AverageLinkTravelTime(Id<Link> linkId) {
+			this.linkId = linkId;
+		}
+
+		@Override
+		public void handleEvent(LinkEnterEvent event) {
+			if (event.getLinkId() == this.linkId) {
+				this.departures.put(event.getDriverId(), event);
+			}
+
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			if (event.getLinkId() == this.linkId) {
+				LinkEnterEvent e = departures.remove(event.getDriverId());
+				double tt = event.getTime() - e.getTime();
+				ttVariance.addVar(tt);
+			}
+		}
+
+		@Override
+		public void reset(int iteration) {
+
+		}
+	}
+
+	private class AverageTravelTime implements PersonDepartureEventHandler, PersonArrivalEventHandler, TTObserver {
 
 		private Map<Id<Person>, PersonDepartureEvent> departures = new HashMap<>();
 

@@ -1,13 +1,12 @@
 package playground.wrashid.parkingSearch.withindayFW.controllers.test;
 
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 
 import javax.inject.Provider;
 
 public class TripRouterFactoryAdapter implements Provider<TripRouter> {
 
-	public TripRouterFactoryAdapter(TripRouterFactory multimodalTripRouterFactory) {
+	public TripRouterFactoryAdapter(Provider<TripRouter> multimodalTripRouterFactory) {
 		// TODO Auto-generated constructor stub
 	}
 

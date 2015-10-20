@@ -48,6 +48,9 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 	private final VTTSHandler vttsHandler;
 	private final double sigma ;
 
+	private static int toSmallVTTSWarning = 0;
+	private static int toLargeVTTSWarning = 0;
+
 	VTTSRandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma, VTTSHandler vttsHandler) {
 		this.timeCalculator = timeCalculator;
 		this.vttsHandler = vttsHandler;
@@ -72,13 +75,25 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 		double vtts_hour = this.vttsHandler.getCarVTTS(person.getId(), time);
 		
 		if (vtts_hour < 1.0) {
-			log.warn("The VTTS is " + vtts_hour + " and considered as too small. Setting the VTTS to 1.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
+			if (toSmallVTTSWarning  <= 3) {
+				log.warn("The VTTS is " + vtts_hour + " and considered as too small. Setting the VTTS to 1.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
+			}
+			if (toSmallVTTSWarning == 3) {
+				log.warn("Additional warnings of this type are suppressed.");
+			}
+			toSmallVTTSWarning++;			
 			vtts_hour = 1.0;
 		}
 		
-		if (vtts_hour > 1000.) {
-			log.warn("The VTTS is " + vtts_hour + " and considered as too large. Setting the VTTS to 1000.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
-			vtts_hour = 1000.0;
+		if (vtts_hour > 1000000.) {
+			if (toLargeVTTSWarning  <= 3) {
+				log.warn("The VTTS is " + vtts_hour + " and considered as too large. Setting the VTTS to 1000000.0. Further information: " + link + "/" + time + "/" + person + "/" + vehicle);
+			}
+			if (toLargeVTTSWarning == 3) {
+				log.warn("Additional warnings of this type are suppressed.");
+			}
+			toLargeVTTSWarning++;
+			vtts_hour = 1000000.0;
 		}
 		
 		double logNormalRnd = 1. ;

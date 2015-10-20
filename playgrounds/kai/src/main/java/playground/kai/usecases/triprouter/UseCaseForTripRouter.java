@@ -19,10 +19,9 @@
 package playground.kai.usecases.triprouter;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
+
+import javax.inject.Provider;
 
 /**
  * @author nagel
@@ -37,12 +36,12 @@ class UseCaseForTripRouter {
 
 		final Controler ctrl = new Controler(args) ;
 		
-		ctrl.setTripRouterFactory( new TripRouterFactory() {
+		ctrl.setTripRouterFactory( new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
 		
 			@Override
-			public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-				TripRouterFactory trf = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl( ctrl.getScenario() ) ;
-				TripRouter router = trf.instantiateAndConfigureTripRouter(routingContext) ;
+			public TripRouter get() {
+				Provider<TripRouter> trf = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(ctrl.getScenario());
+				TripRouter router = trf.get() ;
 				return router ;
 			}
 			

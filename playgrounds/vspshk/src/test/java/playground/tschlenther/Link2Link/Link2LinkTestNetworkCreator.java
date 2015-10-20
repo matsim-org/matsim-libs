@@ -82,7 +82,7 @@ public class Link2LinkTestNetworkCreator {
 		network.addLink(link1);
 		
 		Link link2 = factory.createLink((LINK_ID2), node2, node3);		
-		link2.setCapacity(1800);
+		link2.setCapacity(3600);
 		link2.setLength(1000);
 		link2.setFreespeed(201);
 		network.addLink(link2);	

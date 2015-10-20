@@ -79,34 +79,41 @@ public class PersonTripAnalysisMain {
 	private static String congestionEventsFile;
 		
 	public static void main(String[] args) {
+			
+		log.info("Searching for run-directory in args at index 0...");
+		String runDirectory;
 		
 		if (args.length > 0) {
-			throw new RuntimeException("Aborting...");
+			runDirectory = args[0];
+			log.info("Run-directory found at index 0.");
 			
-		} else {			
+		} else {
 			
 			String id = "c13";
-			
-			String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
-//			String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/c/output/";
-			
-			networkFile = runDirectory + id + "/output_network.xml.gz";
-			configFile = runDirectory + id + "/output_config.xml.gz";
-			
-			eventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			outputPath = runDirectory + id + "/ITERS/it.100/detailedAnalysis/";
-			populationFile = runDirectory + id + "/output_plans.xml.gz";
-			
-			noiseEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			
+			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+						
+			runDirectory = baiscDirectoryPath + id + "/";
+			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(runDirectory);
 		analysis.run();
 	}
+	
+	public PersonTripAnalysisMain(String runDirectory) {
+		
+		networkFile = runDirectory + "output_network.xml.gz";
+		configFile = runDirectory + "output_config.xml.gz";
+		
+		eventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
+		outputPath = runDirectory + "ITERS/it.100/detailedAnalysis/";
+		populationFile = runDirectory + "output_plans.xml.gz";
+		
+		noiseEventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
+		congestionEventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
+	}
 
-	private void run() {
+	public void run() {
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();
@@ -135,7 +142,7 @@ public class PersonTripAnalysisMain {
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
 		events.addHandler(congestionHandler);
-//		events.addHandler(noiseHandler);
+		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -173,17 +180,17 @@ public class PersonTripAnalysisMain {
 		
 		// noise events analysis
 	
-//		if (noiseHandler.isCaughtNoiseEvent()) {
-//			log.info("Noise events have already been analyzed based on the standard events file.");
-//		} else {
-//			EventsManager eventsNoise = EventsUtils.createEventsManager();
-//			eventsNoise.addHandler(noiseHandler);
-//					
-//			log.info("Reading noise events file...");
-//			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-//			noiseEventReader.parse(noiseEventsFile);
-//			log.info("Reading noise events file... Done.");	
-//		}	
+		if (noiseHandler.isCaughtNoiseEvent()) {
+			log.info("Noise events have already been analyzed based on the standard events file.");
+		} else {
+			EventsManager eventsNoise = EventsUtils.createEventsManager();
+			eventsNoise.addHandler(noiseHandler);
+					
+			log.info("Reading noise events file...");
+			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
+			noiseEventReader.parse(noiseEventsFile);
+			log.info("Reading noise events file... Done.");	
+		}	
 		
 		// print the results
 		

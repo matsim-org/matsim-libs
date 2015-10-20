@@ -33,11 +33,13 @@ import java.util.List;
  */
 public class SimpleCTNetworkWalker implements DriverAgent {
 
+	private final Id<Person> id;
 	private List<Id<Link>> links;
 	private int idx = 1;
 
-	public SimpleCTNetworkWalker(List<Id<Link>> links) {
+	public SimpleCTNetworkWalker(List<Id<Link>> links, Id<Person> id) {
 		this.links = links;
+		this.id = id;
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class SimpleCTNetworkWalker implements DriverAgent {
 
 	@Override
 	public Id<Person> getId() {
-		return null;
+		return this.id;
 	}
 
 	@Override

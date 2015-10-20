@@ -123,9 +123,8 @@ public class MatrixBasedPtRouterIntegrationTest {
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);
 		
 		//create new pt matrix
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
-		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
-
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
+		controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix));
 		//execute MATSim run
 		controler.run();
 		
@@ -140,5 +139,5 @@ public class MatrixBasedPtRouterIntegrationTest {
 		Assert.assertEquals(ttime, actualTtime, 0);
 		
 	}
-	
+
 }

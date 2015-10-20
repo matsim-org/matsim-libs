@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -73,7 +73,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
         c.getConfig().controler().setCreateGraphs(false);
         c.setDumpDataAtEnd(false);
@@ -144,7 +144,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
         c.getConfig().controler().setCreateGraphs(false);
         c.setDumpDataAtEnd(false);

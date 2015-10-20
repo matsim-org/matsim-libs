@@ -3,9 +3,13 @@ package playground.benjamin.scenarios.santiago.network;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -28,9 +32,13 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
+import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder;
+
 public class CreateMergedNetwork {
+	private static final Logger log = Logger.getLogger(CreateMergedNetwork.class);
 	
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
 
@@ -51,12 +59,126 @@ public class CreateMergedNetwork {
 		onr.setHierarchyLayer(boundingBox3[3], boundingBox3[0], boundingBox3[1], boundingBox3[2], 5);
 		
 		onr.parse(workingDirInputFiles+"networkOSM/santiago_tertiary.osm");
+		
+		createConnectionLinks(network);
+		removeSomeStreets(network);
+		changeNumberOfLanes(network);
+		
+		new NetworkCleaner().run(network);
+		
+		createRoadTypeMappingForHBEFA(network);
+		changeFreespeedInSecondaryNetwork(network);
+		
+		addNetworkModes(network);
+		
+		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
+		
+		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
+		calcMinMaxCoord(network);
+		
+		log.info("Finished network creation.");
+	}
+	
+	private static void changeNumberOfLanes(NetworkImpl network) {
+		//change number of lanes according to kt's e-mail
+		int newNLanes = 2;
+		network.getLinks().get(Id.createLinkId("10308")).setCapacity(network.getLinks().get(Id.createLinkId("10308")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10308")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10308")).setNumberOfLanes(newNLanes);
 
+		network.getLinks().get(Id.createLinkId("10309")).setCapacity(network.getLinks().get(Id.createLinkId("10309")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10309")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10309")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10310")).setCapacity(network.getLinks().get(Id.createLinkId("10310")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10310")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10310")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10311")).setCapacity(network.getLinks().get(Id.createLinkId("10311")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10311")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10311")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10326")).setCapacity(network.getLinks().get(Id.createLinkId("10326")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10326")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10326")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10327")).setCapacity(network.getLinks().get(Id.createLinkId("10327")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10327")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10327")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10328")).setCapacity(network.getLinks().get(Id.createLinkId("10328")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10328")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10328")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10329")).setCapacity(network.getLinks().get(Id.createLinkId("10329")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10329")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10329")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10330")).setCapacity(network.getLinks().get(Id.createLinkId("10330")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10330")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10330")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10331")).setCapacity(network.getLinks().get(Id.createLinkId("10331")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10331")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10331")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10332")).setCapacity(network.getLinks().get(Id.createLinkId("10332")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10332")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10332")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10333")).setCapacity(network.getLinks().get(Id.createLinkId("10333")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10333")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10333")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10334")).setCapacity(network.getLinks().get(Id.createLinkId("10334")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10334")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10334")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10335")).setCapacity(network.getLinks().get(Id.createLinkId("10335")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10335")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10335")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10336")).setCapacity(network.getLinks().get(Id.createLinkId("10336")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10336")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10336")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("10337")).setCapacity(network.getLinks().get(Id.createLinkId("10337")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10337")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("10337")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("21383")).setCapacity(network.getLinks().get(Id.createLinkId("21383")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21383")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("21383")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("21384")).setCapacity(network.getLinks().get(Id.createLinkId("21384")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21384")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("21384")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("21381")).setCapacity(network.getLinks().get(Id.createLinkId("21381")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21381")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("21381")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("21382")).setCapacity(network.getLinks().get(Id.createLinkId("21382")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21382")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("21382")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16272")).setCapacity(network.getLinks().get(Id.createLinkId("16272")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16272")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16272")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16273")).setCapacity(network.getLinks().get(Id.createLinkId("16273")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16273")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16273")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16270")).setCapacity(network.getLinks().get(Id.createLinkId("16270")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16270")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16270")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16271")).setCapacity(network.getLinks().get(Id.createLinkId("16271")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16271")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16271")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16268")).setCapacity(network.getLinks().get(Id.createLinkId("16268")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16268")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16268")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("16269")).setCapacity(network.getLinks().get(Id.createLinkId("16269")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16269")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("16269")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("19484")).setCapacity(network.getLinks().get(Id.createLinkId("19484")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("19484")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("19484")).setNumberOfLanes(newNLanes);
+
+		network.getLinks().get(Id.createLinkId("19485")).setCapacity(network.getLinks().get(Id.createLinkId("19485")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("19485")).getNumberOfLanes());
+		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
+	}
+
+	private static void removeSomeStreets(NetworkImpl network) {
+		//remove small streets in the south-west of the network
+		network.removeLink(Id.createLinkId("4978"));
+		network.removeLink(Id.createLinkId("9402"));
+	}
+
+	private static void createConnectionLinks(NetworkImpl network) {
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
 		network.addNode(node);
-		
+
 		Link link01 = netFactory.createLink(Id.createLinkId("l_add_01"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315588")), network, 50.2, 40/3.6, 600, 1);
 		network.addLink(link01);
 		Link link02 = netFactory.createLink(Id.createLinkId("l_add_02"), network.getNodes().get(Id.createNodeId("267315588")), network.getNodes().get(Id.createNodeId("n_add_01")), network, 50.2, 40/3.6, 600, 1);
@@ -69,110 +191,130 @@ public class CreateMergedNetwork {
 		network.addLink(link05);
 		Link link06 = netFactory.createLink(Id.createLinkId("l_add_06"), network.getNodes().get(Id.createNodeId("267315716")), network.getNodes().get(Id.createNodeId("n_add_01")), network, 233.03, 40/3.6, 600, 1);
 		network.addLink(link06);
-		
-		//remove small streets in the south west of the network
-		network.removeLink(Id.createLinkId("4978"));
-		network.removeLink(Id.createLinkId("9402"));
-		
-		//change number of lanes according to kt's e-mail
-		int newNLanes = 2;
-		network.getLinks().get(Id.createLinkId("10308")).setCapacity(network.getLinks().get(Id.createLinkId("10308")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10308")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10308")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10309")).setCapacity(network.getLinks().get(Id.createLinkId("10309")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10309")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10309")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10310")).setCapacity(network.getLinks().get(Id.createLinkId("10310")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10310")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10310")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10311")).setCapacity(network.getLinks().get(Id.createLinkId("10311")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10311")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10311")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10326")).setCapacity(network.getLinks().get(Id.createLinkId("10326")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10326")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10326")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10327")).setCapacity(network.getLinks().get(Id.createLinkId("10327")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10327")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10327")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10328")).setCapacity(network.getLinks().get(Id.createLinkId("10328")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10328")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10328")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10329")).setCapacity(network.getLinks().get(Id.createLinkId("10329")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10329")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10329")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10330")).setCapacity(network.getLinks().get(Id.createLinkId("10330")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10330")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10330")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10331")).setCapacity(network.getLinks().get(Id.createLinkId("10331")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10331")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10331")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10332")).setCapacity(network.getLinks().get(Id.createLinkId("10332")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10332")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10332")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10333")).setCapacity(network.getLinks().get(Id.createLinkId("10333")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10333")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10333")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10334")).setCapacity(network.getLinks().get(Id.createLinkId("10334")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10334")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10334")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10335")).setCapacity(network.getLinks().get(Id.createLinkId("10335")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10335")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10335")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10336")).setCapacity(network.getLinks().get(Id.createLinkId("10336")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10336")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10336")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("10337")).setCapacity(network.getLinks().get(Id.createLinkId("10337")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10337")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("10337")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("21383")).setCapacity(network.getLinks().get(Id.createLinkId("21383")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21383")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("21383")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("21384")).setCapacity(network.getLinks().get(Id.createLinkId("21384")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21384")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("21384")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("21381")).setCapacity(network.getLinks().get(Id.createLinkId("21381")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21381")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("21381")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("21382")).setCapacity(network.getLinks().get(Id.createLinkId("21382")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("21382")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("21382")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16272")).setCapacity(network.getLinks().get(Id.createLinkId("16272")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16272")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16272")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16273")).setCapacity(network.getLinks().get(Id.createLinkId("16273")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16273")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16273")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16270")).setCapacity(network.getLinks().get(Id.createLinkId("16270")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16270")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16270")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16271")).setCapacity(network.getLinks().get(Id.createLinkId("16271")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16271")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16271")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16268")).setCapacity(network.getLinks().get(Id.createLinkId("16268")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16268")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16268")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("16269")).setCapacity(network.getLinks().get(Id.createLinkId("16269")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("16269")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("16269")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("19484")).setCapacity(network.getLinks().get(Id.createLinkId("19484")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("19484")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("19484")).setNumberOfLanes(newNLanes);
-		
-		network.getLinks().get(Id.createLinkId("19485")).setCapacity(network.getLinks().get(Id.createLinkId("19485")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("19485")).getNumberOfLanes());
-		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
-		
-		new NetworkCleaner().run(network);
-		
-		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
-		
-		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
-		calcMinMaxCoord(network);
-		
-		System.out.println("### Finished network creation. ###");
-		
 	}
-	
+
+	private static void createRoadTypeMappingForHBEFA(NetworkImpl network) {
+		for(Link ll : network.getLinks().values()){
+			double fs = ll.getFreespeed();
+			// TODO: rural areas might not be not considered; count the cases and decide...
+			if(fs <= 8.333333334){ //30kmh
+				((LinkImpl) ll).setType("URB/Access/30");
+			} else if(fs <= 11.111111112){ //40kmh
+				((LinkImpl) ll).setType("URB/Access/40");
+			} else if(fs <= 13.888888889){ //50kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setType("URB/Local/50");
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setType("URB/Distr/50");
+				} else if(lanes > 2.0){
+					((LinkImpl) ll).setType("URB/Trunk-City/50");
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 16.666666667){ //60kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setType("URB/Local/60");
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setType("URB/Trunk-City/60");
+				} else if(lanes > 2.0){
+					((LinkImpl) ll).setType("URB/MW-City/60");
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 19.444444445){ //70kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setType("RUR/Distr/70");
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setType("RUR/Trunk/70");
+				} else if(lanes > 2.0){
+					((LinkImpl) ll).setType("URB/MW-City/70");
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 22.222222223){ //80kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setType("RUR/Distr/80");
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setType("RUR/Trunk/80");
+				} else if(lanes > 2.0){
+					((LinkImpl) ll).setType("URB/MW-Nat./80");
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 27.777777778){ //100kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setType("RUR/Distr/100");
+				} else if(lanes > 1.0){
+					((LinkImpl) ll).setType("RUR/MW/100");
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 33.333333334){ //120kmh
+				((LinkImpl) ll).setType("RUR/MW/120");
+			} else if(fs > 33.333333334){ //faster
+				((LinkImpl) ll).setType("RUR/MW/>130");
+			} else{
+				throw new RuntimeException("Link not considered...");
+			}
+		}
+	}
+
+	private static void changeFreespeedInSecondaryNetwork(NetworkImpl network) {
+		for(Link ll : network.getLinks().values()){
+			double fs = ll.getFreespeed();
+			if(fs <= 8.333333334){ //30kmh
+				((LinkImpl) ll).setFreespeed(0.5 * ll.getFreespeed());
+			} else if(fs <= 11.111111112){ //40kmh
+				((LinkImpl) ll).setFreespeed(0.5 * ll.getFreespeed());
+			} else if(fs <= 13.888888889){ //50kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setFreespeed(0.5 * ll.getFreespeed());
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setFreespeed(0.75 * ll.getFreespeed());
+				} else if(lanes > 2.0){
+					// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 16.666666667){ //60kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((LinkImpl) ll).setFreespeed(0.5 * ll.getFreespeed());
+				} else if(lanes <= 2.0){
+					((LinkImpl) ll).setFreespeed(0.75 * ll.getFreespeed());
+				} else if(lanes > 2.0){
+					// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs > 16.666666667){
+				// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+			} else{
+				throw new RuntimeException("Link not considered...");
+			}
+		}
+	}
+
+	private static void addNetworkModes(NetworkImpl network) {
+		Set<String> allowedModes = new HashSet<>();
+		allowedModes.add(TransportMode.car);
+		allowedModes.add(TransportMode.ride);
+		allowedModes.add(SantiagoScenarioConstants.Modes.taxi.toString());
+		allowedModes.add(SantiagoScenarioConstants.Modes.colectivo.toString());
+		allowedModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
+		allowedModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
+		for(Link ll : network.getLinks().values()){
+			ll.setAllowedModes(allowedModes);
+		}
+	}
+
 	private static void convertNet2Shape(Network network, String crs, String outputDir){
-		
 		createDir(new File(outputDir));
 		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -215,15 +357,14 @@ public class CreateMergedNetwork {
 	
 	private static void calcMinMaxCoord(Network network) {
 		double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
-		System.out.println("Network bounding box:");
-		System.out.println("minX "+ box[0]);
-		System.out.println("minY "+ box[1]);
-		System.out.println("maxX "+ box[2]);
-		System.out.println("maxY "+ box[3]);
+		log.info("Network bounding box:");
+		log.info("minX "+ box[0]);
+		log.info("minY "+ box[1]);
+		log.info("maxX "+ box[2]);
+		log.info("maxY "+ box[3]);
 	}
 	
 	private static void createDir(File file) {
-		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
+		log.info("Directory " + file + " created: "+ file.mkdirs());	
 	}
-
 }

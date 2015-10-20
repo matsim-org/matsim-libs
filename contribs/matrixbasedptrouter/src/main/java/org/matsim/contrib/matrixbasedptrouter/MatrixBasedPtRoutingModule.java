@@ -36,6 +36,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,7 +62,8 @@ public final class MatrixBasedPtRoutingModule implements RoutingModule {
 	private final GenericRouteFactory genericRouteFactory;
 	private final PtMatrix ptMatrix;
 	private final Scenario scenario;
-	
+
+	@Inject
 	public MatrixBasedPtRoutingModule(Scenario scenario, PtMatrix ptMatrix) {
 		this.scenario = scenario;
 		this.genericRouteFactory = new GenericRouteFactory();

@@ -34,9 +34,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
-import playground.ikaddoura.router.VTTSTollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -45,7 +46,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
@@ -144,7 +145,7 @@ public class CongestionPricingControler {
 				
 			} else if (router.equals("randomized")) {
 				
-				final RandomizedTollTimeDistanceTravelDisutilityFactory factory = new RandomizedTollTimeDistanceTravelDisutilityFactory(
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 						new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 						tollHandler
 					) ;
@@ -159,7 +160,7 @@ public class CongestionPricingControler {
 				
 			} else if (router.equals("VTTSspecific")) {
 				
-				final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
+				final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
 						new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
 						tollHandler
 					);
@@ -209,6 +210,10 @@ public class CongestionPricingControler {
 			controler.addOverridingModule(new OTFVisModule());
 			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 			controler.run();
+			
+			// analysis
+			PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+			analysis.run();
 		}
 
 	}

@@ -22,7 +22,7 @@ import java.util.*;
 public class CTLink implements CTNetworkEntity {
 
 
-	static final double WIDTH = 1;
+	public static final double WIDTH = 4;
 	private static final Logger log = Logger.getLogger(CTLink.class);
 	private static final double EPSILON = 0.00001;
 	private final CTNetwork network;
@@ -66,7 +66,7 @@ public class CTLink implements CTNetworkEntity {
 
 		debugBound(dx, dy);
 
-		double width = Math.max(this.dsLink.getCapacity() / 1.33, 2);
+		double width = Math.max(this.dsLink.getCapacity() / 1.33, WIDTH + 3);
 
 
 		Coordinate[] bounds = new Coordinate[5];
@@ -91,8 +91,9 @@ public class CTLink implements CTNetworkEntity {
 		Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
 		Map<ProtoCell, Geometry> geoMap = new HashMap<>();
 		for (ProtoCell pt : cells) {
-			CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH);
-			c.setArea(1.5 * Math.sqrt(3) * WIDTH * WIDTH);
+			double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
+			CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH / 2, area);
+
 
 			cellsMap.put(pt, c);
 			Coordinate[] coords = new Coordinate[pt.edges.size() * 2];
@@ -170,14 +171,14 @@ public class CTLink implements CTNetworkEntity {
 
 
 		//create pseudo cells
-		this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, width / WIDTH);
+		this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, width, width * width);
 		double dir = Math.PI / 2.;
 		for (CTCell ctCell : dsJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
 			this.dsJumpOn.addFace(face);
 			ctCell.addNeighbor(this.dsJumpOn);
 		}
-		this.usJumpOn = new CTLinkCell(0, 0, this.network, this, width / WIDTH);
+		this.usJumpOn = new CTLinkCell(0, 0, this.network, this, width, width * width);
 		dir = -Math.PI / 2.;
 		for (CTCell ctCell : usJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -286,6 +287,10 @@ public class CTLink implements CTNetworkEntity {
 		maxY = maxY > y3 ? maxY : y3;
 		List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
 		for (GraphEdge ge : edges) {
+//			double aa = ge.x1-ge.x2;
+//			double bb = ge.y1-ge.y2;
+//			double cc = Math.sqrt(aa*aa+bb*bb);
+//			log.info(cc);
 
 			ProtoCell c0 = cells.get(ge.site1);
 			c0.edges.add(ge);

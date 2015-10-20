@@ -30,11 +30,9 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouter;
@@ -44,15 +42,15 @@ import javax.inject.Provider;
 /**
  * @author cdobler
  */
-public class TransitTripRouterFactory implements TripRouterFactory {
+public class TransitTripRouterFactory implements Provider<TripRouter> {
 	
 	private static final Logger log = Logger.getLogger(TransitTripRouterFactory.class);
 		
-	private final TripRouterFactory delegateFactory;
+	private final Provider<TripRouter> delegateFactory;
 	private final Provider<TransitRouter> transitRouterFactory;
 	private final Scenario scenario;
 		
-	public TransitTripRouterFactory(Scenario scenario, TripRouterFactory delegateFactory,
+	public TransitTripRouterFactory(Scenario scenario, Provider<TripRouter> delegateFactory,
 			Provider<TransitRouter> transitRouterFactory) {
 		this.scenario = scenario;
 		this.delegateFactory = delegateFactory;
@@ -60,9 +58,9 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+	public TripRouter get() {
 
-		TripRouter tripRouter = this.delegateFactory.instantiateAndConfigureTripRouter(routingContext);
+		TripRouter tripRouter = this.delegateFactory.get();
 		
 		if (this.scenario.getConfig().transit().isUseTransit()) {
 

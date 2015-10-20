@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.jointtrips.router.JointTripRouterModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.replanning.ReplanningContext;
@@ -37,7 +38,6 @@ import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouterFactory;
-import org.matsim.contrib.socnetsim.jointtrips.router.JointTripRouterFactory;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 
 /**
@@ -52,8 +52,7 @@ public class JointTripsModule extends AbstractModule {
 		bind(Mobsim.class).toProvider(JointQSimFactory.class);
 
 		bind( ScoringFunctionFactory.class ).to(CharyparNagelWithJointModesScoringFunctionFactory.class);
-		bind( TripRouter.class ).toProvider( JointTripRouterFactory.class );
-
+		install(new JointTripRouterModule());
 		// TODO: extract in files (messy and not modular)
 		addControlerListenerBinding().toInstance(
 				new AbstractPrepareForSimListener() {

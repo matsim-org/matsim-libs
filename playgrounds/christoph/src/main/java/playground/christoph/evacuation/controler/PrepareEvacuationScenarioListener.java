@@ -40,10 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -80,7 +77,7 @@ public class PrepareEvacuationScenarioListener {
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
 	private TransitRouterNetwork transitRouterNetwork;
-	private TripRouterFactory tripRouterFactory;
+	private javax.inject.Provider<TripRouter> tripRouterFactory;
 	
 	public void prepareScenario(Scenario scenario) {
 
@@ -278,20 +275,20 @@ public class PrepareEvacuationScenarioListener {
 //	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
 	        transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
 		}
-		
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+
+		javax.inject.Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+		javax.inject.Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
+		javax.inject.Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory,
 				transitRouterFactory);
 		
 		this.tripRouterFactory = transitTripRouterFactory;
 	}
 	
-	private TripRouter createTripRouterInstance(Scenario scenario, TripRouterFactory tripRouterFactory) {
+	private TripRouter createTripRouterInstance(Scenario scenario, javax.inject.Provider<TripRouter> tripRouterFactory) {
 		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
-		return tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		return tripRouterFactory.get();
 	}
 
 }

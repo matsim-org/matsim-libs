@@ -30,26 +30,21 @@ import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.CTEvent;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by laemmel on 12/10/15.
  */
 public class CTNodeCell extends CTCell {
 
-	private final Map<Id<Link>, LinkedList<CTPed>> peds = new HashMap<>();
+	private final Map<Id<Link>, DirInfo> dirInfos = new HashMap<>();
 
 
 	public CTNodeCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width) {
-		super(x, y, net, parent, width);
-		Node node = ((CTNode) parent).getNode();
-		for (Link l : node.getOutLinks().values()) {
-			peds.put(l.getId(), new LinkedList<CTPed>());
-		}
+		super(x, y, net, parent, width, 0);
+
 	}
+
 
 	@Override
 	public void updateIntendedCellJumpTimeAndChooseNextJumper(double now) {
@@ -62,16 +57,17 @@ public class CTNodeCell extends CTCell {
 		}
 		double minJumpTime = Double.POSITIVE_INFINITY;
 		CTPed nextJumper = null;
-		for (LinkedList<CTPed> l : this.peds.values()) {
+		for (DirInfo info : this.dirInfos.values()) {
+			LinkedList<CTPed> l = info.peds;
 			if (l.size() == 0) {
 				continue;
 			}
-			double rate = chooseNextCellAndReturnJumpRate(l.peek());
-
+			double j = chooseNextCellAndReturnJ(l.peek());
 			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
+			double nxtJmpTm = rnd / (getDirectionalProportion(l.peek()) * j);
+
+			if (nxtJmpTm < minJumpTime) {
+				minJumpTime = nxtJmpTm;
 				nextJumper = l.peek();
 			}
 
@@ -81,7 +77,7 @@ public class CTNodeCell extends CTCell {
 		}
 		this.next = nextJumper;
 
-		this.nextCellJumpTime = minJumpTime;
+		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
 		this.currentEvent = e;
 		this.net.addEvent(e);
@@ -107,7 +103,9 @@ public class CTNodeCell extends CTCell {
 
 	@Override
 	public void jumpOffPed(CTPed ctPed, double time) {
-		LinkedList<CTPed> l = this.peds.get(ctPed.getNextLinkId());
+		DirInfo info = this.dirInfos.get(ctPed.getNextLinkId());
+		LinkedList<CTPed> l = info.peds;
+
 		if (l.peek() != ctPed) {
 			throw new RuntimeException("Pedestrian: " + ctPed + " is not first one in the expected queue!");
 		}
@@ -120,13 +118,16 @@ public class CTNodeCell extends CTCell {
 
 		this.n--;
 		this.setRho(this.n / getAlpha());
+		updateDirProps();
+
+		List<CTCellFace> f = this.getFaces();
+		Collections.shuffle(f);
 	}
 
 	@Override
 	public boolean jumpOnPed(CTPed ctPed, double time) {
 		DriverAgent driver = ctPed.getDriver();
-		if (peds.containsKey(driver.getCurrentLinkId())) {
-//			log.warn("wrong direction my friend!");
+		if (dirInfos.containsKey(driver.getCurrentLinkId())) {
 			return false;
 		}
 
@@ -137,15 +138,12 @@ public class CTNodeCell extends CTCell {
 			en.letPedArrive(ctPed);
 		}
 		else {
-//			Id<Link> nextL = ctPed.getNextLinkId();
-//			LinkedList<CTPed> xx = this.peds.get(nextL);
-//			if (xx == null) {
-//				System.out.println("Gotcha!");
-//			}
-//			xx.add(ctPed);
-			this.peds.get(ctPed.getNextLinkId()).add(ctPed);
+			DirInfo info = this.dirInfos.get(ctPed.getNextLinkId());
+			info.peds.add(ctPed);
+			ctPed.setDir(info.dir);
 			this.n++;
 			this.setRho(this.n / getAlpha());
+			updateDirProps();
 		}
 
 		return true;
@@ -154,6 +152,29 @@ public class CTNodeCell extends CTCell {
 	@Override
 	HashSet<CTPed> getPeds() {
 		return null;
+	}
+
+	@Override
+	double getDirectionalProportion(CTPed ped) {
+
+		DirInfo info = this.dirInfos.get(ped.getNextLinkId());
+		if (info == null) {
+			return 1.;
+		}
+		if (this.n == 0) {
+			return 1;
+		}
+		return info.dirProp;
+	}
+
+	private void updateDirProps() {
+
+		for (DirInfo nfo : this.dirInfos.values()) {
+			nfo.dirProp = (double) nfo.peds.size() / (double) this.n;
+			if (Double.isNaN(nfo.dirProp)) {
+				nfo.dirProp = 0;
+			}
+		}
 	}
 
 	public void init() {
@@ -171,5 +192,33 @@ public class CTNodeCell extends CTCell {
 		double area = (maxCap / 1.33) * (maxCap / 1.33);
 
 		setArea(area);
+		Node node = ((CTNode) parent).getNode();
+		for (Link l : node.getOutLinks().values()) {
+
+			CTLink ctLink = net.getLinks().get(l.getId());
+			double dir;
+			if (ctLink.getDsLink() == l) {
+				dir = Math.PI / 2;
+			}
+			else {
+				if (ctLink.getUsLink() == l) {
+					dir = -Math.PI / 2;
+				}
+				else {
+					throw new RuntimeException("Network seems to be faulty wired");
+				}
+			}
+			this.dirInfos.put(l.getId(), new DirInfo(dir));
+		}
+	}
+
+	private static final class DirInfo {
+		private final double dir;
+		LinkedList<CTPed> peds = new LinkedList<CTPed>();
+		double dirProp = 0;
+
+		public DirInfo(double dir) {
+			this.dir = dir;
+		}
 	}
 }

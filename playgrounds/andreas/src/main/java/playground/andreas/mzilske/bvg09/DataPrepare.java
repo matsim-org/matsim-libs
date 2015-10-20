@@ -42,8 +42,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -71,6 +70,8 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 
 import playground.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
+
+import javax.inject.Provider;
 
 public class DataPrepare {
 
@@ -171,13 +172,11 @@ public class DataPrepare {
 		final TripRouterFactoryBuilderWithDefaults builder =
 				new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory( dijkstraFactory );
-		final TripRouterFactory factory = builder.build( scenario );
+		final Provider<TripRouter> factory = builder.build( scenario );
 		final PersonAlgorithm router =
 				new PlanRouter(
-						factory.instantiateAndConfigureTripRouter(
-								new RoutingContextImpl(
-										timeCostCalculator,
-										timeCostCalculator)));
+						factory.get(
+						));
 		//PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
 		//		this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(),
 		//		transitConfig, new TransitRouterImpl(transitRouterConfig, this.scenario.getTransitSchedule() ), this.scenario.getTransitSchedule());

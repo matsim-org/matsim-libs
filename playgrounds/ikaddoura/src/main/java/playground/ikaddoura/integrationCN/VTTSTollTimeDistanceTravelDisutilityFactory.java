@@ -17,14 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.congestion.routing;
+package playground.ikaddoura.integrationCN;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
 import playground.vsp.congestion.handlers.TollHandler;
 
 
@@ -32,24 +33,27 @@ import playground.vsp.congestion.handlers.TollHandler;
  * @author ikaddoura
  *
  */
-public final class RandomizedTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class VTTSTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private TravelTimeAndDistanceBasedTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
+	private VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
+	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 
-	public RandomizedTollTimeDistanceTravelDisutilityFactory(TravelTimeAndDistanceBasedTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public VTTSTollTimeDistanceTravelDisutilityFactory(VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, TollHandler tollHandler) {
+		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
+		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
-		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		
-		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
+		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
-		return new RandomizedTollTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+		return new TollTimeDistanceTravelDisutility(
+				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				this.noiseContext,
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
 				this.sigma

@@ -21,15 +21,23 @@ package tutorial.programming.example13MultiStageTripRouting;
 
 import java.util.Map;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -38,7 +46,6 @@ import org.matsim.facilities.ActivityOption;
  * @author thibautd
  */
 public class RunTeleportationMobsimWithCustomRoutingExample {
-	// this assumes the script is launched from matsim/trunk/
 	private static final String configFile = "examples/pt-tutorial/config.xml";
 
 	public static void main(final String[] args) {
@@ -63,17 +70,31 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 					controler.getScenario().getNetwork().getLinks().get( Id.create( "2333", Link.class ) ));
 
 		// now, plug our stuff in
-		controler.setTripRouterFactory(
-				new MyTripRouterFactory(
-						scenario,
-						teleport));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding(MyRoutingModule.TELEPORTATION_MAIN_MODE).toProvider(
+						new MyRoutingModuleProvider(
+								// the module uses the trip router for the PT part.
+								// This allows to automatically adapt to user settings,
+								// including if they are specified at a later stage
+								// in the initialisation process.
+								binder().getProvider(Key.get(RoutingModule.class, Names.named(TransportMode.pt))),
+								scenario.getPopulation().getFactory(),
+								teleport));
+				// we still need to provide a way to identify our trips
+				// as being teleportation trips.
+				// This is for instance used at re-routing.
+				bind(MainModeIdentifier.class).toInstance(new MyMainModeIdentifier(new MainModeIdentifierImpl()));
+			}
+		});
 		
 		// run the controler:
 		controler.run();
 	}
 
 	private static void tuneConfig(final Config config) {
-		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MyTripRouterFactory.TELEPORTATION_MAIN_MODE );
+		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MyRoutingModule.TELEPORTATION_MAIN_MODE );
 
 		final ActivityParams scoreTelepInteract = new ActivityParams( MyRoutingModule.STAGE );
 		scoreTelepInteract.setTypicalDuration( 2 * 60 );
@@ -85,7 +106,7 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 	private static ActivityFacility createFacility(
 			final Id<ActivityFacility> id,
 			final Link link) {
-		if ( link == null ) throw new IllegalArgumentException( "link == "+link );
+		if ( link == null ) throw new IllegalArgumentException( "link == null");
 		
 		return new ActivityFacility() {
 			@Override

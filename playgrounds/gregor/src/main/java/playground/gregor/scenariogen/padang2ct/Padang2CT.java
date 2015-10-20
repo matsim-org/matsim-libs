@@ -136,7 +136,8 @@ public class Padang2CT {
 		mode.add("walkct");
 		for (Link l : sc.getNetwork().getLinks().values()) {
 			if (l.getId().toString().contains("el")) {
-				l.setCapacity(100 * 1.33);
+				l.setCapacity(20 * 1.33);
+				l.setLength(1000);
 			}
 			l.setAllowedModes(mode);
 		}
