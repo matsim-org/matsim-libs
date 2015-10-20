@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.multimodal;
 
+import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,18 +39,26 @@ import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 
 import javax.inject.Provider;
 import java.util.Collections;
@@ -65,30 +74,23 @@ public class MultiModalTripRouterTest {
 	@Test
 	public void testRouteLeg() {
 		
-		Config config = ConfigUtils.createConfig();
+		final Config config = ConfigUtils.createConfig();
 		config.plansCalcRoute().addParam("teleportedModeSpeed_bike", "6.01");
 		config.plansCalcRoute().addParam("teleportedModeFreespeedFactor_pt", "2.0");
 		config.plansCalcRoute().addParam("teleportedModeSpeed_ride", "15.0");
 		config.plansCalcRoute().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
 		config.plansCalcRoute().addParam("teleportedModeSpeed_walk", "1.34");
 		
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
 		
-//		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		config.addModule(multiModalConfigGroup);
 		multiModalConfigGroup.setSimulatedModes(TransportMode.bike + ", " + TransportMode.walk + ", " + TransportMode.ride + ", " + TransportMode.pt);
 		
 		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
-		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(config, linkSlopes);
-		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 
-		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
-		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-		
 		/*
 		 * Use a ...
 		 * - defaultDelegateFactory for the QNetsim modes
@@ -100,11 +102,24 @@ public class MultiModalTripRouterTest {
 		 * - only "fast" router implementations handle sub-networks correct
 		 * - AStarLandmarks uses link speed information instead of agent speeds
 		 */
-		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
-				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
 
-		TripRouter tripRouter = multiModalTripRouterFactory.get();
+		MultiModalModule multiModalModule = new MultiModalModule();
+		multiModalModule.setLinkSlopes(linkSlopes);
+		Injector injector = Injector.createInjector(
+				config,
+				AbstractModule.override(Collections.singleton(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(config));
+						install(new TripRouterModule());
+						install(new TravelTimeCalculatorModule());
+						install(new TravelDisutilityModule());
+						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
+					}
+				}), multiModalModule));
+
+		TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		PlanRouter planRouter = new PlanRouter(tripRouter);
 		
 		/*

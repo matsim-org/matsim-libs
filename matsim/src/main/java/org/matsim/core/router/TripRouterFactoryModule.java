@@ -22,6 +22,9 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.Key;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -68,28 +71,35 @@ public class TripRouterFactoryModule extends AbstractModule {
             for (String mode : getConfig().transit().getTransitModes()) {
                 addRoutingModuleBinding(mode).toProvider(TransitRoutingModuleProvider.class);
             }
+//            addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
     }
 
     private static class TransitRoutingModuleProvider implements Provider<RoutingModule> {
 
-        @Inject
-        TransitRouter transitRouter;
+        private final TransitRouter transitRouter;
+
+        private final Scenario scenario;
+
+        private final RoutingModule transitWalkRouter;
 
         @Inject
-        Scenario scenario;
+        TransitRoutingModuleProvider(TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.transit_walk) RoutingModule transitWalkRouter) {
+            this.transitRouter = transitRouter;
+            this.scenario = scenario;
+            this.transitWalkRouter = transitWalkRouter;
+        }
 
         @Override
         public RoutingModule get() {
             return new TransitRouterWrapper(transitRouter,
                         scenario.getTransitSchedule(),
-                        scenario.getNetwork(), // use a walk router in case no PT path is found
-                        DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(),
-                                scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ) )) ;
+                        scenario.getNetwork(),
+                        transitWalkRouter);
         }
     }
 
-    private static class NetworkRoutingModuleProvider implements Provider<RoutingModule> {
+    public static class NetworkRoutingModuleProvider implements Provider<RoutingModule> {
 
         @Inject
         Map<String, TravelTime> travelTimes;

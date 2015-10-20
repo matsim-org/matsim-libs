@@ -39,9 +39,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
+import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -98,9 +100,12 @@ public class MultiModalPTCombinationTest {
 		double defaultWalkSpeed = 1.34;
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.transit_walk, defaultWalkSpeed);
-		
-		config.plansCalcRoute().setNetworkModes(CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.walk + 
-				"," + TransportMode.transit_walk));
+		final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
+		pt.setTeleportedModeFreespeedFactor( 2.0 );
+		config.plansCalcRoute().addParameterSet( pt );
+
+//		config.plansCalcRoute().setNetworkModes(CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.walk +
+//				"," + TransportMode.transit_walk));
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -110,7 +115,7 @@ public class MultiModalPTCombinationTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 		
-        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+        controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
