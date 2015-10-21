@@ -20,15 +20,20 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import junit.framework.Assert;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -39,10 +44,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.population.*;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -50,9 +63,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsLogger;
+import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests that the QSim takes a TimeVariant Network into account.
@@ -86,7 +98,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		// run the simulation with the timevariant network and the two persons
 		EventsManager events = EventsUtils.createEventsManager();
-		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
+		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 
 		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
@@ -149,7 +161,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		 * persons. Observe the last person of each wave.
 		 */
 		EventsManager events = EventsUtils.createEventsManager();
-		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
+		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
@@ -217,7 +229,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			@Override
 			public void handleEvent(LinkEnterEvent event) {
 				if (id2.equals(event.getLinkId()))
-					Assert.assertEquals(1.0, event.getTime());
+					Assert.assertEquals(1.0, event.getTime(), MatsimTestCase.EPSILON);
 				if (id3.equals(event.getLinkId()))
 					Assert.fail("Link 3 should never be reached as capacity of link 2 is set to 0");
 			}
@@ -230,7 +242,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			@Override
 			public void handleEvent(PersonStuckEvent event) {
 				Assert.assertEquals(id2, event.getLinkId());
-				Assert.assertEquals(simEndTime, event.getTime());
+				Assert.assertEquals(simEndTime, event.getTime(), MatsimTestCase.EPSILON);
 				Assert.assertEquals(personId, event.getPersonId());
 			}
 		});
@@ -309,19 +321,21 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class TestTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class TestTravelTimeCalculator implements PersonEntersVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Person person1;
-		private final Person person2;
+		private final Id<Person> personId1;
+		private final Id<Person> personId2;
 		private final Id<Link> linkId;
+		private Id<Vehicle> vehicleId1;
+		private Id<Vehicle> vehicleId2;
 		protected double person1enterTime = Time.UNDEFINED_TIME;
 		protected double person1leaveTime = Time.UNDEFINED_TIME;
 		protected double person2enterTime = Time.UNDEFINED_TIME;
 		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		protected TestTravelTimeCalculator(final Person person1, final Person person2, final Id<Link> linkId) {
-			this.person1 = person1;
-			this.person2 = person2;
+		protected TestTravelTimeCalculator(final Id<Person> personId1, final Id<Person> personId2, final Id<Link> linkId) {
+			this.personId1 = personId1;
+			this.personId2 = personId2;
 			this.linkId = linkId;
 		}
 
@@ -330,9 +344,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getDriverId().equals(this.person1.getId())) {
+			if (event.getVehicleId().equals(this.vehicleId1)) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getDriverId().equals(this.person2.getId())) {
+			} else if (event.getVehicleId().equals(this.vehicleId2)) {
 				this.person2enterTime = event.getTime();
 			}
 		}
@@ -342,9 +356,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getDriverId().equals(this.person1.getId())) {
+			if (event.getVehicleId().equals(this.vehicleId1)) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getDriverId().equals(this.person2.getId())) {
+			} else if (event.getVehicleId().equals(this.vehicleId2)) {
 				this.person2leaveTime = event.getTime();
 			}
 		}
@@ -352,6 +366,15 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		@Override
 		public void reset(final int iteration) {
 			// nothing to do
+		}
+
+		@Override
+		public void handleEvent(PersonEntersVehicleEvent event) {
+			if (event.getPersonId().equals(personId1)){
+				vehicleId1 = event.getVehicleId();
+			} else if (event.getPersonId().equals(personId2)){
+				vehicleId2 = event.getVehicleId();
+			}
 		}
 
 	}

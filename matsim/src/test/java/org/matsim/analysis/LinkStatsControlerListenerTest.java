@@ -383,7 +383,7 @@ public class LinkStatsControlerListenerTest {
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, Id.create(i, Vehicle.class)));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Vehicle.class), linkId));
 			}
 		}
 	}

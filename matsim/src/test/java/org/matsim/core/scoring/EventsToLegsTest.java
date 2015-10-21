@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,6 +40,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.vehicles.Vehicle;
 
 public class EventsToLegsTest {
 
@@ -63,11 +66,13 @@ public class EventsToLegsTest {
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
 		Id<Person> agentId = Id.create("1", Person.class);
+		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
 		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.create("l1", Link.class), "car"));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, agentId, Id.create("l1", Link.class), null));
-		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, agentId, Id.create("l2", Link.class), null));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, agentId, Id.create("l2", Link.class), null));
-		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, agentId, Id.create("l3", Link.class), null));
+		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId, vehId));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, vehId, Id.create("l1", Link.class)));
+		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.create("l2", Link.class)));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, vehId, Id.create("l2", Link.class)));
+		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, vehId, Id.create("l3", Link.class)));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.create("l3", Link.class), "car"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0,lh.handledLeg.getDepartureTime(), 1e-9);

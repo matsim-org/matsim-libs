@@ -23,7 +23,6 @@ package org.matsim.core.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 
@@ -33,11 +32,10 @@ import org.matsim.vehicles.Vehicle;
 public class LinkEnterEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final LinkEnterEvent event1 = new LinkEnterEvent(6823.8, Id.create("agfe", Person.class), 
-				Id.create("abcd", Link.class), Id.create("veh", Vehicle.class));
+		final LinkEnterEvent event1 = new LinkEnterEvent(6823.8, Id.create("veh", Vehicle.class), 
+				Id.create("abcd", Link.class));
 		final LinkEnterEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
-		assertEquals(event1.getDriverId(), event2.getDriverId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());
 	}

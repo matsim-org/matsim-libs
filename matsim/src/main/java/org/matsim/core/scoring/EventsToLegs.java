@@ -32,14 +32,12 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -74,7 +72,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
-TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, Wait2LinkEventHandler {
+TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler {
 	
 	private class PendingTransitTravel {
 
@@ -109,12 +107,12 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	
 	private Scenario scenario;
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
-	private Map<Id<Vehicle>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
+	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private LegHandler legHandler;
-	private Map<Id<Person>, Id<Vehicle>> personToVehicleMap = new HashMap<>();
+	private Map<Id<Vehicle>, List<Id<Person>>> personsInsideVehicle = new HashMap<>();
 	
 	public EventsToLegs(Scenario scenario) {
 		this.scenario = scenario;
@@ -125,13 +123,10 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	    LegImpl leg = new LegImpl(event.getLegMode());
 	    leg.setDepartureTime(event.getTime());
 	    legs.put(event.getPersonId(), leg);
-	}
-
-	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	    
 	    List<Id<Link>> route = new ArrayList<>();
 	    route.add(event.getLinkId());
-	    experiencedRoutes.put(event.getVehicleId(), route);
+	    experiencedRoutes.put(event.getPersonId(), route);
 	}
 
 	@Override
@@ -144,6 +139,11 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
+			personsInsideVehicle.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+		}
+		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
+		
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
 		if (lineAndRoute != null
                 && !event.getPersonId().equals(lineAndRoute.driverId)) { // transit drivers are not considered to travel by transit
@@ -158,8 +158,11 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-        List<Id<Link>> route = experiencedRoutes.get(event.getVehicleId());
-        route.add(event.getLinkId());
+		// add the link to the route of all agents inside the vehicle
+		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
+			List<Id<Link>> route = experiencedRoutes.get(personInsideVehicle);
+	        route.add(event.getLinkId());
+		}
     }
 
     @Override
@@ -173,10 +176,10 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	    leg.setArrivalTime(event.getTime());
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
-	    List<Id<Link>> experiencedRoute = experiencedRoutes.remove(personToVehicleMap.get(event.getPersonId()));
+	    List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 	    assert experiencedRoute.size() >= 1;
 	    PendingTransitTravel pendingTransitTravel;
-	    if (experiencedRoute.size() > 1) {
+	    if (experiencedRoute != null && experiencedRoute.size() > 1) {
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
 

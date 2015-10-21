@@ -22,6 +22,13 @@
  */
 package org.matsim.core.mobsim.qsim;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,10 +36,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
@@ -47,11 +60,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Tests the flow capacity for two vehicles that are leaving a link
@@ -87,7 +96,7 @@ public class FlowStorageSpillbackTest {
 		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 							
 		events.addHandler( new LinkLeaveEventHandler() {
-
+			
 			@Override
 			public void reset(int iteration) {				
 			}
@@ -95,9 +104,24 @@ public class FlowStorageSpillbackTest {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 				linkLeaveEvents.add(event);
+			}			
+		});
+		
+		
+		final Map<Id<Person>, Id<Vehicle>> vehicleOfPerson = new HashMap<>();
+		
+		events.addHandler( new PersonEntersVehicleEventHandler() {
+			
+			@Override
+			public void reset(int iteration) {
 			}
 			
+			@Override
+			public void handleEvent(PersonEntersVehicleEvent event) {
+				vehicleOfPerson.put(event.getPersonId(), event.getVehicleId());
+			}
 		});
+		
 		
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -105,7 +129,7 @@ public class FlowStorageSpillbackTest {
 		for (LinkLeaveEvent event : linkLeaveEvents) {
 			System.out.println(event.toString());
 
-			if (event.getDriverId().toString().equals(this.testAgent4.toString()) && event.getLinkId().toString().equals(this.linkId2.toString())) {
+			if (event.getVehicleId().equals(vehicleOfPerson.get(this.testAgent4)) && event.getLinkId().equals(this.linkId2)) {
 				Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
 			}
 		}

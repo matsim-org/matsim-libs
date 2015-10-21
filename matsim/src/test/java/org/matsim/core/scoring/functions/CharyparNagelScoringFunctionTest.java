@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -130,12 +131,13 @@ public class CharyparNagelScoringFunctionTest {
 		eventsToScore.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
+			eventsToScore.handleEvent(new PersonEntersVehicleEvent(leg.getDepartureTime(), f.person.getId(), networkRoute.getVehicleId()));
+			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), leg.getRoute().getStartLinkId()));
 			for (Id<Link> linkId : networkRoute.getLinkIds()) {
-				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
-				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
+				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
+				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
 			}
-			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
+			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), networkRoute.getVehicleId(), leg.getRoute().getEndLinkId()));
 		} else {
 			eventsToScore.handleEvent(new TeleportationArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
 		}
