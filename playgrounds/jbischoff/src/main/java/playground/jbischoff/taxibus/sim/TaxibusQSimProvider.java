@@ -41,6 +41,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.jbischoff.taxibus.TaxibusActionCreator;
 import playground.jbischoff.taxibus.optimizer.DefaultTaxibusOptimizer;
@@ -73,11 +74,12 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private TravelTime travelTime;
 
 	@Inject
-	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events) {
 		this.tbcg = (TaxibusConfigGroup) config.getModule("taxibusConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
-		this.travelTime = travelTime;
+		this.travelTime = new FreeSpeedTravelTime();
+		
 
 	}
 
