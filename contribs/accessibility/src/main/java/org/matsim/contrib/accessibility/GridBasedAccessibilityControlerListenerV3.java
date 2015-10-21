@@ -2,6 +2,7 @@ package org.matsim.contrib.accessibility;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -187,18 +188,14 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
 		log.warn("here-1") ;
 		if (urbanSimMode) {
-			if (outputSubdirectory == null) {
-				log.warn("here0");
-				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
-				delegate.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
-			} else {
-				log.warn("here0b");
-				System.exit(-1) ;
-				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
-				delegate.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
+			if ( outputSubdirectory != null ) {
+				throw new RuntimeException("output subdirectory not null stems from separate accessibility computation per activity type.  "
+						+ "This is, however, not supported on the urbansim side, so using it in the urbansim mode does not make sense.  "
+						+ "Thus aborting ..." ) ;
 			}
-			// yyyy having the above depend on the existence of outputSubdirectory is too indirect ... could you pls use a boolean switch 
-			// with a "telling" name?  thanks.  kai, aug'15
+			log.warn("here0");
+			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+			delegate.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 		}
 		delegate.initDefaultContributionCalculators(event.getControler());
 
