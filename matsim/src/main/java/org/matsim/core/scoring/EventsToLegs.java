@@ -21,8 +21,10 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,12 +33,14 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -72,7 +76,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
-TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler {
+TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
 	
 	private class PendingTransitTravel {
 
@@ -112,7 +116,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private LegHandler legHandler;
-	private Map<Id<Vehicle>, List<Id<Person>>> personsInsideVehicle = new HashMap<>();
+	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>();
 	
 	public EventsToLegs(Scenario scenario) {
 		this.scenario = scenario;
@@ -140,7 +144,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
 		}
 		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
 		
@@ -218,6 +222,11 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	public void handleEvent(TransitDriverStartsEvent event) {
 		LineAndRoute lineAndRoute = new LineAndRoute(event.getTransitLineId(), event.getTransitRouteId(), event.getDriverId());
 		transitVehicle2currentRoute.put(event.getVehicleId(), lineAndRoute);
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
 	}
 
 	@Override

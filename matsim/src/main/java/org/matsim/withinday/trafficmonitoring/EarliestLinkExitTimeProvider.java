@@ -20,11 +20,9 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,12 +35,14 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicle;
  * @author cdobler
  */
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
-		PersonDepartureEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler {
+		PersonDepartureEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
 
@@ -78,7 +78,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<Id<Person>, Double> earliestLinkExitTimes = new ConcurrentHashMap<>();
 	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
-	private Map<Id<Vehicle>, List<Id<Person>>> personsInsideVehicle = new HashMap<>();
+	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>();
 	
 	public EarliestLinkExitTimeProvider(Scenario scenario) {
 		this(scenario, null);
@@ -208,8 +208,13 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
 		}
 		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
 	}
 }

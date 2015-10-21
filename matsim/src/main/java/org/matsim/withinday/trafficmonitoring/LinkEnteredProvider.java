@@ -20,21 +20,23 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -53,11 +55,11 @@ import org.matsim.vehicles.Vehicle;
  * @author cdobler
  */
 public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
-		MobsimAfterSimStepListener, PersonEntersVehicleEventHandler {
+		MobsimAfterSimStepListener, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private Map<Id<Person>, Id<Link>> linkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
 	private Map<Id<Person>, Id<Link>> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
-	private Map<Id<Vehicle>, List<Id<Person>>> personsInsideVehicle = new HashMap<>(); // <vehicleId, List<personIds inside vehicle>>
+	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>(); // <vehicleId, List<personIds inside vehicle>>
 	
 	public Map<Id<Person>, Id<Link>> getLinkEnteredAgentsInLastTimeStep() {
 		return Collections.unmodifiableMap(this.lastTimeStepLinkEnteredAgents);
@@ -72,7 +74,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new ArrayList<Id<Person>>());
+			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
 		}
 		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
 	}
@@ -96,6 +98,11 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
 			this.linkEnteredAgents.put(personInsideVehicle, event.getLinkId());
 		}
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
 	}
 
 	@Override
