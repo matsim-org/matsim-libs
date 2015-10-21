@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -60,6 +62,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class CNControler {
 	private static final Logger log = Logger.getLogger(CNControler.class);
 
+	private static String outputDirectory;
 	private static String configFile;
 
 	private static boolean congestionPricing;
@@ -71,33 +74,54 @@ public class CNControler {
 		
 		if (args.length > 0) {
 			
-			configFile = args[0];
+			outputDirectory = args[0];
+			log.info("Output directory: " + outputDirectory);
+			
+			configFile = args[1];
 			log.info("Config file: " + configFile);
 			
-			congestionPricing = Boolean.parseBoolean(args[1]);
+			congestionPricing = Boolean.parseBoolean(args[2]);
 			log.info("Congestion Pricing: " + congestionPricing);
 			
-			noisePricing = Boolean.parseBoolean(args[2]);
+			noisePricing = Boolean.parseBoolean(args[3]);
 			log.info("Noise Pricing: " + noisePricing);
 			
-			sigma = Double.parseDouble(args[3]);
+			sigma = Double.parseDouble(args[4]);
 			log.info("Sigma: " + sigma);
 			
 		} else {
 			
+			outputDirectory = null;
 			configFile = "/Users/ihab/Desktop/test/config.xml";
 			congestionPricing = true;
 			noisePricing = true;
 			sigma = 0.;
 		}
 				
-		CNControler noiseImmissionControler = new CNControler();
-		noiseImmissionControler.run(configFile, congestionPricing, noisePricing, sigma);
+		CNControler cnControler = new CNControler();
+		cnControler.run(outputDirectory, configFile, congestionPricing, noisePricing, sigma);
 	}
 
-	public void run(String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
+	public void run(String outputDirectory, String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
 				
-		Controler controler = new Controler(configFile);
+		Config config = ConfigUtils.loadConfig(configFile);
+		if (outputDirectory == null) {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
+			} else {
+				log.info("Using the output directory given in the config file...");
+			}
+			
+		} else {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				log.info("Using the output directory provided in the controler.");
+			} else {
+				log.warn("The output directory in the config file will overwritten by the directory provided in the controler.");
+			}
+			config.controler().setOutputDirectory(outputDirectory);
+		}
+		
+		Controler controler = new Controler(config);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 
 		// noise

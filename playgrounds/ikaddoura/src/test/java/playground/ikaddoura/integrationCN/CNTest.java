@@ -65,22 +65,22 @@ public class CNTest {
 		// baseCase
 		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";
 		CNControler cnControler1 = new CNControler();
-		cnControler1.run(configFile1, false, false, 0.);
+		cnControler1.run(null, configFile1, false, false, 0.);
 	
 		// c
 		String configFile2 = testUtils.getPackageInputDirectory() + "CNTest/config2.xml";
 		CNControler cnControler2 = new CNControler();
-		cnControler2.run(configFile2, true, false, 0.);
+		cnControler2.run(null, configFile2, true, false, 0.);
 			
 		// n
 		String configFile3 = testUtils.getPackageInputDirectory() + "CNTest/config3.xml";
 		CNControler cnControler3 = new CNControler();
-		cnControler3.run(configFile3, false, true, 0.);
+		cnControler3.run(null, configFile3, false, true, 0.);
 		
 		// cn
 		String configFile4 = testUtils.getPackageInputDirectory() + "CNTest/config4.xml";
 		CNControler cnControler4 = new CNControler();
-		cnControler4.run(configFile4, true, true, 0.);
+		cnControler4.run(null, configFile4, true, true, 0.);
 		
 		// analyze output events file
 		LinkDemandEventHandler handler1 = analyzeEvents(configFile1); // base case
