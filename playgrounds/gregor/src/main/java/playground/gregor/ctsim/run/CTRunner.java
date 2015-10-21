@@ -65,7 +65,7 @@ public class CTRunner implements IterationStartsListener {
 
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("ctsim");
-		Scenario sc = ScenarioUtils.loadScenario(c);
+		final Scenario sc = ScenarioUtils.loadScenario(c);
 
 		final Controler controller = new Controler(sc);
 		if (vis) {
@@ -96,10 +96,21 @@ public class CTRunner implements IterationStartsListener {
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
 		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
 
+
+//		TODO use injection instead, but how?
 		controller.setTripRouterFactory(tripRouter);
+
+//		controller.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				addRoutingModuleBinding("walkct").toInstance(DefaultRoutingModules.createNetworkRouter("walkct", sc.getPopulation()
+//						.getFactory(), sc.getNetwork(), createDefaultLeastCostPathCalculatorFactory(sc).createPathCalculator(sc.getNetwork(),controller.createTravelDisutilityCalculator(),controller.getLinkTravelTimes())));
+//			}
+//		});
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
+
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -115,20 +126,6 @@ public class CTRunner implements IterationStartsListener {
 			}
 		});
 
-//		controller.addControlerListener(new IterationStartsListener() {
-//
-//			@Override
-//			public void notifyIterationStarts(IterationStartsEvent event) {
-//				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
-//
-//			}
-//		});
-
-		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
-		// DefaultTripRouterFactoryImpl fac = new
-		// DefaultTripRouterFactoryImpl(sc, null, null);
-
-		// controller.setTripRouterFactory(fac);
 		controller.run();
 	}
 

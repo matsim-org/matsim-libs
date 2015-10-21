@@ -30,7 +30,7 @@ import org.matsim.core.controler.Controler;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config.RandomRelocatorConfigGroup;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.BikeSharingWithSimplisticRelocationQSimFactory;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.SimplisticRelocatorManagerEngine;
-import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 
@@ -55,7 +55,7 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile , configGroup );
 		final Controler controler = new Controler( sc );
 
-		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc , null ) );
+		controler.addOverridingModule( new BikeSharingTripRouterModule( sc , null ) );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
