@@ -90,10 +90,7 @@ public class CTRunner implements IterationStartsListener {
 
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
 		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
 
@@ -103,7 +100,7 @@ public class CTRunner implements IterationStartsListener {
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addRoutingModuleBinding("walkct").toInstance(new CTRoutingModule(controller));
+				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
 			}
 		});
 

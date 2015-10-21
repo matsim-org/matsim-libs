@@ -19,6 +19,7 @@ package playground.gregor.ctsim.router;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
@@ -26,39 +27,46 @@ import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by laemmel on 21/10/15.
  */
-public class CTRoutingModule implements RoutingModule {
+public class CTRoutingModule implements Provider<RoutingModule> {
 
+	private Scenario scenario;
+	private Map<String,TravelTime> travelTimes;
+	private Map<String,TravelDisutilityFactory> travelDisutilities;
 
-	private final RoutingModule delegate;
-
-	public CTRoutingModule(Controler c) {
-		this.delegate = DefaultRoutingModules.createNetworkRouter("walkct", c.getScenario().getPopulation()
-				.getFactory(), c.getScenario().getNetwork(), createRoutingAlgo(c));
+	@Inject
+	CTRoutingModule(Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
+		this.scenario = scenario;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 	}
 
-	private LeastCostPathCalculator createRoutingAlgo(Controler c) {
+	private LeastCostPathCalculator createRoutingAlgo() {
 		return new AStarLandmarksFactory(
-				c.getScenario().getNetwork(),
-				new FreespeedTravelTimeAndDisutility(c.getConfig().planCalcScore()),
-				c.getConfig().global().getNumberOfThreads()).createPathCalculator(c.getScenario().getNetwork(), c.createTravelDisutilityCalculator(), c.getLinkTravelTimes());
+				scenario.getNetwork(),
+				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()),
+				scenario.getConfig().global().getNumberOfThreads()).createPathCalculator(scenario.getNetwork(),
+				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore()),
+				travelTimes.get("car"));
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-		return delegate.calcRoute(fromFacility, toFacility, departureTime, person);
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return delegate.getStageActivityTypes();
+	public RoutingModule get() {
+		return DefaultRoutingModules.createNetworkRouter("walkct", scenario.getPopulation()
+				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 }
