@@ -255,7 +255,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	}
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility, Double> accessibilities1) {
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<Modes4Accessibility, Double> accessibilities1) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){

@@ -90,7 +90,7 @@ import java.util.concurrent.ConcurrentHashMap;
 		}
 	}
 
-	public void addZoneDataExchangeListener(FacilityDataExchangeInterface l){
+	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
 
@@ -243,7 +243,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	
-	final void computeAccessibilities( Scenario scenario ) {
+	final void computeAccessibilities( Scenario scenario, Double departureTime ) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -287,7 +287,7 @@ import java.util.concurrent.ConcurrentHashMap;
 			Node fromNode = scenario.getNetwork().getNodes().get( nodeId );
 
 			for ( AccessibilityContributionCalculator calculator : calculators.values() ) {
-				calculator.notifyNewOriginNode( fromNode );
+				calculator.notifyNewOriginNode( fromNode, departureTime );
 			}
 
 			// get list with origins that are assigned to "fromNode"
@@ -301,7 +301,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				// --------------------------------------------------------------------------------------------------------------
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
 				for (final AggregationObject aggregatedFacility : this.aggregatedOpportunities) {
-					computeAndAddExpUtilContributions( gcs, origin, aggregatedFacility );
+					computeAndAddExpUtilContributions( gcs, origin, aggregatedFacility, departureTime );
 				}
 				// --------------------------------------------------------------------------------------------------------------
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -326,7 +326,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					//log.info("here");
-					zoneDataExchangeInterface.setFacilityAccessibilities(origin, accessibilities);
+					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
 			}
 
@@ -336,10 +336,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 	
 	private void computeAndAddExpUtilContributions( SumOfExpUtils[] gcs, ActivityFacility origin, 
-			final AggregationObject aggregatedFacility) {
+			final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			if ( !isComputingMode.get( calculatorEntry.getKey() ) ) continue; // XXX should be configured by adding only the relevant calculators
-			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility );
+			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
 	}

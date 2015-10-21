@@ -86,7 +86,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 	 * 
 	 */
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility startZone, Map<Modes4Accessibility,Double> accessibilities ) {
+	public void setFacilityAccessibilities(ActivityFacility startZone, Double timeOfDay, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 		
 		log.info( "here2");

@@ -2,14 +2,17 @@ package org.matsim.contrib.accessibility;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.collections.Tuple;
@@ -146,7 +149,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 		log.info("Initializing  ...");
 		spatialGridAggregator = new SpatialGridAggregator();
-		accessibilityControlerListener.addZoneDataExchangeListener(spatialGridAggregator);
+		accessibilityControlerListener.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		accessibilityControlerListener.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
@@ -187,12 +190,12 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 			if (outputSubdirectory == null) {
 				log.warn("here0");
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
-				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
+				accessibilityControlerListener.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 			} else {
 				log.warn("here0b");
 				System.exit(-1) ;
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
-				accessibilityControlerListener.addZoneDataExchangeListener(urbansimAccessibilityWriter);
+				accessibilityControlerListener.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 			}
 			// yyyy having the above depend on the existence of outputSubdirectory is too indirect ... could you pls use a boolean switch 
 			// with a "telling" name?  thanks.  kai, aug'15
@@ -220,8 +223,15 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
+		
+		final Scenario scenario = event.getControler().getScenario();
 
-		accessibilityControlerListener.computeAccessibilities(event.getControler().getScenario());
+		AccessibilityConfigGroup moduleAPCM =
+		ConfigUtils.addOrGetModule(
+				scenario.getConfig(),
+				AccessibilityConfigGroup.GROUP_NAME,
+				AccessibilityConfigGroup.class);
+		accessibilityControlerListener.computeAccessibilities(scenario, moduleAPCM.getTimeOfDay());
 
 		if (urbansimAccessibilityWriter != null) {
 			urbansimAccessibilityWriter.close();
@@ -442,9 +452,13 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
 		this.spatialGridDataExchangeListener.add(l);
 	}
+	public final void addFacilityDataExchangeListener( FacilityDataExchangeInterface listener ) {
+		this.accessibilityControlerListener.addFacilityDataExchangeListener(listener);
+	}
 
 	public void setUrbansimMode(boolean urbansimMode) {
 		this.urbanSimMode = urbansimMode;
 	}
+	
 
 }
