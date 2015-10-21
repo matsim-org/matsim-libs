@@ -34,8 +34,9 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.gregor.ctsim.router.CTRoutingModule;
+import playground.gregor.ctsim.router.CTTripRouterFactory;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -98,15 +99,14 @@ public class CTRunner implements IterationStartsListener {
 
 
 //		TODO use injection instead, but how?
-		controller.setTripRouterFactory(tripRouter);
+//		controller.setTripRouterFactory(tripRouter);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("walkct").toInstance(new CTRoutingModule(controller));
+			}
+		});
 
-//		controller.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				addRoutingModuleBinding("walkct").toInstance(DefaultRoutingModules.createNetworkRouter("walkct", sc.getPopulation()
-//						.getFactory(), sc.getNetwork(), createDefaultLeastCostPathCalculatorFactory(sc).createPathCalculator(sc.getNetwork(),controller.createTravelDisutilityCalculator(),controller.getLinkTravelTimes())));
-//			}
-//		});
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();

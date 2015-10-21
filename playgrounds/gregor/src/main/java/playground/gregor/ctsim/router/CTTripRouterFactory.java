@@ -16,12 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.ctsim.simulation;
+package playground.gregor.ctsim.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.*;
+import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -38,7 +40,10 @@ public class CTTripRouterFactory implements Provider<TripRouter> {
 			.getLogger(CTTripRouterFactory.class);
 
 	private final String mainMode = "walkct";
-
+	@Inject
+	Map<String, TravelTime> travelTimes;
+	@Inject
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	private Scenario scenario;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
@@ -48,13 +53,6 @@ public class CTTripRouterFactory implements Provider<TripRouter> {
 		this.scenario = sc;
 		this.leastCostPathCalculatorFactory = leastCostPathClaculatorFactory;
 	}
-
-	@Inject
-	Map<String, TravelTime> travelTimes;
-
-	@Inject
-	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-
 
 	@Override
 	public TripRouter get() {
