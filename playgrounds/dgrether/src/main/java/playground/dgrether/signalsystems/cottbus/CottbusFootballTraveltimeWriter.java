@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
@@ -67,11 +68,11 @@ public class CottbusFootballTraveltimeWriter {
 		}
 	}
 
-	public void writeMapToCsv(Map<Id, Double> atmap, String filename) {
+	public void writeMapToCsv(Map<Id<Person>, Double> map, String filename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 
-			for (Entry<Id, Double> e : atmap.entrySet()) {
+			for (Entry<Id<Person>, Double> e : map.entrySet()) {
 				writer.append(e.getKey().toString() + CottbusFootballStrings.SEPARATOR + e.getValue());
 				writer.newLine();
 			}

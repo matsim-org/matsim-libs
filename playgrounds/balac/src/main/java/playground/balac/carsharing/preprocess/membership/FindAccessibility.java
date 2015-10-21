@@ -162,8 +162,8 @@ public class FindAccessibility
       Vector orderedClosestStationsWork = new Vector();
       Vector orderedClosestStationsHome = new Vector();
 
-      Collection<Station> allClosestStationsWork = this.stations.get(pwcs.getCoordWork().getX(), pwcs.getCoordWork().getY(), 5000.0D);
-      Collection<Station> allClosestStationsHome = this.stations.get(pwcs.getCoordHome().getX(), pwcs.getCoordHome().getY(), 5000.0D);
+      Collection<Station> allClosestStationsWork = this.stations.getDisk(pwcs.getCoordWork().getX(), pwcs.getCoordWork().getY(), 5000.0D);
+      Collection<Station> allClosestStationsHome = this.stations.getDisk(pwcs.getCoordHome().getX(), pwcs.getCoordHome().getY(), 5000.0D);
 
       for (Station stationWork : allClosestStationsWork) {
         int i = 0;

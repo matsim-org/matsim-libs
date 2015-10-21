@@ -20,7 +20,7 @@ package org.matsim.contrib.cadyts.pt;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author nagel
  *
  */
-public class TransitStopFacilityLookUp implements LookUp<TransitStopFacility> {
+public class TransitStopFacilityLookUp implements LookUpItemFromId<TransitStopFacility> {
 	
 	private TransitSchedule schedule;
 
@@ -41,7 +41,7 @@ public class TransitStopFacilityLookUp implements LookUp<TransitStopFacility> {
 	}
 
 	@Override
-	public TransitStopFacility lookUp(Id<TransitStopFacility> id) {
+	public TransitStopFacility getItem(Id<TransitStopFacility> id) {
 		return this.schedule.getFacilities().get(id);
 	}
 

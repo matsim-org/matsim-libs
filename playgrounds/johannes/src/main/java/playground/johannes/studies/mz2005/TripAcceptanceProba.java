@@ -19,34 +19,32 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.index.quadtree.Quadtree;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.io.ActivityType;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author illenberger

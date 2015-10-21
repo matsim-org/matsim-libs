@@ -26,8 +26,6 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
@@ -68,15 +66,16 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 */
 	@Override
 	protected void initReplanners(QSim sim) {
-		
-		this.initIdentifiers();
-	
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
-		
-		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
-				this.getWithinDayTripRouterFactory(), routingContext);
-		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
+
+		throw new RuntimeException();
+//		this.initIdentifiers();
+//
+//		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), this.getConfig().planCalcScore()), this.getTravelTimeCollector());
+//
+//		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
+//				this.getWithinDayTripRouterFactory(), routingContext);
+//		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);
+//		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
 	
 //	protected void setUp() {
@@ -118,7 +117,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 //		
 //		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
 //		
-//		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
+//		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().get(routingContext), parkingInfrastructure);
 //		
 //		final MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 //		this.addOverridingModule(new AbstractModule() {

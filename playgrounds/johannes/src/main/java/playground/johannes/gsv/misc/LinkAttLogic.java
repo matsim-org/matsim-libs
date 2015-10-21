@@ -22,14 +22,13 @@ package playground.johannes.gsv.misc;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import playground.johannes.synpop.source.mid2008.generator.RowHandler;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import playground.johannes.synpop.source.mid2008.generator.RowHandler;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.Histogram;
 
 /**
  * @author johannes

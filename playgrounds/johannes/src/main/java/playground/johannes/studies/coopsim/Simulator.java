@@ -19,20 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -40,76 +36,24 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.vehicles.Vehicle;
-
-import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.Profiler;
 import playground.johannes.coopsim.SimEngine;
-import playground.johannes.coopsim.analysis.ActTypeShareTask;
-import playground.johannes.coopsim.analysis.ActivityDurationTask;
-import playground.johannes.coopsim.analysis.ActivityLoadTask;
-import playground.johannes.coopsim.analysis.ArrivalTimeTask;
-import playground.johannes.coopsim.analysis.CoordinationComplexityTask;
-import playground.johannes.coopsim.analysis.DepartureLoadTask;
-import playground.johannes.coopsim.analysis.DesiredTimeDiffTask;
-import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
-import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
-import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
-import playground.johannes.coopsim.analysis.InfiniteScoresTask;
-import playground.johannes.coopsim.analysis.JointActivityTask;
-import playground.johannes.coopsim.analysis.LegLoadTask;
-import playground.johannes.coopsim.analysis.PlansWriterTask;
-import playground.johannes.coopsim.analysis.ScoreTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
-import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
-import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
-import playground.johannes.coopsim.analysis.TripPurposeShareTask;
-import playground.johannes.coopsim.eval.ActivityEvaluator2;
-import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
-import playground.johannes.coopsim.eval.EvalEngine;
-import playground.johannes.coopsim.eval.EvaluatorComposite;
-import playground.johannes.coopsim.eval.JointActivityEvaluator2;
-import playground.johannes.coopsim.eval.LegEvaluator;
+import playground.johannes.coopsim.analysis.*;
+import playground.johannes.coopsim.eval.*;
 import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.mental.MentalEngine;
-import playground.johannes.coopsim.mental.choice.ActTypeTimeSelector;
-import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
-import playground.johannes.coopsim.mental.choice.ActivityGroupGenerator;
-import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
-import playground.johannes.coopsim.mental.choice.AltersHome;
-import playground.johannes.coopsim.mental.choice.ArrivalTimeSelector;
-import playground.johannes.coopsim.mental.choice.ChoiceSelector;
-import playground.johannes.coopsim.mental.choice.ChoiceSelectorComposite;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.coopsim.mental.choice.DurationSelector;
-import playground.johannes.coopsim.mental.choice.EgoSelector;
-import playground.johannes.coopsim.mental.choice.EgosFacilities;
-import playground.johannes.coopsim.mental.choice.EgosHome;
-import playground.johannes.coopsim.mental.choice.FixedActivityTypeSelector;
-import playground.johannes.coopsim.mental.choice.OnlyEgo;
-import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
-import playground.johannes.coopsim.mental.choice.RandomAlter;
-import playground.johannes.coopsim.mental.choice.RandomAlters3;
-import playground.johannes.coopsim.mental.planmod.ActivityDurationModAdaptor;
-import playground.johannes.coopsim.mental.planmod.ActivityFacilityModAdaptor;
-import playground.johannes.coopsim.mental.planmod.ActivityTypeModAdaptor;
-import playground.johannes.coopsim.mental.planmod.ArrivalTimeModAdaptor;
-import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
-import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorComposite;
-import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
+import playground.johannes.coopsim.mental.choice.*;
+import playground.johannes.coopsim.mental.planmod.*;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.sna.util.MultiThreading;
@@ -122,6 +66,14 @@ import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
 import playground.johannes.socialnetworks.statistics.PowerLawDistribution;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.utils.NetworkLegRouter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 /**
  * @author illenberger
@@ -150,7 +102,7 @@ public class Simulator {
 	private static boolean nonCooperativeMode = false;
 	
 	public static void main(String[] args) throws IOException {
-		LoggerUtils.setDisallowVerbose(false);
+		LoggerUtils.setDisableVerbose(false);
 		
 		LoggerUtils.setVerbose(false);
 		config = new Config();
@@ -235,7 +187,7 @@ public class Simulator {
 		double beta_join = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "beta_join"));
 		double delta_type = Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "delta_type"));
 		double beta_act = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getPerforming_utils_hr() / 3600.0;
-		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getTraveling_utils_hr() / 3600.0;
+		double beta_leg = ((PlanCalcScoreConfigGroup) config.getModule("planCalcScore")).getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0;
 	
 		if(nonCooperativeMode && beta_join != 0) {
 			logger.warn("Simulation runs in non-cooperative mode with beta_join set!");
@@ -298,8 +250,7 @@ public class Simulator {
 	}
 	
 	private static void loadPlans(String file) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario.setNetwork(network);
+		Scenario scenario = new ScenarioBuilder(config).setNetwork(network).build() ;
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(file);
 		Population pop = scenario.getPopulation();

@@ -20,7 +20,7 @@
 package playground.johannes.synpop.source.mid2008.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.coopsim.LoggerUtils;
+import org.matsim.contrib.common.util.LoggerUtils;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;

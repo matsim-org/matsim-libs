@@ -39,23 +39,25 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -75,7 +77,7 @@ import org.matsim.vehicles.Vehicles;
 public class SimulateAndScoreTest extends MatsimTestCase {
 
 	public void testRealPtScore() {
-		Config config = ConfigUtils.createConfig();
+		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
@@ -86,18 +88,18 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		transitActivityParams.setTypicalDuration(120.0);
 
 		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTraveling_utils_hr(0);
-		config.planCalcScore().setTravelingPt_utils_hr(0);
-		config.planCalcScore().setTravelingWalk_utils_hr(0);
-		config.planCalcScore().setMonetaryDistanceRateCar(10);
-		config.planCalcScore().setMonetaryDistanceRatePt(0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
+		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
 		config.planCalcScore().addActivityParams(h);
 		config.planCalcScore().addActivityParams(w);
 		config.planCalcScore().addActivityParams(transitActivityParams);
 		
 		// ---
 		
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(100, 0));
@@ -175,34 +177,20 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
 		plan.addLeg(leg);
 
-		//TransitRouterImplFactory router = new TransitRouterImplFactory(transitSchedule, new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
-		//		scenario.getConfig().vspExperimental()));
-
-		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(network, config.travelTimeCalculator());
-		TravelDisutility travelCostCalculator = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore());
-		//PlansCalcTransitRoute plansCalcRoute =
-		//	new PlansCalcTransitRoute(
-		//			config.plansCalcRoute(),
-		//			network,
-		//			travelCostCalculator,
-		//			travelTimeCalculator.getLinkTravelTimes(),
-		//			new DijkstraFactory(),
-		//			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-		//			config.transit(),
-		//			router.createTransitRouter(),
-		//			transitSchedule);
-
-		final TripRouterFactoryBuilderWithDefaults factoryBuilder =
-			new TripRouterFactoryBuilderWithDefaults();
-		final TripRouterFactory factory = factoryBuilder.build( scenario );
-		final TripRouter tripRouter =
-			factory.instantiateAndConfigureTripRouter(
-					new RoutingContextImpl(
-						travelCostCalculator,
-						travelTimeCalculator.getLinkTravelTimes() ) );
-		final PlanAlgorithm plansCalcRoute = new PlanRouter( tripRouter );
-
-
+		final Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override(Arrays.asList(new ScenarioElementsModule(), new TravelTimeCalculatorModule(), new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						addTravelDisutilityFactoryBinding("car").toInstance(new TravelTimeAndDistanceBasedTravelDisutilityFactory());
+					}
+				}));
+			}
+		});
+		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
+		final PlanAlgorithm plansCalcRoute = new PlanRouter(tripRouter);
 
 		Activity a2 = populationFactory.createActivityFromCoord("w", link3.getCoord());
 		((ActivityImpl) a2).setLinkId(link3.getId());
@@ -218,7 +206,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scorer =
+				new EventsToScore(
+						scenario,
+						new CharyparNagelScoringFunctionFactory(
+								scenario ) );
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
@@ -276,11 +268,13 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
 		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
-		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(-1.00);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(-0.001);
+		final double travelingPt = -1.00;
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		double monetaryDistanceRatePt = -0.001;
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 		scenario.getConfig().planCalcScore().addActivityParams(h);
 		scenario.getConfig().planCalcScore().addActivityParams(w);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getNetwork()));
+		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

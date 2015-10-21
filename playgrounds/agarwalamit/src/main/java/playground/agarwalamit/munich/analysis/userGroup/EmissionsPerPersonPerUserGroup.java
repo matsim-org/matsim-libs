@@ -61,8 +61,8 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/backcasting/";
-		String [] runCases =  {"5ei","10ei","15ei","20ei","25ei"};
+		String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/";
+		String [] runCases =  {"ExI","5ExI","10ExI","15ExI","20ExI","25ExI"};
 		
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);

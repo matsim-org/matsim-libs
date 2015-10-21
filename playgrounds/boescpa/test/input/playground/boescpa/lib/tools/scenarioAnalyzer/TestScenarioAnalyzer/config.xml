@@ -16,7 +16,6 @@
 	</module>
 
 	<module name="scenario">
-		<param name="useTransit" value="true" />
 	</module>
 
 	<module name="controler">
@@ -90,6 +89,7 @@
 		<param name="transitScheduleFile" value="test/scenarios/pt-tutorial/transitschedule.xml" />
 		<param name="vehiclesFile" value="test/scenarios/pt-tutorial/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
+		<param name="useTransit" value="true" />
 	</module>
 	
 	<module name="changeLegModes">

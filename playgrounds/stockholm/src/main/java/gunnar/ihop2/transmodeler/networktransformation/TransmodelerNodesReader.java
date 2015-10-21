@@ -24,17 +24,13 @@ class TransmodelerNodesReader extends AbstractTabularFileHandler {
 
 	private final String latitudeLabel = "Latitude";
 
-	private Map<String, TransmodelerNode> id2node = new LinkedHashMap<String, TransmodelerNode>();
+	final Map<String, TransmodelerNode> id2node = new LinkedHashMap<String, TransmodelerNode>();
 
 	TransmodelerNodesReader(final String nodesFileName) throws IOException {
 		final TabularFileParser parser = new TabularFileParser();
 		parser.setDelimiterTags(new String[] { "," });
 		parser.setOmitEmptyColumns(false);
 		parser.parse(nodesFileName, this);
-	}
-
-	Map<String, TransmodelerNode> getNodes() {
-		return this.id2node;
 	}
 
 	@Override

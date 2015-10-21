@@ -163,10 +163,10 @@ public class FareHandler implements
 	{
 		// Add the length of the link to the distances of all passengers in the vehicle
 		// the driver is 
-		if (driverToVehicle.get(event.getPersonId()) != null)
+		if (driverToVehicle.get(event.getDriverId()) != null)
 		{
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-			Id vehicle = driverToVehicle.get(event.getPersonId());
+			Id vehicle = driverToVehicle.get(event.getDriverId());
 			for (Id p : vehicleToPassengers.get(vehicle))
 			{
 				if (agentCurrentDistance.containsKey(p))

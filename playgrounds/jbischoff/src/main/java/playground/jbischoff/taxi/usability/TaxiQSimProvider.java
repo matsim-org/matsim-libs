@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -42,6 +42,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.TaxiRequestCreator;
@@ -69,13 +70,23 @@ public class TaxiQSimProvider implements Provider<QSim> {
 	private EventsManager events;
 	private TravelTime travelTime;
 
+//	@Inject
+//	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+//		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
+//		this.context = (MatsimVrpContextImpl) context;
+//		this.events=events;
+//		this.travelTime = travelTime;
+//
+//	}
 	@Inject
-	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes) {
 		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
-		this.travelTime = travelTime;
+		this.travelTime = new FreeSpeedTravelTime();
+		this.travelTime = travelTimes.get("car");
 
+		
 	}
 
 	private QSim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -109,7 +120,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 				.getNetwork(), travelDisutility, travelTime);
 
 		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
+				router, new TimeDiscretizer(30 * 4, 15 * 60, false));
 
 		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
 				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
@@ -121,7 +132,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 
 		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
 				context, calculator, scheduler, vrpFinder, filterFactory,
-				Goal.MIN_WAIT_TIME, tcg.getOutputDir(), null);
+				Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
 		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 
 	}

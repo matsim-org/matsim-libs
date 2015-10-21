@@ -74,7 +74,7 @@ public abstract class TransitLineEvent extends Event implements HasPersonId {
 		return attr;
 	}
 	/* (non-Javadoc)
-	 * @see org.matsim.core.api.internal.HasPersonId#getPersonId()
+	 * @see org.matsim.core.api.internal.HasPersonId#getDriverId()
 	 */
 	@Override
 	public Id getPersonId() {

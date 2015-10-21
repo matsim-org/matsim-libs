@@ -5,32 +5,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 
-public class LeastCostPathTreeTest extends MatsimTestCase{
+import junit.framework.Assert;
+
+public class LeastCostPathTreeTest {
 	
-	ScenarioImpl scenario;
+	Scenario scenario;
 	
 	@Test
 	public void testRouteChoiceTestSpanningTree(){
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		// createNetwork();
-		this.scenario.setNetwork( CreateTestNetwork.createTriangularNetwork() );
+		this.scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(CreateTestNetwork.createTriangularNetwork()).build() ;
 		compareRouteChoices();
 	}
 	

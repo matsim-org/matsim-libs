@@ -19,23 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
 
 import java.util.HashSet;
 import java.util.Set;
-
-
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger

@@ -165,16 +165,16 @@ public class TripReconstructor implements
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		if (isPtEvent(event.getPersonId())) return;
+		if (isPtEvent(event.getDriverId())) return;
 		//TODO: check if the entry exists
-		this.agentsData.get( event.getPersonId() ).handleEvent(event);
+		this.agentsData.get( event.getDriverId() ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (isPtEvent(event.getPersonId())) return;
+		if (isPtEvent(event.getDriverId())) return;
 		//TODO: check if the entry exists
-		this.agentsData.get( event.getPersonId() ).handleEvent(event);
+		this.agentsData.get( event.getDriverId() ).handleEvent(event);
 	}
 
 	@Override

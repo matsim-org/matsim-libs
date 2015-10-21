@@ -137,7 +137,7 @@ public class LinksRetailerReader
     for (Retailer r : this.retailers.getRetailers().values()) {
       for (ActivityFacility af : r.getFacilities().values()) {
     	  log.info("Quad tree = " + Utils.getFacilityQuadTree());
-        Collection<ActivityFacility> facilities = Utils.getFacilityQuadTree().get(af.getCoord().getX(), af.getCoord().getY(), 1000.0D);
+        Collection<ActivityFacility> facilities = Utils.getFacilityQuadTree().getDisk(af.getCoord().getX(), af.getCoord().getY(), 1000.0D);
         double ratio = (1.0D / 0.0D);
         double globalCapacity = 0.0D;
         double numberPersons = 0.0D;
@@ -149,7 +149,7 @@ public class LinksRetailerReader
           }
         }
 
-        numberPersons = Utils.getPersonQuadTree().get(af.getCoord().getX(), af.getCoord().getY(), 1000.0D).size();
+        numberPersons = Utils.getPersonQuadTree().getDisk(af.getCoord().getX(), af.getCoord().getY(), 1000.0D).size();
         log.info("The number of person around the facility " + af.getId() + " is: " + numberPersons);
         ratio = numberPersons / globalCapacity;
         this.ratioSum += ratio;
@@ -197,7 +197,7 @@ public class LinksRetailerReader
       }
       else {
         double ratio = (1.0D / 0.0D);
-        Collection<ActivityFacility> facilities = Utils.getFacilityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
+        Collection<ActivityFacility> facilities = Utils.getFacilityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
         double globalCapacity = 0.0D;
         double numberPersons = 0.0D;
         int numberShops = 0;
@@ -211,7 +211,7 @@ public class LinksRetailerReader
         log.info("Link " + link.getId());
         log.info("Link X" + link.getCoord().getX());
         log.info("Link Y" + link.getCoord().getY());
-        numberPersons = Utils.getPersonQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D).size();
+        numberPersons = Utils.getPersonQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 1000.0D).size();
         log.info("The number of person around the link " + link.getId() + " is: " + numberPersons);
         ratio = numberPersons / globalCapacity;
         log.info("The ratio persons/shopsCapacity of the link " + link.getId() + " is: " + ratio);

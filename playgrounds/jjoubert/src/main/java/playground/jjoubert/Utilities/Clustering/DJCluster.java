@@ -134,7 +134,7 @@ public class DJCluster {
 
 			if(p.getCluster() == null){
 				// Compute the density-based neighbourhood, N(p), of the point p
-				Collection<ClusterPoint> neighbourhood = clusteredPoints.get(p.getPoint().getX(), p.getPoint().getY(), radius);
+				Collection<ClusterPoint> neighbourhood = clusteredPoints.getDisk(p.getPoint().getX(), p.getPoint().getY(), radius);
 				List<ClusterPoint> uN = new ArrayList<ClusterPoint>(neighbourhood.size());
 				List<ClusterPoint> cN = new ArrayList<ClusterPoint>(neighbourhood.size());
 				for (ClusterPoint cp : neighbourhood) {

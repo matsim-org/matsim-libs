@@ -1,5 +1,23 @@
-/**
- * 
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
  */
 package scenarios.braess.createInput;
 
@@ -49,23 +67,24 @@ public final class TtCreateBraessNetworkAndLanes {
 	private boolean middleLinkExists = true;
 	private LaneType laneType = LaneType.NONE; 
 	private boolean btuRun = false;
+	private int numberOfPersons;
 	
 	// capacity at the links that all agents have to use
-	private long capFirstLast = 3600; // [veh/h]
+	private long capFirstLast; // [veh/h]
 	// capacity at all other links
-	private long capMain = 1800; // [veh/h]
+	private long capMain; // [veh/h]
 	// link length for the inflow links
-	private double inflowLinkLength = 7.5 * 1; // [m]
+	private double inflowLinkLength; // [m]
 	// link length for all other links
-	private long linkLength = 10000; // [m]
+	private long linkLength; // [m]
 	// travel time for the middle link
-	private double linkTTMid = 1;
+	private double linkTTMid;
 	// travel time for the middle route links
-	private double linkTTSmall = 1*60; // [s]
+	private double linkTTSmall; // [s]
 	// travel time for the two remaining outer route links (choose at least 3*LINK_TT_SMALL!)
-	private double linkTTBig = 10*60; // [s]
+	private double linkTTBig; // [s]
 	// travel time for inflow links and links that all agents have to use
-	private double minimalLinkTT = 1; // [s]
+	private double minimalLinkTT; // [s]
 
 	public TtCreateBraessNetworkAndLanes(Scenario scenario) {		
 		this.scenario = scenario;
@@ -90,22 +109,22 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	private void initNetworkParams() {
 		if (btuRun){
-			capFirstLast = 9000; 
-			capMain = 9000; 
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 200;
 			linkTTMid = 1;
 			linkTTSmall = 10;
 			linkTTBig = 20;
 			minimalLinkTT = 1;
-		}else{
-			capFirstLast = 3600; 
-			capMain = 1800; 
+		} else {
+			capFirstLast = numberOfPersons;
+			capMain = numberOfPersons / 2;
 			inflowLinkLength = 7.5 * 1;
 			linkLength = 10000;
-			linkTTMid = 1*60;
-			linkTTSmall = 1*60;
-			linkTTBig = 10*60;
+			linkTTMid = 1 * 60;
+			linkTTSmall = 1 * 60;
+			linkTTBig = 10 * 60;
 			minimalLinkTT = 1;
 		}
 	}
@@ -115,29 +134,28 @@ public final class TtCreateBraessNetworkAndLanes {
 		NetworkFactory fac = net.getFactory();
 
 		// create nodes
-		double x = -200;
 		net.addNode(fac.createNode(Id.createNodeId(0),
-				new Coord(x, (double) 200)));
+				new Coord(-200, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(1),
-				new Coord((double) 0, (double) 200)));
+				new Coord(0, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(2),
-				new Coord((double) 200, (double) 200)));
+				new Coord(200, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(3),
-				new Coord((double) 400, (double) 400)));
+				new Coord(400, 400)));
 		net.addNode(fac.createNode(Id.createNodeId(4),
-				new Coord((double) 400, (double) 0)));
+				new Coord(400, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(5),
-				new Coord((double) 600, (double) 200)));
+				new Coord(600, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(6),
-				new Coord((double) 800, (double) 200)));
+				new Coord(800, 200)));
 		
 		if (simulateInflowCap){
 			net.addNode(fac.createNode(Id.createNodeId(23),
-					new Coord((double) 250, (double) 250)));
+					new Coord(250, 250)));
 			net.addNode(fac.createNode(Id.createNodeId(24),
-					new Coord((double) 250, (double) 150)));
+					new Coord(250, 150)));
 			net.addNode(fac.createNode(Id.createNodeId(45),
-					new Coord((double) 450, (double) 50)));
+					new Coord(450, 50)));
 		}
 		
 		// create links
@@ -390,6 +408,10 @@ public final class TtCreateBraessNetworkAndLanes {
 	public void writeNetworkAndLanes(String directory) {
 		new NetworkWriter(scenario.getNetwork()).write(directory + "network.xml");
 		if (!laneType.equals(LaneType.NONE)) new LaneDefinitionsWriter20(scenario.getLanes()).write(directory + "lanes.xml");
+	}
+
+	public void setNumberOfPersons(int numberOfPersons) {
+		this.numberOfPersons = numberOfPersons;
 	}
 
 }

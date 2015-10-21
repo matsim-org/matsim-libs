@@ -37,9 +37,11 @@ import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
+	protected Map<Id<Vehicle>, Id<Person>> vehicleToDriver = null;
 	protected Map<Id<Person>, List<Event>> eventsByPerson = null;
 	public LinkedList<Event> allEvents = null;
 
@@ -47,12 +49,14 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.eventsByPerson = new HashMap<Id<Person>, List<Event>>();
+		this.vehicleToDriver = new HashMap<>();
 		this.allEvents = new LinkedList<Event>();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		this.eventsByPerson = null;
+		this.vehicleToDriver = null;
 		this.allEvents = null;
 		SimulationParameters.reset(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
 		super.tearDown();
@@ -216,7 +220,8 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	}
 
 
-	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, 
+			LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
 
 		@Override
 		public void reset(int iteration) {
@@ -224,6 +229,9 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
 		@Override
 		public void handleEvent(Wait2LinkEvent event) {
+			// save drivers
+			vehicleToDriver.put(event.getVehicleId(), event.getPersonId());
+			
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}
@@ -251,19 +259,23 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if (!eventsByPerson.containsKey(event.getPersonId())) {
-				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			Id<Person> driverId = vehicleToDriver.get(event.getVehicleId());
+			if (!eventsByPerson.containsKey(driverId)) {
+				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
-			eventsByPerson.get(event.getPersonId()).add(event);
+			eventsByPerson.get(driverId).add(event);
+			
 			allEvents.add(event);
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			if (!eventsByPerson.containsKey(event.getPersonId())) {
-				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			Id<Person> driverId = vehicleToDriver.get(event.getVehicleId());
+			if (!eventsByPerson.containsKey(driverId)) {
+				eventsByPerson.put(driverId, new LinkedList<Event>());
 			}
-			eventsByPerson.get(event.getPersonId()).add(event);
+			eventsByPerson.get(driverId).add(event);
+			
 			allEvents.add(event);
 		}
 

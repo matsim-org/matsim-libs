@@ -20,17 +20,15 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
@@ -73,7 +71,7 @@ public class GenderTask extends ModuleAnalyzerTask<Gender> {
 		
 		if(outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(hist, "gender", "n", String.format("%1$s/gender.txt", getOutputDirectory()));
+				StatsWriter.writeLabeledHistogram(hist, "gender", "n", String.format("%1$s/gender.txt", getOutputDirectory()));
 				
 				SocioMatrix<String> m = module.countsMatrix(graph.getVertices());
 				m.toFile(String.format("%1$s/gender.countsMatrix.txt", getOutputDirectory()));

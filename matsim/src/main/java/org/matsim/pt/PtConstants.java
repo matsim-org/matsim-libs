@@ -17,5 +17,9 @@ public abstract class PtConstants implements MatsimParameters {
 	 * @see Activity#setType(String)
 	 */
 	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
+	
+	// this is currently used for wait2link events where the mode is not clear (bus, rail...?!), theresa sep'2015
+	public final static String NETWORK_MODE = "pt unspecified";
+	
 
 }

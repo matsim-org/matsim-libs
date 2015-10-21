@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.sna.util.Composite;
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.processing.PersonTask;
 

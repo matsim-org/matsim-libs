@@ -19,11 +19,18 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -40,8 +47,6 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.*;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
@@ -527,8 +532,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void letVehicleArrive(final double now, QVehicle veh) {
+
 		qLink.addParkedVehicle(veh);
-		network.simEngine.letVehicleArrive(veh);
+
+		qLink.letVehicleArrive(veh);
+		
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
 		// remove _after_ processing the arrival to keep link active
 		removeVehicleFromQueue( now, veh ) ;
@@ -543,10 +551,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	public final boolean isActive() {
 		if(this.fastCapacityUpdate){
 		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
-					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
+					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
+					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
 
@@ -571,9 +581,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// (continue only if HOLES)
 
-		if ( !storageOk ) {
-			return false ;
-		}
+//		if ( !storageOk ) { 
+//			// this is not necessary and only next statement is sufficient.
+//			return false ;
+//		}
 		// at this point, storage is ok, so start checking holes:
 		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
@@ -679,6 +690,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			network.simEngine.getMobsim().getEventsManager().processEvent(
+					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+			
+			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			network.simEngine.getMobsim().getAgentCounter().incLost();
 			network.simEngine.getMobsim().getAgentCounter().decLiving();
@@ -687,12 +701,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		for (QVehicle veh : buffer) {
 			network.simEngine.getMobsim().getEventsManager().processEvent(
+					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+			
+			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			network.simEngine.getMobsim().getAgentCounter().incLost();
 			network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		buffer.clear();
 		usedBufferStorageCapacity = 0;
+		
+		holes.clear();
+		this.remainingHolesStorageCapacity = this.storageCapacity;
 	}
 
 	@Override

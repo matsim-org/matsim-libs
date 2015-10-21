@@ -56,7 +56,7 @@ import javax.inject.Provider;
  * config file.
  * @author aneumann, thibautd
  */
-class PTripRouterFactoryImpl implements TripRouterFactory {
+class PTripRouterFactoryImpl implements Provider<TripRouter> {
 	private static final Logger log =
 		Logger.getLogger(PTripRouterFactoryImpl.class);
 
@@ -80,7 +80,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	public TripRouter get() {
 		// initialize here - controller should be fully initialized by now
 		// use fields to keep the rest of the code clean and comparable
 

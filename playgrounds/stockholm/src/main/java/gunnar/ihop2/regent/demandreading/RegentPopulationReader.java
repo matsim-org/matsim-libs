@@ -29,9 +29,9 @@ public class RegentPopulationReader {
 
 	public static final String OTHERTOURMODE_ATTRIBUTE = "othertourmode";
 
-	public static final String CAR_ATTRIBUTEVALUE = "car";
+	public static final String CAR_ATTRIBUTEVALUE = "Car";
 
-	public static final String PT_ATTRIBUTEVALUE = "pt";
+	public static final String PT_ATTRIBUTEVALUE = "PublicTransport";
 
 	// MEMBERS
 
@@ -105,19 +105,19 @@ public class RegentPopulationReader {
 	}
 
 	// MAIN-FUNCTION, ONLY FOR TESTING
-
-	public static void main(String[] args) {
-
-		System.out.println("STARTED ...");
-
-		final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
-		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapefile);
-		final String regentPopulationFileName = "./150410_worktrips_small.xml";
-		final RegentPopulationReader reader = new RegentPopulationReader(
-				"./150410_worktrips_small.xml", zonalSystem, null);
-
-		System.out.println("... DONE");
-
-	}
+	//
+	// public static void main(String[] args) {
+	//
+	// System.out.println("STARTED ...");
+	//
+	// final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
+	// final ZonalSystem zonalSystem = new ZonalSystem(zonesShapefile);
+	// final String regentPopulationFileName = "./150410_worktrips_small.xml";
+	// final RegentPopulationReader reader = new RegentPopulationReader(
+	// "./150410_worktrips_small.xml", zonalSystem, null);
+	//
+	// System.out.println("... DONE");
+	//
+	// }
 
 }

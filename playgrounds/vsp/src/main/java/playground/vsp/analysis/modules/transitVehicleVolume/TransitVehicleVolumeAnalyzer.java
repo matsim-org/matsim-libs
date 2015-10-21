@@ -95,9 +95,9 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 		// count totals
 		this.mode2Link2Total = new HashMap<String, Map<Id, Double>>();
 		Double total;
-		for(Entry<String, Counts> e: this.handler.getMode2Counts().entrySet()){
+		for(Entry<String, Counts<Link>> e: this.handler.getMode2Counts().entrySet()){
 			Map<Id, Double> temp = new HashMap<Id, Double>(); 
-			for(Count c: e.getValue().getCounts().values()){
+			for(Count<Link> c: e.getValue().getCounts().values()){
 				total = new Double(0.);
 				for(Volume v: c.getVolumes().values()){
 					total += v.getValue();
@@ -110,12 +110,12 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		for(Entry<String, Counts> e: this.handler.getMode2Counts().entrySet()){
+		for(Entry<String, Counts<Link>> e: this.handler.getMode2Counts().entrySet()){
 			writeModeShape(e.getKey(), e.getValue(), this.mode2Link2Total.get(e.getKey()), outputFolder + e.getKey() + ".shp", this.targetCoordinateSystem);
 		}
 	}
 	
-	private void writeModeShape(String name, Counts counts, Map<Id, Double> mode2Total, String file, String targetCoordinateSystem){
+	private void writeModeShape(String name, Counts<Link> counts, Map<Id, Double> mode2Total, String file, String targetCoordinateSystem){
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
 		b.setName(name);

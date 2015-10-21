@@ -369,11 +369,11 @@ public final class TransitRouterNetworkWW implements Network {
 		return transitNetwork;
 	}
 	public Collection<TransitRouterNetworkNode> getNearestNodes(final Coord coord, final double distance) {
-		return this.qtNodes.get(coord.getX(), coord.getY(), distance);
+		return this.qtNodes.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 	public TransitRouterNetworkNode getNearestNode(final Coord coord) {
-		return this.qtNodes.get(coord.getX(), coord.getY());
+		return this.qtNodes.getClosest(coord.getX(), coord.getY());
 	}
 
 	@Override

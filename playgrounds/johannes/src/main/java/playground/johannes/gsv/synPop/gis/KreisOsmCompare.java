@@ -19,25 +19,16 @@
 
 package playground.johannes.gsv.synPop.gis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,16 +37,18 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -143,7 +136,7 @@ public class KreisOsmCompare {
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
 		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
-		TXTWriter.writeMap(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/leisure.mean.txt");
+		StatsWriter.writeHistogram(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/leisure.mean.txt");
 		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/leisure.txt"));
 		writer.write("attractivity\tfacilities");
 		writer.newLine();

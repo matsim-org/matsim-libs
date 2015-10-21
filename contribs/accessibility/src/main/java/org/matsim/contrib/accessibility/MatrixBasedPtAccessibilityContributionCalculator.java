@@ -1,16 +1,11 @@
 package org.matsim.contrib.accessibility;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.contrib.accessibility.utils.Distances;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -37,23 +32,23 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
 		this.ptMatrix = ptMatrix;
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 
-		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
-		betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceRatePt();
+		betaPtTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 
-		constPt			= planCalcScoreConfigGroup.getConstantPt();
+		constPt			= planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getConstant();
 	}
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode) {
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		if ( ptMatrix==null ) {
             throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
                     + "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;

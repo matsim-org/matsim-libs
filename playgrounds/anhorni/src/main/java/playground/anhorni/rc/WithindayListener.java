@@ -31,8 +31,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -61,7 +59,7 @@ public class WithindayListener implements StartupListener {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+				bindCarTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 			}
 		});
 
@@ -92,7 +90,7 @@ public class WithindayListener implements StartupListener {
 		duringLegIdentifierFactory.addAgentFilterFactory(linkFilterFactory);
 				
 		CurrentLegReplannerFactory duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayControlerListener.getWithinDayEngine(),
-				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				withinDayControlerListener.getWithinDayTripRouterFactory());
 		duringLegReplannerFactory.addIdentifier(duringLegIdentifierFactory.createIdentifier());
 		
 		//withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);

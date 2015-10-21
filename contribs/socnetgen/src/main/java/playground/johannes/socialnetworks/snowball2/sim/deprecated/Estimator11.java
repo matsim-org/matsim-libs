@@ -19,23 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.HashMap;
-import java.util.Map;
-
-
+import gnu.trove.*;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

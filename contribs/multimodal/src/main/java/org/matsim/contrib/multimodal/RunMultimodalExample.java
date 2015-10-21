@@ -30,11 +30,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import javax.inject.Provider;
 import java.util.Map;
 
 /**
@@ -59,17 +60,20 @@ public class RunMultimodalExample {
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig());
-		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
-	
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
-                ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
+		final Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();
+
+//		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
+//		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
+//                ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
 
 		final MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(scenario, controler.getEvents(), multiModalTravelTimes);
-		controler.setTripRouterFactory(multiModalTripRouterFactory);
+//		controler.setTripRouterFactory(multiModalTripRouterFactory);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				for (Map.Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
+					addTravelTimeBinding(entry.getKey()).toInstance(entry.getValue());
+				}
 				bindMobsim().toProvider(qSimFactory);
 			}
 		});

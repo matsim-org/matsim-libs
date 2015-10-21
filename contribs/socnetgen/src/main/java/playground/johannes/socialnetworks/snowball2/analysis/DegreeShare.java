@@ -21,6 +21,13 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -28,16 +35,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
 
 /**
  * @author illenberger

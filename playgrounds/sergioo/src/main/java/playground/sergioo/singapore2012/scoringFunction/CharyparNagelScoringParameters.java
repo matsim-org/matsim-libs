@@ -22,6 +22,7 @@ package playground.sergioo.singapore2012.scoringFunction;
 
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -68,27 +69,27 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
-		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingBike_s = config.getTravelingBike_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingOther_s = config.getTravelingOther_utils_hr() / 3600.0;
+		marginalUtilityOfTraveling_s = config.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingPT_s = config.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingBike_s = config.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingWalk_s = config.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingOther_s = config.getModes().get(TransportMode.other).getMarginalUtilityOfTraveling() / 3600.0;
 		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
-		
-		constantCar = config.getConstantCar() ;
-		constantBike = config.getConstantBike() ;
-		constantWalk = config.getConstantWalk() ;
-		constantPt = config.getConstantPt() ;
-		constantOther = config.getConstantOther() ;
 
-		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceRateCar() * config.getMarginalUtilityOfMoney() ;
-		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceRatePt() * config.getMarginalUtilityOfMoney() ;
+		constantCar = config.getModes().get(TransportMode.car).getConstant();
+		constantBike = config.getModes().get(TransportMode.bike).getConstant();
+		constantWalk = config.getModes().get(TransportMode.walk).getConstant();
+		constantPt = config.getModes().get(TransportMode.pt).getConstant();
+		constantOther = config.getModes().get(TransportMode.other).getConstant();
 
-		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
-		marginalUtilityOfDistanceOther_m = config.getMarginalUtlOfDistanceOther();
+		marginalUtilityOfDistanceCar_m = config.getModes().get(TransportMode.car).getMonetaryDistanceRate() * config.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfDistancePt_m = config.getModes().get(TransportMode.pt).getMonetaryDistanceRate() * config.getMarginalUtilityOfMoney() ;
 
-		monetaryDistanceCostRateCar = config.getMonetaryDistanceRateCar() ;
-		monetaryDistanceCostRatePt = config.getMonetaryDistanceRatePt();
+		marginalUtilityOfDistanceWalk_m = config.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		marginalUtilityOfDistanceOther_m = config.getModes().get(TransportMode.other).getMarginalUtilityOfDistance();
+
+		monetaryDistanceCostRateCar = config.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+		monetaryDistanceCostRatePt = config.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(

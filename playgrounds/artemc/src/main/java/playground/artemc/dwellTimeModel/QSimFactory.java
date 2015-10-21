@@ -37,6 +37,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import playground.artemc.dwellTimeModel.pt.BoardAlightVehicleTransitStopHandlerFactory;
+import playground.artemc.dwellTimeModel.pt.CrowdednessTransitStopHandlerFactory;
 
 /**
  * Constructs an instance of the modular QSim based on the required features as per the Config file.
@@ -61,14 +63,10 @@ public class QSimFactory implements MobsimFactory {
 		}
 
 		QSim qSim = new QSim(sc, eventsManager);
-		
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-
-
         QNetsimEngineModule.configure(qSim);
-		
 		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
@@ -76,7 +74,8 @@ public class QSimFactory implements MobsimFactory {
 		if (sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			log.info("Creating new CrowdednessTransitStopHandlerFactory");
+			transitEngine.setTransitStopHandlerFactory(new CrowdednessTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);
 			qSim.addMobsimEngine(transitEngine);

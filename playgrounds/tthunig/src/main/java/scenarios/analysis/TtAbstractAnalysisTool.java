@@ -1,10 +1,30 @@
-/**
- * 
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
  */
 package scenarios.analysis;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -12,12 +32,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Abstract tool to analyze a MATSim simulation of an arbitrary scenario.
@@ -46,7 +69,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author tthunig, tschlenther
  */
 public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandler,
-PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
+PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler{
 
 	private static final Logger log = Logger.getLogger(TtAbstractAnalysisTool.class);
 	
@@ -68,6 +91,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
 
 	private Map<Double, double[]> totalRouteTTsByDepartureTime;
 	private Map<Double, int[]> routeUsersByDepartureTime;
+	
+	private Map<Id<Vehicle>, Set<Id<Person>>> vehicle2PersonsMap;
 	
 	private int numberOfRoutes;
 
@@ -94,6 +119,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
 
 		this.totalRouteTTsByDepartureTime = new TreeMap<>();
 		this.routeUsersByDepartureTime = new TreeMap<>();
+		
+		this.vehicle2PersonsMap = new HashMap<>();
 	}
 	
 	/**
@@ -102,6 +129,16 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
 	 */
 	protected abstract void defineNumberOfRoutes();
 
+	/**
+	 * Creates a mapping between vehicles and their occupants
+	 */
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event){
+		if (!vehicle2PersonsMap.containsKey(event.getVehicleId()))
+			vehicle2PersonsMap.put(event.getVehicleId(), new HashSet<Id<Person>>());
+		vehicle2PersonsMap.get(event.getVehicleId()).add(event.getPersonId());
+	}
+	
 	/**
 	 * Remembers the persons departure times.
 	 */
@@ -125,18 +162,19 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler{
 
 		// if a route was determined
 		if (route != -1) {
-			if (this.personRouteChoice.containsKey(event.getPersonId()))
-				throw new IllegalStateException("Person " + event.getPersonId()
-						+ " was seen at least twice on a route specific link."
+			// remember the route choice for all persons inside the vehicle
+			for (Id<Person> occupantId : vehicle2PersonsMap.get(event.getVehicleId())){
+				if (this.personRouteChoice.containsKey(occupantId))
+					throw new IllegalStateException("Person " + occupantId + " was seen at least twice on a route specific link."
 						+ " Did it travel more than once without arrival?");
 
-			// remember the persons route choice
-			this.personRouteChoice.put(event.getPersonId(), route);
+				this.personRouteChoice.put(occupantId, route);
+			}
 		}
 	}
 
 	/**
-	 * Determines the agents route choice if it is unique.
+	 * Determines the vehicles route choice if it is unique.
 	 * 
 	 * @return the route id (counts from 0 to numberOfRoutes)
 	 */

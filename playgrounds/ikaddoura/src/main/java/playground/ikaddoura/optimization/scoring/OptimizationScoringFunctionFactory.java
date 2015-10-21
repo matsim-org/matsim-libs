@@ -20,27 +20,27 @@ package playground.ikaddoura.optimization.scoring;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 
 
 public class OptimizationScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
+	private final CharyparNagelScoringParametersForPerson params;
 	private final double STUCKING_SCORE;
 	private Network network;
 	
 
-	public OptimizationScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, final ScenarioConfigGroup scenarioConfig, Network network, double stuckScore) {
-		this.params = CharyparNagelScoringParameters.getBuilder(planCalcScoreConfigGroup, scenarioConfig).create();
+	public OptimizationScoringFunctionFactory( Scenario scenario, double stuckScore) {
+		this.params = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.network = network;
 		this.STUCKING_SCORE = stuckScore;
 	}
@@ -50,10 +50,10 @@ public class OptimizationScoringFunctionFactory implements ScoringFunctionFactor
 			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.params, network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
-		scoringFunctionAccumulator.addScoringFunction(new OptimizationAgentStuckScoringFunction(this.params, this.STUCKING_SCORE));
-		scoringFunctionAccumulator.addScoringFunction(new OptimizationActivityScoringFunction(this.params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.params.getScoringParameters( person ), network));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params.getScoringParameters( person )));
+		scoringFunctionAccumulator.addScoringFunction(new OptimizationAgentStuckScoringFunction(this.params.getScoringParameters( person ), this.STUCKING_SCORE));
+		scoringFunctionAccumulator.addScoringFunction(new OptimizationActivityScoringFunction(this.params.getScoringParameters( person )));
 		
 		return scoringFunctionAccumulator;
 	}

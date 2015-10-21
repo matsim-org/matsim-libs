@@ -45,9 +45,7 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.priorityqueue.HasIndex;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -71,6 +69,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private CharyparNagelScoringParameters params;
+	private DestinationChoiceConfigGroup dccg;
 	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
 	private int arekValsRead = 1;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
@@ -104,13 +103,17 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	public void init() {
-		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.params = CharyparNagelScoringParameters.getBuilder(
+				scenario.getConfig().planCalcScore(),
+				scenario.getConfig().planCalcScore().getScoringParameters( null ), // global, so use default subpop
+				scenario.getConfig().scenario()).create();
+	this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+	ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter();
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
 		
-		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().findParam("locationchoice", "randomSeed")));
+		this.readOrCreateKVals(dccg.getRandomSeed());
 		this.readFacilitesAttributesAndBetas();
 		this.readPrefs();
 		
@@ -118,7 +121,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	private void readOrCreateKVals(long seed) {
-		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, (ScenarioImpl) this.scenario);
+		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, this.scenario);
 		this.arekValsRead = computer.run();
 		ObjectAttributes personsKValues = computer.getPersonsKValues();
 		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
@@ -148,9 +151,9 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	private void readFacilitesAttributesAndBetas() {
-		String pBetasFileName = this.scenario.getConfig().findParam("locationchoice", "pBetasFileName");
-		String fAttributesFileName = this.scenario.getConfig().findParam("locationchoice", "fAttributesFileName");
-		if (!pBetasFileName.equals("null") && !fAttributesFileName.equals("null")) {			
+		String pBetasFileName = this.dccg.getpBetasFile();
+		String fAttributesFileName = this.dccg.getfAttributesFile();
+		if (pBetasFileName != null && fAttributesFileName!= null) {			
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
 			try {
@@ -165,8 +168,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	private void readPrefs() {
-		String prefsFileName = this.scenario.getConfig().findParam("locationchoice", "prefsFile");
-		if (!prefsFileName.equals("null")) {			
+		String prefsFileName = this.dccg.getPrefsFile();
+		if (prefsFileName != null) {			
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {
 				prefsReader.parse(prefsFileName);
@@ -179,7 +182,6 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
-					PersonImpl person = (PersonImpl)p;
                     prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());

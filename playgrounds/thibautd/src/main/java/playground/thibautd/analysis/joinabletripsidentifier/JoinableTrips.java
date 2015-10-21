@@ -133,8 +133,8 @@ public class JoinableTrips {
 					double eventTime = event.getTime();
 
 					currentCoord = links.get(((LinkLeaveEvent) event).getLinkId()).getCoord();
-					neighbourInformations = linkInformation.get(
-							currentCoord.getX(), 
+					neighbourInformations = linkInformation.getDisk(
+							currentCoord.getX(),
 							currentCoord.getY(),
 							distanceRadius);
 
@@ -163,8 +163,8 @@ public class JoinableTrips {
 					double eventTime = event.getTime();
 
 					currentCoord = links.get(((LinkEnterEvent) event).getLinkId()).getCoord();
-					neighbourInformations = linkInformation.get(
-							currentCoord.getX(), 
+					neighbourInformations = linkInformation.getDisk(
+							currentCoord.getX(),
 							currentCoord.getY(),
 							distanceRadius);
 

@@ -67,8 +67,8 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		betaTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaTD = modeParams.getMarginalUtilityOfDistance();
 
-		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		constant = modeParams.getConstant();
 
@@ -76,13 +76,13 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 	}
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode) {
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
 		this.lcptTravelDistance.calculate(scenario.getNetwork(), fromNode, departureTime);
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
 		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 

@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedSegment;
 

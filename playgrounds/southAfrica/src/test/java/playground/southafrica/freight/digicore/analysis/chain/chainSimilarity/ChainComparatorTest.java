@@ -66,8 +66,8 @@ public class ChainComparatorTest {
 		
 		/* Check QuadTree. */
 		Assert.assertEquals("Wrong number of Ids in QuadTree.", 2, cc.getQuadTree().size());
-		Assert.assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(2, 0).equals(Id.create("a0", Facility.class)));
-		Assert.assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(8, 0).equals(Id.create("a1", Facility.class)));
+		Assert.assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().getClosest(2, 0).equals(Id.create("a0", Facility.class)));
+		Assert.assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().getClosest(8, 0).equals(Id.create("a1", Facility.class)));
 	}
 
 	

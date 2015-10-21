@@ -23,26 +23,14 @@
  */
 package playground.johannes.sna.graph.generators;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.sna.graph.*;
+import playground.johannes.sna.graph.io.GraphMLWriter;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.io.GraphMLWriter;
-import playground.johannes.sna.util.ProgressLogger;
+import java.util.*;
 
 /**
  * Random graph generator that connects vertices with constant probability.

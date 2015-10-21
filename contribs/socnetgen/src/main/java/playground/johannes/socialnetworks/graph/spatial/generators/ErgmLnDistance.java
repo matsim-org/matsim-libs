@@ -20,16 +20,15 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger

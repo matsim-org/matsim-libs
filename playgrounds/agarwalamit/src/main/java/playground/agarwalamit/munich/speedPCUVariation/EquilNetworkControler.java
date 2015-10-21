@@ -106,7 +106,7 @@ public class EquilNetworkControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(emissFact);
+				bindCarTravelDisutilityFactory().toInstance(emissFact);
 			}
 		});
 

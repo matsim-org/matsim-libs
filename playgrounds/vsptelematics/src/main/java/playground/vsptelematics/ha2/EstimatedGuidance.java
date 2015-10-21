@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -43,7 +44,7 @@ public class EstimatedGuidance extends AbstractGuidance implements Guidance {
 	
 	private static final Logger log = Logger.getLogger(EstimatedGuidance.class);
 	
-	private Map<Id, LinkEnterEvent> personIdLinkEnterEventMap = new HashMap<Id, LinkEnterEvent>();
+	private Map<Id<Vehicle>, LinkEnterEvent> vehicleIdLinkEnterEventMap = new HashMap<>();
 	private double vehOn1, vehOn2;
 
 	private Link link5;
@@ -84,7 +85,7 @@ public class EstimatedGuidance extends AbstractGuidance implements Guidance {
 
 	@Override
 	public void reset(int iteration) {
-		this.personIdLinkEnterEventMap.clear();
+		this.vehicleIdLinkEnterEventMap.clear();
 		this.vehOn1 = 0.0;
 		this.vehOn2 = 0.0;
 	}
@@ -93,11 +94,11 @@ public class EstimatedGuidance extends AbstractGuidance implements Guidance {
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		if (e.getLinkId().equals(id2)) {
-			this.personIdLinkEnterEventMap.put(e.getPersonId(), e);
+			this.vehicleIdLinkEnterEventMap.put(e.getVehicleId(), e);
 			this.vehOn1++;
 		}
 		else if (e.getLinkId().equals(id3)){
-			this.personIdLinkEnterEventMap.put(e.getPersonId(), e);
+			this.vehicleIdLinkEnterEventMap.put(e.getVehicleId(), e);
 			this.vehOn2++;
 		}
 	}
@@ -106,11 +107,11 @@ public class EstimatedGuidance extends AbstractGuidance implements Guidance {
 	public void handleEvent(LinkLeaveEvent e) {
 		LinkEnterEvent enterEvent = null;
 		if (e.getLinkId().equals(id4)){
-			enterEvent = this.personIdLinkEnterEventMap.get(e.getPersonId());
+			enterEvent = this.vehicleIdLinkEnterEventMap.get(e.getVehicleId());
 			this.vehOn1--;
 		}
 		else if (e.getLinkId().equals(id5)){
-			enterEvent = this.personIdLinkEnterEventMap.get(e.getPersonId());
+			enterEvent = this.vehicleIdLinkEnterEventMap.get(e.getVehicleId());
 			this.vehOn2--;
 		}
 	}

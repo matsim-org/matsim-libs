@@ -396,7 +396,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					.getEventsManager()
 					.processEvent(
 							new Wait2LinkEvent(now, veh.getDriver().getId(),
-									this.getLink().getId(), veh.getId()));
+									this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if (this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId())) {
 				continue;

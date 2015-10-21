@@ -475,7 +475,7 @@ public class ApproxConvexDecomposer {
 		boolean found = false;
 		CoordinateInfo ret = null;
 		while (!found) {
-			Collection<CoordinateInfo> coll = quadTree.get(c.x, c.y, range);
+			Collection<CoordinateInfo> coll = quadTree.getDisk(c.x, c.y, range);
 			double minDist = Double.POSITIVE_INFINITY;
 			for (CoordinateInfo ci : coll) {
 				if (ci.pIdx != pIdx) {

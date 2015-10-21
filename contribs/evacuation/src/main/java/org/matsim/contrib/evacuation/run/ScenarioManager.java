@@ -20,28 +20,13 @@
 
 package org.matsim.contrib.evacuation.run;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.event.MouseInputListener;
-
 import org.matsim.contrib.evacuation.analysis.EvacuationAnalysis;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.evacuationareaselector.EvacuationAreaSelector;
-import org.matsim.contrib.evacuation.evacuationptlineseditor.EvacuationPTLinesEditor;
 import org.matsim.contrib.evacuation.model.AbstractModule;
 import org.matsim.contrib.evacuation.model.Constants;
-import org.matsim.contrib.evacuation.model.ScenarioManagerModuleChain;
 import org.matsim.contrib.evacuation.model.Constants.ModuleType;
+import org.matsim.contrib.evacuation.model.ScenarioManagerModuleChain;
 import org.matsim.contrib.evacuation.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.evacuation.populationselector.PopulationAreaSelector;
 import org.matsim.contrib.evacuation.roadclosureseditor.RoadClosuresEditor;
@@ -51,6 +36,15 @@ import org.matsim.contrib.evacuation.simulation.SimulationComputation;
 import org.matsim.contrib.evacuation.view.DefaultWindow;
 import org.matsim.contrib.evacuation.view.TabButton;
 
+import javax.swing.*;
+import javax.swing.event.MouseInputListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ScenarioManager extends DefaultWindow {
 	private static final long serialVersionUID = 1L;
 	static int width = 1024;
@@ -58,37 +52,6 @@ public class ScenarioManager extends DefaultWindow {
 	static int border = 10;
 	public ConcurrentHashMap<ModuleType, TabButton> selectionButtons;
 	private ConcurrentHashMap<ModuleType, AbstractModule> modules;
-
-	public static void main(String[] args) {
-		final Controller controller = new Controller(args);
-		controller.setImageContainer(BufferedImageContainer.getImageContainer(
-				width, height, border));
-		controller.setMainFrameUndecorated(false);
-
-		controller.setModuleChain(new ScenarioManagerModuleChain());
-		controller.setStandAlone(false);
-		ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
-
-		// current work flow
-		moduleChain.add(new ScenarioXMLEditor(controller));
-		moduleChain.add(new EvacuationAreaSelector(controller));
-		moduleChain.add(new PopulationAreaSelector(controller));
-		moduleChain.add(new MatsimNetworkGenerator(controller));
-		moduleChain.add(new RoadClosuresEditor(controller));
-		moduleChain.add(new EvacuationPTLinesEditor(controller));
-		moduleChain.add(new SimulationComputation(controller));
-		moduleChain.add(new EvacuationAnalysis(controller));
-
-		controller.addModuleChain(moduleChain);
-
-		ScenarioManager manager = new ScenarioManager(controller);
-
-		// set parent component to forward the (re)paint event
-		controller.setParentComponent(manager);
-		controller.setMainPanel(manager.getMainPanel(), true);
-
-		manager.setVisible(true);
-	}
 
 	public ScenarioManager(Controller controller) {
 		super(controller);
@@ -134,8 +97,10 @@ public class ScenarioManager extends DefaultWindow {
 			if (i > 0) {
 				button.setEnabled(false);
 				module.setEnabled(false);
-			} else
+			}
+			else {
 				module.setEnabled(true);
+			}
 
 			i++;
 
@@ -150,6 +115,44 @@ public class ScenarioManager extends DefaultWindow {
 
 		this.add(panels, BorderLayout.NORTH);
 
+	}
+
+	public static void main(String[] args) {
+		final Controller controller = new Controller(args);
+		controller.setImageContainer(BufferedImageContainer.getImageContainer(
+				width, height, border));
+		controller.setMainFrameUndecorated(false);
+
+		controller.setModuleChain(new ScenarioManagerModuleChain());
+		controller.setStandAlone(false);
+		ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
+
+		// current work flow
+		moduleChain.add(new ScenarioXMLEditor(controller));
+		moduleChain.add(new EvacuationAreaSelector(controller));
+		moduleChain.add(new PopulationAreaSelector(controller));
+		moduleChain.add(new MatsimNetworkGenerator(controller));
+		moduleChain.add(new RoadClosuresEditor(controller));
+		moduleChain.add(new SimulationComputation(controller));
+		moduleChain.add(new EvacuationAnalysis(controller));
+
+		controller.addModuleChain(moduleChain);
+
+		ScenarioManager manager = new ScenarioManager(controller);
+
+		// set parent component to forward the (re)paint event
+		controller.setParentComponent(manager);
+		controller.setMainPanel(manager.getMainPanel(), true);
+
+		manager.setVisible(true);
+	}
+
+	@Override
+	public void updateMask() {
+		for (AbstractModule module : modules.values()) {
+			this.selectionButtons.get(module.getModuleType()).setEnabled(
+					module.isEnabled());
+		}
 	}
 
 	private class ModuleButtonListener implements MouseInputListener,
@@ -222,13 +225,6 @@ public class ScenarioManager extends DefaultWindow {
 			}
 		}
 
-	}
-
-	@Override
-	public void updateMask() {
-		for (AbstractModule module : modules.values())
-			this.selectionButtons.get(module.getModuleType()).setEnabled(
-					module.isEnabled());
 	}
 
 }

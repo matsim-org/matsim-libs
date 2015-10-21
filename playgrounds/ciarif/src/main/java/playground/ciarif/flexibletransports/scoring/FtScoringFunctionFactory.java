@@ -29,7 +29,7 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 
   public FtScoringFunctionFactory(Config config, FtConfigGroup ftConfigGroup, TreeMap<Id, FacilityPenalty> facilityPenalties, ActivityFacilities facilities, Network network)
   {
-    super(config.planCalcScore(), network);
+    super(config.planCalcScore(), scConfig, network);
     this.network = network;
     this.config = config;
     this.ftConfigGroup = ftConfigGroup;

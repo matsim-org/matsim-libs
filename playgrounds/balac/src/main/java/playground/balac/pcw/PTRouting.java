@@ -156,9 +156,10 @@ public class PTRouting {
 				
 		TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 100.0D);
 	    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setUtilityOfLineSwitch(-2.0D);
-	    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setTravelingWalk_utils_hr(-12.0D);
-	    
-	    PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+		final double travelingWalk = -12.0D;
+		((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+
+		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 	    routeConfigGroup.getModeRoutingParams().get("walk").setBeelineDistanceFactor(1.2);
 	    routeConfigGroup.getModeRoutingParams().get("walk").setTeleportedModeSpeed(4.8 / 3.6);
 	   // new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");

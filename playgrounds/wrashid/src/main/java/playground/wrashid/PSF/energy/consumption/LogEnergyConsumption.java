@@ -34,7 +34,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());
@@ -52,7 +52,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 

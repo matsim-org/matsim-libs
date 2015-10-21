@@ -52,17 +52,17 @@ public class RecursiveLocationMutator extends LocationMutator {
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "recursionTravelSpeedChange"));
-		this.maxRecursions = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "maxRecursions"));
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
+		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
+		this.maxRecursions = this.dccg.getMaxRecursions();
+		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
 		this.router = router;
 	}
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
 		super(scenario, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "recursionTravelSpeedChange"));
-		this.maxRecursions = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "maxRecursions"));
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
+		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
+		this.maxRecursions = this.dccg.getMaxRecursions();
+		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
 		this.router = router;
 	}
 
@@ -219,7 +219,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
 		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(type)).
-				get(midPointX, midPointY, radius);
+				getDisk(midPointX, midPointY, radius);
 	}
 
 	// for test cases:

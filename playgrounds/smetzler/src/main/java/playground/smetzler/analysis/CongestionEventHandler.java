@@ -73,14 +73,14 @@ public class CongestionEventHandler implements  LinkLeaveEventHandler, LinkEnter
 		// berechne die differenz zur free travel time
 		// wirf diesen wert in den topf
 		
-		if (this.personId2justDeparted.get(event.getPersonId())){
+		if (this.personId2justDeparted.get(event.getDriverId())){
 			// ignore this guy
 		
 		} else {
 			
 			Link link = this.network.getLinks().get(event.getLinkId());	
 			double freeSpeedLinkduration = link.getLength() / link.getFreespeed();
-			double travelTime = event.getTime() - this.personId2personEnterTime.get(event.getPersonId());
+			double travelTime = event.getTime() - this.personId2personEnterTime.get(event.getDriverId());
 			double diff = travelTime - freeSpeedLinkduration;
 			
 			this.pott_sec = pott_sec + diff;
@@ -91,8 +91,8 @@ public class CongestionEventHandler implements  LinkLeaveEventHandler, LinkEnter
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 	
-		this.personId2justDeparted.put(event.getPersonId(), false);
-		this.personId2personEnterTime.put(event.getPersonId(), event.getTime());
+		this.personId2justDeparted.put(event.getDriverId(), false);
+		this.personId2personEnterTime.put(event.getDriverId(), event.getTime());
 	}
 	
 

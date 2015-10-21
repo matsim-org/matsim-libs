@@ -178,7 +178,7 @@ public class RoutingNetwork {
 		}
 		
 		public Collection<AbstractRoutingNode> getNearestNodes(Coord coord, double radius){
-			return this.quadTree.get(coord.getX(), coord.getY(), radius);
+			return this.quadTree.getDisk(coord.getX(), coord.getY(), radius);
 		}
 		
 		/**

@@ -22,53 +22,40 @@
 
 package org.matsim.core.router;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 public class TripRouterModule extends AbstractModule {
 
     @Override
     public void install() {
         install(new TripRouterFactoryModule());
+        bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
         bind(TripRouter.class).toProvider(RealTripRouterProvider.class);
     }
 
     private static class RealTripRouterProvider implements Provider<TripRouter> {
 
-        final Config config;
-        final TripRouterFactory tripRouterFactory;
-        final TravelDisutilityFactory travelDisutilityFactory;
-        final Provider<TravelTime> travelTime;
+        final Map<String, Provider<RoutingModule>> routingModules;
+        private MainModeIdentifier mainModeIdentifier;
 
         @Inject
-        RealTripRouterProvider(Config config, TripRouterFactory tripRouterFactory, TravelDisutilityFactory travelDisutilityFactory, Provider<TravelTime> travelTime) {
-            this.config = config;
-            this.travelDisutilityFactory = travelDisutilityFactory;
-            this.tripRouterFactory = tripRouterFactory;
-            this.travelTime = travelTime;
+        RealTripRouterProvider(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+            this.routingModules = routingModules;
+            this.mainModeIdentifier = mainModeIdentifier;
         }
 
         @Override
         public TripRouter get() {
-            return tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
-
-                @Override
-                public TravelDisutility getTravelDisutility() {
-                    return travelDisutilityFactory.createTravelDisutility(travelTime.get(), config.planCalcScore());
-                }
-
-                @Override
-                public TravelTime getTravelTime() {
-                    return travelTime.get();
-                }
-
-            });
+            TripRouter tripRouter = new TripRouter();
+            for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+                tripRouter.setRoutingModule(entry.getKey(), entry.getValue().get());
+            }
+            tripRouter.setMainModeIdentifier(mainModeIdentifier);
+            return tripRouter;
         }
 
     }

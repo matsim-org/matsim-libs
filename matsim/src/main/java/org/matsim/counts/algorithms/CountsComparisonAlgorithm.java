@@ -58,7 +58,7 @@ public class CountsComparisonAlgorithm {
 
 	private final VolumesForId volumesPerLinkPerHour;
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	private final List<CountSimComparison> result;
 

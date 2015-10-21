@@ -19,9 +19,8 @@
 
 package playground.juliakern.distribution.withScoring;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -34,8 +33,8 @@ public class ResponsibilityScoringFunctionFactory implements
 	private CharyparNagelScoringFunctionFactory delegate;
 	private EmissionControlerListener ecl;
 	
-	public ResponsibilityScoringFunctionFactory(Config config, Network network, EmissionControlerListener ecl) {
-		this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), network);
+	public ResponsibilityScoringFunctionFactory(EmissionControlerListener ecl, Scenario scenario) {
+		this.delegate = new CharyparNagelScoringFunctionFactory(scenario);
 		this.ecl = ecl;
 		// TODO Auto-generated constructor stub
 	}

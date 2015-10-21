@@ -19,15 +19,16 @@
 
 package playground.johannes.gsv.qlik;
 
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class LinkActsAndLegs {
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
-		List<Zone> list = new ArrayList<>(zones.zoneSet());
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
+		List<Zone> list = new ArrayList<>(zones.getZones());
 
 		long counter = 0;
 

@@ -73,7 +73,7 @@ public class AddAttributes {
 			ShopLocation shop = new ShopLocation(Id.create(f.getId().toString(), Location.class), f.getCoord());
 			shops.put(shop.getId(), shop);
 			
-			ShopLocation closestShopCS = (ShopLocation) shopsCSQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
+			ShopLocation closestShopCS = (ShopLocation) shopsCSQuadTree.getRectangle(shop.getCoord().getX(), shop.getCoord().getY());
 			
 			if (CoordUtils.calcDistance(closestShopCS.getCoord(), shop.getCoord()) < 200) {
 				shop.setPrice(closestShopCS.getPrice());
@@ -134,7 +134,7 @@ public class AddAttributes {
 	
 	private double computeTauAgglo(ShopLocation shop) {
 		double tauagglo = 0.0;
-		int numberOfCloseByFacilities = this.shopTree.get(shop.getCoord().getX(), shop.getCoord().getY(), 300.0).size();
+		int numberOfCloseByFacilities = this.shopTree.getDisk(shop.getCoord().getX(), shop.getCoord().getY(), 300.0).size();
 		if (numberOfCloseByFacilities > 10) tauagglo = 1.0;
 		return tauagglo;
 	}

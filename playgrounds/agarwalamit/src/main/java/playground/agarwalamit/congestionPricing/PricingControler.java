@@ -91,7 +91,7 @@ class PricingControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bindTravelDisutilityFactory().toInstance(fact);
+					bindCarTravelDisutilityFactory().toInstance(fact);
 				}
 			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
@@ -103,7 +103,7 @@ class PricingControler {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindTravelDisutilityFactory().toInstance(fact);
+						bindCarTravelDisutilityFactory().toInstance(fact);
 					}
 				});
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
@@ -115,7 +115,7 @@ class PricingControler {
 //			controler.addOverridingModule(new AbstractModule() {
 //				@Override
 //				public void install() {
-//					bindTravelDisutilityFactory().toInstance(fact);
+//					bindCarTravelDisutilityFactory().toInstance(fact);
 //				}
 //			});
 //			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));

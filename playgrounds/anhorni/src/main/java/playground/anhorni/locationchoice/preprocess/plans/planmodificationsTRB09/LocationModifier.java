@@ -90,8 +90,8 @@ public class LocationModifier extends Modifier {
 		Iterator<? extends Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
-		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.getDisk(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.getDisk(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
 

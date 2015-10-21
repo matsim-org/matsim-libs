@@ -26,20 +26,24 @@ import gnu.trove.TIntArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.*;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.ObjectKeyMatrix;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -129,11 +133,11 @@ public class ODAdjustor {
 
 		Random random = new XORShiftRandom();
 
-		List<Zone> zoneSet = new ArrayList<>(zones.zoneSet());
+		List<Zone> zoneSet = new ArrayList<>(zones.getZones());
 
 //		Map<Zone, Set<Tuple<Integer, List<Zone>>>> zoneMap = new HashMap<>();
 		List<Segment> segments = new ArrayList<>(10000);
-		for (Zone origin : zones.zoneSet()) {
+		for (Zone origin : zones.getZones()) {
 			Set<Segment> relations = getTargetZones(zoneSet, origin, simMatrix, distCalc, disc);
 			for(Segment s : relations) {
 				segments.add(s);
@@ -143,11 +147,11 @@ public class ODAdjustor {
 		 
 		for (long iter = 0; iter < zoneSet.size() * 100; iter++) {
 			Segment s = segments.get(random.nextInt(segments.size()));
-//			Zone origin = zoneSet.get(random.nextInt(zoneSet.size()));
+//			Zone origin = getZones.get(random.nextInt(getZones.size()));
 //
 //			Set<Tuple<Integer, List<Zone>>> relations = zoneMap.get(origin);
 //			if (relations == null) {
-//				relations = getTargetZones(zoneSet, origin, simMatrix, distCalc, disc);
+//				relations = getTargetZones(getZones, origin, simMatrix, distCalc, disc);
 //				zoneMap.put(origin, relations);
 //			}
 //

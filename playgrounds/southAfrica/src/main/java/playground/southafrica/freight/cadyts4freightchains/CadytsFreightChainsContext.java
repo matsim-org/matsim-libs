@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.general.LookUp;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -97,9 +97,9 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 
 	private final Map<Id<Item>,Item> itemContainer = new HashMap<>() ;
 
-	private final LookUp<Item> lookUp = new LookUp<Item>() {
+	private final LookUpItemFromId<Item> lookUp = new LookUpItemFromId<Item>() {
 		@Override
-		public Item lookUp(Id<Item> id) {
+		public Item getItem(Id<Item> id) {
 			return itemContainer.get(id) ;
 		}
 	};
@@ -120,7 +120,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		}
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(config, counts , lookUp , Item.class);
+		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, counts , lookUp , Item.class);
 		
 		// prepare the sim results container:
 		this.simResults = new SimResultsImpl<Item>( itemContainer.values() ) ;
@@ -171,7 +171,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		return this.plansTranslator ;
 	}
 
-	LookUp<Item> getLookUp() {
+	LookUpItemFromId<Item> getLookUp() {
 		return lookUp;
 	}
 

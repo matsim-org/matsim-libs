@@ -129,7 +129,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 
 			parkingTimeIntervals.put(event.getPersonId(), parkingIntervalInfo);
 
-	//		resetLastLinkEntered(event.getPersonId());
+	//		resetLastLinkEntered(event.getDriverId());
 		}
 	}
 
@@ -170,7 +170,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastLinkEntered.put(event.getPersonId(), event.getLinkId());
+		lastLinkEntered.put(event.getDriverId(), event.getLinkId());
 	}
 
 	@Override

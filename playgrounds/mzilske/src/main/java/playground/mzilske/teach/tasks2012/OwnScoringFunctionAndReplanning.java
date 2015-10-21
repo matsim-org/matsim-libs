@@ -106,8 +106,8 @@ public class OwnScoringFunctionAndReplanning {
 
 		private CharyparNagelScoringFunctionFactory delegate;
 		
-		public MyScoringFunctionFactory(Config config, Network network) {
-			this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), config.scenario(), network);
+		public MyScoringFunctionFactory( final Scenario scenario ) {
+			this.delegate = new CharyparNagelScoringFunctionFactory( scenario );
 		}
 
 		@Override
@@ -134,7 +134,7 @@ public class OwnScoringFunctionAndReplanning {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.setScoringFunctionFactory(new MyScoringFunctionFactory(config, scenario.getNetwork()));
+		controler.setScoringFunctionFactory(new MyScoringFunctionFactory( scenario ));
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent controlerEvent) {

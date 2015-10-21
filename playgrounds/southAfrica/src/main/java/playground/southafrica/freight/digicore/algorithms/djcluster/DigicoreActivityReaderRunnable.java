@@ -98,7 +98,7 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 				 * the original procedure of looking for only the surrounding 
 				 * zones. */
 				if(zoneQT.size() > 1){
-					Collection<MyZone> neighbourhood =  zoneQT.get(p.getX(), p.getY(), 10000);
+					Collection<MyZone> neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), 10000);
 					boolean found = false;
 					Iterator<MyZone> iterator = neighbourhood.iterator();
 					while(iterator.hasNext() && !found){
@@ -118,7 +118,7 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 					/* There is only ONE zone, i.e. the entire study area. 
 					 * Check ALL points in that zone. To make it computationally
 					 * a bit more efficient, first check the envelope. */
-					MyZone zone = zoneQT.get(p.getX(), p.getY());
+					MyZone zone = zoneQT.getClosest(p.getX(), p.getY());
 					if(zone.getEnvelope().contains(p)){
 						if(zone.contains(p)){
 							map.get(zone.getId()).add(da.getCoord());

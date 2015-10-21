@@ -83,27 +83,27 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 			boolean found = false;
 			int breakIndex = 0;
 			while(!found && breakIndex < breaks.size()){
-				if(Long.parseLong(event.getPersonId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
+				if(Long.parseLong(event.getDriverId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
 					found = true;
 					/* Check if the person entering the link is already contained
 					 * in the map. If so, increment its toll tally. If not, add 
 					 * it to the map with first toll value.
 					 */
-					double tollFactor = SanralTollFactor.getTollFactor(event.getPersonId(), event.getLinkId(), event.getTime());
-					double toll = tollFactor * this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId(), event.getVehicleId() ).amount;
-					if(valueMaps.get(breakIndex).containsKey(event.getPersonId())){
-						valueMaps.get(breakIndex).put(event.getPersonId(), valueMaps.get(breakIndex).get(event.getPersonId()) + toll);
-						countMaps.get(breakIndex).put(event.getPersonId(), countMaps.get(breakIndex).get(event.getPersonId()) + 1);
+					double tollFactor = SanralTollFactor.getTollFactor(event.getDriverId(), event.getLinkId(), event.getTime());
+					double toll = tollFactor * this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getDriverId(), event.getVehicleId() ).amount;
+					if(valueMaps.get(breakIndex).containsKey(event.getDriverId())){
+						valueMaps.get(breakIndex).put(event.getDriverId(), valueMaps.get(breakIndex).get(event.getDriverId()) + toll);
+						countMaps.get(breakIndex).put(event.getDriverId(), countMaps.get(breakIndex).get(event.getDriverId()) + 1);
 					} else{
-						valueMaps.get(breakIndex).put(event.getPersonId(), new Double(toll));
-						countMaps.get(breakIndex).put(event.getPersonId(), new Integer(1));
+						valueMaps.get(breakIndex).put(event.getDriverId(), new Double(toll));
+						countMaps.get(breakIndex).put(event.getDriverId(), new Integer(1));
 					}
 				} else{
 					breakIndex++;
 				}
 			}
 			if(!found){
-				log.warn("Could not identify a category (bracket) for agent " + event.getPersonId().toString());
+				log.warn("Could not identify a category (bracket) for agent " + event.getDriverId().toString());
 			}
 		}
 	}

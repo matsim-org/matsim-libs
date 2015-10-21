@@ -42,7 +42,7 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 				if (pe instanceof ActivityImpl){
 					ActivityImpl activity=(ActivityImpl) pe;
 					Coord actCoord = activity.getCoord();
-					PParking parking = parkingsQuadTree.get(actCoord.getX(), actCoord.getY());
+					PParking parking = parkingsQuadTree.getClosest(actCoord.getX(), actCoord.getY());
 					
 					if (GeneralLib.getDistance(actCoord, parking.getCoord())>300){
 						basicPointVisualizer.addPointCoordinate(actCoord, activity.getType() ,Color.GREEN);

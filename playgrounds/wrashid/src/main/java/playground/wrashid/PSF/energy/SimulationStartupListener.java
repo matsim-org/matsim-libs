@@ -21,10 +21,11 @@ public class SimulationStartupListener implements StartupListener {
 		this.controler=controler;
 	}
 
-	public void addEventHandler(EventHandler eventHandler) {
-		this.eventHandler.add(eventHandler);
+	public void addEventHandler(EventHandler eventHandler1) {
+		this.eventHandler.add(eventHandler1);
 	}
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 		// add handlers
 		for (int i = 0; i < eventHandler.size(); i++) {
@@ -43,17 +44,17 @@ public class SimulationStartupListener implements StartupListener {
 		// process it
 		ParametersPSF.postMutationProcessing();
 		
-		// initialize events
-		if (ParametersPSF.getEvents()==null){
-			ParametersPSF.setEvents(event.getControler().getEvents());
-		}
+//		// initialize events
+//		if (ParametersPSF.getEvents()==null){
+//			ParametersPSF.setEvents(event.getControler().getEvents());
+//		}
 		
 		
 		
 	}
 	
-	public void addParameterPSFMutator(ParametersPSFMutator parametersPSFMutator){
-		this.parametersPSFMutator = parametersPSFMutator;
+	public void addParameterPSFMutator(ParametersPSFMutator parametersPSFMutator1){
+		this.parametersPSFMutator = parametersPSFMutator1;
 	}
 
 }

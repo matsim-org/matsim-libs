@@ -41,7 +41,7 @@
  * route all trips in a plan.
  * </ul>
  *
- * The behaviour can be modified by implementing custom {@link org.matsim.core.router.TripRouterFactory}s.
+ * The behaviour can be modified by implementing custom {@link org.matsim.core.router.RoutingModule}s.
  *
  *
  * @author thibautd

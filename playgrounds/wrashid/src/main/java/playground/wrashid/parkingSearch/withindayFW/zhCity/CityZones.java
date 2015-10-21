@@ -84,7 +84,7 @@ public class CityZones {
 	}
 
 	public CityZone getClosestZone(Coord coord){
-		return zones.get(coord.getX(), coord.getY());
+		return zones.getClosest(coord.getX(), coord.getY());
 	}
 	
 }

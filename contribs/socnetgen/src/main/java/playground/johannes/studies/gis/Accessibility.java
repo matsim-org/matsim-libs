@@ -19,50 +19,36 @@
  * *********************************************************************** */
 package playground.johannes.studies.gis;
 
+import com.vividsolutions.jts.geom.*;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.gis.*;
+import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
+import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.PointUtils;
-import playground.johannes.socialnetworks.gis.SpatialCostFunction;
-import playground.johannes.socialnetworks.gis.TraveTimeCostFunction;
-import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author illenberger
@@ -117,7 +103,7 @@ public class Accessibility {
 		
 		logger.info("Loading data...");
 		Set<Point> points = loadPoints(popfile);
-		Geometry boundary = (Geometry) FeatureSHP.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) EsriShapeIO.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
 		boundary.setSRID(21781);
 		
 		ZoneLayer<Double> startZones;

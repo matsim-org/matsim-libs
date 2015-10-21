@@ -34,7 +34,7 @@ import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -53,6 +53,7 @@ import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.Emme2ZonesFileParser;
 
+import javax.inject.Provider;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -213,8 +214,8 @@ public class PopulationCreator {
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-		final TripRouterProviderImpl tripRouterFactory = new TripRouterProviderImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
+		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
+		final Provider<TripRouter> tripRouterFactory = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), null);
 		ReplanningContext context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {

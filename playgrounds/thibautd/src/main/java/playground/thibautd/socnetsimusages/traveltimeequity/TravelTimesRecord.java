@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
+import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -38,8 +40,10 @@ import java.util.Set;
 /**
  * @author thibautd
  */
+@Singleton
 public class TravelTimesRecord implements PersonDepartureEventHandler,
 		ActivityStartEventHandler {
+	private static final Logger log = Logger.getLogger(TravelTimesRecord.class);
 	private final Map<Id<Person>, TravelTimesForPerson> times = new HashMap<>();
 	private final Set<Id<Person>> ignoreDeparture = new HashSet<>();
 
@@ -59,6 +63,10 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling activity start "+event );
+		}
+
 		if ( stageActivityTypes.isStageActivity( event.getActType() ) ) {
 			ignoreDeparture.add( event.getPersonId() );
 		}
@@ -72,6 +80,10 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handling person departure "+event );
+		}
+
 		if ( !ignoreDeparture.remove( event.getPersonId() ) ) {
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
@@ -131,10 +143,15 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 		}
 
 		public boolean alreadyKnowsTravelTimeAfter( final double time ) {
-			return departures.get( departures.size() - 1 ) >= time;
+			assert arrivals.size() == departures.size() || arrivals.size() == departures.size() - 1;
+			return !departures.isEmpty() &&
+					arrivals.size() == departures.size() &&
+					departures.get( departures.size() - 1 ) >= time;
 
 		}
+
 		public double getTravelTimeAfter( final double time ) {
+			assert arrivals.size() == departures.size();
 			final int bs = departures.binarySearch( time );
 			final int index = bs < 0 ? -bs -1 : bs;
 

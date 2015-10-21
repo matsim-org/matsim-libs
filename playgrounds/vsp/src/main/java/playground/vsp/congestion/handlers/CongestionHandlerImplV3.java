@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.vsp.congestion.AgentOnLinkInfo;
 import playground.vsp.congestion.DelayInfo;
 
 /** 
@@ -66,11 +65,8 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
-	private double totalDelay = 0.;
 
-	private Scenario scenario;
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
-		this.scenario = scenario;
 		this.delegate = new CongestionHandlerBaseImpl(events, scenario);
 	}
 
@@ -81,7 +77,6 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		this.agentId2storageDelay.clear();
 		this.delayNotInternalized_spillbackNoCausingAgent = 0.;
-		this.totalDelay = 0.;
 	}
 
 	@Override
@@ -120,7 +115,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.totalDelay/ 3600.);
+			bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
 			bw.newLine();
 			bw.write("Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
 			bw.newLine();
@@ -139,7 +134,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	@Override
 	public final double getTotalDelay() {
-		return this.totalDelay;
+		return this.delegate.getTotalDelay();
 	}
 	
 	
@@ -157,7 +152,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
-				// log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
+				// log.warn("A delay of " + this.agentId2storageDelay.get(event.getDriverId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
 				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
@@ -167,29 +162,16 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	@Override
 	public final void handleEvent(LinkLeaveEvent event) {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
+		
+		// coming here ...
+		this.delegate.handleEvent( event ) ;
 
 		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
 			log.warn("Public transport mode. Mixed traffic is not tested.");
-
 		} else { // car!
-			Id<Person> personId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
-
-			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), delegate.getLinkId2congestionInfo(), scenario);
-
-			AgentOnLinkInfo agentInfo = linkInfo.getAgentsOnLink().get( personId ) ;
-
-			DelayInfo delayInfo = new DelayInfo.Builder().setPersonId( personId ).setLinkEnterTime( agentInfo.getEnterTime() )
-					.setFreeSpeedLeaveTime(agentInfo.getFreeSpeedLeaveTime()).setLinkLeaveTime( event.getTime() ).build() ;
-
-			CongestionHandlerBaseImpl.updateFlowAndDelayQueues(event.getTime(), delayInfo, linkInfo );
-
+			LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( event.getLinkId() ) ;
+			DelayInfo delayInfo = linkInfo.getFlowQueue().getLast();
 			calculateCongestion(event, delayInfo);
-			// und hier sieht man in der Tat, dass das mit der abstrakten Klasse gar nicht so falsch war. Hm ... kai, sep'15
-
-			linkInfo.getFlowQueue().add( delayInfo ) ;
-			linkInfo.memorizeLastLinkLeaveEvent( event );
-
-			linkInfo.getAgentsOnLink().remove( personId ) ;
 		}
 	}
 
@@ -198,21 +180,17 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
 		
-		LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
-		double delayOnThisLink = event.getTime() - linkInfo.getAgentsOnLink().get(delayInfo.personId).getFreeSpeedLeaveTime();
-
-		// global book-keeping:
-		this.totalDelay += delayOnThisLink;
+		double delayOnThisLink = delayInfo.linkLeaveTime - delayInfo.freeSpeedLeaveTime ;
 
 		// Check if this (affected) agent was previously delayed without internalizing the delay.
 
 		double agentDelayWithDelaysOnPreviousLinks = 0.;		
 
-		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
+		if (this.agentId2storageDelay.get(delayInfo.personId) == null) {
 			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
+			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(delayInfo.personId);
+			this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), 0.);
 		}
 
 		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
@@ -234,7 +212,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 			} else if (storageDelay > 0.) {	
 				// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-				this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
+				this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), storageDelay);
 			} 
 		}
 	}

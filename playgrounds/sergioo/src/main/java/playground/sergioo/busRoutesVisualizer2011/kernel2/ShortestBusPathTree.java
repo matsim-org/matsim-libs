@@ -7,6 +7,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
@@ -50,7 +51,8 @@ public class ShortestBusPathTree {
 		scenario.getConfig().transitRouter().setExtensionRadius(0);
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1);
 		scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(-100);
-		scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(-1000);
+		final double travelingWalk = -1000;
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental())).get();
 		ExperimentalTransitRouteFactory routesFactory = new ExperimentalTransitRouteFactory();
 		for(int i=0; i<numStops; i++) {

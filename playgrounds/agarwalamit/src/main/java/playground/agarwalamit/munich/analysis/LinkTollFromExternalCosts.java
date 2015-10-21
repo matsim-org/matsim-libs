@@ -24,6 +24,7 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 
@@ -95,7 +96,7 @@ public class LinkTollFromExternalCosts {
 
 		Config config = sc.getConfig();
 
-		double vtts_car = ((config.planCalcScore().getTraveling_utils_hr()/3600) + 
+		double vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 

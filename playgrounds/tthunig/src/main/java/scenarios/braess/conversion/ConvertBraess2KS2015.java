@@ -1,5 +1,23 @@
-/**
- * 
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
  */
 package scenarios.braess.conversion;
 
@@ -17,19 +35,15 @@ import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 public class ConvertBraess2KS2015 {
 
 	public static void main(String[] args) throws Exception {
+		String inputDir = DgPaths.REPOS
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/cap3600_4Signals/";
 		// input files
-		String signalSystemsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalSystems.xml";
-		String signalGroupsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalGroups.xml";
-		String signalControlFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_green.xml";
-		String networkFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network.xml";
-		String lanesFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/trivialLanes.xml.gz";
-		String populationFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/plans3600_woInitRoutes.xml";
+		String signalSystemsFilename = inputDir + "signalSystems.xml";
+		String signalGroupsFilename = inputDir + "signalGroups.xml";
+		String signalControlFilename = inputDir + "signalControl_greenWaveZ.xml";
+		String networkFilename = inputDir + "network_cap3600.xml";
+		String lanesFilename = inputDir + "realisticLanes.xml";
+		String populationFilename = inputDir + "plans3600_initRoutes.xml";
 
 		// output files
 		String outputDirectory = DgPaths.REPOS
@@ -42,14 +56,14 @@ public class ConvertBraess2KS2015 {
 		String monthStr = month + "";
 		if (month < 10)
 			monthStr = "0" + month;
-		String date = cal.get(Calendar.YEAR) + "-"	+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);		
+		String date = cal.get(Calendar.YEAR) + "-"	+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 				
 		/* parameters for the time interval */
 		double startTime = 8 * 3600.0;
-		double endTime = 9 * 3600.0;
+		double endTime = 9 * 3600.0 + 24 * 60;
 		/* parameters for the network area */
-		double signalsBoundingBoxOffset = 500;
-		double cuttingBoundingBoxOffset = 100;
+		double signalsBoundingBoxOffset = 650; // the maximal distance between a node and the signal at node 4 is 600m
+		double cuttingBoundingBoxOffset = 650;
 		/* parameters for the interior link filter */
 		double freeSpeedFilter = 1.0; // = default value
 		boolean useFreeSpeedTravelTime = true; // = default value
@@ -58,10 +72,11 @@ public class ConvertBraess2KS2015 {
 		double matsimPopSampleSize = 1.0; // = default value
 		double ksModelCommoditySampleSize = 1.0; // = default value
 		double minCommodityFlow = 1.0; // = default value
+		boolean simplifyNetwork = false;
 		int cellsX = 5; // = default value
 		int cellsY = 5; // = default value
 		/* other parameters */
-		String scenarioDescription = "run braess with 3600 agents";
+		String scenarioDescription = "run braess with 2000 agents";
 
 		TtMatsim2KS2015.convertMatsim2KS(signalSystemsFilename,
 				signalGroupsFilename, signalControlFilename, networkFilename,
@@ -69,7 +84,7 @@ public class ConvertBraess2KS2015 {
 				signalsBoundingBoxOffset, cuttingBoundingBoxOffset,
 				freeSpeedFilter, useFreeSpeedTravelTime, maximalLinkLength,
 				matsimPopSampleSize, ksModelCommoditySampleSize,
-				minCommodityFlow, cellsX, cellsY, scenarioDescription,
+				minCommodityFlow, simplifyNetwork, cellsX, cellsY, scenarioDescription,
 				date, outputDirectory);
 	}
 }

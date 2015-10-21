@@ -42,6 +42,7 @@ public class CNTollDisutilityCalculatorFactory implements TravelDisutilityFactor
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 
+	@Deprecated
 	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler) {
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;

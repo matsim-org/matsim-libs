@@ -30,8 +30,6 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -80,25 +78,24 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 */
 	@Override
 	protected void initReplanners(QSim sim) {
-
-		initIdentifiers();
+		throw new RuntimeException();
+//		initIdentifiers();
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
-		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
-		
-		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.getConfig().planCalcScore());
-		
-		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
-				this.getWithinDayTripRouterFactory(), routingContext);
-		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
+//		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+//		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
+//		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
+//		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
+//		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
+//		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
+//
+//		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
+//
+//
+//		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
+//				this.getWithinDayTripRouterFactory());
+//		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);
+//		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
 	
 //	protected void setUp() {
@@ -140,7 +137,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 //
 //		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 //
-//		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
+//		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().get(routingContext), parkingInfrastructure);
 //
 //		final MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 //		this.addOverridingModule(new AbstractModule() {

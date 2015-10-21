@@ -106,12 +106,12 @@ public class EvacuationTimePicture implements PersonDepartureEventHandler, Perso
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+		if (evacuationStarted) agentsToUpdate.add(event.getDriverId());
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (evacuationStarted) agentsToUpdate.add(event.getPersonId());
+		if (evacuationStarted) agentsToUpdate.add(event.getDriverId());
 	}
 	
 	@Override

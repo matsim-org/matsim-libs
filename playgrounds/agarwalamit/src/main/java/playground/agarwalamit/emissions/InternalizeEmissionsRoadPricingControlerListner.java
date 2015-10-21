@@ -80,7 +80,7 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+				bindCarTravelDisutilityFactory().toInstance(travelDisutilityFactory);
 			}
 		});
 

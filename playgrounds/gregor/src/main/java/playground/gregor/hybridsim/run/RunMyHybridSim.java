@@ -20,6 +20,9 @@
 
 package playground.gregor.hybridsim.run;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -30,12 +33,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.hybridsim.factories.HybridMobsimProvider;
-
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 
 
 
@@ -50,7 +48,7 @@ public class RunMyHybridSim {
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
 
-		c.qsim().setEndTime(7200);
+//		c.qsim().setEndTime(7200);
 		
 		final Scenario sc = ScenarioUtils.loadScenario(c);
 		

@@ -22,6 +22,15 @@
  */
 package playground.johannes.gsv.demand.tasks;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.core.router.*;
+import org.matsim.pt.config.TransitConfigGroup;
+import playground.johannes.gsv.demand.PopulationTask;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -30,21 +39,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.pt.config.TransitConfigGroup;
-
-import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author johannes
@@ -123,10 +117,8 @@ public class PlanRouteLegs implements PopulationTask {
 //			TransitRouterConfigGroup routerConfig = (TransitRouterConfigGroup) scenario.getConfig().getModule(TransitRouterConfigGroup.GROUP_NAME);
 //			routerConfig.setSearchRadius(0);
 //			routerConfig.setExtensionRadius(0);
-			
-			FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-			RoutingContext context = new RoutingContextImpl(timeCostCalculator, timeCostCalculator);
-			TripRouter tripRouter = new TripRouterFactoryBuilderWithDefaults().build(scenario).instantiateAndConfigureTripRouter(context);
+
+			TripRouter tripRouter = new TripRouterFactoryBuilderWithDefaults().build(scenario).get();
 			PlanRouter router = new PlanRouter(tripRouter);
 			for (Person p : persons) {
 				router.run( p );

@@ -1,5 +1,7 @@
 package opdytsintegration.roadinvestment;
 
+import floetteroed.opdyts.DecisionVariable;
+import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.api.core.v01.population.Population;
@@ -12,18 +14,16 @@ import floetteroed.utilities.math.Vector;
  *
  */
 public class RoadInvestmentStateFactory implements
-		MATSimStateFactory<RoadInvestmentState, RoadInvestmentDecisionVariable> {
+		MATSimStateFactory {
 
 	public RoadInvestmentStateFactory() {
 	}
 
 	@Override
-	public RoadInvestmentState newState(final Population population,
-			final Vector stateVector,
-			final RoadInvestmentDecisionVariable decisionVariable) {
+	public MATSimState newState(Population population, Vector stateVector, DecisionVariable decisionVariable) {
 		return new RoadInvestmentState(population, stateVector,
-				decisionVariable != null ? decisionVariable.betaPay() : null,
-				decisionVariable != null ? decisionVariable.betaAlloc() : null);
+				decisionVariable != null ? ((RoadInvestmentDecisionVariable) decisionVariable).betaPay() : null,
+				decisionVariable != null ? ((RoadInvestmentDecisionVariable) decisionVariable).betaAlloc() : null);
 	}
 
 }

@@ -91,5 +91,15 @@
 					<artifactId>joda-time</artifactId>
 					<version>2.7</version>
 				</dependency>
+				<dependency>
+					<groupId>playground</groupId>
+					<artifactId>mzilske</artifactId>
+					<version>0.8.0-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>playground</groupId>
+					<artifactId>tthunig</artifactId>
+					<version>0.8.0-SNAPSHOT</version>
+				</dependency>
 	</dependencies>
 </project>

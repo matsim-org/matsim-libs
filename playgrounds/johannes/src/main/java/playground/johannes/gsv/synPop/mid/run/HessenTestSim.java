@@ -22,8 +22,6 @@ package playground.johannes.gsv.synPop.mid.run;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
@@ -35,6 +33,8 @@ import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;

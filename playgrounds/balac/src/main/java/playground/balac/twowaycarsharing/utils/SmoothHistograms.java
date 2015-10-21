@@ -27,33 +27,21 @@ public class SmoothHistograms {
 			
 			String[] array = s.split("\t");
 		
-			dep[i - 1] = Integer.parseInt(array[18]);
-			arr[i - 1] = Integer.parseInt(array[19]);
-			en[i - 1] = Integer.parseInt(array[21]);
+			dep[i - 1] = Integer.parseInt(array[10]);
+			arr[i - 1] = Integer.parseInt(array[11]);
+			en[i - 1] = Integer.parseInt(array[13]);
 			s = readLink.readLine();
 			i++;
 			
 		}
-		double l = 0.5;
-		for(int j = 0; j < 295; j += 6) {
-			int sumd = 0;
-			int suma = 0;
-			int sume = 0;
+		for(int j = 0; j < 300; j ++) {
 			
-			for(int k = j; k < j + 6; k++) {
-				
-				sumd += dep[k];
-				suma += arr[k];
-				sume += en[k];
-			}
-			
-			outLinkd.write(String.valueOf(sumd));
-			outLinka.write(String.valueOf(suma));
-			outLinke.write(String.valueOf(sume));
+			outLinkd.write(String.valueOf(dep[j]));
+			outLinka.write(String.valueOf(arr[j]));
+			outLinke.write(String.valueOf(en[j]));
 			outLinkd.newLine();
 			outLinka.newLine();
 			outLinke.newLine();
-			l +=0.5;
 		}
 		outLinkd.flush(); outLinkd.close();
 		outLinka.flush(); outLinka.close();

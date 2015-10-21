@@ -19,11 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis;
 
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-
-
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 
 /**
  * @author illenberger

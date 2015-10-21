@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class CountsCompare2GeoJSON {
 
-	public static void write(LinkOccupancyCalculator simCounts, Counts obsCounts, double factor, Network network, String outDir) {
+	public static void write(LinkOccupancyCalculator simCounts, Counts<Link> obsCounts, double factor, Network network, String outDir) {
 		MathTransform transform = null;
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));
@@ -67,7 +67,7 @@ public class CountsCompare2GeoJSON {
 		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
-		for (Count count : obsCounts.getCounts().values()) {
+		for (Count<Link> count : obsCounts.getCounts().values()) {
 			Id<Link> linkId = count.getLocId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);

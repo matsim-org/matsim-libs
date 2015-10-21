@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities;
 
 /**
@@ -44,6 +44,18 @@ public class Units {
 	public static final double S_PER_D = S_PER_H * H_PER_D;
 
 	public static final double D_PER_S = 1 / S_PER_D;
+
+	// TODO NEW
+	public static final double S_PER_MIN = 60.0;
+
+	// TODO NEW
+	public static final double MIN_PER_S = 1.0 / S_PER_MIN;
+
+	// TODO NEW
+	public static final double MIN_PER_H = 60.0;
+
+	// TODO NEW
+	public static final double H_PER_MIN = 1.0 / MIN_PER_H;
 
 	// -------------------- CONVERSION OF LENGTH UNITS --------------------
 

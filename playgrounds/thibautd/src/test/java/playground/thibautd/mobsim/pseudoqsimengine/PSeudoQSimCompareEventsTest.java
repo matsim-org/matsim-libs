@@ -36,10 +36,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,7 +62,7 @@ import java.util.Random;
  */
 //@Ignore( "fails since refactoring in DriverAgent. to fix!!!" )
 public class PSeudoQSimCompareEventsTest {
-	private static final boolean DUMP_EVENTS = true;
+	private static final boolean DUMP_EVENTS = false;
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -110,10 +108,8 @@ public class PSeudoQSimCompareEventsTest {
 				scenario,
 				new PlanRouter(
 					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-							new RoutingContextImpl(
-									new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
-								travelTime.getLinkTravelTimes() ) ) ),
+						scenario ).get(
+					) ),
 				new QSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(

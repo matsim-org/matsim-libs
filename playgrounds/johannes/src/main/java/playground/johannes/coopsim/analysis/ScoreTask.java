@@ -20,23 +20,21 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TDoubleArrayList;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.regression.SimpleRegression;
-
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.coopsim.ConvergenceCriterion;
 import playground.johannes.coopsim.eval.ActivityEvaluator;
 import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
 import playground.johannes.coopsim.eval.JointActivityEvaluator2;
 import playground.johannes.coopsim.eval.LegEvaluator;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author illenberger

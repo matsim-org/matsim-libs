@@ -22,7 +22,7 @@ package playground.johannes.synpop.sim;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
-import playground.johannes.sna.math.Discretizer;
+import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;

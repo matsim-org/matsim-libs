@@ -41,11 +41,10 @@ public class DestinationSampler {
 	private double[] personsKValues;
 	double samplePercent = 100.0;
 	
-	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues,  
-			DestinationChoiceConfigGroup module) {
+	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues, DestinationChoiceConfigGroup module) {
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
-		this.samplePercent = Double.parseDouble(module.getDestinationSamplePercent());
+		this.samplePercent = module.getDestinationSamplePercent();
 	}
 	
 	public boolean sample(int facilityIndex, int personIndex) { 

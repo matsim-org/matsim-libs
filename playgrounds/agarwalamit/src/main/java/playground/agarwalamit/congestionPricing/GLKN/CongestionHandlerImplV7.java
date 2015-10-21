@@ -170,8 +170,8 @@
 //		String travelMode = event.getLegMode();
 //		if(congestedModes.contains(travelMode)){
 //			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-//			lci.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
-//			lci.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
+//			lci.getPersonId2freeSpeedLeaveTime().put(event.getDriverId(), event.getTime() + 1);
+//			lci.getPersonId2linkEnterTime().put(event.getDriverId(), event.getTime());
 //		}
 //
 //	}
@@ -182,8 +182,8 @@
 //
 //		if(congestedModes.contains(travelMode)){
 //			LinkCongestionInfo lci = this.link2LinkCongestionInfo.get(event.getLinkId());
-//			lci.getPersonId2linkEnterTime().remove(event.getPersonId());
-//			lci.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
+//			lci.getPersonId2linkEnterTime().remove(event.getDriverId());
+//			lci.getPersonId2freeSpeedLeaveTime().remove(event.getDriverId());
 //		}
 //
 //	}

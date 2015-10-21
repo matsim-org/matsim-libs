@@ -19,31 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
-
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import gnu.trove.*;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
@@ -52,17 +35,21 @@ import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
 import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledEdgeDecorator;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
 import playground.johannes.studies.snowball.SnowballSim;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 
 /**

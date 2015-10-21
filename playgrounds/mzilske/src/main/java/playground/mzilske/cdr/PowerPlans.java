@@ -10,9 +10,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.mzilske.util.PowerList;
 
@@ -27,10 +25,8 @@ public class PowerPlans {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(file);
-			TripRouter tripRouter = new TripRouterProviderImpl(
-					scenario, 
-					new OnlyTimeDependentTravelDisutilityFactory(), 
-					new FreeSpeedTravelTime(),
+			TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(
+					scenario,
 					new DijkstraFactory(),
 					null)
 			.get();

@@ -82,7 +82,7 @@ public class AccessibilityIntegrationTest {
 		
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
 		builder.setNetwork(network);
-		Scenario sc = builder.createScenario() ;
+		Scenario sc = builder.build() ;
 
 		// creating test opportunities (facilities)
 		ActivityFacilities opportunities = sc.getActivityFacilities();

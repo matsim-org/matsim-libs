@@ -22,12 +22,12 @@ package playground.johannes.coopsim.analysis;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.util.Map;

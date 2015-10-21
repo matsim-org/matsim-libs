@@ -51,13 +51,13 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 
 
         Link link = ParametersPSF2.controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
-		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getPersonId());
+		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getDriverId());
 
-		Double linkEnteranceTime = linkEntranceTime.get(event.getPersonId(), event.getLinkId());
+		Double linkEnteranceTime = linkEntranceTime.get(event.getDriverId(), event.getLinkId());
 		if (linkEnteranceTime != null) {
 			double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnteranceTime, event.getTime());
 			ParametersPSF2.energyStateMaintainer.processVehicleEnergyState(vehicle, timeSpendOnLink, link);
@@ -66,11 +66,11 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 
 		
 		
-		linkEntranceTime.put(event.getPersonId(), event.getLinkId(), event.getTime());
+		linkEntranceTime.put(event.getDriverId(), event.getLinkId(), event.getTime());
 	}
 
 }

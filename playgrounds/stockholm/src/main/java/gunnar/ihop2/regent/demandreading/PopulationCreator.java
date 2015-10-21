@@ -1,6 +1,5 @@
 package gunnar.ihop2.regent.demandreading;
 
-import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.BIRTHYEAR_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOMEZONE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURMODE_ATTRIBUTE;
@@ -8,13 +7,17 @@ import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -24,12 +27,12 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import patryk.popgen2.Building;
 import patryk.utils.LinksRemover;
@@ -40,6 +43,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import floetteroed.utilities.math.Covariance;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
+import gunnar.ihop2.integration.MATSimDummy;
+import gunnar.ihop2.regent.RegentDictionary;
 
 /**
  * 
@@ -50,13 +55,13 @@ public class PopulationCreator {
 
 	// -------------------- CONSTANTS --------------------
 
-	static final String HOME = "home";
+	public static final String HOME = "home";
 
-	static final String WORK = "work";
+	public static final String WORK = "work";
 
-	static final String VILLA = "villa";
+	public static final String VILLA = "villa";
 
-	static final String APARTMENT = "apartment";
+	public static final String APARTMENT = "apartment";
 
 	// -------------------- MEMBERS --------------------
 
@@ -68,7 +73,7 @@ public class PopulationCreator {
 
 	private double populationSampleFactor = 1.0;
 
-	private String zonesBoundaryShapeFileName = null;
+	// private String zonesBoundaryShapeFileName = null;
 
 	private String agentHomeXYFileName = null;
 
@@ -87,7 +92,8 @@ public class PopulationCreator {
 	// -------------------- CONSTRUCTION --------------------
 
 	public PopulationCreator(final String networkFileName,
-			final String zoneShapeFileName, final String populationFileName) {
+			final String zoneShapeFileName, final String zonalCoordinateSystem,
+			final String populationFileName) {
 
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
@@ -99,7 +105,8 @@ public class PopulationCreator {
 			this.netCoordStats.add(coords, coords);
 		}
 
-		this.zonalSystem = new ZonalSystem(zoneShapeFileName);
+		this.zonalSystem = new ZonalSystem(zoneShapeFileName,
+				zonalCoordinateSystem);
 
 		final RegentPopulationReader regentPopulationReader = new RegentPopulationReader(
 				populationFileName, this.zonalSystem, this.scenario
@@ -132,14 +139,42 @@ public class PopulationCreator {
 		writer.close();
 	}
 
-	public void setZonesBoundaryShapeFileName(
-			final String zonesBoundaryShapeFileName) {
-		this.zonesBoundaryShapeFileName = zonesBoundaryShapeFileName;
-	}
+	// public void setZonesBoundaryShapeFileName(
+	// final String zonesBoundaryShapeFileName) {
+	// this.zonesBoundaryShapeFileName = zonesBoundaryShapeFileName;
+	// }
 
 	public void setPopulationSampleFactor(final double populationSampleFactor) {
 		this.populationSampleFactor = populationSampleFactor;
 	}
+
+	public void setLinkAttributes(final ObjectAttributes linkAttributes) {
+		final Set<String> tmLinkIds = new LinkedHashSet<String>(
+				ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+		final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
+		for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
+				.keySet()) {
+			if (!tmLinkIds.contains(candidateId.toString())) {
+				removeTheseLinkIds.add(candidateId);
+			}
+		}
+		for (Id<Link> linkId : removeTheseLinkIds) {
+			this.scenario.getNetwork().removeLink(linkId);
+		}
+	}
+
+	// public void setNodeAttributeFileName(final String nodeAttributeFileName)
+	// {
+	// final ObjectAttributes nodeAttributes = new ObjectAttributes();
+	// for (Map.Entry<Id<Node>, ? extends Node> id2node : this.scenario
+	// .getNetwork().getNodes().entrySet()) {
+	//
+	// }
+	// final ObjectAttributesXmlWriter nodeAttributesWriter = new
+	// ObjectAttributesXmlWriter(
+	// nodeAttributes);
+	// nodeAttributesWriter.writeFile(nodeAttributeFileName);
+	// }
 
 	// -------------------- INTERNALS --------------------
 
@@ -187,16 +222,20 @@ public class PopulationCreator {
 							.get(rnd.nextInt(zone.getSingleFamilyBuildings()
 									.size()));
 				} else {
-					System.err.println("no villas in zone " + zone.getId());
+					Logger.getLogger(MATSimDummy.class.getName()).warning(
+							"no villas in zone " + zone.getId());
 				}
 			} else if (APARTMENT.equals(housingType)) {
 				if (!zone.getMultiFamilyBuildings().isEmpty()) {
 					building = zone.getMultiFamilyBuildings().get(
 							MathHelpers.draw(apartmentProbas, rnd));
 				} else {
-					System.err.println("no apartments in zone " + zone.getId());
+					Logger.getLogger(MATSimDummy.class.getName()).warning(
+							"no apartments in zone " + zone.getId());
 				}
 			} else {
+				Logger.getLogger(MATSimDummy.class.getName()).severe(
+						"unknown housing type " + housingType);
 				throw new RuntimeException("unknown housing type "
 						+ housingType);
 			}
@@ -207,10 +246,13 @@ public class PopulationCreator {
 				building = zone.getWorkBuildings().get(
 						MathHelpers.draw(officeProbas, rnd));
 			} else {
-				System.err.println("no work buildings in zone " + zone.getId());
+				Logger.getLogger(MATSimDummy.class.getName()).warning(
+						"no work buildings in zone " + zone.getId());
 			}
 
 		} else {
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					"unkown activity: " + activityType);
 			throw new RuntimeException("unknown activity: " + activityType);
 		}
 
@@ -250,9 +292,10 @@ public class PopulationCreator {
 
 		// travel to work
 
-		final String workTourMode = (String) this.scenario.getPopulation()
-				.getPersonAttributes()
-				.getAttribute(personId, WORKTOURMODE_ATTRIBUTE);
+		final String workTourMode = RegentDictionary.regent2matsim
+				.get((String) this.scenario.getPopulation()
+						.getPersonAttributes()
+						.getAttribute(personId, WORKTOURMODE_ATTRIBUTE));
 
 		final Leg homeToWork = this.scenario.getPopulation().getFactory()
 				.createLeg(workTourMode);
@@ -264,14 +307,15 @@ public class PopulationCreator {
 				.getPopulation().getPersonAttributes()
 				.getAttribute(personId, WORKZONE_ATTRIBUTE));
 
-//		((PersonImpl) person).setSex((String) this.scenario.getPopulation()
-//				.getPersonAttributes()
-//				.getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
-		PersonUtils.setEmployed(person, workZone != null);
-		PersonUtils.setAge(person, 2015 - Integer
-				.parseInt((String) this.scenario.getPopulation()
-						.getPersonAttributes()
-						.getAttribute(personId, BIRTHYEAR_ATTRIBUTE)));
+		// ((PersonImpl) person).setSex((String) this.scenario.getPopulation()
+		// .getPersonAttributes()
+		// .getAttribute(personId, RegentPopulationReader.SEX_ATTRIBUTE));
+		// PersonUtils.setEmployed(person, workZone != null);
+		// PersonUtils.setAge(
+		// person,
+		// 2015 - (Integer) this.scenario.getPopulation()
+		// .getPersonAttributes()
+		// .getAttribute(personId, BIRTHYEAR_ATTRIBUTE));
 
 		// if (this.scenario
 		// .getPopulation().getPersonAttributes()
@@ -333,8 +377,8 @@ public class PopulationCreator {
 
 	public void run(final String initialPlansFile) throws FileNotFoundException {
 
-		int processedCarDrivers = 0;
-		int everyXthPerson = (int) (1 / this.populationSampleFactor);
+		int processedPersons = 0;
+		int everyXthPerson = (int) (1.0 / this.populationSampleFactor);
 
 		// >>>>> TODO remove links where we do not want activities >>>>>
 		final LinksRemover linksRem = new LinksRemover(
@@ -348,8 +392,13 @@ public class PopulationCreator {
 						StockholmTransformationFactory.WGS84_EPSG3857,
 						StockholmTransformationFactory.WGS84_SWEREF99);
 
-		final Map<String, Zone> id2clippedZone = this.zonalSystem
-				.getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
+		// final Map<String, Zone> id2clippedZone;
+		// if (this.zonesBoundaryShapeFileName != null) {
+		// id2clippedZone = this.zonalSystem
+		// .getZonesInsideBoundary(this.zonesBoundaryShapeFileName);
+		// } else {
+		// id2clippedZone = this.zonalSystem.getId2zoneView();
+		// }
 
 		final ObjectAttributes personAttributes = this.scenario.getPopulation()
 				.getPersonAttributes();
@@ -371,23 +420,26 @@ public class PopulationCreator {
 			final String workTourMode = (String) personAttributes.getAttribute(
 					personId, WORKTOURMODE_ATTRIBUTE);
 
-			if (id2clippedZone.keySet().contains(homeZone)
-					&& id2clippedZone.keySet().contains(workZone)
-					&& (RegentPopulationReader.PT_ATTRIBUTEVALUE
-							.equals(workTourMode) || RegentPopulationReader.CAR_ATTRIBUTEVALUE
+			if (this.zonalSystem.getId2zoneView().keySet().contains(homeZone)
+					&& this.zonalSystem.getId2zoneView().keySet()
+							.contains(workZone) && (
+					// RegentPopulationReader.PT_ATTRIBUTEVALUE
+					// .equals(workTourMode) ||
+					RegentPopulationReader.CAR_ATTRIBUTEVALUE
 							.equals(workTourMode))) {
-				if (processedCarDrivers % everyXthPerson == 0) {
-					System.out.print("Person " + personId + ": homeZone = "
-							+ homeZone + ", workZone = " + workZone
-							+ ", workTourMode = " + workTourMode);
-					System.out.println("; this is the " + processedCarDrivers
-							+ "th agent.");
+				if (processedPersons % everyXthPerson == 0) {
+					Logger.getLogger(MATSimDummy.class.getName()).info(
+							"Person " + personId + ": homeZone = " + homeZone
+									+ ", workZone = " + workZone
+									+ ", workTourMode = " + workTourMode
+									+ "; this is the " + processedPersons
+									+ "th agent.");
 					final Person person = this.newPerson(personId, xy2links,
 							coordinateTransform);
 					this.scenario.getPopulation().addPerson(person);
 
 				}
-				processedCarDrivers++;
+				processedPersons++;
 			}
 		}
 
@@ -416,32 +468,30 @@ public class PopulationCreator {
 
 		System.out.println("STARTED ...");
 
-		// final String networkFileName =
-		// "./data/network/network_v12_utan_forbifart.xml";
-		final String networkFileName = "./data/transmodeler/network.xml";
 		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
-
 		final String buildingShapeFileName = "./data/shapes/by_full_EPSG3857_2.shp";
+		final String populationFileName = "./data/synthetic_population/150911_trips.xml";
 
-		// final String populationFileName = "./150410_worktrips_small.xml";
-		// final String populationFileName =
-		// "./data/synthetic_population/150410_worktrips.xml";
-		final String populationFileName = "./data/synthetic_population/150615_trips.xml";
+		final String networkFileName = "./data/run/network-expanded.xml";
+		final String linkAttributesFileName = "./data/run/link-attributes.xml";
+		final String initialPlansFile = "./data/run/initial-plans.xml";
 
-		final String initialPlansFile = "./data/demand_output/initial_plans.xml";
+		final ObjectAttributes linkAttributes = new ObjectAttributes();
+		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+				linkAttributes);
+		reader.parse(linkAttributesFileName);
 
 		final PopulationCreator pc = new PopulationCreator(networkFileName,
-				zonesShapeFileName, populationFileName);
+				zonesShapeFileName,
+				StockholmTransformationFactory.WGS84_EPSG3857,
+				populationFileName);
 		pc.setBuildingsFileName(buildingShapeFileName);
 		pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
 		pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
-
 		pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
-
-		pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
-
-		pc.setPopulationSampleFactor(0.001);
-
+		// pc.setZonesBoundaryShapeFileName("./data/shapes/limit_EPSG3857.shp");
+		pc.setPopulationSampleFactor(0.05);
+		pc.setLinkAttributes(linkAttributes);
 		pc.run(initialPlansFile);
 
 		System.out.println("NETWORK NODE COORDINATE STATISTICS");

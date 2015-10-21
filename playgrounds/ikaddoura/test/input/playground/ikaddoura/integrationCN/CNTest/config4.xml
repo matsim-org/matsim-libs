@@ -11,7 +11,7 @@
 	</module>
 	
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/playground/ikaddoura/integrationCN/CNTest/test4" />
+		<param name="outputDirectory" value="test/output/playground/ikaddoura/integrationCN/CNTest/cn" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 		<param name="firstIteration" value="0" />
@@ -64,7 +64,7 @@
 		<param name="waiting" value="0.0" />
 
 		<param name="marginalUtilityOfMoney" value="100000" />
-		<param name="monetaryDistanceCostRateCar" value="0.0" />
+		<param name="monetaryDistanceRateCar" value="0.0" />
 
 		<param name="constantCar" value="-0.0" />
 	

@@ -52,10 +52,10 @@ public class RunCarsharing {
 			}
 		});
 
-		controler.setTripRouterFactory(CarsharingUtils.createTripRouterFactory(sc));
+		controler.addOverridingModule(CarsharingUtils.createModule());
 
 		//setting up the scoring function factory, inside different scoring functions are set-up
-		controler.setScoringFunctionFactory(new CarsharingScoringFunctionFactory( sc.getConfig(), sc.getNetwork()));
+		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
 
 		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) controler.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 		controler.addControlerListener(new CarsharingListener(controler,

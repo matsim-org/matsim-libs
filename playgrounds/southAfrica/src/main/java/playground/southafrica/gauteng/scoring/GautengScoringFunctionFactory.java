@@ -30,6 +30,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -40,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
+	private final CharyparNagelScoringParametersForPerson parameters;
 	private final UtilityOfMoneyI utlOfMon ;
 	private final Scenario scenario ;
 	private final String subPopulationAttributeName;
@@ -48,7 +50,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public GautengScoringFunctionFactory(Scenario scenario, double baseValueOfTime, double valueOfTimeMultiplier) {
 		this.scenario = scenario ;
-		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
+		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
 		this.utlOfMon = new GautengUtilityOfMoney( scenario, baseValueOfTime, valueOfTimeMultiplier) ;
 		this.subPopulationAttributeName = scenario.getConfig().plans().getSubpopulationAttributeName() ;
 		this.personAttributes = this.scenario.getPopulation().getPersonAttributes();
@@ -57,6 +59,8 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 	@Override
 	public ScoringFunction createNewScoringFunction( Person person ) {
 		SumScoringFunction sum = new SumScoringFunction() ;
+
+		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 		
 		String subPopName = (String) personAttributes.getAttribute(person.getId().toString(), this.subPopulationAttributeName ) ;
 		if ( subPopName != null && subPopName.equals("commercial") ) {

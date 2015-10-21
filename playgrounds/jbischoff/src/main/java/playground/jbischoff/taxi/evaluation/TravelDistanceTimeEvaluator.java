@@ -49,7 +49,7 @@ public class TravelDistanceTimeEvaluator
     private Map<Id, Double> endTimes;
 
 
-    public TravelDistanceTimeEvaluator(Network network)
+    public TravelDistanceTimeEvaluator(Network network, double timeLimit)
     {
         this.taxiTravelDistance = new TreeMap<Id, Double>();
         this.taxiTravelDistancesWithPassenger = new HashMap<Id, Double>();

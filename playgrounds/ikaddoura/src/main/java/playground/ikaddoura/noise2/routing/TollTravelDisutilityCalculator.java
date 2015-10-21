@@ -24,6 +24,7 @@ package playground.ikaddoura.noise2.routing;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -48,11 +49,12 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 	private double marginalUtlOfTravelTime;
 	private NoiseContext noiseContext;
 	
+	@Deprecated
 	public TollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseContext noiseContext) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceRateCar();
-		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0); // TODO: make this dependent on the agent-specific time pressure...
+		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0); // TODO: make this dependent on the agent-specific time pressure...
 		this.noiseContext = noiseContext;		
 		log.info("The link travel disutility is calculated based on the travel time, the distance and the expected toll (monetized noise damage costs) of each link.");
 	}

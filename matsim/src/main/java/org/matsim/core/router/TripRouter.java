@@ -42,16 +42,17 @@ import org.matsim.facilities.Facility;
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
  * <p/>
+ *
  * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample} for an example
  * how to use this API from your own code.
  * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample} and {@link tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRoutingExample} for examples
- * how to replace this behavior with your own.
+ * how to extend or replace this behavior with your own.
  *
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private final Map<String, RoutingModule> routingModules =
-		new HashMap<>();
+	private final Map<String, RoutingModule> routingModules = new HashMap<>();
+	
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -149,6 +150,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {

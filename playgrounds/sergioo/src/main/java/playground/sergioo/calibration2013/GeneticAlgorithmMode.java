@@ -1,6 +1,7 @@
 package playground.sergioo.calibration2013;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -20,7 +21,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -65,16 +66,16 @@ public class GeneticAlgorithmMode {
 		
 		public ParametersArray(Scenario scenario) {
 			int k=0;
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getConstantCar();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getConstantPt();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMarginalUtlOfDistanceWalk();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getConstant();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getConstant();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getMarginalUtlOfWaiting_utils_hr();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getMarginalUtlOfWaitingPt_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getTraveling_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingPt_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRateCar();
-			this.parameters[k++] = scenario.getConfig().planCalcScore().getMonetaryDistanceRatePt();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate();
+			this.parameters[k++] = scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getUtilityOfLineSwitch();
 			calculateScore(scenario);
 		}
@@ -85,16 +86,24 @@ public class GeneticAlgorithmMode {
 		}
 		private void modifyConfig(Scenario scenario) {
 			int k=0;
-			scenario.getConfig().planCalcScore().setConstantCar(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setConstantPt(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMarginalUtlOfDistanceWalk(this.parameters[k++]);
+			double constantCar = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setConstant(constantCar);
+			double constantPt = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setConstant(constantPt);
+			final double marginalUtlOfDistanceWalk = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(marginalUtlOfDistanceWalk);
 			scenario.getConfig().planCalcScore().setMarginalUtlOfWaiting_utils_hr(this.parameters[k++]);
 			scenario.getConfig().planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setTraveling_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceRateCar(this.parameters[k++]);
-			scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(this.parameters[k++]);
+			final double traveling = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+			final double travelingPt = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+			final double travelingWalk = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+			double monetaryDistanceRateCar = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+			double monetaryDistanceRatePt = this.parameters[k++];
+			scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 			scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(this.parameters[k++]);
 		}
 		private void calculateScore(final Scenario scenario) {
@@ -196,9 +205,9 @@ public class GeneticAlgorithmMode {
 
 	public static void main(String[] args) throws IOException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		scenario.getConfig().planCalcScore().setConstantCar(10);
-		scenario.getConfig().planCalcScore().setMarginalUtlOfDistanceWalk(10);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceRatePt(10);
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setConstant((double) 10);
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 10);
+		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 10);
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario).readFile(args[3]);
@@ -250,7 +259,7 @@ public class GeneticAlgorithmMode {
 			}
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterProviderImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
+				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
 			}
 		};
 		ReRoute module = new ReRoute(scenario);

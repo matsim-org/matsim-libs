@@ -68,38 +68,55 @@ import playground.vsp.congestion.events.CongestionEventsReader;
 public class PersonTripAnalysisMain {
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static String networkFile;
-	private static String configFile;
-	private static String outputPath;
-	private static String populationFile;
-
-	private static String eventsFile;
-	
-	private static String noiseEventsFile;
-	private static String congestionEventsFile;
-		
+	private String runDirectory;
+			
 	public static void main(String[] args) {
+			
+		log.info("Searching for run-directory in args at index 0...");
+		String runDirectory;
 		
 		if (args.length > 0) {
-			throw new RuntimeException("Aborting...");
+			runDirectory = args[0];
+			log.info("Run-directory found at index 0.");
 			
-		} else {			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_config.xml";
+		} else {
 			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/output_plans.xml.gz";
-			
-			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/c/ITERS/it.100/100.events.xml.gz";
+			String id = "c13";
+			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+						
+			runDirectory = baiscDirectoryPath + id + "/";
+			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(runDirectory);
 		analysis.run();
 	}
+	
+	public PersonTripAnalysisMain(String runDirectory) {
+		
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
+		
+		this.runDirectory = runDirectory;
+	}
 
-	private void run() {
+	public void run() {
+					
+		String networkFile = runDirectory + "output_network.xml.gz";
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+
+		Config config = ConfigUtils.loadConfig(configFile);	
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		int finalIteration = config.controler().getLastIteration();
+		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
+		
+		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();
@@ -110,12 +127,6 @@ public class PersonTripAnalysisMain {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-				
-		Config config = ConfigUtils.loadConfig(configFile);	
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		// standard events analysis
 		

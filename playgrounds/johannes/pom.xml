@@ -31,6 +31,18 @@
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
+		<!-- repeating repositories below although they are in socnetgen in attempt 
+			to repair intermittent build failures. kai, sep'15 -->
+		<repository>
+			<id>basex</id>
+			<name>BaseX Maven Repository</name>
+			<url>http://files.basex.org/maven</url>
+		</repository>
+		<repository>
+			<id>xqj</id>
+			<name>XQJ Maven Repository</name>
+			<url>http://xqj.net/maven</url>
+		</repository>
 	</repositories>
 	<dependencies>
 
@@ -57,6 +69,11 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>socnetgen</artifactId>
+			<version>0.8.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>common</artifactId>
 			<version>0.8.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

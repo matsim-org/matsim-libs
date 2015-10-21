@@ -21,32 +21,30 @@
 package playground.wrashid.parkingSearch.withindayFW2;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+
+import javax.inject.Provider;
 
 public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
-	private final TripRouterFactory tripRouterFactory;
-	private final RoutingContext routingContext;
-	
-	public ParkingSearchReplannerFactory(WithinDayEngine withinDayEngine, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
-		super(withinDayEngine);		
+	private final Provider<TripRouter> tripRouterFactory;
+
+	public ParkingSearchReplannerFactory(WithinDayEngine withinDayEngine, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker, Provider<TripRouter> withinDayTripRouterFactory) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 		this.parkingAgentsTracker = parkingAgentsTracker;
-		this.tripRouterFactory = tripRouterFactory;
-		this.routingContext = routingContext;
+		this.tripRouterFactory = withinDayTripRouterFactory;
 	}
 
 	@Override
 	public ParkingSearchReplanner createReplanner() {
 		ParkingSearchReplanner replanner = new ParkingSearchReplanner(super.getId(), this.scenario, 
 				this.getWithinDayEngine().getActivityRescheduler(), 
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext), this.parkingAgentsTracker);
+				this.tripRouterFactory.get(), this.parkingAgentsTracker);
 		return replanner;
 	}
 

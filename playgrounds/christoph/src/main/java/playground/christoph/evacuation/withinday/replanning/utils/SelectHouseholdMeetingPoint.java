@@ -41,9 +41,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -111,8 +109,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 	private final Provider<TransitRouter> transitRouterFactory;
 	
 	private TravelDisutilityFactory disutilityFactory;
-	private TripRouterFactory toHomeFacilityRouterFactory;
-	private TripRouterFactory fromHomeFacilityRouterFactory;
+	private javax.inject.Provider<TripRouter> toHomeFacilityRouterFactory;
+	private javax.inject.Provider<TripRouter> fromHomeFacilityRouterFactory;
 	
 	private Thread[] threads;
 	private Runnable[] runnables;
@@ -387,8 +385,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
 					coordAnalyzer.createInstance(), mobsimDataProvider, modeAvailabilityChecker.createInstance(), 
 					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected,
-					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(toHomeRoutingContext), 
-					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(fromHomeRoutingContext));
+					toHomeFacilityRouterFactory.get(),
+					fromHomeFacilityRouterFactory.get());
 			runner.setTime(Time.UNDEFINED_TIME);
 			runnables[i] = runner; 
 			

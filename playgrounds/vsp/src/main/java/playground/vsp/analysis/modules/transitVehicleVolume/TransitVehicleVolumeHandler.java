@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -45,14 +46,14 @@ public class TransitVehicleVolumeHandler implements TransitDriverStartsEventHand
 			.getLogger(TransitVehicleVolumeHandler.class);
 	private Map<Id, String> vehId2mode;
 	private TransitSchedule sched;
-	private HashMap<String, Counts> mode2Counts;
+	private HashMap<String, Counts<Link>> mode2Counts;
 	private Integer maxSlice = 0;
 	private Double interval;
 
 	public TransitVehicleVolumeHandler(TransitSchedule sched, Double interval) {
 		this.vehId2mode = new HashMap<Id, String>();
 		this.sched = sched;
-		this.mode2Counts = new HashMap<String, Counts>();
+		this.mode2Counts = new HashMap<>();
 		this.interval = interval;
 	}
 
@@ -113,7 +114,7 @@ public class TransitVehicleVolumeHandler implements TransitDriverStartsEventHand
 		}
 	}
 	
-	public Map<String, Counts> getMode2Counts(){
+	public Map<String, Counts<Link>> getMode2Counts(){
 		return this.mode2Counts;
 	}
 

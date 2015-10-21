@@ -87,7 +87,10 @@ public class RunCustomScoringExample {
 
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().scenario()).create();
+				final CharyparNagelScoringParameters params =
+						CharyparNagelScoringParameters.getBuilder(
+								scenario,
+								person.getId() ).create();
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));

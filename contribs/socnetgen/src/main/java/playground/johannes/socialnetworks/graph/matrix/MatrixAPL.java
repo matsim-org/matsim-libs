@@ -21,16 +21,14 @@ package playground.johannes.socialnetworks.graph.matrix;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntArrayList;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.util.MultiThreading;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author illenberger

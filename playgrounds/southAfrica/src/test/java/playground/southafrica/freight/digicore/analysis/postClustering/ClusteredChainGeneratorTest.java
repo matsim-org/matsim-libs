@@ -125,10 +125,10 @@ public class ClusteredChainGeneratorTest{
 			Assert.fail("Should not catch an IOException.");
 		}
 		
-		Assert.assertEquals("Wrong number of facilities in QT.", 3, qt.get(3, 3, 10).size());
-		Assert.assertEquals("Wrong facility", Id.create("f1", Facility.class), qt.get(0, 6).getId());
-		Assert.assertEquals("Wrong facility", Id.create("f2", Facility.class), qt.get(6, 0).getId());
-		Assert.assertEquals("Wrong facility", Id.create("f3", Facility.class), qt.get(5, 6).getId());
+		Assert.assertEquals("Wrong number of facilities in QT.", 3, qt.getDisk(3, 3, 10).size());
+		Assert.assertEquals("Wrong facility", Id.create("f1", Facility.class), qt.getClosest(0, 6).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f2", Facility.class), qt.getClosest(6, 0).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f3", Facility.class), qt.getClosest(5, 6).getId());
 	}
 	
 	@Test

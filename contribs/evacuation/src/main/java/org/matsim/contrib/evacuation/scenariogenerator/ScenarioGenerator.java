@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.evacuation.scenariogenerator;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,14 +30,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.evacuation.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.evacuation.experimental.CustomizedOsmNetworkReader;
 import org.matsim.contrib.evacuation.io.EvacuationConfigReader;
-import org.matsim.contrib.evacuation.model.Constants;
 import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.model.events.InfoEvent;
+import org.matsim.contrib.evacuation.utils.ScenarioCRSTransformation;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -54,24 +51,17 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
-import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
-import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
-import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.utils.gis.matsim2esri.network.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
 
 /**
- * Evacuation scenario generator Workflow: GIS Metaformat --> ScenarioGenertor -->
- * MATSim Szenario - Wo wird entschied ob 10% oder 100% Scenario erzeugt wird?
+ * Evacuation scenario generator workflow: GIS Metaformat --> ScenarioGenertor -->
+ * MATSim scenario
  * 
  * @author laemmel
  * 
@@ -79,12 +69,13 @@ import com.vividsolutions.jts.geom.Polygon;
 @SuppressWarnings("deprecation")
 public class ScenarioGenerator {
 
-	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	protected static final boolean DEBUG = false;
+	private static final String VIS_CRS = "EPSG:3395";//world mercator for visualization
+	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	protected final String configFile;
+	protected final EventsManager em;
 	protected String matsimConfigFile;
 	protected Id<Link> safeLinkId;
-	protected final EventsManager em;
 	protected Config matsimConfig;
 	protected Scenario matsimScenario;
 
@@ -113,12 +104,7 @@ public class ScenarioGenerator {
 			EvacuationConfigReader parser = new EvacuationConfigReader(gcm);
 			parser.parse(this.configFile);
 //			gcm.setFileNamesAbsolute();
-			String crs = gcm.getTargetCRS();
-			if(crs == null) {
-				log.warn("No coordinate system is given in EvacuationConfigModule, guessing coordinate system from evacuation area file.");
-				crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
-				log.info("Setting coordinate system to: " + crs);
-			}
+			String crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
 			this.matsimConfig.global().setCoordinateSystem(crs);
 
 		
@@ -144,7 +130,7 @@ public class ScenarioGenerator {
 			outputDirFile.mkdirs();
 		}
 
-		generateAndSaveNetwork(this.matsimScenario);
+		generateNetwork(this.matsimScenario);
 		if (DEBUG) {
 			dumpNetworkAsShapeFile(this.matsimScenario);
 		}
@@ -153,13 +139,26 @@ public class ScenarioGenerator {
 		e = new InfoEvent(System.currentTimeMillis(),
 				"generating population file");
 		this.em.processEvent(e);
-		generateAndSavePopulation(this.matsimScenario);
+		generatePopulation(this.matsimScenario);
+
+		//transform coordinate system to world mercator
+		ScenarioCRSTransformation.transform(this.matsimScenario, VIS_CRS);
+		this.matsimConfig.global().setCoordinateSystem(VIS_CRS);
+		//save network
+		String networkOutputFile = gcm.getOutputDir() + "/network.xml.gz";
+		new NetworkWriter(this.matsimScenario.getNetwork()).write(networkOutputFile);
+		this.matsimScenario.getConfig().network().setInputFile(networkOutputFile);
+		//save population
+		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
+		new PopulationWriter(this.matsimScenario.getPopulation(), this.matsimScenario.getNetwork(),
+				gcm.getSampleSize()).write(outputPopulationFile);
+		this.matsimScenario.getConfig().plans().setInputFile(outputPopulationFile);
+
 
 		log.info("saving matsim config file to:" + this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
 		this.em.processEvent(e);
 
-		ConfigUtils.addOrGetModule(this.matsimConfig, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMapOverlayMode(true);
 
 		this.matsimConfig.controler().setLastIteration(10);
 		this.matsimConfig.strategy().setMaxAgentPlanMemorySize(3);
@@ -216,14 +215,20 @@ public class ScenarioGenerator {
 
 	}
 
-	@SuppressWarnings("unused")
-	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
-		throw new RuntimeException(
-				"This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
+	@Deprecated
+	// call this w/origin parameter
+	public EvacuationConfigModule getEvacuationConfig(Config c) {
 
+		ConfigGroup m = c.getModule("evacuation");
+		if (m instanceof EvacuationConfigModule) {
+			return (EvacuationConfigModule) m;
+		}
+		EvacuationConfigModule gcm = new EvacuationConfigModule(m);
+		c.getModules().put("evacuation", gcm);
+		return gcm;
 	}
 
-	protected void generateAndSavePopulation(Scenario sc) {
+	protected void generatePopulation(Scenario sc) {
 		// for now a simple ESRI shape file format is used to emulated the a
 		// more sophisticated not yet defined population meta format
 		EvacuationConfigModule gcm = getEvacuationConfig(sc.getConfig());
@@ -231,10 +236,7 @@ public class ScenarioGenerator {
 		new PopulationFromESRIShapeFileGenerator(sc, evacuationPopulationFile,
 				this.safeLinkId).run();
 
-		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
-		new PopulationWriter(sc.getPopulation(), sc.getNetwork(),
-				gcm.getSampleSize()).write(outputPopulationFile);
-		sc.getConfig().plans().setInputFile(outputPopulationFile);
+
 
 		sc.getConfig().qsim().setStorageCapFactor(gcm.getSampleSize());
 		sc.getConfig().qsim().setFlowCapFactor(gcm.getSampleSize());
@@ -277,7 +279,7 @@ public class ScenarioGenerator {
 
 	}
 
-	protected void generateAndSaveNetwork(Scenario sc) {
+	protected void generateNetwork(Scenario sc) {
 		log.info("generating network file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "generating network file");
 		this.em.processEvent(e);
@@ -354,39 +356,23 @@ public class ScenarioGenerator {
 		// evacuation area consists of one and only one
 		// polygon
 		@SuppressWarnings("rawtypes")
-		FeatureSource fs = ShapeFileReader.readDataFile(gcm.getEvacuationAreaFileName());
-		SimpleFeature ft = null;
-		try {
-			ft = (SimpleFeature) fs.getFeatures().features().next();
-			FeatureTransformer.transform(ft, fs.getSchema()
-					.getCoordinateReferenceSystem(), this.matsimConfig);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (FactoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (TransformException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-		} catch (IllegalAttributeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			System.exit(-2);
-
+		ShapeFileReader r = new ShapeFileReader();
+		r.readFileAndInitialize(gcm.getEvacuationAreaFileName());
+		for (SimpleFeature ft : r.getFeatureSet()) {
+			try {
+				FeatureTransformer.transform(ft, r.getCoordinateSystem(), this.matsimConfig);
+			} catch (FactoryException e1) {
+				e1.printStackTrace();
+			} catch (TransformException e1) {
+				e1.printStackTrace();
+				System.exit(-2);
+			}
+			MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
+			Polygon p = (Polygon) mp.getGeometryN(0);
+			// 2b) generate network
+			new EvacuationNetworkGenerator(sc, p, this.safeLinkId).run();
+			log.info("done generating network file");
 		}
-		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
-		Polygon p = (Polygon) mp.getGeometryN(0);
-		// 2b) generate network
-		new EvacuationNetworkGenerator(sc, p, this.safeLinkId).run();
-		log.info("done generating network file");
-		String networkOutputFile = gcm.getOutputDir() + "/network.xml.gz";
-		// ((NetworkImpl)matsimScenario.getNetwork()).setEffectiveCellSize(0.26);
-		// ((NetworkImpl)matsimScenario.getNetwork()).setEffectiveLaneWidth(0.71);
-		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
-		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
 
 	public EvacuationConfigModule getEvacuationConfig() {
@@ -399,17 +385,11 @@ public class ScenarioGenerator {
 		return gcm;
 	}
 
-	@Deprecated
-	// call this w/origin parameter
-	public EvacuationConfigModule getEvacuationConfig(Config c) {
+	@SuppressWarnings("unused")
+	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
+		throw new RuntimeException(
+				"This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
 
-		ConfigGroup m = c.getModule("evacuation");
-		if (m instanceof EvacuationConfigModule) {
-			return (EvacuationConfigModule) m;
-		}
-		EvacuationConfigModule gcm = new EvacuationConfigModule(m);
-		c.getModules().put("evacuation", gcm);
-		return gcm;
 	}
 
 	public String getPathToMatsimConfigXML() {

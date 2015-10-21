@@ -188,6 +188,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	/**
 	 * Allow replacing the RouterPriorityQueue.
 	 */
+	@SuppressWarnings("static-method")
 	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
 		return new PseudoRemovePriorityQueue<Node>(500);
 	}

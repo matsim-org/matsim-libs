@@ -172,7 +172,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		}
 
 		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, scenarioConfig );
+				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans

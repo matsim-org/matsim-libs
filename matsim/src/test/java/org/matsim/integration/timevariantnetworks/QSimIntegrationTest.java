@@ -330,9 +330,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2enterTime = event.getTime();
 			}
 		}
@@ -342,9 +342,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2leaveTime = event.getTime();
 			}
 		}

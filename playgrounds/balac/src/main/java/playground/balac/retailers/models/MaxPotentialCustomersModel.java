@@ -69,7 +69,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 	      String linkId = this.first.get(i);
 	      //double scoreSum = 0.0D;
             LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
-	      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
+	      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	      
 	      
 	    
@@ -94,8 +94,8 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 
 			  Coord c = new Coord(netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord().getX(), netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord().getY());
 			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), c, ppa.getActivityLinkId());
-			  ActivityFacility af1 = Utils.getInsideShopsQuadTree().get(c.getX(), c.getY());
-			  ActivityFacility af2 = Utils.getOutsideShopsQuadTree().get(c.getX(), c.getY());
+			  ActivityFacility af1 = Utils.getInsideShopsQuadTree().getClosest(c.getX(), c.getY());
+			  ActivityFacility af2 = Utils.getOutsideShopsQuadTree().getClosest(c.getX(), c.getY());
 			  
 	    	  if (af1 instanceof FacilityRetailersImpl ||
 	    	    	  af2 instanceof FacilityRetailersImpl){

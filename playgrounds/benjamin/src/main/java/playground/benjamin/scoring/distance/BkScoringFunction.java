@@ -32,7 +32,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
@@ -147,15 +146,15 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		marginalUtilityOfWaiting = configGroup.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival = configGroup.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture = configGroup.getEarlyDeparture_utils_hr() / 3600.0;
-		marginalUtilityOfTraveling = configGroup.getTraveling_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingPT = configGroup.getTravelingPt_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingWalk = configGroup.getTravelingWalk_utils_hr() / 3600.0;
+		marginalUtilityOfTraveling = configGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingPT = configGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() / 3600.0;
+		marginalUtilityOfTravelingWalk = configGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() / 3600.0;
 		marginalUtilityOfPerforming = configGroup.getPerforming_utils_hr() / 3600.0;
 
 //		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
 
 //		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistanceCar();
-		marginalUtilityOfFuel = configGroup.getMonetaryDistanceRateCar() * configGroup.getMarginalUtilityOfMoney() ;
+		marginalUtilityOfFuel = configGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * configGroup.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

@@ -70,12 +70,12 @@ public class BarcelonaTaxiGenerator
         String dir = "d:/PP-rad/Barcelona/data/";
         String networkFile = dir + "network/barcelona_network.xml";
 
-        boolean useSurveyData = true;
+        boolean useSurveyData = !true;
         //avg values for each hour h, so they correspond to half past h (h:30, for each hour h)
         double[] taxis0to23 = useSurveyData ? getTaxisPerHourFromSurvey()
                 : getTaxisPerHourFromRequets();
         String source = useSurveyData ? "survey" : "reqs";
-        String taxisFile = dir + "taxis4to5_from_" + source + ".xml";
+        String taxisFile = dir + "taxis4to5_from_" + source + "_";
 
         //we start at 4:30 with vehicles, and at 5:00 with requests
         double startTime = BarcelonaServedRequests.ZERO_HOUR * 3600 - 1800;
@@ -86,9 +86,12 @@ public class BarcelonaTaxiGenerator
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
 
-        BarcelonaTaxiCreator btc = new BarcelonaTaxiCreator(scenario);
-        VehicleGenerator vg = new VehicleGenerator(minWorkTime, maxWorkTime, btc);
-        vg.generateVehicles(getTaxis4to5(taxis0to23), startTime, 3600);
-        new VehicleWriter(vg.getVehicles()).write(taxisFile);
+        for (int i = 45; i <= 45; i += 2) {
+            BarcelonaTaxiCreator btc = new BarcelonaTaxiCreator(scenario);
+            VehicleGenerator vg = new VehicleGenerator(minWorkTime, maxWorkTime, btc);
+            double scale = i / 100.;
+            vg.generateVehicles(MathArrays.scale(scale, getTaxis4to5(taxis0to23)), startTime, 3600);
+            new VehicleWriter(vg.getVehicles()).write(taxisFile + scale + ".xml");
+        }
     }
 }

@@ -21,10 +21,7 @@ package org.matsim.contrib.evacuation.scenariogenerator;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-
 import org.apache.log4j.Logger;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,7 +41,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,15 +53,12 @@ public class PopulationFromESRIShapeFileGenerator {
 	private static final Logger log = Logger.getLogger(PopulationFromESRIShapeFileGenerator.class);
 
 	private static final int RAND_SAMPLES = 1000; // the number of random numbers generated for the lookup table
-
-	private final String populationShapeFile;
 	protected final Scenario scenario;
-	protected int id = 0;
 	protected final Random rnd = MatsimRandom.getRandom();
 	protected final Id safeLinkId;
-
+	private final String populationShapeFile;
 	private final EvacuationConfigModule gcm;
-
+	protected int id = 0;
 	private List<Double> depTimeLookup;
 
 	// Konstruktor mit Scenario, PopFile, Senke
@@ -82,28 +75,23 @@ public class PopulationFromESRIShapeFileGenerator {
 		genDepTimeLookup();
 
 		log.info("Generating population from ESRI shape file.");
-		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
-		CoordinateReferenceSystem crs = fs.getSchema().getCoordinateReferenceSystem();
-		try {
-			SimpleFeatureIterator it = fs.getFeatures().features();
-			while (it.hasNext()) {
-				SimpleFeature ft = it.next();
-				try {
-					FeatureTransformer.transform(ft, crs, this.scenario.getConfig());
-				} catch (FactoryException e) {
-					throw new RuntimeException(e);
-				} catch (TransformException e) {
-					throw new RuntimeException(e);
-				} catch (IllegalArgumentException e) {
-					throw new RuntimeException(e);
-				} 
-				createPersons(ft);
+		ShapeFileReader r = new ShapeFileReader();
+		r.readFileAndInitialize(this.populationShapeFile);
+
+
+		CoordinateReferenceSystem crs = r.getCoordinateSystem();
+		for (SimpleFeature ft : r.getFeatureSet()) {
+			try {
+				FeatureTransformer.transform(ft, crs, this.scenario.getConfig());
+			} catch (FactoryException e1) {
+				e1.printStackTrace();
+			} catch (TransformException e1) {
+				e1.printStackTrace();
+				System.exit(-3);
 			}
-			it.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-3);
+			createPersons(ft);
 		}
+
 		log.info("done");
 
 

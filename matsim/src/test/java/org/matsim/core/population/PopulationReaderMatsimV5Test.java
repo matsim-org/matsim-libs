@@ -36,10 +36,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -244,6 +246,63 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertNotNull(route1);
 	}
 
+	@Test
+	public void testReadingOldRoutesWithoutType() {
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		final Population population = scenario.getPopulation();
+
+		String str = "<?xml version=\"1.0\" ?>"+
+		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<population>"+
+		"<person id=\"1\">"+
+		"	<plan>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
+		"		<leg mode=\"car\">"+
+		"     <route trav_time=\"00:05\">"+
+		"       123 234 345 456"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"w\" x=\"10000\" y=\"0\" end_time=\"15:00\"/>"+
+		"		<leg mode=\"walk\">"+
+		"     <route trav_time=\"00:15\">"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"s\" x=\"15000\" y=\"0\" end_time=\"15:30\"/>"+
+		"		<leg mode=\"pt\">"+
+		"     <route trav_time=\"00:15\">"+
+		"       PT1===1===Blue Line===1to3===2a"+
+		"     </route>"+
+		"   </leg>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" start_time=\"16:00\" />"+
+		"	</plan>"+
+		"</person>"+
+		"</population>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
+		Assert.assertEquals(7, plan.getPlanElements().size());
+		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(4) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(5) instanceof Leg);
+		Assert.assertTrue(plan.getPlanElements().get(6) instanceof Activity);
+		
+		Leg leg1 = (Leg) plan.getPlanElements().get(1);
+		Route route1 = leg1.getRoute();
+		Leg leg2 = (Leg) plan.getPlanElements().get(3);
+		Route route2 = leg2.getRoute();
+		Leg leg3 = (Leg) plan.getPlanElements().get(5);
+		Route route3 = leg3.getRoute();
+		
+		Assert.assertTrue(route1 instanceof NetworkRoute);
+		Assert.assertTrue(route2 instanceof GenericRouteImpl);
+		Assert.assertTrue(route3 instanceof ExperimentalTransitRoute);
+	}
+
+	
 	/**
 	 * @author mrieser
 	 */

@@ -20,29 +20,22 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import gnu.trove.TDoubleArrayList;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.utils.collections.Tuple;
+import playground.johannes.gsv.sim.cadyts.ODUtils;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
@@ -79,7 +72,7 @@ public class CalcShares {
 		
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;
 		zones.setPrimaryKey("gsvId");
 		
@@ -183,16 +176,16 @@ public class CalcShares {
 		
 //		double[] samples = railVolumes.toNativeArray();
 //		TDoubleDoubleHashMap hist = Correlations.mean(samples, shareSimDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
-//		TXTWriter.writeMap(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/simVolDiff.txt");
+//		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/simVolDiff.txt");
 //		
 //		hist = Correlations.mean(samples, shareItpDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
-//		TXTWriter.writeMap(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/itpVolDiff.txt");
+//		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/itpVolDiff.txt");
 //		
 //		hist = Correlations.mean(refShares.toNativeArray(), simShares.toNativeArray());
-//		TXTWriter.writeMap(hist, "ref share", "sim share", "/home/johannes/gsv/matrices/analysis/marketShares/simShareCorrel.txt");
+//		TXTWriter.writeHistogram(hist, "ref share", "sim share", "/home/johannes/gsv/matrices/analysis/marketShares/simShareCorrel.txt");
 //		
 //		hist = Correlations.mean(refShares.toNativeArray(), itpShares.toNativeArray());
-//		TXTWriter.writeMap(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
+//		TXTWriter.writeHistogram(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
 	}
 
 	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {

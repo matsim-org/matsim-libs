@@ -66,7 +66,7 @@ public class SwissHaltestellen {
 	}
 
 	public SwissHaltestelle getClosestLocation(final Coord coord) {
-		return this.haltestellen.get(coord.getX(), coord.getY());
+		return this.haltestellen.getClosest(coord.getX(), coord.getY());
 	}
 	
 	/** 

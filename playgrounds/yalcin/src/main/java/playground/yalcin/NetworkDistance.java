@@ -23,6 +23,7 @@ package playground.yalcin;
 import net.opengis.kml._2.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -117,10 +118,11 @@ public class NetworkDistance {
 		// set the config to only look at distance costs, not travel time costs
 		Config config = new Config();
 		config.addCoreModules();
-		config.planCalcScore().setTraveling_utils_hr(0.0);
+		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
 
 //		config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.001); // -1 per kilometer == -0.001 per meter
-		config.planCalcScore().setMonetaryDistanceRateCar(-0.001) ;
+		double monetaryDistanceRateCar = -0.001;
+		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
 		// create the router algorithm

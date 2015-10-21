@@ -65,7 +65,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private final IterationStopWatch iterationStopwatch;
     private final OutputDirectoryHierarchy controlerIO;
 
-    private Counts counts;
+    private Counts<Link> counts;
 
     private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
     private int iterationsUsed = 0;
@@ -82,7 +82,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-        counts = (Counts) this.scenario.getScenarioElement(Counts.ELEMENT_NAME);
+        counts = (Counts<Link>) this.scenario.getScenarioElement(Counts.ELEMENT_NAME);
         loadCountsIfNecessary();
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
