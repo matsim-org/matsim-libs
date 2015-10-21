@@ -11,9 +11,7 @@ import playground.gregor.ctsim.simulation.CTEvent;
 import playground.gregor.ctsim.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -37,16 +35,16 @@ public class CTNetwork {
 	}
 
 	private void init() {
-		log.info("initializing network; using " + this.cores + " threads.");
-		List<Worker> workers = new ArrayList<>();
-		List<Thread> threads = new ArrayList<>();
-		for (int i = 0; i < this.cores; i++) {
-			Worker w = new Worker();
-			workers.add(w);
-			Thread t = new Thread(w);
-			t.start();
-			threads.add(t);
-		}
+//		log.info("initializing network; using " + this.cores + " threads.");
+//		List<Worker> workers = new ArrayList<>();
+//		List<Thread> threads = new ArrayList<>();
+//		for (int i = 0; i < this.cores; i++) {
+//			Worker w = new Worker();
+//			workers.add(w);
+//			Thread t = new Thread(w);
+//			t.start();
+//			threads.add(t);
+//		}
 
 		log.info("creating and initializing links and nodes");
 		for (Node n : this.network.getNodes().values()) {
@@ -73,7 +71,8 @@ public class CTNetwork {
 			}
 			Link rev = getRevLink(l);
 			CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
-			workers.get(cnt++ % this.cores).add(ct);
+//			workers.get(cnt++ % this.cores).add(ct);
+			ct.init();
 			links.put(l.getId(), ct);
 			if (rev != null) {
 				links.put(rev.getId(), ct);
@@ -82,27 +81,37 @@ public class CTNetwork {
 		}
 
 		for (CTNode ctNode : this.nodes.values()) {
-			workers.get(cnt++ % this.cores).add(ctNode);
+			ctNode.init();
+//			workers.get(cnt++ % this.cores).add(ctNode);
 
 		}
-		for (Worker w : workers) {
-			w.add(new CTNetworkEntity() {
-				@Override
-				public void init() {
-				}
-			});
-		}
-		for (Thread t : threads) {
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+//		for (Worker w : workers) {
+//			w.add(new CTNetworkEntity() {
+//				@Override
+//				public void init() {
+//				}
+//			});
+//		}
+//		for (Thread t : threads) {
+//			try {
+//				t.join();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		}
+//		log.info("verifying network");
+//		checkNetwork();
+//		log.info("done.");
+	}
+
+	private Link getRevLink(Link l) {
+		for (Link rev : l.getToNode().getOutLinks().values()) {
+			if (rev.getToNode() == l.getFromNode()) {
+				return rev;
 			}
-
 		}
-		log.info("verifying network");
-		checkNetwork();
-		log.info("done.");
+		return null;
 	}
 
 	private void checkNetwork() {
@@ -122,15 +131,6 @@ public class CTNetwork {
 				}
 			}
 		}
-	}
-
-	private Link getRevLink(Link l) {
-		for (Link rev : l.getToNode().getOutLinks().values()) {
-			if (rev.getToNode() == l.getFromNode()) {
-				return rev;
-			}
-		}
-		return null;
 	}
 
 	public CTNetsimEngine getEngine() {
