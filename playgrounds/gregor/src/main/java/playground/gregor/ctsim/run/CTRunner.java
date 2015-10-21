@@ -96,10 +96,30 @@ public class CTRunner implements IterationStartsListener {
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
 		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
 
+
+		//TODO use injection instead, but how?
 		controller.setTripRouterFactory(tripRouter);
+
+//		controller.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				addRoutingModuleBinding("walkct").toInstance(new RoutingModule() {
+//					@Override
+//					public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+//						return null;
+//					}
+//
+//					@Override
+//					public StageActivityTypes getStageActivityTypes() {
+//						return null;
+//					}
+//				});
+//			}
+//		});
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
+
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
