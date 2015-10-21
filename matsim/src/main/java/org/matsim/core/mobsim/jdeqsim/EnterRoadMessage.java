@@ -52,8 +52,7 @@ public class EnterRoadMessage extends EventMessage {
 			event = new Wait2LinkEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), 
 					Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class), null, 1.0);
 		} else {
-			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), 
-					Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class));
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class), vehicle.getCurrentLinkId());
 		}
 		SimulationParameters.getProcessEventThread().processEvent(event);
 	}

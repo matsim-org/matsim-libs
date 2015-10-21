@@ -245,8 +245,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				.getMobsim()
 				.getEventsManager()
 				.processEvent(
-						new LinkEnterEvent(now, veh.getDriver().getId(), this.getLink().getId(),
-								veh.getId()));
+						new LinkEnterEvent(now, veh.getId(), this.getLink().getId()));
 	}
 
 	@Override

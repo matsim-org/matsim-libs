@@ -133,7 +133,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		road.addFromUpstream(veh);
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getId(), this.link.getId(), veh.getId()));
+				new LinkEnterEvent(now, veh.getId(), this.link.getId()));
 
 	}
 

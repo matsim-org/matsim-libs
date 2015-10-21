@@ -633,8 +633,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 					));
 		}
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, veh.getDriver().getId(), this.link.getId(), veh.getId()
-				));
+				now, veh.getId(), this.link.getId()));
 		return veh;
 	}
 
