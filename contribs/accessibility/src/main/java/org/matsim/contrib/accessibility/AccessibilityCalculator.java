@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -70,7 +70,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 	private PtMatrix ptMatrix;
 
-	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
+	private ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
@@ -90,7 +90,7 @@ import java.util.concurrent.ConcurrentHashMap;
 		}
 	}
 
-	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
+	public void addZoneDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
 
@@ -324,9 +324,9 @@ import java.util.concurrent.ConcurrentHashMap;
 					}
 				}
 
-				for (ZoneDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					//log.info("here");
-					zoneDataExchangeInterface.setZoneAccessibilities(origin, fromNode, accessibilities);
+					zoneDataExchangeInterface.setFacilityAccessibilities(origin, accessibilities);
 				}
 			}
 
