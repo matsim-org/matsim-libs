@@ -35,21 +35,21 @@ import playground.vsp.congestion.handlers.TollHandler;
 public final class CongestionTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private TravelTimeAndDistanceBasedTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
+	private TravelTimeAndDistanceBasedTravelDisutilityFactory timeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
 
-	public CongestionTollTimeDistanceTravelDisutilityFactory(TravelTimeAndDistanceBasedTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public CongestionTollTimeDistanceTravelDisutilityFactory(TravelTimeAndDistanceBasedTravelDisutilityFactory timeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
-		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
+		this.timeDistanceTravelDisutilityFactory = timeDistanceTravelDisutilityFactory;
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		
-		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
+		timeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new CongestionTollTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				timeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
 				this.sigma

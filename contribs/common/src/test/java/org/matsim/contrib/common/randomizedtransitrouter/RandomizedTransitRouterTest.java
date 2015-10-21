@@ -22,31 +22,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
 
 /**
  * @author nagel
@@ -164,10 +160,10 @@ public class RandomizedTransitRouterTest {
 		// could be improved, for example along the lines of the randomized regular router, which uses a (hopefully unbiased) lognormal
 		// distribution rather than a biased uniform distribution as is used here.  kai, jul'15
 		
-		Assert.assertEquals(36., observer.getCounts().get( Id.create("1009", Vehicle.class) ) );
-		Assert.assertEquals( 6., observer.getCounts().get( Id.create("1012", Vehicle.class) ) );
-		Assert.assertEquals(21., observer.getCounts().get( Id.create("2009", Vehicle.class) ) );
-		Assert.assertEquals(36., observer.getCounts().get( Id.create("3009", Vehicle.class) ) );
+		Assert.assertEquals(36., observer.getCounts().get( Id.create("1009", Vehicle.class) ), 0.1 );
+		Assert.assertEquals( 6., observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals(21., observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals(36., observer.getCounts().get( Id.create("3009", Vehicle.class) ) , 0.1 );
 		
 		
 	}

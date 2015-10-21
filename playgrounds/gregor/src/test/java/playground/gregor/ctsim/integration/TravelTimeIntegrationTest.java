@@ -52,8 +52,8 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
+import playground.gregor.ctsim.router.CTRoutingModule;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.utils.Variance;
 
@@ -68,6 +68,45 @@ import java.util.Set;
 public class TravelTimeIntegrationTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(TravelTimeIntegrationTest.class);
 
+	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
+			Scenario scenario) {
+		Config config = scenario.getConfig();
+		if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+			return new DijkstraFactory();
+		}
+		else {
+			if (config
+					.controler()
+					.getRoutingAlgorithmType()
+					.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+				return new AStarLandmarksFactory(
+						scenario.getNetwork(),
+						new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
+						config.global().getNumberOfThreads());
+			}
+			else {
+				if (config.controler().getRoutingAlgorithmType()
+						.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+					return new FastDijkstraFactory();
+				}
+				else {
+					if (config
+							.controler()
+							.getRoutingAlgorithmType()
+							.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+						return new FastAStarLandmarksFactory(
+								scenario.getNetwork(),
+								new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+					}
+					else {
+						throw new IllegalStateException(
+								"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+					}
+				}
+			}
+		}
+	}
 
 	@Test
 	public void testTravelTimeOverMultipleLinks() {
@@ -142,10 +181,12 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 
 
 		controller.getEvents().addHandler(ttObserver);
-		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
-		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
-
-		controller.setTripRouterFactory(tripRouter);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
+			}
+		});
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
@@ -165,46 +206,6 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		});
 
 		controller.run();
-	}
-
-	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
-			Scenario scenario) {
-		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-			return new DijkstraFactory();
-		}
-		else {
-			if (config
-					.controler()
-					.getRoutingAlgorithmType()
-					.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-				return new AStarLandmarksFactory(
-						scenario.getNetwork(),
-						new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
-						config.global().getNumberOfThreads());
-			}
-			else {
-				if (config.controler().getRoutingAlgorithmType()
-						.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-					return new FastDijkstraFactory();
-				}
-				else {
-					if (config
-							.controler()
-							.getRoutingAlgorithmType()
-							.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-						return new FastAStarLandmarksFactory(
-								scenario.getNetwork(),
-								new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-					}
-					else {
-						throw new IllegalStateException(
-								"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-					}
-				}
-			}
-		}
 	}
 
 	private void createSc1(Scenario sc1) {

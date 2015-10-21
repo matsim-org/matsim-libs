@@ -179,17 +179,29 @@ public class CTNodeCell extends CTCell {
 
 	public void init() {
 		double maxCap = 0;
+		double mxLength = 0;
 		for (Link l : ((CTNode) this.getParent()).getNode().getInLinks().values()) {
 			if (l.getCapacity() > maxCap) {
 				maxCap = l.getCapacity();
+				mxLength = l.getLength();
 			}
 		}
 		for (Link l : ((CTNode) this.getParent()).getNode().getOutLinks().values()) {
 			if (l.getCapacity() > maxCap) {
 				maxCap = l.getCapacity();
+				mxLength = l.getLength();
 			}
 		}
-		double area = (maxCap / 1.33) * (maxCap / 1.33);
+
+		double width = (maxCap / 1.33);
+		if (width < CTLink.WIDTH) {
+			width = CTLink.WIDTH;
+		}
+		double area = width * width;
+		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1) {
+			area = width * mxLength;
+		}
+
 
 		setArea(area);
 		Node node = ((CTNode) parent).getNode();

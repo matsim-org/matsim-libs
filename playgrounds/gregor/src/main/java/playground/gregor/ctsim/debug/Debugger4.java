@@ -42,9 +42,9 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.gregor.ctsim.router.CTRoutingModule;
 import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -102,10 +102,12 @@ public class Debugger4 {
 		//END_DEBUG
 
 
-		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
-		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
-
-		controller.setTripRouterFactory(tripRouter);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
+			}
+		});
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
@@ -125,46 +127,6 @@ public class Debugger4 {
 		});
 
 		controller.run();
-	}
-
-	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
-			Scenario scenario) {
-		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-			return new DijkstraFactory();
-		}
-		else {
-			if (config
-					.controler()
-					.getRoutingAlgorithmType()
-					.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-				return new AStarLandmarksFactory(
-						scenario.getNetwork(),
-						new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
-						config.global().getNumberOfThreads());
-			}
-			else {
-				if (config.controler().getRoutingAlgorithmType()
-						.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-					return new FastDijkstraFactory();
-				}
-				else {
-					if (config
-							.controler()
-							.getRoutingAlgorithmType()
-							.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-						return new FastAStarLandmarksFactory(
-								scenario.getNetwork(),
-								new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-					}
-					else {
-						throw new IllegalStateException(
-								"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-					}
-				}
-			}
-		}
 	}
 
 	public static void setupConfig(Scenario sc) {
@@ -214,7 +176,6 @@ public class Debugger4 {
 
 		c.controler().setOutputDirectory("/Users/laemmel/tmp" + "/sc2/");
 	}
-
 
 	private static void createSc(Scenario sc1) {
 		Network net1 = sc1.getNetwork();
@@ -297,5 +258,45 @@ public class Debugger4 {
 			pop1.addPerson(pers);
 		}
 
+	}
+
+	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
+			Scenario scenario) {
+		Config config = scenario.getConfig();
+		if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+			return new DijkstraFactory();
+		}
+		else {
+			if (config
+					.controler()
+					.getRoutingAlgorithmType()
+					.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+				return new AStarLandmarksFactory(
+						scenario.getNetwork(),
+						new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
+						config.global().getNumberOfThreads());
+			}
+			else {
+				if (config.controler().getRoutingAlgorithmType()
+						.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+					return new FastDijkstraFactory();
+				}
+				else {
+					if (config
+							.controler()
+							.getRoutingAlgorithmType()
+							.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+						return new FastAStarLandmarksFactory(
+								scenario.getNetwork(),
+								new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+					}
+					else {
+						throw new IllegalStateException(
+								"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+					}
+				}
+			}
+		}
 	}
 }
