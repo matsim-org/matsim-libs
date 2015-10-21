@@ -20,23 +20,16 @@ package playground.gregor.ctsim.router;
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.Facility;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,14 +38,20 @@ import java.util.Map;
 public class CTRoutingModule implements Provider<RoutingModule> {
 
 	private Scenario scenario;
-	private Map<String,TravelTime> travelTimes;
-	private Map<String,TravelDisutilityFactory> travelDisutilities;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
 	@Inject
 	CTRoutingModule(Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
+	}
+
+	@Override
+	public RoutingModule get() {
+		return DefaultRoutingModules.createNetworkRouter("walkct", scenario.getPopulation()
+				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 
 	private LeastCostPathCalculator createRoutingAlgo() {
@@ -62,11 +61,5 @@ public class CTRoutingModule implements Provider<RoutingModule> {
 				scenario.getConfig().global().getNumberOfThreads()).createPathCalculator(scenario.getNetwork(),
 				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore()),
 				travelTimes.get("car"));
-	}
-
-	@Override
-	public RoutingModule get() {
-		return DefaultRoutingModules.createNetworkRouter("walkct", scenario.getPopulation()
-				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 }

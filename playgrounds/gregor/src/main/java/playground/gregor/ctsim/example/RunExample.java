@@ -50,7 +50,7 @@ import java.util.Set;
  */
 public class RunExample {
 	private static final String OUT_DIR = "/tmp/ctsim/";
-	private static final int NR_AGENTS = 2;
+	private static final int NR_AGENTS = 2000;
 
 	public static void main(String[] args) throws IOException {
 		FileUtils.deleteDirectory(new File(OUT_DIR));
@@ -74,12 +74,12 @@ public class RunExample {
 		// "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", ".5");
-		c.strategy().addParam("ModuleDisableAfterIteration_1", "10");
+		c.strategy().addParam("ModuleDisableAfterIteration_1", "50");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", ".5");
 
 		c.controler().setOutputDirectory(outputDir);
-		c.controler().setLastIteration(20);
+		c.controler().setLastIteration(100);
 
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
 
@@ -150,22 +150,22 @@ public class RunExample {
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
-//		for (int i = NR_AGENTS / 2; i < NR_AGENTS; i++) {
-//			Person pers = fac.createPerson(Id.create("b" + i, Person.class));
-//			Plan plan = fac.createPlan();
-//			pers.addPlan(plan);
-//			Activity act0;
-//			act0 = fac.createActivityFromLinkId("origin",
-//					Id.create(destination + 1, Link.class));
-//			act0.setEndTime(t);
-//			plan.addActivity(act0);
-//			Leg leg = fac.createLeg("walkct");
-//			plan.addLeg(leg);
-//			Activity act1 = fac.createActivityFromLinkId("destination",
-//					Id.create(1, Link.class));
-//			plan.addActivity(act1);
-//			pop.addPerson(pers);
-//		}
+		for (int i = NR_AGENTS / 2; i < NR_AGENTS; i++) {
+			Person pers = fac.createPerson(Id.create("r" + i, Person.class));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			act0 = fac.createActivityFromLinkId("origin",
+					Id.create(destination + 1, Link.class));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("walkct");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination",
+					Id.create(1, Link.class));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
 	}
 
 
@@ -174,7 +174,7 @@ public class RunExample {
 		NetworkFactory fac = net.getFactory();
 
 		double length = 30;
-		double width = 20;
+		double width = 40;
 
 		int id = 0;
 		Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, 0));
