@@ -44,7 +44,7 @@ import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -193,7 +193,7 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
 			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext,
 					congestionTollHandler
 				);
@@ -217,7 +217,7 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
 			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext
 				);
 			factory.setSigma(sigma);
@@ -240,7 +240,7 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
 			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					congestionTollHandler
 				);
 			factory.setSigma(sigma);
@@ -262,7 +262,7 @@ public class CNControler {
 			// base case
 			
 			// a router which accounts for the person- and trip-specific VTTS
-			final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler);
+			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){

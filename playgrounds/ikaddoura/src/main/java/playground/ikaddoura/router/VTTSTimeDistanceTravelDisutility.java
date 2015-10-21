@@ -39,8 +39,8 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
  *
  * @author ikaddoura
  */
-public final class VTTSRandomizingTimeDistanceTravelDisutility implements TravelDisutility {
-	private final static Logger log = Logger.getLogger(VTTSRandomizingTimeDistanceTravelDisutility.class);
+public final class VTTSTimeDistanceTravelDisutility implements TravelDisutility {
+	private final static Logger log = Logger.getLogger(VTTSTimeDistanceTravelDisutility.class);
 	
 	private final RandomizingTimeDistanceTravelDisutility delegate;
 	private final TravelTime timeCalculator;
@@ -51,7 +51,7 @@ public final class VTTSRandomizingTimeDistanceTravelDisutility implements Travel
 	private static int toSmallVTTSWarning = 0;
 	private static int toLargeVTTSWarning = 0;
 
-	VTTSRandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma, VTTSHandler vttsHandler) {
+	VTTSTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma, VTTSHandler vttsHandler) {
 		this.timeCalculator = timeCalculator;
 		this.vttsHandler = vttsHandler;
 		this.cnScoringGroup = cnScoringGroup;
