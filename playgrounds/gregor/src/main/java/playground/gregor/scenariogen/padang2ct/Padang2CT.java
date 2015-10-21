@@ -121,7 +121,7 @@ public class Padang2CT {
 		loadPopulation(sc);
 
 		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork(), 0.01).write(c.plans()
+		new PopulationWriter(pop, sc.getNetwork(), 0.1).write(c.plans()
 				.getInputFile());
 
 		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
