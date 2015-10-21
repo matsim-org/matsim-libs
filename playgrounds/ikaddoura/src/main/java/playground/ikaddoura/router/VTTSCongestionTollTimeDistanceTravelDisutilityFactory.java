@@ -35,10 +35,10 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 public final class VTTSCongestionTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
+	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
 
-	public VTTSCongestionTollTimeDistanceTravelDisutilityFactory(VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public VTTSCongestionTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 	}

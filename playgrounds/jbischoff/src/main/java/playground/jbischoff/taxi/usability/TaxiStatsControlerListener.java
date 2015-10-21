@@ -22,7 +22,6 @@ package playground.jbischoff.taxi.usability;
 import java.io.PrintWriter;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 

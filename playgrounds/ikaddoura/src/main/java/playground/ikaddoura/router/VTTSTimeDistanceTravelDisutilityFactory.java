@@ -31,18 +31,18 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
  * @author ikaddoura
  *
  */
-public final class VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class VTTSTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
 	private VTTSHandler vttsHandler;
 	
-	public VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(VTTSHandler vttsHandler) {
+	public VTTSTimeDistanceTravelDisutilityFactory(VTTSHandler vttsHandler) {
 		this.vttsHandler = vttsHandler ;
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new VTTSRandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, vttsHandler);
+		return new VTTSTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, vttsHandler);
 	}
 	
 	public void setSigma ( double val ) {

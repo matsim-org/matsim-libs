@@ -38,7 +38,7 @@ import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalys
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -107,7 +107,7 @@ public class CongestionPricingControler {
 				
 			} else if (router.equals("VTTSspecific")) {
 
-				final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler);
+				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 				factory.setSigma(0.); // for now no randomness
 				
 				controler.addOverridingModule(new AbstractModule(){
@@ -161,7 +161,7 @@ public class CongestionPricingControler {
 			} else if (router.equals("VTTSspecific")) {
 				
 				final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-						new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 						tollHandler
 					);
 				factory.setSigma(0.); // for now no randomness

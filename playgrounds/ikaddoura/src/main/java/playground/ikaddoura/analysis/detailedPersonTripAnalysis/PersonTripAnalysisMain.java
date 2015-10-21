@@ -68,16 +68,8 @@ import playground.vsp.congestion.events.CongestionEventsReader;
 public class PersonTripAnalysisMain {
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static String networkFile;
-	private static String configFile;
-	private static String outputPath;
-	private static String populationFile;
-
-	private static String eventsFile;
-	
-	private static String noiseEventsFile;
-	private static String congestionEventsFile;
-		
+	private String runDirectory;
+			
 	public static void main(String[] args) {
 			
 		log.info("Searching for run-directory in args at index 0...");
@@ -102,18 +94,29 @@ public class PersonTripAnalysisMain {
 	
 	public PersonTripAnalysisMain(String runDirectory) {
 		
-		networkFile = runDirectory + "output_network.xml.gz";
-		configFile = runDirectory + "output_config.xml.gz";
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
-		eventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
-		outputPath = runDirectory + "ITERS/it.100/detailedAnalysis/";
-		populationFile = runDirectory + "output_plans.xml.gz";
-		
-		noiseEventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
-		congestionEventsFile = runDirectory + "ITERS/it.100/100.events.xml.gz";
+		this.runDirectory = runDirectory;
 	}
 
 	public void run() {
+					
+		String networkFile = runDirectory + "output_network.xml.gz";
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+
+		Config config = ConfigUtils.loadConfig(configFile);	
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		int finalIteration = config.controler().getLastIteration();
+		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
+		
+		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();
@@ -124,12 +127,6 @@ public class PersonTripAnalysisMain {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-				
-		Config config = ConfigUtils.loadConfig(configFile);	
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		// standard events analysis
 		
