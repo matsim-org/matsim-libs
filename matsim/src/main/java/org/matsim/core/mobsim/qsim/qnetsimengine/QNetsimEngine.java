@@ -469,13 +469,7 @@ public class QNetsimEngine implements MobsimEngine {
 //			numOfRunners *= 10 ;
 			this.pool = Executors.newFixedThreadPool(
 					this.numOfThreads,
-					new ThreadFactory() {
-						int count = 0;
-						@Override
-						public Thread newThread(Runnable r) {
-							return new Thread( r , "QNetsimEngine_PooledThread_"+count );
-						}
-					}) ;
+					new NamedThreadFactory()) ;
 		}
 
 		// setup threads
@@ -550,4 +544,12 @@ public class QNetsimEngine implements MobsimEngine {
 		this.linksToActivateInitially.clear();
 	}
 
+	private static class NamedThreadFactory implements ThreadFactory {
+		private int count = 0;
+
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread( r , "QNetsimEngine_PooledThread_"+count );
+		}
+	}
 }
