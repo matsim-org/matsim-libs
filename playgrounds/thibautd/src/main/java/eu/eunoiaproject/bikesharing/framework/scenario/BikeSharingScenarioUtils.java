@@ -36,10 +36,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -49,15 +49,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
-import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
-import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRoute;
-import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
-import playground.thibautd.router.multimodal.LinkSlopeScorer;
-import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
-
-import javax.inject.Provider;
+import playground.thibautd.router.multimodal.*;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -152,18 +146,19 @@ public class BikeSharingScenarioUtils {
 		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingRoute.class , new BikeSharingRouteFactory() );
 	}
 
-	public static Provider<TripRouter> createTripRouterFactoryAndConfigureRouteFactories(
+	public static AbstractModule createTripRouterFactoryAndConfigureRouteFactories(
 			final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
 			final LinkSlopeScorer scorer,
 			final RoutingData routingData,
 			final boolean forceScheduleRouting ) {
+		// Pretty ugly after refatoring to injection. could be all put into modules.
 		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
 
 		if ( !multimodalConfigGroup.isMultiModalSimulationEnabled() ) {
-			return new BikeSharingTripRouterFactory( scenario , scorer );
+			return new BikeSharingTripRouterModule( scenario , scorer );
 		}
 
 		// PrepareMultiModalScenario.run( scenario );
@@ -178,23 +173,23 @@ public class BikeSharingScenarioUtils {
 					scenario.getConfig(),
 					linkSlopes );
 
-		final BikeSharingTripRouterFactory bsFact =
+		final BikeSharingTripRouterModule bsFact =
 				routingData == null ?
-					new BikeSharingTripRouterFactory(
+					new BikeSharingTripRouterModule(
 						scenario,
 						scorer ) :
-					new BikeSharingTripRouterFactory(
+					new BikeSharingTripRouterModule(
 						routingData,
 						scenario,
 						scorer );
 		bsFact.setRoutePtUsingSchedule( forceScheduleRouting );
-	
-		final AccessEgressMultimodalTripRouterFactory fact =
-			new AccessEgressMultimodalTripRouterFactory(
+
+
+		final AccessEgressMultimodalTripRouterModule fact =
+			new AccessEgressMultimodalTripRouterModule(
 				scenario,
 				multiModalTravelTimeFactory.createTravelTimes(),
-				disutilityFactory,
-				bsFact );
+				disutilityFactory );
 
 		if ( scorer != null ) {
 			fact.setDisutilityFactoryForMode(
@@ -210,7 +205,13 @@ public class BikeSharingScenarioUtils {
 						BikeSharingConstants.MODE ) );
 		}
 
-		return fact;
+		return new AbstractModule() {
+			@Override
+			public void install() {
+				install( bsFact );
+				install( fact );
+			}
+		};
 	}
 
 	private static TravelDisutilityFactory createSlopeAwareDisutilityFactory(

@@ -25,7 +25,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 
 
 /**
@@ -35,10 +35,10 @@ import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilit
 public final class VTTSNoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
+	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final NoiseContext noiseContext;
 
-	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext) {
+	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 	}

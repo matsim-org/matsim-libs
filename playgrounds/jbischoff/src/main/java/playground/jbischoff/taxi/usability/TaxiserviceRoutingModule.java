@@ -47,6 +47,7 @@ public class TaxiserviceRoutingModule implements RoutingModule {
 		this.controler = controler;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {

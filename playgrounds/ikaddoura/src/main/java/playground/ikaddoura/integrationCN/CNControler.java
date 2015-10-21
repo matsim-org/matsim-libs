@@ -42,15 +42,13 @@ import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
 import playground.ikaddoura.noise2.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * 
@@ -66,6 +64,8 @@ public class CNControler {
 	private static boolean congestionPricing;
 	private static boolean noisePricing;
 	
+	private static double sigma;
+	
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -79,18 +79,22 @@ public class CNControler {
 			noisePricing = Boolean.parseBoolean(args[2]);
 			log.info("Noise Pricing: " + noisePricing);
 			
+			sigma = Double.parseDouble(args[3]);
+			log.info("Sigma: " + sigma);
+			
 		} else {
 			
 			configFile = "/Users/ihab/Desktop/test/config.xml";
 			congestionPricing = true;
 			noisePricing = true;
+			sigma = 0.;
 		}
 				
 		CNControler noiseImmissionControler = new CNControler();
-		noiseImmissionControler.run(configFile, congestionPricing, noisePricing);
+		noiseImmissionControler.run(configFile, congestionPricing, noisePricing, sigma);
 	}
 
-	public void run(String configFile, boolean congestionPricing, boolean noisePricing) {
+	public void run(String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
 				
 		Controler controler = new Controler(configFile);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
@@ -189,11 +193,11 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
 			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext,
 					congestionTollHandler
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -213,10 +217,10 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
 			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -224,15 +228,6 @@ public class CNControler {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
 			}); 
-			
-			// a router which accounts for noise toll payments
-//			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-//				}
-//			});
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -245,10 +240,10 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
 			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					congestionTollHandler
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -256,15 +251,6 @@ public class CNControler {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
 			}); 
-			
-			// a router which accounts for congestion toll payments
-//			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-//				}
-//			});
 			
 			// computation of noise events + NO consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -275,8 +261,16 @@ public class CNControler {
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
 			
-			// default router
-			// TODO: Use the VTTS router?
+			// a router which accounts for the person- and trip-specific VTTS
+			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+			factory.setSigma(sigma);
+			
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
+				}
+			}); 
 			
 			// computation of noise events + NO consideration in scoring	
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));

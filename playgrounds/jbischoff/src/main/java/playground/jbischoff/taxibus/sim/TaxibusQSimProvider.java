@@ -20,6 +20,7 @@
 package playground.jbischoff.taxibus.sim;
 
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -73,11 +74,12 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private TravelTime travelTime;
 
 	@Inject
-	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes) {
+		
 		this.tbcg = (TaxibusConfigGroup) config.getModule("taxibusConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
-		this.travelTime = travelTime;
+		this.travelTime = travelTimes.get("car");
 
 	}
 
