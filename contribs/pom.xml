@@ -59,29 +59,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
             </plugin>
-			<plugin>
-				<groupId>org.jfrog.buildinfo</groupId>
-				<artifactId>artifactory-maven-plugin</artifactId>
-				<version>2.4.0</version>
-				<inherited>false</inherited>
-				<executions>
-					<execution>
-						<id>build-info</id>
-						<goals>
-							<goal>publish</goal>
-						</goals>
-						<configuration>
-							<publisher>
-								<contextUrl>https://oss.jfrog.org</contextUrl>
-								<username>michaz</username>
-								<password>${env.ARTIFACTORY_PASSWORD}</password>
-								<repoKey>oss-release-local</repoKey>
-								<snapshotRepoKey>oss-snapshot-local</snapshotRepoKey>
-							</publisher>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
