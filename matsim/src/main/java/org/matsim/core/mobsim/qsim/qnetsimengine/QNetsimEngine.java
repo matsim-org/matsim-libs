@@ -218,10 +218,10 @@ public class QNetsimEngine implements MobsimEngine {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch( snapshotStyle ) {
 		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-		case equiDist:
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
@@ -469,13 +469,7 @@ public class QNetsimEngine implements MobsimEngine {
 //			numOfRunners *= 10 ;
 			this.pool = Executors.newFixedThreadPool(
 					this.numOfThreads,
-					new ThreadFactory() {
-						int count = 0;
-						@Override
-						public Thread newThread(Runnable r) {
-							return new Thread( r , "QNetsimEngine_PooledThread_"+count );
-						}
-					}) ;
+					new NamedThreadFactory()) ;
 		}
 
 		// setup threads
@@ -550,4 +544,12 @@ public class QNetsimEngine implements MobsimEngine {
 		this.linksToActivateInitially.clear();
 	}
 
+	private static class NamedThreadFactory implements ThreadFactory {
+		private int count = 0;
+
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread( r , "QNetsimEngine_PooledThread_"+count );
+		}
+	}
 }

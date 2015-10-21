@@ -1,4 +1,4 @@
-package playground.tschlenther.utils;
+package playground.jbischoff.taxibus.network;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -11,7 +11,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
-//import playground.andreas.mzilske.bvg09.MergeNetworks;
+import playground.andreas.mzilske.bvg09.MergeNetworks;
 import playground.mzilske.gtfs.GtfsConverter;
 
 public class WolfsburgGTFSConvert {
@@ -30,12 +30,16 @@ public class WolfsburgGTFSConvert {
 		converter.setDate(20151008);
 		converter.convert();
 		// ---
-//		Scenario scenario1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new MatsimNetworkReader(scenario1).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
-//		MergeNetworks.merge(scenario1.getNetwork(), "pt", scenario0.getNetwork());
-		
 		new NetworkWriter(scenario0.getNetwork()).write( filepath0 + "/output_network.xml.gz");
-//		new NetworkWriter(scenario1.getNetwork()).write( filepath0 + "/networkpt.xml.gz");
+		Scenario scenario1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		
+		
+		new MatsimNetworkReader(scenario1).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
+		
+		MergeNetworks.merge(scenario1.getNetwork(), "pt",scenario0.getNetwork());
+		
+		new NetworkWriter(scenario1.getNetwork()).write( filepath0 + "/networkpt.xml.gz");
 		
 		
 		new TransitScheduleWriter( scenario0.getTransitSchedule() ).writeFile( filepath0 + "/output_transitschedule.xml.gz");

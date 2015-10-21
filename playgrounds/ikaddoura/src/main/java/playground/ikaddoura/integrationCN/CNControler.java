@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -37,20 +39,19 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.noise2.NoiseCalculationOnline;
 import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
 import playground.ikaddoura.noise2.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.router.VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory;
+import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * 
@@ -61,38 +62,66 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 public class CNControler {
 	private static final Logger log = Logger.getLogger(CNControler.class);
 
+	private static String outputDirectory;
 	private static String configFile;
 
 	private static boolean congestionPricing;
 	private static boolean noisePricing;
 	
+	private static double sigma;
+	
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
 			
-			configFile = args[0];
+			outputDirectory = args[0];
+			log.info("Output directory: " + outputDirectory);
+			
+			configFile = args[1];
 			log.info("Config file: " + configFile);
 			
-			congestionPricing = Boolean.parseBoolean(args[1]);
+			congestionPricing = Boolean.parseBoolean(args[2]);
 			log.info("Congestion Pricing: " + congestionPricing);
 			
-			noisePricing = Boolean.parseBoolean(args[2]);
+			noisePricing = Boolean.parseBoolean(args[3]);
 			log.info("Noise Pricing: " + noisePricing);
+			
+			sigma = Double.parseDouble(args[4]);
+			log.info("Sigma: " + sigma);
 			
 		} else {
 			
+			outputDirectory = null;
 			configFile = "/Users/ihab/Desktop/test/config.xml";
 			congestionPricing = true;
 			noisePricing = true;
+			sigma = 0.;
 		}
 				
-		CNControler noiseImmissionControler = new CNControler();
-		noiseImmissionControler.run(configFile, congestionPricing, noisePricing);
+		CNControler cnControler = new CNControler();
+		cnControler.run(outputDirectory, configFile, congestionPricing, noisePricing, sigma);
 	}
 
-	public void run(String configFile, boolean congestionPricing, boolean noisePricing) {
+	public void run(String outputDirectory, String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
 				
-		Controler controler = new Controler(configFile);
+		Config config = ConfigUtils.loadConfig(configFile);
+		if (outputDirectory == null) {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
+			} else {
+				log.info("Using the output directory given in the config file...");
+			}
+			
+		} else {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				log.info("Using the output directory provided in the controler.");
+			} else {
+				log.warn("The output directory in the config file will overwritten by the directory provided in the controler.");
+			}
+			config.controler().setOutputDirectory(outputDirectory);
+		}
+		
+		Controler controler = new Controler(config);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 
 		// noise
@@ -189,11 +218,11 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
 			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext,
 					congestionTollHandler
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -201,6 +230,9 @@ public class CNControler {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
 			}); 
+			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));	
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -213,26 +245,20 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
 			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					noiseContext
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			}); 
+			});
 			
-			// a router which accounts for noise toll payments
-//			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-//				}
-//			});
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -245,10 +271,10 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
 			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 					congestionTollHandler
 				);
-			factory.setSigma(0.); // for now no randomness
+			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -257,15 +283,9 @@ public class CNControler {
 				}
 			}); 
 			
-			// a router which accounts for congestion toll payments
-//			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-//				}
-//			});
-			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
+						
 			// computation of noise events + NO consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
@@ -275,8 +295,19 @@ public class CNControler {
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
 			
-			// default router
-			// TODO: Use the VTTS router?
+			// a router which accounts for the person- and trip-specific VTTS
+			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+			factory.setSigma(sigma);
+			
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
+				}
+			});
+			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
 			
 			// computation of noise events + NO consideration in scoring	
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));

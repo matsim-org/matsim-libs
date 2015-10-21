@@ -58,12 +58,11 @@ import java.util.Set;
 /**
  * Created by laemmel on 20/10/15.
  */
-public class Debugger3 {
+public class Debugger4 {
 
-	private static final double WIDTH = 20;
-	private static double LL = 500;
-	private static double AGENTS_LR = 6000;
-	private static double AGENTS_RL = 6000;
+
+	private static double AGENTS_LR = 1;
+	private static double AGENTS_RL = 1;
 	private static double INV_INFLOW = 0.2;
 
 	public static void main(String[] args) {
@@ -220,36 +219,32 @@ public class Debugger3 {
 	private static void createSc(Scenario sc1) {
 		Network net1 = sc1.getNetwork();
 		NetworkFactory fac1 = net1.getFactory();
-		Node n1_0 = fac1.createNode(Id.createNodeId("n1_0"), CoordUtils.createCoord(0, 0));
-		Node n1_1 = fac1.createNode(Id.createNodeId("n1_1"), CoordUtils.createCoord(10, 0));
-		Node n1_9 = fac1.createNode(Id.createNodeId("n1_9"), CoordUtils.createCoord(10 + LL, 0));
-		Node n1_10 = fac1.createNode(Id.createNodeId("n1_10"), CoordUtils.createCoord(10 + LL + 10, 0));
-		net1.addNode(n1_0);
-		net1.addNode(n1_1);
-		net1.addNode(n1_9);
-		net1.addNode(n1_10);
-		Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
-		Link l1_8 = fac1.createLink(Id.createLinkId("l1_8"), n1_1, n1_9);
-		Link l1_9 = fac1.createLink(Id.createLinkId("l1_9"), n1_9, n1_10);
-		Link l1_0r = fac1.createLink(Id.createLinkId("l1_0r"), n1_1, n1_0);
-		Link l1_8r = fac1.createLink(Id.createLinkId("l1_8r"), n1_9, n1_1);
-		Link l1_9r = fac1.createLink(Id.createLinkId("l1_9r"), n1_10, n1_9);
-		net1.addLink(l1_0);
-		net1.addLink(l1_8);
-		net1.addLink(l1_9);
-		net1.addLink(l1_0r);
-		net1.addLink(l1_8r);
-		net1.addLink(l1_9r);
+		Node n20 = fac1.createNode(Id.createNodeId("20"), CoordUtils.createCoord(651537.2884152286, 9898127.80108908));
+		Node n21 = fac1.createNode(Id.createNodeId("21"), CoordUtils.createCoord(651548.9000000004, 9898114.69));
+
+		net1.addNode(n20);
+		net1.addNode(n21);
+
+		Link l10 = fac1.createLink(Id.createLinkId("l10"), n20, n21);
+		Link l100010 = fac1.createLink(Id.createLinkId("l100010"), n21, n20);
+		l100010.setLength(20.5049676326809);
+		l100010.setFreespeed(1.66);
+		l100010.setCapacity(5.64622226362193);
+		l100010.setNumberOfLanes(7.154292985353256);
+		net1.addLink(l100010);
+		l10.setLength(20.5049676326809);
+		l10.setFreespeed(1.66);
+		l10.setCapacity(5.64622226362193);
+		l10.setNumberOfLanes(7.154292985353256);
+		net1.addLink(l10);
+
+
 		Set<String> modes = new HashSet<>();
 		modes.add("walkct");
 		for (Link l : net1.getLinks().values()) {
 			l.setAllowedModes(modes);
-			l.setFreespeed(20);
-			l.setLength(10.);
-			l.setCapacity(WIDTH * 1.33);
 		}
-		l1_8.setLength(LL);
-		l1_8r.setLength(LL);
+
 
 	}
 
@@ -265,13 +260,13 @@ public class Debugger3 {
 			pers.addPlan(plan);
 			Activity act0;
 			act0 = popFac1.createActivityFromLinkId("origin",
-					Id.create("l1_0", Link.class));
+					Id.create("l10", Link.class));
 			act0.setEndTime(i * INV_INFLOW);
 			plan.addActivity(act0);
 			Leg leg = popFac1.createLeg("walkct");
 			plan.addLeg(leg);
 			Activity act1 = popFac1.createActivityFromLinkId("destination",
-					Id.create("l1_9", Link.class));
+					Id.create("l100010", Link.class));
 			plan.addActivity(act1);
 			pop1.addPerson(pers);
 		}
@@ -291,13 +286,13 @@ public class Debugger3 {
 			pers.addPlan(plan);
 			Activity act0;
 			act0 = popFac1.createActivityFromLinkId("origin",
-					Id.create("l1_9r", Link.class));
+					Id.create("l100010", Link.class));
 			act0.setEndTime(i * INV_INFLOW);
 			plan.addActivity(act0);
 			Leg leg = popFac1.createLeg("walkct");
 			plan.addLeg(leg);
 			Activity act1 = popFac1.createActivityFromLinkId("destination",
-					Id.create("l1_0r", Link.class));
+					Id.create("l10", Link.class));
 			plan.addActivity(act1);
 			pop1.addPerson(pers);
 		}

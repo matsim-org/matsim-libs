@@ -24,11 +24,8 @@ import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouter;
 
 import playground.michalm.taxi.run.TaxiLauncherUtils;
-
-import javax.inject.Provider;
 
 /**
  * @author jbischoff
@@ -54,8 +51,15 @@ public class ConfigBasedTaxiLaunchUtils {
 		context.setVrpData(vrpData);	 
 		TaxiStatsControlerListener tscl = new TaxiStatsControlerListener(context,tcg);
 		controler.addControlerListener(tscl);
-		Provider<TripRouter> factory = new TaxiTripRouterFactory(controler);
-		controler.setTripRouterFactory(factory);
+		controler.addOverridingModule(new AbstractModule() {
+			
+						
+			@Override
+			public void install() {
+				addRoutingModuleBinding("taxi").toInstance(new TaxiserviceRoutingModule(controler));
+				
+			}
+		});
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override

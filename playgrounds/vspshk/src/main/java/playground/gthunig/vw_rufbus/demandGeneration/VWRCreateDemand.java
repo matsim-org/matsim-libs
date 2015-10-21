@@ -2,9 +2,11 @@ package playground.gthunig.vw_rufbus.demandGeneration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -67,7 +69,7 @@ public class VWRCreateDemand {
 	private Id<Link> a2TruckerEastLinkIDEnd = Id.createLinkId(57868);
 	private Id<Link> a2TruckerWestLinkID = Id.createLinkId(10799);
 	private Id<Link> a2TruckerWestLinkIDEnd = Id.createLinkId(10865);
-
+	private Set<Id<Person>> teleportPtUsers = new HashSet<>();
 	private Random random = MatsimRandom.getRandom();
 
 	private int commuterCounter = 0;
@@ -105,8 +107,8 @@ public class VWRCreateDemand {
 		String schools = "landuse/schools.shp";
 		String universities = "landuse/universities.shp";
 //		double scalefactor = 0.05;
-		double scalefactor = 0.1;
-//		double scalefactor = 1.0;
+//		double scalefactor = 0.1;
+		double scalefactor = 1.0;
 //		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
@@ -365,10 +367,13 @@ public class VWRCreateDemand {
 		System.out.println("VW Workers: " + vwWorkerCounter);
 		System.out.println("Workers: " + workerCounter);
 		createAgentGroupNearTransitstrops(scenario, 1500,config.getTransitSchedule() );
+		replaceSptByPtp();
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		pw.write(config.getPlansOutputString());
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(config.getObjectAttributes());
 	}
+
+	
 
 	private void replaceDoubtfulLegsByOtherMode() {
 		for (Person p : scenario.getPopulation().getPersons().values()){
@@ -572,7 +577,7 @@ public class VWRCreateDemand {
 
 		for (int i = 0; i <= commuters; i++) {
 			String mode = "car";
-			if (i < carcommuters) {
+			if (i > carcommuters) {
 				mode = "bike";
 				if (i > bikecommuters + carcommuters) {
 					mode = "walk";
@@ -603,7 +608,7 @@ public class VWRCreateDemand {
 
 		for (int i = 0; i <= commuters; i++) {
 			String mode = "car";
-			if (i < carcommuters) {
+			if (i > carcommuters) {
 				mode = "bike";
 				if (i > bikecommuters + carcommuters) {
 					mode = "walk";
@@ -912,7 +917,7 @@ public class VWRCreateDemand {
 		plan.addActivity(home2);
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
 
 		}
 		person.addPlan(plan);
@@ -1139,9 +1144,12 @@ public class VWRCreateDemand {
 		return coords;
 	}
 	
-	static void createAgentGroupNearTransitstrops(Scenario scenario,double distance, String transitScheduleFile ){
+	void createAgentGroupNearTransitstrops(Scenario scenario,double distance, String transitScheduleFile ){
 		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 		for(Person p : scenario.getPopulation().getPersons().values()){
+			if (scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "subpopulation")!=null){
+				return;
+			}
 			ArrayList<Boolean> isIt = new ArrayList<>();
 			for (Plan plan : p.getPlans()){
 				for (PlanElement pe : plan.getPlanElements()){
@@ -1167,11 +1175,28 @@ public class VWRCreateDemand {
 			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "schedulePt");
 		}else {
 			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "teleportPt");
+			this.teleportPtUsers.add(p.getId());
 		}
 		}
 		
 	}
 
+	private void replaceSptByPtp() {
+		for (Id<Person> pid : this.teleportPtUsers){
+			Person p = scenario.getPopulation().getPersons().get(pid);
+			for (Plan plan : p.getPlans()){
+				for (PlanElement pe : plan.getPlanElements()){
+					if (pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						if (leg.getMode().equals("pt")){
+							leg.setMode("tpt");
+						}
+						
+					}
+				}
+			}
+		}
+	}
 }
 
 

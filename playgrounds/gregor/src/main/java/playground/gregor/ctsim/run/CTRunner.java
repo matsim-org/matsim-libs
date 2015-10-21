@@ -34,8 +34,9 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.gregor.ctsim.router.CTRoutingModule;
+import playground.gregor.ctsim.router.CTTripRouterFactory;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -65,7 +66,7 @@ public class CTRunner implements IterationStartsListener {
 
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("ctsim");
-		Scenario sc = ScenarioUtils.loadScenario(c);
+		final Scenario sc = ScenarioUtils.loadScenario(c);
 
 		final Controler controller = new Controler(sc);
 		if (vis) {
@@ -89,17 +90,24 @@ public class CTRunner implements IterationStartsListener {
 
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
 		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
 
-		controller.setTripRouterFactory(tripRouter);
+
+//		TODO use injection instead, but how?
+//		controller.setTripRouterFactory(tripRouter);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
+			}
+		});
+
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
+
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -115,20 +123,6 @@ public class CTRunner implements IterationStartsListener {
 			}
 		});
 
-//		controller.addControlerListener(new IterationStartsListener() {
-//
-//			@Override
-//			public void notifyIterationStarts(IterationStartsEvent event) {
-//				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
-//
-//			}
-//		});
-
-		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
-		// DefaultTripRouterFactoryImpl fac = new
-		// DefaultTripRouterFactoryImpl(sc, null, null);
-
-		// controller.setTripRouterFactory(fac);
 		controller.run();
 	}
 

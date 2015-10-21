@@ -49,7 +49,7 @@ import java.util.Set;
  * Created by laemmel on 13/10/15.
  */
 public class RunExample {
-	private static final String OUT_DIR = "/Users/laemmel/devel/ctsim/";
+	private static final String OUT_DIR = "/tmp/ctsim/";
 	private static final int NR_AGENTS = 2;
 
 	public static void main(String[] args) throws IOException {

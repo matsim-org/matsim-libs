@@ -128,7 +128,7 @@ public class RunZurichBikeSharingSimulation {
 					(Map<Id<Link>, Double>) sc.getScenarioElement( BikeSharingScenarioUtils.LINK_SLOPES_ELEMENT_NAME ),
 					utilGain_m );
 
-		controler.setTripRouterFactory(
+		controler.addOverridingModule(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),

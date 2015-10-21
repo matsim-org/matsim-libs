@@ -52,8 +52,8 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
+import playground.gregor.ctsim.router.CTTripRouterFactory;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.utils.Variance;
 

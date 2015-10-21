@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DefaultTravelCostCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.ikaddoura.router;
 
-package playground.jbischoff.taxibus.scenario;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioUtils;
+import playground.ikaddoura.analysis.vtts.VTTSHandler;
+
 
 /**
- * @author  jbischoff
+ * @author ikaddoura
  *
  */
-public class ReduceNetworkSpeeds {
+public final class VTTSTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	public static void main(String[] args) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-		new MatsimNetworkReader(scenario).readFile(basedir+"network.xml");
-		for (Link link : scenario.getNetwork().getLinks().values()){
-			double speed = link.getFreespeed();
-			if (speed<10) link.setFreespeed(0.75*speed);
-			else if (speed<20) link.setFreespeed(0.7*speed);
-			else if (speed<30) 
-			{
-				if (link.getNumberOfLanes()<2) link.setFreespeed(0.7*speed);
-				else link.setFreespeed(0.75*speed);
-			}
-			else link.setFreespeed(0.7*speed);
-			
-		}
-		new NetworkWriter(scenario.getNetwork()).write(basedir+"networks.xml");
-		
-		
-		
+	private double sigma = 0. ;
+	private VTTSHandler vttsHandler;
+	
+	public VTTSTimeDistanceTravelDisutilityFactory(VTTSHandler vttsHandler) {
+		this.vttsHandler = vttsHandler ;
+	}
+
+	@Override
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		return new VTTSTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, vttsHandler);
+	}
+	
+	public void setSigma ( double val ) {
+		this.sigma = val;
 	}
 
 }
