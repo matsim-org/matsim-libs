@@ -63,7 +63,8 @@ public class RunSignalSystemsExample {
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
+				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		// ---
 
 		// add the signals module to the simulation:
