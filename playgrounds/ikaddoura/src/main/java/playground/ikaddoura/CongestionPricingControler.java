@@ -47,7 +47,6 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author ikaddoura
@@ -59,9 +58,10 @@ public class CongestionPricingControler {
 
 	static String configFile;
 	
-	static String router; // standard, randomized, VTTSspecific	
+	static String router; // standard, VTTSspecific	
 	static String implementation; // V3, V7, V8, noPricing
 	static String VTTSapproach; // different, equal
+	static double sigma;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -78,12 +78,16 @@ public class CongestionPricingControler {
 			
 			router = args[3];
 			log.info("router: " + router);
+			
+			sigma = Double.parseDouble(args[4]);
+			log.info("Sigma: " + sigma);
 
 		} else {
 			configFile = "../../shared-svn/studies/ihab/test_siouxFalls/input/config.xml";
 			VTTSapproach = "different";
 			implementation = "V3";
 			router = "standard";
+			sigma = 0.;
 		}
 
 		CongestionPricingControler main = new CongestionPricingControler();
@@ -99,16 +103,21 @@ public class CongestionPricingControler {
 			final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 
 			if (router.equals("standard")) {
-				// nothing to do here
+
+				final TravelTimeAndDistanceBasedTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+				factory.setSigma(sigma);
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						this.bindCarTravelDisutilityFactory().toInstance( factory );
+					}
+				}); 
 				
-			} else if (router.equals("randomized")) {
-				
-				throw new RuntimeException("Not implemented. Aborting...");
 				
 			} else if (router.equals("VTTSspecific")) {
 
 				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
-				factory.setSigma(0.); // for now no randomness
+				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
@@ -134,29 +143,15 @@ public class CongestionPricingControler {
 			
 			if (router.equals("standard")) {
 				
-				final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new TravelTimeAndDistanceBasedTravelDisutilityFactory(), tollHandler);
+				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+						bindCarTravelDisutilityFactory().toInstance(factory);
 					}
 				});
-				
-			} else if (router.equals("randomized")) {
-				
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-						new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
-						tollHandler
-					) ;
-				factory.setSigma(3.);
-				
-				controler.addOverridingModule(new AbstractModule(){
-					@Override
-					public void install() {
-						this.bindCarTravelDisutilityFactory().toInstance( factory );
-					}
-				}); 
 				
 			} else if (router.equals("VTTSspecific")) {
 				
@@ -164,7 +159,7 @@ public class CongestionPricingControler {
 						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
 						tollHandler
 					);
-				factory.setSigma(0.); // for now no randomness
+				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule(){
 					@Override

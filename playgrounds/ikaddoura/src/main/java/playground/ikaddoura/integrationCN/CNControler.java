@@ -37,6 +37,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
+import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.noise2.NoiseCalculationOnline;
 import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.data.GridParameters;
@@ -206,6 +207,9 @@ public class CNControler {
 				}
 			}); 
 			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));	
+			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
@@ -227,7 +231,10 @@ public class CNControler {
 				public void install() {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			}); 
+			});
+			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
 			
 			// computation of noise events + consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -252,6 +259,9 @@ public class CNControler {
 				}
 			}); 
 			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
+						
 			// computation of noise events + NO consideration in scoring
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
@@ -270,7 +280,10 @@ public class CNControler {
 				public void install() {
 					this.bindCarTravelDisutilityFactory().toInstance( factory );
 				}
-			}); 
+			});
+			
+			// computation of person- and trip-specific VTTS
+			controler.addControlerListener(new VTTScomputation(vttsHandler));
 			
 			// computation of noise events + NO consideration in scoring	
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
