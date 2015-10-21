@@ -65,8 +65,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private Scenario scenario = null ;
 	private Population population = null;
-	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
-	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
+	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
+	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
 
 	// statistics types:
 	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
@@ -287,7 +287,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	private String getSubpopName(Person person) {
 		return "yy_" + getSubpopName( person.getId(), this.population.getPersonAttributes(), this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
 	}
-	public static final String getSubpopName( Id personId, ObjectAttributes personAttributes, String subpopAttrName ) {
+	public static final String getSubpopName( Id<Person> personId, ObjectAttributes personAttributes, String subpopAttrName ) {
 		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
 		return "subpop_" + subpop;
 	}
@@ -448,8 +448,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 
 		// write link statistics:
-		for ( Entry<Id, Double> entry : this.linkCnts.entrySet() ) {
-			final Id linkId = entry.getKey();
+		for ( Entry<Id<Link>, Double> entry : this.linkCnts.entrySet() ) {
+			final Id<Link> linkId = entry.getKey();
 			linkAttribs.putAttribute(linkId.toString(), CNT, entry.getValue().toString() ) ;
 			linkAttribs.putAttribute(linkId.toString(), TTIME_SUM, this.linkTtimesSums.get(linkId).toString() ) ;
 		}
@@ -537,7 +537,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 	}
 
-	private Map<Id,Double> vehicleEnterTimes = new HashMap<Id,Double>() ;
+	private Map<Id<Vehicle>,Double> vehicleEnterTimes = new HashMap<>() ;
 
 	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
 
@@ -560,14 +560,14 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		
 	}
 
-	private Map<Id,Double> linkTtimesSums = new HashMap<Id,Double>() ;
-	private Map<Id,Double> linkCnts = new HashMap<Id,Double>() ;
+	private Map<Id<Link>,Double> linkTtimesSums = new HashMap<>() ;
+	private Map<Id<Link>,Double> linkCnts = new HashMap<>() ;
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Double enterTime = vehicleEnterTimes.get( event.getVehicleId() ) ;
 		if ( enterTime != null && enterTime < 9.*3600. ) {
-			final Id linkId = event.getLinkId();
+			final Id<Link> linkId = event.getLinkId();
 			final Double sumSoFar = linkTtimesSums.get( linkId );
 			if ( sumSoFar == null ) {
 				linkTtimesSums.put( linkId, event.getTime() - enterTime ) ;
