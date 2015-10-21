@@ -541,6 +541,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
 
+	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>();
+
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		vehicleEnterTimes.put( event.getVehicleId(), event.getTime() ) ;
@@ -555,7 +557,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( event.getDriverId(), 1., CERTAIN_LINKS_CNT );
+			// handle all persons inside the vehicle
+			for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
+				add( personInsideVehicle, 1., CERTAIN_LINKS_CNT );
+			}
 		}
 		
 	}
@@ -581,7 +586,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		// do we need to do anything here?
+		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
+			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
+		}
+		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
 	}
 
 	private static int wrnCnt = 0 ;
@@ -597,6 +605,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
+		
+		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
 	}
 
 }
