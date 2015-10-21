@@ -7,9 +7,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import playground.boescpa.lib.obj.CSVReader;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Creates facilities from BZ12.
  *
@@ -25,7 +22,7 @@ public class FacilitiesFromBZ12 {
         final boolean publicFacilities = true;
 
         final ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
-        final Map<String, TempFacility> tempFacilities = new HashMap<>();
+        final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
         int idNumber = 0;
 
         CSVReader reader = new CSVReader(pathToCSV);
@@ -34,19 +31,47 @@ public class FacilitiesFromBZ12 {
         while (newLine != null) {
 
             // EMPFTE;METER_X;METER_Y;NOGA_CD_2008_6;KATEGORIE;NOGA_TAG;CAPACITY;OPEN_FROM;OPEN_TO;METER_X_GERUNDET;METER_Y_GERUNDET
-            String desc;
-            if (!publicFacilities) {
-                desc = newLine[4];
-            } else {
-                desc = null;
-            }
+            double xCoord = Double.parseDouble(newLine[1]);
+            double yCoord = Double.parseDouble(newLine[2]);
+            String desc = newLine[4] + " (" + newLine[5] + ")";
             double capacity = Double.parseDouble(newLine[6]);
             double openFrom = Double.parseDouble(newLine[7]);
             double openTill = Double.parseDouble(newLine[8]);
-            double xCoord = Double.parseDouble(newLine[9]);
-            double yCoord = Double.parseDouble(newLine[10]);
 
             // new facility
+            ActivityFacilityImpl newFacility = (ActivityFacilityImpl) factory.createActivityFacility(
+                    Id.create(String.format("%06d", ++idNumber), ActivityFacility.class),
+                    new Coord(xCoord, yCoord));
+            if (!publicFacilities) {
+                newFacility.setDesc(desc);
+            }
+            // new activity
+            ActivityOption newActivity = factory.createActivityOption(activityType);
+            newActivity.setCapacity(capacity);
+            newActivity.addOpeningTime(new OpeningTimeImpl(openFrom, openTill));
+            newFacility.addActivityOption(newActivity);
+            // add new facility and activity
+            facilities.addActivityFacility(newFacility);
+
+            newLine = reader.readLine(); // next line
+        }
+
+        // Write facilities
+        FacilitiesWriter facilitiesWriter = new FacilitiesWriter(facilities);
+        facilitiesWriter.write(pathToOutputFacilities);
+        testFacilities(pathToOutputFacilities);
+    }
+
+    public static void testFacilities(String pathToFile) {
+        MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(
+                ScenarioUtils.createScenario(
+                        ConfigUtils.createConfig()));
+        facilitiesReader.readFile(pathToFile);
+    }
+}
+
+            /*
+            final Map<String, TempFacility> tempFacilities = new HashMap<>();
             TempFacility tempFacility;
             String coordKey = xCoord + "_" + yCoord;
             if (tempFacilities.containsKey(coordKey)) {
@@ -117,4 +142,4 @@ public class FacilitiesFromBZ12 {
             descs = new HashMap<>();
         }
     }
-}
+}*/
