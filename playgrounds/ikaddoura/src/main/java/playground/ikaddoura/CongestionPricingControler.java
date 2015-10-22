@@ -137,9 +137,8 @@ public class CongestionPricingControler {
 					}
 				}); 
 				
-				
 			} else if (router.equals("VTTSspecific")) {
-
+				// TODO: Wrong!
 				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 				factory.setSigma(sigma);
 				
@@ -155,10 +154,6 @@ public class CongestionPricingControler {
 			} else {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}
-			
-			controler.addOverridingModule(new OTFVisModule());
-			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-			controler.run();
 			
 		} else {
 			
@@ -226,14 +221,15 @@ public class CongestionPricingControler {
 				throw new RuntimeException("Not implemented. Aborting...");
 			}
 
-			controler.addOverridingModule(new OTFVisModule());
-			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-			controler.run();
-			
-			// analysis
-			PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
-			analysis.run();
 		}
+		
+		controler.addOverridingModule(new OTFVisModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
+		// analysis
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		analysis.run();
 
 	}
 }

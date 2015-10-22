@@ -57,8 +57,9 @@ public final class VTTSTimeDistanceTravelDisutility implements TravelDisutility 
 		this.cnScoringGroup = cnScoringGroup;
 		this.sigma = sigma;
 		
-		this.delegate = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
-
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
+		builder.setSigma(sigma);
+		this.delegate = builder.createTravelDisutility(timeCalculator, cnScoringGroup);
 	}
 
 	@Override

@@ -295,6 +295,8 @@ public class CNControler {
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
 			
+			// TODO: Wrong!
+			
 			// a router which accounts for the person- and trip-specific VTTS
 			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 			factory.setSigma(sigma);
