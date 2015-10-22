@@ -53,6 +53,8 @@ public class ActivityClassifier {
 		this.sc = scenario;
 		actType2TypDur = new TreeMap<String, Double>();
 		log.info("Least integer [Math.floor()] of stated activity duration of an activity is set to typical duration.");
+		log.info("A person is skipped if first and last acitity are different and last activity starts after mid night.");
+		//TODO : might make more sense if I check above for all intermediate activities as well.
 	}
 
 	public static final Logger log = Logger.getLogger(ActivityClassifier.class.getSimpleName());
