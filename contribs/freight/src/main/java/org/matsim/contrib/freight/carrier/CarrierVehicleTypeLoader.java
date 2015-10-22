@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * Loader that loads/assigns vehicleTypes to their vehicles and carriers respectively.
@@ -35,7 +36,7 @@ public class CarrierVehicleTypeLoader {
 	public void loadVehicleTypes(CarrierVehicleTypes types){
 		for(Carrier c : carriers.getCarriers().values()){
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				Id typeId = v.getVehicleTypeId();
+				Id<VehicleType> typeId = v.getVehicleTypeId();
 				if(typeId != null){
 					if(types.getVehicleTypes().containsKey(typeId)){
 						CarrierVehicleType vehicleType = types.getVehicleTypes().get(typeId);

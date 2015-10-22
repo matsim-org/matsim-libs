@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * This contains the capabilities/resources a carrier has/can deploy.
@@ -33,7 +34,7 @@ public class CarrierCapabilities {
 		
 		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
 		
-		private Set<Id> typeIds = new HashSet<Id>();
+		private Set<Id<VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		

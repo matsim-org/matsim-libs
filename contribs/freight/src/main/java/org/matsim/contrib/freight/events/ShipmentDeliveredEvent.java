@@ -2,6 +2,8 @@ package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 
 /**
@@ -13,21 +15,21 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 public class ShipmentDeliveredEvent extends Event {
 
 	private CarrierShipment shipment;
-	private Id carrierId;
-	private Id driverId;
+	private Id<Carrier> carrierId;
+	private Id<Person> driverId;
 	
-	public ShipmentDeliveredEvent(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
+	public ShipmentDeliveredEvent(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
 		super(time);
 		this.shipment = shipment;
 		this.driverId = driverId;
 		this.carrierId = carrierId;
 	}
 
-	public Id getCarrierId() {
+	public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
 
-	public Id getDriverId() {
+	public Id<Person> getDriverId() {
 		return driverId;
 	}
 

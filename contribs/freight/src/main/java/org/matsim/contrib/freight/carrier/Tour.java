@@ -59,18 +59,18 @@ public class Tour {
 		 * @param startLinkId
 		 * @return the builder again
 		 */
-		public Builder scheduleStart(Id startLinkId) {
+		public Builder scheduleStart(Id<Link> startLinkId) {
 			scheduleStart(startLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
 			return this;
 		}
 		
-		public Builder scheduleStart(Id startLinkId, TimeWindow timeWindow){
+		public Builder scheduleStart(Id<Link> startLinkId, TimeWindow timeWindow){
 			this.start = new Start(startLinkId, timeWindow);
 			previousElementIsActivity = true;
 			return this;
 		}
 		
-		public Builder scheduleEnd(Id endLinkId, TimeWindow timeWindow){
+		public Builder scheduleEnd(Id<Link> endLinkId, TimeWindow timeWindow){
 			assertLastElementIsLeg();
 			End end = new End(endLinkId, timeWindow);
 			this.end = end;
@@ -84,7 +84,7 @@ public class Tour {
 		 * @param endLinkId
 		 * @return the builder
 		 */
-		public Builder scheduleEnd(Id endLinkId) {
+		public Builder scheduleEnd(Id<Link> endLinkId) {
 			scheduleEnd(endLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
 			return this;
 		}
@@ -363,7 +363,7 @@ public class Tour {
 		}
 
 		@Override
-		public Id getLocation() {
+		public Id<Link> getLocation() {
 			return service.getLocationLinkId();
 		}
 
@@ -396,11 +396,11 @@ public class Tour {
 
 	public static class Start extends TourActivity {
 
-		private Id locationLinkId;
+		private Id<Link> locationLinkId;
 		
 		private TimeWindow timeWindow;
 		
-		public Start(Id locationLinkId, TimeWindow timeWindow) {
+		public Start(Id<Link> locationLinkId, TimeWindow timeWindow) {
 			super();
 			this.locationLinkId = locationLinkId;
 			this.timeWindow = timeWindow;
@@ -417,7 +417,7 @@ public class Tour {
 		}
 
 		@Override
-		public Id getLocation() {
+		public Id<Link> getLocation() {
 			return locationLinkId;
 		}
 
@@ -450,13 +450,13 @@ public class Tour {
 	}
 	
 	public static class End extends TourActivity {
-		private Id locationLinkId;
+		private Id<Link> locationLinkId;
 		
 		private TimeWindow timeWindow;
 
 		private double arrTime;
 		
-		public End(Id locationLinkId, TimeWindow timeWindow) {
+		public End(Id<Link> locationLinkId, TimeWindow timeWindow) {
 			super();
 			this.locationLinkId = locationLinkId;
 			this.timeWindow = timeWindow;
@@ -473,7 +473,7 @@ public class Tour {
 		}
 
 		@Override
-		public Id getLocation() {
+		public Id<Link> getLocation() {
 			return locationLinkId;
 		}
 
@@ -529,7 +529,7 @@ public class Tour {
 		}
 
 		@Override
-		public Id getLocation() {
+		public Id<Link> getLocation() {
 			return shipment.getFrom();
 		}
 
@@ -587,7 +587,7 @@ public class Tour {
 		}
 
 		@Override
-		public Id getLocation() {
+		public Id<Link> getLocation() {
 			return shipment.getTo();
 		}
 
@@ -656,11 +656,11 @@ public class Tour {
 		return end;
 	}
 
-	public Id getStartLinkId() {
+	public Id<Link> getStartLinkId() {
 		return start.getLocation();
 	}
 
-	public Id getEndLinkId() {
+	public Id<Link> getEndLinkId() {
 		return end.getLocation();
 	}
 	

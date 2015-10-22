@@ -7,13 +7,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -55,7 +56,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 
 	private boolean doReplanning(MobsimAgent mobsimAgent, double time, Mobsim mobsim) {
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
-		Id agentId = planAgent.getCurrentPlan().getPerson().getId();
+		Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
 		if (currentPlanElement instanceof Activity) {
 			ActivityImpl act = (ActivityImpl) currentPlanElement;

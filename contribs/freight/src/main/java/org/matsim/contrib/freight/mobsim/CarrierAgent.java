@@ -14,11 +14,15 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -53,7 +57,7 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler {
+class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	/**
 	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
@@ -120,7 +124,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),Id.createPersonId(event.getVehicleId().toString()),event.getLinkId(),getVehicle().getVehicleId()));
+            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(), event.getVehicleId(), event.getLinkId()));
             currentRoute.add(event.getLinkId());
 		}
 
@@ -211,6 +215,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	private Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
 
 	private final ScoringFunction scoringFunction;
+	
+	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 
 	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction) {
 		this.tracker = carrierAgentTracker;
@@ -310,11 +316,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		return id;
 	}
 
-	public void notifyPickup(Id driverId, CarrierShipment shipment, double time) {
+	public void notifyPickup(Id<Person> driverId, CarrierShipment shipment, double time) {
 		tracker.notifyPickedUp(carrier.getId(), driverId, shipment, time);
 	}
 
-	public void notifyDelivery(Id driverId, CarrierShipment shipment,
+	public void notifyDelivery(Id<Person> driverId, CarrierShipment shipment,
 			double time) {
 		tracker.notifyDelivered(carrier.getId(), driverId, shipment, time);
 	}
@@ -340,7 +346,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		getDriver(event.getDriverId()).handleEvent(event);
+		getDriver(driverAgents.get(event.getVehicleId())).handleEvent(event);
 	}
 
 
@@ -361,6 +367,16 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		driverAgents.put(event.getVehicleId(), event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		driverAgents.remove(event.getVehicleId());
 	}
 
 }
