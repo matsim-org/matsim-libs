@@ -211,7 +211,11 @@ public class AddingActivitiesInPlans {
 		double timeShift = 0.;
 		double dur = 0;
 
-		if(duration == 0) {
+		if( Double.isNaN(duration) ) {
+			// activity type "pt interaction" falls under this category and thus, name is modified.
+			throw new RuntimeException("Start and end time are not defined. Don't know how to calculate duration in absence of them. Aborting ...");
+		}
+		else if(duration == 0) {
 			if(zeroDurCount<1){
 				log.warn("Duration of person is zero, it may result in higher utility loss. Thus setting it to minimum dur of 1800.");
 				log.warn(Gbl.ONLYONCE);
