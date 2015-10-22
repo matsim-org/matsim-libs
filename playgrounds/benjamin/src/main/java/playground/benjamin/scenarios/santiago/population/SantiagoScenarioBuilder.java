@@ -172,16 +172,16 @@ public class SantiagoScenarioBuilder {
 		//TODO: what is happening here? Change with Amit.
 		//now "pt interaction" activities has neither maxduration nor start/end time -> Error when running (KT, 25.08.2015)
 		Population populationOut = aap.getOutPop();
-		for (Person p : populationOut.getPersons().values()){
-			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Activity){
-				 Activity act = (Activity) pe;
-				  if ((act.getEndTime() == Time.UNDEFINED_TIME ) && (act.getStartTime()  == Time.UNDEFINED_TIME) && act.getType() =="pt iNaNH"){
-					  act.setMaximumDuration(0.);
-				  }
-				}
-			}
-		}
+//		for (Person p : populationOut.getPersons().values()){
+//			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+//				if (pe instanceof Activity){
+//				 Activity act = (Activity) pe;
+//				  if ((act.getEndTime() == Time.UNDEFINED_TIME ) && (act.getStartTime()  == Time.UNDEFINED_TIME) && act.getType() =="pt iNaNH"){
+//					  act.setMaximumDuration(0.);
+//				  }
+//				}
+//			}
+//		}
 		
 		//finish population
 		addFreightPop(populationOut);
@@ -541,6 +541,9 @@ public class SantiagoScenarioBuilder {
 							act.setEndTime(act.getEndTime() + delta);
 						}
 					}
+//					else {
+//						log.warn("This should not happen! ");
+//					}
 				}
 			}
 		}
