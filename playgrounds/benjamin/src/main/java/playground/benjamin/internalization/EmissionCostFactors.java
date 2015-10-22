@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission;
+package playground.benjamin.internalization;
 /**
  * @author amit
  * These values are taken from Maibach et al. (2008)
