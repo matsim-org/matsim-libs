@@ -54,7 +54,7 @@ public class DemandAnalyzer {
 			otherzones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERZONE_ATTRIBUTE));
 			worktourmodes.add(personAttributes.getAttribute(personId,
-					RegentPopulationReader.WORKTOURMODE_ATTRIBUTE));
+					RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE));
 			othertourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE));
 		}
@@ -75,7 +75,7 @@ public class DemandAnalyzer {
 	public static void main(String[] args) {
 
 		// run("./data/synthetic_population/150615_trips.xml");
-		run("./data/synthetic_population/150911_trips.xml");
+		run("./data_ZZZ/synthetic_population/151008_trips.xml");
 
 	}
 

@@ -151,7 +151,7 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBa
 		return this.originalObjectiveFunctionValue(alphas)
 				+ this.equilibriumGapWeight * this.initialGradientNorm
 				* this.equilibriumGap(alphas) + this.uniformityWeight
-				* this.initialGradientNorm * alphas.euclNorm();
+				* this.initialGradientNorm * alphas.innerProd(alphas);
 	}
 
 	@Override
@@ -191,7 +191,7 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBa
 		 */
 		for (int l = 0; l < alphas.size(); l++) {
 			result.add(l, this.uniformityWeight * this.initialGradientNorm
-					* alphas.get(l));
+					*  2.0 * alphas.get(l));
 		}
 		return result;
 	}

@@ -73,13 +73,13 @@ public class MATSimDummy {
 
 	public static final String NODESAMPLE_SIZE_ELEMENT = "nodesamplesize";
 
-	private static void fatal(final String msg) {
+	public static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
 				"FATAL ERROR: " + msg);
 		System.exit(-1);
 	}
 
-	private static void fatal(final Exception e) {
+	public static void fatal(final Exception e) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
 				"FATAL ERROR: " + e);
 		e.printStackTrace();
