@@ -97,7 +97,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	}
 
-	private CarrierAgent findCarrierAgent(Id<Person> id) {
+	private CarrierAgent findCarrierAgent(Id<Carrier> id) {
 		for (CarrierAgent agent : carrierAgents) {
 			if (agent.getId().equals(id)) {
 				return agent;
