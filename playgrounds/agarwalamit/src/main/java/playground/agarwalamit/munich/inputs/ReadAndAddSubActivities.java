@@ -66,7 +66,7 @@ public class ReadAndAddSubActivities {
 	}
 	
 	private void addDataAndWriteConfig(String outConfig, String inputPlans){
-		AddingActivitiesInPlans newPlans= new AddingActivitiesInPlans(sc);
+		ActivityClassifier newPlans= new ActivityClassifier(sc);
 		newPlans.run();
 		newPlans.writePlans(inputPlans);
 		SortedMap<String, Double> acts = newPlans.getActivityType2TypicalDuration();

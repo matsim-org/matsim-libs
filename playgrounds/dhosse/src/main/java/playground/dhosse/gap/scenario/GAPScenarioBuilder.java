@@ -37,7 +37,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
+import playground.agarwalamit.munich.inputs.ActivityClassifier;
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -201,7 +201,7 @@ public class GAPScenarioBuilder {
 		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
 		//create activity parameters for all types of activities
-		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
+		ActivityClassifier aaip = new ActivityClassifier(scenario);
 		aaip.run();
 		
 		SortedMap<String, Double> acts = aaip.getActivityType2TypicalDuration();
@@ -223,7 +223,7 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPop()).write("/home/danielhosse/Dokumente/01_eGAP/plansV4.xml.gz");
+		new PopulationWriter(aaip.getOutPopulation()).write("/home/danielhosse/Dokumente/01_eGAP/plansV4.xml.gz");
 		
 //		SpatialAnalysis.writePopulationToShape(Global.matsimInputDir + "Pläne/plansV4.xml.gz", "/home/danielhosse/plansV4.shp");
 		
