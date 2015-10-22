@@ -77,7 +77,7 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
         this.carrierScoringFunctionFactory = scoringFunctionFactory;
     }
 
-    public Map<Id, Carrier> getCarriers() {
+    public Map<Id<Carrier>, Carrier> getCarriers() {
         return carriers.getCarriers();
     }
 
