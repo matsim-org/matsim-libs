@@ -1,28 +1,39 @@
 package playground.dhosse.gap.run;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
-import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
-import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
-import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
-import org.matsim.contrib.carsharing.runExample.RunCarsharing;
+import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
+import org.matsim.contrib.multimodal.MultimodalQSimFactory;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -31,75 +42,69 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.vehicles.Vehicle;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
 
+/**
+ * 
+ * @author dhosse
+ *
+ */
 public class GAPScenarioRunner {
 
-	private static final String inputPath = Global.matsimDir + "INPUT/";
-	private static final String simInputPath = Global.matsimDir + "OUTPUT/" + Global.runID +"/input/";
-	private static final String outputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/" + Global.runID + "/ouput_/";
+	//the input path for the current simulation
+	public static final String simInputPath = Global.runInputDir;
+	
+	//number of iterations
+	private static final int lastIteration = 100;
 	
 	//configure innovative strategies you want to use
 	private static final boolean addModeChoice = true;
 	private static final boolean addTimeChoice = false;
-	private static final boolean addLocationChoice = false;
 	
+	private static final boolean addLocationChoice = false;
+
+	//carsharing
 	private static final boolean addCarsharing = true;
 	
+	//cadyts
+	private static final boolean runCadyts = false;
+	
+	//multimodal
+	private static final boolean multimodal = false;
+	
+	//roadpricing
+	private static final boolean roadpricing = true;
+	
 	/**
-	 * edit the static method executed in the main method
-	 * to run a different case
 	 * 
 	 * @param args
 	 */
 	public static void main(String args[]){
-		
-//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new MatsimPopulationReader(scenario).readFile(simInputPath + "plansV3.xml.gz");
-//		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(simInputPath + "demographicAtts.xml");
-//		
-//		ObjectAttributes atts = new ObjectAttributes();
-//		
-//		for(Person p : scenario.getPopulation().getPersons().values()){
-//			
-//			if(p.getId().toString().startsWith("09180")){
-//				
-//				if(scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), Global.LICENSE) != null){
-//				
-//					if(scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), Global.LICENSE).equals("true")){
-//						
-//						if(scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), Global.CAR_AVAIL).equals("true")){
-//							
-//							atts.putAttribute(p.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
-//							
-//						} else {
-//							
-//							atts.putAttribute(p.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
-//							
-//						}
-//						
-//					}
-//					
-//				}
-//				
-//			}
-//			
-//		}
-//		
-//		new ObjectAttributesXmlWriter(atts).writeFile(simInputPath + "subpopAttributes.xml.gz");
 		
 		run();
 //		runAnalysis();
@@ -114,12 +119,37 @@ public class GAPScenarioRunner {
 		//create a new config and a new scenario and load it
 		final Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
+		
+		config.controler().setLastIteration(lastIteration);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		//create a second scenario containing only the cleaned (road only) network
-		//in order to map agents on car links
+		if(multimodal){
+			
+			MultiModalConfigGroup mm = new MultiModalConfigGroup();
+			mm.setCreateMultiModalNetwork(false);
+			mm.setCutoffValueForNonCarModes(50/3.6);
+			mm.setDropNonCarRoutes(false);
+			mm.setMultiModalSimulationEnabled(true);
+			mm.setNumberOfThreads(4);
+			mm.setSimulatedModes("bike,walk");
+			config.addModule(mm);
+			
+			PrepareMultiModalScenario.run(scenario);
+			
+		}
+		
+//		create a second scenario containing only the cleaned (road) network
+//		in order to map agents on car links
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario2).readFile(config.network().getInputFile());
+		Set<Id<Link>> linkIds = new HashSet<>();
+		for(Link link : scenario2.getNetwork().getLinks().values()){
+			if(link.getFreespeed() > 50 / 3.6){
+				linkIds.add(link.getId());
+			}
+		}
+		for(Id<Link> linkId : linkIds)
+			scenario2.getNetwork().removeLink(linkId);
 		new NetworkCleaner().run(scenario2.getNetwork());
 		
 		XY2Links xy2links = new XY2Links(scenario2);
@@ -129,6 +159,10 @@ public class GAPScenarioRunner {
 		
 		//create a new controler
 		final Controler controler = new Controler(scenario);
+		
+		if(runCadyts){
+			addCadyts(controler);
+		}
 		
 		//by default, route choice is the only innovative strategy.
 		//additional strategies can be switched on/off via boolean members (see above)
@@ -151,8 +185,62 @@ public class GAPScenarioRunner {
 			
 		}
 		
+		if(multimodal){
+			
+			final TravelTime walkTravelTime = new TravelTime() {
+				
+				@Override
+				public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+					return link.getLength() / config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+				}
+			};
+			TravelDisutility walkTravelDisutility = new TravelDisutility() {
+				
+				@Override
+				public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+					return 0;
+				}
+				
+				@Override
+				public double getLinkMinimumTravelDisutility(Link link) {
+					return 0;
+				}
+			};
+			
+			MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig());
+			final Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					
+					addTravelTimeBinding(TransportMode.walk).toInstance(walkTravelTime);
+					
+//					for (Map.Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
+//						addTravelTimeBinding(entry.getKey()).toInstance(entry.getValue());
+//					}
+					
+					bindMobsim().toProvider(MultimodalQSimFactory.class);
+					
+				}
+				
+			});
+			
+//			addMultimodal(controler);
+			
+		}
+		
 		if(addCarsharing){
+			
 			addCarsharing(controler);
+			
+		}
+		
+		if(roadpricing){
+			
+			addRoadpricing(controler);
+			
 		}
 		
 		//finally, add controler listeners and event handlers
@@ -160,6 +248,56 @@ public class GAPScenarioRunner {
 		
 		//start of the simulation
 		controler.run();
+		
+	}
+	
+	private static void addRoadpricing(final Controler controler){
+		
+		RoadPricingConfigGroup rp = new RoadPricingConfigGroup();
+		rp.setTollLinksFile("/home/danielhosse/roadpricing.xml");
+		rp.setRoutingRandomness(3.);
+		controler.getConfig().addModule(rp);
+		
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		
+	}
+	
+	private static void addCadyts(final Controler controler){
+		
+		// create the cadyts context and add it to the control(l)er:
+		final CadytsContext cContext = new CadytsContext(controler.getConfig());
+		controler.addControlerListener(cContext);
+
+		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				
+				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), controler.getConfig(), cContext);
+				final double cadytsScoringWeight = 100. * controler.getConfig().planCalcScore().getBrainExpBeta() ;
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+
+				return scoringFunctionAccumulator;
+			}
+		}) ;
+		
+	}
+	
+	private static void addMultimodal(final Controler controler){
+		
+		controler.getConfig().controler().setMobsim("myMobsim");
+		controler.getConfig().travelTimeCalculator().setFilterModes(true);
+		
+		controler.setModules(new ControlerDefaultsWithMultiModalModule());
 		
 	}
 	
@@ -178,24 +316,28 @@ public class GAPScenarioRunner {
 		tam.setStrategyName("TimeAllocationMutator");
 		tam.setSubpopulation(null);
 		tam.setWeight(0.1);
+		tam.setDisableAfter((int) (lastIteration * 0.6));
 		controler.getConfig().strategy().addStrategySettings(tam);
 		
 		StrategySettings car = new StrategySettings();
 		car.setStrategyName("TimeAllocationMutator");
 		car.setSubpopulation(Global.GP_CAR);
 		car.setWeight(0.1);
+		car.setDisableAfter((int) (lastIteration * 0.6));
 		controler.getConfig().strategy().addStrategySettings(car);
 		
 		StrategySettings license = new StrategySettings();
 		license.setStrategyName("TimeAllocationMutator");
 		license.setSubpopulation(Global.LICENSE_OWNER);
 		license.setWeight(0.1);
+		license.setDisableAfter((int) (lastIteration * 0.6));
 		controler.getConfig().strategy().addStrategySettings(license);
 		
 		StrategySettings commuter = new StrategySettings();
 		commuter.setStrategyName("TimeAllocationMutator");
 		commuter.setSubpopulation(Global.COMMUTER);
 		commuter.setWeight(0.1);
+		commuter.setDisableAfter((int) (lastIteration * 0.6));
 		controler.getConfig().strategy().addStrategySettings(commuter);
 		
 	}
@@ -265,117 +407,215 @@ public class GAPScenarioRunner {
 		carAvail.setStrategyName("SubtourModeChoice_".concat(Global.GP_CAR));
 		carAvail.setSubpopulation(Global.GP_CAR);
 		carAvail.setWeight(0.1);
+		carAvail.setDisableAfter((int) (0.7 * lastIteration));
 		controler.getConfig().strategy().addStrategySettings(carAvail);
 		
 		StrategySettings license = new StrategySettings();
 		license.setStrategyName("SubtourModeChoice_".concat(Global.LICENSE_OWNER));
 		license.setSubpopulation(Global.LICENSE_OWNER);
 		license.setWeight(0.1);
+		license.setDisableAfter((int) (0.7 * lastIteration));
 		controler.getConfig().strategy().addStrategySettings(license);
 		
 		StrategySettings nonCarAvail = new StrategySettings();
 		nonCarAvail.setStrategyName("SubtourModeChoice_".concat("NO_CAR"));
 		nonCarAvail.setSubpopulation(null);
 		nonCarAvail.setWeight(0.1);
+		nonCarAvail.setDisableAfter((int) (0.7 * lastIteration));
 		controler.getConfig().strategy().addStrategySettings(nonCarAvail);
 		
 		StrategySettings commuter = new StrategySettings();
 		commuter.setStrategyName("SubtourModeChoice_".concat(Global.COMMUTER));
 		commuter.setSubpopulation(Global.COMMUTER);
 		commuter.setWeight(0.1);
+		commuter.setDisableAfter((int) (0.7 * lastIteration));
 		controler.getConfig().strategy().addStrategySettings(commuter);
 		
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
-				
-			}
-		});
+		setModeChoiceModules(controler, addCarsharing);
 		
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat("NO_CAR")).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
-					String[] chainBasedModes = {TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
-				
-			}
-		});
+	}
+	
+	private static void setModeChoiceModules(final Controler controler, boolean carsharingEnabled){
 		
-		controler.addOverridingModule(new AbstractModule() {
+		if(carsharingEnabled){
 			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
+			controler.addOverridingModule(new AbstractModule() {
 				
-			}
-		});
-		
-		controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, "onewaycarsharing"};
+						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
 			
-			@Override
-			public void install() {
-				addPlanStrategyBinding("SubtourModeChoice_".concat(Global.LICENSE_OWNER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk, "onewaycarsharing"};
-					String[] chainBasedModes = {TransportMode.bike};
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-						return builder.build();
-					}
-				});
+			controler.addOverridingModule(new AbstractModule() {
 				
-			}
-		});
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat("NO_CAR")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
+						String[] chainBasedModes = {TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.car, TransportMode.pt};
+						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.LICENSE_OWNER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk, "onewaycarsharing"};
+						String[] chainBasedModes = {TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+		} else{
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat("NO_CAR")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
+						String[] chainBasedModes = {TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.car, TransportMode.pt};
+						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+			controler.addOverridingModule(new AbstractModule() {
+				
+				@Override
+				public void install() {
+					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.LICENSE_OWNER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
+						String[] chainBasedModes = {TransportMode.bike};
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							return builder.build();
+						}
+					});
+					
+				}
+			});
+			
+		}
 		
 	}
 	
 	private static void addCarsharing(final Controler controler){
 		
 		OneWayCarsharingConfigGroup ow = new OneWayCarsharingConfigGroup();
-		ow.setConstantOneWayCarsharing("0");
-		ow.setDistanceFeeOneWayCarsharing("0");
-		ow.setRentalPriceTimeOneWayCarsharing("0");
+		ow.setConstantOneWayCarsharing("-0.0");
+		ow.setDistanceFeeOneWayCarsharing("-0.00026");
+		ow.setRentalPriceTimeOneWayCarsharing("-0.000625");
+//		ow.setDistanceFeeOneWayCarsharing("-0.0");
+//		ow.setRentalPriceTimeOneWayCarsharing("0.004833333");
 		ow.setsearchDistance("2000");
-		ow.setTimeFeeOneWayCarsharing("-1");
-		ow.setTimeParkingFeeOneWayCarsharing("-0.1");
+		ow.setTimeFeeOneWayCarsharing("-0.0");
+		ow.setTimeParkingFeeOneWayCarsharing("-0.0");
 		ow.setUtilityOfTravelling("-6");
 		ow.setUseOneWayCarsharing(true);
 		ow.setvehiclelocations(simInputPath + "stations.txt");
@@ -390,10 +630,55 @@ public class GAPScenarioRunner {
 		controler.getConfig().addModule(ff);
 		
 		CarsharingConfigGroup cs = new CarsharingConfigGroup();
-		cs.setStatsWriterFrequency("10");
+		cs.setStatsWriterFrequency("1");
 		controler.getConfig().addModule(cs);
 		
-		RunCarsharing.installCarSharing(controler);
+		//add carsharing to the main (congested) modes
+		String[] mainModes = new String[]{"car","onewaycarsharing"};
+		controler.getConfig().qsim().setMainModes(Arrays.asList(mainModes));
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+//				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( RandomTripToCarsharingStrategy.class ) ;
+//				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( CarsharingSubtourModeChoiceStrategy.class ) ;
+				bindMobsim().toProvider( CarsharingQsimFactory.class );
+				
+				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
+				
+				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
+                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+
+                    @Override
+                    public String identifyMainMode(
+                            final List<? extends PlanElement> tripElements) {
+                        // we still need to provide a way to identify our trips
+                        // as being twowaycarsharing trips.
+                        // This is for instance used at re-routing.
+                        for ( PlanElement pe : tripElements ) {
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+                                return "twowaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
+                                return "onewaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+                                return "freefloating";
+                            }
+                        }
+                        // if the trip doesn't contain a carsharing leg,
+                        // fall back to the default identification method.
+                        return defaultModeIdentifier.identifyMainMode( tripElements );
+                    }
+                });
+			}
+		});
+		
+		//setting up the scoring function factory, inside different scoring functions are set-up
+		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( controler.getScenario() ) );
+
+		controler.addControlerListener(new CarsharingListener(controler,
+				cs.getStatsWriterFrequency() ) ) ;
 		
 	}
 	
@@ -402,8 +687,8 @@ public class GAPScenarioRunner {
 	 */
 	private static void runAnalysis() {
 	
-//		PersonAnalysis.createLegModeDistanceDistribution("/home/dhosse/plansV3_cleaned.xml.gz", "/home/danielhosse/Dokumente/lmdd/");
-		SpatialAnalysis.writePopulationToShape("/home/danielhosse/plansV4.xml", "/home/danielhosse/Dokumente/01_eGAP/popV4.shp");
+//		PersonAnalysis.createLegModeDistanceDistribution(Global.matsimInputDir + "Pläne/plansV3.xml.gz", "/home/danielhosse/Dokumente/lmdd/");
+		SpatialAnalysis.writePopulationToShape("/home/danielhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/danielhosse/Dokumente/01_eGAP/popV4.shp");
 	
 	}
 	

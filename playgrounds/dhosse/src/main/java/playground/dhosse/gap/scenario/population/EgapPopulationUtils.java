@@ -479,13 +479,15 @@ public class EgapPopulationUtils {
 			
 			if(accumulatedWeight >= rnd){
 				
-				return (int) (i * 10 + Global.random.nextDouble() * 9);
+				int age = (int) (i * 10 + Global.random.nextDouble() * 9);
+				
+				return age < lowerBound ? lowerBound : age; 
 				
 			}
 			
 		}
 		
-		return 0;
+		return lowerBound;
 		
 	}
 	
