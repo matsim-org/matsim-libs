@@ -30,9 +30,14 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
+import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,6 +47,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -49,6 +55,8 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.TripRouterFactoryModule;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,10 +69,15 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Binder;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -89,13 +102,13 @@ public class GAPScenarioRunner {
 	private static final boolean addLocationChoice = false;
 
 	//carsharing
-	private static final boolean addCarsharing = true;
+	private static final boolean carsharing = true;
 	
 	//cadyts
 	private static final boolean runCadyts = false;
 	
 	//multimodal
-	private static final boolean multimodal = false;
+	private static final boolean multimodal = true;
 	
 	//roadpricing
 	private static final boolean roadpricing = true;
@@ -125,16 +138,16 @@ public class GAPScenarioRunner {
 		
 		if(multimodal){
 			
-			MultiModalConfigGroup mm = new MultiModalConfigGroup();
-			mm.setCreateMultiModalNetwork(false);
-			mm.setCutoffValueForNonCarModes(50/3.6);
-			mm.setDropNonCarRoutes(false);
-			mm.setMultiModalSimulationEnabled(true);
-			mm.setNumberOfThreads(4);
-			mm.setSimulatedModes("bike,walk");
-			config.addModule(mm);
-			
-			PrepareMultiModalScenario.run(scenario);
+//			MultiModalConfigGroup mm = new MultiModalConfigGroup();
+//			mm.setCreateMultiModalNetwork(true);
+//			mm.setCutoffValueForNonCarModes(50/3.6);
+//			mm.setDropNonCarRoutes(true);
+//			mm.setMultiModalSimulationEnabled(true);
+//			mm.setNumberOfThreads(4);
+//			mm.setSimulatedModes("bike");
+//			config.addModule(mm);
+//			
+//			PrepareMultiModalScenario.run(scenario);
 			
 		}
 		
@@ -153,8 +166,23 @@ public class GAPScenarioRunner {
 		new NetworkCleaner().run(scenario2.getNetwork());
 		
 		XY2Links xy2links = new XY2Links(scenario2);
+		
+		ObjectAttributes atts = new ObjectAttributes();
+		new ObjectAttributesXmlReader(atts).parse(Global.runInputDir + "demographicAtts.xml");
+		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			xy2links.run(person);
+			String age = (String)atts.getAttribute(person.getId().toString(), Global.AGE);
+			if(age != null){
+				person.getCustomAttributes().put("age", Integer.parseInt(age));
+			}
+			
+			String sex = (String) atts.getAttribute(person.getId().toString(), Global.SEX);
+			if(sex != null){
+			if(sex.equals("0")) sex = "m";
+			else sex = "f";
+			person.getCustomAttributes().put("sex", sex);
+			}
 		}
 		
 		//create a new controler
@@ -185,53 +213,17 @@ public class GAPScenarioRunner {
 			
 		}
 		
+		//END
+		
+		//add the extensions you want to use
+		
 		if(multimodal){
 			
-			final TravelTime walkTravelTime = new TravelTime() {
-				
-				@Override
-				public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-					return link.getLength() / config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
-				}
-			};
-			TravelDisutility walkTravelDisutility = new TravelDisutility() {
-				
-				@Override
-				public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-					return 0;
-				}
-				
-				@Override
-				public double getLinkMinimumTravelDisutility(Link link) {
-					return 0;
-				}
-			};
-			
-			MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig());
-			final Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();
-			
-			controler.addOverridingModule(new AbstractModule() {
-				
-				@Override
-				public void install() {
-					
-					addTravelTimeBinding(TransportMode.walk).toInstance(walkTravelTime);
-					
-//					for (Map.Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
-//						addTravelTimeBinding(entry.getKey()).toInstance(entry.getValue());
-//					}
-					
-					bindMobsim().toProvider(MultimodalQSimFactory.class);
-					
-				}
-				
-			});
-			
-//			addMultimodal(controler);
+			addMultimodal(controler);
 			
 		}
 		
-		if(addCarsharing){
+		if(carsharing){
 			
 			addCarsharing(controler);
 			
@@ -242,6 +234,8 @@ public class GAPScenarioRunner {
 			addRoadpricing(controler);
 			
 		}
+		
+		//END
 		
 		//finally, add controler listeners and event handlers
 		controler.getEvents().addHandler(new ZugspitzbahnFareHandler(controler));
@@ -294,10 +288,43 @@ public class GAPScenarioRunner {
 	
 	private static void addMultimodal(final Controler controler){
 		
-		controler.getConfig().controler().setMobsim("myMobsim");
+//		controler.getConfig().controler().setMobsim("myMobsim");
 		controler.getConfig().travelTimeCalculator().setFilterModes(true);
 		
-		controler.setModules(new ControlerDefaultsWithMultiModalModule());
+		final MultiModalConfigGroup mm = new MultiModalConfigGroup();
+		mm.setMultiModalSimulationEnabled(true);
+		mm.setSimulatedModes("bike");
+		controler.getConfig().addModule(mm);
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				
+				for(String mode : CollectionUtils.stringToSet(mm.getSimulatedModes())){
+					
+					if(mode.equals(TransportMode.bike)){
+						
+						addTravelTimeBinding(mode).toProvider(new BikeTravelTimeFactory(controler.getConfig().plansCalcRoute()));
+						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
+						
+					} else if(mode.equals(TransportMode.walk)){
+						
+						addTravelTimeBinding(mode).toProvider(new WalkTravelTimeFactory(controler.getConfig().plansCalcRoute()));
+						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
+						
+					}
+					
+				}
+				
+				addControlerListenerBinding().to(MultiModalControlerListener.class);
+//				bindMobsim().toProvider(MultimodalQSimFactory.class);
+			
+			}
+			
+		});
 		
 	}
 	
@@ -431,7 +458,7 @@ public class GAPScenarioRunner {
 		commuter.setDisableAfter((int) (0.7 * lastIteration));
 		controler.getConfig().strategy().addStrategySettings(commuter);
 		
-		setModeChoiceModules(controler, addCarsharing);
+		setModeChoiceModules(controler, carsharing);
 		
 	}
 	
