@@ -1,8 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.population;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,9 +56,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
-
 import com.vividsolutions.jts.geom.Geometry;
+
+import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 
 public class CSVToPlans {
 	private static final Logger log = Logger.getLogger(CSVToPlans.class);
@@ -61,16 +79,14 @@ public class CSVToPlans {
 	private Map<String,String> agentId2carLicenceAttr = new TreeMap<String,String>();
 	
 	private final Config config;
-	private boolean prepareForModeChoice;
 	private final String shapefile;
 	private final String outputDirectory;
 	
 	private Map<String,Integer> legMode2NumberOfShotLegs = new HashMap<>();
 	private int legCounter = 0;
 	
-	public CSVToPlans(Config config, boolean prepareForModeChoice, String outputDirectory, String shapefileName){
+	public CSVToPlans(Config config, String outputDirectory, String shapefileName){
 		this.config = config;
-		this.prepareForModeChoice = prepareForModeChoice;
 		this.shapefile = shapefileName;
 		this.outputDirectory = outputDirectory;
 	}
@@ -321,9 +337,9 @@ public class CSVToPlans {
 					if(viaje.getEtapas().size() < 2){
 						reportedTravelTime = viaje.getEndTime() - viaje.getStartTime();
 					}
-					if(persona.getId().equals("13768103")){
-						System.out.println();
-					}
+//					if(persona.getId().equals("13768103")){
+//						System.out.println();
+//					}
 					String proposito = viaje.getProposito();
 					if(proposito.equals("home")){
 						destination = persona.getHomeCoord();
@@ -536,9 +552,9 @@ public class CSVToPlans {
 		}
 	}
 	
+	// TODO: Check if this is correct
 	private boolean isCarOrPTUser(String legMode){
-		return legMode.equals(TransportMode.car) || legMode.equals(SantiagoScenarioConstants.Modes.bus.toString()) ||
-				legMode.equals(TransportMode.walk);
+		return legMode.equals(TransportMode.car) || legMode.equals(SantiagoScenarioConstants.Modes.bus.toString()) || legMode.equals(TransportMode.walk);
 	}
 	
 	private Coord shoot(String legMode, Geometry comuna){

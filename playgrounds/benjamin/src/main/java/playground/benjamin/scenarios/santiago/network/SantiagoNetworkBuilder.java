@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.network;
 
 import java.io.File;
@@ -9,12 +28,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -34,15 +55,26 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder;
+import playground.benjamin.utils.MergeNetworks;
 
-public class CreateMergedNetwork {
-	private static final Logger log = Logger.getLogger(CreateMergedNetwork.class);
+public class SantiagoNetworkBuilder {
+	private static final Logger log = Logger.getLogger(SantiagoNetworkBuilder.class);
 	
-	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
-	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
+//	final boolean prepareForModeChoice = false;
+	final boolean prepareForModeChoice = true;
+	
+	private final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
+	private final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
+	private final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
 
+	private final String transitNetworkFile = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/transit/transitnetwork.xml.gz";
+	
 	public static void main(String[] args) {
+		SantiagoNetworkBuilder snb = new SantiagoNetworkBuilder();
+		snb.run();
+	}
+	
+	private void run() {
 		createDir(new File(outputDir));
 
 		String crs = "EPSG:32719";
@@ -71,15 +103,28 @@ public class CreateMergedNetwork {
 		
 		addNetworkModes(network);
 		
+		if(prepareForModeChoice) mergeWithTransitNetwork(network);
+		
 		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
 		
 		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
 		calcMinMaxCoord(network);
 		
 		log.info("Finished network creation.");
+		
 	}
-	
-	private static void changeNumberOfLanes(NetworkImpl network) {
+
+	private void mergeWithTransitNetwork(NetworkImpl network) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(transitNetworkFile);
+		// TODO: hack in order to avoid pt jamming on the routing network
+		for(Link ll : scenario.getNetwork().getLinks().values()){
+			ll.setCapacity(200 * ll.getCapacity());
+		}
+		new MergeNetworks().merge(network, TransportMode.pt, scenario.getNetwork());
+	}
+
+	private void changeNumberOfLanes(NetworkImpl network) {
 		//change number of lanes according to kt's e-mail
 		int newNLanes = 2;
 		network.getLinks().get(Id.createLinkId("10308")).setCapacity(network.getLinks().get(Id.createLinkId("10308")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10308")).getNumberOfLanes());
@@ -167,13 +212,13 @@ public class CreateMergedNetwork {
 		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
 	}
 
-	private static void removeSomeStreets(NetworkImpl network) {
+	private void removeSomeStreets(NetworkImpl network) {
 		//remove small streets in the south-west of the network
 		network.removeLink(Id.createLinkId("4978"));
 		network.removeLink(Id.createLinkId("9402"));
 	}
 
-	private static void createConnectionLinks(NetworkImpl network) {
+	private void createConnectionLinks(NetworkImpl network) {
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
@@ -193,7 +238,7 @@ public class CreateMergedNetwork {
 		network.addLink(link06);
 	}
 
-	private static void createRoadTypeMappingForHBEFA(NetworkImpl network) {
+	private void createRoadTypeMappingForHBEFA(NetworkImpl network) {
 		for(Link ll : network.getLinks().values()){
 			double fs = ll.getFreespeed();
 			// TODO: rural areas might not be not considered; count the cases and decide...
@@ -264,7 +309,7 @@ public class CreateMergedNetwork {
 		}
 	}
 
-	private static void changeFreespeedInSecondaryNetwork(NetworkImpl network) {
+	private void changeFreespeedInSecondaryNetwork(NetworkImpl network) {
 		for(Link ll : network.getLinks().values()){
 			double fs = ll.getFreespeed();
 			if(fs <= 8.333333334){ //30kmh
@@ -301,7 +346,7 @@ public class CreateMergedNetwork {
 		}
 	}
 
-	private static void addNetworkModes(NetworkImpl network) {
+	private void addNetworkModes(NetworkImpl network) {
 		Set<String> allowedModes = new HashSet<>();
 		allowedModes.add(TransportMode.car);
 		allowedModes.add(TransportMode.ride);
@@ -314,7 +359,7 @@ public class CreateMergedNetwork {
 		}
 	}
 
-	private static void convertNet2Shape(Network network, String crs, String outputDir){
+	private void convertNet2Shape(Network network, String crs, String outputDir){
 		createDir(new File(outputDir));
 		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -355,7 +400,7 @@ public class CreateMergedNetwork {
 		ShapeFileWriter.writeGeometries(features, outputDir + "network_merged_cl_Nodes.shp");
 	}
 	
-	private static void calcMinMaxCoord(Network network) {
+	private void calcMinMaxCoord(Network network) {
 		double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
 		log.info("Network bounding box:");
 		log.info("minX "+ box[0]);
@@ -364,7 +409,7 @@ public class CreateMergedNetwork {
 		log.info("maxY "+ box[3]);
 	}
 	
-	private static void createDir(File file) {
+	private void createDir(File file) {
 		log.info("Directory " + file + " created: "+ file.mkdirs());	
 	}
 }

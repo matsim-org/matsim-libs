@@ -16,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.population;
 
 import java.util.List;
@@ -38,9 +39,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-
 /**
  * @author amit
  */
@@ -48,23 +46,22 @@ public class AddingActivitiesInPlans {
 
 	public AddingActivitiesInPlans(Scenario scenario) {
 		this.sc = scenario;
-		actType2TypDurMinDur = new TreeMap<String, Tuple<Double,Double>>();
-		log.warn("Minimum duration for any sub activity is defined as half of new tyical duration.");
-		log.warn("Least integer of actual activity duration of an activity is set to typical duration.");
+		actType2TypDur = new TreeMap<String, Double>();
+		log.info("Typical durations calculated by this class are rounded down to full hours.");
 	}
 
 	public static final Logger log = Logger.getLogger(AddingActivitiesInPlans.class.getSimpleName());
 	private Scenario sc ;
 	private int zeroDurCount =0;
-	private SortedMap<String, Tuple<Double, Double>> actType2TypDurMinDur;
+	private SortedMap<String, Double> actType2TypDur;
 	private Scenario scOut;
 	private int skippedPersons = 0;
 
 	/**
 	 * @return activity type to typical and minimum duration respectively
 	 */
-	public SortedMap<String, Tuple<Double, Double>> getActivityType2TypicalAndMinimalDuration(){
-		return actType2TypDurMinDur;
+	public SortedMap<String, Double> getActivityType2TypicalDuration(){
+		return actType2TypDur;
 	}
 
 	public void run(){
@@ -198,14 +195,9 @@ public class AddingActivitiesInPlans {
 						timeShift += durAndTimeShift.getSecond();
 
 						a1.setEndTime(currentAct.getEndTime() + timeShift); 
-						/* updated time shift --> to incorporate time shift of the current and/or previous activities. (Basically, multiple activities with zero duration for same person).
-						 * for e.g. see initial plan of 555576.2#10166, 555576.2#14123
-						 */
 						planOut.addActivity(a1);
 					}
-
-					Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(typDur, typDur/2);
-					actType2TypDurMinDur.put(actType, typMinDur);
+					actType2TypDur.put(actType, typDur);
 				} 
 			}
 			if(!skipPerson) popOut.addPerson(pOut);

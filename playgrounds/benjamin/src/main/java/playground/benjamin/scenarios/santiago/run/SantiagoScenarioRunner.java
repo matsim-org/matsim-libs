@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.run;
 
 import org.matsim.api.core.v01.Scenario;
@@ -24,8 +43,9 @@ import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 public class SantiagoScenarioRunner {
 
 	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
-//	private static String inputPath = "../../../runs-svn/santiago/run9/input/";
 	private static boolean doModeChoice = false;
+//	private static String inputPath = "../../../runs-svn/santiago/run30/input/";
+//	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
 		
@@ -126,8 +146,8 @@ public class SantiagoScenarioRunner {
 			@Override
 			public void install() {
 				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"car", "bike", "bus", "metro", "walk"};
-					String[] chainBasedModes = {"car", "bike"};
+					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
 
 					@Override
 					public PlanStrategy get() {
@@ -143,8 +163,8 @@ public class SantiagoScenarioRunner {
 			@Override
 			public void install() {
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"bike", "bus", "metro", "walk"};
-					String[] chainBasedModes = {"bike"};
+					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {TransportMode.bike};
 
 					@Override
 					public PlanStrategy get() {
