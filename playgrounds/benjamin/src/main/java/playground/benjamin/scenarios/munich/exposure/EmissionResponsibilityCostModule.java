@@ -112,13 +112,14 @@ public class EmissionResponsibilityCostModule {
 			}
 			else ; //do nothing
 		}
-		
-		logger.info("warm emission costs" + warmEmissionCosts);
+		//following log statment increases size of the logFile thus commented. amit, Oct'15
+//		logger.info("warm emission costs" + warmEmissionCosts);
 		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
-		logger.info("relative density" + relativeDensity 
-				+ " on link " + linkId.toString() 
-				+ "resulting costs " + (this.emissionCostFactor*warmEmissionCosts*relativeDensity));
+		//following log statment increases size of the logFile thus commented. amit, Oct'15
+//		logger.info("relative density" + relativeDensity 
+//				+ " on link " + linkId.toString() 
+//				+ "resulting costs " + (this.emissionCostFactor*warmEmissionCosts*relativeDensity));
 		return this.emissionCostFactor * warmEmissionCosts * relativeDensity;
 	}
 	
@@ -133,8 +134,8 @@ public class EmissionResponsibilityCostModule {
 		}
 		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
-		
-		logger.info("cold emission costs " + coldEmissionCosts);
+		//following log statment increases size of the logFile thus commented. amit, Oct'15
+//		logger.info("cold emission costs " + coldEmissionCosts);
 		return this.emissionCostFactor * coldEmissionCosts * relativeDensity;
 	}
 
