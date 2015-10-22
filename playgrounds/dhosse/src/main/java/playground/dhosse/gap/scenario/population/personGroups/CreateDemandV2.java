@@ -1,15 +1,12 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -27,8 +24,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
 import org.matsim.matrices.Matrix;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
@@ -43,10 +41,7 @@ import playground.dhosse.gap.scenario.population.PlansCreatorV2;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.utils.EgapHashGenerator;
 
-import com.vividsolutions.jts.geom.Geometry;
-
-@Deprecated
-public class CreateDemand {
+public class CreateDemandV2 {
 	
 	private static String lastMunId = "";
 	
@@ -396,7 +391,7 @@ public class CreateDemand {
 				
 			}
 			
-			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
+			double timeShift = PlansCreatorV2.createRandomTimeShift(2);
 			
 			Person person = factory.createPerson(Id.createPersonId(munId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
@@ -415,11 +410,6 @@ public class CreateDemand {
 					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
 					
 				}
-				
-			} else{
-				
-//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, "null");
-//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, "null");
 				
 			}
 			
@@ -455,10 +445,10 @@ public class CreateDemand {
 			if(munId.length() <= 4 || munId.contains("AT")){
 				
 				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
-				
+
 			} else {
 
-				homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+					homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 				
 			}
 			
@@ -474,7 +464,7 @@ public class CreateDemand {
 				String nextActType = stage.getNextActType();
 				String legMode = stage.getLegMode().equals("car (passenger)") ? TransportMode.ride : stage.getLegMode();
 				double departure = stage.getDepartureTime();
-				double arrival = stage.getArrivalTime();
+				double currentTime = departure;
 
 				if(plan.getPlanElements().size() == 0){
 					
@@ -504,7 +494,11 @@ public class CreateDemand {
 					
 				}
 				
-				currentAct.setEndTime(departure + timeShift);
+				currentAct.setEndTime(currentTime + timeShift);
+				if(currentAct.getEndTime() - currentAct.getStartTime() < 1800){
+					currentAct.setEndTime(currentAct.getStartTime() + 1800);
+				}
+				currentTime = currentAct.getEndTime();
 				
 				if(currentAct.getEndTime() > 24*3600 || currentAct.getEndTime() < currentAct.getStartTime()){
 					currentAct.setEndTime(24 * 3600);
@@ -517,88 +511,117 @@ public class CreateDemand {
 				}
 				
 				Leg leg = factory.createLeg(legMode);
-				leg.setDepartureTime(departure + timeShift);
+				leg.setDepartureTime(currentTime);
 				
-				double d = stage.getDistance()/1.3;//PlanCreationUtils.getTravelDistanceForMode(legMode);
-				if(d * 1000 > NinetyPctDistances.get(legMode)/1.3){
+				double d = 1000*stage.getDistance()/1.3;//PlanCreationUtils.getTravelDistanceForMode(legMode);
+				if(d > NinetyPctDistances.get(legMode)/1.3){
 					d = NinetyPctDistances.get(legMode)/1.3;
 				}
 				
 				Coord c = null;
 				
+				String toId = null;
+				
+				String pattern = getActPattern(prevActType, nextActType);
+				if(legMode.equals(TransportMode.walk)){
+					toId = lastMunId;
+				} else{
+					toId = distributeTrip(nextActType, odMatrices.get(pattern), d, legMode);
+				}
+				
 				if(nextActType.equals(Global.ActType.home.name())){
 					
 					c = homeCoord;
+					toId = munId;
 					
 				} else{
 					
-						ArrayList<ActivityFacility> facilitiesInRange = null;
+					List<ActivityFacility> facilities = new ArrayList<>();
+					List<ActivityFacility> facilitiesInRange = new ArrayList<>();
+					
+					if(nextActType.equals(Global.ActType.education.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2EducationFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.leisure.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2LeisureFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.shop.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2ShopFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.work.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2WorkLocation().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else{
+						
+						facilities = GAPScenarioBuilder.getMunId2OtherFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					}
+					
+					if(facilities != null){
+						if(facilities.size() > 0){
+							
+							facilitiesInRange = getFacilitiesInRange(currentAct.getCoord(), facilities, d);
+							
+						}
+					}
+					
+					if(facilitiesInRange.size() > 0){
+						
+						int randomIndex = Global.random.nextInt(facilitiesInRange.size());
+						
+						c = facilitiesInRange.get(randomIndex).getCoord();
+						
+					} else{
 						
 						if(nextActType.equals(Global.ActType.education.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							c = GAPScenarioBuilder.getEducationQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else if(nextActType.equals(Global.ActType.leisure.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							c = GAPScenarioBuilder.getLeisureQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else if(nextActType.equals(Global.ActType.shop.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							c = GAPScenarioBuilder.getShopQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else if(nextActType.equals(Global.ActType.work.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							c = GAPScenarioBuilder.getWorkLocations().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else{
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							c = GAPScenarioBuilder.getOtherQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						}
-						
-						if(facilitiesInRange.size() > 0){
-							
-							int randomIndex = Global.random.nextInt(facilitiesInRange.size());
-							
-							c = facilitiesInRange.get(randomIndex).getCoord();
-							
-						} else{
-							
-							String toId = null;
-							
-							String pattern = getActPattern(prevActType, nextActType);
-							if(legMode.equals(TransportMode.walk)){
-								toId = lastMunId;
-							} else{
-								toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
-							}
-							Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
-							
-							if(toId.length() <= 4 || toId.contains("AT")){
-								coord2 = Global.ct.transform(coord2);
-							} else{
-								coord2 = Global.gk4ToUTM32N.transform(coord2);
-							}
-							
-							Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
-							
-//							if(legMode.equals(TransportMode.walk)){
-//								c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
-//							} else{
-								c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-//							}
-//							
-//							d = CoordUtils.calcDistance(currentAct.getCoord(), c);
-								
-							lastMunId = toId;
 							
 					}
 					
 				}
 				
+				lastMunId = toId;
+				
+				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
+				
+				double ttime = CoordUtils.calcDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
+				
 				Activity nextAct = factory.createActivityFromCoord(nextActType, c);
 //				((ActivityImpl)nextAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), c).getId());
-				nextAct.setStartTime(arrival + timeShift);
+				nextAct.setStartTime(currentAct.getEndTime() + ttime);
 				
 				if(nextAct.getStartTime() > 24 * 3600){
 					currentAct.setEndTime(24 * 3600);
@@ -643,6 +666,20 @@ public class CreateDemand {
 			population.addPerson(person);
 			
 		}
+		
+	}
+	
+	private static List<ActivityFacility> getFacilitiesInRange(Coord lastCoord, List<ActivityFacility> facilities, double distance){
+		
+		List<ActivityFacility> result = new ArrayList<>();
+		
+		for(ActivityFacility facility : facilities){
+			if(CoordUtils.calcDistance(lastCoord, facility.getCoord()) <= distance){
+				result.add(facility);
+			}
+		}
+		
+		return result;
 		
 	}
 	
@@ -763,33 +800,39 @@ public class CreateDemand {
 		}
 	};
 	
-	private static String distributeTrip(String actType, Matrix od, double distance){
+	private static String distributeTrip(String actType, Matrix od, double distance, String mode){
+		
+		if(od == null){
+			return null;
+		}
+		
+		double proba = LegModeCreator.getProbaForDistance(mode, distance);
 		
 		ArrayList<org.matsim.matrices.Entry> entries = od.getFromLocations().get(lastMunId);
 		
 		ArrayList<org.matsim.matrices.Entry> entriesInRange = new ArrayList<>();
 		int i = 0;
+		if(entries == null){
+			return null;
+		}
+		
+		double accumulatedWeights = 0.;
+		
 		for(org.matsim.matrices.Entry entry : entries){
 			double d = GAPMatrices.getDistances().getFromLocations().get(lastMunId).get(i).getValue();
-			if(d * 2 <= distance*1000 || entry.getToLocation().equals(lastMunId)){
+			if(d <= distance*1000 || entry.getToLocation().equals(lastMunId)){
 				entriesInRange.add(entry);
+				accumulatedWeights += entry.getValue() * proba;
 			}
 			i++;
 		}
 		
-		double random = Global.random.nextDouble();
-		double accumulatedWeights = 0.;
+		double random = Global.random.nextDouble() * accumulatedWeights;
 		
 		if(entriesInRange.size() < 1) return lastMunId;
 		
-		for(org.matsim.matrices.Entry entry : entriesInRange){
-			accumulatedWeights += entry.getValue();
-		}
-		
 		Collections.sort(entriesInRange, matrixEntryComparator);
 		
-		
-		random *= accumulatedWeights;
 		double weight = 0.;
 		
 		for(org.matsim.matrices.Entry entry : entriesInRange){
@@ -805,499 +848,11 @@ public class CreateDemand {
 		
 	}
 	
-	public static void run(String munId, int a0, int aX, int amount, Scenario scenario, MiDPersonGroupTemplates templates){
-		
-		Population population = scenario.getPopulation();
-		PopulationFactory factory = population.getFactory();
-		
-		for(int i = 0; i < amount; i++){
-			
-			int age = EgapPopulationUtils.setAge(a0, aX);
-			int sex = EgapPopulationUtils.setSex(age);
-			
-			boolean isEmployed = false;
-			boolean hasLicense = false;
-			boolean carAvail = false;
-			
-			double rnd = Global.random.nextDouble();
-			
-			if(sex == 0){
-			
-				if(age < 10){
-					
-					if(rnd <= 0.4388){
-						
-						isEmployed = true;
-						hasLicense = false;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 10 && age < 20){
-					
-					if(rnd <= 0.1801){
-						
-						isEmployed = true;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = true;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 20 && age < 30){
-					
-						
-					isEmployed = false;
-					hasLicense = true;
-					carAvail = true;
-					
-				} else if(age >= 30 && age < 40){
-					
-					i--;
-					continue;
-					
-				} else if(age >= 40 && age < 50){
-					
-					if(rnd <= 0.8333){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.9815){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 50 && age < 60){
-					
-					if(rnd <= 0.9474){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 60 && age < 70){
-					
-					if(rnd <= 0.9669){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.9752){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 70 && age < 80){
-					
-					if(rnd <= 0.0357){
-						
-						isEmployed = true;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.9762){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else{
-					
-					if(rnd <= 0.7778){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.8889){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				}
-				
-			} else {
-				
-				if(age < 10){
-					
-					if(rnd <= 0.5139){
-						
-						isEmployed = true;
-						hasLicense = false;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 10 && age < 20){
-					
-					if(rnd <= 0.2176){
-						
-						isEmployed = true;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.2315){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.2407){
-						
-						isEmployed = true;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = true;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 20 && age < 30){
-					
-					if(rnd <= 0.8125){
-
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 30 && age < 40){
-					
-					isEmployed = false;
-					hasLicense = true;
-					carAvail = true;
-					
-				} else if(age >= 40 && age < 50){
-					
-					if(rnd <= 0.9275){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 50 && age < 60){
-					
-					if(rnd <= 0.9351){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.9481){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 60 && age < 70){
-					
-					if(rnd <= 0.7642){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.783){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else if(age >= 70 && age < 80){
-					
-					if(rnd <= 0.0164){
-						
-						isEmployed = true;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.5902){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else if(rnd <= 0.6066){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = false;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				} else{
-					
-					if(rnd <= 0.3846){
-						
-						isEmployed = false;
-						hasLicense = true;
-						carAvail = true;
-						
-					} else{
-						
-						isEmployed = false;
-						hasLicense = false;
-						carAvail = false;
-						
-					}
-					
-				}
-				
-			}
-			
-			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
-			
-			Person person = factory.createPerson(Id.createPersonId(munId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
-			Plan plan = factory.createPlan();
-			
-			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
-			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.AGE, Integer.toString(age));
-			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.LICENSE, Boolean.toString(hasLicense));
-			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.CAR_AVAIL, Boolean.toString(carAvail));
-			
-			if(hasLicense){
-				
-				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
-				
-				if(carAvail){
-					
-					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.GP_CAR);
-					
-				}
-				
-			} else{
-				
-			}
-			
-			String pHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
-			
-			Map<String, List<MiDTravelChain>> patterns = templates.getTravelPatterns(pHash);
-			
-			if(patterns == null){
-				i--;
-				continue;
-			}
-			
-			MiDTravelChain patternTemplate = null;
-			double patternRandom = Global.random.nextDouble(); 
-			double accumulatedWeight = 0.;
-			
-			for(Entry<String, List<MiDTravelChain>> entry : patterns.entrySet()){
-				
-				accumulatedWeight += entry.getValue().size() / templates.getWeightForPersonGroupHash(pHash);
-				
-				if(accumulatedWeight >= patternRandom){
-					
-					int rndIndex = Global.random.nextInt(entry.getValue().size());
-					patternTemplate = entry.getValue().get(rndIndex);
-					
-				}
-				
-			}
-			
-			Coord homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
-			
-			Activity homeAct = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
-			
-			Activity currentAct = null;
-			
-			for(MiDTravelStage stage : patternTemplate.getStages()){
-				
-				String prevActType = stage.getPreviousActType();
-				String nextActType = stage.getNextActType();
-				String legMode = stage.getLegMode().equals("car (passenger)") ? TransportMode.ride : stage.getLegMode();
-				double departure = stage.getDepartureTime();
-				double arrival = stage.getArrivalTime();
-
-				if(plan.getPlanElements().size() == 0){
-					
-					if(prevActType.equals(Global.ActType.home.name())){
-
-						currentAct = factory.createActivityFromCoord(homeAct.getType(), homeCoord);
-//						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord).getId());
-						
-					} else{
-						
-						Coord coord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
-						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
-//						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
-						
-					}
-					
-					currentAct.setStartTime(0.);
-					
-				}
-				
-				currentAct.setEndTime(departure + timeShift);
-				
-				if(currentAct.getEndTime() < currentAct.getStartTime()){
-					currentAct.setEndTime(24 * 3600);
-					plan.addActivity(currentAct);
-					break;
-				}
-				
-				Leg leg = factory.createLeg(legMode);
-				leg.setDepartureTime(departure);
-				
-				double d = PlanCreationUtils.getTravelDistanceForMode(legMode);
-				if(d > 50000/1.3){
-					d = 50000/1.3;
-				}
-				
-				Coord c = null;
-				
-				if(nextActType.equals(Global.ActType.home.name())){
-					
-					c = homeCoord;
-					
-				} else{
-					
-					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-					c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-					
-					Coord coord = checkQuadTreesForFacilityCoords(nextActType, c);
-					if(coord != null){
-						c = coord;
-					}
-					
-				}
-				
-				Activity nextAct = factory.createActivityFromCoord(nextActType, c);
-//				((ActivityImpl)nextAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), c).getId());
-				nextAct.setStartTime(arrival + timeShift);
-
-				plan.addActivity(currentAct);
-				plan.addLeg(leg);
-				
-				if(patternTemplate.getStages().indexOf(stage) >= patternTemplate.getStages().size() - 1){
-					
-					nextAct.setEndTime(24 * 3600);
-					plan.addActivity(nextAct);
-					
-				}
-				
-				currentAct = nextAct;
-				
-			}
-			
-			person.addPlan(plan);
-			population.addPerson(person);
-			
-		}
-		
-	}
-	
 	public static void createCommuters(String munId, String workId, int a0, int aX, CommuterDataElement relation,
 			Scenario scenario, MiDPersonGroupTemplates templates, Map<String,Matrix> odMatrices){
 		
 		Population population = scenario.getPopulation();
 		PopulationFactory factory = population.getFactory();
-		
-		TreeMap<Id<ActivityFacility>, ActivityFacility> facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.work.name());
 		
 		for(int i = 0; i < relation.getCommuters(); i++){
 			
@@ -1516,7 +1071,7 @@ public class CreateDemand {
 				
 			}
 			
-			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
+			double timeShift = PlansCreatorV2.createRandomTimeShift(2);
 			
 			Person person = factory.createPerson(Id.createPersonId(munId + "_" + workId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
@@ -1568,40 +1123,24 @@ public class CreateDemand {
 			Coord homeCoord = null;
 			Coord workCoord = null;
 			
-			if(munId.length() <= 4){
+			lastMunId = munId;
+			
+			if(munId.length() <= 4 || munId.contains("AT")){
+				
 				homeCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
-			} else{
+
+			} else {
+
 				homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
+					
 			}
 			
-			double aw = 0.;
-			Set<ActivityFacility> facilitiesWithinMunicipality = new HashSet<>();
-			for(ActivityFacility facility : facilities.values()){
-				if(GAPScenarioBuilder.getMunId2Geometry().get(workId).contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
-					facilitiesWithinMunicipality.add(facility);
-					for(ActivityOption ao : facility.getActivityOptions().values()){
-						aw += ao.getCapacity();
-						break;
-					}
-				}
-			}
-			
-			double random = Global.random.nextDouble() * aw;
-			double w = 0;
-			for(ActivityFacility facility : facilitiesWithinMunicipality){
-				
-				w += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
-				if(random >= w){
-					workCoord = facility.getCoord();
-				}
-				
-			}
 			
 			if(workCoord == null){
 				if(workId.length() <= 4 || workId.contains("AT")){
 					workCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
 				} else{
-					workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
+					workCoord = chooseWorkLocation(workId);
 				}
 			}
 			
@@ -1615,7 +1154,7 @@ public class CreateDemand {
 				String nextActType = stage.getNextActType();
 				String legMode = stage.getLegMode().equals("car (passenger)") ? TransportMode.ride : stage.getLegMode();
 				double departure = stage.getDepartureTime();
-				double arrival = stage.getArrivalTime();
+				double currentTime = departure;
 
 				if(plan.getPlanElements().size() == 0){
 					
@@ -1645,6 +1184,10 @@ public class CreateDemand {
 				}
 				
 				currentAct.setEndTime(departure + timeShift);
+				if(currentAct.getEndTime() - currentAct.getStartTime() < 1800){
+					currentAct.setEndTime(currentAct.getStartTime() + 1800);
+				}
+				currentTime = currentAct.getEndTime();
 				
 				if(currentAct.getEndTime() > 24*3600 || currentAct.getEndTime() < currentAct.getStartTime()){
 					currentAct.setEndTime(24 * 3600);
@@ -1657,91 +1200,126 @@ public class CreateDemand {
 				}
 				
 				Leg leg = factory.createLeg(legMode);
-				leg.setDepartureTime(departure + timeShift);
+				leg.setDepartureTime(currentTime);
 				
-				double d = PlanCreationUtils.getTravelDistanceForMode(legMode);
-				if(d * 1000 > NinetyPctDistances.get(legMode)){
-					d = NinetyPctDistances.get(legMode);
+				double d = 1000 * stage.getDistance()/1.3;
+				if(d > NinetyPctDistances.get(legMode)/1.3){
+					d = NinetyPctDistances.get(legMode)/1.3;
 				}
 				
 				Coord c = null;
 				
+				String toId = null;
+				
+				String pattern = getActPattern(prevActType, nextActType);
+				if(legMode.equals(TransportMode.walk)){
+					toId = lastMunId;
+				} else{
+					toId = distributeTrip(nextActType, odMatrices.get(pattern), d, legMode);
+					if(toId == null){
+						toId = lastMunId;
+					}
+				}
+				
 				if(nextActType.equals(Global.ActType.home.name())){
 					
 					c = homeCoord;
+					toId = munId;
 					
 				} else if(nextActType.equals(Global.ActType.work.name()) && !prevActType.equals(Global.ActType.work.name())){
 					
 					c = workCoord;
+					toId = workId;
 					
 				} else{
 					
-						ArrayList<ActivityFacility> facilitiesInRange = null;
+					List<ActivityFacility> facilities = new ArrayList<>();
+					List<ActivityFacility> facilitiesInRange = new ArrayList<>();
+					
+					if(nextActType.equals(Global.ActType.education.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2EducationFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.leisure.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2LeisureFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.shop.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2ShopFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else if(nextActType.equals(Global.ActType.work.name())){
+						
+						facilities = GAPScenarioBuilder.getMunId2WorkLocation().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					} else{
+						
+						facilities = GAPScenarioBuilder.getMunId2OtherFacilities().get(toId);
+						
+//						facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+						
+					}
+					
+					if(facilities != null){
+						if(facilities.size() > 0){
+							facilitiesInRange = getFacilitiesInRange(currentAct.getCoord(), facilities, d);
+						}
+					}
+					
+					if(facilitiesInRange.size() > 0){
+						
+						int randomIndex = Global.random.nextInt(facilitiesInRange.size());
+						
+						c = facilitiesInRange.get(randomIndex).getCoord();
+						
+					} else{
 						
 						if(nextActType.equals(Global.ActType.education.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							c = GAPScenarioBuilder.getEducationQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else if(nextActType.equals(Global.ActType.leisure.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							c = GAPScenarioBuilder.getLeisureQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else if(nextActType.equals(Global.ActType.shop.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							c = GAPScenarioBuilder.getShopQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
-						} else if(nextActType.equalsIgnoreCase(Global.ActType.work.name())){
+						} else if(nextActType.equals(Global.ActType.work.name())){
 							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
-							
-						} else {
-							
-							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
-							
-						}
-						
-						if(facilitiesInRange.size() > 0){
-							
-							int randomIndex = Global.random.nextInt(facilitiesInRange.size());
-							
-							c = facilitiesInRange.get(randomIndex).getCoord();
+							c = GAPScenarioBuilder.getWorkLocations().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						} else{
 							
-							String toId = null;
-							
-							String pattern = getActPattern(prevActType, nextActType);
-							if(legMode.equals(TransportMode.walk)){
-								toId = lastMunId;
-							} else{
-								toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
-							}
-							Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
-							
-							if(toId.length() <= 4 || toId.contains("AT")){
-								coord2 = Global.ct.transform(coord2);
-							} else{
-								coord2 = Global.gk4ToUTM32N.transform(coord2);
-							}
-							
-							Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
-							
-//							if(legMode.equals(TransportMode.walk)){
-//								c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
-//							} else{
-								c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-//							}
-							
-//							d = CoordUtils.calcDistance(currentAct.getCoord(), c);
-								
-							lastMunId = toId;
+							c = GAPScenarioBuilder.getOtherQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						}
+						
+//						Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
+//						
+//						c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
+							
+					}
 					
 				}
 				
+				lastMunId = toId;
+				
+				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
+				
+				double ttime = CoordUtils.calcDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
+				
 				Activity nextAct = factory.createActivityFromCoord(nextActType, c);
-				nextAct.setStartTime(arrival + timeShift);
+				nextAct.setStartTime(currentAct.getEndTime() + ttime);
 				
 				if(nextAct.getStartTime() > 24 * 3600){
 					currentAct.setEndTime(24 * 3600);
@@ -1789,6 +1367,32 @@ public class CreateDemand {
 		
 	}
 	
+	private static double getSpeedForMode(String legMode){
+		
+		if(legMode.equals(TransportMode.bike)){
+			
+			return 15 / 3.6;
+			
+		} else if(legMode.equals(TransportMode.car) || legMode.equals(TransportMode.ride)){
+			
+			return 40/3.6;
+			
+		} else if(legMode.equals(TransportMode.pt)){
+			
+			return 35 / 3.6;
+			
+		} else if(legMode.equals(TransportMode.walk)){
+			
+			return 4 / 3.6;
+			
+		} else{
+			
+			return 0.;
+			
+		}
+		
+	}
+	
 	private static Coord checkQuadTreesForFacilityCoords(String nextActType, Coord coord){
 		
 		Coord c = null;
@@ -1820,6 +1424,47 @@ public class CreateDemand {
 
 	public static void setNinetyPctDistances(Map<String,Double> ninetyPctDistances) {
 		NinetyPctDistances = ninetyPctDistances;
+	}
+	
+	private static Coord chooseWorkLocation(String workMunId){
+		
+		List<ActivityFacility> workFacilities = GAPScenarioBuilder.getMunId2WorkLocation().get(workMunId);
+		
+		//in case no activity facilities exist within the borders of the municipality
+		if(workFacilities ==  null){
+			
+			Coord coord = PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workMunId));
+			return Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getBuiltAreaQT().getClosest(coord.getX(), coord.getY())));
+			
+		}
+		
+		double accumulatedWeight = 0.;
+		double random = Global.random.nextDouble();
+		double weight = 0.;
+		
+		for(ActivityFacility facility : workFacilities){
+			
+			accumulatedWeight += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
+			
+		}
+		
+		random *= accumulatedWeight;
+		
+		for(ActivityFacility facility : workFacilities){
+			
+			weight += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
+			
+			if(weight <= random){
+				
+				return facility.getCoord();
+				
+			}
+			
+		}
+		
+		//if the above shouldn't work, return a random facility coord
+		return workFacilities.get(Global.random.nextInt(workFacilities.size())).getCoord();
+		
 	}
 	
 }

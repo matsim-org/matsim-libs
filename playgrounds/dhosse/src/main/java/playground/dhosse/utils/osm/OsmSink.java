@@ -82,14 +82,16 @@ public class OsmSink implements Sink{
 				ActivityFacility af;
 				if(!this.facilities.getFacilities().containsKey(id)){
 					af = aff.createActivityFacility(id, coord);
-//					((ActivityFacilityImpl)af).setDesc(name);
+					((ActivityFacilityImpl)af).setDesc(name);
 					this.facilities.addActivityFacility(af);
 				} else{
 					af = (ActivityFacilityImpl) this.facilities.getFacilities().get(id);
 				}
 				
 				ActivityOption ao = aff.createActivityOption(matsimType);
-				af.addActivityOption(ao);
+				if(!af.getActivityOptions().containsKey(ao.getType())){
+					af.addActivityOption(ao);
+				}
 				
 			}
 			}

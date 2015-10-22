@@ -96,7 +96,7 @@ public class PlansCreator {
 	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
 		
 		MiDCSVReader reader = new MiDCSVReader();
-		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
+//		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
 		Map<String, MiDSurveyPerson> persons = reader.getPersons();
 		
 		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
