@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.TransportMode;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.population.personGroups.DemandCreator;
 
 public class LegModeCreator {
 
