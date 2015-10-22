@@ -204,14 +204,14 @@ public class GAPScenarioBuilder {
 		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
 		aaip.run();
 		
-		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
+		SortedMap<String, Double> acts = aaip.getActivityType2TypicalDuration();
 		
 		for(String act : acts.keySet()){
 			
 			ActivityParams params = new ActivityParams();
 			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act).getFirst());
-			params.setMinimalDuration(acts.get(act).getSecond());
+			params.setTypicalDuration(acts.get(act));
+			params.setMinimalDuration(acts.get(act)/2);
 			params.setClosingTime(Time.UNDEFINED_TIME);
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);

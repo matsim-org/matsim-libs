@@ -22,10 +22,9 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -70,13 +69,14 @@ public class ReadAndAddSubActivities {
 		AddingActivitiesInPlans newPlans= new AddingActivitiesInPlans(sc);
 		newPlans.run();
 		newPlans.writePlans(inputPlans);
-		SortedMap<String, Tuple<Double, Double>> acts = newPlans.getActivityType2TypicalAndMinimalDuration();
+		SortedMap<String, Double> acts = newPlans.getActivityType2TypicalDuration();
 		
 		for(String act :acts.keySet()){
 			ActivityParams params = new ActivityParams();
+			
 			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act).getFirst());
-			params.setMinimalDuration(acts.get(act).getSecond());
+			params.setTypicalDuration(acts.get(act));
+			// setting minimal duration does not have any effect in absence of marginalUtilityForEarlyDeparture
 			params.setClosingTime(Time.UNDEFINED_TIME);
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);

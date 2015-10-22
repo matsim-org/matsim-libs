@@ -48,15 +48,14 @@ public class AddingActivitiesInPlans {
 
 	public AddingActivitiesInPlans(Scenario scenario) {
 		this.sc = scenario;
-		actType2TypDurMinDur = new TreeMap<String, Tuple<Double,Double>>();
-		log.warn("Minimum duration for any sub activity is defined as half of new tyical duration.");
-		log.warn("Least integer of actual activity duration of an activity is set to typical duration.");
+		actType2TypDur = new TreeMap<String, Double>();
+		log.info("Least integer [Math.floor()] of stated activity duration of an activity is set to typical duration.");
 	}
 
 	public static final Logger log = Logger.getLogger(AddingActivitiesInPlans.class.getSimpleName());
 	private Scenario sc ;
 	private int zeroDurCount =0;
-	private SortedMap<String, Tuple<Double, Double>> actType2TypDurMinDur;
+	private SortedMap<String, Double> actType2TypDur;
 	private Scenario scOut;
 	private PersonFilter pf = new PersonFilter();
 	private int skippedPersons = 0;
@@ -64,8 +63,8 @@ public class AddingActivitiesInPlans {
 	/**
 	 * @return activity type to typical and minimum duration respectively
 	 */
-	public SortedMap<String, Tuple<Double, Double>> getActivityType2TypicalAndMinimalDuration(){
-		return actType2TypDurMinDur;
+	public SortedMap<String, Double> getActivityType2TypicalDuration(){
+		return actType2TypDur;
 	}
 
 	public void run(){
@@ -206,9 +205,7 @@ public class AddingActivitiesInPlans {
 							 */
 							planOut.addActivity(a1);
 						}
-
-						Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(typDur, typDur/2);
-						actType2TypDurMinDur.put(actType, typMinDur);
+						actType2TypDur.put(actType, typDur);
 					} 
 				}
 				if(!skipPerson) popOut.addPerson(pOut);
@@ -248,18 +245,17 @@ public class AddingActivitiesInPlans {
 		double timeShift = 0.;
 		double dur = 0;
 
-		if(duration == 0) {
+		if( Double.isNaN(duration) ) throw new RuntimeException("Start and end time are not defined. Don't know how to calculate duration in absence of them. Aborting ...");
+		else if(duration == 0) {
 			if(zeroDurCount<1){
-				log.warn("Duration of person is zero, it may result in higher utility loss. Thus setting it to minimum dur of 1800.");
+				log.warn("Duration of person is zero, it may result in higher utility loss if typicalDuration calaculation is set to 'Uniform'. Thus setting it to minimum dur of 1800.");
 				log.warn(Gbl.ONLYONCE);
 			}
 			zeroDurCount ++;
 			dur = 1800;
 			timeShift = 1800;
 		} else if (duration < 0){
-			throw new RuntimeException("Duration is negative. Setting it to minimum dur of 1800");
-			//			timeShift = - duration + 1800;
-			//			duration = 1800;
+			throw new RuntimeException("Duration is negative. Aborting...");
 		} else dur = duration;
 
 		return new Tuple<Double, Double>(dur, timeShift);
