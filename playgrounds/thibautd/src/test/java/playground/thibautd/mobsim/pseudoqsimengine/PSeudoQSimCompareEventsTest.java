@@ -36,8 +36,10 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -107,9 +109,7 @@ public class PSeudoQSimCompareEventsTest {
 		CompareEventsUtils.testEventsSimilarToQsim(
 				scenario,
 				new PlanRouter(
-					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).get(
-					) ),
+						createTripRouter( travelTime , scenario ) ),
 				new QSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(
@@ -119,6 +119,15 @@ public class PSeudoQSimCompareEventsTest {
 				false );
 	}
 
+	private TripRouter createTripRouter(TravelTimeCalculator travelTime, Scenario scenario) {
+		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		builder.setTravelDisutility(
+				new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(
+						travelTime.getLinkTravelTimes() ,
+						scenario.getConfig().planCalcScore() ));
+		builder.setTravelTime( travelTime.getLinkTravelTimes() );
+		return builder.build( scenario ).get();
+	}
 
 
 	private Scenario createTestScenario(final boolean useTransit) {
