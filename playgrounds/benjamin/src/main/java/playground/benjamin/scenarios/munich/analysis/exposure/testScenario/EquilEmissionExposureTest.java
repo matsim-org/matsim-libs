@@ -74,7 +74,7 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
  */
 
 @RunWith(Parameterized.class)
-public class EquilTest {
+public class EquilEmissionExposureTest {
 
 	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/";
 	private String outputDir = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/output/";
@@ -92,7 +92,7 @@ public class EquilTest {
 
 	private boolean isConsideringCO2Costs ;
 	
-	public EquilTest (boolean isConsideringCO2Costs) {
+	public EquilEmissionExposureTest (boolean isConsideringCO2Costs) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
 	}
 	
