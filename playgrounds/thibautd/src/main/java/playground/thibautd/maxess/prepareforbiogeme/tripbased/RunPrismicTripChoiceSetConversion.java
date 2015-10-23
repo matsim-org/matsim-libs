@@ -51,7 +51,7 @@ import java.util.Collections;
  * @author thibautd
  */
 public class RunPrismicTripChoiceSetConversion {
-	public static void main(final String[] args) {
+	public static void main(final String... args) {
 		final PrismicConversionConfigGroup group = new PrismicConversionConfigGroup();
 		final Config config = ConfigUtils.loadConfig(args[0], group);
 
@@ -67,7 +67,7 @@ public class RunPrismicTripChoiceSetConversion {
 
 		new XY2Links( sc ).run(sc.getPopulation());
 
-		Logger.getLogger(SoftCache.class).setLevel(Level.TRACE );
+		//Logger.getLogger(SoftCache.class).setLevel(Level.TRACE );
 		try {
 			Converter.<Trip, TripChoiceSituation>builder()
 					.withRecordFiller(
@@ -81,9 +81,10 @@ public class RunPrismicTripChoiceSetConversion {
 								public ChoiceSetSampler<Trip, TripChoiceSituation> get() {
 									final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
-									final TripRouter tripRouter =
-											new TripRouterFactoryBuilderWithDefaults().build(sc).get(
-											);
+									final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
+									b.setTravelTime( tt );
+									b.setTravelDisutility( tt );
+									final TripRouter tripRouter = b.build(sc).get();
 
 									tripRouter.setRoutingModule(
 											TransportMode.car,
