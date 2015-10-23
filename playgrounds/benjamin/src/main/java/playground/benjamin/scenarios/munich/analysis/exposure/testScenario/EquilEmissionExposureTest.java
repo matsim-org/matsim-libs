@@ -189,54 +189,6 @@ public class EquilEmissionExposureTest {
 
 		Assert.assertEquals(totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
-		
-		// checks
-		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
-		Plan selectedPlan = activeAgent.getSelectedPlan();
-
-		// check with the first leg
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
-		// Agent should take shorter route to pay lesser emission toll
-		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 39 (shorter) instead. ", route.getLinkIds().contains(Id.create("39", Link.class)));
-		
-		Double scoreOfSelectedPlan;
-		// check selected plan 
-		scoreOfSelectedPlan = selectedPlan.getScore();
-		for(PlanElement pe: selectedPlan.getPlanElements()){
-			if(pe instanceof Leg){
-				Leg leg = (Leg)pe;
-				LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-				if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-					logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
-				}else{
-					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-						logger.info("Selected route avoids node 9 as it is supposed to. " +
-								"It's score is " + selectedPlan.getScore());
-					}
-				}
-			}
-		}
-
-		// check not selected plans - score should be worse if link 39 is used
-		boolean plan9ex=false;
-		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
-				logger.info("This plan is not selected. It's score is " + p.getScore());
-				for(PlanElement pe: p.getPlanElements()){
-					if(pe instanceof Leg){
-						Leg leg = (Leg)pe;
-						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							plan9ex = true;
-							if(scoreOfSelectedPlan<p.getScore()){
-								logger.info("A plan with a route via node 9 should have a worse score.");
-							}
-						}
-					}
-				}
-			}
-		}
-		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 	}
 
 	@Test
@@ -293,7 +245,6 @@ public class EquilEmissionExposureTest {
 
 		// checks
 		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
-		Double scoreOfSelectedPlan;
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 
 		// check with the first leg
@@ -301,43 +252,6 @@ public class EquilEmissionExposureTest {
 		// Agent should take longer route to avoid exposure toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
 
-		// check selected plan 
-		scoreOfSelectedPlan = selectedPlan.getScore();
-		for(PlanElement pe: selectedPlan.getPlanElements()){
-			if(pe instanceof Leg){
-				Leg leg = (Leg)pe;
-				LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-				if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-					logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
-				}else{
-					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-						logger.info("Selected route avoids node 9 as it is supposed to. " +
-								"It's score is " + selectedPlan.getScore());
-					}
-				}
-			}
-		}
-
-		// check not selected plans - score should be worse if link 39 is used
-		boolean plan9ex=false;
-		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
-				logger.info("This plan is not selected. It's score is " + p.getScore());
-				for(PlanElement pe: p.getPlanElements()){
-					if(pe instanceof Leg){
-						Leg leg = (Leg)pe;
-						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							plan9ex = true;
-							if(scoreOfSelectedPlan<p.getScore()){
-								logger.info("A plan with a route via node 9 should have a worse score.");
-							}
-						}
-					}
-				}
-			}
-		}
-		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 	}
 
 	private void emissionSettings(Scenario scenario){
