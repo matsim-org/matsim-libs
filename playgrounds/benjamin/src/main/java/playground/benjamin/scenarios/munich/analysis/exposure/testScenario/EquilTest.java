@@ -145,7 +145,7 @@ public class EquilTest {
 		emissionSettings(sc);
 		
 		Controler controler = new Controler(sc);
-		sc.getConfig().controler().setOutputDirectory(outputDir + "/emissionToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/"));
+		sc.getConfig().controler().setOutputDirectory(outputDir + "/exposureToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/"));
 		
 		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
