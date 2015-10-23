@@ -4,19 +4,58 @@ import java.util.LinkedList;
 
 import org.matsim.core.utils.misc.Time;
 
+import playground.dhosse.gap.Global;
+
 public class MiDTravelChain {
 	
 	private LinkedList<MiDTravelStage> stages = new LinkedList<>();
+	private double c = 0.;
+	private double maxD = 0.;
 	
 	public MiDTravelChain(String pId,String[] legs, String[] acts, String[] times, String[] lengths){
 		
 		//acts.length() = legs.length + 1 (because of first activity: home / other)
 		for(int i = 0; i < legs.length; i++){
 			
+			if(isPrimaryActType(acts[i + 1])){
+			if(!lengths[i].equals("NULL")){
+
+				double d = 1000*Double.parseDouble(lengths[i].replace(",", "."));
+				if(d > this.c)
+				this.c = d;
+				
+			}
+			} else{
+				
+				if(!lengths[i].equals("NULL")){
+					
+					double d = 1000*Double.parseDouble(lengths[i].replace(",", "."));
+					if(d > maxD){
+						maxD = d;
+					}
+					
+				}
+				
+			}
+			
 			this.stages.addLast(new MiDTravelStage(legs[i], acts[i], acts[i+1], Time.parseTime(times[i].split("-")[0]), Time.parseTime(times[i].split("-")[1]),lengths[i]));
 			
 		}
 		
+	}
+	
+	private boolean isPrimaryActType(String actType){
+		
+		return(actType.equals(Global.ActType.home.name()) || actType.equals(Global.ActType.work.name()) || actType.equals(Global.ActType.education.name()));
+		
+	}
+	
+	public double getC(){
+		return this.c;
+	}
+	
+	public double getMaxD(){
+		return this.maxD;
 	}
 	
 	public LinkedList<MiDTravelStage> getStages(){

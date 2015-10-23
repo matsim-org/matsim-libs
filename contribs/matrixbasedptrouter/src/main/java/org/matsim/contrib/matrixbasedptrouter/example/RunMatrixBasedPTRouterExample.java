@@ -22,6 +22,7 @@ package org.matsim.contrib.matrixbasedptrouter.example;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -65,8 +66,8 @@ public class RunMatrixBasedPTRouterExample
         //and finally setting up the controler
         Controler controler = new Controler(config);
         // setting up routing 
-        controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
-        
+        controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix));
+
         controler.run();
         
 

@@ -21,8 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -31,20 +30,22 @@ import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
+import javax.inject.Provider;
+
 public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final SwissPTTravelTimeCalculator ptTravelTime;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			WithinDayEngine withinDayEngine, DecisionDataProvider decisionDataProvider, 
 			ModeAvailabilityChecker modeAvailabilityChecker,
 			SwissPTTravelTimeCalculator ptTravelTime,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+														 Provider<TripRouter> tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
@@ -59,7 +60,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
 				this.getWithinDayEngine().getActivityRescheduler(), decisionDataProvider, 
 				modeAvailabilityChecker.createInstance(), ptTravelTime,
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
+				this.tripRouterFactory.get());
 		return replanner;
 	}
 

@@ -28,16 +28,12 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
@@ -65,41 +61,12 @@ public class WalkBikeRouting {
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig(), linkSlopes);
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
+		DefaultDelegateFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
+		MultimodalTripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
                 ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
 		
 		controler.setTripRouterFactory(multiModalTripRouterFactory);	
-		TripRouter tripRouter = multiModalTripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(
-										new TravelDisutility() {
-
-											@Override
-											public double getLinkTravelDisutility(
-													Link link, double time,
-													Person person,
-													Vehicle vehicle) {
-												// TODO Auto-generated method stub
-												return 0;
-											}
-
-											@Override
-											public double getLinkMinimumTravelDisutility(
-													Link link) {
-												// TODO Auto-generated method stub
-												return 0;
-											}
-										},
-										new TravelTime() {
-
-											@Override
-											public double getLinkTravelTime(
-													Link link, double time,
-													Person person,
-													Vehicle vehicle) {
-												// TODO Auto-generated method stub
-												return 0;
-											}
-										}));
+		TripRouter tripRouter = multiModalTripRouterFactory.get();
 		RoutingModule routingModuleWalk = tripRouter.getRoutingModule("walk");
 		RoutingModule routingModuleBike = tripRouter.getRoutingModule("bike");
 

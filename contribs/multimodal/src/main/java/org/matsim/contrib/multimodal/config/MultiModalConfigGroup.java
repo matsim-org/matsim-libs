@@ -44,7 +44,10 @@ public class MultiModalConfigGroup extends ConfigGroup {
 	private int numberOfThreads = 1;
 	private String simulatedModes = "bike,walk"; 
 	private String slopeInformationFile = null;
-	
+
+	// set default walk speed; according to Weidmann 1.34 [m/s]
+	private double walkSpeed = 1.34;
+
 	private boolean createMultiModalNetwork = false;
 	private double cuttoffValueForNonMotorizedModes = 80/3.6;	// 80km/h -> m/s
 	private boolean dropNonCarRoutes = false;
@@ -195,5 +198,13 @@ public class MultiModalConfigGroup extends ConfigGroup {
 
 	public boolean isEnsureActivityReachability() {
 		return this.ensureActivityReachability;
+	}
+
+	public double getWalkSpeed() {
+		return walkSpeed;
+	}
+
+	public void setWalkSpeed(double walkSpeed) {
+		this.walkSpeed = walkSpeed;
 	}
 }

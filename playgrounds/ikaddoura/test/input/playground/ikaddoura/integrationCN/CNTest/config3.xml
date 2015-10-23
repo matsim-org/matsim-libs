@@ -11,7 +11,7 @@
 	</module>
 	
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/playground/ikaddoura/integrationCN/CNTest/test3" />
+		<param name="outputDirectory" value="test/output/playground/ikaddoura/integrationCN/CNTest/n" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 		<param name="firstIteration" value="0" />

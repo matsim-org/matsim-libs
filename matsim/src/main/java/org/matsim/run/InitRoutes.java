@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -33,16 +35,15 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
-import javax.inject.Provider;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -124,10 +125,9 @@ public class InitRoutes {
 
 	public void run(final String[] args) {
 		parseArguments(args);
-		Scenario scenario;
 		this.config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(config.global().getRandomSeed());
-		scenario = ScenarioUtils.createScenario(config);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
@@ -138,23 +138,25 @@ public class InitRoutes {
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		//plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc,
-		//		new AStarLandmarksFactory(network, timeCostCalc, this.config.global().getNumberOfThreads()), 
-		//		((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory()));
-		Provider<TripRouter> tripRouterFact = new TripRouterProviderImpl(
-				scenario,
-				new TravelDisutilityFactory() {
+		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+			install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+				@Override
+				public void install() {
+				bind(Scenario.class).toInstance(scenario);
+				addTravelTimeBinding("car").toInstance(timeCostCalc);
+				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 					@Override
-					public TravelDisutility createTravelDisutility(
-							TravelTime timeCalculator,
-							PlanCalcScoreConfigGroup cnScoringGroup) {
+					public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 						return timeCostCalc;
 					}
-				},
-				timeCostCalc,
-				new AStarLandmarksFactory( network, timeCostCalc, this.config.global().getNumberOfThreads()),
-				null);
-		plans.addAlgorithm( new PlanRouter( tripRouterFact.get() , null ) );
+				});
+				}
+			}));
+			}
+		});
+		plans.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

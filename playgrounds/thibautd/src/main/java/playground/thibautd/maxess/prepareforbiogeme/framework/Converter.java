@@ -20,6 +20,7 @@ package playground.thibautd.maxess.prepareforbiogeme.framework;
 
 import com.google.inject.Provider;
 import eu.eunoiaproject.examples.schedulebasedteleportation.Run;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -33,6 +34,7 @@ import java.util.concurrent.*;
  * @author thibautd
  */
 public class Converter<T,C extends ChoiceSituation<T>> {
+	private static final Logger log = Logger.getLogger(Converter.class);
 	private final ThreadLocal<ChoiceSetSampler<T,C>> choiceSetSampler;
 	private final ChoiceSetRecordFiller<T> recordFiller;
 	private final ThreadLocal<ChoicesIdentifier<C>> choicesIdentifier;
@@ -67,6 +69,7 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 	public void convert( final Population chains , final String dataset ) {
 		final ExecutorService executor = Executors.newFixedThreadPool( nThreads );
 
+		log.info( "start conversion" );
 		try ( final ChoiceDataSetWriter<T> writer = new ChoiceDataSetWriter<>( recordFiller , dataset ) ) {
 			final WritingRunnable runnable = new WritingRunnable( writer );
 			final Thread writerThread = new Thread( runnable );
@@ -91,6 +94,7 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 			executor.shutdown();
 			runnable.doRun = false;
 			writerThread.join();
+			log.info( "done with conversion" );
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );

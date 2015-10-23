@@ -75,8 +75,8 @@ class Talk_2015_09_03 {
 		final Random rnd = new Random();
 		final double demand = 500;
 		final double capacity = 1000;
-		final int linkCnt = 800;
-		final int tollCnt = 400;
+		final int linkCnt = 400;
+		final int tollCnt = 200;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
@@ -86,15 +86,14 @@ class Talk_2015_09_03 {
 		final int replications = 3;
 		final boolean keepBestSolution = true;
 		final int maxDeltaBin = 3;
-		final double replanningProbability = 0.1;
+		final double replanningProbability = 0.05;
 
 		final double maxExternality = 3.0;
-		final Vector externalities = randomExternalities(maxExternality,
-				linkCnt, new Random(4711));
+//		final Vector externalities = randomExternalities(maxExternality,
+//				linkCnt, new Random(4711));
+		final Vector externalities = minMaxExternalities(maxExternality, linkCnt, 2);
 		
-		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32 }) {
-			// , 4, 8, 16, 32, 64, 128,
-			// 256 }) {
+		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
 
 			final List<List<Double>> naiveTransitionList = new ArrayList<List<Double>>();
 			final List<List<Double>> naiveObjectiveFunctionValueList = new ArrayList<List<Double>>();
@@ -272,12 +271,6 @@ class Talk_2015_09_03 {
 			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8, 5);
 			writer.setLabelX("transitions [$10^3$]");
 			writer.setLabelY("Q [$10^3$]");
-			// writer.setYMin(0.0);
-			// writer.setYMax(150.0);
-			// writer.setYDelta(20.0);
-			// writer.setXMin(0.0);
-			// writer.setXMax(25.0);
-			// writer.setXDelta(5.0);
 
 			for (int r = 0; r < replications; r++) {
 				final String selectId = "select"

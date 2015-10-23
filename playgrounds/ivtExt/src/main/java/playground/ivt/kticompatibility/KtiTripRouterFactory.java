@@ -21,19 +21,18 @@ package playground.ivt.kticompatibility;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.*;
 
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
  */
-public class KtiTripRouterFactory implements TripRouterFactory {
+public class KtiTripRouterFactory implements Provider<TripRouter> {
 	final KtiPtRoutingModuleInfo ptInfo;
-	private TripRouterFactory delegate;
+	private Provider<TripRouter> delegate;
 	private Scenario scenario;
 
 	public KtiTripRouterFactory(final Scenario scenario) {
@@ -41,15 +40,14 @@ public class KtiTripRouterFactory implements TripRouterFactory {
 				(KtiPtConfigGroup) scenario.getConfig().getModule( KtiPtConfigGroup.GROUP_NAME ),
 				scenario.getNetwork() );
 		this.delegate =
-				DefaultTripRouterFactoryImpl
-						.createRichTripRouterFactoryImpl(scenario);
+				TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario);
 		this.scenario = scenario;
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	public TripRouter get() {
 
-		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
+		final TripRouter router = delegate.get();
 
 		router.setRoutingModule(
 				TransportMode.pt,

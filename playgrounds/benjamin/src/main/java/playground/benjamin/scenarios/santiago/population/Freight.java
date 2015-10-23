@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.population;
 
 import java.io.BufferedReader;
@@ -34,9 +53,9 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class Freight {
 
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
+	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
 	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/freight/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/plans/" ; //outputDir of this class -> input for Matsim (KT)
 
 	private static Map<String, Coord> zonaId2Coord = new HashMap<String, Coord>();
 	private static Map<String, FreightTrip> tripId2FreightTrip = new HashMap<String, FreightTrip>(); 

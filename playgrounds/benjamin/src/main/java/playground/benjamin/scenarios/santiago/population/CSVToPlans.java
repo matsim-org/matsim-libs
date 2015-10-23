@@ -1,8 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.santiago.population;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,23 +56,21 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.benjamin.scenarios.santiago.Constants;
-
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
+
 public class CSVToPlans {
+	private static final Logger log = Logger.getLogger(CSVToPlans.class);
 	
 	private final String carUsers = "carUsers"; 	//Attribute name for subpopulation
 	private final String carAvail = "carAvail";		//Attribute value for subpopulation -> car is available
 
-	private final String shapefile;
-	private final String outputDirectory;
-	
 	private Scenario scenario;
 	private ObjectAttributes agentAttributes;
 	
-	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", Constants.toCRS);
-	CoordinateTransformation transf = TransformationFactory.getCoordinateTransformation(Constants.toCRS, "EPSG:4326");
+	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
+	CoordinateTransformation transf = TransformationFactory.getCoordinateTransformation(SantiagoScenarioConstants.toCRS, "EPSG:4326");
 	
 	private Map<String,Persona> personas = new HashMap<>();
 	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
@@ -62,38 +78,29 @@ public class CSVToPlans {
 	private Map<String,String> comunaName2Id = new HashMap<>();
 	private Map<String,String> agentId2carLicenceAttr = new TreeMap<String,String>();
 	
-	private static final Logger log = Logger.getLogger(CSVToPlans.class);
 	private final Config config;
+	private final String shapefile;
+	private final String outputDirectory;
 	
 	private Map<String,Integer> legMode2NumberOfShotLegs = new HashMap<>();
 	private int legCounter = 0;
 	
-	public CSVToPlans(Config config, String outputFile){
-		
-		this(config, outputFile, null);
-		
-	}
-	
 	public CSVToPlans(Config config, String outputDirectory, String shapefileName){
-		
 		this.config = config;
 		this.shapefile = shapefileName;
 		this.outputDirectory = outputDirectory;
 	}
 	
 	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile){
-		
 		this.readHogares(hogaresFile);
 		this.readPersonas(personasFile);
 		this.readViajes(viajesFile);
 		this.readEtapas(etapasFile);
 		this.createPersons();
 		this.write();
-		
 	}
 	
 	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile, String comunasFile){
-		
 		this.readHogares(hogaresFile);
 		this.readPersonas(personasFile);
 		this.readViajes(viajesFile);
@@ -101,13 +108,10 @@ public class CSVToPlans {
 		this.readComunas(comunasFile);
 		this.createPersons();
 		this.write();
-		
 	}
 	
 	private void readComunas(String comunasFile){
-		
 		BufferedReader reader = IOUtils.getBufferedReader(comunasFile);	
-		
 		try {
 			String line = reader.readLine();
 			while( (line = reader.readLine()) != null ){
@@ -333,9 +337,9 @@ public class CSVToPlans {
 					if(viaje.getEtapas().size() < 2){
 						reportedTravelTime = viaje.getEndTime() - viaje.getStartTime();
 					}
-					if(persona.getId().equals("13768103")){
-						System.out.println();
-					}
+//					if(persona.getId().equals("13768103")){
+//						System.out.println();
+//					}
 					String proposito = viaje.getProposito();
 					if(proposito.equals("home")){
 						destination = persona.getHomeCoord();
@@ -499,9 +503,9 @@ public class CSVToPlans {
 	}
 	
 	private void write(){
-		createDir(new File(this.outputDirectory));
+//		createDir(new File(this.outputDirectory));
 		new ObjectAttributesXmlWriter(agentAttributes).writeFile(this.outputDirectory + "agentAttributes.xml");
-		new PopulationWriter(this.scenario.getPopulation()).write(this.outputDirectory + "plans.xml.gz");
+		new PopulationWriter(this.scenario.getPopulation()).write(this.outputDirectory + "plans_eod.xml.gz");
 	}
 	
 	private String getActType(int index){
@@ -527,30 +531,30 @@ public class CSVToPlans {
 	private String getLegMode(int index){
 		switch(index){
 			case 1: return TransportMode.car;
-			case 2: return Constants.Modes.bus.toString();
-			case 3: return Constants.Modes.bus.toString();
-			case 4: return Constants.Modes.metro.toString();
-			case 5: return Constants.Modes.colectivo.toString();
-			case 6: return Constants.Modes.school_bus.toString();
-			case 7: return Constants.Modes.taxi.toString();
+			case 2: return SantiagoScenarioConstants.Modes.bus.toString();
+			case 3: return SantiagoScenarioConstants.Modes.bus.toString();
+			case 4: return SantiagoScenarioConstants.Modes.metro.toString();
+			case 5: return SantiagoScenarioConstants.Modes.colectivo.toString();
+			case 6: return SantiagoScenarioConstants.Modes.school_bus.toString();
+			case 7: return SantiagoScenarioConstants.Modes.taxi.toString();
 			case 8: return TransportMode.walk;
 			case 9: return TransportMode.bike;
-			case 10: return Constants.Modes.motorcycle.toString();
+			case 10: return SantiagoScenarioConstants.Modes.motorcycle.toString();
 			case 11: return TransportMode.other;
 			case 12: return TransportMode.other;
-			case 13: return Constants.Modes.school_bus.toString();
+			case 13: return SantiagoScenarioConstants.Modes.school_bus.toString();
 			case 14: return TransportMode.other;
 			case 15: return TransportMode.other;
-			case 16: return Constants.Modes.train.toString();
+			case 16: return SantiagoScenarioConstants.Modes.train.toString();
 			case 17: return TransportMode.ride;
 			case 18: return TransportMode.ride;
 			default: return TransportMode.other;
 		}
 	}
 	
+	// TODO: Check if this is correct
 	private boolean isCarOrPTUser(String legMode){
-		return legMode.equals(TransportMode.car) || legMode.equals(Constants.Modes.bus.toString()) ||
-				legMode.equals(TransportMode.walk);
+		return legMode.equals(TransportMode.car) || legMode.equals(SantiagoScenarioConstants.Modes.bus.toString()) || legMode.equals(TransportMode.walk);
 	}
 	
 	private Coord shoot(String legMode, Geometry comuna){
@@ -653,9 +657,5 @@ public class CSVToPlans {
 		this.legMode2NumberOfShotLegs.put(legMode + " w/o travel time", n+1);
 		
 		return res;
-	}
-	
-	private static void createDir(File file) {
-		System.out.println("Directory " + file + " created: "+ file.mkdirs());	
 	}
 }

@@ -30,8 +30,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.MultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
@@ -178,14 +176,14 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		
 		if (duringLegRerouting) {
 			duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(),
-					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+					this.withinDayControlerListener.getWithinDayTripRouterFactory());
 			duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 		}
 		
 		if (initialLegRerouting) {
 			duringLegReplannerFactory = new CurrentLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(),
-					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+					this.withinDayControlerListener.getWithinDayTripRouterFactory());
 			duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 //			duringActivityReplannerFactory = new NextLegReplannerFactory(scenario, this.withinDayControlerListener.getWithinDayEngine(), 

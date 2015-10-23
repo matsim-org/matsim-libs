@@ -30,14 +30,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 
 public class PModule {
     private AgentsStuckHandlerImpl agentsStuckHandler = null;
     private PersonReRouteStuckFactory stuckFactory = null;
     private PtMode2LineSetter lineSetter = null;
     private PTransitRouterFactory pTransitRouterFactory = null;
-    private Class<? extends TripRouterFactory> tripRouterFactory = null;
+    private Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory = null;
 
     public void setLineSetter(PtMode2LineSetter lineSetter) {
         this.lineSetter = lineSetter;
@@ -48,7 +48,7 @@ public class PModule {
     public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
         this.stuckFactory = stuckFactory;
     }
-    public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
+    public void setTripRouterFactory(Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory) {
         this.tripRouterFactory = tripRouterFactory;
     }
     public void configureControler(final Controler controler) {

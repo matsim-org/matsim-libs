@@ -23,6 +23,7 @@
 package org.matsim.roadpricing;
 
 import com.google.inject.Singleton;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -53,6 +54,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser
  */
 
+@Ignore
 public class PlansCalcRouteWithTollOrNotTest {
 
 	@Rule
