@@ -110,6 +110,7 @@ public class EquilEmissionExposureTest {
 
 	public EquilEmissionExposureTest (boolean isConsideringCO2Costs) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
+		logger.info("Each parameter will be used in all the tests i.e. all tests will be run while inclusing and excluding CO2 costs.");
 	}
 
 	@Parameters
