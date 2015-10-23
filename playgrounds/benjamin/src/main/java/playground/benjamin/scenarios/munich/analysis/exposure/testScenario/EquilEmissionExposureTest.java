@@ -19,6 +19,7 @@
 
 package playground.benjamin.scenarios.munich.analysis.exposure.testScenario;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -44,7 +47,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -58,11 +68,14 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
+import playground.benjamin.internalization.EmissionCostFactors;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -119,7 +132,8 @@ public class EquilEmissionExposureTest {
 		emissionSettings(sc);
 
 		Controler controler = new Controler(sc);
-		sc.getConfig().controler().setOutputDirectory(outputDir + "/emissionToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/"));
+		String outputDirectory = outputDir + "/emissionToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
@@ -136,12 +150,48 @@ public class EquilEmissionExposureTest {
 			}
 		});
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+		
+		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
+		controler.getEvents().addHandler(personMoneyHandler);
 
 		controler.run();
 
+		//TODO dont know how to catch emission event during simulation.
+		EventsManager events = EventsUtils.createEventsManager();
+		EmissionEventsReader reader = new EmissionEventsReader(events);
+		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
+		events.addHandler(emissEventHandler);
+		int lastIt = sc.getConfig().controler().getLastIteration();
+		reader.parse(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+		
+		// first check for cold emission, which are generated only on departure link.
+		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {
+			if( ! ( e.getLinkId().equals(Id.createLinkId(12)) || e.getLinkId().equals(Id.createLinkId(45)) ) ) {
+				throw new RuntimeException("Cold emission event can occur only on departure link.");	
+			}
+		}
+		
+		// first coldEmission event is on departure link, thus compare money event and coldEmissionEvent
+		
+		double firstMoneyEventToll = personMoneyHandler.events.get(0).getAmount();
+
+		Map<ColdPollutant, Double> coldEmiss = emissEventHandler.coldEvents.get(0).getColdEmissions();
+		double totalColdEmissAmount = 0;
+		/*
+		 * departure time is 21600, so at this time. distance = 1.0km, parking duration = 12h, vehType="PASSENGER_CAR;petrol (4S);&gt;=2L;PC-P-Euro-0"
+		 * Thus, coldEmission levels => FC 22.12, HC 5.41, CO 99.97, NO2 -0.00122764240950346, NOx -0-03, PM 0, NMHC 5.12
+		 * Thus coldEmissionCost = 0 * 384500. / (1000. * 1000.) + 45.12 * 1700. / (1000. * 1000.) + -0.03 * 9600. / (1000. * 1000.) = 0.008416 
+		 */
+		
+		for (ColdPollutant cp :coldEmiss.keySet() ){
+			totalColdEmissAmount += EmissionCostFactors.getCostFactor(cp.toString()) * coldEmiss.get(cp);
+		}
+
+		Assert.assertEquals(totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
+		
 		// checks
 		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
-		Double scoreOfSelectedPlan;
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 
 		// check with the first leg
@@ -149,6 +199,7 @@ public class EquilEmissionExposureTest {
 		// Agent should take shorter route to pay lesser emission toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 39 (shorter) instead. ", route.getLinkIds().contains(Id.create("39", Link.class)));
 		
+		Double scoreOfSelectedPlan;
 		// check selected plan 
 		scoreOfSelectedPlan = selectedPlan.getScore();
 		for(PlanElement pe: selectedPlan.getPlanElements()){
@@ -234,6 +285,10 @@ public class EquilEmissionExposureTest {
 		});
 
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		
+		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
+		controler.getEvents().addHandler(personMoneyHandler);
+		
 		controler.run();
 
 		// checks
@@ -471,6 +526,43 @@ public class EquilEmissionExposureTest {
 				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
 				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
 			}
+		}
+	}
+	
+	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler  {
+
+		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
+		
+		@Override
+		public void reset(int iteration) {
+			events.clear();
+		}
+
+		@Override
+		public void handleEvent(PersonMoneyEvent event) {
+			events.add(event);
+		}
+	}
+	
+	private class MyEmissionEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+
+		List<WarmEmissionEvent> warmEvents = new ArrayList<WarmEmissionEvent>();
+		List<ColdEmissionEvent> coldEvents = new ArrayList<ColdEmissionEvent>();
+		
+		@Override
+		public void reset(int iteration) {
+			warmEvents.clear();
+			coldEvents.clear();
+		}
+
+		@Override
+		public void handleEvent(ColdEmissionEvent event) {
+			coldEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(WarmEmissionEvent event) {
+			warmEvents.add(event);
 		}
 	}
 }
