@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,6 +40,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -57,6 +59,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.internalization.EmissionCostModule;
@@ -76,6 +79,8 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 @RunWith(Parameterized.class)
 public class EquilEmissionExposureTest {
 
+	private static final Logger logger = Logger.getLogger(EquilEmissionExposureTest.class);
+
 	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/";
 	private String outputDir = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/output/";
 
@@ -91,17 +96,17 @@ public class EquilEmissionExposureTest {
 	private String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
 
 	private boolean isConsideringCO2Costs ;
-	
+
 	public EquilEmissionExposureTest (boolean isConsideringCO2Costs) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
 	}
-	
+
 	@Parameters
 	public static List<Object> considerCO2 () {
 		Object[] considerCO2 = new Object [] { true, false };
 		return Arrays.asList(considerCO2);
 	}
-	
+
 	@Test
 	public void emissionTollTest () {
 
@@ -111,18 +116,18 @@ public class EquilEmissionExposureTest {
 		createPassiveAgents(sc);
 
 		emissionSettings(sc);
-		
+
 		Controler controler = new Controler(sc);
 		sc.getConfig().controler().setOutputDirectory(outputDir + "/emissionToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/"));
-		
+
 		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
-		
+
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -130,57 +135,143 @@ public class EquilEmissionExposureTest {
 			}
 		});
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-		
+
 		controler.run();
+
+		// checks
+		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
+		Double scoreOfSelectedPlan;
+		Plan selectedPlan = activeAgent.getSelectedPlan();
+
+		// check selected plan 
+		scoreOfSelectedPlan = selectedPlan.getScore();
+		for(PlanElement pe: selectedPlan.getPlanElements()){
+			if(pe instanceof Leg){
+				Leg leg = (Leg)pe;
+				LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
+				if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
+					logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
+				}else{
+					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
+						logger.info("Selected route avoids node 9 as it is supposed to. " +
+								"It's score is " + selectedPlan.getScore());
+					}
+				}
+			}
+		}
+
+		// check not selected plans - score should be worse if link 39 is used
+		boolean plan9ex=false;
+		for(Plan p: activeAgent.getPlans()){			
+			if(p.isSelected()==false){
+				logger.info("This plan is not selected. It's score is " + p.getScore());
+				for(PlanElement pe: p.getPlanElements()){
+					if(pe instanceof Leg){
+						Leg leg = (Leg)pe;
+						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
+						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
+							plan9ex = true;
+							if(scoreOfSelectedPlan<p.getScore()){
+								logger.info("A plan with a route via node 9 should have a worse score.");
+							}
+						}
+					}
+				}
+			}
+		}
+		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 	}
 
 	@Test
 	public void exposureTollTest () {
-		
+
 		Scenario sc = createConfig();
 		createNetwork(sc);
 		createActiveAgents(sc);
 		createPassiveAgents(sc);
 
 		emissionSettings(sc);
-		
+
 		Controler controler = new Controler(sc);
 		sc.getConfig().controler().setOutputDirectory(outputDir + "/exposureToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/"));
-		
+
 		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
-		
+
 		Double xMin = 0.0;
 		Double xMax = 20000.0;
 		Double yMin = 0.0;
 		Double yMax = 12500.0;
-		
+
 		Integer noOfXCells = 32;
 		Integer noOfYCells = 20;
 
 		Integer noOfTimeBins =1;
 		Double timeBinSize = sc.getConfig().qsim().getEndTime() / noOfTimeBins;
-		
+
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		
+
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, links2xCells, links2yCells);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		
+
 		controler.addOverridingModule(new AbstractModule() {
-			
+
 			@Override
 			public void install() {
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
-		
+
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
 		controler.run();
+
+		// checks
+		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
+		Double scoreOfSelectedPlan;
+		Plan selectedPlan = activeAgent.getSelectedPlan();
+
+		// check selected plan 
+		scoreOfSelectedPlan = selectedPlan.getScore();
+		for(PlanElement pe: selectedPlan.getPlanElements()){
+			if(pe instanceof Leg){
+				Leg leg = (Leg)pe;
+				LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
+				if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
+					logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
+				}else{
+					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
+						logger.info("Selected route avoids node 9 as it is supposed to. " +
+								"It's score is " + selectedPlan.getScore());
+					}
+				}
+			}
+		}
+
+		// check not selected plans - score should be worse if link 39 is used
+		boolean plan9ex=false;
+		for(Plan p: activeAgent.getPlans()){			
+			if(p.isSelected()==false){
+				logger.info("This plan is not selected. It's score is " + p.getScore());
+				for(PlanElement pe: p.getPlanElements()){
+					if(pe instanceof Leg){
+						Leg leg = (Leg)pe;
+						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
+						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
+							plan9ex = true;
+							if(scoreOfSelectedPlan<p.getScore()){
+								logger.info("A plan with a route via node 9 should have a worse score.");
+							}
+						}
+					}
+				}
+			}
+		}
+		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 	}
 
 	private void emissionSettings(Scenario scenario){
@@ -203,7 +294,7 @@ public class EquilEmissionExposureTest {
 	private Scenario createConfig(){
 		Config config = ConfigUtils.createConfig();
 
-		config.strategy().setMaxAgentPlanMemorySize(2);
+		config.strategy().setMaxAgentPlanMemorySize(11);
 
 		ControlerConfigGroup ccg = config.controler();
 		ccg.setWriteEventsInterval(2);
@@ -343,18 +434,19 @@ public class EquilEmissionExposureTest {
 		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(12500.0, 7500.0));
 
 
-		network.createAndAddLink(Id.create("12", Link.class), node1, node2, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("23", Link.class), node2, node3, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("45", Link.class), node4, node5, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("56", Link.class), node5, node6, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("67", Link.class), node6, node7, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("71", Link.class), node7, node1, 1000, 60.00, 3600, 1, null, "22");
+		//freeSpeed is 100km/h for roadType 22.
+		network.createAndAddLink(Id.create("12", Link.class), node1, node2, 1000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("23", Link.class), node2, node3, 2000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("45", Link.class), node4, node5, 2000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("56", Link.class), node5, node6, 1000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("67", Link.class), node6, node7, 1000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("71", Link.class), node7, node1, 1000, 100.00/3.6, 3600, 1, null, "22");
 
 		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		network.createAndAddLink(Id.create("38", Link.class), node3, node8, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("39", Link.class), node3, node9, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("84", Link.class), node8, node4, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("94", Link.class), node9, node4, 4999, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("38", Link.class), node3, node8, 5000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("39", Link.class), node3, node9, 5000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("84", Link.class), node8, node4, 5000, 100.00/3.6, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("94", Link.class), node9, node4, 4999, 100.00/3.6, 3600, 1, null, "22");
 
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
