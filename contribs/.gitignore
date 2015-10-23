@@ -20,7 +20,11 @@ accessibility/test/output/
 matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
 .gitignore
-.gitignore
-
-
+#
+#contrib/signals
+signals/**/output
+signals/**/*.aux
+signals/**/*.log
+signals/**/*.toc
+signals/**/*.out
 
