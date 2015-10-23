@@ -21,6 +21,7 @@ package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
+import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
@@ -49,9 +50,9 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 	
-		String output = "/home/johannes/gsv/germany-scenario/mid2008/analysis/pop/";
+		String output = "/home/johannes/gsv/matrix2014/mid-fusion/";
 
-		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
+		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
 		
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
@@ -72,7 +73,8 @@ public class Analyzer {
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.setOutputDirectory(output);
 //		task.addTask(new AgeIncomeCorrelation());
-		task.addTask(new ActTypeDistanceTask());
+//		task.addTask(new ActTypeDistanceTask());
+		task.addTask(new LegGeoDistanceTask("car"));
 		task.setOutputDirectory(output);
 		
 		ProxyAnalyzer.analyze(persons, task);

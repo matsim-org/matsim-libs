@@ -28,6 +28,7 @@ import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.processing.SetActivityTypeTask;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.processing.ValidateNoPlans;
+import playground.johannes.synpop.source.mid2008.processing.AdjustJourneyWeight;
 import playground.johannes.synpop.source.mid2008.processing.ReturnEpisodeTask;
 import playground.johannes.synpop.source.mid2008.processing.SetFirstActivityTypeTask;
 import playground.johannes.synpop.source.mid2008.processing.VacationsTypeTask;
@@ -46,10 +47,6 @@ public class JourneysValidator {
         Factory factory = new PlainFactory();
         Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], factory);
 
-        //TaskRunner.run(new SortLegsTask(MiDKeys.LEG_INDEX, new SortLegsTask.IntComparator()), persons);
-        //TaskRunner.validateEpisodes(new ValidateMissingLegTimes(), persons);
-        //TaskRunner.validateEpisodes(new ValidateNegativeLegDuration(), persons);
-        //TaskRunner.validateEpisodes(new ValidateOverlappingLegs(), persons);
         TaskRunner.validatePersons(new ValidateNoPlans(), persons);
 
         logger.info("Setting activity types...");
@@ -60,16 +57,8 @@ public class JourneysValidator {
         TaskRunner.run(new VacationsTypeTask(), persons);
         logger.info("Adding return episodes...");
         TaskRunner.run(new ReturnEpisodeTask(), persons);
-
-//        LoggerUtils.disableNewLine();
-//        logger.info("Resolving round trips...");
-//        int cnt = countActivities(persons);
-//        TaskRunner.run(new ResolveRoundTripsTask(factory), persons);
-//        System.out.println(String.format(" inserted %s activities.", countActivities(persons) - cnt));
-//        LoggerUtils.enableNewLine();
-
-//        logger.info("Setting activity times...");
-//        TaskRunner.run(new SetActivityTimesTask(), persons);
+        logger.info("Adjusting weights...");
+        TaskRunner.run(new AdjustJourneyWeight(), persons);
 
         logger.info("Writing validated population...");
         PopulationIO.writeToXML(args[1], persons);
