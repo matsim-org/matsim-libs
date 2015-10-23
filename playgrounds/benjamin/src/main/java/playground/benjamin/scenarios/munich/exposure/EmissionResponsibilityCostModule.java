@@ -83,7 +83,7 @@ public class EmissionResponsibilityCostModule {
 		this.responsibilityGridTools = rgt;
 	}
 
-	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id linkId, double time) {
+	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id<Link> linkId, double time) {
 		double warmEmissionCosts = 0.0;
 		
 		for(WarmPollutant wp : warmEmissions.keySet()){
@@ -123,7 +123,7 @@ public class EmissionResponsibilityCostModule {
 		return this.emissionCostFactor * warmEmissionCosts * relativeDensity;
 	}
 	
-	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions, Id linkId, double time) {
+	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions, Id<Link> linkId, double time) {
 		double coldEmissionCosts = 0.0;
 		
 		for(ColdPollutant cp : coldEmissions.keySet()){
