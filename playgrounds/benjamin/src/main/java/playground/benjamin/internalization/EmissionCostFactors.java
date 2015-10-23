@@ -34,6 +34,15 @@ public enum EmissionCostFactors {
 	public double getCostFactor(){
 		return costFactors;
 	}
+	
+	public static double getCostFactor ( String pollutant ) {
+		double cf = 0.;
+		for (EmissionCostFactors ecf : EmissionCostFactors.values() ){
+			if ( ecf.toString().equalsIgnoreCase(pollutant) ) return ecf.getCostFactor();
+		}
+		return cf;
+	}
+	
 	private EmissionCostFactors(double costFactor){
 		this.costFactors = costFactor;
 	}
