@@ -17,7 +17,7 @@ public class ResponsibilityGridTools {
 	
 	Double timeBinSize;
 	int noOfTimeBins;
-	Map<Double, Map<Id, Double>> timebin2link2factor;
+	Map<Double, Map<Id<Link>, Double>> timebin2link2factor;
  
 	private Map<Id<Link>, Integer> links2xCells;
 	private Map<Id<Link>, Integer> links2yCells;
@@ -44,10 +44,10 @@ public class ResponsibilityGridTools {
  
 	public void resetAndcaluculateRelativeDurationFactors(HashMap<Double, Double[][]> duration) {
 		
-		timebin2link2factor = new HashMap<Double, Map<Id, Double>>();
+		timebin2link2factor = new HashMap<Double, Map<Id<Link>, Double>>();
 		
 		// each time bin - generate new map
-		for(Double timeBin : duration.keySet()){timebin2link2factor.put(timeBin, new HashMap<Id, Double>());
+		for(Double timeBin : duration.keySet()){timebin2link2factor.put(timeBin, new HashMap<Id<Link>, Double>());
 		// calculate total durations for each time bin
 			Double sumOfCurrentTimeBin = 0.0;
 			Double [][] currentDurations = duration.get(timeBin);
@@ -59,7 +59,7 @@ public class ResponsibilityGridTools {
 			// calculate average for each time bin
 			Double averageOfCurrentTimeBin = sumOfCurrentTimeBin/currentDurations.length/currentDurations[0].length;
 			// calculate factor for each link for current time bin
-			for(Id linkId: links2xCells.keySet()){
+			for(Id<Link> linkId: links2xCells.keySet()){
 				if (links2yCells.containsKey(linkId)) { // only if in research are
 					
 					Double relativeFactorForCurrentLink = getRelativeFactorForCurrentLink(
@@ -70,7 +70,7 @@ public class ResponsibilityGridTools {
 		}		
 	}
 
-	private Double getRelativeFactorForCurrentLink(Double averageOfCurrentTimeBin, Double[][] currentDurations, Id linkId) {
+	private Double getRelativeFactorForCurrentLink(Double averageOfCurrentTimeBin, Double[][] currentDurations, Id<Link> linkId) {
 		
 		Double relevantDuration = new Double(0.0);
 		if(links2xCells.get(linkId)!=null && links2yCells.get(linkId)!=null){
@@ -130,9 +130,9 @@ public class ResponsibilityGridTools {
 			Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells, int noOfXCells, int noOfYCells) {
 		this.timeBinSize = timeBinSize;
 		this.noOfTimeBins = noOfTimeBins;
-		this.timebin2link2factor = new HashMap<Double, Map<Id,Double>>();
+		this.timebin2link2factor = new HashMap<Double, Map<Id<Link>,Double>>();
 		for(int i=1; i<noOfTimeBins+1; i++){
-			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id, Double>());
+			timebin2link2factor.put((i*this.timeBinSize), new HashMap<Id<Link>, Double>());
 		}
 		this.links2xCells = links2xCells;
 		this.links2yCells = links2yCells;
