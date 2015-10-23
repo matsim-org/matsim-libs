@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -143,6 +144,11 @@ public class EquilEmissionExposureTest {
 		Double scoreOfSelectedPlan;
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 
+		// check with the first leg
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		// Agent should take shorter route to pay lesser emission toll
+		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 39 (shorter) instead. ", route.getLinkIds().contains(Id.create("39", Link.class)));
+		
 		// check selected plan 
 		scoreOfSelectedPlan = selectedPlan.getScore();
 		for(PlanElement pe: selectedPlan.getPlanElements()){
@@ -234,6 +240,11 @@ public class EquilEmissionExposureTest {
 		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
 		Double scoreOfSelectedPlan;
 		Plan selectedPlan = activeAgent.getSelectedPlan();
+
+		// check with the first leg
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		// Agent should take longer route to avoid exposure toll
+		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
 
 		// check selected plan 
 		scoreOfSelectedPlan = selectedPlan.getScore();
@@ -459,7 +470,6 @@ public class EquilEmissionExposureTest {
 				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
 				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
 				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
-
 			}
 		}
 	}
