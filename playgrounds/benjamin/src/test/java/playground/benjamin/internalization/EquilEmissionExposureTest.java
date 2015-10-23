@@ -19,6 +19,7 @@
 
 package playground.benjamin.internalization;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -74,10 +76,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.benjamin.scenarios.munich.exposure.GridTools;
@@ -175,7 +173,7 @@ public class EquilEmissionExposureTest {
 		double firstMoneyEventToll = personMoneyHandler.events.get(0).getAmount();
 
 		Map<ColdPollutant, Double> coldEmiss = emissEventHandler.coldEvents.get(0).getColdEmissions();
-		double totalColdEmissAmount = 0;
+		double totalColdEmissAmount = 0.;
 		/*
 		 * departure time is 21600, so at this time. distance = 1.0km, parking duration = 12h, vehType="PASSENGER_CAR;petrol (4S);&gt;=2L;PC-P-Euro-0"
 		 * Thus, coldEmission levels => FC 22.12, HC 5.41, CO 99.97, NO2 -0.00122764240950346, NOx -0-03, PM 0, NMHC 5.12
@@ -186,8 +184,41 @@ public class EquilEmissionExposureTest {
 			totalColdEmissAmount += EmissionCostFactors.getCostFactor(cp.toString()) * coldEmiss.get(cp);
 		}
 
-		Assert.assertEquals(totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from manual calculation.",totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from money event.",firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
+		
+		/*
+		 * There are two routes --> 12-23-38-84-45 and 12-23-39-94-45. 12 is departure link --> no warmEmissionevent. 
+		 * Thus, in both routes, 2nd warmEmission event is on the link with length 5000m. On this link, only free flow warm emission is thrown.
+		 * warmEmission --> linkLength = 5km, FC 77.12, HC 0.08, CO 1.0700000000000001, NO2 0.01, NOX 0.36, CO2(total) 241.78, PM 0.00503000011667609, NMHC 0.07, SO2 0.00123396399430931
+		 * Thus if co2Costs is not considered --> warmEmissCost = 0.36 * 5 * 9600. / (1000. * 1000.) +  0.07 * 5 * 1700. / (1000. * 1000.) + 0.00123396399430931* 5 * 11000. / (1000. * 1000.)
+		 *  +   0.00503000011667609 * 5 * 384500. / (1000. * 1000.) = 0.027613043
+		 *  if co2costs are considerd, then warmEmissCost = 0.01787566 +  241.78 * 5 * 70. / (1000. * 1000.) = 0.112236043
+		 */
+		Map<WarmPollutant, Double> warmEmiss = emissEventHandler.warmEvents.get(2).getWarmEmissions();
+		double warmEmissTime = emissEventHandler.warmEvents.get(2).getTime();
+		double totalWarmEmissAmount = 0.;
+		for ( WarmPollutant wp : warmEmiss.keySet() ) {
+			if( wp.toString().equalsIgnoreCase(WarmPollutant.CO2_TOTAL.toString()) && !isConsideringCO2Costs ) {
+				//nothing to do 
+			} else {
+				totalWarmEmissAmount += EmissionCostFactors.getCostFactor(wp.toString()) * warmEmiss.get(wp);	
+			}
+		}
+		double tollFromMoneyEvent = 0.; 
+		for (PersonMoneyEvent e : personMoneyHandler.events) {
+			// Money event at the time of 2nd warm emission event.
+			if ( e.getTime() == warmEmissTime ) tollFromMoneyEvent = e.getAmount();
+		}
+		
+		DecimalFormat df = new DecimalFormat("#.#####");
+		if ( isConsideringCO2Costs ) {
+			Assert.assertEquals( "Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.112236043 ), df.format( totalWarmEmissAmount ) );
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+		} else {
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.027613043 ), df.format( totalWarmEmissAmount ) );
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+		}
 	}
 
 	@Test
@@ -479,5 +510,3 @@ public class EquilEmissionExposureTest {
 		}
 	}
 }
-
-
