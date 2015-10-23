@@ -50,7 +50,7 @@ import java.util.Collections;
 /**
  * @author thibautd
  */
-public class PrismicTripChoiceSetConversion {
+public class RunPrismicTripChoiceSetConversion {
 	public static void main(final String[] args) {
 		final PrismicConversionConfigGroup group = new PrismicConversionConfigGroup();
 		final Config config = ConfigUtils.loadConfig(args[0], group);
