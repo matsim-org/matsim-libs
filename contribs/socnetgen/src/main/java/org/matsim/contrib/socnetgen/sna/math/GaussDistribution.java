@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LogNormalDistribution.java
+ * GaussDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.statistics;
+package org.matsim.contrib.socnetgen.sna.math;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
@@ -26,23 +26,23 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
  * @author illenberger
  *
  */
-public class LogNormalDistribution implements UnivariateRealFunction {
+public class GaussDistribution implements UnivariateRealFunction {
 
 	private final double sigma;
 	
 	private final double mu;
 	
-	private final double intercept;
+	private final double scale;
 	
-	public LogNormalDistribution(double sigma, double mu, double intercept) {
+	public GaussDistribution(double sigma, double mu, double scale) {
 		this.sigma = sigma;
 		this.mu = mu;
-		this.intercept = intercept;
+		this.scale = scale;
 	}
 	
 	@Override
 	public double value(double x) throws FunctionEvaluationException {
-		return intercept / (Math.sqrt(2 * Math.PI) * sigma * x) * Math.exp(- Math.pow(Math.log(x) - mu, 2)/(2 * Math.pow(sigma, 2)));
+		return scale/(sigma * Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * Math.pow((x - mu)/sigma, 2.0));
 	}
 
 }

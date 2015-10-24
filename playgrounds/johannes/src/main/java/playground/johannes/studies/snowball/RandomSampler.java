@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim;
+package playground.johannes.studies.snowball;
 
 import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;

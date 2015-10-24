@@ -23,6 +23,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -30,7 +31,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.Map;

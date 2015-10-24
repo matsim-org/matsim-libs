@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainFactory;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExponentialDistribution.java
+ * PowerLawDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.statistics;
+package org.matsim.contrib.socnetgen.sna.math;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
@@ -26,21 +26,19 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
  * @author illenberger
  *
  */
-public class ExponentialDistribution implements UnivariateRealFunction {
+public class PowerLawDistribution implements UnivariateRealFunction {
 
-
-	private final double lambda;
+	private final double exponent;
 	
-	private final double intercept;
+	private final double factor;
 	
-	public ExponentialDistribution(double lambda, double intercept) {
-		this.lambda = lambda;
-		this.intercept = intercept;
+	public PowerLawDistribution(double exponent, double factor) {
+		this.exponent = exponent;
+		this.factor = factor;
 	}
-	
 	@Override
-	public double value(double arg0) throws FunctionEvaluationException {
-		return intercept * Math.exp(lambda * arg0);
+	public double value(double x) throws FunctionEvaluationException {
+		return factor * Math.pow(x, exponent);
 	}
 
 }

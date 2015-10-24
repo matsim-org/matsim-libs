@@ -42,7 +42,7 @@ import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphMLWriter;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialSparseVertexPool;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.SpatialAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.generators.ErgmLnDistance;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;

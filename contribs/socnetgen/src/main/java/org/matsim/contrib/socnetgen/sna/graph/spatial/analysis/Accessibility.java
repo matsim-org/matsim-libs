@@ -23,12 +23,12 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.CollectionUtils;
 
 import java.util.List;
 import java.util.Set;

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;

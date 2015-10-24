@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball.postprocess;
 
 import gnu.trove.TDoubleIntHashMap;
 import org.apache.log4j.Logger;
@@ -58,11 +58,6 @@ public class TableAverage {
 		 */
 		logger.info("Getting number of runs and dumps...");
 		int n_runs = rootDir.listFiles(dirFilter).length;
-//		File[] runDirs = rootDir.listFiles(dirFilter);
-//		for(File runDir : runDirs) {
-//			n_runs++;
-//		
-//		}
 		/*
 		 * Load data
 		 */
@@ -119,9 +114,7 @@ public class TableAverage {
 						}
 					}
 				}
-//				if(avrRowIdx == 0 && avrColIdx == 0)
-//					System.out.println();
-				
+
 				avrTable.values[avrRowIdx][avrColIdx] = sum/(double)cnt;
 			}
 		}

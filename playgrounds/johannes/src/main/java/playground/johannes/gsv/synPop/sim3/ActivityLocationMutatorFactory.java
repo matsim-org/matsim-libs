@@ -1,6 +1,6 @@
 package playground.johannes.gsv.synPop.sim3;
 
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.gis.DataPool;
 
 import java.util.Random;

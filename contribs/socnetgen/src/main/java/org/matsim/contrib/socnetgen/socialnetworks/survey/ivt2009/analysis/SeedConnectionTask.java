@@ -23,6 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
@@ -32,7 +33,6 @@ import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

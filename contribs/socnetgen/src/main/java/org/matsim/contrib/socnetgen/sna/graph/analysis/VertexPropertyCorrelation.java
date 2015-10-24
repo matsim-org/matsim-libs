@@ -21,11 +21,11 @@ package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
 import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.util.HashSet;
 import java.util.Set;

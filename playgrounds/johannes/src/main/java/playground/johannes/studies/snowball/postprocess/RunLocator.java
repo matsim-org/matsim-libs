@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball.postprocess;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
@@ -132,14 +132,12 @@ public abstract class RunLocator<T> {
 		 * Average distributions.
 		 */
 		logger.info("Averaging distributions...");
-//		SortedSet<Double> bins = new TreeSet<Double>();
 		int notFound = 0;
 		Map<String, TDoubleDoubleHashMap> avrTable = new HashMap<String, TDoubleDoubleHashMap>();
 		for(String dumpKey : dataTable.keySet()) {
 			TDoubleDoubleHashMap[] distributions = dataTable.get(dumpKey);
 			TDoubleDoubleHashMap distrAvr = new TDoubleDoubleHashMap();
 			TDoubleIntHashMap counts = new TDoubleIntHashMap();
-//			int count = 0;
 			for(int i = 0; i < distributions.length; i++) {
 				TDoubleDoubleHashMap distr = distributions[i];
 				if(distr == null) {
@@ -150,9 +148,7 @@ public abstract class RunLocator<T> {
 						it.advance();
 						distrAvr.adjustOrPutValue(it.key(), it.value(), it.value());
 						counts.adjustOrPutValue(it.key(), 1, 1);
-//						bins.add(it.key());
 					}
-//					count++;
 				}
 			}
 			

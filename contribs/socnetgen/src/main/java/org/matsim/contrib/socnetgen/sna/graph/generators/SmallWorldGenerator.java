@@ -20,9 +20,9 @@
 package org.matsim.contrib.socnetgen.sna.graph.generators;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.contrib.socnetgen.sna.graph.*;
 import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 
 import java.io.IOException;
 import java.util.*;

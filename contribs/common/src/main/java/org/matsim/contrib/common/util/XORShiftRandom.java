@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GaussDistribution.java
+ * XORShiftRandom.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.statistics;
+package org.matsim.contrib.common.util;
 
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.analysis.UnivariateRealFunction;
+import java.util.Random;
 
 /**
- * @author illenberger
+ * A random number generator according to <a href="http://www.javamex.com/tutorials/random_numbers/xorshift.shtml#.ViwMCoTAr4w">http://www.javamex.com/tutorials/random_numbers/xorshift.shtml#.ViwMCoTAr4w</a>.
  *
+ * @author illenberger
  */
-public class GaussDistribution implements UnivariateRealFunction {
+public class XORShiftRandom extends Random {
 
-	private final double sigma;
-	
-	private final double mu;
-	
-	private final double scale;
-	
-	public GaussDistribution(double sigma, double mu, double scale) {
-		this.sigma = sigma;
-		this.mu = mu;
-		this.scale = scale;
-	}
-	
-	@Override
-	public double value(double x) throws FunctionEvaluationException {
-		return scale/(sigma * Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * Math.pow((x - mu)/sigma, 2.0));
-	}
+    private static final long serialVersionUID = 1620841289225382129L;
 
+    private long seed;
+
+    public XORShiftRandom() {
+        super();
+    }
+
+    public XORShiftRandom(long seed) {
+        super(seed);
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        if (seed == 0)
+            throw new IllegalArgumentException("Zero is not allowed as seed number.");
+        else
+            this.seed = seed;
+
+        super.setSeed(seed);
+    }
+
+    protected int next(int nbits) {
+        long x = this.seed;
+        x ^= (x << 21);
+        x ^= (x >>> 35);
+        x ^= (x << 4);
+        this.seed = x;
+        x &= ((1L << nbits) - 1);
+        return (int) x;
+    }
 }

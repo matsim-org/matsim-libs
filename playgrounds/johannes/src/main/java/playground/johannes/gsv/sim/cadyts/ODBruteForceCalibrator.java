@@ -32,7 +32,7 @@ import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

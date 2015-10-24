@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XORShiftRandom.java
+ * LinearDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.utils;
+package org.matsim.contrib.socnetgen.sna.math;
 
-import java.util.Random;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class XORShiftRandom extends Random {
+public class LinearDistribution implements UnivariateRealFunction {
 
-	private static final long serialVersionUID = 1620841289225382129L;
+	private final double slope;
 	
-	private long seed;
-
-	public XORShiftRandom() {
-		super();
+	private final double intercept;
+	
+	public LinearDistribution(double slope, double intercept) {
+		this.slope = slope;
+		this.intercept = intercept;
 	}
-
-	public XORShiftRandom(long seed) {
-		super(seed);
-	}
-
+	
 	@Override
-	public void setSeed(long seed) {
-		if (seed == 0)
-			throw new IllegalArgumentException("Zero is not allowd as seed number.");
-		else
-			this.seed = seed;
-
-		super.setSeed(seed);
+	public double value(double x) throws FunctionEvaluationException {
+		return intercept + slope * x;
 	}
 
-	protected int next(int nbits) {
-		long x = this.seed;
-		x ^= (x << 21);
-		x ^= (x >>> 35);
-		x ^= (x << 4);
-		this.seed = x;
-		x &= ((1L << nbits) - 1);
-		return (int) x;
-	}
 }

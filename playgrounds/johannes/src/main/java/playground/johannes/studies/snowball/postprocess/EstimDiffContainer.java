@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PercentileTest.java
+ * EstimDiffContainer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball.postprocess;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 
 /**
  * @author illenberger
  *
  */
-public class PercentileTest {
+public class EstimDiffContainer {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
-		for(int i = 0; i < 20; i++) {
-			stats.addValue(i);
-		}
-		
-		System.out.println(stats.getPercentile(10));
-
-	}
-
+	protected TIntIntHashMap kSum = new TIntIntHashMap();
+	
+	protected TIntDoubleHashMap pSum = new TIntDoubleHashMap();
+	
+	protected TIntIntHashMap kCount = new TIntIntHashMap();
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HTEstimator.java
+ * HorwitzThompsonEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.deprecated;
+package org.matsim.contrib.socnetgen.sna.math;
 
+import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
+import org.matsim.contrib.common.stats.UnivariatePiStatistic;
 
 /**
  * @author illenberger
- * @deprecated
+ *
  */
-public class HTEstimator implements PopulationEstimator {
+public class HorwitzThompsonEstimator implements UnivariatePiStatistic {
 
-	private final int N;
+	private final double N;
 	
-	public HTEstimator(int N) {
+	private double[] piValues;
+
+	public HorwitzThompsonEstimator(double N) {
 		this.N = N;
 	}
 	
 	@Override
-	public double mean(double[] values, double[] weights) {
+	public void setPiValues(double[] piValues) {
+		this.piValues = piValues;
+	}
+
+	@Override
+	public UnivariateStatistic copy() {
+		HorwitzThompsonEstimator ht = new HorwitzThompsonEstimator(N);
+		ht.setPiValues(piValues);
+		return ht;
+	}
+
+	@Override
+	public double evaluate(double[] values) {
+		return evaluate(values, 0, values.length);
+	}
+
+	@Override
+	public double evaluate(double[] values, int begin, int length) {
 		double sum = 0;
-		for(int i = 0; i < values.length; i++) {
-			sum += values[i] * weights[i];
+		for(int i = begin; i < (begin + length); i++) {
+			sum += values[i]/piValues[i];
 		}
-		return sum/(double)N;
+		
+		return sum/N;
 	}
 
 }

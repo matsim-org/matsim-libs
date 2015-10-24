@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.CollectionUtils;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball.postprocess;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntDoubleHashMap;

@@ -25,7 +25,7 @@ package playground.johannes.gsv.demand.tasks;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.demand.PopulationTask;
 

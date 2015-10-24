@@ -25,12 +25,12 @@ import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.util.Set;
 

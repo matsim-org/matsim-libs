@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BiasCalc.java
+ * LogNormalDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package org.matsim.contrib.socnetgen.sna.math;
 
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 
 /**
  * @author illenberger
  *
  */
-public class BiasCalc {
+public class LogNormalDistribution implements UnivariateRealFunction {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		final int MAX_ITERATION = 20;
-		String basedir = "";
-		String nSamplesFile = "";
-		/*
-		 * read n_samples file
-		 */
-		TIntIntHashMap n_samples = new TIntIntHashMap();
-		BufferedReader reader = new BufferedReader(new FileReader(nSamplesFile));
-		
-		String line = reader.readLine();
-		while((line = reader.readLine()) != null) {
-			String[] tokens = line.split("\t");
-			int it = Integer.parseInt(tokens[0]);
-			int n = Integer.parseInt(tokens[1]);
-			n_samples.put(it, n);
-		}
-		/*
-		 * read p_obs files
-		 */
-		TIntDoubleHashMap bias = new TIntDoubleHashMap();
-		for(int i = 0; i < MAX_ITERATION; i++) {
-			reader = new BufferedReader(new FileReader(String.format("%1$s/%2$s.pobs.txt", basedir, i)));
-			line = reader.readLine();
-			while((line = reader.readLine()) != null) {
-				
-			}
-		}
+	private final double sigma;
+	
+	private final double mu;
+	
+	private final double intercept;
+	
+	public LogNormalDistribution(double sigma, double mu, double intercept) {
+		this.sigma = sigma;
+		this.mu = mu;
+		this.intercept = intercept;
+	}
+	
+	@Override
+	public double value(double x) throws FunctionEvaluationException {
+		return intercept / (Math.sqrt(2 * Math.PI) * sigma * x) * Math.exp(- Math.pow(Math.log(x) - mu, 2)/(2 * Math.pow(sigma, 2)));
 	}
 
 }

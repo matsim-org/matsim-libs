@@ -33,7 +33,6 @@ import org.matsim.contrib.common.stats.*;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledVertexDecorator;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;

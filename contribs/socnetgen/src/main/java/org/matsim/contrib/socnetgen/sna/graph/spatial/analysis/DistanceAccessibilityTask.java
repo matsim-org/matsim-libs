@@ -25,6 +25,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
@@ -33,7 +34,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.Map;

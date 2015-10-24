@@ -17,21 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.postprocess;
+package playground.johannes.studies.snowball.postprocess;
 
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author illenberger
  *
  */
-public class Merge {
+public class RMSE {
 
 	/**
 	 * @param args
@@ -50,6 +48,8 @@ public class Merge {
 		
 		String output = args[7];
 		
+		final double mean = 6;
+		
 		TIntObjectHashMap<TIntDoubleHashMap> table = new TIntObjectHashMap<TIntDoubleHashMap>();
 		SortedSet<Integer> dumpKeys = new TreeSet<Integer>();
 		
@@ -58,23 +58,44 @@ public class Merge {
 			
 			BufferedReader reader;
 			if(constParamKey.equalsIgnoreCase("alpha"))
-				reader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, dumpKey, constParam, property)));
+				reader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.txt", rootDir, dumpKey, constParam, property)));
 			else if(constParamKey.equalsIgnoreCase("seed"))
-				reader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.avr.txt", rootDir, constParam, dumpKey, property)));
+				reader = new BufferedReader(new FileReader(String.format("%1$s/seed.%2$s/alpha.%3$s/%4$s.txt", rootDir, constParam, dumpKey, property)));
 			else
 				throw new IllegalArgumentException(String.format("Constant parameter %1$s unknown.", constParamKey));
 			
+			String header = reader.readLine();
+			String keys[] = header.split("\t");
+			int cols = keys.length;
 			String line;
-			line = reader.readLine();
+			List<double[]> matrix = new LinkedList<double[]>();
 			while((line = reader.readLine()) != null) {
-				String tokens[] = line.split("\t");
-				int key = (int) Double.parseDouble(tokens[0]);
-				double val = Double.parseDouble(tokens[1]);
+				double[] vals = new double[cols];
+				matrix.add(vals);
 				
-				row.put(key, val);
-				dumpKeys.add(key);
+				String tokens[] = line.split("\t");
+				
+				for(int i = 0; i < cols; i++)
+					vals[i] = Double.parseDouble(tokens[i]);
+
 			}
-			reader.close();
+			
+			for(int i = 0; i < cols; i++) {
+				double sum = 0;
+				int cnt = 0;
+				for(double[] vals : matrix) {
+					double val = vals[i];
+					if(!Double.isNaN(val)) {
+						sum += Math.pow(val-mean, 2);
+						cnt++;
+					}
+				}
+				double rmse = Math.sqrt(sum/(double)cnt);
+				int key = Integer.parseInt(keys[i]);
+				row.put(key, rmse);
+				dumpKeys.add(key);
+				
+			}
 			table.put(dumpKey, row);
 		}
 

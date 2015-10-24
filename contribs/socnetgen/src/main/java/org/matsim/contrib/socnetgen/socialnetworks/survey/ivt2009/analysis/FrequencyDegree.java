@@ -23,13 +23,13 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

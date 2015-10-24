@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.data.FacilityZoneValidator;

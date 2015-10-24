@@ -38,7 +38,6 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLWriter;
 import org.matsim.contrib.socnetgen.sna.snowball.spatial.SpatialSampledGraphProjectionBuilder;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;

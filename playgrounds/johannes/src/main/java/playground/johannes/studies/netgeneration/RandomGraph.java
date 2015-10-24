@@ -27,7 +27,7 @@ import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.graph.generators.RandomGraphGenerator;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphMLWriter;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialSparseVertexPool;
-import org.matsim.contrib.socnetgen.socialnetworks.statistics.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;

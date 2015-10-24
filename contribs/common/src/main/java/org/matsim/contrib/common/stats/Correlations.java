@@ -21,17 +21,13 @@
 /**
  * 
  */
-package org.matsim.contrib.socnetgen.socialnetworks.statistics;
+package org.matsim.contrib.common.stats;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleIntHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.DummyDiscretizer;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.StatsWriter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -164,7 +160,7 @@ public class Correlations {
 	 * @deprecated
 	 */
 	public static void writeToFile(TDoubleDoubleHashMap values, String filename, String xLabel, String yLabel)
-			throws FileNotFoundException, IOException {
+			throws IOException {
 		StatsWriter.writeHistogram(values, xLabel, yLabel, filename);
 	}
 
