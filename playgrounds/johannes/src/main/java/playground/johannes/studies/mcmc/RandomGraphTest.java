@@ -24,8 +24,8 @@ import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.generators.RandomGraphGenerator;
-import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.generators.RandomGraphGenerator;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.LogNormalDistribution;
 
 /**
  * @author illenberger

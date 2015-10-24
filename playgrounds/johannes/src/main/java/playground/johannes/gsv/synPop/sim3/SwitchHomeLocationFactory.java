@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 
 import java.util.Random;
 

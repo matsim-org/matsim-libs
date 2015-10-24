@@ -31,12 +31,12 @@ import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.matrices.MatrixOperations;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.*;

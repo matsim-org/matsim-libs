@@ -21,11 +21,11 @@ package playground.johannes.coopsim.services;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.router.util.TravelTime;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;

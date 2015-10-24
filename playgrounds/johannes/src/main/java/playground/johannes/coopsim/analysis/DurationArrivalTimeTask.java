@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.HashSet;

@@ -41,8 +41,8 @@ import org.matsim.contrib.socnetgen.sna.snowball.analysis.SimplePiEstimator;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
 import org.matsim.core.config.Config;
-import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

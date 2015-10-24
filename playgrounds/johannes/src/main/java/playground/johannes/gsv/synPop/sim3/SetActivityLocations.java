@@ -20,13 +20,13 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistFunction;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;

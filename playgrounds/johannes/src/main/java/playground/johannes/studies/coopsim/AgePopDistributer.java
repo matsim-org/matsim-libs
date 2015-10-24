@@ -23,14 +23,14 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Age;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLWriter;
 import org.matsim.core.population.PersonUtils;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.social.analysis.Age;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLWriter;
 
 import java.io.IOException;
 

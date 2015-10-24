@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.socialnetworks.utils.CollectionUtils;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.CollectionUtils;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;

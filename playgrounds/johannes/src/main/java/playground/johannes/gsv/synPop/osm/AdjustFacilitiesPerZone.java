@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,8 +39,6 @@ import org.matsim.facilities.*;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import playground.johannes.gsv.synPop.gis.KreisOsmCompare;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.io.IOException;
 import java.util.*;

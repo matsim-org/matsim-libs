@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
 
 import java.io.IOException;
 

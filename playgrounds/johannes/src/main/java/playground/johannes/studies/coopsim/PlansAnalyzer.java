@@ -22,6 +22,8 @@ package playground.johannes.studies.coopsim;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,8 +39,6 @@ import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 import java.util.HashSet;
 import java.util.Set;

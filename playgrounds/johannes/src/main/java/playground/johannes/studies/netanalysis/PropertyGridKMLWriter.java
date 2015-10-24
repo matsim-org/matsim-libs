@@ -21,11 +21,11 @@ package playground.johannes.studies.netanalysis;
 
 
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
-import playground.johannes.socialnetworks.graph.social.analysis.Age;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.VertexPropertyGrid;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerKMLWriter;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Age;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.VertexPropertyGrid;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 import java.io.IOException;
 

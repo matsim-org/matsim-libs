@@ -24,7 +24,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

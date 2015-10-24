@@ -20,12 +20,12 @@
 package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;

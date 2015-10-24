@@ -30,13 +30,13 @@ import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListenerComposite;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.IterationTask;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.SeedAPLTask;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WaveSizeTask;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.ConnectionSampleAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
-import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
-import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
-import playground.johannes.socialnetworks.snowball2.sim.ConnectionSampleAnalyzer;
 
 import java.util.*;
 

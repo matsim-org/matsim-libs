@@ -22,13 +22,13 @@ package playground.johannes.coopsim.services;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.coopsim.eval.Evaluator;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.util.*;
 

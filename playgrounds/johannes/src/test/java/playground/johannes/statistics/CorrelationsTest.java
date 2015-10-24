@@ -25,7 +25,7 @@ package playground.johannes.statistics;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import junit.framework.TestCase;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 /**
  * @author illenberger

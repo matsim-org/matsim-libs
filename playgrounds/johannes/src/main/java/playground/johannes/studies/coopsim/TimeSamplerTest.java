@@ -26,9 +26,9 @@ import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.GaussDistribution;
-import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.GaussDistribution;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.LogNormalDistribution;
 
 import java.io.IOException;
 import java.util.Random;

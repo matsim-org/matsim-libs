@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -42,7 +43,6 @@ import playground.johannes.gsv.demand.tasks.PlanModeCarPT;
 import playground.johannes.gsv.demand.tasks.PlanNetworkConnect;
 import playground.johannes.gsv.demand.tasks.PlanRouteLegs;
 import playground.johannes.gsv.demand.tasks.PlanTransformCoord;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.io.IOException;
 import java.util.Random;

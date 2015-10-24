@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +48,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.util.*;
 

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +35,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.FacilitiesWriter;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 import java.io.IOException;
 import java.util.ArrayList;

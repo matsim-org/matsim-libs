@@ -21,8 +21,8 @@ package playground.johannes.graph;
 
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import org.matsim.testcases.MatsimTestCase;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**
  * @author illenberger

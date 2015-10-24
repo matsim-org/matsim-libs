@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Gender;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 
 import java.util.Map;
 

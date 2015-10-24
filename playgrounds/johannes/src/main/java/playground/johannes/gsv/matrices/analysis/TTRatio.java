@@ -25,11 +25,11 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

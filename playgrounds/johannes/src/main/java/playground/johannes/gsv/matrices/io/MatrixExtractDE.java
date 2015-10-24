@@ -21,11 +21,11 @@ package playground.johannes.gsv.matrices.io;
 
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 import java.io.IOException;
 import java.util.HashMap;

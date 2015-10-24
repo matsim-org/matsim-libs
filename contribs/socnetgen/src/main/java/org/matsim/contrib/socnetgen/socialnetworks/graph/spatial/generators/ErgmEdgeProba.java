@@ -1,0 +1,60 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ErgmEdgeProba.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.generators;
+
+
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.mcmc.ErgmTerm;
+
+/**
+ * @author illenberger
+ * 
+ */
+public class ErgmEdgeProba extends ErgmTerm {
+
+	private final EdgeProbabilityFunction probaFunction;
+
+	public ErgmEdgeProba(EdgeProbabilityFunction function) {
+		probaFunction = function;
+	}
+
+	@Override
+	public <V extends Vertex> double ratio(AdjacencyMatrix<V> y, int i, int j, boolean yIj) {
+		double p = probaFunction.probability(i, j);
+
+		if(p == 0)
+			return Double.POSITIVE_INFINITY;
+		else if(Double.isInfinite(p))
+			return 0;
+		else {
+			double r = (1 - p) / p;
+			if(Double.isNaN(r)) {
+				System.err.println("NaN");
+				return 0;
+			} else if(Double.isInfinite(r)) {
+				System.err.println("Inf");
+				return r;
+			} else
+				return r;
+				
+		}
+	}
+}

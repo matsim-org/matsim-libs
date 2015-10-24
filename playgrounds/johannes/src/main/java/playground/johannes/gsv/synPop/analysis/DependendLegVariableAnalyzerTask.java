@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;

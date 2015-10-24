@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.processing.PersonTask;

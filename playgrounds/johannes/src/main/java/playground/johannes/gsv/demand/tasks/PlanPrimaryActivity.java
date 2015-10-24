@@ -38,6 +38,7 @@ import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -46,7 +47,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.util.*;
 

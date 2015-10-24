@@ -22,10 +22,10 @@ package playground.johannes.coopsim.mental;
 import gnu.trove.TIntArrayList;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.coopsim.Profiler;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 import java.util.ArrayList;
 import java.util.List;

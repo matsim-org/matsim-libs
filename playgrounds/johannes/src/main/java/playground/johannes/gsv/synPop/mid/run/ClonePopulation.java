@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.gsv.synPop.ApplySampleProbas;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.io.XMLHandler;

@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.gsv.demand.ActivityTypes;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.util.ArrayList;
 import java.util.Collections;

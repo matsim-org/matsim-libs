@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 
 import java.util.LinkedList;
 import java.util.List;

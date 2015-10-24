@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid2002;
 
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
-import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.synpop.source.mid2008.generator.RowHandler;
 
 import java.io.IOException;

@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.osm;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.socnetgen.socialnetworks.utils.XORShiftRandom;
 
 import java.util.Random;
 

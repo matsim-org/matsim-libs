@@ -28,13 +28,13 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.VertexPropertyCorrelation;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.GridAccessibility;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.GridAccessibility;
 
 import java.io.IOException;
 import java.util.HashSet;

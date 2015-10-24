@@ -21,7 +21,7 @@ package playground.johannes.coopsim.services;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 
 import java.util.ArrayList;
 import java.util.List;

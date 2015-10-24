@@ -34,10 +34,10 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AttributePartition;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;

@@ -28,8 +28,8 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 import java.util.Map;
 
