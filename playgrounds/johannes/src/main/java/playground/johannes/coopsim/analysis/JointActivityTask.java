@@ -23,8 +23,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 

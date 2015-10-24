@@ -23,10 +23,10 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 import org.matsim.core.population.PersonUtils;
 
 import java.io.BufferedWriter;

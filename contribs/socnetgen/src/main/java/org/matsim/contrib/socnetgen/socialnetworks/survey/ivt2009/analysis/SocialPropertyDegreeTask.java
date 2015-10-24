@@ -28,9 +28,9 @@ import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Age;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Age;
 
 import java.io.IOException;
 import java.util.Map;

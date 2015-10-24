@@ -21,11 +21,11 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.EdgeLengthCategoryTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
+import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.EdgeLengthCategoryTask;
+import org.matsim.contrib.socnetgen.sna.snowball.spatial.analysis.ObservedAccessibility;
 
 import java.util.Set;
 

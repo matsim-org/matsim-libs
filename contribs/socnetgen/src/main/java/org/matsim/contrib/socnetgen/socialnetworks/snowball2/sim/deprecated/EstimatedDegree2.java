@@ -27,7 +27,7 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.EstimatedDegree;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.SampleStats;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SampleStats;
 
 /**
  * @author illenberger

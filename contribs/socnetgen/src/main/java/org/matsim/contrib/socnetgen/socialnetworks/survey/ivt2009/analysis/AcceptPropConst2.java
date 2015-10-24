@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.AbstractSpatialProperty;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.AbstractSpatialProperty;
 
 import java.util.Set;
 

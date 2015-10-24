@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.*;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.*;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.analysis.ObservedAge;
+import org.matsim.contrib.socnetgen.sna.snowball.social.analysis.ObservedAge;
 
 /**
  * @author illenberger

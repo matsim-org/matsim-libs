@@ -29,13 +29,13 @@ import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.AcceptanceProbability;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Distance;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Distance;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.analysis.ObservedDistance;
+import org.matsim.contrib.socnetgen.sna.snowball.spatial.analysis.ObservedDistance;
 import org.matsim.core.population.PersonUtils;
 
 import java.io.FileNotFoundException;

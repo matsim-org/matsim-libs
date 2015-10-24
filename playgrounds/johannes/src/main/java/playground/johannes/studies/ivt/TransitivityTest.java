@@ -31,13 +31,13 @@ import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AttributePartition;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AttributePartition;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Population2SpatialGraph;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;

@@ -20,11 +20,11 @@
 package playground.johannes.studies.smallworld;
 
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ExtendedTopologyAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.TopologyAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 import java.io.IOException;
 

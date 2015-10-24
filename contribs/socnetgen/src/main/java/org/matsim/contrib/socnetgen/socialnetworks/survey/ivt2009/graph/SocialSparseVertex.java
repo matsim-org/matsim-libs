@@ -20,9 +20,9 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph;
 
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialPerson;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 
 import java.util.List;
 

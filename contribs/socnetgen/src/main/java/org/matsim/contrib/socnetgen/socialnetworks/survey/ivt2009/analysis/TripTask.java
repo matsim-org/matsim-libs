@@ -30,9 +30,9 @@ import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.F2FFrequency;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.EdgeLength;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.F2FFrequency;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.EdgeLength;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.WSMStatsFactory;
 
 import java.io.IOException;
 import java.util.Map;

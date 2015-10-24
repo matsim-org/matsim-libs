@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;

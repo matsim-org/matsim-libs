@@ -30,9 +30,9 @@ import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AttributePartition;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AttributePartition;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Distance;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Distance;
 
 import java.util.Set;
 

@@ -30,8 +30,6 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.io.TimeTagger2;
 
 import java.util.ArrayList;
 import java.util.HashSet;

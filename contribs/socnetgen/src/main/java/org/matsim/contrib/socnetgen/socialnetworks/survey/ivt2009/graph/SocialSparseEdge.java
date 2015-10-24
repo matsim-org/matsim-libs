@@ -20,8 +20,8 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph;
 
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
 import org.matsim.core.utils.collections.Tuple;
 
 /**

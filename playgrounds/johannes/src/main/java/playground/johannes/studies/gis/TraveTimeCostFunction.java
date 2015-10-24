@@ -22,7 +22,7 @@ package playground.johannes.studies.gis;
 import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.SpatialCostFunction;
+import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import playground.johannes.studies.gis.SpanningTree.NodeData;

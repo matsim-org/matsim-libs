@@ -21,8 +21,8 @@ package playground.johannes.studies.coopsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;

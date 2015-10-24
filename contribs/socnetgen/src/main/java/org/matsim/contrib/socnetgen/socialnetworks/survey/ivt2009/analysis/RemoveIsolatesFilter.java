@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter;
 
 import java.io.IOException;
 import java.util.HashSet;

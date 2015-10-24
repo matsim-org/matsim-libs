@@ -28,10 +28,10 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SimplePiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.WSMStatsFactory;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.deprecated.EstimatedDegree2;
 import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
 

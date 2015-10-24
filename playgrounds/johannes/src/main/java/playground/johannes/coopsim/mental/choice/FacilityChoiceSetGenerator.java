@@ -20,7 +20,7 @@
 package playground.johannes.coopsim.mental.choice;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.facilities.ActivityFacility;
 
 import java.util.Collection;

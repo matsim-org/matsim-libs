@@ -22,9 +22,9 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 import com.vividsolutions.jts.geom.Point;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.AcceptanceProbability;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
 
 import java.util.Set;
 

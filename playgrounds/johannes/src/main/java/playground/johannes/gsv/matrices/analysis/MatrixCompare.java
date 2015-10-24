@@ -31,7 +31,7 @@ import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;

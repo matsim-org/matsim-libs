@@ -23,10 +23,10 @@ import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 
 import java.util.HashSet;
 import java.util.Set;

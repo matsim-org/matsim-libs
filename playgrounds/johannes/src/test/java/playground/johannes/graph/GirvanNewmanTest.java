@@ -21,7 +21,7 @@ package playground.johannes.graph;
 
 import junit.framework.TestCase;
 import org.matsim.contrib.socnetgen.sna.graph.*;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GirvanNewmanAlgorithm;
 
 import java.io.IOException;
 import java.util.ArrayList;

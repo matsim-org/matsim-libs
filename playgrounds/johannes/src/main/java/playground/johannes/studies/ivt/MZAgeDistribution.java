@@ -21,13 +21,13 @@ package playground.johannes.studies.ivt;
 
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.io.Population2SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.GridAccessibility;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.AgeAccessibilityTask;
+import org.matsim.contrib.socnetgen.sna.graph.social.io.Population2SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.GridAccessibility;
 
 import java.io.IOException;
 

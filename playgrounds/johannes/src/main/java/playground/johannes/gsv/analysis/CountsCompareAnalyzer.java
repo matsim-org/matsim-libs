@@ -29,7 +29,7 @@ import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.WSMStatsFactory;
 import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;

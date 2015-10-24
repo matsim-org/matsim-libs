@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io;
 
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.io.SocialGraphMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphMLWriter;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import org.matsim.core.utils.collections.Tuple;

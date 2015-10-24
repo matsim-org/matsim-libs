@@ -20,11 +20,11 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphMLWriter;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.io.SocialGraphMLWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.io.SampledGraphProjMLReader;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
+import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLWriter;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjectionBuilder;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;

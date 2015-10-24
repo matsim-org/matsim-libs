@@ -20,8 +20,8 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph;
 
 import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.util.Set;

@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 
 import java.util.ArrayList;
 import java.util.List;

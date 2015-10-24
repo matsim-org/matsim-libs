@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io;
 
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;

@@ -20,13 +20,8 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.BridgeEdgeTask;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.ComponentsSeedTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.DegreeIterationTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.ResponseRateTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WaveSizeTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.*;
 
 /**
  * @author illenberger

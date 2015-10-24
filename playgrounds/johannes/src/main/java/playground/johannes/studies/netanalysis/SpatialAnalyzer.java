@@ -20,17 +20,17 @@
 package playground.johannes.studies.netanalysis;
 
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.AcceptancePropaCategoryTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.EdgeLengthDegreeTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.TransitivityAccessibilityTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.GravityCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.SpatialCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.Accessibility;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.EdgeLengthDegreeTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
 
 import java.io.IOException;
 

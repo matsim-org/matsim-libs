@@ -23,12 +23,12 @@ import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AttributePartition;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AttributePartition;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Gender;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.LinguisticHistogram;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Gender;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.LinguisticHistogram;
 
 import java.util.Map;
 import java.util.Map.Entry;

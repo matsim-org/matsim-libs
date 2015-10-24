@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.TopologyAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Map;

@@ -27,13 +27,6 @@ import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.math.DescriptivePiStatisticsFactory;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.*;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.*;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.IterationTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.ResponseRateTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WaveSizeTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.EstimatorTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.RDSEstimator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 

@@ -22,15 +22,15 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.depr
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexFilter;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SampleStats;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.SampleStats;
 
 import java.util.HashSet;
 import java.util.Set;

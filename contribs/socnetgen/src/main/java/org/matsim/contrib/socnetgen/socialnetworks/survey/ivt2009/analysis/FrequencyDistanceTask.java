@@ -31,12 +31,12 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.LogDiscretizer;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.statistics.Correlations;
 
 import java.io.FileNotFoundException;

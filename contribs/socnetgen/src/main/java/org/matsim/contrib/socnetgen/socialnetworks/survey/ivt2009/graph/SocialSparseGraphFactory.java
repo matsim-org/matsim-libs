@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.graph.GraphFactory;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

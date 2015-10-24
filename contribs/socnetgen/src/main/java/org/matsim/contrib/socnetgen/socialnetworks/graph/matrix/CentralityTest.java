@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetgen.socialnetworks.graph.matrix;
 
 import junit.framework.TestCase;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.MatrixCentrality;
 
 import java.io.IOException;
 

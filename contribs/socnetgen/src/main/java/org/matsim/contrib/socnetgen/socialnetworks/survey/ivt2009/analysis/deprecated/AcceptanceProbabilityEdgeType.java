@@ -25,10 +25,10 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
 
 import java.util.HashSet;
 import java.util.Set;

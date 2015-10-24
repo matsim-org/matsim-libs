@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph;
 import com.vividsolutions.jts.geom.Point;
 import org.matsim.contrib.socnetgen.sna.graph.AbstractSparseGraphBuilder;
 import org.matsim.contrib.socnetgen.sna.graph.GraphFactory;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

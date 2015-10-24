@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Gender;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.SocioMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.SocioMatrixBuilder;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Gender;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.SocioMatrix;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.SocioMatrixBuilder;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledVertexDecorator;
 
 import java.util.Map;
 import java.util.Set;

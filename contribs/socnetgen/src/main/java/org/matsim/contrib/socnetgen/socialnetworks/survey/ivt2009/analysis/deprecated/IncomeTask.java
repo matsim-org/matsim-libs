@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.depr
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.List;

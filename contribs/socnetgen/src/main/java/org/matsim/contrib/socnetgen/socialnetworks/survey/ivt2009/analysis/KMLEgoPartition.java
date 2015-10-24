@@ -24,7 +24,7 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 
 import java.util.ArrayList;
 import java.util.List;

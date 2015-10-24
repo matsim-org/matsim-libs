@@ -22,16 +22,11 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.EstimatedDegree;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.EstimatedTransitivity;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.SimplePiEstimator;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.WSMStatsFactory;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.sim.EstimatorTask;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.*;
 
 import java.util.Map;
 

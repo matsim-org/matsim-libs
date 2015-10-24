@@ -21,12 +21,12 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.LogAccessibility;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.SpatialCostFunction;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.LogAccessibility;
 
 import java.util.Set;
 

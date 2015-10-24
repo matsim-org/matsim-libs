@@ -20,10 +20,10 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TObjectIntHashMap;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 
 import java.util.ArrayList;
 import java.util.HashSet;

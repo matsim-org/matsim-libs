@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +34,7 @@ import java.util.Set;
 public class ApplySeedsFilter implements GraphFilter<SampledGraph> {
 
 	/* (non-Javadoc)
-	 * @see org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter#apply(org.matsim.contrib.sna.graph.Graph)
+	 * @see org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter#apply(org.matsim.contrib.sna.graph.Graph)
 	 */
 	@Override
 	public SampledGraph apply(SampledGraph graph) {

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.gis.CRSUtils;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialPerson;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;

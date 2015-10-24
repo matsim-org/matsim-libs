@@ -20,15 +20,11 @@
 package playground.johannes.studies.mcmc;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskArray;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.TopologyAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.*;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.SocialAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.SpatialAnalyzerTask;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;

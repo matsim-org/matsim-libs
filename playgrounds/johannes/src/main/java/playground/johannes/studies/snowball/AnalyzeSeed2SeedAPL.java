@@ -26,8 +26,8 @@ import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.analysis.SeedAPLTask;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SeedAPLTask;
+import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLReader;
 
 import java.io.IOException;
 import java.util.Map;

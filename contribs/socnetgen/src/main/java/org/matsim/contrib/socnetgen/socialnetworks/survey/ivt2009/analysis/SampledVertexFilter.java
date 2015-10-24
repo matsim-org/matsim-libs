@@ -20,10 +20,10 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphFilter;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledEdge;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.GraphFilter;
 
 import java.util.HashSet;
 import java.util.Set;

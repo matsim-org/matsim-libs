@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.data;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.io.ZoneLayerSHP;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.core.config.ConfigGroup;
 import playground.johannes.synpop.gis.DataLoader;
 

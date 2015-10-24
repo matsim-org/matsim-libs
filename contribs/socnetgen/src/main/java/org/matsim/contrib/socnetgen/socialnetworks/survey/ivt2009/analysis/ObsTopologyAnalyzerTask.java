@@ -20,14 +20,9 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 
-import org.matsim.contrib.socnetgen.sna.graph.analysis.ComponentsTask;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphSizeTask;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.*;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedTransitivity;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.PropertyDegreeTask;
 
 /**
  * @author illenberger

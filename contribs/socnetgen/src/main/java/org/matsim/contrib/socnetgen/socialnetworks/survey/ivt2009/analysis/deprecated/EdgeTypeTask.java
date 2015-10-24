@@ -23,9 +23,9 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectIntHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.HashMap;

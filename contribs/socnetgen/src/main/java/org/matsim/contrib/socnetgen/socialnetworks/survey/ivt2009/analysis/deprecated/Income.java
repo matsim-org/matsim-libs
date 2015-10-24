@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 
 /**
  * @author illenberger

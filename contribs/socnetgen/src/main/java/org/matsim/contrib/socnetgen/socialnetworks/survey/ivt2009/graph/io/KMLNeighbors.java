@@ -20,8 +20,8 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io;
 
 import net.opengis.kml._2.PlacemarkType;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLObjectDetail;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

@@ -23,16 +23,16 @@ package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLIconVertexStyle;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLObjectDetailComposite;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.io.SampledGraphProjMLReader;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjection;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
-import org.matsim.contrib.socnetgen.socialnetworks.snowball2.spatial.io.KMLSnowballDescriptor;
+import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjectionBuilder;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.KMLVertexId;
 import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.KMLSampledComponents;
+import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.KMLSnowballDescriptor;
 
 
 

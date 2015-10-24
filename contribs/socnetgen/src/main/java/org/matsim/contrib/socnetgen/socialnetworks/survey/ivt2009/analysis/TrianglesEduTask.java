@@ -24,10 +24,10 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.EducationCategorized;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.analysis.Gender;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.EducationCategorized;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Gender;
 
 import java.util.List;
 import java.util.Map;

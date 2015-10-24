@@ -20,12 +20,12 @@
 package org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis;
 
 import com.vividsolutions.jts.geom.*;
+import org.matsim.contrib.socnetgen.sna.gis.PointUtils;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexProperty;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.gis.PointUtils;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.analysis.ZoneUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.ZoneUtils;
 
 import java.util.HashSet;
 import java.util.Set;

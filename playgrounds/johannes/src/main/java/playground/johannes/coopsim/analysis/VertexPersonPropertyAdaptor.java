@@ -24,8 +24,8 @@ import gnu.trove.TObjectDoubleIterator;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 
 import java.util.HashMap;
 import java.util.HashSet;

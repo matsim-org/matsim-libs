@@ -20,11 +20,11 @@
 package playground.johannes.studies.netanalysis;
 
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.TopologyAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import org.matsim.contrib.socnetgen.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 import java.io.IOException;
 
