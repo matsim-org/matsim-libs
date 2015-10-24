@@ -19,19 +19,13 @@
 
 package playground.johannes.gsv.gis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -40,14 +34,18 @@ import org.opengis.referencing.operation.MathTransform;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author johannes

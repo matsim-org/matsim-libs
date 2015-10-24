@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OrthodromicDistanceCalculator.java
+ * WGS84DistanceCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
-
-import org.geotools.geometry.jts.JTS;
-import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.sna.gis.CRSUtils;
+package org.matsim.contrib.common.gis;
 
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.referencing.GeodeticCalculator;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class OrthodromicDistanceCalculator implements DistanceCalculator {
+public class WGS84DistanceCalculator implements DistanceCalculator {
 
-	private static OrthodromicDistanceCalculator instance;
+	private static WGS84DistanceCalculator instance;
 	
-	public static OrthodromicDistanceCalculator getInstance() {
+	public static WGS84DistanceCalculator getInstance() {
 		if(instance == null)
-			instance = new OrthodromicDistanceCalculator();
+			instance = new WGS84DistanceCalculator();
+		
 		return instance;
 	}
-
+	
+	private final GeodeticCalculator geoCalc = new GeodeticCalculator(DefaultGeographicCRS.WGS84);
+	
 	@Override
 	public double distance(Point p1, Point p2) {
-		if (p1.getSRID() == p2.getSRID()) {
-			if (p1.getSRID() == 0) {
-				return CartesianDistanceCalculator.getInstance().distance(p1, p2);
-			} else {
-				try {
-					return JTS.orthodromicDistance(p1.getCoordinate(), p2.getCoordinate(),
-							CRSUtils.getCRS(p1.getSRID()));
-				} catch (TransformException e) {
-					e.printStackTrace();
-					return Double.NaN;
-				}
-			}
-		} else {
-			throw new RuntimeException("Incompatible coordinate reference systems.");
-		}
+		geoCalc.setStartingGeographicPoint(p1.getX(), p1.getY());
+		geoCalc.setDestinationGeographicPoint(p2.getX(), p2.getY());
+		return geoCalc.getOrthodromicDistance();
 	}
 
 }

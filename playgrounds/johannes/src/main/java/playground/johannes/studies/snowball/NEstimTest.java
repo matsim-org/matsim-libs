@@ -17,20 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
+package playground.johannes.studies.snowball;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
@@ -40,10 +31,17 @@ import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
-import playground.johannes.studies.snowball.SnowballSim;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 /**
  * @author illenberger

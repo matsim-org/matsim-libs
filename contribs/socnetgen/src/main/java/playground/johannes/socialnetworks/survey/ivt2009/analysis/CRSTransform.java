@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.io.IOException;
-
-
-import playground.johannes.sna.gis.CRSUtils;
+import org.matsim.contrib.common.gis.CRSUtils;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
@@ -32,6 +29,8 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

@@ -23,18 +23,17 @@
  */
 package playground.johannes.sna.graph.spatial.io;
 
-import java.io.IOException;
-import java.util.List;
-
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.io.GraphMLWriter;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * An extension to {@link GraphMLWriter} that includes writing spatial

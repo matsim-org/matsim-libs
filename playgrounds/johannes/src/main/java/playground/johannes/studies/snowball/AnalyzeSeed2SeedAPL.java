@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGridTableWriter.java
+ * AnalyzeSeed2SeedAPL.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.studies.snowball;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.sna.graph.SparseEdge;
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
+import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
+
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class SpatialGridTableWriter {
+public class AnalyzeSeed2SeedAPL {
 
-	public void write(SpatialGrid<Double> grid, String file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		
-		for(int j = 0; j < grid.getNumCols(0); j++) {
-			writer.write("\t");
-			writer.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
-		}
-		writer.newLine();
-		
-		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
-			writer.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
-			for(int j = 0; j < grid.getNumCols(i); j++) {
-				writer.write("\t");
-				Double val = grid.getValue(i, j);
-				if(val != null)
-					writer.write(String.valueOf(val));
-				else
-					writer.write("NA");
-			}
-			writer.newLine();
-		}
-		
-		writer.close();
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		SampledGraphProjMLReader<SparseGraph, SparseVertex, SparseEdge> reader = new SampledGraphProjMLReader<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphMLReader());
+		SampledGraphProjection<SparseGraph, SparseVertex, SparseEdge> graph = reader.readGraph("");
+
+		Map<String, DescriptiveStatistics> map = GraphAnalyzer.analyze(graph, new SeedAPLTask());
+		GraphAnalyzer.writeStatistics(map, "", true);
 	}
+
 }

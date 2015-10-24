@@ -20,9 +20,10 @@
 package playground.johannes.socialnetworks.gis;
 
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.sna.gis.CRSUtils;
 
 /**
  * @author illenberger

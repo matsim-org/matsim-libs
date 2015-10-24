@@ -19,19 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial.io;
 
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.Attributes;
-
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.Attributes;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+
+import java.util.List;
 
 /**
  * Utility-class for de- and encoding GraphML data.

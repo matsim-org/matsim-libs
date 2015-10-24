@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeelineCostFunction.java
+ * DistanceCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,29 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package org.matsim.contrib.common.gis;
 
 import com.vividsolutions.jts.geom.Point;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
 
 /**
  * @author illenberger
  *
  */
-public class BeelineCostFunction implements SpatialCostFunction {
+public interface DistanceCalculator {
 
-	private DistanceCalculator calculator = new OrthodromicDistanceCalculator();
-	
-	private Discretizer discretizer = new LinearDiscretizer(1000.0);
-	
-	public void setDistanceCalculator(DistanceCalculator calculator) {
-		this.calculator = calculator;
-	}
-	
-	@Override
-	public double costs(Point p1, Point p2) {
-		return discretizer.index(calculator.distance(p1, p2));
-	}
-
+	double distance(Point p1, Point p2);
 }

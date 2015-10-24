@@ -19,15 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial;
 
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraphBuilder;
-import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
 import junit.framework.TestCase;
+import org.matsim.contrib.common.gis.CRSUtils;
 
 /**
  * @author illenberger

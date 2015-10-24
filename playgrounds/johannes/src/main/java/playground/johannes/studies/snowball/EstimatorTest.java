@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.snowball2.sim;
+package playground.johannes.studies.snowball;
 
 import gnu.trove.*;
 import org.apache.commons.math.stat.StatUtils;
@@ -43,7 +43,6 @@ import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
-import playground.johannes.studies.snowball.SnowballSim;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

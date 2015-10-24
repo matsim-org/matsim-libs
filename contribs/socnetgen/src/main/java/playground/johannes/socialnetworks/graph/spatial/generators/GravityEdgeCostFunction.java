@@ -20,10 +20,10 @@
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
 
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
 /**
  * @author illenberger

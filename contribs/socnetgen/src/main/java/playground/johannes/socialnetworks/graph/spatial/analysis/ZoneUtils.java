@@ -20,19 +20,10 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import com.vividsolutions.jts.geom.*;
-import gnu.trove.TObjectDoubleHashMap;
-import org.matsim.contrib.common.gis.EsriShapeIO;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
-import playground.johannes.studies.gis.Accessibility;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -91,37 +82,5 @@ public class ZoneUtils {
 		}
 		
 		return layer;
-	}
-	
-	public static void main(String args[]) throws IOException {
-		SpatialGraph g = new SpatialGraphMLReader().readGraph("/Users/jillenberger/Work/socialnets/mcmc/output-switch/2100000000/graph.graphml");
-		
-//		ZoneLayer<Set<SpatialVertex>> layer =  ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
-//		layer.overwriteCRS(CRSUtils.getCRS(21781));
-		
-		Geometry boundary = (Geometry) EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
-		boundary.setSRID(21781);
-		
-		ZoneLayer<Set<SpatialVertex>> layer = Accessibility.createGridLayer(10000, boundary);
-		
-		ZoneUtils.fillZoneLayer(layer, (Set<SpatialVertex>)g.getVertices());
-		
-		FeatureKMLWriter writer = new FeatureKMLWriter();
-		
-		TObjectDoubleHashMap<Geometry> colors = new TObjectDoubleHashMap<Geometry>();
-		Set<Geometry> geometries = new HashSet<Geometry>();
-		for(Zone<Set<SpatialVertex>> zone : layer.getZones()) {
-			if(zone.getAttribute() != null) {
-			double k = Degree.getInstance().statistics(zone.getAttribute()).getMean();
-			colors.put(zone.getGeometry(), k);
-			geometries.add(zone.getGeometry());
-			}
-		}
-		
-		NumericAttributeColorizer colorizer = new NumericAttributeColorizer(colors);
-		colorizer.setLogscale(true);
-		writer.setColorizable(colorizer);
-		
-		writer.write(geometries, "/Users/jillenberger/Work/socialnets/mcmc/output-switch/2100000000/zones.kmz");
 	}
 }

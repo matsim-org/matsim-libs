@@ -22,12 +22,12 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 import java.util.Set;
 

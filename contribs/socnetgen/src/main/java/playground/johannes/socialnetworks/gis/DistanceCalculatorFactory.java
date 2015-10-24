@@ -20,6 +20,9 @@
 package playground.johannes.socialnetworks.gis;
 
 import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**

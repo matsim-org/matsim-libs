@@ -19,11 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.netanalysis;
 
-import java.io.IOException;
-
-
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
@@ -31,6 +28,8 @@ import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

@@ -19,13 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial;
 
-import org.apache.log4j.Logger;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.GraphFactory;
-
 import com.vividsolutions.jts.geom.Point;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import playground.johannes.sna.graph.GraphFactory;
 
 
 /**

@@ -19,11 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,34 +32,16 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.MatsimFacilitiesReader;
-
-import playground.johannes.coopsim.analysis.ActTypeShareTask;
-import playground.johannes.coopsim.analysis.ActivityDurationTask;
-import playground.johannes.coopsim.analysis.ActivityLoadTask;
-import playground.johannes.coopsim.analysis.AgeTripCorrelationTask;
-import playground.johannes.coopsim.analysis.ArrivalTimeTask;
-import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
-import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
-import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
-import playground.johannes.coopsim.analysis.GenderTripCorrelationTask;
-import playground.johannes.coopsim.analysis.JointActivityTask;
-import playground.johannes.coopsim.analysis.LegLoadTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceDegreeTask;
-import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
-import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
-import playground.johannes.coopsim.analysis.TripPurposeShareTask;
+import playground.johannes.coopsim.analysis.*;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

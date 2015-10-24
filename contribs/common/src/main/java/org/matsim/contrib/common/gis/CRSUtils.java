@@ -17,11 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.gis;
+package org.matsim.contrib.common.gis;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.opengis.metadata.Identifier;
@@ -32,10 +33,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility-class providing functionality related to coordinate reference

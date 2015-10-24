@@ -23,6 +23,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -35,8 +37,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 import java.io.IOException;
 import java.util.*;

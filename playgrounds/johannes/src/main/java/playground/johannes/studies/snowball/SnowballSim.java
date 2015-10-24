@@ -19,38 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.DegreeTask;
-import playground.johannes.sna.graph.analysis.GraphSizeTask;
-import playground.johannes.sna.graph.analysis.PropDegreeFixedSizePartition;
-import playground.johannes.sna.graph.analysis.RandomPartition;
-import playground.johannes.sna.graph.analysis.TransitivityTask;
-import playground.johannes.sna.graph.analysis.VertexFilter;
+import playground.johannes.sna.graph.analysis.*;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
-import playground.johannes.sna.snowball.analysis.EstimatedDegree;
-import playground.johannes.sna.snowball.analysis.EstimatedTransitivity;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.snowball.analysis.ObservedTransitivity;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.FinalSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.LogIntervalSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
+import playground.johannes.sna.snowball.analysis.*;
+import playground.johannes.sna.snowball.sim.*;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
@@ -58,6 +36,11 @@ import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
 import playground.johannes.socialnetworks.snowball2.sim.RDSEstimator;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author illenberger

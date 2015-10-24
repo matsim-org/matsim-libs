@@ -19,17 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial;
 
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.GeodeticCalculator;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.SparseEdge;
 import playground.johannes.sna.graph.Vertex;
-
-
-import com.vividsolutions.jts.geom.Point;
 
 
 /**

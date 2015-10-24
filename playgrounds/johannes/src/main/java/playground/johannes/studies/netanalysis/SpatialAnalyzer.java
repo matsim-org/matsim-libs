@@ -19,25 +19,20 @@
  * *********************************************************************** */
 package playground.johannes.studies.netanalysis;
 
-import java.io.IOException;
-
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthDegreeTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

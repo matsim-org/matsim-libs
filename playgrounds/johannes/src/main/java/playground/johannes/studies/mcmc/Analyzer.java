@@ -19,13 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.studies.mcmc;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
@@ -36,6 +33,8 @@ import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTa
 import playground.johannes.socialnetworks.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

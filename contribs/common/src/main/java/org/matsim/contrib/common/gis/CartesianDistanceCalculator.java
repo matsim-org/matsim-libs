@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DistanceCalculator.java
+ * CartesianDistanceCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package org.matsim.contrib.common.gis;
+
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -25,7 +26,20 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  *
  */
-public interface DistanceCalculator {
+public class CartesianDistanceCalculator implements DistanceCalculator {
 
-	public double distance(Point p1, Point p2);
+	private static CartesianDistanceCalculator instance;
+	
+	public static CartesianDistanceCalculator getInstance() {
+		if(instance == null)
+			instance = new CartesianDistanceCalculator();
+		return instance;
+	}
+	
+	public double distance(Point p1, Point p2) {
+		double dx = p1.getCoordinate().x - p2.getCoordinate().x;
+		double dy = p1.getCoordinate().y - p2.getCoordinate().y;
+		return Math.sqrt(dx*dx + dy*dy);
+	}
+
 }

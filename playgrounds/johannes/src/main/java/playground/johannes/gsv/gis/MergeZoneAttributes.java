@@ -21,9 +21,9 @@ package playground.johannes.gsv.gis;
 
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.referencing.CRS;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneEsriShapeIO;

@@ -19,26 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.mcmc;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.generators.ErdosRenyiGenerator;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
@@ -57,11 +50,12 @@ import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialAnalyzerTask;
 import playground.johannes.socialnetworks.graph.spatial.generators.ErgmLnDistance;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.*;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

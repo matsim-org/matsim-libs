@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
-
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
-
-import com.vividsolutions.jts.geom.Point;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

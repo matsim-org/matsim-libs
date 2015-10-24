@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.io.IOException;
-
 import gnu.trove.TObjectDoubleHashMap;
-
 import org.apache.commons.math.stat.StatUtils;
-
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.core.population.PersonUtils;
 import playground.johannes.sna.graph.Vertex;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Age;
@@ -35,6 +31,8 @@ import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLWriter;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

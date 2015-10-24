@@ -19,21 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
 import playground.johannes.sna.graph.spatial.io.KMLObjectDetailComposite;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
@@ -49,9 +45,11 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.EgoAlterTableReader.RespondentData;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger

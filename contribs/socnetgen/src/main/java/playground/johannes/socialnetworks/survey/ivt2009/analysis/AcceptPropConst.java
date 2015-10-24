@@ -23,14 +23,14 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 

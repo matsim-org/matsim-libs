@@ -24,6 +24,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
@@ -34,7 +35,6 @@ import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.matrices.MatrixOperations;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.socialnetworks.statistics.Correlations;
 

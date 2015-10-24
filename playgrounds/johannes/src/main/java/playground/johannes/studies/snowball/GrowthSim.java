@@ -19,11 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.SparseGraph;
@@ -33,10 +29,13 @@ import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.analysis.VertexFilter;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.studies.mcmc.KeyMatrix;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * @author illenberger

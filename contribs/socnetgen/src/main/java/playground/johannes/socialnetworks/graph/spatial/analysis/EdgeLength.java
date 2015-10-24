@@ -20,17 +20,15 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-
-import playground.johannes.sna.gis.CRSUtils;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.spatial.SpatialEdge;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
+
+import java.util.Set;
 
 /**
  * @author illenberger

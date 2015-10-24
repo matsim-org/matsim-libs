@@ -21,14 +21,14 @@ package playground.johannes.studies.netgeneration;
 
 import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.social.io.Population2SocialGraph;

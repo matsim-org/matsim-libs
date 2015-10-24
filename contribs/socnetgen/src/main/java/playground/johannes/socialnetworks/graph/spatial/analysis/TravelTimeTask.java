@@ -19,15 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -36,14 +33,16 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.spatial.SpatialEdge;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.math.Distribution;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author illenberger

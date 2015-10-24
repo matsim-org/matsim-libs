@@ -21,9 +21,9 @@ package playground.johannes.studies.ivt;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.GraphBuilder;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;

@@ -19,14 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -35,7 +32,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
@@ -45,10 +41,13 @@ import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
 import playground.johannes.mz2005.io.EscortData;
 import playground.johannes.mz2005.utils.FacilityFromActivity;
 import playground.johannes.mz2005.validate.RoundTrips;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**

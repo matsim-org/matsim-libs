@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial;
 
-import java.util.Set;
-
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.SparseGraph;
 import playground.johannes.sna.graph.SparseVertex;
+
+import java.util.Set;
 
 
 /**

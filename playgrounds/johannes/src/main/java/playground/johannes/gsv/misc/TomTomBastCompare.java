@@ -1,20 +1,11 @@
 package playground.johannes.gsv.misc;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-
-import playground.johannes.sna.gis.CRSUtils;
+import org.matsim.contrib.common.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraphBuilder;
@@ -22,9 +13,10 @@ import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 

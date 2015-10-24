@@ -19,21 +19,16 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author johannes
