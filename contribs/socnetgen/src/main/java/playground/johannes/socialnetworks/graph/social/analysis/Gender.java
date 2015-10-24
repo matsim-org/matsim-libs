@@ -20,14 +20,12 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TDoubleArrayList;
-
-import java.util.Set;
-
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
-
 import org.matsim.core.population.PersonUtils;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.Set;
 
 /**
  * @author illenberger

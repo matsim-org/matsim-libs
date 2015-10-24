@@ -19,29 +19,23 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.util;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import net.opengis.kml._2.FolderType;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.VertexDecorator;
-import playground.johannes.sna.graph.analysis.VertexFilter;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
-import playground.johannes.sna.graph.spatial.io.KMLObjectDetailComposite;
-import playground.johannes.sna.graph.spatial.io.KMLPartitions;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import playground.johannes.sna.snowball.SampledGraphProjection;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
-import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.VertexDecorator;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexFilter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLObjectDetailComposite;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListenerComposite;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SeedColorizer;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;
@@ -55,6 +49,12 @@ import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.KMLNeighbors;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger

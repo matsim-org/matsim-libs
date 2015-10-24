@@ -19,18 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.io.GraphMLWriter;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
 
 /**
  * @author illenberger

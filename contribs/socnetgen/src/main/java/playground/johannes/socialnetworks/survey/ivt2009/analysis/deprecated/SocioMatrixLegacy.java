@@ -20,19 +20,15 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TObjectIntHashMap;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

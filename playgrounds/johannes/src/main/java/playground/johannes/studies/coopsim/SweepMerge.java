@@ -19,17 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * @author illenberger

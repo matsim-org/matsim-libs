@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.Map;
-
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
+
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -29,9 +29,9 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.io.IOException;

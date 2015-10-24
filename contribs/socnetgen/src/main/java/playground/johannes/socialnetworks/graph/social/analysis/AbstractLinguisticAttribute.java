@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
+import org.apache.log4j.Logger;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

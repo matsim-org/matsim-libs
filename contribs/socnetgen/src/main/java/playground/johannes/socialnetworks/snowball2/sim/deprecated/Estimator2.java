@@ -23,13 +23,11 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
-
 import org.apache.commons.math.stat.StatUtils;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.snowball.SampledGraph;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 

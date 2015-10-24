@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.osm;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import playground.johannes.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
 
 /**
  * Representation of a generic algorithm that modifies an existing graph or

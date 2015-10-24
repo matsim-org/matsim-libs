@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.matrix;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import java.io.IOException;
 
 /**
  * @author illenberger

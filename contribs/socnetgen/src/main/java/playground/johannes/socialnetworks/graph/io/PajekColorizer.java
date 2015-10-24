@@ -23,16 +23,12 @@
  */
 package playground.johannes.socialnetworks.graph.io;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Vertex;
 
 
 /**

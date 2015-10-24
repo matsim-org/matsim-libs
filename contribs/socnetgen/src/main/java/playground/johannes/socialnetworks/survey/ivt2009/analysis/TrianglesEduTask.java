@@ -19,19 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.EducationCategorized;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import playground.johannes.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
 
 /**
  * @author illenberger

@@ -19,23 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.Set;
-
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.social.analysis.F2FFreqEdgeLengthTask;
-import playground.johannes.socialnetworks.graph.social.analysis.F2FFrequencyTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbaDegreeTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLength;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthAccessibilityTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthCategoryTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.TransitivityAccessibilityTask;
-import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import playground.johannes.socialnetworks.gis.GravityCostFunction;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
+import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthCategoryTask;
+import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
+
+import java.util.Set;
 
 /**
  * @author illenberger

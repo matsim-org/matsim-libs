@@ -20,9 +20,9 @@
 package playground.johannes.coopsim.mental.choice;
 
 
-import java.util.List;
-
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.List;
 
 /**
  * @author illenberger

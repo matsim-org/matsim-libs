@@ -21,14 +21,13 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger

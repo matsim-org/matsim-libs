@@ -19,21 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.VertexFilter;
-import playground.johannes.sna.snowball.SampledGraphProjection;
-import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexFilter;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

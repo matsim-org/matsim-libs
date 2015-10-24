@@ -19,22 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectIntHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
+import playground.johannes.socialnetworks.graph.social.SocialEdge;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.socialnetworks.graph.social.SocialEdge;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
 
 /**
  * @author illenberger

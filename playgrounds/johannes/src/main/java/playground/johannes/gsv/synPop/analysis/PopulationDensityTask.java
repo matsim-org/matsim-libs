@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.synpop.data.*;
 

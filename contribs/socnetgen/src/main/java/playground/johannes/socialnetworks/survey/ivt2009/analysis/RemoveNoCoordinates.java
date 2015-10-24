@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
+
 import java.util.HashSet;
 import java.util.Set;
-
-
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
  * @author illenberger

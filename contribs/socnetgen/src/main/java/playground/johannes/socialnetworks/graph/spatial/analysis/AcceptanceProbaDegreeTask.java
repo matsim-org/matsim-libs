@@ -28,11 +28,11 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
 
@@ -55,7 +55,7 @@ public class AcceptanceProbaDegreeTask extends AnalyzerTask {
 	}
 	
 	/* (non-Javadoc)
-	 * @see playground.johannes.sna.graph.analysis.AnalyzerTask#analyze(playground.johannes.sna.graph.Graph, java.util.Map)
+	 * @see AnalyzerTask#analyze(Graph, java.util.Map)
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, DescriptiveStatistics> results) {

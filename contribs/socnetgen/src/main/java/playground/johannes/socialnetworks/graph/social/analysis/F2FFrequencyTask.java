@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger

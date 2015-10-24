@@ -19,16 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
 
 /**
  * @author illenberger

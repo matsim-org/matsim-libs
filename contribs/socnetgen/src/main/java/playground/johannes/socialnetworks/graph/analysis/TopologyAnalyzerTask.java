@@ -19,17 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import java.io.IOException;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.*;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.ComponentsTask;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.DegreeTask;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.analysis.GraphSizeTask;
-import playground.johannes.sna.graph.analysis.TransitivityTask;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import java.io.IOException;
 
 
 /**

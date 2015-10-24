@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.io.GraphMLWriter;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

@@ -22,16 +22,11 @@ package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Set;
 import java.util.TreeSet;
-
-import playground.johannes.sna.math.Distribution;
 
 /**
  * @author illenberger

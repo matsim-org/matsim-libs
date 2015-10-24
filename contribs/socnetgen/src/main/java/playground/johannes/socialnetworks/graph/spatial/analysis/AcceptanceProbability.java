@@ -30,9 +30,9 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.util.MultiThreading;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 
 import java.util.ArrayList;
 import java.util.Iterator;

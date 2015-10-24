@@ -20,6 +20,14 @@
 package playground.johannes.socialnetworks.snowball2.sim;
 
 import gnu.trove.TObjectIntHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SampleAnalyzer;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,17 +35,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.sim.SampleAnalyzer;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.Sampler;
 
 
 /**

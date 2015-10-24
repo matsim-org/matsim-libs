@@ -28,9 +28,9 @@ import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 

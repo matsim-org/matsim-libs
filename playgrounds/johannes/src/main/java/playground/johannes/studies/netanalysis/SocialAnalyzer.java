@@ -20,7 +20,7 @@
 package playground.johannes.studies.netanalysis;
 
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
-import java.util.Set;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 
-import playground.johannes.sna.graph.spatial.SpatialGraph;
+import java.util.Set;
 
 /**
  * @author illenberger

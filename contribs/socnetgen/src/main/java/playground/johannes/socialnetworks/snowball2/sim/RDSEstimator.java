@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import playground.johannes.sna.snowball.SampledGraph;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
 
 /**
  * @author illenberger

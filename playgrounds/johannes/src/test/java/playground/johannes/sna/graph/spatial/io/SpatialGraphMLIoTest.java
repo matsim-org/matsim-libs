@@ -19,16 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial.io;
 
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.johannes.sna.TestCaseUtils;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
+
+import java.io.IOException;
 
 
 /**

@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 /**
  * @author illenberger

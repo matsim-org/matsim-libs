@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

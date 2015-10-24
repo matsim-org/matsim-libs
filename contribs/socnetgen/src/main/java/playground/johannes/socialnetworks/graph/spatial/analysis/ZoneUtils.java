@@ -20,9 +20,9 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import com.vividsolutions.jts.geom.*;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 
 import java.util.HashSet;
 import java.util.Set;

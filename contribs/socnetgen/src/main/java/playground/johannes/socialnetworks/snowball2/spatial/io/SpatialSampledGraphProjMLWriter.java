@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import java.util.List;
-
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphML;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.io.GraphMLWriter;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphML;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;
+
+import java.util.List;
 
 /**
  * @author illenberger

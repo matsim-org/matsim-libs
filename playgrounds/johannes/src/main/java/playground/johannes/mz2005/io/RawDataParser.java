@@ -20,14 +20,13 @@
 package playground.johannes.mz2005.io;
 
 import gnu.trove.TObjectIntHashMap;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 
 /**

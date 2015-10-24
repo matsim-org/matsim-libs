@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballStatistics;
+
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.SnowballStatistics;
 
 /**
  * @author illenberger

@@ -20,13 +20,8 @@
 package playground.johannes.sna.graph.generators;
 
 import junit.framework.TestCase;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.generators.ErdosRenyiGenerator;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.generators.ErdosRenyiGenerator;
 
 /**
  * @author jillenberger

@@ -21,17 +21,13 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.Set;
-
-import javax.swing.text.AbstractDocument.LeafElement;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.Set;
 
 /**
  * @author illenberger

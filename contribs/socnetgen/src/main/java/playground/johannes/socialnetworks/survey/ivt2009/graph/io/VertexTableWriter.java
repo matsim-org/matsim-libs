@@ -20,26 +20,13 @@
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import gnu.trove.TObjectIntHashMap;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.GraphUtils;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Components;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.GraphUtils;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
@@ -49,6 +36,11 @@ import playground.johannes.socialnetworks.survey.ivt2009.analysis.SeedConnection
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger

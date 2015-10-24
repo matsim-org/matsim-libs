@@ -24,7 +24,7 @@ import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
-import playground.johannes.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 import java.util.HashMap;
 import java.util.HashSet;

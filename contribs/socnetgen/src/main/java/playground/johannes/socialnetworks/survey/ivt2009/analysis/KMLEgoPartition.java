@@ -19,18 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import net.opengis.kml._2.FolderType;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import net.opengis.kml._2.FolderType;
-
-
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.KMLPartitions;
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 
 /**
  * @author illenberger

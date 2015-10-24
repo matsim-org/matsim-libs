@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
 
 /**
  * @author illenberger

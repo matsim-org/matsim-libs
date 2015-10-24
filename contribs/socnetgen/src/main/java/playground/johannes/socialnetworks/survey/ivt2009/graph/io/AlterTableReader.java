@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.Tuple;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,9 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author illenberger

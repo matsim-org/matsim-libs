@@ -20,21 +20,19 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.AttributePartition;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 import playground.johannes.socialnetworks.graph.social.analysis.LinguisticHistogram;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author illenberger

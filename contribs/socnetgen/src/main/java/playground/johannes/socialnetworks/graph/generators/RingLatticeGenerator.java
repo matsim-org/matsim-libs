@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.generators;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.Vertex;
 
 /**
  * @author illenberger

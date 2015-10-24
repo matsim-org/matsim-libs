@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
 import playground.johannes.coopsim.mental.MentalEngine;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger

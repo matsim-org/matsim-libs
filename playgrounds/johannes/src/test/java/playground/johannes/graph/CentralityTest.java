@@ -21,9 +21,8 @@ package playground.johannes.graph;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.socialnetworks.graph.analysis.Centrality;
 
 /**

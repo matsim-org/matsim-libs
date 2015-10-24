@@ -21,17 +21,15 @@ package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphUtils;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
 
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphUtils;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.matrix.MatrixCentrality;
 
 /**
  * @author illenberger

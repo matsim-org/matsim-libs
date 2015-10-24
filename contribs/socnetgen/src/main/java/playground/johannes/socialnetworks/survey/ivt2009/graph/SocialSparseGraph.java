@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import java.util.Set;
-
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
+
+import java.util.Set;
 
 /**
  * @author illenberger

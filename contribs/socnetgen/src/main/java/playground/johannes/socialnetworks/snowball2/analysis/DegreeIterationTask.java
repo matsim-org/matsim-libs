@@ -21,6 +21,13 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -29,15 +36,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

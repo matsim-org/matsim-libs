@@ -19,17 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.network.Network;
-
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.io.GraphMLWriter;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
 
 /**
  * @author illenberger

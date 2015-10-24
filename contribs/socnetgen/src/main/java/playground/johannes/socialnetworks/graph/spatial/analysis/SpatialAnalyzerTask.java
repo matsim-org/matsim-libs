@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
-import java.io.IOException;
-
-
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

@@ -20,10 +20,9 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TIntIntHashMap;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 import java.util.Set;
-
-import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

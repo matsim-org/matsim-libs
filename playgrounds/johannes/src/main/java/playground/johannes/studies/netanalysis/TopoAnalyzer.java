@@ -19,17 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.studies.netanalysis;
 
-import java.io.IOException;
-
-
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-import playground.johannes.sna.util.MultiThreading;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthDegreeTask;
+
+import java.io.IOException;
 
 /**
  * @author illenberger

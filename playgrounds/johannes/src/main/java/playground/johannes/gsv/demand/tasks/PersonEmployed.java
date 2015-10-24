@@ -22,20 +22,18 @@
  */
 package playground.johannes.gsv.demand.tasks;
 
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.population.PersonUtils;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.Random;
 
 /**
  * @author johannes

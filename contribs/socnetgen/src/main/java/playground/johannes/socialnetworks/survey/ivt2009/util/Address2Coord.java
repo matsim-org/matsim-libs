@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+
+import java.io.*;
 
 
 /**

@@ -20,22 +20,10 @@
 package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 
 import gnu.trove.TDoubleIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * @author illenberger

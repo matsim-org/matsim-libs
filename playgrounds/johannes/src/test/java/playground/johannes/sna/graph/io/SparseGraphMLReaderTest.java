@@ -20,11 +20,10 @@
 package playground.johannes.sna.graph.io;
 
 
-import playground.johannes.sna.TestCaseUtils;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-
 import junit.framework.TestCase;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.TestCaseUtils;
 
 /**
  * @author illenberger

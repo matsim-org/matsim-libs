@@ -20,7 +20,7 @@
 package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import org.matsim.contrib.common.collections.Composite;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
@@ -30,7 +30,7 @@ import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 public class SpatialFilterComposite extends Composite<GraphFilter<SpatialGraph>> implements GraphFilter<SpatialGraph> {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.analysis.GraphFilter#apply(playground.johannes.sna.graph.Graph)
+	 * @see playground.johannes.socialnetworks.graph.analysis.GraphFilter#apply(Graph)
 	 */
 	@Override
 	public SpatialGraph apply(SpatialGraph graph) {

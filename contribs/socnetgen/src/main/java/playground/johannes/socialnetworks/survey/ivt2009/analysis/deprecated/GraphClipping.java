@@ -21,10 +21,10 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.snowball.SampledGraphProjection;
-import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;

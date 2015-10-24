@@ -20,10 +20,10 @@
 package playground.johannes.studies.mcmc;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;

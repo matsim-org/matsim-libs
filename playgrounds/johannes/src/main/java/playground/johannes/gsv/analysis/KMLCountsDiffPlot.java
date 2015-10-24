@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import java.awt.*;

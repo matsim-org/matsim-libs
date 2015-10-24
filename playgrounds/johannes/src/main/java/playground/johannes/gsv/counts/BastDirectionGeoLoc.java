@@ -19,19 +19,13 @@
 
 package playground.johannes.gsv.counts;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.code.geocoder.model.LatLng;
 import org.apache.log4j.Logger;
-
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 
-import com.google.code.geocoder.model.LatLng;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes

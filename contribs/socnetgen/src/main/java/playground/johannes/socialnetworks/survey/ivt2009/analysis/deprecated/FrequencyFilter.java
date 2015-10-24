@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import java.util.HashSet;
-import java.util.Set;
-
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

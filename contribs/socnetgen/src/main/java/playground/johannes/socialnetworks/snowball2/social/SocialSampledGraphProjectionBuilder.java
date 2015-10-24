@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.social;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-import playground.johannes.sna.snowball.SampledEdgeDecorator;
-import playground.johannes.sna.snowball.SampledGraphProjection;
-import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledEdgeDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import java.util.List;
-
-
-import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.List;
 
 /**
  * @author illenberger

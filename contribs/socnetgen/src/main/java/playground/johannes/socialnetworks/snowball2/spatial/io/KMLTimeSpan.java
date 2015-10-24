@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
-import java.util.Map;
-
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.TimeSpanType;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLObjectDetail;
 
-import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
+import java.util.Map;
 
 /**
  * @author illenberger

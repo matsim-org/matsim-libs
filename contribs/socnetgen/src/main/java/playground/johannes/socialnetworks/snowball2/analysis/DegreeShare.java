@@ -24,10 +24,10 @@ import gnu.trove.TDoubleDoubleIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

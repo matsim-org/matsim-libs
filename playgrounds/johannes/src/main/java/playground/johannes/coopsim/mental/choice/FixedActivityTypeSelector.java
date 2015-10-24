@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.Map;
-
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -20,18 +20,15 @@
 package playground.johannes.sna.graph.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import junit.framework.TestCase;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Transitivity;
 
 import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Transitivity;
 
 /**
  * @author jillenberger

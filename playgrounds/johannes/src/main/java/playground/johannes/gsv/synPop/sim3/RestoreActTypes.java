@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes

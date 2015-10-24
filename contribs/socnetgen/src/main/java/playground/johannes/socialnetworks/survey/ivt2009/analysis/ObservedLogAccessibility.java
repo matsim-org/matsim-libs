@@ -19,19 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Distribution;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.analysis.LogAccessibility;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
 
 /**
  * @author illenberger

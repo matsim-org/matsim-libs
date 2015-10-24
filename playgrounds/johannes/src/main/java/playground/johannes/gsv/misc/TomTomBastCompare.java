@@ -6,11 +6,11 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import org.matsim.contrib.common.gis.CRSUtils;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraphBuilder;
-import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import java.io.*;

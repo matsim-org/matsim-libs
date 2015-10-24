@@ -19,13 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.johannes.sna.graph.AbstractSparseGraphBuilder;
-import playground.johannes.sna.graph.GraphFactory;
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
-
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.graph.AbstractSparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.GraphFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 
 /**

@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.Collection;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * @author illenberger

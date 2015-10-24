@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * @author johannes

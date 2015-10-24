@@ -20,14 +20,12 @@
 package playground.johannes.socialnetworks.snowball2.spatial.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.analysis.EdgeLengthMedian;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;
+
+import java.util.Set;
 
 /**
  * @author illenberger

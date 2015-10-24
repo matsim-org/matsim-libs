@@ -21,7 +21,7 @@ package playground.johannes.studies.ivt;
 
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.analysis.AgeAccessibilityTask;

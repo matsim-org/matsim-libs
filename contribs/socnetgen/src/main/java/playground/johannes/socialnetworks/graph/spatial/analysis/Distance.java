@@ -21,16 +21,14 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.math.stat.StatUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.Distribution;
 
 
 /**

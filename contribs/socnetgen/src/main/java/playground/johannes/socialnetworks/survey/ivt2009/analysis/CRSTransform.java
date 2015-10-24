@@ -20,7 +20,7 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import org.matsim.contrib.common.gis.CRSUtils;
-import playground.johannes.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLWriter;

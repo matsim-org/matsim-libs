@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
+
 import java.io.IOException;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.io.GraphMLWriter;
 
 /**
  * @author illenberger
@@ -35,7 +34,7 @@ import playground.johannes.sna.graph.io.GraphMLWriter;
 public class GraphWriterTask extends AnalyzerTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.sna.graph.analysis.AnalyzerTask#analyze(playground.johannes.sna.graph.Graph, java.util.Map)
+	 * @see AnalyzerTask#analyze(Graph, java.util.Map)
 	 */
 	@Override
 	public void analyze(Graph graph, Map<String, DescriptiveStatistics> results) {

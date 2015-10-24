@@ -19,15 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import com.google.code.geocoder.model.LatLng;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 
-import com.google.code.geocoder.model.LatLng;
+import java.io.*;
 
 /**
  * @author illenberger

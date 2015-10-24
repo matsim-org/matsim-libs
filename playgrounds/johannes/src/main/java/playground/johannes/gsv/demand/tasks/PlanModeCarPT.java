@@ -22,14 +22,13 @@
  */
 package playground.johannes.gsv.demand.tasks;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-
 import playground.johannes.gsv.demand.PopulationTask;
+
+import java.util.Random;
 
 /**
  * @author johannes

@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.VertexDegreeColorizer;
 
 /**
  * @author illenberger

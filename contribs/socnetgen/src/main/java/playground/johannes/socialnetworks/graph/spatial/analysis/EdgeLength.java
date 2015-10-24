@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.DistanceCalculator;
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
 

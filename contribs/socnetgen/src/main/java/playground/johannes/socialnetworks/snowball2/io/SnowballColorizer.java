@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.io;
 
-import java.awt.Color;
-import java.util.Collection;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.sna.snowball.SampledVertex;
+import java.awt.*;
+import java.util.Collection;
 
 /**
  * @author illenberger

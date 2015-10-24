@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.mz2005.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**

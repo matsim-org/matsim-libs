@@ -23,6 +23,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import junit.framework.TestCase;
 import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger

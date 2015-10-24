@@ -24,9 +24,9 @@ import gnu.trove.TDoubleDoubleIterator;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 
 import java.io.BufferedWriter;
 import java.io.File;

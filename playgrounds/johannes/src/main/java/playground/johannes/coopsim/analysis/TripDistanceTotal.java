@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 
 import java.util.Set;
 

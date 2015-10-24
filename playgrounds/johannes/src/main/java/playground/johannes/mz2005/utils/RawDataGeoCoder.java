@@ -19,21 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.mz2005.utils;
 
+import com.google.code.geocoder.model.LatLng;
 import gnu.trove.TObjectIntHashMap;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
 
-import com.google.code.geocoder.model.LatLng;
+import java.io.*;
 
 /**
  * @author illenberger

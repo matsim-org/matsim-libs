@@ -19,24 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.johannes.coopsim.eval.Evaluator;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
-import playground.johannes.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.*;
 
 /**
  * @author illenberger

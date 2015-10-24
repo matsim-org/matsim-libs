@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledEdge;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.snowball.SampledEdge;
-import playground.johannes.sna.snowball.SampledGraph;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**
  * @author illenberger

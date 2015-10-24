@@ -22,8 +22,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph;
 import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.GraphFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import playground.johannes.sna.graph.GraphFactory;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 
 

@@ -19,21 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.graph;
 
+import junit.framework.TestCase;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import playground.johannes.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import junit.framework.TestCase;
-
-
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
 
 /**
  * @author illenberger

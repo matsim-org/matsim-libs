@@ -19,30 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.generators;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.io.GraphMLWriter;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
-import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger

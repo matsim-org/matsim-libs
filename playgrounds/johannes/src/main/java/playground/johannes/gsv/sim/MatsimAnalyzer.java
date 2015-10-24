@@ -19,11 +19,6 @@
 
 package playground.johannes.gsv.sim;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,13 +29,17 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
 import playground.johannes.coopsim.analysis.PkmRouteTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.analysis.PkmGeoTask;
 import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes

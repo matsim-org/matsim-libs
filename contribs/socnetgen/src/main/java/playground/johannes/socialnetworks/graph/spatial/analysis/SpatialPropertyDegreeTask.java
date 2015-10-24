@@ -27,11 +27,11 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 

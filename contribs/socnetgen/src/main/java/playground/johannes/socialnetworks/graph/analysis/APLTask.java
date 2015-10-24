@@ -21,10 +21,10 @@ package playground.johannes.socialnetworks.graph.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.matrix.MatrixAPL;
 
 import java.io.IOException;

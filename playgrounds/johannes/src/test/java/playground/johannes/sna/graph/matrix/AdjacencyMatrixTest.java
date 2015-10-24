@@ -23,21 +23,14 @@
  */
 package playground.johannes.sna.graph.matrix;
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.collections.CollectionUtils;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.generators.ErdosRenyiGenerator;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.generators.ErdosRenyiGenerator;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import java.util.List;
 
 /**
  * @author illenberger

@@ -20,10 +20,10 @@
 package playground.johannes.studies.mcmc;
 
 
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.generators.RandomGraphGenerator;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
 

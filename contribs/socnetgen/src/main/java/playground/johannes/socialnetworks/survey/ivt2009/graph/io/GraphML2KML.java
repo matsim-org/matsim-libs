@@ -19,21 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import net.opengis.kml._2.FolderType;
-
-
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
-import playground.johannes.sna.graph.spatial.io.KMLPartitions;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import playground.johannes.sna.graph.spatial.io.VertexDegreeColorizer;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLIconVertexStyle;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.VertexDegreeColorizer;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -41,6 +34,10 @@ import playground.johannes.socialnetworks.survey.ivt2009.analysis.SampledVertexF
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger

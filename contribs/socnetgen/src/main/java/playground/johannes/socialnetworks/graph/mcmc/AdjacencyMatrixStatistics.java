@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

@@ -21,11 +21,10 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
 
-import java.awt.Color;
-
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
+import java.awt.*;
 
 /**
  * @author jillenberger

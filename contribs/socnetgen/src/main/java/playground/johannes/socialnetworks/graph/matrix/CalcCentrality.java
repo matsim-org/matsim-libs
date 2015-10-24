@@ -20,11 +20,10 @@
 package playground.johannes.socialnetworks.graph.matrix;
 
 import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 
 
 /**

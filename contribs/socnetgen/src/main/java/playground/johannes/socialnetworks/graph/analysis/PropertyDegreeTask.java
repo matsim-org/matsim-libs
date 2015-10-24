@@ -23,10 +23,10 @@ import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
-import playground.johannes.sna.graph.analysis.Transitivity;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Transitivity;
 
 import java.io.IOException;
 import java.util.Map;

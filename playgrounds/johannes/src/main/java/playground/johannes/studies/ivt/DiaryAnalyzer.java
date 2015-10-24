@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.studies.ivt;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
  * @author illenberger

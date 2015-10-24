@@ -20,21 +20,15 @@
 package playground.johannes.socialnetworks.graph.io;
 
 import gnu.trove.TIntObjectHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.io.GraphMLWriter;
 
 
 /**

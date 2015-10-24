@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.graph;
 
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
 import org.matsim.testcases.MatsimTestUtils;
-
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.DegreeTask;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.analysis.TransitivityTask;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
+
+import java.util.Map;
 
 /**
  * @author illenberger

@@ -21,12 +21,11 @@ package playground.johannes.sna.graph.matrix;
 
 import gnu.trove.TIntArrayList;
 import junit.framework.TestCase;
-
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
 
 
 /**

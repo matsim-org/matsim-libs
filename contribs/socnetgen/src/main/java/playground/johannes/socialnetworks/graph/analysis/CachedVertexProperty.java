@@ -20,13 +20,11 @@
 package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexProperty;
 
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.VertexProperty;
 
 /**
  * @author illenberger

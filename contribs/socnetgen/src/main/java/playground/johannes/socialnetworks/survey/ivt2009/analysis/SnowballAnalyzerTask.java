@@ -20,8 +20,8 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 
-import playground.johannes.sna.snowball.analysis.BridgeEdgeTask;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.BridgeEdgeTask;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.ComponentsSeedTask;
 import playground.johannes.socialnetworks.snowball2.analysis.DegreeIterationTask;

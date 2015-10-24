@@ -20,13 +20,11 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-
-import playground.johannes.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
+
+import java.util.Set;
 
 /**
  * @author illenberger

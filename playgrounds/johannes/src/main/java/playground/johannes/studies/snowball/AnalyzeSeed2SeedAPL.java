@@ -20,12 +20,12 @@
 package playground.johannes.studies.snowball;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.analysis.GraphAnalyzer;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-import playground.johannes.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 

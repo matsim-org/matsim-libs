@@ -23,18 +23,17 @@
  */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import playground.johannes.sna.graph.spatial.SpatialEdge;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.io.PajekAttributes;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekWriter;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author illenberger

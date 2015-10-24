@@ -25,16 +25,14 @@ package playground.johannes.socialnetworks.statistics;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
+import org.matsim.core.utils.collections.Tuple;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.sna.math.Distribution;
 
 /**
  * @author illenberger

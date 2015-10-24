@@ -19,19 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.io;
 
-import java.util.LinkedList;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * @author jillenberger

@@ -19,25 +19,24 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.socnetgen.sna.graph.io.AbstractGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphML;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.Attributes;
-
-import playground.johannes.sna.graph.io.AbstractGraphMLReader;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphML;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphML;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+
+import java.io.File;
 
 /**
  * @author illenberger

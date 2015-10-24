@@ -19,18 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeCorrelationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.AgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.CentralityLingAttTask;
-import playground.johannes.socialnetworks.graph.social.analysis.DegreeAgeTask;
-import playground.johannes.socialnetworks.graph.social.analysis.DegreeEducationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.DegreeGenderTask;
-import playground.johannes.socialnetworks.graph.social.analysis.EducationCategorized;
-import playground.johannes.socialnetworks.graph.social.analysis.EducationTask;
-import playground.johannes.socialnetworks.graph.social.analysis.Gender;
-import playground.johannes.socialnetworks.graph.social.analysis.GenderTask;
-import playground.johannes.socialnetworks.graph.social.analysis.SocialAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.socialnetworks.graph.social.analysis.*;
 import playground.johannes.socialnetworks.snowball2.social.analysis.ObservedAge;
 
 /**

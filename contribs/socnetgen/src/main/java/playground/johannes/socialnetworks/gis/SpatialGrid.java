@@ -23,15 +23,14 @@
  */
 package playground.johannes.socialnetworks.gis;
 
-import java.io.IOException;
-import java.util.Stack;
-
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.xml.sax.Attributes;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.Stack;
 
 
 /**

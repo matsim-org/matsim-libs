@@ -19,17 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph.spatial.io;
 
-import junit.framework.TestCase;
-
-
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLVertexDescriptor;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.johannes.sna.TestCaseUtils;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 
 /**
  * @author jillenberger

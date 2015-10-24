@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.sna.math;
 
-import playground.johannes.sna.math.Distribution;
-
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import junit.framework.TestCase;
+import org.matsim.contrib.socnetgen.sna.math.Distribution;
 
 /**
  * @author illenberger

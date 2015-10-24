@@ -20,16 +20,15 @@
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.util.Set;
-
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.snowball.SampledEdge;
-import playground.johannes.sna.snowball.SampledGraph;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledEdge;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
+
+import java.awt.*;
+import java.util.Set;
 
 /**
  * @author illenberger

@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.mcmc;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import java.util.Random;
 
 /**
  * @author illenberger

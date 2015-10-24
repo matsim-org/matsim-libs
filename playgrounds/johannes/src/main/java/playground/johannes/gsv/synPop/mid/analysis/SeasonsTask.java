@@ -22,8 +22,11 @@ package playground.johannes.gsv.synPop.mid.analysis;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.*;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 

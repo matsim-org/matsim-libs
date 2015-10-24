@@ -19,13 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.sna.graph;
 
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
 import junit.framework.TestCase;
+import org.matsim.contrib.socnetgen.sna.graph.*;
 
 /**
  * @author illenberger

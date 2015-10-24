@@ -20,8 +20,8 @@
 package playground.johannes.gsv.misc;
 
 import org.matsim.contrib.common.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 import java.io.IOException;

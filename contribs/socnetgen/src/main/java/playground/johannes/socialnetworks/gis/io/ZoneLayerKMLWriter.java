@@ -19,18 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis.io;
 
+import com.vividsolutions.jts.geom.Geometry;
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
+import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import java.util.HashSet;
 import java.util.Set;
-
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger

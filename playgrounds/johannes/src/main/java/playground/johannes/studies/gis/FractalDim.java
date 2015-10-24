@@ -29,6 +29,7 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -36,7 +37,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 
 import java.io.IOException;
 import java.util.*;

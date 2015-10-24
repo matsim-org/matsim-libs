@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialEdge;
 
 /**
  * @author illenberger

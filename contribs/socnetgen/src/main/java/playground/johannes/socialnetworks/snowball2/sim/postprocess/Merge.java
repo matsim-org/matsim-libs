@@ -22,11 +22,7 @@ package playground.johannes.socialnetworks.snowball2.sim.postprocess;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;

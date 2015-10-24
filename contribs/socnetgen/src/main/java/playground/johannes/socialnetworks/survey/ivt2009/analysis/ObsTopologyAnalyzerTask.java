@@ -20,12 +20,12 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 
-import playground.johannes.sna.graph.analysis.ComponentsTask;
-import playground.johannes.sna.graph.analysis.DegreeTask;
-import playground.johannes.sna.graph.analysis.GraphSizeTask;
-import playground.johannes.sna.graph.analysis.TransitivityTask;
-import playground.johannes.sna.snowball.analysis.ObservedDegree;
-import playground.johannes.sna.snowball.analysis.ObservedTransitivity;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ComponentsTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.TransitivityTask;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedDegree;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.ObservedTransitivity;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.PropertyDegreeTask;
 

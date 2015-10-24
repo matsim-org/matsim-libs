@@ -20,12 +20,11 @@
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 
 import java.util.Set;
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 
 /**
  * @author illenberger

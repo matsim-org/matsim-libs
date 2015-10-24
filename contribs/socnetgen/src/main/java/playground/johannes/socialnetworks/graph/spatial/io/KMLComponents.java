@@ -19,21 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.opengis.kml._2.FolderType;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.KMLPartitions;
 
-import playground.johannes.sna.graph.analysis.Components;
-import playground.johannes.sna.graph.spatial.SpatialGraph;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.sna.graph.spatial.io.KMLPartitions;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 
 /**

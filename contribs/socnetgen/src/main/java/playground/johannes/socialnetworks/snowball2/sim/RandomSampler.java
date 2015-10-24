@@ -19,26 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
+import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ComponentsTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphSizeTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.RandomPartition;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SimplePiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.IterationSampleAnalyzer;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.ComponentsTask;
-import playground.johannes.sna.graph.analysis.GraphSizeTask;
-import playground.johannes.sna.graph.analysis.RandomPartition;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 
 
 /**

@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 
 
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
-import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
+import org.matsim.contrib.socnetgen.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.socialnetworks.statistics.HorwitzThompsonEstimator;
 
 /**

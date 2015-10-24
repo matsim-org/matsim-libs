@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.Map;
-import java.util.Set;
-
-import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrix;
 import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrixBuilder;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author illenberger

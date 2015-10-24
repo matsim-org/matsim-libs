@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import playground.johannes.utils.NetworkLegRouter;
 import org.matsim.facilities.ActivityFacilities;
-
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
+import playground.johannes.utils.NetworkLegRouter;
+
+import java.util.Map;
 
 /**
  * @author illenberger

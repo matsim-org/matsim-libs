@@ -19,22 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.sna.graph.analysis.VertexProperty;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
+import com.vividsolutions.jts.geom.*;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexProperty;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.PointUtils;
 import playground.johannes.socialnetworks.graph.spatial.analysis.ZoneUtils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger

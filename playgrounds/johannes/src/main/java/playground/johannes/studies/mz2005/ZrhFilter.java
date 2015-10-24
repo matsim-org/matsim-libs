@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -34,7 +35,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 
 import java.io.IOException;
 import java.util.HashSet;

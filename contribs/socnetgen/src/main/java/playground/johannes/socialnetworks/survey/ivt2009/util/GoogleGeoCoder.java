@@ -19,20 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import com.google.code.geocoder.AdvancedGeoCoder;
 import com.google.code.geocoder.Geocoder;
 import com.google.code.geocoder.GeocoderRequestBuilder;
@@ -40,6 +26,14 @@ import com.google.code.geocoder.model.GeocodeResponse;
 import com.google.code.geocoder.model.GeocoderRequest;
 import com.google.code.geocoder.model.GeocoderStatus;
 import com.google.code.geocoder.model.LatLng;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author illenberger

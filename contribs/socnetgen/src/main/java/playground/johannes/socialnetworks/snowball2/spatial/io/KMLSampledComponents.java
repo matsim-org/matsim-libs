@@ -20,17 +20,14 @@
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import gnu.trove.TIntIntHashMap;
+import net.opengis.kml._2.FolderType;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLComponents;
 
 import java.util.Arrays;
 import java.util.Set;
-
-import net.opengis.kml._2.FolderType;
-
-
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.snowball.SampledVertex;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLComponents;
 
 /**
  * @author illenberger

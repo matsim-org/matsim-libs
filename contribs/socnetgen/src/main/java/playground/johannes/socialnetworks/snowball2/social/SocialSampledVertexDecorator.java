@@ -19,15 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.social;
 
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-
-import playground.johannes.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.List;
 
 /**
  * @author illenberger

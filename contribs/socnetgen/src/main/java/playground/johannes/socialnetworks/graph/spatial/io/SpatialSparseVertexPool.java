@@ -19,15 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
-import java.util.LinkedList;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraphFactory;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.johannes.sna.graph.spatial.SpatialSparseGraphFactory;
-import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
-
-import com.vividsolutions.jts.geom.Point;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * @author jillenberger

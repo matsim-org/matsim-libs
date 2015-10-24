@@ -19,32 +19,25 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphBuilder;
-import playground.johannes.sna.graph.SparseEdge;
-import playground.johannes.sna.graph.SparseGraph;
-import playground.johannes.sna.graph.SparseGraphBuilder;
-import playground.johannes.sna.graph.SparseVertex;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
-import playground.johannes.sna.graph.analysis.VertexFilter;
-import playground.johannes.sna.graph.generators.ErdosRenyiGenerator;
-import playground.johannes.sna.snowball.SampledGraph;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.FixedSizeRandomPartition;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexFilter;
+import org.matsim.contrib.socnetgen.sna.graph.generators.ErdosRenyiGenerator;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.SimplePiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.EstimatedDegree2;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author illenberger

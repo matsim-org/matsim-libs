@@ -19,36 +19,26 @@
  * *********************************************************************** */
 package playground.johannes.studies.smallworld;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.*;
+import org.matsim.contrib.socnetgen.sna.graph.io.SparseGraphMLReader;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.IntervalSampleAnalyzer;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListenerComposite;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SnowballSampler;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.ComponentsTask;
-import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
-import playground.johannes.sna.graph.analysis.GraphSizeTask;
-import playground.johannes.sna.graph.analysis.RandomPartition;
-import playground.johannes.sna.graph.analysis.VertexFilter;
-import playground.johannes.sna.graph.io.SparseGraphMLReader;
-import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.SamplerListener;
-import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
-import playground.johannes.sna.snowball.sim.SnowballSampler;
-import playground.johannes.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.ConnectionSampleAnalyzer;
+
+import java.util.*;
 
 /**
  * @author illenberger

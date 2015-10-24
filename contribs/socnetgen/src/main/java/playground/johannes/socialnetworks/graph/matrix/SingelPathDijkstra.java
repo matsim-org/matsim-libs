@@ -20,11 +20,10 @@
 package playground.johannes.socialnetworks.graph.matrix;
 
 import gnu.trove.TIntArrayList;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.DijkstraEngine;
 
 import java.util.Arrays;
-
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.graph.matrix.DijkstraEngine;
 
 
 /**

@@ -20,34 +20,19 @@
 package playground.johannes.socialnetworks.graph.analysis;
 
 import gnu.trove.TObjectDoubleIterator;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.*;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.EdgeDecorator;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.GraphProjection;
-import playground.johannes.sna.graph.SparseGraphProjectionBuilder;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.VertexDecorator;
-import playground.johannes.sna.graph.analysis.Components;
-import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import java.util.*;
 
 /**
  * @author illenberger

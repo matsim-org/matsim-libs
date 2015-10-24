@@ -23,9 +23,9 @@ import gnu.trove.*;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.VertexProperty;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexProperty;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.util.HashSet;

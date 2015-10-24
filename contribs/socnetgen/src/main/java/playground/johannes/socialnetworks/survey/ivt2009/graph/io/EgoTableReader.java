@@ -19,21 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
+import com.google.code.geocoder.model.LatLng;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import org.apache.log4j.Logger;
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
-
-import com.google.code.geocoder.model.LatLng;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger

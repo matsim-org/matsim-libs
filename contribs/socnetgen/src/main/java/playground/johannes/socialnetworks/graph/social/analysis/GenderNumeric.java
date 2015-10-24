@@ -20,14 +20,12 @@
 package playground.johannes.socialnetworks.graph.social.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
+import org.matsim.core.population.PersonUtils;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 import java.util.Set;
-
-
-import org.matsim.core.population.PersonUtils;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

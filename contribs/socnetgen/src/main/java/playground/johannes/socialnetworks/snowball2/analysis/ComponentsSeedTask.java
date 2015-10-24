@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.snowball2.analysis;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.analysis.AnalyzerTask;
-import playground.johannes.sna.graph.analysis.Components;
-import playground.johannes.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 import java.io.IOException;
 import java.util.List;
