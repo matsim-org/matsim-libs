@@ -89,8 +89,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		this.noOfYCells = rgt.getNoOfYCells();
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
-		//TODO check: should already be initialized -> remove
-//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		this.responsibilityGridTools = rgt;
 		this.links2xCells = links2xCells;
 		this.links2yCells = links2yCells;
