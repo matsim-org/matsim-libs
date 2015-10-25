@@ -27,9 +27,8 @@ import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -38,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.io.IOException;
 import java.util.HashMap;

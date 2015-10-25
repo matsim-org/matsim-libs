@@ -31,7 +31,7 @@ import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AttributePartition;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.analysis.ObservedLogAccessibility;
+import org.matsim.contrib.socnetgen.sna.snowball.spatial.analysis.ObservedLogAccessibility;
 
 import java.util.Set;
 

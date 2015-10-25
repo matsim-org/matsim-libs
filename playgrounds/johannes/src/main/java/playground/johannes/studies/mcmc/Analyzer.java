@@ -25,10 +25,10 @@ import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.analysis.SocialAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.SpatialAnalyzerTask;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.io.IOException;
 

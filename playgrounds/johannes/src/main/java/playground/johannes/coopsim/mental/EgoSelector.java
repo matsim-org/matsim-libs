@@ -24,8 +24,8 @@ import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.coopsim.Profiler;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.util.ArrayList;
 import java.util.List;

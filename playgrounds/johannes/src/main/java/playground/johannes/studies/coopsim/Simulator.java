@@ -38,7 +38,6 @@ import org.matsim.contrib.socnetgen.sna.math.LinearDistribution;
 import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 import org.matsim.contrib.socnetgen.sna.math.PowerLawDistribution;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -66,6 +65,7 @@ import playground.johannes.coopsim.mental.choice.*;
 import playground.johannes.coopsim.mental.planmod.*;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 import playground.johannes.utils.NetworkLegRouter;
 
 import java.io.File;

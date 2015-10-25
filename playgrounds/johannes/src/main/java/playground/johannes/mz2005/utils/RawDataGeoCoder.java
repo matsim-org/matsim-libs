@@ -23,8 +23,8 @@ import com.google.code.geocoder.model.LatLng;
 import gnu.trove.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.GoogleLocationLookup.RequestLimitException;
+import playground.johannes.studies.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.ivt2009.util.GoogleLocationLookup.RequestLimitException;
 
 import java.io.*;
 

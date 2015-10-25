@@ -30,13 +30,13 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.matsim.contrib.common.stats.*;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseEdge;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseVertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledVertexDecorator;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.GraphReaderFacade;
+import playground.johannes.studies.sbsurvey.io.GraphReaderFacade;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -24,13 +24,13 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Age;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLWriter;
 import org.matsim.core.population.PersonUtils;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLWriter;
 
 import java.io.IOException;
 

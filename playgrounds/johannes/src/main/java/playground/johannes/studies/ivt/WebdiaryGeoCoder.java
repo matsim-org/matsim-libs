@@ -20,7 +20,7 @@
 package playground.johannes.studies.ivt;
 
 import com.google.code.geocoder.model.LatLng;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.ivt2009.util.GoogleGeoCoder;
 
 import java.io.*;
 

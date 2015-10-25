@@ -24,8 +24,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraphFactory;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.util.LinkedList;

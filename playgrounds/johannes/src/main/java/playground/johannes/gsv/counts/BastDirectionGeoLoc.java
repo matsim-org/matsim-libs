@@ -21,7 +21,7 @@ package playground.johannes.gsv.counts;
 
 import com.google.code.geocoder.model.LatLng;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.ivt2009.util.GoogleGeoCoder;
 
 import java.io.*;
 import java.util.HashMap;

@@ -29,13 +29,13 @@ import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.DegreeTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.GraphAnalyzer;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseVertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.Population2SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphMLWriter;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.*;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
-import org.matsim.contrib.socnetgen.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
