@@ -72,7 +72,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -174,7 +173,6 @@ public class EquilEmissionExposureTest {
 		}
 
 		// first coldEmission event is on departure link, thus compare money event and coldEmissionEvent
-
 		double firstMoneyEventToll = personMoneyHandler.events.get(0).getAmount();
 
 		Map<ColdPollutant, Double> coldEmiss = emissEventHandler.coldEvents.get(0).getColdEmissions();
@@ -228,6 +226,61 @@ public class EquilEmissionExposureTest {
 	@Test
 	public void exposureTollTest () {
 
+		Controler controler = exposureInternalizationSettings();
+		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
+		controler.getEvents().addHandler(personMoneyEventHandler);
+		controler.run();
+
+		/*
+		 * Manual calculation
+		 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
+		 * All passive agent perform home activity for 86399 whereas active agent perform 6*3600+86400-51148 (=56852) home activity 
+		 * and 51000-22107 (=28893) work activity. 	Total cells = 32*20 = 640.
+		 * Emission costs (only warm emission since cold emission exists only upto 2 km on departure link) on link 39 = 0.027613043 
+		 * without considering co2 costs (see previous emissionTollTest().)
+		 * cell of Link 39 = 13,14; Thus only cells with 9 < x < 17 and 10 < y < 18 matters to get the dispersion weight.
+		 * 15,13; 15,12; 15,11; 14,13; 14,12; 14,11; 13,13; 13,12; 13,11; 12,13; 12,12; 12,11; 11,13; 11,12; 11,11; 
+		 * noOfCells with zero distance (13,14;) =0; noOfCells with 1 distance (13,13;) =1;
+		 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) =3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) =5;
+		 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
+		 * Thus total relavant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
+		 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
+		 */
+
+		if (! isConsideringCO2Costs ) {
+
+			if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
+				throw new RuntimeException("Active agent does not pass through link 39.");
+			}
+			
+			for (PersonMoneyEvent e : personMoneyEventHandler.events){
+				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
+				}
+			}
+		} else {
+			// TODO: this is completly wrong. Include flat CO2 costs not distributive costs.
+		}
+	}
+
+	@Test
+	public void exposureInternalizationTest () {
+		Controler controler = exposureInternalizationSettings();
+		Scenario sc = controler.getScenario();
+		addReplanningStrategy(sc);
+		controler.getScenario().getConfig().controler().setLastIteration(20);
+		controler.run();
+		// checks
+		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
+		Plan selectedPlan = activeAgent.getSelectedPlan();
+
+		// check with the first leg
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		// Agent should take longer route to avoid exposure toll
+		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
+	}
+
+	private Controler exposureInternalizationSettings () {
 		Scenario sc = createConfig();
 		createNetwork(sc);
 		createActiveAgents(sc);
@@ -272,51 +325,7 @@ public class EquilEmissionExposureTest {
 		});
 
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
-		controler.run();
-
-		// checks
-		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
-		Plan selectedPlan = activeAgent.getSelectedPlan();
-
-		// check with the first leg
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
-		// Agent should take longer route to avoid exposure toll
-		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
-
-		/*
-		 * Manual calculation
-		 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
-		 * All passive agent perform home activity for 86399 whereas active agent perform 6*3600+86400-51148 (=56852) home activity 
-		 * and 51000-22107 (=28893) work activity. 	Total cells = 32*20 = 640.
-		 * Emission costs (only warm emission since cold emission exists only upto 2 km on departure link) on link 39 = 0.027613043 
-		 * without considering co2 costs (see previous emissionTollTest().)
-		 * cell of Link 39 = 13,14; Thus only cells with 9 < x < 17 and 10 < y < 18 matters to get the dispersion weight.
-		 * 15,13; 15,12; 15,11; 14,13; 14,12; 14,11; 13,13; 13,12; 13,11; 12,13; 12,12; 12,11; 11,13; 11,12; 11,11; 
-		 * noOfCells with zero distance (13,14;) =0; noOfCells with 1 distance (13,13;) =1;
-		 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) =3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) =5;
-		 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
-		 * Thus total relavant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
-		 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
-		 */
-
-		if (! isConsideringCO2Costs ) {
-			EventsManager events = EventsUtils.createEventsManager();
-			MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
-			events.addHandler(personMoneyEventHandler);
-			MatsimEventsReader reader = new MatsimEventsReader(events);
-			reader.readFile(outputDirectory+"/ITERS/it.2/2.events.xml.gz");
-			
-			if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
-				throw new RuntimeException("Active agent does not pass through link 39.");
-			}
-			for (PersonMoneyEvent e : personMoneyEventHandler.events){
-				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( 0.19278 ), df.format( e.getAmount() ) );
-				}
-			}
-		} else {
-			// TODO: this is completly wrong. Include flat CO2 costs not distributive costs.
-		}
+		return controler;
 	}
 
 	private void emissionSettings(Scenario scenario){
@@ -346,7 +355,7 @@ public class EquilEmissionExposureTest {
 		ccg.setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		ccg.setCreateGraphs(false);		
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(20);
+		ccg.setLastIteration(1);
 		ccg.setWriteEventsInterval(1);//want to get the toll in first iteration.
 		ccg.setMobsim("qsim");
 
@@ -378,15 +387,9 @@ public class EquilEmissionExposureTest {
 
 		StrategyConfigGroup scg  = config.strategy();
 
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setWeight(0.999);
-		strategySettingsR.setDisableAfter(10);
-		scg.addStrategySettings(strategySettingsR);
-
-		StrategySettings strategySettings = new StrategySettings(Id.create("2", StrategySettings.class));
+		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setWeight(0.001);
+		strategySettings.setWeight(1);
 		scg.addStrategySettings(strategySettings);
 
 		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
@@ -395,6 +398,16 @@ public class EquilEmissionExposureTest {
 
 		return ScenarioUtils.loadScenario(config);
 	}
+
+	private void addReplanningStrategy(Scenario sc) {
+		StrategyConfigGroup scg = sc.getConfig().strategy();
+		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
+		strategySettingsR.setStrategyName("ReRoute");
+		strategySettingsR.setWeight(1000);
+		strategySettingsR.setDisableAfter(10);
+		scg.addStrategySettings(strategySettingsR);
+	}
+
 
 	/**
 	 * Exposure to these agents will result in toll for active agent.
