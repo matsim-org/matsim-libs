@@ -129,4 +129,24 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			return 0;
 		}
 	}
+
+	@Override
+	public Map<U, Integer> getDecisionVariable2evaluationCnt() {
+		return null; // TODO not ideal
+	}
+
+	@Override
+	public double getInitialEquilibriumGap() {
+		return 0.0; // TODO not ideal
+	}
+
+	@Override
+	public double getInitialObjectiveFunctionValue() {
+		return 0.0; // TODO not ideal
+	}
+
+	@Override
+	public double getInitialUniformityGap() {
+		return 0.0; // TODO not ideal
+	}
 }

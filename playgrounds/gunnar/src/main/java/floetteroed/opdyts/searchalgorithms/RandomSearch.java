@@ -223,6 +223,10 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	public void run() {
 
+		double equilibriumGapWeight = 0.0;
+		double uniformityGapWeight = 0.0;
+		double inertia = 0.95;
+
 		U bestDecisionVariable = this.randomizer.newRandomDecisionVariable();
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
@@ -235,9 +239,11 @@ public class RandomSearch<U extends DecisionVariable> {
 					+ " of " + this.maxTransitions);
 
 			this.interpolatedObjectiveFunctionValueWeights.add(1.0);
-			this.equilibriumGapWeights.add(this.selfTuner
-					.getEquilibriumGapWeight());
-			this.uniformityGapWeights.add(this.selfTuner.getUniformityWeight());
+			this.equilibriumGapWeights.add(equilibriumGapWeight);
+			this.uniformityGapWeights.add(uniformityGapWeight);
+			// this.equilibriumGapWeights.add(this.selfTuner
+			// .getEquilibriumGapWeight());
+			// this.uniformityGapWeights.add(this.selfTuner.getUniformityWeight());
 			this.offsets.add(this.selfTuner.getOffset());
 
 			final Set<U> candidates = new LinkedHashSet<U>();
@@ -259,15 +265,16 @@ public class RandomSearch<U extends DecisionVariable> {
 					sampler = new ParallelTrajectorySampler<>(candidates,
 							this.objectBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
-							this.selfTuner.getEquilibriumGapWeight(),
-							this.selfTuner.getUniformityWeight());
+							equilibriumGapWeight, uniformityGapWeight);
+					// this.selfTuner.getEquilibriumGapWeight(),
+					// this.selfTuner.getUniformityWeight());
 				} else {
 					sampler = new ParallelTrajectorySampler<>(candidates,
 							this.vectorBasedObjectiveFunction,
 							this.convergenceCriterion, this.rnd,
-							this.selfTuner.getEquilibriumGapWeight(),
-							this.selfTuner.getUniformityWeight());
-
+							equilibriumGapWeight, uniformityGapWeight);
+					// this.selfTuner.getEquilibriumGapWeight(),
+					// this.selfTuner.getUniformityWeight());
 				}
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
@@ -278,11 +285,29 @@ public class RandomSearch<U extends DecisionVariable> {
 						.getFinalObjectiveFunctionValue(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				this.selfTuner.registerSamplingStageSequence(
+				// this.selfTuner.registerSamplingStageSequence(
+				// sampler.getInitialObjectiveFunctionValue(),
+				// sampler.getInitialEquilibriumGap(),
+				// sampler.getInitialUniformityGap(),
+				// newBestObjectiveFunctionValue, newBestDecisionVariable);
+
+				// this.selfTuner.registerSamplingStageSequence(
+				// sampler.getSamplingStages(),
+				// newBestObjectiveFunctionValue,
+				// sampler.getInitialGradientNorm(),
+				// newBestDecisionVariable);
+
+				final UpperBoundTuner newTuner = new UpperBoundTuner();
+				newTuner.registerSamplingStageSequence(
 						sampler.getSamplingStages(),
 						newBestObjectiveFunctionValue,
 						sampler.getInitialGradientNorm(),
 						newBestDecisionVariable);
+
+				equilibriumGapWeight = inertia * equilibriumGapWeight
+						+ (1.0 - inertia) * newTuner.equilGapWeight;
+				uniformityGapWeight *= inertia * uniformityGapWeight
+						+ (1.0 - inertia) * newTuner.unifGapWeight;
 
 			} else {
 

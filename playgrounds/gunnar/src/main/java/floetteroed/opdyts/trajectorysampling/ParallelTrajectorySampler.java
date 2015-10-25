@@ -176,6 +176,75 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.initialGradientNorm;
 	}
 
+	@Override
+	public Map<U, Integer> getDecisionVariable2evaluationCnt() {
+		final Map<U, Integer> result = new LinkedHashMap<>();
+		for (Map.Entry<U, TransitionSequence<U>> decVar2tranSeq : this.decisionVariable2transitionSequence
+				.entrySet()) {
+			result.put(decVar2tranSeq.getKey(), decVar2tranSeq.getValue()
+					.size());
+		}
+		return result;
+	}
+
+	@Override
+	public double getInitialObjectiveFunctionValue() {
+		final List<Transition<U>> initialTransitions = new ArrayList<>();
+		final List<Double> counts = new ArrayList<>();
+		for (TransitionSequence<U> transitionSequence : this.decisionVariable2transitionSequence
+				.values()) {
+			initialTransitions.add(transitionSequence.getTransitions().get(0));
+			counts.add(new Double(transitionSequence.size()));
+		}
+		final Vector alphas = new Vector(counts);
+		alphas.mult(1.0 / alphas.sum());
+
+		if (this.vectorBasedObjectiveFunction == null) {
+			throw new RuntimeException("need a vector based objective function");
+		}
+		final TransitionSequencesAnalyzer<U> analyzer = new TransitionSequencesAnalyzer<U>(
+				initialTransitions, this.equilibriumWeight,
+				this.uniformityWeight, this.vectorBasedObjectiveFunction,
+				this.initialGradientNorm);
+		return analyzer.originalObjectiveFunctionValue(alphas);
+	}
+
+	@Override
+	public double getInitialEquilibriumGap() {
+		final List<Transition<U>> initialTransitions = new ArrayList<>();
+		final List<Double> counts = new ArrayList<>();
+		for (TransitionSequence<U> transitionSequence : this.decisionVariable2transitionSequence
+				.values()) {
+			initialTransitions.add(transitionSequence.getTransitions().get(0));
+			counts.add(new Double(transitionSequence.size()));
+		}
+		final Vector alphas = new Vector(counts);
+		alphas.mult(1.0 / alphas.sum());
+
+		if (this.vectorBasedObjectiveFunction == null) {
+			throw new RuntimeException("need a vector based objective function");
+		}
+		final TransitionSequencesAnalyzer<U> analyzer = new TransitionSequencesAnalyzer<U>(
+				initialTransitions, this.equilibriumWeight,
+				this.uniformityWeight, this.vectorBasedObjectiveFunction,
+				this.initialGradientNorm);
+		return analyzer.equilibriumGap(alphas);
+	}
+
+	@Override
+	public double getInitialUniformityGap() {
+		final List<Transition<U>> initialTransitions = new ArrayList<>();
+		final List<Double> counts = new ArrayList<>();
+		for (TransitionSequence<U> transitionSequence : this.decisionVariable2transitionSequence
+				.values()) {
+			initialTransitions.add(transitionSequence.getTransitions().get(0));
+			counts.add(new Double(transitionSequence.size()));
+		}
+		final Vector alphas = new Vector(counts);
+		alphas.mult(1.0 / alphas.sum());
+		return alphas.innerProd(alphas);
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	/*

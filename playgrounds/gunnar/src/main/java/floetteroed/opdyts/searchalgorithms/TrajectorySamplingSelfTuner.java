@@ -142,7 +142,7 @@ public class TrajectorySamplingSelfTuner {
 		// .get(finalDecisionVariable)
 		);
 		input.add(this.uniformityWeightIndex,
-				gradientNorm * stage.getAlphaNorm()
+				gradientNorm * stage.getAlphaNorm() * stage.getAlphaNorm()
 		// * stage.decisionVariable2singletonUniformityGap
 		// .get(finalDecisionVariable)
 		);
@@ -248,6 +248,42 @@ public class TrajectorySamplingSelfTuner {
 		// this.inputs.addFirst(input);
 		// this.outputs.addFirst(output);
 		// }
+
+		final UpperBoundTuner myTuner = new UpperBoundTuner();
+		myTuner.registerSamplingStageSequence(samplingStages,
+				finalObjectiveFunctionValue, gradientNorm,
+				finalDecisionVariable);
+
+		this.run();
+	}
+
+	public <U extends DecisionVariable> void registerSamplingStageSequence(
+			final double initialObjectiveFunctionValue,
+			final double initialEquilibriumGap,
+			final double initialUniformityGap,
+			final double finalObjectiveFunctionValue,
+			final U finalDecisionVariable) {
+
+		final Vector input = new Vector(4);
+		input.set(this.equilibriumGapWeightIndex, initialEquilibriumGap);
+		input.add(this.uniformityWeightIndex, initialUniformityGap);
+		input.add(this.posOffsetIndex, +1.0);
+		input.add(this.negOffsetIndex, -1.0);
+		double output = finalObjectiveFunctionValue
+				- initialObjectiveFunctionValue;
+
+		this.inputs.addFirst(input);
+		this.outputs.addFirst(output);
+
+		// try {
+		// this.log = new PrintWriter(new BufferedWriter(new FileWriter(
+		// "./predvsreal.txt", true)));
+		// } catch (IOException e) {
+		// throw new RuntimeException(e);
+		// }
+		// this.log.println((stage.getOriginalObjectiveFunctionValue() + input
+		// .innerProd(this.coeffs)) + "\t" + finalObjectiveFunctionValue);
+		// this.log.close();
 
 		this.run();
 	}

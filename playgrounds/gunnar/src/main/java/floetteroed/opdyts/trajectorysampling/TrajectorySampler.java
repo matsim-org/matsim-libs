@@ -67,4 +67,17 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 */
 	public void afterIteration(SimulatorState newState);
 
+	// TODO NEW
+	@Deprecated
+	public Map<U, Integer> getDecisionVariable2evaluationCnt();
+	
+	// TODO NEW
+	public double getInitialObjectiveFunctionValue();
+
+	// TODO NEW
+	public double getInitialEquilibriumGap();
+
+	// TODO NEW
+	public double getInitialUniformityGap();
+	
 }

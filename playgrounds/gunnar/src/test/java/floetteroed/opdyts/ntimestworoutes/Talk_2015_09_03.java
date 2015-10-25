@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Random;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.VectorToObjectBasedObjectiveFunctionWrapper;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
@@ -83,17 +84,19 @@ class Talk_2015_09_03 {
 		final int transitionBinSize = 100;
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
-		final int replications = 3;
+		final int replications = 1;
 		final boolean keepBestSolution = true;
 		final int maxDeltaBin = 3;
-		final double replanningProbability = 0.05;
+		final double replanningProbability = 0.10;
 
 		final double maxExternality = 3.0;
-//		final Vector externalities = randomExternalities(maxExternality,
-//				linkCnt, new Random(4711));
-		final Vector externalities = minMaxExternalities(maxExternality, linkCnt, 2);
-		
-		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
+		// final Vector externalities = randomExternalities(maxExternality,
+		// linkCnt, new Random(4711));
+		final Vector externalities = minMaxExternalities(maxExternality,
+				linkCnt, 2);
+
+		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32, 64, 128,
+				256 }) {
 
 			final List<List<Double>> naiveTransitionList = new ArrayList<List<Double>>();
 			final List<List<Double>> naiveObjectiveFunctionValueList = new ArrayList<List<Double>>();
@@ -165,8 +168,8 @@ class Talk_2015_09_03 {
 					// final ObjectiveFunction objectiveFunction = new
 					// NTimesTwoRoutesObjectiveFunction_exact(
 					// externalities, capacity);
-					final VectorBasedObjectiveFunction objectiveFunction = new NTimesTwoRoutesObjectiveFunction(
-							externalities);
+					final ObjectBasedObjectiveFunction objectiveFunction = new VectorToObjectBasedObjectiveFunctionWrapper(
+							new NTimesTwoRoutesObjectiveFunction(externalities));
 
 					final ConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 							1e-4, 1e-4, simulate ? 10 : 10);
