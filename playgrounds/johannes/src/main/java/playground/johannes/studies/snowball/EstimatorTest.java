@@ -26,6 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.run.RunSnowballSim;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
@@ -604,7 +605,7 @@ public class EstimatorTest implements SamplerListener {
     public static void main(String args[]) throws IOException {
         final String MODULE_NAME = "estimatortest";
 
-        Config config = SnowballSim.loadConfig(args[0]);
+        Config config = RunSnowballSim.loadConfig(args[0]);
 
         SparseGraphMLReader reader = new SparseGraphMLReader();
         Graph graph = reader.readGraph(config.getParam(MODULE_NAME, "graphfile"));

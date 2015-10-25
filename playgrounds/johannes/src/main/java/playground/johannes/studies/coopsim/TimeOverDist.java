@@ -30,7 +30,6 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.common.stats.StatsWriter;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -44,6 +43,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

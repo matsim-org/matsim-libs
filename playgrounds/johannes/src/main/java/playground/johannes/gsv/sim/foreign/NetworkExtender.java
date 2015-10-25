@@ -34,7 +34,6 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,6 +44,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 

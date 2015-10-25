@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.population.PersonUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 
 import java.util.Random;

@@ -28,7 +28,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.utils.NetworkLegRouter;
+import playground.johannes.coopsim.utils.NetworkLegRouter;
 
 /**
  * @author illenberger

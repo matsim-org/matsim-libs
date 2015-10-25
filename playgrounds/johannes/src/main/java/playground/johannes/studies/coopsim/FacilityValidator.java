@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 /**
  * @author illenberger

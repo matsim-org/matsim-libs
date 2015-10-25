@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import com.google.code.geocoder.model.LatLng;
-import playground.johannes.studies.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.sbsurvey.util.GoogleGeoCoder;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;

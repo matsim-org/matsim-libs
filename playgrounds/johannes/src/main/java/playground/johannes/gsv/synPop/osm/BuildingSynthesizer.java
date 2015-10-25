@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -38,6 +37,7 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.util.*;
 import java.util.Map.Entry;

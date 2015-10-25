@@ -24,7 +24,6 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-import playground.johannes.studies.ivt2009.util.KMLSampledComponents;
 
 import java.awt.*;
 import java.util.*;

@@ -23,7 +23,6 @@ import net.opengis.kml._2.PlacemarkType;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
-import playground.johannes.studies.ivt2009.util.KMLSnowballDescriptor;
 
 /**
  * @author illenberger

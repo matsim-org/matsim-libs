@@ -31,13 +31,13 @@ import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.gis.KreisOsmCompare;
 
 import java.io.IOException;

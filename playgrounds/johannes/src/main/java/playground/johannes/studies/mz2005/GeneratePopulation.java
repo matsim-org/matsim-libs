@@ -21,8 +21,8 @@ package playground.johannes.studies.mz2005;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import playground.johannes.mz2005.io.EscortData;
-import playground.johannes.mz2005.io.RawDataToPopulation;
+import playground.johannes.studies.mz2005.io.EscortData;
+import playground.johannes.studies.mz2005.io.RawDataToPopulation;
 
 import java.io.IOException;
 import java.util.ArrayList;

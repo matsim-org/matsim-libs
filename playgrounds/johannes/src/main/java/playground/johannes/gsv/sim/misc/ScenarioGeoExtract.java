@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 /**
  * @author johannes
