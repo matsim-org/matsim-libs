@@ -255,6 +255,7 @@ public class EquilEmissionExposureTest {
 			
 			for (PersonMoneyEvent e : personMoneyEventHandler.events){
 				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+//					TODO fix this test. Current value shows -0.18909
 					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
 				}
 			}
@@ -278,6 +279,7 @@ public class EquilEmissionExposureTest {
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
 		// Agent should take longer route to avoid exposure toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
+		//TODO : not sure if exposure toll forces active agent to avoid route with link 29 after 0th iteration.
 	}
 
 	private Controler exposureInternalizationSettings () {
