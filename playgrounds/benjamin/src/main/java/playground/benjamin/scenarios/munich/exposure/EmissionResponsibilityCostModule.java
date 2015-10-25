@@ -45,15 +45,6 @@ public class EmissionResponsibilityCostModule {
 	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
-	// TODO move parameter to controler/ set in constructor
-//	private Double timeBinSize = 60.*60.;
-//
-//	private int noOfXCells = 160;
-//
-//	private int noOfYCells = 120;
-//	
-//	private int noOfTimeBins = 30;
-	
 	private ResponsibilityGridTools responsibilityGridTools;
 
 	
@@ -68,8 +59,6 @@ public class EmissionResponsibilityCostModule {
 			logger.info("CO2 emission costs will NOT be calculated... ");
 		}
 		
-		// TODO should now be initialized before... delete this
-//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		this.responsibilityGridTools = rgt;
 		
 	}
@@ -78,8 +67,6 @@ public class EmissionResponsibilityCostModule {
 		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");
-		// TODO should now be initialized before... delete this
-//		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		this.responsibilityGridTools = rgt;
 	}
 
