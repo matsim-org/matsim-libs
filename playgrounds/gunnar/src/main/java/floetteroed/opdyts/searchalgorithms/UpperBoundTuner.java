@@ -65,8 +65,10 @@ public class UpperBoundTuner {
 
 	public <U extends DecisionVariable> void registerSamplingStageSequence(
 			final List<SamplingStage<U>> samplingStages,
-			final double finalObjectiveFunctionValue,
-			final double gradientNorm, final U finalDecisionVariable) {
+			final double finalObjectiveFunctionValue
+//			,
+//			final double gradientNorm, final U finalDecisionVariable
+			) {
 
 		/*
 		 * Objective function.

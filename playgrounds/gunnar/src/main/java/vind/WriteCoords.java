@@ -1,8 +1,10 @@
+package vind;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import floetteroed.utilities.latex.PSTricksDiagramWriter;
 
+@Deprecated
 public class WriteCoords {
 
 	public WriteCoords() {

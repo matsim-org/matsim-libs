@@ -1,7 +1,8 @@
+package vind;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
-
+@Deprecated
 public class MyBindings {
 
 	private MyBindings() {

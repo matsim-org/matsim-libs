@@ -22,13 +22,17 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package floetteroed.opdyts;
+package vind;
+
+import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
 
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
+@Deprecated
 public class VectorToObjectBasedObjectiveFunctionWrapper implements
 		ObjectBasedObjectiveFunction {
 

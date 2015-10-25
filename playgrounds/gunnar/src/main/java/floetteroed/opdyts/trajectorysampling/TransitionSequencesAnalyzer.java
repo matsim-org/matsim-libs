@@ -63,31 +63,37 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequencesAnalyzer(
-			final List<Transition<U>> transitions,
-			final double equilibriumGapWeight,
-			final double uniformityWeight,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final double initialGradientNorm) {
+	TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
+			final double equilibriumGapWeight, final double uniformityWeight
+	// ,
+	// final floetteroed.opdyts.VectorBasedObjectiveFunction
+	// vectorBasedObjectiveFunction,
+	// final double initialGradientNorm
+	) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
-				vectorBasedObjectiveFunction, transitions,
-				equilibriumGapWeight, uniformityWeight, initialGradientNorm);
+		// null,
+				transitions, equilibriumGapWeight, uniformityWeight
+		// , 0.0
+		);
 	}
 
 	TransitionSequencesAnalyzer(
 			final Map<U, TransitionSequence<U>> decisionVariable2transitionSequence,
-			final double equilibriumWeight,
-			final double uniformityWeight,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final double initialGradientNorm) {
+			final double equilibriumWeight, final double uniformityWeight
+	// ,
+	// final floetteroed.opdyts.VectorBasedObjectiveFunction
+	// vectorBasedObjectiveFunction,
+	// final double initialGradientNorm
+	) {
 		this(map2list(decisionVariable2transitionSequence), equilibriumWeight,
-				uniformityWeight, vectorBasedObjectiveFunction,
-				initialGradientNorm);
+				uniformityWeight
+		// , null, 0.0
+		);
 	}
 
 	static <V extends DecisionVariable> List<Transition<V>> map2list(

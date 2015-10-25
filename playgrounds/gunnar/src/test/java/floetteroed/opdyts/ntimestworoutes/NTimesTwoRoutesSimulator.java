@@ -2,9 +2,9 @@ package floetteroed.opdyts.ntimestworoutes;
 
 import java.util.List;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
-import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -13,7 +13,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-class NTimesTwoRoutesSimulator implements Simulator {
+class NTimesTwoRoutesSimulator<U extends DecisionVariable> implements Simulator<U> {
 
 	// -------------------- CONSTANTS (CONFIGURABLE) --------------------
 
@@ -150,14 +150,14 @@ class NTimesTwoRoutesSimulator implements Simulator {
 	// -------------------- IMPLEMENTATION OF System --------------------
 
 	@Override
-	public SimulatorState run(final TrajectorySampler sampler) {
+	public SimulatorState run(final TrajectorySampler<U> sampler) {
 		return this.run(sampler, null);
 	}
 
 	// -------------------- SIMULATION LOGIC --------------------
 
 	@Override
-	public SimulatorState run(final TrajectorySampler sampler,
+	public SimulatorState run(final TrajectorySampler<U> sampler,
 			final SimulatorState initialState) {
 
 		// for (int i = 0; i < this.replanners.size(); i++) {

@@ -22,7 +22,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package floetteroed.opdyts;
+package vind;
 
 import floetteroed.utilities.math.Vector;
 
@@ -35,6 +35,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
+@Deprecated
 public interface VectorBasedObjectiveFunction {
 
 	public double value(Vector state);

@@ -35,7 +35,6 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
@@ -51,13 +50,13 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
-	private final Simulator simulator;
+	private final Simulator<U> simulator;
 
 	private final DecisionVariableRandomizer<U> randomizer;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
-	private final TrajectorySamplingSelfTuner selfTuner;
+	// private final TrajectorySamplingSelfTuner selfTuner;
 
 	private final int maxIterations;
 
@@ -73,7 +72,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
 
-	private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
+	// private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
 
 	private final int maxMemoryLength;
 
@@ -97,43 +96,43 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RandomSearch(final Simulator system,
-			final DecisionVariableRandomizer<U> randomizer,
-			final ConvergenceCriterion convergenceCriterion,
-			final TrajectorySamplingSelfTuner selfTuner,
-			final int maxIterations, final int maxTransitions,
-			final int populationSize, final Random rnd,
-			final boolean interpolate, final boolean keepBestSolution,
-			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final int maxMemoryLength) {
-		this.simulator = system;
-		this.randomizer = randomizer;
-		this.convergenceCriterion = convergenceCriterion;
-		this.selfTuner = selfTuner;
-		this.maxIterations = maxIterations;
-		this.maxTransitions = maxTransitions;
-		this.populationSize = populationSize;
-		this.rnd = rnd;
-		this.interpolate = interpolate;
-		this.keepBestSolution = keepBestSolution;
-		this.objectBasedObjectiveFunction = null;
-		this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
-		this.maxMemoryLength = maxMemoryLength;
-	}
+	// public RandomSearch(final Simulator system,
+	// final DecisionVariableRandomizer<U> randomizer,
+	// final ConvergenceCriterion convergenceCriterion,
+	// final TrajectorySamplingSelfTuner selfTuner,
+	// final int maxIterations, final int maxTransitions,
+	// final int populationSize, final Random rnd,
+	// final boolean interpolate, final boolean keepBestSolution,
+	// final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
+	// final int maxMemoryLength) {
+	// this.simulator = system;
+	// this.randomizer = randomizer;
+	// this.convergenceCriterion = convergenceCriterion;
+	// this.selfTuner = selfTuner;
+	// this.maxIterations = maxIterations;
+	// this.maxTransitions = maxTransitions;
+	// this.populationSize = populationSize;
+	// this.rnd = rnd;
+	// this.interpolate = interpolate;
+	// this.keepBestSolution = keepBestSolution;
+	// this.objectBasedObjectiveFunction = null;
+	// this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
+	// this.maxMemoryLength = maxMemoryLength;
+	// }
 
-	public RandomSearch(final Simulator system,
+	public RandomSearch(final Simulator<U> simulator,
 			final DecisionVariableRandomizer<U> randomizer,
 			final ConvergenceCriterion convergenceCriterion,
-			final TrajectorySamplingSelfTuner selfTuner,
+			// final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
 			final int populationSize, final Random rnd,
 			final boolean interpolate, final boolean keepBestSolution,
 			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
 			final int maxMemoryLength) {
-		this.simulator = system;
+		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.convergenceCriterion = convergenceCriterion;
-		this.selfTuner = selfTuner;
+		// this.selfTuner = selfTuner;
 		this.maxIterations = maxIterations;
 		this.maxTransitions = maxTransitions;
 		this.populationSize = populationSize;
@@ -141,7 +140,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.interpolate = interpolate;
 		this.keepBestSolution = keepBestSolution;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
-		this.vectorBasedObjectiveFunction = null;
+		// this.vectorBasedObjectiveFunction = null;
 		this.maxMemoryLength = maxMemoryLength;
 	}
 
@@ -244,7 +243,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			// this.equilibriumGapWeights.add(this.selfTuner
 			// .getEquilibriumGapWeight());
 			// this.uniformityGapWeights.add(this.selfTuner.getUniformityWeight());
-			this.offsets.add(this.selfTuner.getOffset());
+			this.offsets.add(Double.NaN); // this.selfTuner.getOffset());
 
 			final Set<U> candidates = new LinkedHashSet<U>();
 			if (this.keepBestSolution) {
@@ -261,21 +260,21 @@ public class RandomSearch<U extends DecisionVariable> {
 			if (this.interpolate) {
 
 				final ParallelTrajectorySampler<U> sampler;
-				if (this.objectBasedObjectiveFunction != null) {
-					sampler = new ParallelTrajectorySampler<>(candidates,
-							this.objectBasedObjectiveFunction,
-							this.convergenceCriterion, this.rnd,
-							equilibriumGapWeight, uniformityGapWeight);
-					// this.selfTuner.getEquilibriumGapWeight(),
-					// this.selfTuner.getUniformityWeight());
-				} else {
-					sampler = new ParallelTrajectorySampler<>(candidates,
-							this.vectorBasedObjectiveFunction,
-							this.convergenceCriterion, this.rnd,
-							equilibriumGapWeight, uniformityGapWeight);
-					// this.selfTuner.getEquilibriumGapWeight(),
-					// this.selfTuner.getUniformityWeight());
-				}
+				// if (this.objectBasedObjectiveFunction != null) {
+				sampler = new ParallelTrajectorySampler<>(candidates,
+						this.objectBasedObjectiveFunction,
+						this.convergenceCriterion, this.rnd,
+						equilibriumGapWeight, uniformityGapWeight);
+				// this.selfTuner.getEquilibriumGapWeight(),
+				// this.selfTuner.getUniformityWeight());
+				// } else {
+				// sampler = new ParallelTrajectorySampler<>(candidates,
+				// this.vectorBasedObjectiveFunction,
+				// this.convergenceCriterion, this.rnd,
+				// equilibriumGapWeight, uniformityGapWeight);
+				// // this.selfTuner.getEquilibriumGapWeight(),
+				// // this.selfTuner.getUniformityWeight());
+				// }
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
@@ -300,9 +299,11 @@ public class RandomSearch<U extends DecisionVariable> {
 				final UpperBoundTuner newTuner = new UpperBoundTuner();
 				newTuner.registerSamplingStageSequence(
 						sampler.getSamplingStages(),
-						newBestObjectiveFunctionValue,
-						sampler.getInitialGradientNorm(),
-						newBestDecisionVariable);
+						newBestObjectiveFunctionValue
+				// ,
+				// sampler.getInitialGradientNorm(),
+				// newBestDecisionVariable
+				);
 
 				equilibriumGapWeight = inertia * equilibriumGapWeight
 						+ (1.0 - inertia) * newTuner.equilGapWeight;
@@ -319,15 +320,15 @@ public class RandomSearch<U extends DecisionVariable> {
 				for (U candidate : candidates) {
 					this.convergenceCriterion.reset();
 					final SingleTrajectorySampler<U> singleSampler;
-					if (this.objectBasedObjectiveFunction != null) {
-						singleSampler = new SingleTrajectorySampler<>(
-								candidate, this.objectBasedObjectiveFunction,
-								this.convergenceCriterion);
-					} else {
-						singleSampler = new SingleTrajectorySampler<>(
-								candidate, this.vectorBasedObjectiveFunction,
-								this.convergenceCriterion);
-					}
+					// if (this.objectBasedObjectiveFunction != null) {
+					singleSampler = new SingleTrajectorySampler<>(candidate,
+							this.objectBasedObjectiveFunction,
+							this.convergenceCriterion);
+					// } else {
+					// singleSampler = new SingleTrajectorySampler<>(
+					// candidate, this.vectorBasedObjectiveFunction,
+					// this.convergenceCriterion);
+					// }
 					final SimulatorState candidateInitialState = this.simulator
 							.run(singleSampler, thisRoundsInitialState);
 					final double candidateObjectiveFunctionValue = singleSampler

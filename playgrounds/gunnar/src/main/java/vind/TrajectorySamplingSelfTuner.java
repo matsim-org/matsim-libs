@@ -22,7 +22,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package floetteroed.opdyts.searchalgorithms;
+package vind;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -45,6 +45,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.searchalgorithms.UpperBoundTuner;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.utilities.math.Vector;
 
@@ -53,6 +54,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
+@Deprecated
 public class TrajectorySamplingSelfTuner {
 
 	// TODO
@@ -130,19 +132,23 @@ public class TrajectorySamplingSelfTuner {
 
 	public <U extends DecisionVariable> void registerSamplingStageSequence(
 			final List<SamplingStage<U>> samplingStages,
-			final double finalObjectiveFunctionValue,
-			final double gradientNorm, final U finalDecisionVariable) {
+			final double finalObjectiveFunctionValue
+			,
+//			final double gradientNorm, final 
+			U finalDecisionVariable) {
 
 		final SamplingStage<U> stage = samplingStages.get(0);
 		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
 		final Vector input = new Vector(4);
 		input.set(this.equilibriumGapWeightIndex,
-				gradientNorm * stage.getEquilibriumGap()
+				// gradientNorm * 
+				stage.getEquilibriumGap()
 		// * stage.decisionVariable2singletonEquilbriumGap
 		// .get(finalDecisionVariable)
 		);
 		input.add(this.uniformityWeightIndex,
-				gradientNorm * stage.getAlphaNorm() * stage.getAlphaNorm()
+				// gradientNorm * 
+				stage.getAlphaNorm() * stage.getAlphaNorm()
 		// * stage.decisionVariable2singletonUniformityGap
 		// .get(finalDecisionVariable)
 		);
@@ -251,8 +257,11 @@ public class TrajectorySamplingSelfTuner {
 
 		final UpperBoundTuner myTuner = new UpperBoundTuner();
 		myTuner.registerSamplingStageSequence(samplingStages,
-				finalObjectiveFunctionValue, gradientNorm,
-				finalDecisionVariable);
+				finalObjectiveFunctionValue
+				// , 
+				// gradientNorm,
+				// finalDecisionVariable
+				);
 
 		this.run();
 	}
