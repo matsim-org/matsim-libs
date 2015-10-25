@@ -19,10 +19,9 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import java.util.Map;
-
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.Segment;
+
+import java.util.Map;
 
 /**
  * @author johannes

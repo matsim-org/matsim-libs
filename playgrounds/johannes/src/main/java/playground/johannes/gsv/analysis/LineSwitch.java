@@ -1,15 +1,12 @@
 package playground.johannes.gsv.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.pt.PtConstants;
-
 import playground.johannes.coopsim.analysis.AbstractTrajectoryProperty;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Set;
 
 public class LineSwitch extends AbstractTrajectoryProperty {
 

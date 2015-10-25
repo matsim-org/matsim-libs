@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.convergencecriteria;
 
 import java.util.List;
@@ -57,7 +57,7 @@ public class FixedIterationNumberConvergenceCriterion implements
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
-	public void evaluate(final TransitionSequence transitionSequence) {
+	public void evaluate(final TransitionSequence<?> transitionSequence) {
 		if ((transitionSequence.size() < this.iterationsToConvergence)) {
 			this.finalObjectiveFunctionValue = null;
 		} else {
@@ -82,7 +82,7 @@ public class FixedIterationNumberConvergenceCriterion implements
 	public Double getFinalObjectiveFunctionValue() {
 		return this.finalObjectiveFunctionValue;
 	}
-	
+
 	@Override
 	public void reset() {
 		this.finalObjectiveFunctionValue = null;

@@ -19,15 +19,11 @@
 
 package playground.johannes.gsv.misc;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author johannes

@@ -22,27 +22,20 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.NutsLevel3Zones;
 import playground.johannes.gsv.demand.tasks.PersonAge;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author johannes

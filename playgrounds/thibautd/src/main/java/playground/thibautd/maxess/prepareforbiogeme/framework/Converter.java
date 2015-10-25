@@ -71,27 +71,44 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 
 		log.info( "start conversion" );
 		try ( final ChoiceDataSetWriter<T> writer = new ChoiceDataSetWriter<>( recordFiller , dataset ) ) {
+			log.info( "start data writing thread" );
 			final WritingRunnable runnable = new WritingRunnable( writer );
 			final Thread writerThread = new Thread( runnable );
 
 			writerThread.start();
 
+			log.info( "Submit tasks to worker threads" );
+			final Counter counter = new Counter( "Submitting task # " );
 			for (Person p : chains.getPersons().values() ) {
+				counter.incCounter();
 				final Person pf = p;
 				executor.execute(
 						new Runnable() {
 							@Override
 							public void run() {
-								for (C choice : choicesIdentifier.get().identifyChoices(pf.getSelectedPlan())) {
-									final ChoiceSet<T> set = choiceSetSampler.get().sampleChoiceSet(pf, choice);
-									runnable.queue.add( set );
+								try {
+									for (C choice : choicesIdentifier.get().identifyChoices(pf.getSelectedPlan())) {
+										final ChoiceSet<T> set = choiceSetSampler.get().sampleChoiceSet(pf, choice);
+										runnable.queue.add(set);
+									}
+								}
+								catch (Throwable t) {
+									// Bypass an anoying feature of the Executor, that creates new threads if a thread
+									// crashes. We want to stop fast if something occurs.
+									executor.shutdownNow();
+									throw t;
 								}
 							}
 						});
 			}
+			counter.printCounter();
 
-			executor.awaitTermination( Long.MAX_VALUE , TimeUnit.DAYS );
+			log.info( "all tasks submitted. Waiting for execution." );
 			executor.shutdown();
+			executor.awaitTermination( Long.MAX_VALUE , TimeUnit.DAYS );
+			log.info( "all tasks executed." );
+
+			log.info( "Wait for writer thread to finish." );
 			runnable.doRun = false;
 			writerThread.join();
 			log.info( "done with conversion" );
@@ -116,9 +133,12 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 		@Override
 		public void run() {
 			try {
+				log.info( "Writing thread started");
 				while ( doRun || !queue.isEmpty() ) {
-					writer.write(queue.take());
+					final ChoiceSet<T> elem = queue.poll( 1 , TimeUnit.SECONDS );
+					if ( elem != null ) writer.write( elem );
 				}
+				log.info( "Writing thread completed");
 			}
 			catch (InterruptedException e) {
 				throw new RuntimeException( e );

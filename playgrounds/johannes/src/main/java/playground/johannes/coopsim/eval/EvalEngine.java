@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
+import org.matsim.api.core.v01.Id;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 
 /**

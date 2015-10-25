@@ -19,10 +19,10 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes

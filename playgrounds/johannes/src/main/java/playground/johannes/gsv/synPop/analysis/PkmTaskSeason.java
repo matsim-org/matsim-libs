@@ -20,7 +20,10 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 

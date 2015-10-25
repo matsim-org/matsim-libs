@@ -22,7 +22,6 @@ import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.Simulator;
-import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 
 /**
@@ -118,8 +117,8 @@ class RoadInvestmentMain {
 
 		System.out.println("STARTED ...");
 
-		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
-				0.0, 0.0, 0.0, 0.95, 1.0);
+//		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
+//				0.0, 0.0, 0.0, 0.95, 1.0);
 
 		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
 		config.controler()
@@ -174,7 +173,9 @@ class RoadInvestmentMain {
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10;
 		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>(system, randomizer,
-				convergenceCriterion, selfTuner, maxIterations, maxTransitions,
+				convergenceCriterion, 
+				//selfTuner, 
+				maxIterations, maxTransitions,
 				populationSize, MatsimRandom.getRandom(), interpolate,
 				keepBestSolution, objectiveFunction, maxMemoryLength);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
