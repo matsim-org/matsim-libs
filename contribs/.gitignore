@@ -15,3 +15,6 @@ signals/**/*.aux
 signals/**/*.log
 signals/**/*.toc
 signals/**/*.out
+signals/**/*.bbl
+signals/**/*.blg
+signals/**/*.bak
