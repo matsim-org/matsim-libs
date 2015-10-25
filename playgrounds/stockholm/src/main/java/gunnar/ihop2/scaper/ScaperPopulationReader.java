@@ -5,6 +5,8 @@ import gunnar.ihop2.regent.demandreading.ShapeUtils;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
 
+import java.util.Iterator;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -62,12 +64,19 @@ class ScaperPopulationReader extends DefaultHandler {
 	static final String ZONE_ATTRIBUTE = "zone";
 
 	static final String ENDTIME_ATTRIBUTE = "end_time";
+	static final String ACTIVITY_DURATION = "act_dur";
 
 	// LEGS
 
 	static final String LEG_ELEMENT = "leg";
 
 	static final String MODE_ATTRIBUTE = "mode";
+	static final String HOME_ACTIVITY = "h";
+	static final String WORK_ACTIVITY = "w";
+	static final String SHOPPING_ACTIVITY = "s";
+	static final String LEISURE_ACTIVITY = "l";
+	static final String OTHER_ACTIVITY = "o";
+	static final String MODE_BICYCLE = "bicycle";
 
 	// -------------------- MEMBERS --------------------
 
@@ -141,8 +150,18 @@ class ScaperPopulationReader extends DefaultHandler {
 			final Activity act = this.scenario
 					.getPopulation()
 					.getFactory()
-					.createActivityFromCoord(attrs.getValue(TYPE_ATTRIBUTE),
-							coord);
+					.createActivityFromCoord(ScaperToMatsimDictionary.scaper2matsim.getOrDefault(attrs.getValue(TYPE_ATTRIBUTE), attrs.getValue(TYPE_ATTRIBUTE)),coord);
+//			Uncomment the following lines if you want to allocate starting time to the activities
+//			String activityduration = attrs.getValue(ACTIVITY_DURATION);
+//			if(activityduration.contains("E")){
+//				int activitydurationsecs = 60*(int) (Double.parseDouble(activityduration.substring(0,activityduration.indexOf('E')))
+//						*Math.pow(10, Double.parseDouble(activityduration.substring(activityduration.indexOf('+'),activityduration.length()))));
+//				act.setStartTime(Time.secFromStr(attrs.getValue(ENDTIME_ATTRIBUTE))-activitydurationsecs);
+//			}else{
+//				int activitydurationsecs = (int)(60*Double.parseDouble(activityduration));
+//				act.setStartTime(Time.secFromStr(attrs.getValue(ENDTIME_ATTRIBUTE))-activitydurationsecs);
+//			}
+			
 			act.setEndTime(Time.secFromStr(attrs.getValue(ENDTIME_ATTRIBUTE)));
 			this.plan.addActivity(act);
 
@@ -151,12 +170,20 @@ class ScaperPopulationReader extends DefaultHandler {
 			final String mode = attrs.getValue(MODE_ATTRIBUTE);
 			if (!"".equals(mode)) {
 				final Leg leg = this.scenario.getPopulation().getFactory()
-						.createLeg(mode);
+						.createLeg(ScaperToMatsimDictionary.scaper2matsim.getOrDefault(mode, mode));
 				this.plan.addLeg(leg);
 			}
 		}
 	}
-
+	public static void removeLastActivityEndTimes(final Scenario scenario){
+		Iterator iter = scenario.getPopulation().getPersons().values().iterator();
+		while(iter.hasNext()){
+			Person person = (Person)iter.next();
+			Activity activity = (Activity)person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
+			activity.setEndTime(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+//			System.out.println(activity.getType());
+		}
+	}
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTIN --------------------
 
 	public static void main(String[] args) {
@@ -164,7 +191,7 @@ class ScaperPopulationReader extends DefaultHandler {
 		System.out.println("STARTED ...");
 
 		final String zonesShapeFileName = "./data/shapes/sverige_TZ_EPSG3857.shp";
-		final String populationFileName = "./data/scaper/allind.xml";
+		final String populationFileName = "./data/scaper/151014_trips.xml";
 		final String plansFileName = "./data/scaper/initial_plans.xml";
 
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
@@ -177,7 +204,8 @@ class ScaperPopulationReader extends DefaultHandler {
 						StockholmTransformationFactory.WGS84_SWEREF99);
 		final ScaperPopulationReader reader = new ScaperPopulationReader(
 				scenario, zonalSystem, coordinateTransform, populationFileName);
-
+		//To remove the end times of last activity
+		removeLastActivityEndTimes(scenario);
 		PopulationWriter popwriter = new PopulationWriter(
 				scenario.getPopulation(), null);
 		popwriter.write(plansFileName);
