@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.flowDynamics;
+package playground.agarwalamit.mixedTraffic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,10 +61,9 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  */
 public class HolesInOTFVisTest {
 
-	private final boolean useOTFVis = true;
+	private static final boolean useOTFVis = true;
 	
-	@Test 
-	public void test(){
+	public static void main(String[] args) {
 
 		SimpleNetwork net = new SimpleNetwork();
 
