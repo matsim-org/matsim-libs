@@ -31,7 +31,7 @@ import java.util.*;
  */
 public class Predicates {
 
-    public static Map<String, ActTypePredicate> actTypePredicates(Collection<? extends Person> persons) {
+    public static Map<String, Predicate<Segment>> actTypePredicates(Collection<? extends Person> persons) {
         Set<String> acttypes = new HashSet<>();
 
         for(Person person : persons) {
@@ -44,11 +44,83 @@ public class Predicates {
             }
         }
 
-        Map<String, ActTypePredicate> predicates = new HashMap<>();
+        Map<String, Predicate<Segment>> predicates = new HashMap<>();
         for(String type : acttypes) {
             predicates.put(type, new ActTypePredicate(type));
         }
 
         return predicates;
+    }
+
+    public static Map<String, Predicate<Segment>> legPurposePredicates(Collection<? extends Person> persons) {
+        Map<String, Predicate<Segment>> actPredicates = actTypePredicates(persons);
+        Map<String, Predicate<Segment>> legPredicates = new HashMap<>();
+
+        for(Map.Entry<String, Predicate<Segment>> entry : actPredicates.entrySet()) {
+            legPredicates.put(entry.getKey(), new LegPurposePredicate(entry.getValue()));
+        }
+
+        return legPredicates;
+    }
+
+    public static Map<String, Predicate<Segment>> legModePredicates(Collection<? extends Person> persons) {
+        Set<String> modes = new HashSet<>();
+
+        for(Person person : persons) {
+            for(Episode episode : person.getEpisodes()) {
+                for(Segment leg : episode.getLegs()) {
+                    String mode = leg.getAttribute(CommonKeys.LEG_MODE);
+                    if(mode != null)
+                        modes.add(mode);
+                }
+            }
+        }
+
+        Map<String, Predicate<Segment>> predicates = new HashMap<>();
+        for(String mode : modes) {
+            predicates.put(mode, new ModePredicate(mode));
+        }
+
+        return predicates;
+    }
+
+    public static Map<String, Predicate<Segment>> legPredicates(Collection<? extends Person> persons) {
+        Map<String, Predicate<Segment>> actTypePredicates = legPurposePredicates(persons);
+        Map<String, Predicate<Segment>> legModePredicates = legModePredicates(persons);
+
+        actTypePredicates.put("all", TrueLegPredicate.getInstance());
+        legModePredicates.put("all", TrueLegPredicate.getInstance());
+
+        Map<String, Predicate<Segment>> predicates = new HashMap<>();
+
+        for(Map.Entry<String, Predicate<Segment>> modeEntry : legModePredicates.entrySet()) {
+            for(Map.Entry<String, Predicate<Segment>> actEntry : actTypePredicates.entrySet()) {
+                LegPurposePredicate purposePredicate = new LegPurposePredicate(actEntry.getValue());
+
+                PredicateAndComposite<Segment> composite = new PredicateAndComposite<>();
+                composite.addComponent(modeEntry.getValue());
+                composite.addComponent(purposePredicate);
+
+                predicates.put(String.format("%s.%s", modeEntry.getKey(), actEntry.getKey()), composite);
+            }
+
+        }
+
+        return predicates;
+    }
+
+    public static class TrueLegPredicate implements Predicate<Segment> {
+
+        private static TrueLegPredicate instance;
+
+        public static TrueLegPredicate getInstance() {
+            if(instance == null) instance = new TrueLegPredicate();
+            return instance;
+        }
+
+        @Override
+        public boolean test(Segment segment) {
+            return true;
+        }
     }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
-
+import playground.johannes.gsv.popsim.Predicate;
+import playground.johannes.gsv.popsim.Predicates;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class LegPurposePredicate implements Predicate<Segment> {
+public class LegAttributeAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
 
-    private final Predicate<Segment> actTypePredicate;
+    private final String attKey;
 
-    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
-        this.actTypePredicate = actTypePredicate;
+    public LegAttributeAnalyzer(String attKey) {
+        this.attKey = attKey;
     }
 
     @Override
-    public boolean test(Segment segment) {
-        return actTypePredicate.test(segment.next());
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
+        Map<String, Predicate<Segment>> predicates = Predicates.legPredicates(persons);
+
+
     }
 }
