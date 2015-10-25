@@ -22,14 +22,14 @@
  */
 package playground.johannes.gsv.demand.loader;
 
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.tasks.PlanDepartureTime;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
-
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.tasks.PlanDepartureTime;
 
 /**
  * @author johannes

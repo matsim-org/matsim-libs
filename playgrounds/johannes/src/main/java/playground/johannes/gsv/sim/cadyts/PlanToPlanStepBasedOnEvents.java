@@ -20,9 +20,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.demand.PlanBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
-import cadyts.demand.PlanBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {

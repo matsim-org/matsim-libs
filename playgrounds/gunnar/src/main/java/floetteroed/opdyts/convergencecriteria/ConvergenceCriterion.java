@@ -44,7 +44,7 @@ public interface ConvergenceCriterion {
 	 * @param transitionSequence
 	 *            convergence is evaluated for this sequence
 	 */
-	public void evaluate(final TransitionSequence transitionSequence);
+	public void evaluate(final TransitionSequence<?> transitionSequence);
 
 	/**
 	 * @return if the most recently evaluated TransitionSequence is converged

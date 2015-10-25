@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;

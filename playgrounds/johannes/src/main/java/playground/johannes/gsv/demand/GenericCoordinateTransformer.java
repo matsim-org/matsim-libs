@@ -22,19 +22,14 @@
  */
 package playground.johannes.gsv.demand;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.geotools.referencing.CRS;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import playground.johannes.sna.gis.CRSUtils;
+import java.io.*;
 
 /**
  * @author johannes

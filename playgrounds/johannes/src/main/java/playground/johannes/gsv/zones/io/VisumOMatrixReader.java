@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.zones.io;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
-import playground.johannes.gsv.zones.KeyMatrix;
 
 /**
  * @author johannes

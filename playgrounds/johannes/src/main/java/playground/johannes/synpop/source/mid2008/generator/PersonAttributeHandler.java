@@ -20,7 +20,6 @@
 package playground.johannes.synpop.source.mid2008.generator;
 
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Map;
 

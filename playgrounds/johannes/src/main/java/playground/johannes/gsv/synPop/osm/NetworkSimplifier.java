@@ -20,11 +20,6 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +34,11 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Simplifies a given network, by merging links.

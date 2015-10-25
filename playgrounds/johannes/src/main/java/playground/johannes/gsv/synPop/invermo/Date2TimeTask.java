@@ -21,11 +21,11 @@ package playground.johannes.gsv.synPop.invermo;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.Episode;
 
 import java.util.Locale;
 

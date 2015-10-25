@@ -1,8 +1,5 @@
 package gunnar.ihop2.regent.demandreading;
 
-import static gunnar.ihop2.regent.demandreading.PopulationCreator.APARTMENT;
-import static gunnar.ihop2.regent.demandreading.PopulationCreator.VILLA;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +21,12 @@ import floetteroed.utilities.math.MathHelpers;
  *
  */
 public class Zone {
+
+	// -------------------- CONSTANTS --------------------
+
+	private static final String VILLA = "villa";
+
+	private static final String APARTMENT = "apartment";
 
 	// -------------------- MEMBERS --------------------
 
