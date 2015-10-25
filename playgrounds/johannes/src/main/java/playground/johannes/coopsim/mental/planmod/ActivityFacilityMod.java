@@ -29,7 +29,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.utils.LegRouter;
+import playground.johannes.coopsim.utils.LegRouter;
 
 /**
  * @author illenberger

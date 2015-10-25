@@ -30,9 +30,9 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.data.*;
 
 import java.io.IOException;

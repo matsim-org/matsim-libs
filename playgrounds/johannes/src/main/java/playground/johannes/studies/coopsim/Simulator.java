@@ -65,8 +65,8 @@ import playground.johannes.coopsim.mental.choice.*;
 import playground.johannes.coopsim.mental.planmod.*;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
+import playground.johannes.coopsim.utils.NetworkLegRouter;
 import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
-import playground.johannes.utils.NetworkLegRouter;
 
 import java.io.File;
 import java.io.IOException;

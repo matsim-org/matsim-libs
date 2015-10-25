@@ -39,13 +39,13 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 
 import java.util.*;

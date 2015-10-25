@@ -29,8 +29,8 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLReader;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledGraphProjectionBuilder;
-import playground.johannes.studies.ivt2009.util.KMLSampledComponents;
-import playground.johannes.studies.ivt2009.util.KMLSnowballDescriptor;
+import playground.johannes.studies.sbsurvey.io.KMLSampledComponents;
+import playground.johannes.studies.sbsurvey.io.KMLSnowballDescriptor;
 import playground.johannes.studies.sbsurvey.io.KMLVertexId;
 import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 

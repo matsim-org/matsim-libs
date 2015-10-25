@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.gis.CRSUtils;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,6 +40,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

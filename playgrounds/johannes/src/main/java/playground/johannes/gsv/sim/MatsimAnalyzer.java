@@ -34,7 +34,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.analysis.PkmGeoTask;
-import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
+import playground.johannes.studies.mz2005.analysis.TrajectoryPlanBuilder;
 
 import java.io.IOException;
 import java.util.HashSet;

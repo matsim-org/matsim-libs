@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.gis.CRSUtils;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -48,6 +47,7 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.*;
 import java.util.HashMap;

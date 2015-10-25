@@ -26,10 +26,10 @@ import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.*;
 import java.util.*;

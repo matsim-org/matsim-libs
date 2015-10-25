@@ -21,8 +21,8 @@ package playground.johannes.gsv.synPop.mid.sim;
 
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;

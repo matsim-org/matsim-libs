@@ -29,7 +29,6 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -37,6 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.io.IOException;

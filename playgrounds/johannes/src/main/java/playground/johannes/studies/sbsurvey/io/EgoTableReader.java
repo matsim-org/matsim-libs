@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
-import playground.johannes.studies.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.sbsurvey.util.GoogleGeoCoder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

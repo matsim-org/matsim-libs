@@ -25,10 +25,10 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CRSUtils;
-import org.matsim.contrib.socnetgen.util.MatsimCoordUtils;
 import org.matsim.facilities.*;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.util.Collection;
 
