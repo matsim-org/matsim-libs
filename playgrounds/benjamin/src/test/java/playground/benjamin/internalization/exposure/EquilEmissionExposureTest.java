@@ -111,7 +111,7 @@ public class EquilEmissionExposureTest {
 	private boolean isUsingDetailedEmissionCalculation = true;
 	private String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
 	private String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
-	private DecimalFormat df = new DecimalFormat("#.#####");
+	private DecimalFormat df = new DecimalFormat("#.###");
 
 	private boolean isConsideringCO2Costs ;
 
