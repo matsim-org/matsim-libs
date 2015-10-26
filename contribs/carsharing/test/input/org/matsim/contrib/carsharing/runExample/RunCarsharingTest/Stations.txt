@@ -1,7 +1,7 @@
-Ort	Standort	PLZ	Stao-Nr.	Kanton	GeoX	GeoY	North	East	Fahrzeuge
-1505	Bahnhof	-375	0	47.31194	8.52438	1
-1504	Gr?ner Stieg	0	375	47.30806	8.51782	1
-3019	Bahnhof / Seewadelstrasse	0	-375	47.27747	8.44702	1
-1506	Bahnhof	-375	0	47.31194	8.52438	1
-1503	Gr?ner Stieg	0	375	47.30806	8.51782	1
-3023	Bahnhof / Seewadelstrasse	1000	-375	47.27747	8.44702	1
+Ort	Standort	PLZ	Stao-Nr.	Kanton	GeoX	GeoY	North	East	Fahrzeuge	Frei Parkplatze(Only relevant for one-way carsharing)
+1505	Bahnhof	-375	0	47.31194	8.52438	1	1
+1504	Gr?ner Stieg	0	375	47.30806	8.51782	1	1
+3019	Bahnhof / Seewadelstrasse	0	-375	47.27747	8.44702	1	1
+1506	Bahnhof	-375	0	47.31194	8.52438	1	1
+1503	Gr?ner Stieg	0	375	47.30806	8.51782	1	1
+3023	Bahnhof / Seewadelstrasse	1000	-375	47.27747	8.44702	1	1

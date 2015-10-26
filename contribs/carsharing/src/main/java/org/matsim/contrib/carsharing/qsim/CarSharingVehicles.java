@@ -3,7 +3,9 @@ package org.matsim.contrib.carsharing.qsim;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -24,7 +26,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 
 public class CarSharingVehicles {
-	
+	private static final Logger log = Logger.getLogger(CarSharingVehicles.class);
+
 	private Scenario scenario;
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;
 	private OneWayCarsharingVehicleLocation owvehiclesLocation;
@@ -71,6 +74,8 @@ public class CarSharingVehicles {
 		    s = reader.readLine();
 		    int i = 1;
 		    ArrayList<FreeFloatingStation> ffStations = new ArrayList<FreeFloatingStation>();
+		    HashMap<Link, FreeFloatingStation> stationToLinkMap = new HashMap<Link, FreeFloatingStation>();
+
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
@@ -84,9 +89,36 @@ public class CarSharingVehicles {
 		    		i++;
 		    	}
 		    	
-		    	FreeFloatingStation f = new FreeFloatingStation(l, Integer.parseInt(arr[6]), vehIDs);
-		    	
-		    	ffStations.add(f);
+		    	if (stationToLinkMap.containsKey(l)) {
+		    		
+		    		FreeFloatingStation oldStation = stationToLinkMap.get(l);
+		    		
+		    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+
+		    		ArrayList<String> oldVehIDs = oldStation.getIDs();
+		    		ArrayList<String> newvehIDs = new ArrayList<String>();
+					for (String id : oldVehIDs) {
+						newvehIDs.add(id);
+					}
+					newvehIDs.addAll(vehIDs);
+					FreeFloatingStation newStation = new FreeFloatingStation(l, Integer.parseInt(arr[6]) + oldStation.getNumberOfVehicles(),
+			    			newvehIDs);
+			    	
+					ffStations.remove(oldStation);
+			    	stationToLinkMap.replace(l, newStation);
+			    	ffStations.add(newStation);
+					
+		    	}
+		    	else {
+		    		
+		    		FreeFloatingStation newStation = new FreeFloatingStation(l, Integer.parseInt(arr[6]) ,
+		    				vehIDs);
+			    	
+			    	stationToLinkMap.put(l, newStation);
+			    	ffStations.add(newStation);
+		    		
+		    		
+		    	}
 		    	s = reader.readLine();
 		    	
 		    }	
@@ -100,6 +132,7 @@ public class CarSharingVehicles {
 		    s = reader.readLine();
 		    int i = 1;
 		    ArrayList<OneWayCarsharingStation> owStations = new ArrayList<OneWayCarsharingStation>();
+		    HashMap<Link, OneWayCarsharingStation> stationToLinkMap = new HashMap<Link, OneWayCarsharingStation>();
 
 		    while(s != null) {
 		    	
@@ -113,10 +146,37 @@ public class CarSharingVehicles {
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-		    	//add parking spaces
-		    	OneWayCarsharingStation f = new OneWayCarsharingStation(l, Integer.parseInt(arr[6]), vehIDs, Integer.parseInt(arr[6]) * 2);
-		    	
-		    	owStations.add(f);
+
+		    	if (stationToLinkMap.containsKey(l)) {
+		    		
+		    		OneWayCarsharingStation oldStation = stationToLinkMap.get(l);
+		    		
+		    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+
+		    		ArrayList<String> oldVehIDs = oldStation.getIDs();
+		    		ArrayList<String> newvehIDs = new ArrayList<String>();
+					for (String id : oldVehIDs) {
+						newvehIDs.add(id);
+					}
+					newvehIDs.addAll(vehIDs);
+					OneWayCarsharingStation newStation = new OneWayCarsharingStation(l, Integer.parseInt(arr[6]) + oldStation.getNumberOfVehicles(),
+			    			newvehIDs, oldStation.getNumberOfAvailableParkingSpaces() + Integer.parseInt(arr[7]));
+			    	
+					owStations.remove(oldStation);
+			    	stationToLinkMap.replace(l, newStation);
+			    	owStations.add(newStation);
+					
+		    	}
+		    	else {
+		    		
+		    		OneWayCarsharingStation newStation = new OneWayCarsharingStation(l, Integer.parseInt(arr[6]) ,
+		    				vehIDs, Integer.parseInt(arr[7]));
+			    	
+			    	stationToLinkMap.put(l, newStation);
+			    	owStations.add(newStation);
+		    		
+		    		
+		    	}
 		    	s = reader.readLine();
 		    	
 		    }	
@@ -128,7 +188,7 @@ public class CarSharingVehicles {
 		    s = reader.readLine();
 		    int i = 1;
 		    ArrayList<TwoWayCarsharingStation> twStations = new ArrayList<TwoWayCarsharingStation>();
-
+		    HashMap<Link, TwoWayCarsharingStation> stationToLinkMap = new HashMap<Link, TwoWayCarsharingStation>();
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
@@ -141,9 +201,38 @@ public class CarSharingVehicles {
 		    		vehIDs.add(Integer.toString(i));
 		    		i++;
 		    	}
-		    	TwoWayCarsharingStation f = new TwoWayCarsharingStation(l, Integer.parseInt(arr[6]), vehIDs);
 		    	
-				twStations.add(f);
+		    	if (stationToLinkMap.containsKey(l)) {
+		    		
+		    		TwoWayCarsharingStation oldStation = stationToLinkMap.get(l);
+		    		
+		    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+
+		    		ArrayList<String> oldVehIDs = oldStation.getIDs();
+		    		ArrayList<String> newvehIDs = new ArrayList<String>();
+					for (String id : oldVehIDs) {
+						newvehIDs.add(id);
+					}
+					newvehIDs.addAll(vehIDs);
+			    	TwoWayCarsharingStation newStation = new TwoWayCarsharingStation(l, Integer.parseInt(arr[6]) + oldStation.getNumberOfVehicles(),
+			    			newvehIDs);
+			    	
+			    	twStations.remove(oldStation);
+			    	stationToLinkMap.replace(l, newStation);
+			    	twStations.add(newStation);
+					
+		    	}
+		    	else {
+		    		
+		    		TwoWayCarsharingStation newStation = new TwoWayCarsharingStation(l, Integer.parseInt(arr[6]) ,
+		    				vehIDs);
+			    	
+			    	stationToLinkMap.put(l, newStation);
+			    	twStations.add(newStation);
+		    		
+		    		
+		    	}
+		    	
 		    	s = reader.readLine();
 		    	
 		    }
