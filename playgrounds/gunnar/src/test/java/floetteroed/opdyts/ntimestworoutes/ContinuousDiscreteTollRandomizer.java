@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 
 /**
@@ -13,8 +12,9 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
  * @author Gunnar Flötteröd
  *
  */
-public class ContinuousDiscreteTollRandomizer implements
-		DecisionVariableRandomizer {
+public class ContinuousDiscreteTollRandomizer
+		implements
+		DecisionVariableRandomizer<NTimesTwoRoutesDecisionVariableMixedDiscrCont> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -70,9 +70,10 @@ public class ContinuousDiscreteTollRandomizer implements
 
 	@Override
 	public NTimesTwoRoutesDecisionVariableMixedDiscrCont newRandomVariation(
-			final DecisionVariable parent) {
+			final NTimesTwoRoutesDecisionVariableMixedDiscrCont myParent) {
 
-		final NTimesTwoRoutesDecisionVariableMixedDiscrCont myParent = (NTimesTwoRoutesDecisionVariableMixedDiscrCont) parent;
+		// final NTimesTwoRoutesDecisionVariableMixedDiscrCont myParent =
+		// (NTimesTwoRoutesDecisionVariableMixedDiscrCont) parent;
 
 		// randomize all toll values; the may become negative
 		final List<Integer> newTollIndices = new ArrayList<Integer>();

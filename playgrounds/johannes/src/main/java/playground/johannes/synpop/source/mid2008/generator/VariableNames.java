@@ -62,4 +62,14 @@ public interface VariableNames {
     String LEG_END_TIME_MIN = "en_min";
     String START_NEXT_DAY = "st_dat";
     String END_NEXT_DAY = "en_dat";
+
+    String JOURNEY_DISTANCE = "p1016";
+
+    String JOURNEY_MODE = "hvm_r";
+
+    String JOURNEY_PURPOSE = "p101";
+
+    String JOURNEY_NIGHTS = "p1014";
+
+    String JOURNEY_DESTINATION = "p1012";
 }

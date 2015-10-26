@@ -22,18 +22,18 @@
  */
 package playground.johannes.gsv.demand.loader;
 
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.NutsLevel3Zones;
+import playground.johannes.gsv.demand.tasks.PersonGender;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.NutsLevel3Zones;
-import playground.johannes.gsv.demand.tasks.PersonGender;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
 
 /**

@@ -16,10 +16,10 @@ public class PopulationSampler {
 
 		System.out.println("STARTED ...");
 
-		final String fromFile = "./data/synthetic_population/150911_trips.xml";
-		final double fraction = 0.02;
-		final String toFile = "./data/synthetic_population/150911_trips_"
-				+ fraction + ".xml";
+		final String prefix = "./test/regentmatsim/exchange/151023_trips";
+		final String fromFile = prefix + ".xml";
+		final double fraction = 0.01;
+		final String toFile = prefix + "_" + +fraction + ".xml";
 
 		final ObjectAttributes all = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(

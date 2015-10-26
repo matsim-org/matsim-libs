@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -71,7 +72,6 @@ import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
 import playground.johannes.gsv.sim.cadyts.ODAdjustorListener;
 import playground.johannes.gsv.synPop.Proxy2Matsim;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.io.IOException;
 import java.util.ArrayList;

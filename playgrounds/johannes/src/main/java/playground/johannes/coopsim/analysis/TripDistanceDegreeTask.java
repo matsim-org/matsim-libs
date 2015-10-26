@@ -26,12 +26,12 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.HashSet;

@@ -19,16 +19,15 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.data.CommonValues;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes

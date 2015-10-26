@@ -22,14 +22,13 @@ package playground.johannes.synpop.source.mid2008.run;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.processing.IsolateEpisodes;
-import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.processing.IsolateEpisodes;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.generator.*;
 
 import java.io.IOException;
@@ -83,6 +82,13 @@ public class Generator {
         fileReader.addLegAttributeHandler(new LegOriginHandler());
         fileReader.addLegAttributeHandler(new LegModeHandler());
         fileReader.addLegAttributeHandler(new LegIndexHandler());
+
+        fileReader.addJourneyAttributeHandler(new JourneyDistanceHandler());
+        fileReader.addJourneyAttributeHandler(new JourneyModeHandler());
+        fileReader.addJourneyAttributeHandler(new JourneyPurposeHandler());
+        fileReader.addJourneyAttributeHandler(new JourneyDestinationHandler());
+
+        fileReader.addEpisodeAttributeHandler(new JourneyDaysHandler());
 
         logger.info("Generating persons...");
         Set<PlainPerson> persons = (Set<PlainPerson>)fileReader.read(personsFile, tripsFile, journeysFile);

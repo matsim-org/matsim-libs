@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -362,16 +361,17 @@ public class MATSimDummy {
 					StockholmTransformationFactory.WGS84_EPSG3857,
 					populationFileName);
 			populationCreator.setBuildingsFileName(buildingShapeFileName);
-			// pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
-			// pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
-			// pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
 			populationCreator
 					.setPopulationSampleFactor(matsimPopulationSubSample);
 			final ObjectAttributes linkAttributes = new ObjectAttributes();
 			final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 					linkAttributes);
 			reader.parse(linkAttributeFileName);
-			populationCreator.setLinkAttributes(linkAttributes);
+			Logger.getLogger(MATSimDummy.class.getName())
+					.warning(
+							"Commented out call to "
+									+ "populationCreator.setLinkAttributes(linkAttributes)");
+			// populationCreator.setLinkAttributes(linkAttributes);
 			try {
 				populationCreator.run(initialPlansFileName);
 			} catch (FileNotFoundException e1) {
@@ -419,38 +419,10 @@ public class MATSimDummy {
 					StockholmTransformationFactory.WGS84_EPSG3857);
 			zonalSystem.addNetwork(controler.getScenario().getNetwork(),
 					StockholmTransformationFactory.WGS84_SWEREF99);
-			// final String lastIteration = matsimConfig.getModule("controler")
-			// .getValue("lastIteration");
-			// final String eventsFileName = matsimConfig.getModule("controler")
-			// .getValue("outputDirectory")
-			// + "ITERS/it."
-			// + lastIteration
-			// + "/" + lastIteration + ".events.xml.gz";
-
-			// final int ttCalcTimeBinSize = 15 * 60;
-			// final int ttCalcEndTime = 24 * 3600 - 1; // one sec before
-			// midnight
-			// final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
-			// controler.getScenario().getNetwork(), ttCalcTimeBinSize,
-			// ttCalcEndTime, controler.getScenario().getConfig()
-			// .travelTimeCalculator());
-			// Logger.getLogger(TourTravelTimes.class.getName()).info(
-			// "number of time bins in matsim tt calc: "
-			// + ttcalc.getNumSlots());
-			// Logger.getLogger(TourTravelTimes.class.getName()).info(
-			// "time bin size in matsim tt calc: " + ttcalc.getTimeSlice()
-			// + " seconds");
-			// final EventsManager events = EventsUtils.createEventsManager();
-			// events.addHandler(ttcalc);
-			// final MatsimEventsReader eventsReader = new MatsimEventsReader(
-			// events);
-			// eventsReader.readFile(eventsFileName);
-			// final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
-
-			final TravelTime linkTTs = controler.getLinkTravelTimes();
 
 			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-					controler.getScenario().getNetwork(), linkTTs,
+					controler.getScenario().getNetwork(),
+					controler.getLinkTravelTimes(),
 					new LinkedHashSet<>(zoneIDs), zonalSystem, rnd,
 					analysisStartTime_s, analysisBinSize_s, analysisBinCnt,
 					nodeSampleSize);
@@ -458,6 +430,7 @@ public class MATSimDummy {
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"Computing tour travel times ...");
 
+			// TODO make sure the population uses the experienced travel times.
 			final TourTravelTimes tourTravelTimes = new TourTravelTimes(
 					controler.getScenario(), travelTimeMatrices);
 			tourTravelTimes.writeTourTravelTimesToFile(traveltimesFileName);
