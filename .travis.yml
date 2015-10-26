@@ -5,3 +5,5 @@ script:
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"
+
+# seems that "mvn install" is always run, indep of what is said under "script:". kai based on mz, oct'15
